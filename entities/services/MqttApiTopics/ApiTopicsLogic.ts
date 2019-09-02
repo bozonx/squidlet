@@ -13,6 +13,12 @@ type DeviceStateType = 'status' | 'config';
 type OutcomeHandler = (topic: string, data: string) => void;
 
 const topicTypes = ['device', 'api'];
+const allowedApiMethodsToCall = [
+  'setDeviceConfig',
+  'switchToIoServer',
+  'publishWholeState',
+  'reboot',
+];
 export const TOPIC_TYPE_SEPARATOR = '|';
 export const TOPIC_SEPARATOR = '/';
 
@@ -94,28 +100,25 @@ export default class ApiTopicsLogic {
     }
   }
 
-  private async callApi(methodName: string, data: string) {
+  private async callApi(methodName: string, data: string): Promise<void> {
+    if (allowedApiMethodsToCall.includes(methodName)) {
+      return this.context.log.warn(`Restricted or unsupported api method has been called "${methodName}"`);
+    }
+
+    this.context.log.debug(`ApiTopicsLogic income call api method "${methodName}": ${data}`);
+
     const args: JsonTypes[] = this.parseArgs(data);
 
-    // TODO: call any api's method
-
-    switch (methodName) {
-      case 'publishWholeState':
-        await this.publishWholeState();
-        break;
-      // case 'blockIo':
-      //   await this.system.api.blockIo(args[0] as boolean);
-      //   break;
-    }
+    (this.context.system.api as any)[methodName](...args);
   }
 
   private async callDeviceAction(deviceId: string, actionName?: string, data?: string) {
     if (!actionName) {
-      throw new Error(`MqttApiTopics.callDeviceAction: no actionName: "${deviceId}"`);
+      throw new Error(`ApiTopicsLogic.callDeviceAction: no actionName: "${deviceId}"`);
     }
 
     // income string-type api message - call device action
-    this.context.log.info(`MqttApiTopics income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${JSON.stringify(data)}`);
+    this.context.log.debug(`ApiTopicsLogic income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${data}`);
 
     const args: JsonTypes[] = this.parseArgs(data);
 
@@ -182,12 +185,8 @@ export default class ApiTopicsLogic {
   private emitOutcomeMsg(topicType: TopicType, topicBody: string, data: string) {
     const topic = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
 
-    this.context.log.info(`MqttApiTopics outcome: ${topic} - ${JSON.stringify(data)}`);
+    this.context.log.debug(`ApiTopicsLogic outcome: ${topic} - ${JSON.stringify(data)}`);
     this.outcomeEvents.emit(topic, data);
-  }
-
-  private publishWholeState() {
-    // TODO: publish all the states of all the devices etc
   }
 
 }

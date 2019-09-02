@@ -108,8 +108,6 @@ export default class WsClientLogic {
   async send(data: string | Uint8Array): Promise<void> {
     await this.connectedPromise;
 
-    console.log(555555555)
-
     return this.wsClientIo.send(this.connectionId, data);
   }
 

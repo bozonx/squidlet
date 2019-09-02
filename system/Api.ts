@@ -21,6 +21,8 @@ export default class Api {
   callDeviceAction(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
     const device = this.context.system.devicesManager.getDevice(deviceId);
 
+    this.context.log.info(`Api: called device's ${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
+
     return device.action(actionName, ...args);
   }
 
@@ -119,13 +121,17 @@ export default class Api {
     });
   }
 
-  async switchToIoServer() {
+  switchToIoServer() {
     if (!this.context.config.ioServer) {
       throw new Error(`Switching to IO-server isn't allowed it config`);
     }
 
     this.context.log.info(`Switching to IO server`);
     this.context.system.shutdownRequest('switchToIoServer');
+  }
+
+  publishWholeState() {
+    // TODO: publish all the states of all the devices etc
   }
 
   async reboot() {

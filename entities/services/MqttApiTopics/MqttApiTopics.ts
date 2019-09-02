@@ -73,7 +73,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
     const devicesActionsTopics: string[] = this.getDevicesActionTopics();
 
     for (let topic of devicesActionsTopics) {
-      this.log.info(`MQTT subscribe: ${topic}`);
+      this.log.debug(`MQTT subscribe: ${topic}`);
 
       await this.mqtt.subscribe(topic);
     }

@@ -114,7 +114,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
    * Call action and return it's result.
    */
   async action(actionName: string, ...params: any[]): Promise<JsonTypes> {
-    if (!this.actions[actionName]) throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
+    if (!this.actions[actionName]) {
+      throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
+    }
 
     let result: any;
 
