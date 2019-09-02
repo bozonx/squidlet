@@ -101,7 +101,7 @@ export default class ApiTopicsLogic {
   }
 
   private async callApi(methodName: string, data: string): Promise<void> {
-    if (allowedApiMethodsToCall.includes(methodName)) {
+    if (!allowedApiMethodsToCall.includes(methodName)) {
       return this.context.log.warn(`Restricted or unsupported api method has been called "${methodName}"`);
     }
 

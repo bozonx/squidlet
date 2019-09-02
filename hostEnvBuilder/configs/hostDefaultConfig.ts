@@ -2,7 +2,6 @@ import {HostConfigConfig} from '../../system/interfaces/HostConfig';
 
 
 const config: HostConfigConfig = {
-  //logLevel: 'info',
   //defaultStatusRepublishIntervalMs: 60000,
   //defaultConfigRepublishIntervalMs: 600000,
   // timeout in seconds to send a request. It resend on failure or brake connection if timout is finished.

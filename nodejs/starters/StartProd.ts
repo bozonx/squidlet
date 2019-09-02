@@ -12,6 +12,7 @@ import SystemStarter from './SystemStarter';
 import {isEmptyObject} from '../../system/lib/objects';
 import IoSetLocal from '../../system/IoSetLocal';
 import IoSet from '../../system/interfaces/IoSet';
+import LogLevel from '../../system/interfaces/LogLevel';
 
 
 export default class StartProd {
@@ -29,6 +30,7 @@ export default class StartProd {
   constructor(
     configPath: string,
     argForce?: boolean,
+    argLogLevel?: LogLevel,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -40,6 +42,7 @@ export default class StartProd {
       this.os,
       this.groupConfig,
       argForce,
+      argLogLevel,
       argMachine,
       argHostName,
       argWorkDir,

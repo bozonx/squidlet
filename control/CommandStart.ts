@@ -1,6 +1,7 @@
 import StartDevelop from '../nodejs/starters/StartDevelop';
 import StartProd from '../nodejs/starters/StartProd';
 import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
+import LogLevel from '../system/interfaces/LogLevel';
 
 
 interface CommandStartArgs {
@@ -9,6 +10,7 @@ interface CommandStartArgs {
   name?: string;
   prod?: boolean;
   force?: boolean;
+  logLevel?: LogLevel;
   user?: string;
   group?: string;
   ioset?: string;
@@ -36,6 +38,7 @@ export default class CommandStart {
       const starter = new StartProd(
         this.configPath,
         this.args.force,
+        this.args.logLevel,
         this.args.machine as any,
         this.args.name,
         this.args.workDir,
@@ -53,6 +56,7 @@ export default class CommandStart {
     const starter = new StartDevelop(
       this.configPath,
       this.args.force,
+      this.args.logLevel,
       this.args.machine as any,
       this.args.name,
       this.args.workDir,
@@ -72,6 +76,7 @@ export default class CommandStart {
     const starter = new StartIoServerStandalone(
       this.configPath,
       this.args.force,
+      this.args.logLevel,
       this.args.machine as any,
       this.args.name,
       this.args.workDir,

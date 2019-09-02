@@ -11,6 +11,7 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 import SystemStarter from './SystemStarter';
 import {IoSetClass} from '../interfaces/IoSetClass';
+import LogLevel from '../../system/interfaces/LogLevel';
 
 
 export default class StartDevelop {
@@ -28,6 +29,7 @@ export default class StartDevelop {
   constructor(
     configPath: string,
     argForce?: boolean,
+    argLogLevel?: LogLevel,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -41,6 +43,7 @@ export default class StartDevelop {
       this.os,
       this.groupConfig,
       argForce,
+      argLogLevel,
       argMachine,
       argHostName,
       argWorkDir,

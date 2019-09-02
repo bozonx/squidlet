@@ -13,6 +13,7 @@ import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
 import {isKindOfNumber} from '../../system/lib/common';
+import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 
 
 export default class Props {
@@ -26,6 +27,7 @@ export default class Props {
   gid?: number;
   destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
+  readonly argLogLevel?: LogLevel;
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
   }
@@ -48,6 +50,7 @@ export default class Props {
     os: Os,
     groupConfig: GroupConfigParser,
     argForce?: boolean,
+    argLogLevel?: LogLevel,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -58,6 +61,7 @@ export default class Props {
     this.os = os;
     this.groupConfig = groupConfig;
     this.force = Boolean(argForce);
+    this.argLogLevel = argLogLevel;
     this.argMachine = argMachine;
     this.argHostName = argHostName;
     this.argWorkDir = argWorkDir;
@@ -72,7 +76,7 @@ export default class Props {
     this.uid = await this.resolveUser();
     this.gid = await this.resolveGroup();
 
-    //this.validate();
+    this.validate();
 
     this.hostId = this.hostConfig.id as any;
 
@@ -86,11 +90,15 @@ export default class Props {
   }
 
 
-  // private validate() {
-  //   if (this.platform !== this.hostConfig.platform) {
-  //     throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
-  //   }
-  // }
+  private validate() {
+    if (this.argLogLevel && !LOG_LEVELS.includes(this.argLogLevel)) {
+      throw new Error(`Invalid "log-level" param: ${this.argLogLevel}`);
+    }
+
+    // if (this.platform !== this.hostConfig.platform) {
+    //   throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
+    // }
+  }
 
   private async resolveMachine(): Promise<NodejsMachines> {
     if (this.argMachine) {

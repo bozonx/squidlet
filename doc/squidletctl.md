@@ -46,6 +46,7 @@ only first time or if `--force` parameter is set.
       [--work-dir]
       [--name]
       [--force=true]
+      [--log-level=debug|info|warn|error]
       [--user=username]
       [--group=groupname]
       ./groupOrHostConfig.yaml
@@ -57,6 +58,7 @@ only first time or if `--force` parameter is set.
       [--work-dir]
       [--name]
       [--force=true]
+      [--log-level=debug|info|warn|error]
       [--user=username]
       [--group=groupname]
       [--ioset=localhost:8089]
@@ -72,6 +74,7 @@ Config is optional, if it does not includes io definitions you don't have to spe
       [--work-dir]
       [--name]
       [--force=true]
+      [--log-level=debug|info|warn|error]
       [--user=username]
       [--group=groupname]
       [./groupOrHostConfig.yaml]
@@ -85,6 +88,7 @@ Config is optional, if it does not includes io definitions you don't have to spe
 * --name uses only if group config is specified
   and selects a host config from group config
 * --force - it runs `npm install` anyway
+* --log-level - log level which will be used. It overrides a log level specified in a host config.
 * --user - owner of files which will be written. It can be a user name or uid. It is optional
 * --group - group of files which will be written, It can be a group name or uid. It is optional
 * --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in config of remote host

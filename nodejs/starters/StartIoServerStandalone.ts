@@ -11,6 +11,7 @@ import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
+import LogLevel from '../../system/interfaces/LogLevel';
 
 
 export default class StartIoServerStandalone {
@@ -23,6 +24,7 @@ export default class StartIoServerStandalone {
   constructor(
     configPath?: string,
     argForce?: boolean,
+    argLogLevel?: LogLevel,
     argMachine?: NodejsMachines,
     argHostName?: string,
     argWorkDir?: string,
@@ -34,6 +36,7 @@ export default class StartIoServerStandalone {
       this.os,
       this.groupConfig,
       argForce,
+      argLogLevel,
       argMachine,
       argHostName,
       argWorkDir,
