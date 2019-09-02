@@ -30,10 +30,7 @@ export default class StartDevelop extends StartDevelopBase {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   protected async makeIoSet(): Promise<IoSet> {
-    const ioSet = new IoSetDevelopSrc(
-      this.os,
-      this.envBuilder,
-    );
+    const ioSet = new IoSetDevelopSrc(this.os, this.envBuilder);
 
     ioSet.prepare && await ioSet.prepare();
 

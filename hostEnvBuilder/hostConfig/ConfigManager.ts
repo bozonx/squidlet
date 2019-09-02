@@ -27,6 +27,8 @@ export default class ConfigManager {
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   dependencies?: {[index: string]: any};
+  readonly platform: Platforms;
+  readonly machine: string;
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
   }
@@ -34,8 +36,6 @@ export default class ConfigManager {
     return this._hostConfig as any;
   }
 
-  private readonly platform: Platforms;
-  private readonly machine: string;
   private readonly os: Os;
   private _hostConfig?: HostConfig;
   private _machineConfig?: MachineConfig;

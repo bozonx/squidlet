@@ -52,12 +52,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   protected async makeIoSet(): Promise<IoSet> {
     const {host, port} = this.parseIoSetString(this.argIoSet);
 
-    const ioSet = new IoSetDevelopRemote(
-      this.os,
-      this.envBuilder,
-      host,
-      port
-    );
+    const ioSet = new IoSetDevelopRemote(this.os, this.envBuilder, host, port);
 
     ioSet.prepare && await ioSet.prepare();
 
