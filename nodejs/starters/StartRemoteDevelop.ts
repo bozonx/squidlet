@@ -23,7 +23,8 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     argGroup?: string,
     argIoSet?: string,
   ) {
-    super(configPath, argForce, argLogLevel, argMachine, argHostName, argWorkDir, argUser, argGroup);
+    // not pass user and group to not set it to IoSet
+    super(configPath, argForce, argLogLevel, argMachine, argHostName, argWorkDir, undefined, undefined);
 
     if (!argIoSet) throw new Error(`ioset param is required`);
 
