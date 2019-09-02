@@ -59,6 +59,7 @@ export default class AppSwitcher {
     this.ioServer = new IoServer(
       this.ioSet,
       this.handleShutdownRequest,
+      console.log,
       console.info,
       consoleError
     );

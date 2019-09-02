@@ -26,6 +26,7 @@ export default class IoServer {
   private readonly ioSet: IoSet;
   private readonly shutdownRequest: ShutdownHandler;
   private hostConfig?: HostConfig;
+  private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;
@@ -41,11 +42,13 @@ export default class IoServer {
     // initialized ioSet
     ioSet: IoSet,
     shutdownRequestCb: ShutdownHandler,
+    logDebug: (msg: string) => void,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
     this.shutdownRequest = shutdownRequestCb;
+    this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
   }
@@ -105,6 +108,8 @@ export default class IoServer {
       return this.logError(`IoServer: Can't decode message: ${err}`);
     }
 
+    this.logDebug(`Income IO message: ${JSON.stringify(msg)}`);
+
     return this.remoteCall && this.remoteCall.incomeMessage(msg);
   }
 
@@ -120,9 +125,12 @@ export default class IoServer {
       return this.logError(err);
     }
 
+    this.logDebug(`Outcome IO message: ${JSON.stringify(message)}`);
+
     return this.wsServer.send(this.connectionId, binData);
   }
 
+  // TODO: remake to HttpApi
   private callIoApi = async (fullName: string, args: any[]): Promise<any> => {
     const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
 

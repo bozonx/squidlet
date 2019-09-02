@@ -81,6 +81,7 @@ export default class StartIoServerStandalone {
     const ioServer = new IoServer(
       this.ioSet,
       this.shutdownRequestCb,
+      console.log,
       console.info,
       consoleError
     );
