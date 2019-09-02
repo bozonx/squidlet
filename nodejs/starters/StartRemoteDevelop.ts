@@ -1,14 +1,6 @@
-import * as path from 'path';
-
-import Os from '../../shared/Os';
-import GroupConfigParser from '../../shared/GroupConfigParser';
-import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR} from '../../shared/constants';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {SYSTEM_DIR} from '../../shared/helpers';
-import SystemStarter from './SystemStarter';
 import LogLevel from '../../system/interfaces/LogLevel';
 import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartDevelopBase from './StartDevelopBase';
@@ -45,6 +37,10 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
   async start() {
     await super.start();
+
+    const ioSet: IoSet = await this.makeIoSet();
+
+    await this.systemStarter.start(SYSTEM_DIR, ioSet);
   }
 
   /**

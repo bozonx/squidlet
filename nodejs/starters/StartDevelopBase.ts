@@ -74,15 +74,6 @@ export default abstract class StartDevelopBase {
 
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
     await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
-    //
-    // // install node modules in local mode. And don't install in remote mode
-    // if (!this.isRemoteIoSet()) {
-    //   await this.installModules();
-    // }
-
-    const ioSet: IoSet = await this.makeIoSet();
-
-    await this.systemStarter.start(SYSTEM_DIR, ioSet);
   }
 
 
