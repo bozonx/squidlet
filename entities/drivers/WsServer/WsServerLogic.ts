@@ -89,11 +89,15 @@ export default class WsServerLogic {
    * Send message to client
    */
   send(connectionId: string, data: string | Uint8Array): Promise<void> {
+    this.logDebug(`WsServerLogic.send from ${this.props.host}:${this.props.port} to connection ${connectionId}, data length ${data.length}`);
+
     return this.wsServerIo.send(this.serverId, connectionId, data);
   }
 
   async setCookie(connectionId: string, cookie: string) {
     const data = `${SETCOOKIE_LABEL}${cookie}`;
+
+    this.logDebug(`WsServerLogic.setCookie from ${this.props.host}:${this.props.port} to connection ${connectionId}, ${data}`);
 
     return this.wsServerIo.send(this.serverId, connectionId, data);
   }
@@ -103,11 +107,13 @@ export default class WsServerLogic {
    * Close event will be risen
    */
   closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
+    this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} manually closes connection ${connectionId}`);
     // TODO: проверить будет ли поднято событие close ???
     return this.wsServerIo.close(this.serverId, connectionId, code, reason);
   }
 
   async destroyConnection(connectionId: string) {
+    this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} destroys connection ${connectionId}`);
     // TODO: может проще тут отписаться от события и выполнить просто close
     return this.wsServerIo.close(this.serverId, connectionId, WsCloseStatus.closeGoingAway, 'Destroy connection');
     //await this.wsServerIo.destroyConnection(this.serverId, connectionId);
@@ -148,6 +154,7 @@ export default class WsServerLogic {
     const listeningIndex: number = await this.wsServerIo.onServerListening(
       this.serverId,
       () => {
+        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} started listening`);
         clearTimeout(listeningTimeout);
         this._listeningPromised.resolve();
       }
@@ -155,12 +162,16 @@ export default class WsServerLogic {
     const connectionIndex: number = await this.wsServerIo.onConnection(
       this.serverId,
       (connectionId: string, request: ConnectionParams) => {
+        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
         this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
       }
     );
     const closeIndex: number = await this.wsServerIo.onServerClose(
       this.serverId,
-      () => this.onClose()
+      () => {
+        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} has been closed`);
+        this.onClose();
+      }
     );
     const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
 
@@ -174,12 +185,14 @@ export default class WsServerLogic {
     const closeIndex: number = await this.wsServerIo.onClose(
       this.serverId,
       (connectionId: string) => {
+        this.logDebug(`WsServerLogic connection ${connectionId} has been closed on server ${this.props.host}:${this.props.port} has been closed`);
         this.events.emit(WS_SERVER_EVENTS.closeConnection, connectionId);
       }
     );
     const messageIndex: number = await this.wsServerIo.onMessage(
       this.serverId,
       (connectionId: string, data: string | Uint8Array) => {
+        this.logDebug(`WsServerLogic income message on server ${this.props.host}:${this.props.port} has been closed, connection id ${connectionId}, data length ${data.length}`);
         this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
       }
     );

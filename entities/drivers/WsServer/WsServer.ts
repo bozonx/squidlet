@@ -29,6 +29,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
       this.wsServerIo,
       this.props,
       this.onServerClosed,
+      this.log.debug,
       this.log.info,
       this.log.error
     );

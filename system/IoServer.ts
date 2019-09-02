@@ -188,6 +188,7 @@ export default class IoServer {
       wsServerIo,
       props,
       this.handleClose,
+      this.logDebug,
       this.logInfo,
       this.logError,
     );
