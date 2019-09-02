@@ -4,6 +4,7 @@ import {SYSTEM_DIR} from '../../shared/helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
 import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartDevelopBase from './StartDevelopBase';
+import SystemStarter from './SystemStarter';
 
 
 export default class StartRemoteDevelop extends StartDevelopBase {
@@ -39,8 +40,9 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     await super.start();
 
     const ioSet: IoSet = await this.makeIoSet();
+    const systemStarter = new SystemStarter(this.os, this.props);
 
-    await this.systemStarter.start(SYSTEM_DIR, ioSet);
+    await systemStarter.start(SYSTEM_DIR, ioSet);
   }
 
   /**

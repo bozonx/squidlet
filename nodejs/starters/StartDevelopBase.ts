@@ -18,7 +18,6 @@ export default abstract class StartDevelopBase {
   protected  readonly os: Os = new Os();
   protected  readonly groupConfig: GroupConfigParser;
   protected  readonly props: Props;
-  protected  readonly systemStarter: SystemStarter;
   private _envBuilder?: EnvBuilder;
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
@@ -47,8 +46,6 @@ export default abstract class StartDevelopBase {
       argUser,
       argGroup,
     );
-    // TODO: review
-    this.systemStarter = new SystemStarter(this.os, this.props, this.isRemoteIoSet());
   }
 
   async init() {

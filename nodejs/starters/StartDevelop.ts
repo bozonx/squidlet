@@ -6,6 +6,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 import StartDevelopBase from './StartDevelopBase';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
+import SystemStarter from './SystemStarter';
 
 
 export default class StartDevelop extends StartDevelopBase {
@@ -23,8 +24,9 @@ export default class StartDevelop extends StartDevelopBase {
     await this.installModules();
 
     const ioSet: IoSet = await this.makeIoSet();
+    const systemStarter = new SystemStarter(this.os, this.props);
 
-    await this.systemStarter.start(SYSTEM_DIR, ioSet);
+    await systemStarter.start(SYSTEM_DIR, ioSet);
   }
 
 

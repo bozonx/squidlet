@@ -12,45 +12,16 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
 import LogLevel from '../../system/interfaces/LogLevel';
+import StartDevelopBase from './StartDevelopBase';
 
 
-export default class StartIoServerStandalone {
-  private readonly os: Os = new Os();
-  private readonly groupConfig: GroupConfigParser;
-  private readonly props: Props;
+export default class StartIoServerStandalone extends StartDevelopBase {
   private ioSet?: IoSet;
 
 
-  constructor(
-    configPath?: string,
-    argForce?: boolean,
-    argLogLevel?: LogLevel,
-    argMachine?: NodejsMachines,
-    argHostName?: string,
-    argWorkDir?: string,
-    argUser?: string,
-    argGroup?: string,
-  ) {
-    this.groupConfig = new GroupConfigParser(this.os, configPath);
-    this.props = new Props(
-      this.os,
-      this.groupConfig,
-      argForce,
-      argLogLevel,
-      argMachine,
-      argHostName,
-      argWorkDir,
-      argUser,
-      argGroup,
-    );
-  }
-
-
   async init() {
-    await this.groupConfig.init();
-    await this.props.resolve();
-    // load all the machine's io
-    this.ioSet = await this.makeIoSet();
+    // TODO: заменить host config в EnvBuilder
+    await super.init();
 
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
@@ -77,6 +48,9 @@ export default class StartIoServerStandalone {
 
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
     await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
+
+    // load all the machine's io
+    this.ioSet = await this.makeIoSet();
 
     // TODO: install like in dev mode
     //await this.installModules();

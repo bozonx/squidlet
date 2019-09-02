@@ -2,6 +2,7 @@ import StartDevelop from '../nodejs/starters/StartDevelop';
 import StartProd from '../nodejs/starters/StartProd';
 import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
 import LogLevel from '../system/interfaces/LogLevel';
+import StartRemoteDevelop from '../nodejs/starters/StartRemoteDevelop';
 
 
 interface CommandStartArgs {
@@ -53,6 +54,27 @@ export default class CommandStart {
     }
 
     // or run dev
+    // with remote io set
+    if (this.args.ioset) {
+      const starter = new StartRemoteDevelop(
+        this.configPath,
+        this.args.force,
+        this.args.logLevel,
+        this.args.machine as any,
+        this.args.name,
+        this.args.workDir,
+        this.args.user,
+        this.args.group,
+        this.args.ioset,
+      );
+
+      await starter.init();
+      await starter.start();
+
+      return;
+    }
+
+    // with local io set
     const starter = new StartDevelop(
       this.configPath,
       this.args.force,
@@ -62,7 +84,6 @@ export default class CommandStart {
       this.args.workDir,
       this.args.user,
       this.args.group,
-      this.args.ioset,
     );
 
     await starter.init();
