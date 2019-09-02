@@ -5,6 +5,7 @@ class SenderRequest {
   private readonly id: string;
   private readonly timeoutMs: number;
   private readonly resendTimeoutMs: number;
+  private readonly logDebug: (msg: string) => void;
   private startedTimeStamp: number = 0;
   private readonly sendCb: (...p: any[]) => any;
   private sendParams: any[] = [];
@@ -18,12 +19,14 @@ class SenderRequest {
     id: string,
     timeoutSec: number,
     resendTimeoutSec: number,
+    logDebug: (msg: string) => void,
     sendCb: (...p: any[]) => any,
     sendParams: any[],
   ) {
     this.id = id;
     this.timeoutMs = timeoutSec * 1000;
     this.resendTimeoutMs = resendTimeoutSec * 1000;
+    this.logDebug = logDebug;
     this.sendCb = sendCb;
     this.sendParams = sendParams;
 
@@ -68,10 +71,7 @@ class SenderRequest {
         }
 
         setTimeout(() => {
-
-          // TODO: print in debug
-          // TODO: use logger
-          console.log(`--> resending - ${this.id}`);
+          this.logDebug(`--> resending - ${this.id}`);
 
           // try another one
           this.trySend();
@@ -93,12 +93,21 @@ class SenderRequest {
 export default class Sender {
   private readonly timeoutSec: number;
   private readonly resendTimeoutSec: number;
+  private readonly logDebug: (msg: string) => void;
+  private readonly logWarn: (msg: string) => void;
   private readonly requests: {[index: string]: SenderRequest} = {};
 
 
-  constructor(timeoutSec: number, resendTimeoutSec: number) {
+  constructor(
+    timeoutSec: number,
+    resendTimeoutSec: number,
+    logDebug: (msg: string) => void,
+    logWarn: (msg: string) => void
+  ) {
     this.timeoutSec = timeoutSec;
     this.resendTimeoutSec = resendTimeoutSec;
+    this.logDebug = logDebug;
+    this.logWarn = logWarn;
   }
 
 
@@ -116,9 +125,7 @@ export default class Sender {
 
     try {
       const result: any = await this.requests[id].promise;
-      // TODO: print in debug
-      // TODO: use logger
-      console.log(`==> Request successfully finished ${id}`);
+      this.logDebug(`==> Request successfully finished ${id}`);
 
       delete this.requests[id];
 
@@ -137,6 +144,7 @@ export default class Sender {
       id,
       this.timeoutSec,
       this.resendTimeoutSec,
+      this.logDebug,
       sendCb,
       params,
     );
@@ -149,8 +157,7 @@ export default class Sender {
     this.requests[id].updateParams(params);
 
     if (!this.requests[id].isCbSame(sendCb)) {
-      // TODO: use logger
-      console.warn(`Callback has been changed for sender id "${id}"`);
+      this.logWarn(`Callback has been changed for sender id "${id}"`);
     }
 
     // try {

@@ -9,7 +9,9 @@ export default class DriverBase<Props extends {[index: string]: any} = any> exte
   protected newSender(): Sender {
     return new Sender(
       this.context.config.config.senderTimeout,
-      this.context.config.config.senderResendTimeout
+      this.context.config.config.senderResendTimeout,
+      this.context.log.debug,
+      this.context.log.warn
     );
   }
 
