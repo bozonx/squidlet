@@ -1,17 +1,11 @@
-import NodejsMachines from '../interfaces/NodejsMachines';
-import Props from './Props';
-import Os from '../../shared/Os';
-import GroupConfigParser from '../../shared/GroupConfigParser';
 import IoServer from '../../system/IoServer';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {consoleError} from '../../system/lib/helpers';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
-import LogLevel from '../../system/interfaces/LogLevel';
 import StartDevelopBase from './StartDevelopBase';
 
 
@@ -20,7 +14,6 @@ export default class StartIoServerStandalone extends StartDevelopBase {
 
 
   async init() {
-    // TODO: заменить host config в EnvBuilder
     await super.init();
 
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
@@ -44,10 +37,7 @@ export default class StartIoServerStandalone extends StartDevelopBase {
 
 
   async start() {
-    if (!this.ioSet) throw new Error(`No IoSet`);
-
-    await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
-    await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
+    await super.start();
 
     // load all the machine's io
     this.ioSet = await this.makeIoSet();
@@ -70,22 +60,10 @@ export default class StartIoServerStandalone extends StartDevelopBase {
     console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
   }
 
-  private async makeIoSet(): Promise<IoSet> {
-    const envBuilder = new EnvBuilder(
-      this.preparePreHostConfig(),
-      this.props.envSetDir,
-      this.props.tmpDir,
-      this.props.platform,
-      this.props.machine,
-      { uid: this.props.uid, gid: this.props.gid }
-    );
-    //const ioSet = new IoSetStandaloneIoServer(this.os, this.props.hostConfig, this.props.platform, this.props.machine);
-
-    await envBuilder.collect();
-
+  protected async makeIoSet(): Promise<IoSet> {
     const ioSet: IoSet = new IoSetDevelopSrc(
       this.os,
-      envBuilder,
+      this.envBuilder,
       this.props.platform,
       this.props.machine
     );
@@ -100,7 +78,7 @@ export default class StartIoServerStandalone extends StartDevelopBase {
   /**
    * Remove useless props from host config such as entities definitions.
    */
-  private preparePreHostConfig(): PreHostConfig {
+  protected resolveHostConfig(): PreHostConfig {
     return omitObj(
       this.props.hostConfig,
       'plugins',

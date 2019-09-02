@@ -1,17 +1,14 @@
 import * as path from 'path';
 
-import {isEmptyObject} from '../../system/lib/objects';
-import Os, {SpawnCmdResult} from '../../shared/Os';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
-import SystemStarter from './SystemStarter';
-import {IoSetClass} from '../interfaces/IoSetClass';
 import LogLevel from '../../system/interfaces/LogLevel';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 export default abstract class StartDevelopBase {
@@ -55,7 +52,7 @@ export default abstract class StartDevelopBase {
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
 
     this._envBuilder = new EnvBuilder(
-      this.props.hostConfig,
+      this.resolveHostConfig(),
       this.props.envSetDir,
       tmpDir,
       this.props.platform,
@@ -78,5 +75,9 @@ export default abstract class StartDevelopBase {
    * Prepare ioSet here.
    */
   protected abstract async makeIoSet(): Promise<IoSet>;
+
+  protected resolveHostConfig(): PreHostConfig {
+    return this.props.hostConfig;
+  }
 
 }
