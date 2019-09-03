@@ -1,12 +1,10 @@
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
-import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
 import RemoteIoCollection from './RemoteIoCollection';
 import Os from '../../shared/Os';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 import {checkIoExistance} from '../../hostEnvBuilder/helpers';
 
 
@@ -30,6 +28,11 @@ export default class IoSetDevelopRemote implements IoSet {
     this.os = os;
     this.envBuilder = envBuilder;
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
+    // TODO: pass remote io names
+
+    //this.ioNames = await this.ioClient.getIoNames();
+
+
     this.remoteIoCollection = new RemoteIoCollection(host, port);
   }
 

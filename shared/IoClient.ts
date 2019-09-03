@@ -4,7 +4,7 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
-import {IO_API, IO_NAMES_METHOD, METHOD_DELIMITER} from '../system/IoServer';
+import {METHOD_DELIMITER} from '../system/IoServer';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 
@@ -37,7 +37,7 @@ export default class IoClient {
     this.client = new WsClientLogic(
       wsClientIo,
       clientProps,
-      () => this.logError(`Websocket connection has been closed`),
+      () => this.logError(`Websocket client connection has been closed`),
       this.logDebug,
       this.logInfo,
       this.logError
@@ -73,12 +73,6 @@ export default class IoClient {
     this.logDebug(`IoClient.callIoMethod: ${pathToMethod}, ${JSON.stringify(args)}`);
 
     return this.remoteCall.callMethod(pathToMethod, ...args);
-  }
-
-  getIoNames(): Promise<string[]> {
-    const pathToMethod = `${IO_API}${METHOD_DELIMITER}${IO_NAMES_METHOD}`;
-
-    return this.remoteCall.callMethod(pathToMethod);
   }
 
   async close() {

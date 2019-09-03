@@ -81,6 +81,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
   protected async resolvePlatformMachine(): Promise<{platform: Platforms, machine: string}> {
     // TODO: ask ioServer via http api for platform and machine
+    // TODO: сохранить результат чтобы потом не делать запрос на список ios
     return {
       platform: 'nodejs',
       machine: 'rpi',

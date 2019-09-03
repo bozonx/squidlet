@@ -16,8 +16,6 @@ import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 import IoItem, {IoItemDefinition} from './interfaces/IoItem';
 
 
-export const IO_API = 'ioApi';
-export const IO_NAMES_METHOD = 'getIoNames';
 export const METHOD_DELIMITER = '.';
 const initCfg: InitializationConfig = initializationConfig();
 
@@ -60,7 +58,7 @@ export default class IoServer {
     await this.configureIoSet();
 
     this.logInfo('--> Initializing websocket server');
-    await this.initWsServer();
+    await this.initWsIoServer();
 
     this.logInfo('===> IoServer initialization has been finished');
   }
@@ -89,7 +87,7 @@ export default class IoServer {
 
     this.remoteCall = new RemoteCall(
       this.sendToClient,
-      this.callIoApi,
+      this.callIoMethod,
       this.hostConfig.config.rcResponseTimoutSec,
       this.logError,
       makeUniqId
@@ -130,26 +128,13 @@ export default class IoServer {
     return this.wsServer.send(this.connectionId, binData);
   }
 
-  // TODO: remake to HttpApi
-  private callIoApi = async (fullName: string, args: any[]): Promise<any> => {
+  private callIoMethod = async (fullName: string, args: any[]): Promise<any> => {
     const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
 
     if (!methodName) {
       throw new Error(`No method name: "${fullName}"`);
     }
 
-    if (ioName === IO_API) {
-      if (methodName === IO_NAMES_METHOD) {
-        return this.ioSet.getNames();
-      }
-
-      throw new Error(`Unknown ioApi method`);
-    }
-
-    return this.callIoMethod(ioName, methodName, args);
-  }
-
-  private async callIoMethod(ioName: string, methodName: string, args: any[]): Promise<any> {
     const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
 
     if (!IoItem[methodName]) {
@@ -160,7 +145,7 @@ export default class IoServer {
   }
 
   private handleClose = () => {
-    this.logError(`Websocket server was closed`);
+    this.logError(`Websocket server has been closed`);
   }
 
   private async loadConfig<T>(configFileName: string): Promise<T> {
@@ -176,7 +161,7 @@ export default class IoServer {
     return JSON.parse(configStr);
   }
 
-  private async initWsServer() {
+  private async initWsIoServer() {
     if (!this.hostConfig || !this.hostConfig.ioServer) {
       throw new Error(`Can't init ioServer because it isn't allowed in a host config`);
     }
@@ -204,10 +189,6 @@ export default class IoServer {
         .catch(this.logError);
 
       this.logInfo(`IO client has been disconnected`);
-
-      // TODO: может не делать этого - а делать запрос на переключение на app
-      // switch to normal app on connection close
-      //this.shutdownRequest('switchToApp');
     });
   }
 

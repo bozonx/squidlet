@@ -8,7 +8,7 @@ import {consoleError} from '../../system/lib/helpers';
 
 export default class RemoteIoCollection {
   private ioCollection: {[index: string]: IoItem} = {};
-  private ioNames: string[] = [];
+  private readonly remoteIoNames: string[] = [];
   private readonly host?: string;
   private readonly port?: number;
   private _ioClient?: IoClient;
@@ -17,9 +17,10 @@ export default class RemoteIoCollection {
   }
 
 
-  constructor(host?: string, port?: number) {
+  constructor(remoteIoNames: string[], host?: string, port?: number) {
     this.host = host;
     this.port = port;
+    this.remoteIoNames = remoteIoNames;
   }
 
 
@@ -34,10 +35,8 @@ export default class RemoteIoCollection {
 
     await this.ioClient.init();
 
-    this.ioNames = await this.ioClient.getIoNames();
-
     // make fake io items
-    for (let ioName of this.ioNames) {
+    for (let ioName of this.remoteIoNames) {
       this.ioCollection[ioName] = this.makeFakeIo(ioName);
     }
   }
@@ -45,17 +44,12 @@ export default class RemoteIoCollection {
   async destroy() {
     await this.ioClient.destroy();
     delete this._ioClient;
-    delete this.ioNames;
     delete this.ioCollection;
   }
 
 
   getIo(ioName: string): IoItem | undefined {
     return this.ioCollection[ioName];
-  }
-
-  getIoNames(): string[] {
-    return this.ioNames;
   }
 
 
