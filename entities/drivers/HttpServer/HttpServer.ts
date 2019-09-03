@@ -1,11 +1,10 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import WebSocketServerIo, {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
-import HttpServerLogic from './HttpServerLogic';
+import {HttpServerIo, HttpServerProps} from 'system/interfaces/io/HttpServerIo';
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerLogic';
 
 
-export class HttpServer extends DriverBase<WebSocketServerProps> {
+export class HttpServer extends DriverBase<HttpServerProps> {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     if (!this.server) {
@@ -15,7 +14,7 @@ export class HttpServer extends DriverBase<WebSocketServerProps> {
     return this.server.listeningPromise;
   }
 
-  private get wsServerIo(): WebSocketServerIo {
+  private get wsServerIo(): HttpServerIo {
     return this.getIo('WebSocketServer') as any;
   }
   private server?: HttpServerLogic;
@@ -46,11 +45,11 @@ export class HttpServer extends DriverBase<WebSocketServerProps> {
   }
 
 
-  send(connectionId: string, data: string | Uint8Array): Promise<void> {
-    if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
-
-    return this.server.send(connectionId, data);
-  }
+  // send(connectionId: string, data: string | Uint8Array): Promise<void> {
+  //   if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
+  //
+  //   return this.server.send(connectionId, data);
+  // }
 
   /**
    * Force closing a connection
@@ -61,17 +60,19 @@ export class HttpServer extends DriverBase<WebSocketServerProps> {
     await this.server.closeConnection(connectionId, code, reason);
   }
 
-  async setCookie(connectionId: string, cookie: string) {
-    if (!this.server) return;
+  // async setCookie(connectionId: string, cookie: string) {
+  //   if (!this.server) return;
+  //
+  //   await this.server.setCookie(connectionId, cookie);
+  // }
 
-    await this.server.setCookie(connectionId, cookie);
+  onRequest(cb: (request: HttpDriverRequest) => Promise<HttpDriverResponse>): number {
+    // TODO: remove
+    // TODO: remove listener
+    return this.server.onRequest(cb);
   }
 
-  onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {
-    if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.closedMsg}`);
-
-    return this.server.onMessage(cb);
-  }
+  /
 
   onConnection(
     cb: (connectionId: string, connectionParams: ConnectionParams) => void

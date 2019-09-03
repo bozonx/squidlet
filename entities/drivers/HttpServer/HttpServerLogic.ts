@@ -3,16 +3,20 @@ import Promised from '../../../system/lib/Promised';
 import {HttpMethods, HttpRequestHeaders, HttpResponseHeaders} from '../../../system/interfaces/io/HttpServerIo';
 
 
-interface HttpDriverRequest {
+export interface HttpDriverRequest {
   method: HttpMethods;
   url: string | string[];
   headers: HttpRequestHeaders;
+  // TODO: атоматом сделать JSON.stringify
+  // TODO: атоматом установить content-type
   body?: string | {[index: string]: any} | Uint8Array;
 }
 
-interface HttpDriverResponse {
-  headers: HttpResponseHeaders;
-  status: number;
+export interface HttpDriverResponse {
+  // TODO: не обязательный - если ok то 200, иначе 500
+  status?: number;
+  // TODO: не обязательны - потом они сами добавляются
+  headers?: HttpResponseHeaders;
   body?: string | {[index: string]: any} | Uint8Array;
 }
 
