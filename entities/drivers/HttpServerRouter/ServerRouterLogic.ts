@@ -5,7 +5,7 @@ import {HttpMethods, HttpRequest} from '../../../system/interfaces/io/HttpServer
 import {JsonTypes} from '../../../system/interfaces/Types';
 import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
 import {trimChar} from '../../../system/lib/strings';
-import {ParsedUrl, parseUrl} from '../../../system/lib/url';
+import {ParsedUrl, parseUrl, URL_DELIMITER} from '../../../system/lib/url';
 import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
 
 
@@ -17,7 +17,7 @@ interface ParsedRoute {
   params: {[index: string]: string | number};
   // route which has been set in addRoute()
   route: string;
-  routeParams: {[index: string]: JsonTypes};
+  pinnedProps: {[index: string]: JsonTypes};
   location: ParsedUrl;
 }
 
@@ -25,7 +25,7 @@ interface RouteItem {
   // full route
   route: string;
   method: HttpMethods;
-  routeParams: {[index: string]: JsonTypes};
+  pinnedProps: {[index: string]: JsonTypes};
 }
 
 type RouterRequestHandler = (parsedRoute: ParsedRoute, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
@@ -45,29 +45,28 @@ export default class ServerRouterLogic {
   /**
    * Call this to register a new route and its params
    */
-  addRoute(method: HttpMethods, route: string, routeParams: {[index: string]: JsonTypes}) {
+  addRoute(method: HttpMethods, route: string, pinnedProps: {[index: string]: JsonTypes}) {
     const preparedRoute: string = this.prepareRoute(route);
-    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
+    const preparedMethod: HttpMethods = method.toLowerCase() as HttpMethods;
+    const eventName = `${preparedMethod}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
-    this.registeredRoutes[eventName] = { method, route: preparedRoute, routeParams };
+    this.registeredRoutes[eventName] = { method: preparedMethod, route: preparedRoute, pinnedProps };
   }
 
   /**
    * Call this only when a new request came.
    */
   parseIncomeRequest(request: HttpRequest) {
-    const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
-    const parsedRoute: ParsedRoute = this.parseRoute(request);
-    const eventName = `${driverRequest.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
-    const resolvedRoute: RouteItem | undefined = this.registeredRoutes[eventName];
+    const parsedRoute: ParsedRoute | undefined = this.parseRoute(request);
 
-    if (!resolvedRoute) {
-      this.logDebug(`ServerRouterLogic.parseIncomeRequest: route "${eventName}: isn't registered!`);
+    if (!parsedRoute) {
+      this.logDebug(`ServerRouterLogic.parseIncomeRequest: route for url "${request.url}: isn't registered!`);
 
       return;
     }
 
-    // TODO: поднять на все роуты с /page/:id
+    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
+    const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
 
     this.events.emit(eventName, parsedRoute, driverRequest);
   }
@@ -106,33 +105,50 @@ export default class ServerRouterLogic {
   private makeDriverRequest(request: HttpRequest): HttpDriverRequest {
     return {
       ...request,
+      // TODO: может это будет в самом драйвере происходить ???
       // TODO: prepare body - resolve type
     };
   }
 
-  private parseRoute(request: HttpRequest): ParsedRoute {
+  private parseRoute(request: HttpRequest): ParsedRoute | undefined {
     const location: ParsedUrl = parseUrl(request.url);
-    const { route, params } = this.resolveRoute(location.url);
+    const { route, params } = this.resolveRoute(request.method, location.url);
     const eventName = `${request.method}${EVENT_NAME_DELIMITER}${route}`;
     const routeItem: RouteItem = this.registeredRoutes[eventName];
+
+    if (!routeItem) return;
 
     return {
       route,
       params,
-      routeParams: routeItem.routeParams,
+      pinnedProps: routeItem.pinnedProps,
       location,
     };
   }
 
-  private resolveRoute(relativeUrl: string): { route: string, params: {[index: string]: string | number} } {
-    // TODO: это ещё не роут - это только url - нужно соотнести с шаблонами routes и поднять все совпадающие
+  private resolveRoute(method: HttpMethods, relativeUrl: string): { route: string, params: {[index: string]: string | number} } {
+    const cleanUrl = this.prepareRoute(relativeUrl);
+    const urlParts: string[] = cleanUrl.split(URL_DELIMITER);
 
+    // TODO: лучше тримить каждую urlPart
+    // TODO: ищем ближайший параметр :id - и все что до него это baseUrl
+
+
+    // TODO: если это root - то выполнить этот роут
+    // TODO: нужно учитывать method
+
+    // TODO: это ещё не роут - это только url - нужно соотнести с шаблонами routes и поднять все совпадающие
     // TODO: resolve - parse params like :id
     // TODO: resolve numbers
+
+    return {
+      route: '',
+      params: {},
+    };
   }
 
   private prepareRoute(rawRoute: string): string {
-    return trimChar(rawRoute, '/');
+    return trimChar(rawRoute, URL_DELIMITER);
   }
 
 }
