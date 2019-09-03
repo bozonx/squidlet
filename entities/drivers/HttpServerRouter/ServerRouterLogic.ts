@@ -2,6 +2,7 @@ import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLog
 import {HttpMethods, HttpRequest} from '../../../system/interfaces/io/HttpServerIo';
 import {JsonTypes} from '../../../system/interfaces/Types';
 import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
+import {trimChar} from '../../../system/lib/strings';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -42,9 +43,10 @@ export default class ServerRouterLogic {
    * Call this to register a new route and its params
    */
   addRoute(method: HttpMethods, route: string, routeParams: {[index: string]: JsonTypes}) {
-    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+    const preparedRoute: string = this.prepareRoute(route);
+    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
-    this.registeredRoutes[eventName] = { method, route, routeParams };
+    this.registeredRoutes[eventName] = { method, route: preparedRoute, routeParams };
   }
 
   /**
@@ -69,7 +71,7 @@ export default class ServerRouterLogic {
    * Call this to handle calling of route
    */
   onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
-
+    const preparedRoute: string = this.prepareRoute(route);
 
 
     // const handlerWrapper = (parsedRoute: ParsedRoute, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
@@ -83,13 +85,14 @@ export default class ServerRouterLogic {
 
     // TODO: cb returns a response !!!! этом может не обрабатываться в events
 
-    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
     return this.events.addListener(eventName, cb);
   }
 
   removeRequestListener(method: HttpMethods, route: string, handlerIndex: number) {
-    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+    const preparedRoute: string = this.prepareRoute(route);
+    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
     this.events.removeListener(eventName, handlerIndex);
   }
@@ -104,6 +107,24 @@ export default class ServerRouterLogic {
 
   private parseRoute(request: HttpRequest): ParsedRoute {
     // TODO: parse
+    const localUrl: string = '';
+    // TODO: parse url - see cookies
+    const search: {[index: string]: JsonTypes} = {};
+    const preparedRoute: string = this.prepareRoute(localUrl);
+    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${preparedRoute}`;
+    const routeItem: RouteItem = this.registeredRoutes[eventName];
+    const routePath: string[] = [];
+
+    return {
+      path: routePath,
+      route: routeItem.route,
+      routeParams: routeItem.routeParams,
+      search,
+    };
+  }
+
+  private prepareRoute(rawRoute: string): string {
+    return trimChar(rawRoute, '/');
   }
 
 }
