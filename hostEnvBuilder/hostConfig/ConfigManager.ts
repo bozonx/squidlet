@@ -11,7 +11,7 @@ import {loadMachineConfigInPlatformDir, makeListOfNamesFromPaths, resolvePlatfor
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
-import Platforms from '../interfaces/Platforms';
+import Platforms from '../../system/interfaces/Platforms';
 
 
 export default class ConfigManager {

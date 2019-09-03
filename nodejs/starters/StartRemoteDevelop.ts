@@ -6,11 +6,13 @@ import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartDevelopBase from './StartDevelopBase';
 import SystemStarter from './SystemStarter';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+import Platforms from '../../system/interfaces/Platforms';
+import HostInfo from '../../system/interfaces/HostInfo';
 
 
 export default class StartRemoteDevelop extends StartDevelopBase {
   private readonly argIoSet: string;
+  private remoteHostInfo?: HostInfo;
 
 
   constructor(
@@ -40,6 +42,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   }
 
   async init() {
+    this.remoteHostInfo = await this.getHostInfo();
     await super.init();
 
     console.info(`Using remote ioset of host "${this.argIoSet}"`);
@@ -79,12 +82,21 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     };
   }
 
-  protected async resolvePlatformMachine(): Promise<{platform: Platforms, machine: string}> {
+  protected resolvePlatformMachine(): {platform: Platforms, machine: string} {
+    if (!this.remoteHostInfo) throw new  Error(`No remote host info`);
+
+    return {
+      platform: this.remoteHostInfo.platform,
+      machine: this.remoteHostInfo.machine,
+    };
+  }
+
+  private async getHostInfo(): Promise<HostInfo> {
     // TODO: ask ioServer via http api for platform and machine
-    // TODO: сохранить результат чтобы потом не делать запрос на список ios
     return {
       platform: 'nodejs',
       machine: 'rpi',
+      usedIo: [],
     };
   }
 

@@ -11,7 +11,7 @@ import LogLevel from '../../system/interfaces/LogLevel';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {isEmptyObject} from '../../system/lib/objects';
 import {REPO_ROOT} from '../../shared/helpers';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+import Platforms from '../../system/interfaces/Platforms';
 
 
 export default abstract class StartDevelopBase {
@@ -53,7 +53,7 @@ export default abstract class StartDevelopBase {
     await this.props.resolve();
 
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
-    const {platform, machine} = await this.resolvePlatformMachine();
+    const {platform, machine} = this.resolvePlatformMachine();
 
     this._envBuilder = new EnvBuilder(
       this.resolveHostConfig(),
@@ -130,7 +130,7 @@ export default abstract class StartDevelopBase {
     }
   }
 
-  protected async resolvePlatformMachine(): Promise<{platform: Platforms, machine: string}> {
+  protected resolvePlatformMachine(): {platform: Platforms, machine: string} {
     if (!this.props.machine) {
       throw new Error(`No defined machine`);
     }

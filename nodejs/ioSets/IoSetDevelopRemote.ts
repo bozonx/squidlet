@@ -14,6 +14,7 @@ import {checkIoExistance} from '../../hostEnvBuilder/helpers';
 export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
+  private readonly remoteIoNames: string[];
   private readonly storageWrapper: StorageEnvMemoryWrapper;
   private wrappedStorageIo?: StorageIo;
   private remoteIoCollection: RemoteIoCollection;
@@ -22,18 +23,15 @@ export default class IoSetDevelopRemote implements IoSet {
   constructor(
     os: Os,
     envBuilder: EnvBuilder,
+    remoteIoNames: string[],
     host?: string,
     port?: number
   ) {
     this.os = os;
     this.envBuilder = envBuilder;
+    this.remoteIoNames = remoteIoNames;
     this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
-    // TODO: pass remote io names
-
-    //this.ioNames = await this.ioClient.getIoNames();
-
-
-    this.remoteIoCollection = new RemoteIoCollection(host, port);
+    this.remoteIoCollection = new RemoteIoCollection(this.remoteIoNames, host, port);
   }
 
   async prepare() {
@@ -44,7 +42,7 @@ export default class IoSetDevelopRemote implements IoSet {
     await this.remoteIoCollection.init();
 
     // check io dependencies
-    checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoCollection.getIoNames());
+    checkIoExistance(this.envBuilder.usedEntities.getUsedIo(), this.remoteIoNames);
 
     this.wrappedStorageIo = this.storageWrapper.makeWrapper(
       this.remoteIoCollection.getIo('Storage') as StorageIo
@@ -68,7 +66,7 @@ export default class IoSetDevelopRemote implements IoSet {
   }
 
   getNames(): string[] {
-    return this.remoteIoCollection.getIoNames();
+    return this.remoteIoNames;
   }
 
 }

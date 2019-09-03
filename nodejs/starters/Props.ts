@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import Os, {SpawnCmdResult} from '../../shared/Os';
-import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
+import Platforms from '../../system/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {

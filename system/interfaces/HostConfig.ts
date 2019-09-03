@@ -1,3 +1,6 @@
+import Platforms from './Platforms';
+
+
 export interface HostConfigConfig {
   //logLevel: LogLevel;
   // republish status silently every minute if it hasn't been changed
@@ -33,7 +36,7 @@ export interface HostConfigConfig {
 export default interface HostConfig {
   // id of host e.g master
   id: string;
-  platform: string;
+  platform: Platforms;
   machine: string;
   //platform: Platforms;
   // specific config for each host

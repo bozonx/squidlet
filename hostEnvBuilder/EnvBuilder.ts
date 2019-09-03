@@ -14,7 +14,7 @@ import Register from './entities/Register';
 import PluginEnv from './entities/PluginEnv';
 import {checkIoExistance} from './helpers';
 import {OwnerOptions} from '../shared/interfaces/OnwerOptions';
-import Platforms from './interfaces/Platforms';
+import Platforms from '../system/interfaces/Platforms';
 
 
 export default class EnvBuilder {

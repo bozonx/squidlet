@@ -93,16 +93,20 @@ export default class Api {
     return this.context.state.getState(category, stateName);
   }
 
+  /**
+   * The same info for System and for IoServer
+   */
   getHostInfo(): HostInfo {
     return {
-      // TODO: add platform, machine, host id
+      platform: this.context.config.platform,
+      machine: this.context.config.machine,
       usedIo: this.context.system.ioManager.getNames(),
-      //config: this.context.config,
     };
   }
 
   // getHostConfig(): HostInfo {
   //   return {
+  // hostId: this.context.config.id,
   //     // TODO: add used drivers, services, devices and its defenitions
   //     config: this.context.config,
   //   };

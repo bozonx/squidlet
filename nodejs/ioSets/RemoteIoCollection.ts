@@ -8,7 +8,7 @@ import {consoleError} from '../../system/lib/helpers';
 
 export default class RemoteIoCollection {
   private ioCollection: {[index: string]: IoItem} = {};
-  private readonly remoteIoNames: string[] = [];
+  private readonly remoteIoNames: string[];
   private readonly host?: string;
   private readonly port?: number;
   private _ioClient?: IoClient;

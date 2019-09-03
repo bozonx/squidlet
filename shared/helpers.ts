@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
-import Platforms from '../hostEnvBuilder/interfaces/Platforms';
+import Platforms from '../system/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../nodejs/interfaces/NodejsMachines';
 
