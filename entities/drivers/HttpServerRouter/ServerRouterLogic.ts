@@ -28,7 +28,7 @@ interface RouteItem {
   pinnedProps: {[index: string]: JsonTypes};
 }
 
-type RouterRequestHandler = (parsedRoute: ParsedRoute, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
+export type RouterRequestHandler = (parsedRoute: ParsedRoute, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
 
 
 export default class ServerRouterLogic {

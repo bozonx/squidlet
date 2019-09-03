@@ -3,6 +3,7 @@ import ServiceBase from 'system/base/ServiceBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import {HttpServer} from '../../drivers/HttpServer/HttpServer';
 import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
+import {HttpServerRouter} from '../../drivers/HttpServerRouter/HttpServerRouter';
 
 
 const allowedApiMethodsToCall = [
@@ -22,17 +23,17 @@ const allowedApiMethodsToCall = [
 // TODO: use router HttpServerRouter
 
 export default class HttpApi extends ServiceBase<HttpServerProps> {
-  private get httpServer(): HttpServer {
-    return this.depsInstances.httpServer;
+  private get router(): HttpServerRouter {
+    return this.depsInstances.router;
   }
 
 
   protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.httpServer = await getDriverDep('HttpServer')
+    this.depsInstances.router = await getDriverDep('HttpServerRouter')
       .getInstance(this.props);
 
     // listen income api requests
-    this.httpServer.onRequest(this.handleIncomeRequest);
+    this.router.onRequest(this.handleIncomeRequest);
   }
 
 
