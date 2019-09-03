@@ -48,7 +48,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       if (!sessionId) return;
 
-      this.context.log.debug(`WsServerSessions: new message of connection "${connectionId}", session "${sessionId}": length: ${data.length}`);
+      this.log.debug(`WsServerSessions: new message of connection "${connectionId}", session "${sessionId}": length: ${data.length}`);
       this.events.emit(WS_SESSIONS_EVENTS.message, sessionId, data);
     });
     this.server.onConnectionClose((connectionId: string) => {
@@ -59,7 +59,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       // clear connectionId
       delete this.sessionConnections[sessionId];
-      this.context.log.debug(`WsServerSessions: connection "${connectionId}" of session "${sessionId}" closed`);
+      this.log.debug(`WsServerSessions: connection "${connectionId}" of session "${sessionId}" closed`);
     });
     this.context.sessions.onSessionClosed((sessionId) => {
       // listen only ours session
@@ -67,13 +67,13 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       delete this.sessionConnections[sessionId];
 
-      this.context.log.debug(`WsServerSessions: session "${sessionId}" closed`);
+      this.log.debug(`WsServerSessions: session "${sessionId}" closed`);
       this.events.emit(WS_SESSIONS_EVENTS.sessionClose, sessionId);
     });
   }
 
   destroy = async () => {
-    this.context.log.debug(`... destroying WsServerSessions: ${this.props.host}:${this.props.port}`);
+    this.log.debug(`... destroying WsServerSessions: ${this.props.host}:${this.props.port}`);
 
     for (let sessionId of Object.keys(this.sessionConnections)) {
       this.context.sessions.destroySession(sessionId);
@@ -93,7 +93,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       throw new Error(`WsServerSessions.send: Can't find a connection of session "${sessionId}"`);
     }
 
-    this.context.log.debug(`WsServerSessions: send message of session "${sessionId}": length: ${data.length}`);
+    this.log.debug(`WsServerSessions: send message of session "${sessionId}": length: ${data.length}`);
 
     return this.server.send(this.sessionConnections[sessionId] as string, data);
   }
@@ -105,7 +105,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     if (!this.sessionConnections[sessionId]) return;
 
     await this.destroySession(sessionId);
-    this.context.log.debug(`WsServerSessions: manually close session "${sessionId}"`);
+    this.log.debug(`WsServerSessions: manually close session "${sessionId}"`);
     this.events.emit(WS_SESSIONS_EVENTS.sessionClose, sessionId);
   }
 
@@ -153,7 +153,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       this.sessionConnections[sessionId] = connectionId;
       // if session exists - recover it
       this.context.sessions.recoverSession(sessionId);
-      this.context.log.debug(`WsServerSessions: new connection, recover session "${sessionId}"`);
+      this.log.debug(`WsServerSessions: new connection, recover session "${sessionId}"`);
     }
     else {
       // create a new session if there isn't cookie of session is inactive
@@ -162,8 +162,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 
       const cookie = `${SESSIONID_COOKIE}=${sessionId}`;
 
-      this.context.log.debug(`WsServerSessions: new connection, make new session "${sessionId}"`);
-      this.context.log.debug(`WsServerSessions: new connection, set cookie "${cookie}"`);
+      this.log.debug(`WsServerSessions: new connection, make new session "${sessionId}"`);
+      this.log.debug(`WsServerSessions: new connection, set cookie "${cookie}"`);
 
       try {
         await this.server.setCookie(connectionId, cookie);
@@ -171,7 +171,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
       catch (err) {
         delete this.sessionConnections[sessionId];
         // TODO: нужно ли дестроить сессию ???
-        this.context.log.debug(`WsServerSessions: fail set cookie, remove session`);
+        this.log.debug(`WsServerSessions: fail set cookie, remove session`);
 
         throw err;
       }

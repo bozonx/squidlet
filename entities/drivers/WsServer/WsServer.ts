@@ -20,7 +20,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
   private server?: WsServerLogic;
   private get closedMsg() {
-    return `Server "${this.props.host}:${this.props.port}" has been closed`;
+    return `Server "${this.props.host}:${this.props.port}" has been already closed`;
   }
 
 
@@ -52,6 +52,8 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 
     return this.server.send(connectionId, data);
   }
+
+  // TODO: add closeServer ???
 
   /**
    * Force closing a connection

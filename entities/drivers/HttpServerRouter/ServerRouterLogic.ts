@@ -1,11 +1,8 @@
-
-// TODO: make absolute paths
-
-import {HttpMethods, HttpRequest} from '../../../system/interfaces/io/HttpServerIo';
-import {JsonTypes} from '../../../system/interfaces/Types';
-import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
-import {trimChar} from '../../../system/lib/strings';
-import {ParsedUrl, parseUrl, URL_DELIMITER} from '../../../system/lib/url';
+import {JsonTypes} from 'system/interfaces/Types';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {trimChar} from 'system/lib/strings';
+import {ParsedUrl, parseUrl, URL_DELIMITER} from 'system/lib/url';
+import {HttpMethods, HttpRequest} from 'system/interfaces/io/HttpServerIo';
 import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
 
 
@@ -41,6 +38,10 @@ export default class ServerRouterLogic {
     this.logDebug = logDebug;
   }
 
+  destroy() {
+    this.events.destroy();
+  }
+
 
   /**
    * Call this to register a new route and its params
@@ -51,24 +52,6 @@ export default class ServerRouterLogic {
     const eventName = `${preparedMethod}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
     this.registeredRoutes[eventName] = { method: preparedMethod, route: preparedRoute, pinnedProps };
-  }
-
-  /**
-   * Call this only when a new request came.
-   */
-  parseIncomeRequest(request: HttpRequest) {
-    const parsedRoute: ParsedRoute | undefined = this.parseRoute(request);
-
-    if (!parsedRoute) {
-      this.logDebug(`ServerRouterLogic.parseIncomeRequest: route for url "${request.url}: isn't registered!`);
-
-      return;
-    }
-
-    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
-    const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
-
-    this.events.emit(eventName, parsedRoute, driverRequest);
   }
 
   /**
@@ -92,6 +75,28 @@ export default class ServerRouterLogic {
     const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
     return this.events.addListener(eventName, cb);
+  }
+
+  /**
+   * Call this only when a new request came.
+   */
+  parseIncomeRequest(request: HttpRequest) {
+
+    // TODO: use HttpDriverRequest
+    // TODO: может сразу вернуть ответ ???
+
+    const parsedRoute: ParsedRoute | undefined = this.parseRoute(request);
+
+    if (!parsedRoute) {
+      this.logDebug(`ServerRouterLogic.parseIncomeRequest: route for url "${request.url}: isn't registered!`);
+
+      return;
+    }
+
+    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
+    const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
+
+    this.events.emit(eventName, parsedRoute, driverRequest);
   }
 
   removeRequestListener(method: HttpMethods, route: string, handlerIndex: number) {

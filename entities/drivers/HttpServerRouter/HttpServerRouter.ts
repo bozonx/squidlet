@@ -1,22 +1,23 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {HttpServerIo, HttpServerProps} from 'system/interfaces/io/HttpServerIo';
-import {HttpServer} from '../HttpServer/HttpServer';
+import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import ServerRouterLogic, {RouterRequestHandler} from './ServerRouterLogic';
-import {HttpMethods, HttpRequest} from '../../../system/interfaces/io/HttpServerIo';
-import {JsonTypes} from '../../../system/interfaces/Types';
+import {HttpMethods} from 'system/interfaces/io/HttpServerIo';
+import {JsonTypes} from 'system/interfaces/Types';
+import {GetDriverDep} from 'system/base/EntityBase';
+import {HttpServer} from '../HttpServer/HttpServer';
+import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
 
 
 export class HttpServerRouter extends DriverBase<HttpServerProps> {
-  // TODO: add
   // it fulfils when server is start listening
-  // get listeningPromise(): Promise<void> {
-  //   if (!this.server) {
-  //     throw new Error(`WebSocketServer.listeningPromise: ${this.closedMsg}`);
-  //   }
-  //
-  //   return this.server.listeningPromise;
-  // }
+  get listeningPromise(): Promise<void> {
+    if (!this.server) {
+      throw new Error(`HttpServerRouter.listeningPromise: ${this.closedMsg}`);
+    }
+
+    return this.server.listeningPromise;
+  }
 
   private _router?: ServerRouterLogic;
 
@@ -24,30 +25,24 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   private get router(): ServerRouterLogic {
     return this._router as any;
   }
-  // private get closedMsg() {
-  //   return `Server "${this.props.host}:${this.props.port}" has been closed`;
-  // }
-
-
-  protected willInit = async () => {
-    this._router = new ServerRouterLogic(this.log.debug);
-    // TODO: get instance of HttpDriver
+  private get server(): HttpServer {
+    return this.depsInstances.server;
+  }
+  private get closedMsg() {
+    return `Server "${this.props.host}:${this.props.port}" has been already closed`;
   }
 
-  // protected didInit = async () => {
-  //   this.router.
-  // }
 
-  // protected appDidInit = async () => {
-  //   await this.router.init();
-  // }
+  protected willInit = async (getDriverDep: GetDriverDep) => {
+    this.depsInstances.server = await getDriverDep('HttpServer')
+      .getInstance(this.props);
+    this._router = new ServerRouterLogic(this.log.debug);
+
+    this.server.onRequest(this.handleIncomeRequest);
+  }
 
   destroy = async () => {
-    // TODO: вызвать destroy io http server
-    // if (!this.server) return;
-    //
-    // await this.server.destroy();
-    // delete this.server;
+    this.router.destroy();
   }
 
 
@@ -60,38 +55,18 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   }
 
   async closeServer() {
-    // if (!this.serverId) return;
-    //
-    // // TODO: должно при этом подняться событие close или нет ???
-    // await this.httpServerIo.closeServer(this.serverId);
-    //
-    // delete this.serverId;
+    if (!this.server) throw new Error(`HttpServerRouter.removeRequestListener: ${this.onRequest}`);
+
+    return this.server.closeServer();
   }
 
-  // onConnection(
-  //   cb: (connectionId: string, connectionParams: ConnectionParams) => void
-  // ): number {
-  //   if (!this.server) throw new Error(`WebSocketServer.onConnection: ${this.closedMsg}`);
-  //
-  //   return this.server.onConnection(cb);
-  // }
-  //
-  // onConnectionClose(cb: (connectionId: string) => void): number {
-  //   if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.closedMsg}`);
-  //
-  //   return this.server.onConnectionClose(cb);
-  // }
-  //
-  // removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
-  //   if (!this.server) return;
-  //
-  //   this.server.removeListener(eventName, handlerIndex);
-  // }
-  //
-  //
-  // private onServerClosed = () => {
-  //   this.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
-  // }
+
+  private handleIncomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
+    this.router.parseIncomeRequest(request);
+
+    // TODO: как получить ответ ????
+    // TODO: если не найден обработчик - то вернуть 404
+  }
 
 }
 

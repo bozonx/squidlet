@@ -8,33 +8,30 @@ export class HttpServer extends DriverBase<HttpServerProps> {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     if (!this.server) {
-      throw new Error(`WebSocketServer.listeningPromise: ${this.closedMsg}`);
+      throw new Error(`HttpServer.listeningPromise: ${this.closedMsg}`);
     }
 
     return this.server.listeningPromise;
   }
 
-  private serverId?: string;
   private get httpServerIo(): HttpServerIo {
     return this.getIo('HttpServer') as any;
   }
   private server?: HttpServerLogic;
   private get closedMsg() {
-    return `Server "${this.props.host}:${this.props.port}" has been closed`;
+    return `Server "${this.props.host}:${this.props.port}" has been already closed`;
   }
 
 
   protected willInit = async () => {
-
     this.server = new HttpServerLogic(
-      this.wsServerIo,
+      this.httpServerIo,
       this.props,
       this.onServerClosed,
+      this.log.debug,
       this.log.info,
       this.log.error
     );
-
-    //this.serverId = await this.httpServerIo.newServer(this.props);
   }
 
   protected appDidInit = async () => {
@@ -49,58 +46,27 @@ export class HttpServer extends DriverBase<HttpServerProps> {
   }
 
 
-  // send(connectionId: string, data: string | Uint8Array): Promise<void> {
-  //   if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
-  //
-  //   return this.server.send(connectionId, data);
-  // }
-
-  /**
-   * Force closing a connection
-   */
-  async closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
-    if (!this.server) return;
-
-    await this.server.closeConnection(connectionId, code, reason);
-  }
-
-  // async setCookie(connectionId: string, cookie: string) {
-  //   if (!this.server) return;
-  //
-  //   await this.server.setCookie(connectionId, cookie);
-  // }
-
   onRequest(cb: (request: HttpDriverRequest) => Promise<HttpDriverResponse>): number {
-    // TODO: remove
-    // TODO: remove listener
+    if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.onRequest}`);
+
     return this.server.onRequest(cb);
   }
 
-  /
+  removeRequestListener(handlerIndex: number) {
+    if (!this.server) throw new Error(`WebSocketServer.removeRequestListener: ${this.onRequest}`);
 
-  onConnection(
-    cb: (connectionId: string, connectionParams: ConnectionParams) => void
-  ): number {
-    if (!this.server) throw new Error(`WebSocketServer.onConnection: ${this.closedMsg}`);
-
-    return this.server.onConnection(cb);
+    this.server.removeRequestListener(handlerIndex);
   }
 
-  onConnectionClose(cb: (connectionId: string) => void): number {
-    if (!this.server) throw new Error(`WebSocketServer.onConnectionClose: ${this.closedMsg}`);
+  async closeServer() {
+    if (!this.server) throw new Error(`WebSocketServer.removeRequestListener: ${this.onRequest}`);
 
-    return this.server.onConnectionClose(cb);
-  }
-
-  removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
-    if (!this.server) return;
-
-    this.server.removeListener(eventName, handlerIndex);
+    return this.server.closeServer();
   }
 
 
   private onServerClosed = () => {
-    this.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
+    this.log.error(`HttpServer: ${this.closedMsg}, you can't manipulate it any more!`);
   }
 
 }

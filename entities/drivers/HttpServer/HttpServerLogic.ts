@@ -125,18 +125,22 @@ export default class HttpServerLogic {
       clearTimeout(listeningTimeout);
       this.handleCloseServer();
     });
-    await this.httpServerIo.onServerError(this.serverId, (err: string) => this.logError(err));
     await this.httpServerIo.onServerListening(this.serverId, () => {
       clearTimeout(listeningTimeout);
-      this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} started listening`);
-      this._listeningPromised.resolve();
+      this.handleStartListening();
     });
+    await this.httpServerIo.onServerError(this.serverId, (err: string) => this.logError(err));
     await this.httpServerIo.onRequest(this.serverId, this.handleRequest);
   }
 
   private async handleTimeout() {
     this._listeningPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
     await this.httpServerIo.closeServer(this.serverId);
+  }
+
+  private handleStartListening() {
+    this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+    this._listeningPromised.resolve();
   }
 
   private async handleCloseServer() {

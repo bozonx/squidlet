@@ -36,6 +36,7 @@ export default class ApiTopicsLogic {
 
 
   constructor(context: Context) {
+    // TODO: вместо context использовать только то что нужно
     this.context = context;
   }
 
