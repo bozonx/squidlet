@@ -9,8 +9,8 @@ const EVENT_NAME_DELIMITER = '|';
 
 
 interface ParsedRoute {
-  // parsed url parts like /path/to/:page => ['path', 'to', 'myPageName'];
-  path: string[];
+  // parsed url params like /path/to/:page => {page: 'myPageName'};
+  params: {[index: string]: string | number};
   // route which has been set in addRoute()
   route: string;
   routeParams: {[index: string]: JsonTypes};
@@ -64,6 +64,8 @@ export default class ServerRouterLogic {
       return;
     }
 
+    // TODO: поднять на все роуты с /page/:id
+
     this.events.emit(eventName, parsedRoute, driverRequest);
   }
 
@@ -107,20 +109,26 @@ export default class ServerRouterLogic {
 
   private parseRoute(request: HttpRequest): ParsedRoute {
     // TODO: parse
-    const localUrl: string = '';
+    const relativeUrl: string = '';
     // TODO: parse url - see cookies
     const search: {[index: string]: JsonTypes} = {};
-    const preparedRoute: string = this.prepareRoute(localUrl);
-    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${preparedRoute}`;
+    const { route, params } = this.resolveRoute(relativeUrl);
+    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${route}`;
     const routeItem: RouteItem = this.registeredRoutes[eventName];
-    const routePath: string[] = [];
 
     return {
-      path: routePath,
-      route: routeItem.route,
+      route,
+      params,
       routeParams: routeItem.routeParams,
       search,
     };
+  }
+
+  private resolveRoute(relativeUrl: string): { route: string, params: {[index: string]: string | number} } {
+    // TODO: это ещё не роут - это только url - нужно соотнести с шаблонами routes и поднять все совпадающие
+
+    // TODO: resolve - parse params like :id
+    // TODO: resolve numbers
   }
 
   private prepareRoute(rawRoute: string): string {
