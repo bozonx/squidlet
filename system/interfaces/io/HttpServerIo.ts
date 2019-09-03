@@ -50,7 +50,7 @@ export interface HttpResponse {
 }
 
 export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
-type HttpRequestHandler = (request: HttpRequest) => Promise<HttpResponse>;
+type HttpRequestHandler = (requestId: number, request: HttpRequest) => Promise<HttpResponse>;
 
 
 export interface HttpServerIo {
@@ -81,15 +81,15 @@ export interface HttpServerIo {
 
   /**
    * Handle new request.
-   * Please return the response in a promise as result of cb.
+   * Please call the sendResponse with a received `requestId` to make a response to client.
    */
   onRequest(serverId: string, cb: HttpRequestHandler): Promise<number>;
 
-  // /**
-  //  * Send a response to client.
-  //  * Call it only when you are handled a request.
-  //  */
-  // sendResponse(requestId: number, response: HttpResponse): Promise<void>;
+  /**
+   * Send a response to client.
+   * Call it only when you are handled a request.
+   */
+  sendResponse(requestId: number, response: HttpResponse): Promise<void>;
 
   /**
    * Remove one of server listeners

@@ -23,6 +23,7 @@ export interface HttpDriverResponse {
 
 
 export default class HttpServerLogic {
+  // TODO: review
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     return this._listeningPromised.promise;
@@ -80,8 +81,12 @@ export default class HttpServerLogic {
   }
 
 
-  private startListen() {
-    // TODO: !!!
+  private async startListen() {
+    // TODO: проверить как быдет отписываться
+    await this.httpServerIo.onServerClose();
+    await this.httpServerIo.onServerError();
+    await this.httpServerIo.onServerListening();
+    await this.httpServerIo.onRequest();
   }
 
 }

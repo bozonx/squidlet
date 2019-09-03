@@ -19,27 +19,19 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   // }
 
   private _router?: ServerRouterLogic;
-  private serverId?: string;
 
-  private get httpServerIo(): HttpServerIo {
-    return this.getIo('HttpServer') as any;
-  }
+
   private get router(): ServerRouterLogic {
     return this._router as any;
   }
-  private get closedMsg() {
-    return `Server "${this.props.host}:${this.props.port}" has been closed`;
-  }
+  // private get closedMsg() {
+  //   return `Server "${this.props.host}:${this.props.port}" has been closed`;
+  // }
 
 
   protected willInit = async () => {
     this._router = new ServerRouterLogic(this.log.debug);
-    this.serverId = await this.httpServerIo.newServer(this.props);
-
-    // TODO: проверить как быдет отписываться
-    await this.httpServerIo.onServerClose();
-    await this.httpServerIo.onServerError();
-    await this.httpServerIo.onServerListening();
+    // TODO: get instance of HttpDriver
   }
 
   // protected didInit = async () => {

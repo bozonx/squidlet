@@ -14,8 +14,9 @@ export class HttpServer extends DriverBase<HttpServerProps> {
     return this.server.listeningPromise;
   }
 
-  private get wsServerIo(): HttpServerIo {
-    return this.getIo('WebSocketServer') as any;
+  private serverId?: string;
+  private get httpServerIo(): HttpServerIo {
+    return this.getIo('HttpServer') as any;
   }
   private server?: HttpServerLogic;
   private get closedMsg() {
@@ -24,6 +25,7 @@ export class HttpServer extends DriverBase<HttpServerProps> {
 
 
   protected willInit = async () => {
+
     this.server = new HttpServerLogic(
       this.wsServerIo,
       this.props,
@@ -31,6 +33,8 @@ export class HttpServer extends DriverBase<HttpServerProps> {
       this.log.info,
       this.log.error
     );
+
+    this.serverId = await this.httpServerIo.newServer(this.props);
   }
 
   protected appDidInit = async () => {
