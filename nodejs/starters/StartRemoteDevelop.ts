@@ -6,6 +6,7 @@ import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartDevelopBase from './StartDevelopBase';
 import SystemStarter from './SystemStarter';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 export default class StartRemoteDevelop extends StartDevelopBase {
@@ -14,12 +15,18 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
   constructor(
     configPath: string,
+    // TODO: remove
     argForce?: boolean,
     argLogLevel?: LogLevel,
+    // TODO: remove
     argMachine?: NodejsMachines,
+    // TODO: remove ????
     argHostName?: string,
+    // TODO: remove
     argWorkDir?: string,
+    // TODO: remove
     argUser?: string,
+    // TODO: remove
     argGroup?: string,
     argIoSet?: string,
   ) {
@@ -33,8 +40,6 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   }
 
   async init() {
-    // TODO: при instantiate EnvBuilder нужно указать платформу и машину удаленного хоста!!!
-    // TODO: нужно запросить инфу с удаленного хоста
     await super.init();
 
     console.info(`Using remote ioset of host "${this.argIoSet}"`);
@@ -71,6 +76,14 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     return {
       host: splat[0],
       port: splat[1] && parseInt(splat[1]) || undefined,
+    };
+  }
+
+  protected async resolvePlatformMachine(): Promise<{platform: Platforms, machine: string}> {
+    // TODO: ask ioServer via http api for platform and machine
+    return {
+      platform: 'nodejs',
+      machine: 'rpi',
     };
   }
 
