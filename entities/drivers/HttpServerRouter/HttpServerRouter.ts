@@ -60,12 +60,12 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   }
 
   async closeServer() {
-    if (!this.serverId) return;
-
-    // TODO: должно при этом подняться событие close или нет ???
-    await this.httpServerIo.closeServer(this.serverId);
-
-    delete this.serverId;
+    // if (!this.serverId) return;
+    //
+    // // TODO: должно при этом подняться событие close или нет ???
+    // await this.httpServerIo.closeServer(this.serverId);
+    //
+    // delete this.serverId;
   }
 
   // onConnection(

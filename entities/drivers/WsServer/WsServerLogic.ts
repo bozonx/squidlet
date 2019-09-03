@@ -5,7 +5,7 @@ import WebSocketServerIo, {
 } from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Promised from 'system/lib/Promised';
-import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION} from 'system/constants';
+import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION, SERVER_START_LISTENING_SEC} from 'system/constants';
 import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
@@ -15,7 +15,6 @@ export enum WS_SERVER_EVENTS {
   newConnection,
 }
 
-const SERVER_START_LISTENING_SEC = 30;
 export const SETCOOKIE_LABEL = '__SET_COOKIE__';
 
 
@@ -158,21 +157,23 @@ export default class WsServerLogic {
       () => {
         clearTimeout(listeningTimeout);
         //console.log(22222222222)
-        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} started listening`);
+        this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
         this._listeningPromised.resolve();
       }
     );
     const connectionIndex: number = await this.wsServerIo.onConnection(
       this.serverId,
       (connectionId: string, request: ConnectionParams) => {
-        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
+        this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
         this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
       }
     );
     const closeIndex: number = await this.wsServerIo.onServerClose(
       this.serverId,
       () => {
-        this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} has been closed`);
+        // TODO: delete this.serverId
+        // TODO: maybe start destroy
+        this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
         this.onClose();
       }
     );

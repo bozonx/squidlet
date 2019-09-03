@@ -5,6 +5,7 @@ export const BYTES_IN_WORD = 2;
 export const DATA_ADDRESS_LENGTH = 1;
 export const BITS_IN_BYTE = 8;
 export const ENCODE = 'utf8';
+export const SERVER_START_LISTENING_SEC = 30;
 
 export const HANDLER_EVENT_POSITION = 0;
 export const HANDLER_INDEX_POSITION = 1;

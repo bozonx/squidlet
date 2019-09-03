@@ -50,7 +50,7 @@ export interface HttpResponse {
 }
 
 export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
-type HttpRequestHandler = (requestId: number, request: HttpRequest) => Promise<HttpResponse>;
+export type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
 
 export interface HttpServerIo {
@@ -72,7 +72,7 @@ export interface HttpServerIo {
   /**
    * Emits on server error
    */
-  onServerError(serverId: string, cb: (err: Error) => void): Promise<number>;
+  onServerError(serverId: string, cb: (err: string) => void): Promise<number>;
 
   /**
    * when server starts listening

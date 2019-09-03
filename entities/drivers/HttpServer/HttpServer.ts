@@ -34,7 +34,7 @@ export class HttpServer extends DriverBase<HttpServerProps> {
       this.log.error
     );
 
-    this.serverId = await this.httpServerIo.newServer(this.props);
+    //this.serverId = await this.httpServerIo.newServer(this.props);
   }
 
   protected appDidInit = async () => {
