@@ -1,7 +1,10 @@
 import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
-import {HttpRequest} from '../../../system/interfaces/io/HttpServerIo';
+import {HttpMethods, HttpRequest} from '../../../system/interfaces/io/HttpServerIo';
 import {JsonTypes} from '../../../system/interfaces/Types';
 import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
+
+
+const EVENT_NAME_DELIMITER = '|';
 
 
 interface ParsedRoute {
@@ -15,7 +18,9 @@ interface ParsedRoute {
 }
 
 interface RouteItem {
+  // full route
   route: string;
+  method: HttpMethods;
   routeParams: {[index: string]: JsonTypes};
 }
 
@@ -24,18 +29,22 @@ type RouterRequestHandler = (parsedRoute: ParsedRoute, request: HttpDriverReques
 
 export default class ServerRouterLogic {
   private readonly events = new IndexedEventEmitter<RouterRequestHandler>();
-  private readonly registeredRoutes: RouteItem[] = [];
+  private readonly registeredRoutes: {[index: string]: RouteItem} = {};
+  private readonly logDebug: (msg: string) => void;
 
 
-  constructor() {
+  constructor(logDebug: (msg: string) => void) {
+    this.logDebug = logDebug;
   }
 
 
   /**
    * Call this to register a new route and its params
    */
-  addRoute(route: string, routeParams: {[index: string]: JsonTypes}) {
-    this.registeredRoutes.push({ route, routeParams });
+  addRoute(method: HttpMethods, route: string, routeParams: {[index: string]: JsonTypes}) {
+    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+
+    this.registeredRoutes[eventName] = { method, route, routeParams };
   }
 
   /**
@@ -43,14 +52,25 @@ export default class ServerRouterLogic {
    */
   parseIncomeRequest(request: HttpRequest) {
     const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
+    const parsedRoute: ParsedRoute = this.parseRoute(request);
+    const eventName = `${driverRequest.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
+    const resolvedRoute: RouteItem | undefined = this.registeredRoutes[eventName];
+
+    if (!resolvedRoute) {
+      this.logDebug(`ServerRouterLogic.parseIncomeRequest: route "${eventName}: isn't registered!`);
+
+      return;
+    }
+
+    this.events.emit(eventName, parsedRoute, driverRequest);
   }
 
   /**
    * Call this to handle calling of route
    */
-  onRequest(route: string, cb: RouterRequestHandler): number {
+  onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
 
-    // TODO: слушать ещё и method
+
 
     // const handlerWrapper = (parsedRoute: ParsedRoute, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
     //   if (parsedRoute.route !== route) return;
@@ -60,13 +80,18 @@ export default class ServerRouterLogic {
     //   cb(parsedRoute, request);
     // }
 
+
     // TODO: cb returns a response !!!! этом может не обрабатываться в events
 
-    return this.events.addListener(route, cb);
+    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+
+    return this.events.addListener(eventName, cb);
   }
 
-  removeRequestListener(route: string, handlerIndex: number) {
-    this.events.removeListener(route, handlerIndex);
+  removeRequestListener(method: HttpMethods, route: string, handlerIndex: number) {
+    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+
+    this.events.removeListener(eventName, handlerIndex);
   }
 
 
@@ -75,6 +100,10 @@ export default class ServerRouterLogic {
       ...request,
       // TODO: prepare body - resolve type
     };
+  }
+
+  private parseRoute(request: HttpRequest): ParsedRoute {
+    // TODO: parse
   }
 
 }
