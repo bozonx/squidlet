@@ -8,6 +8,7 @@ import {
 } from 'system/interfaces/io/HttpServerIo';
 import {SERVER_START_LISTENING_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
+import {HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
 
 
 export interface HttpDriverRequest {
@@ -150,13 +151,19 @@ export default class HttpServerLogic {
   }
 
   private async callCb(requestId: number, request: HttpRequest, cb: HttpDriverHandler) {
-    let response: HttpDriverResponse
+
     // TODO: подготовить request - особенно body - резолвить с contentType
 
-    cb(request)
+    const response: HttpDriverResponse = await cb(request);
 
     // TODO: body - если object - то JSON.stringify
 
+    const preparedResponse: HttpResponse = {
+      ...response,
+    };
+
+
+    await this.httpServerIo.sendResponse(requestId, preparedResponse);
   }
 
 }
