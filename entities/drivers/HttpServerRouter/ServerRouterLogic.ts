@@ -1,8 +1,12 @@
-import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
+
+// TODO: make absolute paths
+
 import {HttpMethods, HttpRequest} from '../../../system/interfaces/io/HttpServerIo';
 import {JsonTypes} from '../../../system/interfaces/Types';
 import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
 import {trimChar} from '../../../system/lib/strings';
+import {ParsedUrl, parseUrl} from '../../../system/lib/url';
+import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -14,8 +18,7 @@ interface ParsedRoute {
   // route which has been set in addRoute()
   route: string;
   routeParams: {[index: string]: JsonTypes};
-  // parameters
-  search: {[index: string]: JsonTypes};
+  location: ParsedUrl;
 }
 
 interface RouteItem {
@@ -108,11 +111,8 @@ export default class ServerRouterLogic {
   }
 
   private parseRoute(request: HttpRequest): ParsedRoute {
-    // TODO: parse
-    const relativeUrl: string = '';
-    // TODO: parse url - see cookies
-    const search: {[index: string]: JsonTypes} = {};
-    const { route, params } = this.resolveRoute(relativeUrl);
+    const location: ParsedUrl = parseUrl(request.url);
+    const { route, params } = this.resolveRoute(location.url);
     const eventName = `${request.method}${EVENT_NAME_DELIMITER}${route}`;
     const routeItem: RouteItem = this.registeredRoutes[eventName];
 
@@ -120,7 +120,7 @@ export default class ServerRouterLogic {
       route,
       params,
       routeParams: routeItem.routeParams,
-      search,
+      location,
     };
   }
 
