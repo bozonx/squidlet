@@ -9,6 +9,7 @@ export const Methods = [
   'removeListener',
 ];
 
+
 export enum HttpServerEvent {
   listening,
   serverClose,
@@ -16,19 +17,21 @@ export enum HttpServerEvent {
   request,
 }
 
-export interface HttpServerProps {
-  host: string;
-  port: number;
-}
-
-export type ContentType = 'text/plain'
+export type HttpContentType = 'text/plain'
   | 'text/html'
   | 'application/json'
   | 'application/javascript'
   | 'application/xml';
+export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
+export type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
 interface CommonHeaders {
-  'content-type'?: ContentType;
+  'content-type'?: HttpContentType;
+}
+
+export interface HttpServerProps {
+  host: string;
+  port: number;
 }
 
 export interface HttpRequestHeaders extends CommonHeaders {
@@ -50,16 +53,11 @@ export interface HttpRequest extends HttpRequestBase {
 }
 
 export interface HttpResponse {
-  // method: HttpMethods;
-  // url: string;
   headers: HttpResponseHeaders;
   status: number;
-  //statusString: string;
+  statusString: string;
   body?: string | Uint8Array;
 }
-
-export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
-export type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
 
 export interface HttpServerIo {

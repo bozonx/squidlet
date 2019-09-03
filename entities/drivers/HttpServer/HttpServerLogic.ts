@@ -1,16 +1,14 @@
 import {HttpRequestHandler, HttpServerIo, HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import Promised from 'system/lib/Promised';
 import {
-  HttpMethods,
   HttpRequest,
-  HttpRequestHeaders,
   HttpResponseHeaders
 } from 'system/interfaces/io/HttpServerIo';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {ContentType, HttpRequestBase, HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
-import {types} from 'util';
-import {JsonTypes} from '../../../system/interfaces/Types';
+import {HttpContentType, HttpRequestBase, HttpResponse} from 'system/interfaces/io/HttpServerIo';
+import {JsonTypes} from 'system/interfaces/Types';
+import {parseBody, prepareBody} from 'system/lib/httpBody';
 
 
 export interface HttpDriverRequest extends HttpRequestBase {
@@ -18,9 +16,9 @@ export interface HttpDriverRequest extends HttpRequestBase {
 }
 
 export interface HttpDriverResponse {
-  // TODO: не обязательный - если ok то 200, иначе 500
+  // if you don't set a status then 200 or 500 will be used
   status?: number;
-  // TODO: не обязательны - потом они сами добавляются
+  // headers are optional. But content-type will be set.
   headers?: HttpResponseHeaders;
   body?: string | {[index: string]: any} | Uint8Array;
 }
@@ -154,45 +152,39 @@ export default class HttpServerLogic {
   }
 
   private async callRequestCb(requestId: number, request: HttpRequest, cb: HttpDriverHandler) {
-
-    // TODO: подготовить request - особенно body - резолвить с contentType
     const preparedRequest: HttpDriverRequest = {
       ...request,
-      body: this.parseBody(request.headers['content-type'], request.body),
-    }
-
-    const response: HttpDriverResponse = await cb(preparedRequest);
-
-    // TODO: body - если object - то JSON.stringify
-    // TODO: атоматом сделать JSON.stringify
-    // TODO: атоматом установить content-type
-
-    const preparedResponse: HttpResponse = {
-      ...response,
+      body: parseBody(request.headers['content-type'], request.body),
     };
 
-
-    await this.httpServerIo.sendResponse(requestId, preparedResponse);
-  }
-
-  private parseBody(contentType: ContentType, body?: string | Uint8Array): JsonTypes | Uint8Array {
-    if (typeof body === 'undefined') {
-      return;
-    }
-    else if (body instanceof Uint8Array) {
-      return body;
-    }
-    else if (typeof body !== 'string') {
-      throw new Error(`Unsupported type of body ${typeof body}`);
-    }
+    let preparedResponse: HttpResponse;
+    // let status = 200;
+    // let statusString: 'OK';
 
     try {
-      return JSON.parse(body);
+      const response: HttpDriverResponse = await cb(preparedRequest);
+
+      preparedResponse = {
+        ...response,
+        status: 200,
+        statusString: 'OK',
+        // TODO: add content type
+        //headers?: HttpResponseHeaders,
+        body: prepareBody(response.body),
+    };
     }
-    catch (e) {
-      // just string, maybe html
-      return body;
+    catch(err) {
+      preparedResponse = {
+        headers: {
+          'content-type': 'text/plain',
+        },
+        status: 500,
+        statusString: 'Server error',
+        body: String(err),
+      };
     }
+
+    await this.httpServerIo.sendResponse(requestId, preparedResponse);
   }
 
 }
