@@ -1,4 +1,4 @@
-import {HttpRequestHandler, HttpServerIo, HttpServerProps} from 'system/interfaces/io/HttpServerIo';
+import {HttpContentType, HttpRequestHandler, HttpServerIo, HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import Promised from 'system/lib/Promised';
 import {
   HttpRequest,
@@ -6,9 +6,9 @@ import {
 } from 'system/interfaces/io/HttpServerIo';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {HttpContentType, HttpRequestBase, HttpResponse} from 'system/interfaces/io/HttpServerIo';
+import {HttpRequestBase, HttpResponse} from 'system/interfaces/io/HttpServerIo';
 import {JsonTypes} from 'system/interfaces/Types';
-import {parseBody, prepareBody} from 'system/lib/httpBody';
+import {parseBody, prepareBody, resolveBodyType} from 'system/lib/httpBody';
 
 
 export interface HttpDriverRequest extends HttpRequestBase {
@@ -20,7 +20,7 @@ export interface HttpDriverResponse {
   status?: number;
   // headers are optional. But content-type will be set.
   headers?: HttpResponseHeaders;
-  body?: string | {[index: string]: any} | Uint8Array;
+  body?: JsonTypes | Uint8Array;
 }
 
 type HttpDriverHandler = (request: HttpDriverRequest) => Promise<HttpDriverResponse>;
@@ -163,13 +163,17 @@ export default class HttpServerLogic {
 
     try {
       const response: HttpDriverResponse = await cb(preparedRequest);
+      const contentType: HttpContentType = (response.headers && response.headers['content-type'])
+        || resolveBodyType(response.body);
 
       preparedResponse = {
         ...response,
         status: 200,
         statusString: 'OK',
-        // TODO: add content type
-        //headers?: HttpResponseHeaders,
+        headers: {
+          ...response.headers,
+          'content-type': contentType,
+        },
         body: prepareBody(response.body),
     };
     }

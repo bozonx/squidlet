@@ -30,7 +30,7 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
 /**
  * Prepare body to response
  */
-export function prepareBody(fullBoby: JsonTypes | Uint8Array): string | Uint8Array | undefined {
+export function prepareBody(fullBody: JsonTypes | Uint8Array): string | Uint8Array | undefined {
 
   // TODO: body - если object - то JSON.stringify
   // TODO: атоматом сделать JSON.stringify
@@ -38,6 +38,6 @@ export function prepareBody(fullBoby: JsonTypes | Uint8Array): string | Uint8Arr
 
 }
 
-export function resolveBodyType(): HttpContentType {
+export function resolveBodyType(fullBody: JsonTypes | Uint8Array): HttpContentType {
   // TODO: add !!!!
 }
