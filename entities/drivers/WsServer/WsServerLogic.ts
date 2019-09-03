@@ -5,7 +5,7 @@ import WebSocketServerIo, {
 } from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Promised from 'system/lib/Promised';
-import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION, SERVER_START_LISTENING_SEC} from 'system/constants';
+import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION, SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
@@ -76,7 +76,10 @@ export default class WsServerLogic {
     this.events.destroy();
     await this.removeListeners();
     // TODO: use destroyServer - it removes all the events before destroy
+    // TODO: не должно поднять события
     await this.wsServerIo.closeServer(this.serverId);
+
+    delete this.serverId;
   }
 
 
@@ -148,7 +151,7 @@ export default class WsServerLogic {
     const listeningTimeout = setTimeout(() => {
       this.handleTimeout()
         .catch(this.logError);
-    }, SERVER_START_LISTENING_SEC * 1000);
+    }, SERVER_STARTING_TIMEOUT_SEC * 1000);
 
     //console.log(111111111, this.props)
 
@@ -171,10 +174,9 @@ export default class WsServerLogic {
     const closeIndex: number = await this.wsServerIo.onServerClose(
       this.serverId,
       () => {
-        // TODO: delete this.serverId
-        // TODO: maybe start destroy
-        this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
-        this.onClose();
+        clearTimeout(listeningTimeout);
+        this.handleCloseServer()
+          .catch(this.logError);
       }
     );
     const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
@@ -218,6 +220,14 @@ export default class WsServerLogic {
     this.handlerIndexes.push([WsServerEvent.clientMessage, messageIndex]);
     this.handlerIndexes.push([WsServerEvent.clientError, errorIndex]);
     this.handlerIndexes.push([WsServerEvent.clientUnexpectedResponse, unexpectedIndex]);
+  }
+
+  private async handleCloseServer() {
+    this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
+    await this.removeListeners();
+    delete this.serverId;
+    this.onClose();
+    this.events.destroy();
   }
 
   private async removeListeners() {

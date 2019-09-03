@@ -6,7 +6,7 @@ import {
   HttpRequestHeaders,
   HttpResponseHeaders
 } from 'system/interfaces/io/HttpServerIo';
-import {SERVER_START_LISTENING_SEC} from 'system/constants';
+import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
 
@@ -33,7 +33,6 @@ type HttpDriverHandler = (request: HttpDriverRequest) => Promise<HttpDriverRespo
 
 
 export default class HttpServerLogic {
-  // TODO: review
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     return this._listeningPromised.promise;
@@ -83,7 +82,10 @@ export default class HttpServerLogic {
     }
 
     this.requestEvents.removeAll();
+    // TODO: не должно поднять события
     await this.httpServerIo.closeServer(this.serverId);
+
+    delete this.serverId;
   }
 
 
@@ -94,7 +96,7 @@ export default class HttpServerLogic {
 
   onRequest(cb: HttpDriverHandler): number {
     const cbWrapper = (requestId: number, request: HttpRequest) => {
-      this.callCb(requestId, request, cb)
+      this.callRequestCb(requestId, request, cb)
         .catch(this.logError);
     };
 
@@ -108,7 +110,7 @@ export default class HttpServerLogic {
   async closeServer() {
     if (!this.serverId) return;
 
-    // TODO: должно при этом подняться событие close или нет ???
+    // TODO: должно при этом подняться событие close
     await this.httpServerIo.closeServer(this.serverId);
 
     delete this.serverId;
@@ -123,13 +125,11 @@ export default class HttpServerLogic {
     const listeningTimeout = setTimeout(() => {
       this.handleTimeout()
         .catch(this.logError);
-    }, SERVER_START_LISTENING_SEC * 1000);
+    }, SERVER_STARTING_TIMEOUT_SEC * 1000);
 
     await this.httpServerIo.onServerClose(this.serverId, () => {
-      delete this.serverId;
-      this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
-      this.requestEvents.removeAll();
-      this.onClose();
+      clearTimeout(listeningTimeout);
+      this.handleCloseServer();
     });
     await this.httpServerIo.onServerError(this.serverId, (err: string) => this.logError(err));
     await this.httpServerIo.onServerListening(this.serverId, () => {
@@ -145,12 +145,19 @@ export default class HttpServerLogic {
     await this.httpServerIo.closeServer(this.serverId);
   }
 
+  private async handleCloseServer() {
+    this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
+    delete this.serverId;
+    this.requestEvents.removeAll();
+    this.onClose();
+  }
+
   private handleRequest = (requestId: number, request: HttpRequest) => {
     this.logDebug(`HttpServerLogic: income message on server ${this.props.host}:${this.props.port} has been closed, request ${JSON.stringify(request)}`);
     this.requestEvents.emit(requestId, request);
   }
 
-  private async callCb(requestId: number, request: HttpRequest, cb: HttpDriverHandler) {
+  private async callRequestCb(requestId: number, request: HttpRequest, cb: HttpDriverHandler) {
 
     // TODO: подготовить request - особенно body - резолвить с contentType
 

@@ -59,6 +59,7 @@ export interface HttpServerIo {
    */
   newServer(props: HttpServerProps): Promise<string>;
 
+  // TODO: должно при этом подняться событие close
   /**
    * Shut down a server which has been previously created
    */
