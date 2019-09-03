@@ -1,4 +1,4 @@
-cookies = require('../../../system/lib/cookies')
+cookies = require('../../../system/lib/url')
 
 
 describe 'system.lib.cookies', ->
