@@ -5,6 +5,7 @@ import {HttpMethods, HttpRequestHeaders, HttpResponseHeaders} from '../../../sys
 
 export interface HttpDriverRequest {
   method: HttpMethods;
+  // TODO: зачем массив ????
   url: string | string[];
   headers: HttpRequestHeaders;
   // TODO: атоматом сделать JSON.stringify

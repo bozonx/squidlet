@@ -19,6 +19,8 @@ const allowedApiMethodsToCall = [
 ];
 
 
+// TODO: use router HttpServerRouter
+
 export default class HttpApi extends ServiceBase<HttpServerProps> {
   private get httpServer(): HttpServer {
     return this.depsInstances.httpServer;
