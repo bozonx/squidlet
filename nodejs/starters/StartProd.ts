@@ -59,6 +59,10 @@ export default class StartProd {
 
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
 
+    if (!this.props.machine) {
+      throw new Error(`No defined machine`);
+    }
+
     this._envBuilder = new EnvBuilder(
       this.props.hostConfig,
       this.props.envSetDir,

@@ -24,7 +24,8 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     argIoSet?: string,
   ) {
     // not pass user and group to not set it to IoSet
-    super(configPath, argForce, argLogLevel, argMachine, argHostName, argWorkDir, undefined, undefined);
+    // and not pass user and group to not set them to ioSet
+    super(configPath, argForce, argLogLevel, 'noMachine', argHostName, argWorkDir, undefined, undefined);
 
     if (!argIoSet) throw new Error(`ioset param is required`);
 
@@ -32,6 +33,8 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   }
 
   async init() {
+    // TODO: при instantiate EnvBuilder нужно указать платформу и машину удаленного хоста!!!
+    // TODO: нужно запросить инфу с удаленного хоста
     await super.init();
 
     console.info(`Using remote ioset of host "${this.argIoSet}"`);

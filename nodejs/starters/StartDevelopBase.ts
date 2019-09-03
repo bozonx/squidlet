@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import Os, {SpawnCmdResult} from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import Props from './Props';
+import Props, {NoMachine} from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
 import {HOST_ENVSET_DIR} from '../../shared/constants';
@@ -11,6 +11,7 @@ import LogLevel from '../../system/interfaces/LogLevel';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {isEmptyObject} from '../../system/lib/objects';
 import {REPO_ROOT} from '../../shared/helpers';
+import Platforms from '../../hostEnvBuilder/interfaces/Platforms';
 
 
 export default abstract class StartDevelopBase {
@@ -27,7 +28,7 @@ export default abstract class StartDevelopBase {
     configPath: string,
     argForce?: boolean,
     argLogLevel?: LogLevel,
-    argMachine?: NodejsMachines,
+    argMachine?: NodejsMachines | NoMachine,
     argHostName?: string,
     argWorkDir?: string,
     argUser?: string,
@@ -52,13 +53,14 @@ export default abstract class StartDevelopBase {
     await this.props.resolve();
 
     const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    const {platform, machine} = await this.resolvePlatformMachine();
 
     this._envBuilder = new EnvBuilder(
       this.resolveHostConfig(),
       this.props.envSetDir,
       tmpDir,
-      this.props.platform,
-      this.props.machine,
+      platform,
+      machine,
       { uid: this.props.uid, gid: this.props.gid }
     );
   }
@@ -126,6 +128,17 @@ export default abstract class StartDevelopBase {
       console.error(result.stdout);
       console.error(result.stderr);
     }
+  }
+
+  protected async resolvePlatformMachine(): Promise<{platform: Platforms, machine: string}> {
+    if (!this.props.machine) {
+      throw new Error(`No defined machine`);
+    }
+
+    return {
+      platform: this.props.platform,
+      machine: this.props.machine,
+    };
   }
 
 }

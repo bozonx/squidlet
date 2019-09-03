@@ -16,6 +16,9 @@ import {isKindOfNumber} from '../../system/lib/common';
 import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 
 
+export type NoMachine = 'noMachine';
+
+
 export default class Props {
   workDir: string = '';
   envSetDir: string = '';
@@ -28,22 +31,20 @@ export default class Props {
   destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
   readonly argLogLevel?: LogLevel;
+  machine?: NodejsMachines;
   get hostConfig(): PreHostConfig {
     return this._hostConfig as any;
   }
-  get machine(): NodejsMachines {
-    return this._machine as any;
-  }
+
 
   private readonly os: Os;
-  private readonly argMachine?: NodejsMachines;
+  private readonly argMachine?: NodejsMachines | NoMachine;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
   private readonly argUser?: string;
   private readonly argGroup?: string;
   private _hostConfig?: PreHostConfig;
-  private _machine?: NodejsMachines;
 
 
   constructor(
@@ -51,7 +52,7 @@ export default class Props {
     groupConfig: GroupConfigParser,
     argForce?: boolean,
     argLogLevel?: LogLevel,
-    argMachine?: NodejsMachines,
+    argMachine?: NodejsMachines | NoMachine,
     argHostName?: string,
     argWorkDir?: string,
     // TODO: test
@@ -71,7 +72,9 @@ export default class Props {
 
 
   async resolve() {
-    this._machine = await this.resolveMachine();
+    if (this.argMachine !== 'noMachine') {
+      this.machine = await this.resolveMachine();
+    }
     this._hostConfig = this.groupConfig.getHostConfig(this.argHostName);
     this.uid = await this.resolveUser();
     this.gid = await this.resolveGroup();
@@ -94,13 +97,11 @@ export default class Props {
     if (this.argLogLevel && !LOG_LEVELS.includes(this.argLogLevel)) {
       throw new Error(`Invalid "log-level" param: ${this.argLogLevel}`);
     }
-
-    // if (this.platform !== this.hostConfig.platform) {
-    //   throw new Error(`Param "platform" of host config "${this.hostId}" is not a "${this.platform}"`);
-    // }
   }
 
-  private async resolveMachine(): Promise<NodejsMachines> {
+  private async resolveMachine(): Promise<NodejsMachines | undefined> {
+    if (this.argMachine === 'noMachine') return;
+
     if (this.argMachine) {
       if (!nodejsSupportedMachines.includes(this.argMachine)) {
         throw new Error(`Unsupported machine type "${this.argMachine}"`);

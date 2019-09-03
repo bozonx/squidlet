@@ -68,6 +68,10 @@ export default class ProdBuild {
   }
 
   private async doBuildIo(buildDir: string, tmpDir: string) {
+    if (!this.props.machine) {
+      throw new Error(`No defined machine`);
+    }
+
     const buildIo: BuildIo = new BuildIo(
       this.os,
       this.props.platform,
