@@ -1,6 +1,8 @@
 import {JsonTypes} from '../interfaces/Types';
 
 
+export const URL_DELIMITER = '/';
+
 export interface ParsedUrl {
   protocol: string;
   host: string;
