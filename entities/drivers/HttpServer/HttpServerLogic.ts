@@ -8,17 +8,13 @@ import {
 } from 'system/interfaces/io/HttpServerIo';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
+import {HttpRequestBase, HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
+import {types} from 'util';
+import {JsonTypes} from '../../../system/interfaces/Types';
 
 
-export interface HttpDriverRequest {
-  method: HttpMethods;
-  // TODO: зачем массив ????
-  url: string | string[];
-  headers: HttpRequestHeaders;
-  // TODO: атоматом сделать JSON.stringify
-  // TODO: атоматом установить content-type
-  body?: string | {[index: string]: any} | Uint8Array;
+export interface HttpDriverRequest extends HttpRequestBase {
+  body?: JsonTypes | Uint8Array;
 }
 
 export interface HttpDriverResponse {
@@ -160,10 +156,16 @@ export default class HttpServerLogic {
   private async callRequestCb(requestId: number, request: HttpRequest, cb: HttpDriverHandler) {
 
     // TODO: подготовить request - особенно body - резолвить с contentType
+    const preparedRequest: HttpDriverRequest = {
+      ...request,
+      body: this.parseBody(request.body);
+    }
 
-    const response: HttpDriverResponse = await cb(request);
+    const response: HttpDriverResponse = await cb(preparedRequest);
 
     // TODO: body - если object - то JSON.stringify
+    // TODO: атоматом сделать JSON.stringify
+    // TODO: атоматом установить content-type
 
     const preparedResponse: HttpResponse = {
       ...response,
@@ -171,6 +173,26 @@ export default class HttpServerLogic {
 
 
     await this.httpServerIo.sendResponse(requestId, preparedResponse);
+  }
+
+  private parseBody(body: string | Uint8Array): JsonTypes | Uint8Array {
+    if (typeof body === 'undefined') {
+      return;
+    }
+    else if (body instanceof Uint8Array) {
+      return body;
+    }
+    else if (typeof body !== 'string') {
+      throw new Error(`Unsupported type of body ${typeof body}`);
+    }
+
+    try {
+      return JSON.parse(body);
+    }
+    catch (e) {
+      // just string, maybe html
+      return body;
+    }
   }
 
 }

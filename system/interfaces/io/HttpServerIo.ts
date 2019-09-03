@@ -33,10 +33,13 @@ export interface HttpResponseHeaders extends CommonHeaders {
 
 // TODO: поддержка Uint8Array
 
-export interface HttpRequest {
+export interface HttpRequestBase {
   method: HttpMethods;
   url: string;
   headers: HttpRequestHeaders;
+}
+
+export interface HttpRequest extends HttpRequestBase {
   body?: string | Uint8Array;
 }
 
