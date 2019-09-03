@@ -21,8 +21,14 @@ export interface HttpServerProps {
   port: number;
 }
 
+export type ContentType = 'text/plain'
+  | 'text/html'
+  | 'application/json'
+  | 'application/javascript'
+  | 'application/xml';
+
 interface CommonHeaders {
-  'content-type'?: string;
+  'content-type'?: ContentType;
 }
 
 export interface HttpRequestHeaders extends CommonHeaders {

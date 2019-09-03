@@ -8,7 +8,7 @@ import {
 } from 'system/interfaces/io/HttpServerIo';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {HttpRequestBase, HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
+import {ContentType, HttpRequestBase, HttpResponse} from '../../../system/interfaces/io/HttpServerIo';
 import {types} from 'util';
 import {JsonTypes} from '../../../system/interfaces/Types';
 
@@ -158,7 +158,7 @@ export default class HttpServerLogic {
     // TODO: подготовить request - особенно body - резолвить с contentType
     const preparedRequest: HttpDriverRequest = {
       ...request,
-      body: this.parseBody(request.body);
+      body: this.parseBody(request.headers['content-type'], request.body),
     }
 
     const response: HttpDriverResponse = await cb(preparedRequest);
@@ -175,7 +175,7 @@ export default class HttpServerLogic {
     await this.httpServerIo.sendResponse(requestId, preparedResponse);
   }
 
-  private parseBody(body: string | Uint8Array): JsonTypes | Uint8Array {
+  private parseBody(contentType: ContentType, body?: string | Uint8Array): JsonTypes | Uint8Array {
     if (typeof body === 'undefined') {
       return;
     }
