@@ -58,13 +58,8 @@ export default class CommandStart {
     if (this.args.ioset) {
       const starter = new StartRemoteDevelop(
         this.configPath,
-        this.args.force,
         this.args.logLevel,
-        this.args.machine as any,
         this.args.name,
-        this.args.workDir,
-        this.args.user,
-        this.args.group,
         this.args.ioset,
       );
 

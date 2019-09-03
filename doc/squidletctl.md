@@ -63,6 +63,16 @@ only first time or if `--force` parameter is set.
       [--group=groupname]
       [--ioset=localhost:8089]
       ./groupOrHostConfig.yaml
+      
+### Start development host on your machine and use remote io set on micro-controller or remote host.
+
+    squidletctl start
+      [--name]
+      [--log-level=debug|info|warn|error]
+      [--ioset=localhost:8089]
+      ./groupOrHostConfig.yaml
+
+* --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in config of remote host
 
 ### Start development io server
 
@@ -91,7 +101,6 @@ Config is optional, if it does not includes io definitions you don't have to spe
 * --log-level - log level which will be used. It overrides a log level specified in a host config.
 * --user - owner of files which will be written. It can be a user name or uid. It is optional
 * --group - group of files which will be written, It can be a group name or uid. It is optional
-* --ioset=localhost:8089 - connect to ioSet of remote host. You should allow it in config of remote host
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.

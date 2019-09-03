@@ -1,4 +1,3 @@
-import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
 import {SYSTEM_DIR} from '../../shared/helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
@@ -17,24 +16,13 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
   constructor(
     configPath: string,
-    // TODO: remove
-    argForce?: boolean,
     argLogLevel?: LogLevel,
-    // TODO: remove
-    argMachine?: NodejsMachines,
-    // TODO: remove ????
     argHostName?: string,
-    // TODO: remove
-    argWorkDir?: string,
-    // TODO: remove
-    argUser?: string,
-    // TODO: remove
-    argGroup?: string,
     argIoSet?: string,
   ) {
     // not pass user and group to not set it to IoSet
     // and not pass user and group to not set them to ioSet
-    super(configPath, argForce, argLogLevel, 'noMachine', argHostName, argWorkDir, undefined, undefined);
+    super(configPath, undefined, argLogLevel, 'noMachine', argHostName);
 
     if (!argIoSet) throw new Error(`ioset param is required`);
 
@@ -62,9 +50,10 @@ export default class StartRemoteDevelop extends StartDevelopBase {
    * Resolve which io set will be used and make instance of it and pass ioSet config.
    */
   protected async makeIoSet(): Promise<IoSet> {
-    const {host, port} = this.parseIoSetString(this.argIoSet);
+    if (!this.remoteHostInfo) throw new  Error(`No remote host info`);
 
-    const ioSet = new IoSetDevelopRemote(this.os, this.envBuilder, host, port);
+    const {host, port} = this.parseIoSetString(this.argIoSet);
+    const ioSet = new IoSetDevelopRemote(this.os, this.envBuilder, this.remoteHostInfo.usedIo, host, port);
 
     ioSet.prepare && await ioSet.prepare();
 
