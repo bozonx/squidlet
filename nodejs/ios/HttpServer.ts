@@ -135,14 +135,11 @@ export default class HttpServer implements HttpServerIo{
       let handlerIndex: number;
       let waitTimeout: any;
       const requestId: number = makeUniqNumber();
-      const httpRequest: HttpRequest = {
-        // TODO: в каком формате method и форматируется ли он??? нуно ли делать toLowerCase()
-        method: req.method.toLowerCase() as any,
-        url: req.url,
-        headers: req.headers as any,
-        // TODO: конверитровать Buffer to Uint. string оставить - см content type
-        body: req.body,
-      };
+      const httpRequest: HttpRequest = this.makeRequestObject(req);
+
+      // TODO: remove
+      console.log('------ httpRequest', httpRequest)
+
       const respHandler = (receivedRequestId: number, response: HttpResponse) => {
         // listen only expected requestId
         if (receivedRequestId !== requestId) return;
@@ -150,18 +147,7 @@ export default class HttpServer implements HttpServerIo{
         clearTimeout(waitTimeout);
         events.removeListener(RESPONSE_EVENT, handlerIndex);
 
-        for (let headerName of Object.keys(response.headers)) {
-          res.setHeader(headerName, (response.headers as any)[headerName]);
-        }
-
-        res.status(response.status);
-
-        if (typeof response.body === 'string') {
-          res.send(response.body);
-        }
-        else {
-          // TODO: support of Buffer - convert from Uint8Arr
-        }
+        this.setupResponse(response, res);
 
         resolve();
       };
@@ -183,6 +169,41 @@ export default class HttpServer implements HttpServerIo{
     }
 
     return this.servers[Number(serverId)];
+  }
+
+  private makeRequestObject(req: Request): HttpRequest {
+    let body: string | Buffer;
+
+    if (typeof req.body === 'string') {
+      body = req.body;
+    }
+    else {
+      // TODO: convert Uint8Array to Buffer
+      body = req.body;
+    }
+
+    return  {
+      // TODO: в каком формате method и форматируется ли он??? нуно ли делать toLowerCase()
+      method: req.method.toLowerCase() as any,
+      url: req.url,
+      headers: req.headers as any,
+      body,
+    };
+  }
+
+  private setupResponse(response: HttpResponse, expressRes: Response) {
+    for (let headerName of Object.keys(response.headers)) {
+      expressRes.setHeader(headerName, (response.headers as any)[headerName]);
+    }
+
+    expressRes.status(response.status);
+
+    if (typeof response.body === 'string') {
+      expressRes.send(response.body);
+    }
+    else {
+      // TODO: support of Buffer - convert from Uint8Arr to Buffer
+    }
   }
 
 }
