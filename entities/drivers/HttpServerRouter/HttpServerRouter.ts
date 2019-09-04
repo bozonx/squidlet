@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
-import ServerRouterLogic, {RouterRequestHandler} from './ServerRouterLogic';
+import HttpRouterLogic, {RouterRequestHandler} from '../../../system/lib/HttpRouterLogic';
 import {HttpMethods} from 'system/interfaces/io/HttpServerIo';
 import {JsonTypes} from 'system/interfaces/Types';
 import {GetDriverDep} from 'system/base/EntityBase';
@@ -19,10 +19,10 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
     return this.server.listeningPromise;
   }
 
-  private _router?: ServerRouterLogic;
+  private _router?: HttpRouterLogic;
 
 
-  private get router(): ServerRouterLogic {
+  private get router(): HttpRouterLogic {
     return this._router as any;
   }
   private get server(): HttpServer {
@@ -36,7 +36,7 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   protected willInit = async (getDriverDep: GetDriverDep) => {
     this.depsInstances.server = await getDriverDep('HttpServer')
       .getInstance(this.props);
-    this._router = new ServerRouterLogic(this.log.debug);
+    this._router = new HttpRouterLogic(this.log.debug);
 
     this.server.onRequest(this.handleIncomeRequest);
   }

@@ -3,7 +3,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {trimChar} from 'system/lib/strings';
 import {ParsedUrl, parseUrl, URL_DELIMITER} from 'system/lib/url';
 import {HttpMethods, HttpRequest} from 'system/interfaces/io/HttpServerIo';
-import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
+import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -28,7 +28,7 @@ interface RouteItem {
 export type RouterRequestHandler = (parsedRoute: ParsedRoute, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
 
 
-export default class ServerRouterLogic {
+export default class HttpRouterLogic {
   private readonly events = new IndexedEventEmitter<RouterRequestHandler>();
   private readonly registeredRoutes: {[index: string]: RouteItem} = {};
   private readonly logDebug: (msg: string) => void;
