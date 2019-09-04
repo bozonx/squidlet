@@ -2,6 +2,7 @@ import * as express from 'express';
 import {Express, NextFunction, Request, Response} from 'express';
 
 import {
+  HttpRequest,
   HttpRequestHandler,
   HttpResponse,
   HttpServerEvent,
@@ -11,12 +12,15 @@ import {
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
 import {WAIT_RESPONSE_TIMEOUT} from 'system/constants';
+import {makeUniqNumber} from '../../system/lib/uniqId';
 
 
 enum ITEM_POSITION {
   server,
   events,
 }
+
+const RESPONSE_EVENT = 'res';
 
 type ServerItem = [ Express, IndexedEventEmitter<AnyHandler> ];
 
@@ -30,11 +34,10 @@ export default class HttpServer implements HttpServerIo{
       // destroy events of server
       this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
 
-      await this.destroyServer(serverId);
+      // TODO: what to do ????
+      //await this.destroyServer(serverId);
     }
   }
-
-  // TODO: method.toLowerCase()
 
 
   async newServer(props: HttpServerProps): Promise<string>{
@@ -69,11 +72,15 @@ export default class HttpServer implements HttpServerIo{
   }
 
   async onRequest(serverId: string, cb: HttpRequestHandler): Promise<number> {
-    // TODO: !!!
+    const serverItem = this.getServerItem(serverId);
+
+    return serverItem[ITEM_POSITION.events].addListener(HttpServerEvent.request, cb);
   }
 
-  async sendResponse(requestId: number, response: HttpResponse): Promise<void> {
-    // TODO: !!!
+  async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
+    const serverItem = this.getServerItem(serverId);
+
+    return serverItem[ITEM_POSITION.events].emit(RESPONSE_EVENT, requestId, response);
   }
 
   async removeListener(serverId: string, eventName: HttpServerEvent, handlerIndex: number): Promise<void> {
@@ -125,14 +132,48 @@ export default class HttpServer implements HttpServerIo{
     const events = this.servers[Number(serverId)][ITEM_POSITION.events];
 
     return new Promise<void>((resolve, reject) => {
+      let handlerIndex: number;
+      let waitTimeout: any;
+      const requestId: number = makeUniqNumber();
+      const httpRequest: HttpRequest = {
+        // TODO: в каком формате method и форматируется ли он??? нуно ли делать toLowerCase()
+        method: req.method.toLowerCase() as any,
+        url: req.url,
+        headers: req.headers as any,
+        // TODO: конверитровать Buffer to Uint. string оставить - см content type
+        body: req.body,
+      };
+      const respHandler = (receivedRequestId: number, response: HttpResponse) => {
+        // listen only expected requestId
+        if (receivedRequestId !== requestId) return;
 
-      const waitTimeout = setTimeout(() => {
+        clearTimeout(waitTimeout);
+        events.removeListener(RESPONSE_EVENT, handlerIndex);
+
+        for (let headerName of Object.keys(response.headers)) {
+          res.setHeader(headerName, (response.headers as any)[headerName]);
+        }
+
+        res.status(response.status);
+
+        if (typeof response.body === 'string') {
+          res.send(response.body);
+        }
+        else {
+          // TODO: support of Buffer - convert from Uint8Arr
+        }
+
+        resolve();
+      };
+
+      handlerIndex = events.addListener(RESPONSE_EVENT, respHandler);
+
+      waitTimeout = setTimeout(() => {
+        events.removeListener(RESPONSE_EVENT, handlerIndex);
         reject(`Timeout has been exceeded. Server ${serverId}. ${req.method} ${req.url}`);
       }, WAIT_RESPONSE_TIMEOUT);
 
-      events.emit(HttpServerEvent.request);
-
-      // TODO: слушаем ответ - очистить таймаут
+      events.emit(HttpServerEvent.request, requestId, httpRequest);
     });
   }
 

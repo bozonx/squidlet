@@ -101,7 +101,7 @@ export interface HttpServerIo {
    * Send a response to client.
    * Call it only when you are handled a request.
    */
-  sendResponse(requestId: number, response: HttpResponse): Promise<void>;
+  sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void>;
 
   /**
    * Remove one of server listeners
