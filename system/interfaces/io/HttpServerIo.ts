@@ -61,11 +61,15 @@ export interface HttpResponse {
 
 export interface HttpServerIo {
   /**
+   * Destroy server and don't rise a close event.
+   */
+  destroy: () => Promise<void>;
+
+  /**
    * make new server and return serverId
    */
   newServer(props: HttpServerProps): Promise<string>;
 
-  // TODO: должно при этом подняться событие close
   /**
    * Shut down a server which has been previously created
    */
@@ -101,5 +105,5 @@ export interface HttpServerIo {
   /**
    * Remove one of server listeners
    */
-  removeListener(serverId: string, eventName: HttpServerEvent,handlerIndex: number): Promise<void>;
+  removeListener(serverId: string, eventName: HttpServerEvent, handlerIndex: number): Promise<void>;
 }
