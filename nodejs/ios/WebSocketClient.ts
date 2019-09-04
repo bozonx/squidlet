@@ -10,8 +10,8 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/common';
 import {omitObj} from 'system/lib/objects';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
-import {makeConnectionParams} from './WebSocketServer';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import {makeConnectionParams} from './WebSocketServer';
 
 
 /**

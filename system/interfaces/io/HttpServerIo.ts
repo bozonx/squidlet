@@ -11,11 +11,12 @@ export const Methods = [
 
 
 export enum HttpServerEvent {
+  request,
   listening,
   serverClose,
   serverError,
-  request,
 }
+
 
 export type HttpContentType = 'text/plain'
   | 'text/html'
