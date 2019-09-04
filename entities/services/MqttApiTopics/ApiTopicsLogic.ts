@@ -1,6 +1,5 @@
 import {splitFirstElement} from 'system/lib/strings';
-import {combineTopic} from 'system/lib/helpers';
-import {parseValue} from 'system/lib/common';
+import {combineTopic, parseArgs} from 'system/lib/helpers';
 import {Dictionary, JsonTypes} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
@@ -108,9 +107,9 @@ export default class ApiTopicsLogic {
 
     this.context.log.debug(`ApiTopicsLogic income call api method "${methodName}": ${data}`);
 
-    const args: JsonTypes[] = this.parseArgs(data);
+    const args: JsonTypes[] = parseArgs(data);
 
-    (this.context.system.api as any)[methodName](...args);
+    await (this.context.system.api as any)[methodName](...args);
   }
 
   private async callDeviceAction(deviceId: string, actionName?: string, data?: string) {
@@ -121,27 +120,9 @@ export default class ApiTopicsLogic {
     // income string-type api message - call device action
     this.context.log.debug(`ApiTopicsLogic income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${data}`);
 
-    const args: JsonTypes[] = this.parseArgs(data);
+    const args: JsonTypes[] = parseArgs(data);
 
     await this.context.system.api.callDeviceAction(deviceId, actionName, ...args);
-  }
-
-  private parseArgs(data: string | undefined): JsonTypes[] {
-    if (typeof data === 'undefined') {
-      return [];
-    }
-    else if (typeof data !== 'string') {
-      throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
-    }
-
-    const splat: string[] = data.split(',');
-    const result: JsonTypes[] = [];
-
-    for (let item of splat) {
-      result.push( parseValue(item.trim()) );
-    }
-
-    return result;
   }
 
   /**

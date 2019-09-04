@@ -1,8 +1,9 @@
 import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
-import {splitFirstElement} from './strings';
 import {compactUndefined} from './arrays';
 import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
+import {JsonTypes} from '../interfaces/Types';
+import {parseValue} from './common';
 
 
 export const PATH_SEPARATOR = '/';
@@ -135,6 +136,30 @@ export function consoleError(msg: string) {
   console.error(`ERROR: ${msg}`);
 }
 
+// TODO: test
+/**
+ * Parse args like: param1,5,true to ['param1', 5, true];
+ */
+export function parseArgs(data: string | number | undefined): JsonTypes[] {
+  if (typeof data === 'undefined') {
+    return [];
+  }
+  else if (typeof data === 'number') {
+    return [data];
+  }
+  else if (typeof data !== 'string') {
+    throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
+  }
+
+  const splat: string[] = data.split(',');
+  const result: JsonTypes[] = [];
+
+  for (let item of splat) {
+    result.push( parseValue(item.trim()) );
+  }
+
+  return result;
+}
 
 // /**
 //  * Split topic like "id/sub/deeper" to [ 'id', 'sub/deeper' ]

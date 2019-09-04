@@ -2,6 +2,8 @@ import {GetDriverDep} from 'system/base/EntityBase';
 import ServiceBase from 'system/base/ServiceBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import {Route} from 'system/lib/HttpRouterLogic';
+import {JsonTypes} from 'system/interfaces/Types';
+import {parseArgs} from 'system/lib/helpers';
 
 import {HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
 import {HttpServerRouter} from '../../drivers/HttpServerRouter/HttpServerRouter';
@@ -11,12 +13,8 @@ const allowedApiMethodsToCall = [
   'callDeviceAction',
   'getDeviceStatus',
   'getDeviceConfig',
-  // TODO: use setDeviceConfigParam
-  //'setDeviceConfig',
   'getState',
   'getHostInfo',
-  // TODO: add get host config
-  // TODO: add set host config param
   'getSessionStore',
   'switchToIoServer',
   'publishWholeState',
@@ -54,9 +52,8 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
       };
     }
 
-    // TODO: parse args - split by "," and parseValue
-
-    const result = await (this.context.system.api as any)[methodName](...route.params.args);
+    const args: JsonTypes[] = parseArgs(route.params.args);
+    const result = await (this.context.system.api as any)[methodName](...args);
 
     return {
       body: {
