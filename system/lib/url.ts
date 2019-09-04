@@ -15,7 +15,7 @@ export interface ParsedUrl {
 }
 
 
-function parseSearch(rawSearch: string): {[index: string]: JsonTypes} {
+export function parseSearch(rawSearch: string): {[index: string]: JsonTypes} {
   if (!rawSearch) return {};
 
   // TODO: add - see cookies
@@ -28,7 +28,10 @@ export function parseHostPort(rawStr: string): { host: string, port?: number } {
 
   const splat = rawStr.split(':');
 
-  if (splat.length > 1) {
+  if (splat.length > 2) {
+    throw new Error(`Invalid format of host:port - more than 2 parts`);
+  }
+  else if (splat.length === 2) {
     const portNum: number = Number(splat[2]);
 
     if (Number.isNaN(portNum)) throw new Error(`Invalid port number`);
@@ -42,7 +45,16 @@ export function parseHostPort(rawStr: string): { host: string, port?: number } {
 export function parseUserPassword(rawStr: string): {user?: string; password?: string} {
   if (!rawStr) return {};
 
+  const splat = rawStr.split(':');
 
+  if (splat.length > 2) {
+    throw new Error(`Invalid format of user:passwort - more than 2 parts`);
+  }
+  else if (splat.length === 2) {
+    return { user: splat[1], password: splat[2] };
+  }
+
+  return { user: splat[1] };
 }
 
 export function parseUrl(rawUrl: string): ParsedUrl {
