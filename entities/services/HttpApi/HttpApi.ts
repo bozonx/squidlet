@@ -1,9 +1,9 @@
 import {GetDriverDep} from 'system/base/EntityBase';
 import ServiceBase from 'system/base/ServiceBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
-import {ParsedRoute} from 'system/lib/HttpRouterLogic';
+import {Route} from 'system/lib/HttpRouterLogic';
 
-import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
+import {HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
 import {HttpServerRouter} from '../../drivers/HttpServerRouter/HttpServerRouter';
 
 
@@ -11,9 +11,12 @@ const allowedApiMethodsToCall = [
   'callDeviceAction',
   'getDeviceStatus',
   'getDeviceConfig',
-  'setDeviceConfig',
+  // TODO: use setDeviceConfigParam
+  //'setDeviceConfig',
   'getState',
   'getHostInfo',
+  // TODO: add get host config
+  // TODO: add set host config param
   'getSessionStore',
   'switchToIoServer',
   'publishWholeState',
@@ -31,23 +34,35 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     this.depsInstances.router = await getDriverDep('HttpServerRouter')
       .getInstance(this.props);
 
-    this.router.addRoute('get', 'api/:methodName', this.handleRouteRequest);
+    this.router.addRoute('get', 'api/:methodName/:args', this.handleRouteRequest);
   }
 
 
-  private handleRouteRequest = async (
-    parsedRoute: ParsedRoute,
-    request: HttpDriverRequest
-  ): Promise<HttpDriverResponse> => {
-    // TODO: проверить разрешенно ли запускать api
+  private handleRouteRequest = async (route: Route): Promise<HttpDriverResponse> => {
+    const methodName: string | number | undefined = route.params.methodName;
 
-    const result = (this.context.system.api as any)[methodName](...args);
+    if (typeof methodName !== 'string') {
+      return {
+        status: 400,
+        body: `Unexpected type of method "${methodName}"`,
+      };
+    }
+    if (!allowedApiMethodsToCall.includes(methodName)) {
+      return {
+        status: 400,
+        body: `Method "${methodName}" isn't allowed in a HttpApi service`,
+      };
+    }
 
-    const body = {
-      result,
+    // TODO: parse args - split by "," and parseValue
+
+    const result = await (this.context.system.api as any)[methodName](...route.params.args);
+
+    return {
+      body: {
+        result
+      },
     };
-
-    return { body };
-  };
+  }
 
 }

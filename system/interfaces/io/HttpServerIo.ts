@@ -55,7 +55,6 @@ export interface HttpRequest extends HttpRequestBase {
 export interface HttpResponse {
   headers: HttpResponseHeaders;
   status: number;
-  statusString: string;
   body?: string | Uint8Array;
 }
 

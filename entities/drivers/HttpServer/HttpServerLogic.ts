@@ -162,8 +162,6 @@ export default class HttpServerLogic {
     };
 
     let preparedResponse: HttpResponse;
-    // let status = 200;
-    // let statusString: 'OK';
 
     try {
       const response: HttpDriverResponse = await cb(preparedRequest);
@@ -183,8 +181,7 @@ export default class HttpServerLogic {
 
     return {
       ...response,
-      status: 200,
-      statusString: 'OK',
+      status: response.status || 200,
       headers: {
         ...response.headers,
         'content-type': contentType,
@@ -199,7 +196,6 @@ export default class HttpServerLogic {
         'content-type': 'text/plain',
       },
       status: 500,
-      statusString: 'Server error',
       body: err,
     };
   }

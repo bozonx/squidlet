@@ -11,7 +11,7 @@ import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/Http
 const EVENT_NAME_DELIMITER = '|';
 
 
-export interface ParsedRoute {
+export interface Route {
   // parsed url params like /path/to/:page => {page: 'myPageName'};
   params: {[index: string]: string | number};
   // route which has been set in addRoute()
@@ -27,7 +27,7 @@ interface RouteItem {
   pinnedProps: {[index: string]: JsonTypes};
 }
 
-export type RouterRequestHandler = (parsedRoute: ParsedRoute, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
+export type RouterRequestHandler = (route: Route, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
 
 
 export default class HttpRouterLogic {
@@ -69,7 +69,7 @@ export default class HttpRouterLogic {
     const preparedRoute: string = this.prepareRoute(route);
 
 
-    // const handlerWrapper = (parsedRoute: ParsedRoute, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
+    // const handlerWrapper = (parsedRoute: Route, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
     //   if (parsedRoute.route !== route) return;
     //
     //   // TODO: cb returns a response !!!!
@@ -94,7 +94,7 @@ export default class HttpRouterLogic {
     // TODO: use HttpDriverRequest
     // TODO: может сразу вернуть ответ ???
 
-    const parsedRoute: ParsedRoute | undefined = this.parseRoute(request);
+    const parsedRoute: Route | undefined = this.parseRoute(request);
 
     if (!parsedRoute) {
       this.logDebug(`ServerRouterLogic.parseIncomeRequest: route for url "${request.url}: isn't registered!`);
@@ -124,7 +124,7 @@ export default class HttpRouterLogic {
     };
   }
 
-  private parseRoute(request: HttpRequest): ParsedRoute | undefined {
+  private parseRoute(request: HttpRequest): Route | undefined {
     const location: ParsedUrl = parseUrl(request.url);
     const { route, params } = this.resolveRoute(request.method, location.url);
     const eventName = `${request.method}${EVENT_NAME_DELIMITER}${route}`;
