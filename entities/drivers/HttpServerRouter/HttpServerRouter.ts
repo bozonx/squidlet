@@ -1,10 +1,11 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
-import HttpRouterLogic, {RouterRequestHandler} from '../../../system/lib/HttpRouterLogic';
+import HttpRouterLogic, {RouterRequestHandler} from 'system/lib/HttpRouterLogic';
 import {HttpMethods} from 'system/interfaces/io/HttpServerIo';
 import {JsonTypes} from 'system/interfaces/Types';
 import {GetDriverDep} from 'system/base/EntityBase';
+
 import {HttpServer} from '../HttpServer/HttpServer';
 import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
 
@@ -46,26 +47,24 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   }
 
 
-  addRoute(method: HttpMethods, route: string, pinnedProps: {[index: string]: JsonTypes}) {
-    this.router.addRoute(method, route, pinnedProps);
-  }
-
-  onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
-    return this.router.onRequest(method, route, cb);
+  addRoute(
+    method: HttpMethods,
+    route: string,
+    routeHandler: RouterRequestHandler,
+    pinnedProps?: {[index: string]: JsonTypes}
+  ) {
+    this.router.addRoute(method, route, routeHandler, pinnedProps);
   }
 
   async closeServer() {
-    if (!this.server) throw new Error(`HttpServerRouter.removeRequestListener: ${this.onRequest}`);
+    if (!this.server) throw new Error(`HttpServerRouter.closeServer: ${this.closedMsg}`);
 
     return this.server.closeServer();
   }
 
 
-  private handleIncomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
-    this.router.parseIncomeRequest(request);
-
-    // TODO: как получить ответ ????
-    // TODO: если не найден обработчик - то вернуть 404
+  private handleIncomeRequest = async (request: HttpDriverRequest): Promise<HttpDriverResponse> => {
+    return this.router.incomeRequest(request);
   }
 
 }

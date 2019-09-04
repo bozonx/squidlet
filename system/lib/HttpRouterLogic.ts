@@ -1,15 +1,17 @@
-import {JsonTypes} from 'system/interfaces/Types';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {trimChar} from 'system/lib/strings';
-import {ParsedUrl, parseUrl, URL_DELIMITER} from 'system/lib/url';
-import {HttpMethods, HttpRequest} from 'system/interfaces/io/HttpServerIo';
+import {JsonTypes} from '../interfaces/Types';
+import IndexedEventEmitter from './IndexedEventEmitter';
+import {trimChar} from './strings';
+import {ParsedUrl, parseUrl, URL_DELIMITER} from './url';
+// TODO: don't use dependencies
+import {HttpMethods, HttpRequest} from '../interfaces/io/HttpServerIo';
+// TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 
 
 const EVENT_NAME_DELIMITER = '|';
 
 
-interface ParsedRoute {
+export interface ParsedRoute {
   // parsed url params like /path/to/:page => {page: 'myPageName'};
   params: {[index: string]: string | number};
   // route which has been set in addRoute()
@@ -46,10 +48,13 @@ export default class HttpRouterLogic {
   /**
    * Call this to register a new route and its params
    */
-  addRoute(method: HttpMethods, route: string, pinnedProps: {[index: string]: JsonTypes}) {
+  addRoute(method: HttpMethods, route: string, routeHandler: RouterRequestHandler, pinnedProps?: {[index: string]: JsonTypes}) {
     const preparedRoute: string = this.prepareRoute(route);
     const preparedMethod: HttpMethods = method.toLowerCase() as HttpMethods;
     const eventName = `${preparedMethod}${EVENT_NAME_DELIMITER}${preparedRoute}`;
+
+    // TODO: save routeHandler
+    // TODO: pinnedProps может не быть
 
     this.registeredRoutes[eventName] = { method: preparedMethod, route: preparedRoute, pinnedProps };
   }
@@ -58,6 +63,9 @@ export default class HttpRouterLogic {
    * Call this to handle calling of route
    */
   onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
+
+    // TODO: remove!!!!
+
     const preparedRoute: string = this.prepareRoute(route);
 
 
@@ -80,7 +88,8 @@ export default class HttpRouterLogic {
   /**
    * Call this only when a new request came.
    */
-  parseIncomeRequest(request: HttpRequest) {
+  async incomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
+    // TODO: если не найден обработчик - то вернуть 404
 
     // TODO: use HttpDriverRequest
     // TODO: может сразу вернуть ответ ???

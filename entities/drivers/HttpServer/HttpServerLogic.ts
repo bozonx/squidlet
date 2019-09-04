@@ -167,32 +167,41 @@ export default class HttpServerLogic {
 
     try {
       const response: HttpDriverResponse = await cb(preparedRequest);
-      const contentType: HttpContentType = (response.headers && response.headers['content-type'])
-        || resolveBodyType(response.body);
 
-      preparedResponse = {
-        ...response,
-        status: 200,
-        statusString: 'OK',
-        headers: {
-          ...response.headers,
-          'content-type': contentType,
-        },
-        body: prepareBody(response.body),
-    };
+      preparedResponse = this.makeSuccessResponse(response);
     }
     catch(err) {
-      preparedResponse = {
-        headers: {
-          'content-type': 'text/plain',
-        },
-        status: 500,
-        statusString: 'Server error',
-        body: String(err),
-      };
+      preparedResponse = this.makeServerErrorResponse(String(err));
     }
 
     await this.httpServerIo.sendResponse(requestId, preparedResponse);
+  }
+
+  private makeSuccessResponse(response: HttpDriverResponse): HttpResponse {
+    const contentType: HttpContentType = (response.headers && response.headers['content-type'])
+      || resolveBodyType(response.body);
+
+    return {
+      ...response,
+      status: 200,
+      statusString: 'OK',
+      headers: {
+        ...response.headers,
+        'content-type': contentType,
+      },
+      body: prepareBody(response.body),
+    };
+  }
+
+  private makeServerErrorResponse(err: string): HttpResponse {
+    return {
+      headers: {
+        'content-type': 'text/plain',
+      },
+      status: 500,
+      statusString: 'Server error',
+      body: err,
+    };
   }
 
 }
