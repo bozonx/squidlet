@@ -1,5 +1,6 @@
 import * as express from 'express';
 import {Express, NextFunction, Request, Response} from 'express';
+import {Server} from 'http';
 
 import {
   HttpRequest,
@@ -12,17 +13,19 @@ import {
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
 import {WAIT_RESPONSE_TIMEOUT} from 'system/constants';
-import {makeUniqNumber} from '../../system/lib/uniqId';
+import {makeUniqNumber} from 'system/lib/uniqId';
+import {callPromised} from 'system/lib/common';
 
 
 enum ITEM_POSITION {
+  app,
   server,
   events,
 }
 
 const RESPONSE_EVENT = 'res';
 
-type ServerItem = [ Express, IndexedEventEmitter<AnyHandler> ];
+type ServerItem = [ Express, Server, IndexedEventEmitter<AnyHandler> ];
 
 
 export default class HttpServer implements HttpServerIo{
@@ -49,8 +52,18 @@ export default class HttpServer implements HttpServerIo{
   }
 
   async closeServer(serverId: string): Promise<void> {
-    // TODO: должно при этом подняться событие close
-    // TODO: !!!
+    const serverIdNum: number = Number(serverId);
+    if (!this.servers[serverIdNum]) return;
+
+    const serverItem = this.servers[serverIdNum];
+
+    serverItem[ITEM_POSITION.events].destroy();
+    await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
+
+    delete this.servers[serverIdNum];
+
+    // TODO: НЕ должно при этом подняться событие close
+    // TODO: отписаться от всех событий навешанный на этот сервер
   }
 
   async onServerClose(serverId: string, cb: () => void): Promise<number> {
@@ -92,9 +105,9 @@ export default class HttpServer implements HttpServerIo{
 
   private makeServer(serverId: string, props: HttpServerProps): ServerItem {
     const events = new IndexedEventEmitter();
-    const server: Express = express();
+    const app: Express = express();
 
-    server.all('*', (req: Request, res: Response, next: NextFunction) => {
+    app.all('*', (req: Request, res: Response, next: NextFunction) => {
       this.handleIncomeRequest(serverId, req, res)
         .then(next)
         .catch((err) => {
@@ -117,12 +130,13 @@ export default class HttpServer implements HttpServerIo{
       });
      */
 
-    server.listen(props.port, props.host, () => events.emit(HttpServerEvent.listening));
-    //server.on();
-    // TODO: listen server close
-    // TODO: listen server error
+    const server: Server = app.listen(props.port, props.host, () => events.emit(HttpServerEvent.listening));
+
+    server.on('error', (err: Error) => events.emit(HttpServerEvent.serverError, String(err)));
+    server.on('close', () => events.emit(HttpServerEvent.serverClose));
 
     return [
+      app,
       server,
       events,
     ];
@@ -138,7 +152,7 @@ export default class HttpServer implements HttpServerIo{
       const httpRequest: HttpRequest = this.makeRequestObject(req);
 
       // TODO: remove
-      console.log('------ httpRequest', httpRequest)
+      console.log('------ httpRequest', httpRequest);
 
       const respHandler = (receivedRequestId: number, response: HttpResponse) => {
         // listen only expected requestId
