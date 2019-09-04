@@ -1,4 +1,5 @@
 import {JsonTypes} from '../interfaces/Types';
+import {parseValue} from './common';
 
 
 export const URL_DELIMITER = '/';
@@ -18,7 +19,18 @@ export interface ParsedUrl {
 export function parseSearch(rawSearch: string): {[index: string]: JsonTypes} {
   if (!rawSearch) return {};
 
-  // TODO: add - see cookies
+  const splat: string[] = rawSearch.split('&');
+  const result: {[index: string]: any} = {};
+
+  for (let item of splat) {
+    const [key, value] = item.split('=');
+
+    // TODO: support of lists
+
+    result[key.trim()] = parseValue((value || '').trim() || undefined);
+  }
+
+  return result;
 }
 
 export function parseHostPort(rawStr: string): { host: string, port?: number } {
@@ -32,14 +44,14 @@ export function parseHostPort(rawStr: string): { host: string, port?: number } {
     throw new Error(`Invalid format of host:port - more than 2 parts`);
   }
   else if (splat.length === 2) {
-    const portNum: number = Number(splat[2]);
+    const portNum: number = Number(splat[1]);
 
     if (Number.isNaN(portNum)) throw new Error(`Invalid port number`);
 
-    return { host: splat[1], port: portNum };
+    return { host: splat[0], port: portNum };
   }
 
-  return { host: splat[1] };
+  return { host: splat[0] };
 }
 
 export function parseUserPassword(rawStr: string): {user?: string; password?: string} {
@@ -51,10 +63,10 @@ export function parseUserPassword(rawStr: string): {user?: string; password?: st
     throw new Error(`Invalid format of user:passwort - more than 2 parts`);
   }
   else if (splat.length === 2) {
-    return { user: splat[1], password: splat[2] };
+    return { user: splat[0], password: splat[1] };
   }
 
-  return { user: splat[1] };
+  return { user: splat[0] };
 }
 
 export function parseUrl(rawUrl: string): ParsedUrl {
@@ -75,7 +87,7 @@ export function parseUrl(rawUrl: string): ParsedUrl {
     protocol: match[1],
     url: match[3],
     search: parseSearch(match[4]),
-    ...parseHostPort(authHostSplat[(authHostSplat.length === 2) ? 2 : 1]),
-    ...(authHostSplat.length === 2) ? parseUserPassword(authHostSplat[1]) : undefined,
+    ...parseHostPort(authHostSplat[(authHostSplat.length === 2) ? 1 : 0]),
+    ...(authHostSplat.length === 2) ? parseUserPassword(authHostSplat[0]) : {},
   };
 }
