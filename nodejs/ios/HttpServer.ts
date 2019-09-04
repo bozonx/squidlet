@@ -62,7 +62,7 @@ export default class HttpServer implements HttpServerIo{
 
     delete this.servers[serverIdNum];
 
-    // TODO: НЕ должно при этом подняться событие close
+    // TODO: НЕ должно при этом подняться событие close или должно???
     // TODO: отписаться от всех событий навешанный на этот сервер
   }
 
