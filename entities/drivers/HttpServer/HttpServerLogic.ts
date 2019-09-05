@@ -9,6 +9,7 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {HttpRequestBase, HttpResponse} from 'system/interfaces/io/HttpServerIo';
 import {JsonTypes} from 'system/interfaces/Types';
 import {parseBody, prepareBody, resolveBodyType} from 'system/lib/httpBody';
+import {omitUndefined} from '../../../system/lib/objects';
 
 
 export interface HttpDriverRequest extends HttpRequestBase {
@@ -176,17 +177,17 @@ export default class HttpServerLogic {
   }
 
   private makeSuccessResponse(response: HttpDriverResponse): HttpResponse {
-    const contentType: HttpContentType = (response.headers && response.headers['content-type'])
+    const contentType: HttpContentType | undefined = (response.headers && response.headers['content-type'])
       || resolveBodyType(response.body);
 
     return {
       ...response,
       status: response.status || 200,
-      headers: {
+      headers: omitUndefined({
         ...response.headers,
         'content-type': contentType,
-      },
-      body: prepareBody(response.body),
+      }),
+      body: prepareBody(contentType, response.body),
     };
   }
 

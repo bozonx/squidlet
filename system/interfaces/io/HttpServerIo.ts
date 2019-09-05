@@ -22,7 +22,8 @@ export type HttpContentType = 'text/plain'
   | 'text/html'
   | 'application/json'
   | 'application/javascript'
-  | 'application/xml';
+  | 'application/xml'
+  | 'application/octet-stream';
 export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
 export type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
