@@ -20,14 +20,15 @@ export interface Route {
   location: ParsedUrl;
 }
 
+export type RouterRequestHandler = (route: Route, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
+
 interface RouteItem {
   // full route
   route: string;
   method: HttpMethods;
-  pinnedProps: {[index: string]: JsonTypes};
+  routeHandler: RouterRequestHandler;
+  pinnedProps?: {[index: string]: JsonTypes};
 }
-
-export type RouterRequestHandler = (route: Route, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
 
 
 export default class HttpRouterLogic {
@@ -48,64 +49,46 @@ export default class HttpRouterLogic {
   /**
    * Call this to register a new route and its params
    */
-  addRoute(method: HttpMethods, route: string, routeHandler: RouterRequestHandler, pinnedProps?: {[index: string]: JsonTypes}) {
+  addRoute(
+    method: HttpMethods,
+    route: string,
+    routeHandler: RouterRequestHandler,
+    pinnedProps?: {[index: string]: JsonTypes}
+  ) {
     const preparedRoute: string = this.prepareRoute(route);
-    const preparedMethod: HttpMethods = method.toLowerCase() as HttpMethods;
+    const preparedMethod = method.toLowerCase() as HttpMethods;
     const eventName = `${preparedMethod}${EVENT_NAME_DELIMITER}${preparedRoute}`;
 
-    // TODO: save routeHandler
-    // TODO: pinnedProps может не быть
-
-    this.registeredRoutes[eventName] = { method: preparedMethod, route: preparedRoute, pinnedProps };
-  }
-
-  /**
-   * Call this to handle calling of route
-   */
-  onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
-
-    // TODO: remove!!!!
-
-    const preparedRoute: string = this.prepareRoute(route);
-
-
-    // const handlerWrapper = (parsedRoute: Route, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
-    //   if (parsedRoute.route !== route) return;
-    //
-    //   // TODO: cb returns a response !!!!
-    //
-    //   cb(parsedRoute, request);
-    // }
-
-
-    // TODO: cb returns a response !!!! этом может не обрабатываться в events
-
-    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
-
-    return this.events.addListener(eventName, cb);
+    this.registeredRoutes[eventName] = {
+      method: preparedMethod,
+      route: preparedRoute,
+      routeHandler,
+      pinnedProps
+    };
   }
 
   /**
    * Call this only when a new request came.
    */
   async incomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
-    // TODO: если не найден обработчик - то вернуть 404
 
-    // TODO: use HttpDriverRequest
-    // TODO: может сразу вернуть ответ ???
+    // TODO: сначала найти item потом сделать RouteObj
 
-    const parsedRoute: Route | undefined = this.parseRoute(request);
+    const parsedRoute: Route | undefined = this.makeRouteObj(request);
 
     if (!parsedRoute) {
-      this.logDebug(`ServerRouterLogic.parseIncomeRequest: route for url "${request.url}: isn't registered!`);
-
-      return;
+      return {
+        status: 404,
+        body: `route for url "${request.url}: isn't registered!`
+      };
     }
 
     const eventName = `${request.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
     const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
 
-    this.events.emit(eventName, parsedRoute, driverRequest);
+    // TODO: сразу вернуть ответ
+
+    //this.events.emit(eventName, parsedRoute, driverRequest);
   }
 
   removeRequestListener(method: HttpMethods, route: string, handlerIndex: number) {
@@ -124,13 +107,18 @@ export default class HttpRouterLogic {
     };
   }
 
-  private parseRoute(request: HttpRequest): Route | undefined {
+  /**
+   * Make route object using request
+   */
+  private makeRouteObj(request: HttpDriverRequest): Route | undefined {
     const location: ParsedUrl = parseUrl(request.url);
     const { route, params } = this.resolveRoute(request.method, location.url);
     const eventName = `${request.method}${EVENT_NAME_DELIMITER}${route}`;
     const routeItem: RouteItem = this.registeredRoutes[eventName];
 
     if (!routeItem) return;
+
+    // TODO: pinnedProps может не быть
 
     return {
       route,
@@ -164,5 +152,31 @@ export default class HttpRouterLogic {
   private prepareRoute(rawRoute: string): string {
     return trimChar(rawRoute, URL_DELIMITER);
   }
+
+  // /**
+  //  * Call this to handle calling of route
+  //  */
+  // onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
+  //
+  //   // TODO: remove!!!!
+  //
+  //   const preparedRoute: string = this.prepareRoute(route);
+  //
+  //
+  //   // const handlerWrapper = (parsedRoute: Route, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
+  //   //   if (parsedRoute.route !== route) return;
+  //   //
+  //   //   // TODO: cb returns a response !!!!
+  //   //
+  //   //   cb(parsedRoute, request);
+  //   // }
+  //
+  //
+  //   // TODO: cb returns a response !!!! этом может не обрабатываться в events
+  //
+  //   const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
+  //
+  //   return this.events.addListener(eventName, cb);
+  // }
 
 }
