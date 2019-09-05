@@ -8,8 +8,14 @@ export type HttpContentType = 'text/plain'
   | 'application/xml'
   | 'application/octet-stream';
 
-const STRING_CONTENT_TYPES = ['text/plain', 'text/html', 'application/javascript', 'application/xml'];
+const STRING_CONTENT_TYPES = ['text/plain', 'application/javascript', 'application/xml'];
 
+
+export function isHtml(str: any): boolean {
+  if (typeof str !== 'string') return false;
+
+  return Boolean(str.match(/^\s*<!DOCTYPE\s+html/i));
+}
 
 /**
  * Parse request's body. It should correspond to content-type header.
@@ -52,9 +58,15 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
       );
     }
   }
+  else if (contentType === 'text/html') {
+    if (!isHtml(body)) {
+      throw new Error(
+        `parseBody: Incorrect body: content-type is "text/html" but body isn't html`
+      );
+    }
 
-  // TODO: check html
-
+    return body;
+  }
   else if (STRING_CONTENT_TYPES.includes(contentType)) {
     if (typeof body !== 'string') {
       throw new Error(
@@ -140,7 +152,7 @@ export function resolveBodyType(fullBody: JsonTypes | Uint8Array): HttpContentTy
     return 'application/octet-stream';
   }
   else if (typeof fullBody === 'string') {
-    if (fullBody.match(/^\s*<!DOCTYPE\s+html/i)) return 'text/html';
+    if (isHtml(fullBody)) return 'text/html';
 
     return 'text/plain';
   }

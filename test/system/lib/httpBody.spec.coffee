@@ -29,4 +29,4 @@ describe.only 'system.lib.httpBody', ->
     assert.throws(() => httpBody.parseBody('application/javascript', undefined))
     assert.throws(() => httpBody.parseBody('application/xml', undefined))
     assert.throws(() => httpBody.parseBody('text/html', undefined))
-#    assert.throws(() => httpBody.parseBody('text/html', 'str'))
+    assert.throws(() => httpBody.parseBody('text/html', 'str'))
