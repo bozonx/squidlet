@@ -12,7 +12,8 @@ const STRING_CONTENT_TYPES = ['text/plain', 'text/html', 'application/javascript
 
 
 /**
- * Parse request body
+ * Parse request's body. It should correspond to content-type header.
+ * But if content-type isn't supported then body will be used as is.
  */
 export function parseBody(contentType?: HttpContentType, body?: string | Uint8Array): JsonTypes | Uint8Array {
   if (!contentType) return;
@@ -52,48 +53,12 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
         `and body has to be a string`
       );
     }
+
+    return body;
   }
 
-    /*
-
-export type HttpContentType = 'text/plain'
-  | 'text/html'
-  | 'application/json'
-  | 'application/javascript'
-  | 'application/xml'
-  | 'application/octet-stream';
-     */
-
-  switch (contentType) {
-    case 'application/octet-stream':
-
-    case 'application/json':
-
-    default:
-
-      // TODO: проверить json, text/hteml, javascript, xml что это string - остальное как есть
-
-      // other types such as text/plain, text/html and os on
-      return String(fullBody);
-  }
-
-  // if (typeof body === 'undefined') {
-  //   return;
-  // }
-  // else if (body instanceof Uint8Array) {
-  //   return body;
-  // }
-  // else if (typeof body !== 'string') {
-  //   throw new Error(`Unsupported type of body ${typeof body}`);
-  // }
-  //
-  // try {
-  //   return JSON.parse(body);
-  // }
-  // catch (e) {
-  //   // just string, maybe html
-  //   return body;
-  // }
+  // return as is
+  return body;
 }
 
 /**
