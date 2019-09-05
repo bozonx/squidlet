@@ -1,3 +1,6 @@
+import {HttpContentType} from '../../lib/httpBody';
+
+
 export const Methods = [
   'newServer',
   'closeServer',
@@ -17,13 +20,6 @@ export enum HttpServerEvent {
   serverError,
 }
 
-
-export type HttpContentType = 'text/plain'
-  | 'text/html'
-  | 'application/json'
-  | 'application/javascript'
-  | 'application/xml'
-  | 'application/octet-stream';
 export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
 export type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
 
