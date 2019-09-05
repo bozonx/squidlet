@@ -167,6 +167,7 @@ export default class IoServer {
     }
 
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
+    // TODO: ioServer может быть не указан
     const props = this.hostConfig.ioServer;
 
     this._wsServer = new WsServerLogic(

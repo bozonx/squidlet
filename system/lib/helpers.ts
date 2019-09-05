@@ -100,7 +100,6 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
   return `${entityType}s` as any;
 }
 
-// TODO: test
 /**
  * Parse comma separated args like: param1,5,true to ['param1', 5, true];
  */
@@ -115,11 +114,21 @@ export function parseArgs(data: string | number | boolean| undefined): JsonTypes
     throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
   }
 
+  // TODO: support of array and objects
   const splat: string[] = data.split(',');
   const result: JsonTypes[] = [];
 
   for (let item of splat) {
-    result.push( parseValue(item.trim()) );
+    const trimmed = item.trim();
+
+    // remove quotes
+    if (trimmed.match(/^'.+'$/) || trimmed.match(/^".+"$/)) {
+      result.push(trimmed.replace(/^['"](.+)['"]$/, '$1'));
+
+      continue;
+    }
+
+    result.push( parseValue(trimmed.trim()) );
   }
 
   return result;
