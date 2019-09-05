@@ -180,7 +180,7 @@ export default class HttpServerLogic {
     const contentType: HttpContentType | undefined = (response.headers && response.headers['content-type'])
       || resolveBodyType(response.body);
 
-    return {
+    const preparedResponse: HttpResponse = {
       ...response,
       status: response.status || 200,
       headers: omitUndefined({
@@ -189,6 +189,8 @@ export default class HttpServerLogic {
       }),
       body: prepareBody(contentType, response.body),
     };
+
+    return omitUndefined(preparedResponse) as HttpResponse;
   }
 
   private makeServerErrorResponse(err: string): HttpResponse {

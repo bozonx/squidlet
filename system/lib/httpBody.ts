@@ -31,13 +31,35 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
  * Prepare body to response
  */
 export function prepareBody(
-  contentType: HttpContentType,
+  contentType: HttpContentType | undefined,
   fullBody: JsonTypes | Uint8Array
 ): string | Uint8Array | undefined {
+  if (!contentType) return;
 
-  // TODO: body - если object - то JSON.stringify
-  // TODO: атоматом сделать JSON.stringify
-  // TODO: атоматом установить content-type
+  switch (contentType) {
+    case 'application/octet-stream':
+      if (!(fullBody instanceof Uint8Array)) {
+        throw new Error(
+          `Incorrect body: it has to be instance of Uint8Array ` +
+          `because content-type is "application/octet-stream:`
+        );
+      }
+
+      return fullBody;
+    case 'application/json':
+      try {
+        return JSON.stringify(fullBody);
+      }
+      catch(e) {
+        throw new Error(
+          `Incorrect body: content-type is application/json ` +
+          `but body can't be converted to JSON`
+        );
+      }
+    default:
+      // other types such as text/plain, text/html and os on
+      return String(fullBody);
+  }
 }
 
 /**
