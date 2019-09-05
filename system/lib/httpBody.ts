@@ -7,24 +7,60 @@ import {JsonTypes} from '../interfaces/Types';
  * Parse request body
  */
 export function parseBody(contentType?: HttpContentType, body?: string | Uint8Array): JsonTypes | Uint8Array {
-  // TODO: резолвить с contentType
-  if (typeof body === 'undefined') {
-    return;
-  }
-  else if (body instanceof Uint8Array) {
-    return body;
-  }
-  else if (typeof body !== 'string') {
-    throw new Error(`Unsupported type of body ${typeof body}`);
+  if (!contentType) return;
+
+  switch (contentType) {
+    case 'application/octet-stream':
+      if (!(body instanceof Uint8Array)) {
+        throw new Error(
+          `parseBody: Incorrect body: it has to be instance of Uint8Array ` +
+          `because content-type is "application/octet-stream:`
+        );
+      }
+
+      return body;
+    case 'application/json':
+      if (typeof body !== 'string') {
+        throw new Error(
+          `parseBody: Incorrect body: content-type is application/json ` +
+          `and body has to be a string`
+        );
+      }
+
+      try {
+        return JSON.parse(body);
+      }
+      catch(e) {
+        throw new Error(
+          `parseBody: Incorrect body: content-type is application/json ` +
+          `but body can't convert JSON to js`
+        );
+      }
+    default:
+
+      // TODO: проверить json, text/hteml, javascript, xml что это string - остальное как есть
+
+      // other types such as text/plain, text/html and os on
+      return String(fullBody);
   }
 
-  try {
-    return JSON.parse(body);
-  }
-  catch (e) {
-    // just string, maybe html
-    return body;
-  }
+  // if (typeof body === 'undefined') {
+  //   return;
+  // }
+  // else if (body instanceof Uint8Array) {
+  //   return body;
+  // }
+  // else if (typeof body !== 'string') {
+  //   throw new Error(`Unsupported type of body ${typeof body}`);
+  // }
+  //
+  // try {
+  //   return JSON.parse(body);
+  // }
+  // catch (e) {
+  //   // just string, maybe html
+  //   return body;
+  // }
 }
 
 /**
@@ -34,13 +70,19 @@ export function prepareBody(
   contentType: HttpContentType | undefined,
   fullBody: JsonTypes | Uint8Array
 ): string | Uint8Array | undefined {
-  if (!contentType) return;
+  if (!contentType) {
+    if (typeof fullBody !== 'undefined') {
+      throw new Error(`prepareBody: Incorrect body: no content-type and body has to be undefined`);
+    }
+
+    return;
+  }
 
   switch (contentType) {
     case 'application/octet-stream':
       if (!(fullBody instanceof Uint8Array)) {
         throw new Error(
-          `Incorrect body: it has to be instance of Uint8Array ` +
+          `prepareBody: Incorrect body: it has to be instance of Uint8Array ` +
           `because content-type is "application/octet-stream:`
         );
       }
@@ -52,13 +94,16 @@ export function prepareBody(
       }
       catch(e) {
         throw new Error(
-          `Incorrect body: content-type is application/json ` +
+          `prepareBody: Incorrect body: content-type is application/json ` +
           `but body can't be converted to JSON`
         );
       }
     default:
+
+      // TODO: проверить json, text/hteml, javascript, xml что это string - остальное как есть
+
       // other types such as text/plain, text/html and os on
-      return String(fullBody);
+      return fullBody;
   }
 }
 
