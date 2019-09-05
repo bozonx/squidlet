@@ -52,6 +52,9 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
       );
     }
   }
+
+  // TODO: check html
+
   else if (STRING_CONTENT_TYPES.includes(contentType)) {
     if (typeof body !== 'string') {
       throw new Error(
@@ -103,6 +106,9 @@ export function prepareBody(
       );
     }
   }
+
+  // TODO: check html
+
   else if (STRING_CONTENT_TYPES.includes(contentType)) {
     if (typeof fullBody !== 'string') {
       throw new Error(
