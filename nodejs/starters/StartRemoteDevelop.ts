@@ -7,11 +7,20 @@ import SystemStarter from './SystemStarter';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
+import {HttpClientIo} from '../../system/interfaces/io/HttpClientIo';
+import HttpClient from '../ios/HttpClient';
+import {HttpResponse} from '../../system/interfaces/io/HttpServerIo';
+import {compactUndefined} from '../../system/lib/arrays';
+
+
+const httpClientIo: HttpClientIo = new HttpClient();
 
 
 export default class StartRemoteDevelop extends StartDevelopBase {
-  private readonly argIoSet: string;
+  //private readonly argIoSet: string;
   private remoteHostInfo?: HostInfo;
+  private readonly host: string;
+  private readonly port?: number;
 
 
   constructor(
@@ -26,14 +35,17 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
     if (!argIoSet) throw new Error(`ioset param is required`);
 
-    this.argIoSet = argIoSet;
+    const {host, port} = this.parseIoSetString(argIoSet);
+
+    this.host = host;
+    this.port = port;
   }
 
   async init() {
     this.remoteHostInfo = await this.getHostInfo();
     await super.init();
 
-    console.info(`Using remote ioset of host "${this.argIoSet}"`);
+    console.info(`Using remote ioset of host "${this.joinHostPort()}"`);
   }
 
 
@@ -52,16 +64,22 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   protected async makeIoSet(): Promise<IoSet> {
     if (!this.remoteHostInfo) throw new  Error(`No remote host info`);
 
-    const {host, port} = this.parseIoSetString(this.argIoSet);
-    const ioSet = new IoSetDevelopRemote(this.os, this.envBuilder, this.remoteHostInfo.usedIo, host, port);
+
+    const ioSet = new IoSetDevelopRemote(
+      this.os,
+      this.envBuilder,
+      this.remoteHostInfo.usedIo,
+      this.host,
+      this.port
+    );
 
     ioSet.prepare && await ioSet.prepare();
 
     return ioSet;
   }
 
-  private parseIoSetString(ioSetString?: string): {host?: string, port?: number} {
-    if (!ioSetString) return {};
+  private parseIoSetString(ioSetString?: string): {host: string, port?: number} {
+    if (!ioSetString) throw new Error(`Host is required`);
 
     const splat = ioSetString.split(IOSET_STRING_DELIMITER);
 
@@ -81,12 +99,26 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   }
 
   private async getHostInfo(): Promise<HostInfo> {
+    // TODO: use HttpClientLogic
+    // TODO: how to switch protocol???
+    const url = `http://${this.joinHostPort()}/api/info`;
+    const result: HttpResponse = await httpClientIo.fetch({
+      method: 'get',
+      url,
+      // TODO: remove
+      headers: {},
+    });
     // TODO: ask ioServer via http api for platform and machine
+    // TODO: set result
     return {
       platform: 'nodejs',
       machine: 'rpi',
       usedIo: [],
     };
+  }
+
+  private joinHostPort(): string {
+    return compactUndefined([this.host, this.port]).join(':');
   }
 
 }
