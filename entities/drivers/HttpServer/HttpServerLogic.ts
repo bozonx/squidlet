@@ -172,7 +172,7 @@ export default class HttpServerLogic {
       preparedResponse = this.makeServerErrorResponse(String(err));
     }
 
-    await this.httpServerIo.sendResponse(requestId, preparedResponse);
+    await this.httpServerIo.sendResponse(this.serverId, requestId, preparedResponse);
   }
 
   private makeSuccessResponse(response: HttpDriverResponse): HttpResponse {
