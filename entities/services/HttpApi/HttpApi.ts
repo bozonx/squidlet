@@ -32,11 +32,11 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     this.depsInstances.router = await getDriverDep('HttpServerRouter')
       .getInstance(this.props);
 
-    this.router.addRoute('get', 'api/:methodName/:args', this.handleRouteRequest);
+    this.router.addRoute('get', 'api/:methodName/:args', this.handleRoute);
   }
 
 
-  private handleRouteRequest = async (route: Route): Promise<HttpDriverResponse> => {
+  private handleRoute = async (route: Route): Promise<HttpDriverResponse> => {
     const methodName: string | number | undefined = route.params.methodName;
 
     if (typeof methodName !== 'string') {

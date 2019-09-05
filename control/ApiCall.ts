@@ -127,6 +127,7 @@ export default class ApiCall {
 
     const result =  await apiClient.callMethod('getHostInfo');
 
+    // TODO: don't use null
     console.info(JSON.stringify(result, null, 2));
     await apiClient.close();
   }

@@ -51,6 +51,7 @@ export default class Polling {
     const id = this.resolveId(uniqId);
     const pollingCbWrapper: MethodWrapper = () => {
       methodWhichWillPoll()
+      // TODO: don't use null
         .then((result) => this.events.emit(id, null, result))
         .catch((err) => this.events.emit(id, err));
     };

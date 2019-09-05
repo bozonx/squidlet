@@ -1,14 +1,13 @@
-/**
- * When undefined, null, '', [] or {}.
- * 0 is not empty!
- * @param toCheck
- */
 import {isPlainObject} from './objects';
 
 
 // export function values(obj: {[index: string]: any}): any[] {
 //   return Object.keys(obj).map(key => obj[key]);
 // }
+
+
+
+
 
 // TODO: better to not use it at all
 export function isEqual(first: any, second: any): boolean {

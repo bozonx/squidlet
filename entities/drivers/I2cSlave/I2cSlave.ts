@@ -5,6 +5,7 @@ import DriverBase from 'system/base/DriverBase';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 
+// TODO: don't use null
 const NO_DATA_ADDRESS = 'null';
 const REGISTER_LENGTH = 1;
 

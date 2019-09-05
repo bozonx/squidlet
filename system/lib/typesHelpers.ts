@@ -42,6 +42,7 @@ export function parseType(type: Primitives): ParsedType {
     //else if (constants.includes(item)) result.constants.push(item);
     else if (item === 'true') result.constants.push(true);
     else if (item === 'false') result.constants.push(false);
+    // TODO: don't use null
     else if (item === 'null') result.constants.push(null);
     else if (item === 'undefined') result.constants.push(undefined);
     // string constants

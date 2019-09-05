@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe 'system.lib.helpers', ->
+describe.only 'system.lib.helpers', ->
   it 'convertToLevel', ->
     assert.isTrue(helpers.convertToLevel(true))
     assert.isTrue(helpers.convertToLevel(1))
@@ -71,6 +71,9 @@ describe 'system.lib.helpers', ->
     assert.equal(helpers.convertEntityTypeToPlural('driver'), 'drivers')
     assert.equal(helpers.convertEntityTypeToPlural('service'), 'services')
     assert.equal(helpers.convertEntityTypeToPlural('device'), 'devices')
+
+  it 'parseArgs', ->
+    assert.deepEqual(helpers.parseArgs('5, "str", '))
 
 #  it 'splitTopicId', ->
 #    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])

@@ -44,12 +44,12 @@ export default interface HostConfig {
 
   // host and port to listen to in IO server mode.
   // it will use default values if this param is en empty object.
-  ioServer: {
+  ioServer?: {
     // default is localhost
     host: string;
     // default is 8089
     port: number;
-  } | null;
+  };
 
   // // TODO: remove
   // address: Destination;

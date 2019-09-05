@@ -2,6 +2,12 @@ import {isEqual} from './lodashLike';
 import {compactArray} from './arrays';
 
 
+// /**
+//  * When undefined, null, '', [] or {}.
+//  * 0 is not empty!
+//  * @param toCheck
+//  */
+
 /**
  * Check is object is empty.
  * For other types it will return true.
@@ -81,6 +87,7 @@ export function findObj<T extends any>(
 
 export function isPlainObject(obj: any): boolean {
   return  typeof obj === 'object' // separate from primitives
+    // TODO: don't use null
     && obj !== null         // is obvious
     && obj.constructor === Object // separate instances (Array, DOM, ...)
     && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math

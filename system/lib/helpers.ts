@@ -100,6 +100,31 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
   return `${entityType}s` as any;
 }
 
+// TODO: test
+/**
+ * Parse comma separated args like: param1,5,true to ['param1', 5, true];
+ */
+export function parseArgs(data: string | number | boolean| undefined): JsonTypes[] {
+  if (typeof data === 'undefined') {
+    return [];
+  }
+  else if (typeof data === 'number' || typeof data === 'boolean') {
+    return [data];
+  }
+  else if (typeof data !== 'string') {
+    throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
+  }
+
+  const splat: string[] = data.split(',');
+  const result: JsonTypes[] = [];
+
+  for (let item of splat) {
+    result.push( parseValue(item.trim()) );
+  }
+
+  return result;
+}
+
 // TODO: review
 // TODO: test
 export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
@@ -134,31 +159,6 @@ export function callOnDifferentValues(
 
 export function consoleError(msg: string) {
   console.error(`ERROR: ${msg}`);
-}
-
-// TODO: test
-/**
- * Parse args like: param1,5,true to ['param1', 5, true];
- */
-export function parseArgs(data: string | number | undefined): JsonTypes[] {
-  if (typeof data === 'undefined') {
-    return [];
-  }
-  else if (typeof data === 'number') {
-    return [data];
-  }
-  else if (typeof data !== 'string') {
-    throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
-  }
-
-  const splat: string[] = data.split(',');
-  const result: JsonTypes[] = [];
-
-  for (let item of splat) {
-    result.push( parseValue(item.trim()) );
-  }
-
-  return result;
 }
 
 // /**
