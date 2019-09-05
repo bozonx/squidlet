@@ -57,3 +57,15 @@ describe.only 'system.lib.httpBody', ->
     assert.throws(() => httpBody.prepareBody('application/xml', undefined))
     assert.throws(() => httpBody.prepareBody('text/html', undefined))
     assert.throws(() => httpBody.prepareBody('text/html', 'str'))
+
+  it 'resolveBodyType', ->
+    uintArr = new Uint8Array([0])
+
+    assert.isUndefined(httpBody.resolveBodyType(undefined))
+    assert.equal(httpBody.resolveBodyType(uintArr), 'application/octet-stream')
+    assert.equal(httpBody.resolveBodyType('<!doctype html><body></body>'), 'text/html')
+    assert.equal(httpBody.resolveBodyType('str'), 'text/plain')
+    assert.equal(httpBody.resolveBodyType(5), 'application/json')
+    assert.equal(httpBody.resolveBodyType(true), 'application/json')
+    assert.equal(httpBody.resolveBodyType([]), 'application/json')
+    assert.equal(httpBody.resolveBodyType({}), 'application/json')

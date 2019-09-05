@@ -1,6 +1,9 @@
 import {JsonTypes} from '../interfaces/Types';
 
 
+// TODO: does it need support of null????
+
+
 export type HttpContentType = 'text/plain'
   | 'text/html'
   | 'application/json'
