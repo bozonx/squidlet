@@ -11,6 +11,7 @@ describe.only 'system.lib.httpBody', ->
     assert.equal(httpBody.parseBody('application/json', 'true'), true)
     assert.deepEqual(httpBody.parseBody('application/json', '[1]'), [1])
     assert.deepEqual(httpBody.parseBody('application/json', '{"a":1}'), {a:1})
+    assert.equal(httpBody.parseBody('application/json', '"str"'), 'str')
     assert.equal(httpBody.parseBody('text/plain', 'str'), 'str')
     assert.equal(httpBody.parseBody('application/javascript', 'str'), 'str')
     assert.equal(httpBody.parseBody('application/xml', 'str'), 'str')
@@ -30,3 +31,29 @@ describe.only 'system.lib.httpBody', ->
     assert.throws(() => httpBody.parseBody('application/xml', undefined))
     assert.throws(() => httpBody.parseBody('text/html', undefined))
     assert.throws(() => httpBody.parseBody('text/html', 'str'))
+
+  it 'prepareBody', ->
+    uintArr = new Uint8Array([0])
+
+    assert.isUndefined(httpBody.prepareBody(undefined, undefined))
+    assert.equal(httpBody.prepareBody('application/octet-stream', uintArr), uintArr)
+    assert.equal(httpBody.prepareBody('application/json', 5), '5')
+    assert.equal(httpBody.prepareBody('application/json', true), 'true')
+    assert.equal(httpBody.prepareBody('application/json', [1]), '[1]')
+    assert.equal(httpBody.prepareBody('application/json', {a:1}), '{"a":1}')
+    assert.equal(httpBody.prepareBody('application/json', 'str'), '"str"')
+    assert.equal(httpBody.prepareBody('text/plain', 'str'), 'str')
+    assert.equal(httpBody.prepareBody('application/javascript', 'str'), 'str')
+    assert.equal(httpBody.prepareBody('text/html', '<!doctype html><body></body>'), '<!doctype html><body></body>')
+    assert.isTrue(httpBody.prepareBody('unsupported', true))
+    assert.isUndefined(httpBody.prepareBody('unsupported', undefined))
+
+    # errors
+    assert.throws(() => httpBody.prepareBody(undefined, ''))
+    assert.throws(() => httpBody.prepareBody('application/octet-stream', []))
+    assert.throws(() => httpBody.prepareBody('application/json', undefined))
+    assert.throws(() => httpBody.prepareBody('text/plain', undefined))
+    assert.throws(() => httpBody.prepareBody('application/javascript', undefined))
+    assert.throws(() => httpBody.prepareBody('application/xml', undefined))
+    assert.throws(() => httpBody.prepareBody('text/html', undefined))
+    assert.throws(() => httpBody.prepareBody('text/html', 'str'))

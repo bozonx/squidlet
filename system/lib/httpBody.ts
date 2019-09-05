@@ -61,7 +61,7 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
   else if (contentType === 'text/html') {
     if (!isHtml(body)) {
       throw new Error(
-        `parseBody: Incorrect body: content-type is "text/html" but body isn't html`
+        `parseBody: Incorrect body: content-type is "text/html" but body isn't a html`
       );
     }
 
@@ -108,6 +108,10 @@ export function prepareBody(
     return fullBody;
   }
   else if (contentType === 'application/json') {
+    if (typeof fullBody === 'undefined') {
+      throw new Error(`prepareBody: Incorrect body: content-type is application/json but it is undefined`);
+    }
+
     try {
       return JSON.stringify(fullBody);
     }
@@ -118,9 +122,15 @@ export function prepareBody(
       );
     }
   }
+  else if (contentType === 'text/html') {
+    if (!isHtml(fullBody)) {
+      throw new Error(
+        `prepareBody: Incorrect body: content-type is "text/html" but body isn't a html`
+      );
+    }
 
-  // TODO: check html
-
+    return fullBody as string;
+  }
   else if (STRING_CONTENT_TYPES.includes(contentType)) {
     if (typeof fullBody !== 'string') {
       throw new Error(
