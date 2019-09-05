@@ -17,6 +17,9 @@ describe 'system.lib.objects', ->
   it 'omitObj', ->
     assert.deepEqual(objects.omitObj({a: 0, b: 1, c: 2}, 'a', 'b'), {c: 2})
 
+  it 'omitUndefined', ->
+    assert.deepEqual(objects.omitUndefined({a: 0, b: undefined, c: 2}), {a: 0, c: 2})
+
   it 'pickObj', ->
     assert.deepEqual(objects.pickObj({a: 0, b: 1, c: 2}, 'b', 'c'), {b: 1, c: 2})
 

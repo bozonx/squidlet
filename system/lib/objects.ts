@@ -28,6 +28,20 @@ export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclud
   return result;
 }
 
+export function omitUndefined(obj: {[index: string]: any} | undefined): {[index: string]: any} {
+  if (!obj) return {};
+
+  const result: {[index: string]: any} = {};
+
+  for (let key of Object.keys(obj)) {
+    if (typeof obj[key] === 'undefined') continue;
+
+    result[key] = obj[key];
+  }
+
+  return result;
+}
+
 export function pickObj(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
   if (!obj) return {};
 
