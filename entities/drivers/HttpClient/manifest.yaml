@@ -1,14 +1,7 @@
 name: HttpClient
 main: HttpClient.ts
-system: true
 
 ios:
   - HttpClient
 
 props:
-  host:
-    type: string
-    default: localhost
-  port:
-    type: number
-    default: 80

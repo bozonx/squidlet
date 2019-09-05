@@ -1,0 +1,38 @@
+import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import DriverBase from 'system/base/DriverBase';
+import {HttpClientIo} from 'system/interfaces/io/HttpClientIo';
+import HttpClientLogic, {HttpClientProps} from './HttpClientLogic';
+import {HttpResponse} from 'system/interfaces/io/HttpServerIo';
+import {HttpDriverRequest} from '../HttpServer/HttpServerLogic';
+
+
+export class HttpClient extends DriverBase<HttpClientProps> {
+  private get httpClientIo(): HttpClientIo {
+    return this.getIo('HttpClient') as any;
+  }
+  private client?: HttpClientLogic;
+
+
+  protected willInit = async () => {
+    this.client = new HttpClientLogic(
+      this.httpClientIo,
+      this.props,
+    );
+  }
+
+  destroy = async () => {
+    this.client && await this.client.destroy();
+  }
+
+
+  async fetch(request: HttpDriverRequest): Promise<HttpResponse> {
+    if (!this.client) throw new Error(`HttpClient: Client is not initialized`);
+
+    return await this.client.fetch(request);
+  }
+}
+
+export default class Factory extends DriverFactoryBase<HttpClient> {
+  protected DriverClass = HttpClient;
+  protected instanceAlwaysNew: boolean = true;
+}
