@@ -16,7 +16,13 @@ const STRING_CONTENT_TYPES = ['text/plain', 'text/html', 'application/javascript
  * But if content-type isn't supported then body will be used as is.
  */
 export function parseBody(contentType?: HttpContentType, body?: string | Uint8Array): JsonTypes | Uint8Array {
-  if (!contentType) return;
+  if (!contentType) {
+    if (typeof body !== 'undefined') {
+      throw new Error(`parseBody: Incorrect body: no content-type and body has to be undefined`);
+    }
+
+    return;
+  }
 
   if (contentType === 'application/octet-stream') {
     if (!(body instanceof Uint8Array)) {
@@ -57,7 +63,7 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
     return body;
   }
 
-  // return as is
+  // return as is for other types
   return body;
 }
 
@@ -76,33 +82,40 @@ export function prepareBody(
     return;
   }
 
-  switch (contentType) {
-    case 'application/octet-stream':
-      if (!(fullBody instanceof Uint8Array)) {
-        throw new Error(
-          `prepareBody: Incorrect body: it has to be instance of Uint8Array ` +
-          `because content-type is "application/octet-stream:`
-        );
-      }
+  if (contentType === 'application/octet-stream') {
+    if (!(fullBody instanceof Uint8Array)) {
+      throw new Error(
+        `prepareBody: Incorrect body: it has to be instance of Uint8Array ` +
+        `because content-type is "application/octet-stream:`
+      );
+    }
 
-      return fullBody;
-    case 'application/json':
-      try {
-        return JSON.stringify(fullBody);
-      }
-      catch(e) {
-        throw new Error(
-          `prepareBody: Incorrect body: content-type is application/json ` +
-          `but body can't be converted to JSON`
-        );
-      }
-    default:
-
-      // TODO: проверить json, text/hteml, javascript, xml что это string - остальное как есть
-
-      // other types such as text/plain, text/html and os on
-      return fullBody;
+    return fullBody;
   }
+  else if (contentType === 'application/json') {
+    try {
+      return JSON.stringify(fullBody);
+    }
+    catch(e) {
+      throw new Error(
+        `prepareBody: Incorrect body: content-type is application/json ` +
+        `but body can't be converted to JSON`
+      );
+    }
+  }
+  else if (STRING_CONTENT_TYPES.includes(contentType)) {
+    if (typeof fullBody !== 'string') {
+      throw new Error(
+        `prepareBody: Incorrect body: content-type is "${contentType}" ` +
+        `and body has to be a string`
+      );
+    }
+
+    return fullBody;
+  }
+
+  // return as is for other types
+  return fullBody as any;
 }
 
 /**
