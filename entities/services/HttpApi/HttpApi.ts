@@ -47,8 +47,8 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     }
     if (!allowedApiMethodsToCall.includes(methodName)) {
       return {
-        status: 400,
-        body: `Method "${methodName}" isn't allowed in a HttpApi service`,
+        status: 404,
+        body: `Api method "${methodName}" not found`,
       };
     }
 

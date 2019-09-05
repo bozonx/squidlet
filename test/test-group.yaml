@@ -9,6 +9,8 @@ hosts:
     platform: nodejs
     machine: x86
 
+    httpApi:
+      host: 0.0.0.0
     wsApi:
       host: 0.0.0.0
     ioServer:

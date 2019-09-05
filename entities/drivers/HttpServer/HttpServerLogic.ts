@@ -145,6 +145,7 @@ export default class HttpServerLogic {
   }
 
   private async handleCloseServer() {
+    // TODO: review
     this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
     delete this.serverId;
     this.requestEvents.removeAll();
@@ -157,6 +158,7 @@ export default class HttpServerLogic {
   }
 
   private async callRequestCb(requestId: number, request: HttpRequest, cb: HttpDriverHandler) {
+    // prepare simplified request object to manipulate it in the upper code
     const preparedRequest: HttpDriverRequest = {
       ...request,
       body: parseBody(request.headers['content-type'], request.body),

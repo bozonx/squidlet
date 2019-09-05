@@ -1,6 +1,5 @@
 name: HttpServerRouter
 main: HttpServerRouter.ts
-system: true
 
 drivers:
   - HttpServer
