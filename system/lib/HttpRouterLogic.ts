@@ -8,6 +8,7 @@ import {HttpMethods} from '../interfaces/io/HttpServerIo';
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 import {clearObject} from './objects';
 import {response} from 'express';
+import {matchRoute, MatchRouteResult} from './route';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -113,64 +114,38 @@ export default class HttpRouterLogic {
    */
   private makeRouteObj(request: HttpDriverRequest): Route | undefined {
     const location: ParsedUrl = parseUrl(request.url);
-    const { route, params } = this.resolveRoute(request.method, location.path);
-    const routeId = this.makeRouteId(request.method, route);
+    const resolvedRoute: MatchRouteResult | undefined = this.resolveRoute(request.method, location.path);
+
+    if (!resolvedRoute) return;
+
+    const routeId = this.makeRouteId(request.method, resolvedRoute.route);
     const routeItem: RouteItem = this.registeredRoutes[routeId];
 
     if (!routeItem) return;
 
     return {
-      routeId,
-      route,
-      params,
+      routeId: routeId,
+      route: resolvedRoute.route,
+      params: resolvedRoute.params,
       pinnedProps: routeItem.pinnedProps,
       location,
     };
   }
 
-  private resolveRoute(
-    method: HttpMethods,
-    relativeUrl: string
-  ): { route: string, params: {[index: string]: string | number}} | undefined {
-    const cleanUrl = this.prepareRoute(relativeUrl);
-    const urlParts: string[] = cleanUrl.split(URL_DELIMITER);
+  private resolveRoute(method: HttpMethods, urlPath: string): MatchRouteResult | undefined {
     const pathOfIdToStripLength: number = method.length + 1;
-    // routes matched to method
-    const matchedMethodRoutes: string[] = Object.keys(this.registeredRoutes)
+    // routes matched to method and stripped - only route path of id.
+    const routesMatchedToMethod: string[] = Object.keys(this.registeredRoutes)
       .filter((routeId: string): boolean => {
         return routeId.indexOf(method as string) === 0;
       })
       .map((routeId: string) => routeId.slice(0, pathOfIdToStripLength));
 
-    if (!matchedMethodRoutes.length) return;
-
-    let compoundUrl: string = '';
-
-    for (let urlPart of urlParts) {
-      compoundUrl += ((compoundUrl) ? URL_DELIMITER : '') + urlPart;
-
-
-
-      // TODO: отсеиваем совпадения
-    }
-
-    // TODO: сделать рекурсивный поиск пути
-
-    // TODO: лучше тримить каждую urlPart
-    // TODO: ищем ближайший параметр :id - и все что до него это baseUrl
-
+    if (!routesMatchedToMethod.length) return;
 
     // TODO: если это root - то выполнить этот роут
-    // TODO: нужно учитывать method
 
-    // TODO: это ещё не роут - это только url - нужно соотнести с шаблонами routes и поднять все совпадающие
-    // TODO: resolve - parse params like :id
-    // TODO: resolve numbers
-
-    return {
-      route: '',
-      params: {},
-    };
+    return  matchRoute(urlPath, routesMatchedToMethod);
   }
 
   private prepareRoute(rawRoute: string): string {
