@@ -1,26 +1,31 @@
 import {JsonTypes} from '../interfaces/Types';
-import IndexedEventEmitter from './IndexedEventEmitter';
 import {trimChar} from './strings';
 import {ParsedUrl, parseUrl, URL_DELIMITER} from './url';
+import IndexedEvents from './IndexedEvents';
 // TODO: don't use dependencies
-import {HttpMethods, HttpRequest} from '../interfaces/io/HttpServerIo';
+import {HttpMethods} from '../interfaces/io/HttpServerIo';
 // TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
+import {clearObject} from './objects';
+import {response} from 'express';
 
 
 const EVENT_NAME_DELIMITER = '|';
 
 
 export interface Route {
+  // string in format "method|path/to/route"
+  routeId: string;
   // parsed url params like /path/to/:page => {page: 'myPageName'};
   params: {[index: string]: string | number};
   // route which has been set in addRoute()
   route: string;
-  pinnedProps: {[index: string]: JsonTypes};
   location: ParsedUrl;
+  pinnedProps?: {[index: string]: JsonTypes};
 }
 
 export type RouterRequestHandler = (route: Route, request: HttpDriverRequest) => Promise<HttpDriverResponse>;
+export type RouterEnterHandler = (route: Route, request: HttpDriverRequest, response: HttpDriverResponse) => Promise<void>;
 
 interface RouteItem {
   // full route
@@ -32,7 +37,7 @@ interface RouteItem {
 
 
 export default class HttpRouterLogic {
-  private readonly events = new IndexedEventEmitter<RouterRequestHandler>();
+  private readonly enterEvents = new IndexedEvents<RouterEnterHandler>();
   private readonly registeredRoutes: {[index: string]: RouteItem} = {};
   private readonly logDebug: (msg: string) => void;
 
@@ -42,7 +47,8 @@ export default class HttpRouterLogic {
   }
 
   destroy() {
-    this.events.destroy();
+    this.enterEvents.removeAll();
+    clearObject(this.registeredRoutes);
   }
 
 
@@ -57,11 +63,11 @@ export default class HttpRouterLogic {
   ) {
     const preparedRoute: string = this.prepareRoute(route);
     const preparedMethod = method.toLowerCase() as HttpMethods;
-    const eventName = `${preparedMethod}${EVENT_NAME_DELIMITER}${preparedRoute}`;
+    const routeId = this.makeRouteId(preparedMethod, preparedRoute);
 
-    this.registeredRoutes[eventName] = {
-      method: preparedMethod,
+    this.registeredRoutes[routeId] = {
       route: preparedRoute,
+      method: preparedMethod,
       routeHandler,
       pinnedProps
     };
@@ -71,9 +77,6 @@ export default class HttpRouterLogic {
    * Call this only when a new request came.
    */
   async incomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
-
-    // TODO: сначала найти item потом сделать RouteObj
-
     const parsedRoute: Route | undefined = this.makeRouteObj(request);
 
     if (!parsedRoute) {
@@ -83,44 +86,41 @@ export default class HttpRouterLogic {
       };
     }
 
-    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${parsedRoute.route}`;
-    const driverRequest: HttpDriverRequest = this.makeDriverRequest(request);
+    const response: HttpDriverResponse = await this.registeredRoutes[parsedRoute.routeId].routeHandler(
+      parsedRoute,
+      request
+    );
 
-    // TODO: сразу вернуть ответ
+    this.enterEvents.emit(parsedRoute, request, response);
 
-    //this.events.emit(eventName, parsedRoute, driverRequest);
+    return response;
   }
 
-  removeRequestListener(method: HttpMethods, route: string, handlerIndex: number) {
-    const preparedRoute: string = this.prepareRoute(route);
-    const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
-
-    this.events.removeListener(eventName, handlerIndex);
+  /**
+   * Listen to all the requests to all the routes
+   */
+  onEnter(cb: RouterEnterHandler): number {
+    return this.enterEvents.addListener(cb);
   }
 
-
-  private makeDriverRequest(request: HttpRequest): HttpDriverRequest {
-    return {
-      ...request,
-      // TODO: может это будет в самом драйвере происходить ???
-      // TODO: prepare body - resolve type
-    };
+  removeEnterListener(handlerIndex: number) {
+    this.enterEvents.removeListener(handlerIndex);
   }
+
 
   /**
    * Make route object using request
    */
   private makeRouteObj(request: HttpDriverRequest): Route | undefined {
     const location: ParsedUrl = parseUrl(request.url);
-    const { route, params } = this.resolveRoute(request.method, location.url);
-    const eventName = `${request.method}${EVENT_NAME_DELIMITER}${route}`;
-    const routeItem: RouteItem = this.registeredRoutes[eventName];
+    const { route, params } = this.resolveRoute(request.method, location.path);
+    const routeId = this.makeRouteId(request.method, route);
+    const routeItem: RouteItem = this.registeredRoutes[routeId];
 
     if (!routeItem) return;
 
-    // TODO: pinnedProps может не быть
-
     return {
+      routeId,
       route,
       params,
       pinnedProps: routeItem.pinnedProps,
@@ -153,30 +153,8 @@ export default class HttpRouterLogic {
     return trimChar(rawRoute, URL_DELIMITER);
   }
 
-  // /**
-  //  * Call this to handle calling of route
-  //  */
-  // onRequest(method: HttpMethods, route: string, cb: RouterRequestHandler): number {
-  //
-  //   // TODO: remove!!!!
-  //
-  //   const preparedRoute: string = this.prepareRoute(route);
-  //
-  //
-  //   // const handlerWrapper = (parsedRoute: Route, request: HttpDriverRequest): Promise<HttpDriverResponse> => {
-  //   //   if (parsedRoute.route !== route) return;
-  //   //
-  //   //   // TODO: cb returns a response !!!!
-  //   //
-  //   //   cb(parsedRoute, request);
-  //   // }
-  //
-  //
-  //   // TODO: cb returns a response !!!! этом может не обрабатываться в events
-  //
-  //   const eventName = `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${preparedRoute}`;
-  //
-  //   return this.events.addListener(eventName, cb);
-  // }
+  private makeRouteId(method: HttpMethods, route: string): string {
+    return `${method.toLowerCase()}${EVENT_NAME_DELIMITER}${route}`;
+  }
 
 }

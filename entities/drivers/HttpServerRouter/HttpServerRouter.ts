@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
-import HttpRouterLogic, {RouterRequestHandler} from 'system/lib/HttpRouterLogic';
+import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from 'system/lib/HttpRouterLogic';
 import {HttpMethods} from 'system/interfaces/io/HttpServerIo';
 import {JsonTypes} from 'system/interfaces/Types';
 import {GetDriverDep} from 'system/base/EntityBase';
@@ -54,6 +54,14 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
     pinnedProps?: {[index: string]: JsonTypes}
   ) {
     this.router.addRoute(method, route, routeHandler, pinnedProps);
+  }
+
+  onEnter(cb: RouterEnterHandler): number {
+    return this.router.onEnter(cb);
+  }
+
+  removeEnterListener(handlerIndex: number) {
+    this.router.removeEnterListener(handlerIndex);
   }
 
   async closeServer() {
