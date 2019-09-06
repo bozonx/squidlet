@@ -8,6 +8,7 @@ import {GetDriverDep} from 'system/base/EntityBase';
 
 import {HttpServer} from '../HttpServer/HttpServer';
 import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
+import {URL_DELIMITER} from '../../../system/lib/url';
 
 
 export class HttpServerRouter extends DriverBase<HttpServerProps> {
@@ -53,6 +54,13 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
     routeHandler: RouterRequestHandler,
     pinnedProps?: {[index: string]: JsonTypes}
   ) {
+    if (!route.indexOf(URL_DELIMITER)) {
+      this.log.warn(
+        `HttpServerRouter.addRoute: The route "${route}" doesn't have a "/" at the beginning.` +
+        `Better to add it`
+      );
+    }
+
     this.router.addRoute(method, route, routeHandler, pinnedProps);
   }
 

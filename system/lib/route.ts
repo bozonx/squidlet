@@ -1,4 +1,5 @@
 import {URL_DELIMITER} from './url';
+import {trimCharEnd} from './strings';
 
 
 export interface MatchRouteResult {
@@ -9,7 +10,23 @@ export interface MatchRouteResult {
 
 
 /**
- * Match url with route and return route, basePath of route and route params.
+ * Remove trailing slash and add slash to the beginning if it doesn't have it
+ */
+export function prepareRoute(rawRoute: string): string {
+  const trimmed = trimCharEnd(rawRoute.trim(), URL_DELIMITER);
+
+  if (trimmed.indexOf(URL_DELIMITER)) return trimmed;
+
+  return URL_DELIMITER + trimmed;
+}
+
+/**
+ * Match urlPath with route and return route, basePath of route and route params.
+ * Example: '/path/to/actionName/value1/' => {
+ *   route: '/path/to/:action/:param1'
+ *   basePath: /path/to
+ *   params: { action: 'actionName', param1: 'value1' }
+ * }
  * @param urlPath - path part of url
  * @param allRoutes - all the available routes
  */
@@ -28,6 +45,8 @@ export function matchRoute(urlPath: string, allRoutes: string[]): MatchRouteResu
 
       //if (route.indexOf(urlPart) === 0) newMatchedRoutes.push();
     }
+
+    // TODO: если это root - то выполнить этот роут
 
 
     // TODO: сделать рекурсивный поиск пути

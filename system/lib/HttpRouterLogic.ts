@@ -1,14 +1,12 @@
 import {JsonTypes} from '../interfaces/Types';
-import {trimChar} from './strings';
-import {ParsedUrl, parseUrl, URL_DELIMITER} from './url';
+import {ParsedUrl, parseUrl} from './url';
 import IndexedEvents from './IndexedEvents';
+import {clearObject} from './objects';
+import {matchRoute, MatchRouteResult, prepareRoute} from './route';
 // TODO: don't use dependencies
 import {HttpMethods} from '../interfaces/io/HttpServerIo';
 // TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
-import {clearObject} from './objects';
-import {response} from 'express';
-import {matchRoute, MatchRouteResult} from './route';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -54,7 +52,7 @@ export default class HttpRouterLogic {
 
 
   /**
-   * Call this to register a new route and its params
+   * Call this to register a new route and its params.
    */
   addRoute(
     method: HttpMethods,
@@ -62,7 +60,7 @@ export default class HttpRouterLogic {
     routeHandler: RouterRequestHandler,
     pinnedProps?: {[index: string]: JsonTypes}
   ) {
-    const preparedRoute: string = this.prepareRoute(route);
+    const preparedRoute: string = prepareRoute(route);
     const preparedMethod = method.toLowerCase() as HttpMethods;
     const routeId = this.makeRouteId(preparedMethod, preparedRoute);
 
@@ -133,23 +131,16 @@ export default class HttpRouterLogic {
   }
 
   private resolveRoute(method: HttpMethods, urlPath: string): MatchRouteResult | undefined {
-    const pathOfIdToStripLength: number = method.length + 1;
+    const LENGTH_OF_DELIMITER = 1;
+    const pathOfIdToStripLength: number = method.length + LENGTH_OF_DELIMITER;
     // routes matched to method and stripped - only route path of id.
     const routesMatchedToMethod: string[] = Object.keys(this.registeredRoutes)
-      .filter((routeId: string): boolean => {
-        return routeId.indexOf(method as string) === 0;
-      })
+      .filter((routeId: string): boolean => routeId.indexOf(method as string) === 0)
       .map((routeId: string) => routeId.slice(0, pathOfIdToStripLength));
 
     if (!routesMatchedToMethod.length) return;
 
-    // TODO: если это root - то выполнить этот роут
-
-    return  matchRoute(urlPath, routesMatchedToMethod);
-  }
-
-  private prepareRoute(rawRoute: string): string {
-    return trimChar(rawRoute.trim(), URL_DELIMITER);
+    return matchRoute(urlPath, routesMatchedToMethod);
   }
 
   private makeRouteId(method: HttpMethods, route: string): string {
