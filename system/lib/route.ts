@@ -31,33 +31,53 @@ export function prepareRoute(rawRoute: string): string {
  * @param allRoutes - all the available routes
  */
 export function matchRoute(urlPath: string, allRoutes: string[]): MatchRouteResult | undefined {
-  const cleanUrl = this.prepareRoute(relativeUrl);
-  const urlParts: string[] = cleanUrl.split(URL_DELIMITER);
+  const cleanUrl = prepareRoute(urlPath);
 
-  let compoundUrl: string = '';
+  const filteredRoutes: string[] = filterRoutes(cleanUrl, allRoutes);
 
-  for (let urlPart of urlParts) {
-    compoundUrl += ((compoundUrl) ? URL_DELIMITER : '') + urlPart;
+  if (!filteredRoutes.length) return;
 
-    const newMatchedRoutes: string[] = [];
+  return parseRouteString(filteredRoutes[0]);
 
-    for (let route of matchedRoutes) {
+  // TODO: test root route
 
-      //if (route.indexOf(urlPart) === 0) newMatchedRoutes.push();
+  //const urlParts: string[] = cleanUrl.split(URL_DELIMITER);
+  // let compoundUrl: string = '';
+  // let matchedRoutes = [...allRoutes];
+
+  // for (let urlPart of urlParts) {
+  //   compoundUrl += ((compoundUrl) ? URL_DELIMITER : '') + urlPart;
+  //
+  //   const newMatchedRoutes: string[] = [];
+  //
+  //   for (let route of matchedRoutes) {
+  //     // not matched
+  //     if (route.indexOf(compoundUrl) !== 0) continue;
+  //
+  //     //if (route.indexOf(urlPart) === 0) newMatchedRoutes.push();
+  //   }
+  //
+  //
+  // }
+}
+
+export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
+  const result: string[] = [];
+
+  // TODO: а что если нет прям полгого совпадения в параметрах ????
+
+  for (let route of allRoutes) {
+    const regExpStr = route.replace(/:[^\/]/g, '[^\\/]*');
+
+    if (urlPath.match(new RegExp(regExpStr))) {
+      result.push(route);
     }
-
-    // TODO: если это root - то выполнить этот роут
-
-
-    // TODO: сделать рекурсивный поиск пути
-
-    // TODO: лучше тримить каждую urlPart
-    // TODO: ищем ближайший параметр :id - и все что до него это baseUrl
-
-    // TODO: это ещё не роут - это только url - нужно соотнести с шаблонами routes и поднять все совпадающие
-    // TODO: resolve - parse params like :id
-    // TODO: resolve numbers
-
-    // TODO: отсеиваем совпадения
   }
+
+  return result;
+}
+
+export function parseRouteString(routeStr: string): MatchRouteResult {
+  //   // TODO: ищем ближайший параметр :id - и все что до него это baseUrl
+
 }

@@ -37,6 +37,7 @@ interface RouteItem {
 
 export default class HttpRouterLogic {
   private readonly enterEvents = new IndexedEvents<RouterEnterHandler>();
+  // TODO: лучше использовать массив так как важен порядок
   private readonly registeredRoutes: {[index: string]: RouteItem} = {};
   private readonly logDebug: (msg: string) => void;
 

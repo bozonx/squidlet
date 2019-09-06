@@ -32,7 +32,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     this.depsInstances.router = await getDriverDep('HttpServerRouter')
       .getInstance(this.props);
 
-    this.router.addRoute('get', 'api/:methodName/:args', this.handleRoute);
+    this.router.addRoute('get', '/api/:methodName/:args', this.handleRoute);
   }
 
 
