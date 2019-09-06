@@ -128,9 +128,33 @@ export default class HttpRouterLogic {
     };
   }
 
-  private resolveRoute(method: HttpMethods, relativeUrl: string): { route: string, params: {[index: string]: string | number} } {
+  private resolveRoute(
+    method: HttpMethods,
+    relativeUrl: string
+  ): { route: string, params: {[index: string]: string | number}} | undefined {
     const cleanUrl = this.prepareRoute(relativeUrl);
     const urlParts: string[] = cleanUrl.split(URL_DELIMITER);
+    const pathOfIdToStripLength: number = method.length + 1;
+    // routes matched to method
+    const matchedMethodRoutes: string[] = Object.keys(this.registeredRoutes)
+      .filter((routeId: string): boolean => {
+        return routeId.indexOf(method as string) === 0;
+      })
+      .map((routeId: string) => routeId.slice(0, pathOfIdToStripLength));
+
+    if (!matchedMethodRoutes.length) return;
+
+    let compoundUrl: string = '';
+
+    for (let urlPart of urlParts) {
+      compoundUrl += ((compoundUrl) ? URL_DELIMITER : '') + urlPart;
+
+
+
+      // TODO: отсеиваем совпадения
+    }
+
+    // TODO: сделать рекурсивный поиск пути
 
     // TODO: лучше тримить каждую urlPart
     // TODO: ищем ближайший параметр :id - и все что до него это baseUrl
@@ -150,7 +174,7 @@ export default class HttpRouterLogic {
   }
 
   private prepareRoute(rawRoute: string): string {
-    return trimChar(rawRoute, URL_DELIMITER);
+    return trimChar(rawRoute.trim(), URL_DELIMITER);
   }
 
   private makeRouteId(method: HttpMethods, route: string): string {
