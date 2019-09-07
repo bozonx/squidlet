@@ -3,9 +3,9 @@ import {ParsedUrl, parseUrl} from './url';
 import IndexedEvents from './IndexedEvents';
 import {matchRoute, MatchRouteResult, prepareRoute} from './route';
 import {HttpMethods} from '../interfaces/Http';
+import {clearArray} from './arrays';
 // TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
-import {clearArray} from './arrays';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -27,6 +27,7 @@ export type RouterEnterHandler = (route: Route, request: HttpDriverRequest, resp
 
 interface RouteItem {
   // full route
+  routeId: string;
   route: string;
   method: HttpMethods;
   routeHandler: RouterRequestHandler;
@@ -64,6 +65,7 @@ export default class HttpRouterLogic {
     const routeId = this.makeRouteId(preparedMethod, preparedRoute);
 
     this.registeredRoutes.push({
+      routeId,
       route: preparedRoute,
       method: preparedMethod,
       routeHandler,
@@ -75,21 +77,27 @@ export default class HttpRouterLogic {
    * Call this only when a new request came.
    */
   async incomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
-    const parsedRoute: Route | undefined = this.makeRouteObj(request);
+    const location: ParsedUrl = parseUrl(request.url);
+    const matchedRoute: MatchRouteResult | undefined = this.resolveRoute(request.method, location.path);
+    const routeItem: RouteItem | undefined = this.findRoute(
+      request.method,
+      matchedRoute && matchedRoute.route
+    );
 
-    if (!parsedRoute) {
+    if (!matchedRoute || !routeItem) {
       return {
         status: 404,
         body: `route for url "${request.url}: isn't registered!`
       };
     }
 
-    const response: HttpDriverResponse = await this.registeredRoutes[parsedRoute.routeId].routeHandler(
-      parsedRoute,
+    const routeObj: Route = this.makeRouteObj(location, routeItem, matchedRoute);
+    const response: HttpDriverResponse = await routeItem.routeHandler(
+      routeObj,
       request
     );
 
-    this.enterEvents.emit(parsedRoute, request, response);
+    this.enterEvents.emit(routeObj, request, response);
 
     return response;
   }
@@ -106,24 +114,26 @@ export default class HttpRouterLogic {
   }
 
 
+  private findRoute(method: HttpMethods, route?: string): RouteItem | undefined {
+    if (!route) return;
+
+    const routeId: string = this.makeRouteId(method, route);
+
+    return this.registeredRoutes.find((item) => item.routeId === routeId);
+  }
+
   /**
    * Make route object using request
    */
-  private makeRouteObj(request: HttpDriverRequest): Route | undefined {
-    const location: ParsedUrl = parseUrl(request.url);
-    const resolvedRoute: MatchRouteResult | undefined = this.resolveRoute(request.method, location.path);
-
-    if (!resolvedRoute) return;
-
-    const routeId = this.makeRouteId(request.method, resolvedRoute.route);
-    const routeItem: RouteItem = this.registeredRoutes[routeId];
-
-    if (!routeItem) return;
-
+  private makeRouteObj(
+    location: ParsedUrl,
+    routeItem: RouteItem,
+    matchedRoute: MatchRouteResult,
+  ): Route {
     return {
-      routeId: routeId,
-      route: resolvedRoute.route,
-      params: resolvedRoute.params,
+      routeId: routeItem.routeId,
+      route: matchedRoute.route,
+      params: matchedRoute.params,
       pinnedProps: routeItem.pinnedProps,
       location,
     };
