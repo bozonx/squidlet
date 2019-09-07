@@ -71,12 +71,13 @@ export function matchRoute(urlPath: string, allRoutes: string[]): MatchRouteResu
 export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
   const result: string[] = [];
 
-  // TODO: а что если нет прям полгого совпадения в параметрах ????
-
   for (let route of allRoutes) {
-    const regExpStr = route.replace(new RegExp(`${PARAM_MARK}[^\/]`, 'g'), '[^\\/]*');
+    const patternFindParam = `${PARAM_MARK}[^\\/]+`;
+    const patternMatchUrl = route.replace(new RegExp(patternFindParam, 'g'), '[^\\/]*');
 
-    if (urlPath.match(new RegExp(regExpStr))) {
+    // if use this then shorter routes will be matched too
+    //if (urlPath.match(new RegExp(patternMatchUrl))) {
+    if (urlPath.match(new RegExp(`^${patternMatchUrl}$`))) {
       result.push(route);
     }
   }
@@ -85,7 +86,7 @@ export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
 }
 
 /**
- * Parse params. Expample:
+ * Parse params. Example:
  * * url: /path/to/action/myAction/sub-url/5/true
  * * params: /path/to/action/:actionName/sub-url/:param1/:param2
  * * result: { actionName: 'myAction', param1: 5, param2: true }

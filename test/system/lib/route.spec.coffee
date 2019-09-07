@@ -2,11 +2,26 @@ helper = require('../../../system/lib/route')
 
 
 describe.only 'system.lib.route', ->
-  it 'parseRouteParams', ->
-    url = '/path/to/action/myAction/sub-url/5/true'
-    route = '/path/to/action/:actionName/sub-url/:param1/:param2'
+  beforeEach ->
+    @url = '/path/to/action/myAction/sub-url/5/true'
+    @route = '/path/to/action/:actionName/sub-url/:param1/:param2'
 
-    assert.deepEqual(helper.parseRouteParams(url, route), {
+  it 'filterRoutes', ->
+    routes = [
+      '/path/to/action',
+      '/path/to/action/:actionName',
+      '/path/to/action/:actionName/sub-url/:anotherParam/:param2',
+      '/path/to/action/:actionName/sub-url/:param1',
+      '/path/to/action/:actionName/sub-url/:param1/:param2',
+      '/path/to/action/:actionName/sub-url/:param1/other/:param2',
+    ]
+    assert.deepEqual(helper.filterRoutes(@url, routes), [
+      '/path/to/action/:actionName/sub-url/:anotherParam/:param2',
+      @route
+    ])
+
+  it 'parseRouteParams', ->
+    assert.deepEqual(helper.parseRouteParams(@url, @route), {
       actionName: 'myAction'
       param1: 5
       param2: true
