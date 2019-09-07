@@ -80,12 +80,12 @@ export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
 }
 
 export function parseRouteString(url: string, route: string): MatchRouteResult {
-  const [ rawBasePath ] = splitFirstElement(route, PARAM_MARK);
-  const basePath = trimCharEnd(rawBasePath, URL_DELIMITER);
+  //const [ rawBasePath ] = splitFirstElement(route, PARAM_MARK);
+  //const basePath = trimCharEnd(rawBasePath, URL_DELIMITER);
   const params: {[index: string]: Primitives} = {};
 
   // parse params
-  if (url !== basePath) {
+  if (route.match(PARAM_MARK)) {
     const routeSplat: string[] = trimCharStart(route, URL_DELIMITER).split(URL_DELIMITER);
     const urlSplat: string[] = trimCharStart(url, URL_DELIMITER).split(URL_DELIMITER);
 
