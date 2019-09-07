@@ -47,27 +47,6 @@ export function matchRoute(urlPath: string, allRoutes: string[]): MatchRouteResu
     route: foundRoute,
     params: parseRouteParams(urlPath, foundRoute),
   };
-
-  // TODO: test root route
-
-  //const urlParts: string[] = cleanUrl.split(URL_DELIMITER);
-  // let compoundUrl: string = '';
-  // let matchedRoutes = [...allRoutes];
-
-  // for (let urlPart of urlParts) {
-  //   compoundUrl += ((compoundUrl) ? URL_DELIMITER : '') + urlPart;
-  //
-  //   const newMatchedRoutes: string[] = [];
-  //
-  //   for (let route of matchedRoutes) {
-  //     // not matched
-  //     if (route.indexOf(compoundUrl) !== 0) continue;
-  //
-  //     //if (route.indexOf(urlPart) === 0) newMatchedRoutes.push();
-  //   }
-  //
-  //
-  // }
 }
 
 export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
