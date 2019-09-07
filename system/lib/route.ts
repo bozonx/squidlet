@@ -39,7 +39,12 @@ export function matchRoute(urlPath: string, allRoutes: string[]): MatchRouteResu
 
   if (!filteredRoutes.length) return;
 
-  return parseRouteString(urlPath, filteredRoutes[0]);
+  const foundRoute: string = filteredRoutes[0];
+
+  return {
+    route: foundRoute,
+    params: parseRouteParams(urlPath, foundRoute),
+  };
 
   // TODO: test root route
 
@@ -79,25 +84,25 @@ export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
   return result;
 }
 
-export function parseRouteString(url: string, route: string): MatchRouteResult {
-  //const [ rawBasePath ] = splitFirstElement(route, PARAM_MARK);
-  //const basePath = trimCharEnd(rawBasePath, URL_DELIMITER);
+/**
+ * Parse params. Expample:
+ * * url: /path/to/action/myAction/sub-url/5/true
+ * * params: /path/to/action/:actionName/sub-url/:param1/:param2
+ * * result: { actionName: 'myAction', param1: 5, param2: true }
+ */
+export function parseRouteParams(url: string, route: string): {[index: string]: Primitives} {
+  if (!route.match(PARAM_MARK)) return {};
+
   const params: {[index: string]: Primitives} = {};
 
-  // parse params
-  if (route.match(PARAM_MARK)) {
-    const routeSplat: string[] = trimCharStart(route, URL_DELIMITER).split(URL_DELIMITER);
-    const urlSplat: string[] = trimCharStart(url, URL_DELIMITER).split(URL_DELIMITER);
+  const routeSplat: string[] = trimCharStart(route, URL_DELIMITER).split(URL_DELIMITER);
+  const urlSplat: string[] = trimCharStart(url, URL_DELIMITER).split(URL_DELIMITER);
 
-    for (let itemIndex in routeSplat) {
-      if (routeSplat[itemIndex].indexOf(PARAM_MARK) !== 0) continue;
+  for (let itemIndex in routeSplat) {
+    if (routeSplat[itemIndex].indexOf(PARAM_MARK) !== 0) continue;
 
-      params[routeSplat[itemIndex].slice(1)] = parseValue(urlSplat[itemIndex]);
-    }
+    params[routeSplat[itemIndex].slice(1)] = parseValue(urlSplat[itemIndex]);
   }
 
-  return {
-    route,
-    params,
-  };
+  return params;
 }
