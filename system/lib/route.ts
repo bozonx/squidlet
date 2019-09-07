@@ -8,7 +8,6 @@ const PARAM_MARK = ':';
 
 export interface MatchRouteResult {
   route: string;
-  basePath: string;
   params: {[index: string]: Primitives};
 }
 
@@ -25,10 +24,9 @@ export function prepareRoute(rawRoute: string): string {
 }
 
 /**
- * Match urlPath with route and return route, basePath of route and route params.
+ * Match urlPath with route and return route and route params.
  * Example: '/path/to/actionName/value1/' => {
  *   route: '/path/to/:action/:param1'
- *   basePath: /path/to
  *   params: { action: 'actionName', param1: 'value1' }
  * }
  * @param urlPath - path part of url
@@ -100,7 +98,6 @@ export function parseRouteString(url: string, route: string): MatchRouteResult {
 
   return {
     route,
-    basePath,
     params,
   };
 }
