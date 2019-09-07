@@ -1,11 +1,15 @@
 import {URL_DELIMITER} from './url';
-import {trimCharEnd} from './strings';
+import {splitFirstElement, splitLastElement, trimCharEnd, trimCharStart} from './strings';
+import {Primitives} from '../interfaces/Types';
+import {parseValue} from './common';
 
+
+const PARAM_MARK = ':';
 
 export interface MatchRouteResult {
   route: string;
   basePath: string;
-  params: {[index: string]: string | number};
+  params: {[index: string]: Primitives};
 }
 
 
@@ -37,7 +41,7 @@ export function matchRoute(urlPath: string, allRoutes: string[]): MatchRouteResu
 
   if (!filteredRoutes.length) return;
 
-  return parseRouteString(filteredRoutes[0]);
+  return parseRouteString(urlPath, filteredRoutes[0]);
 
   // TODO: test root route
 
@@ -67,7 +71,7 @@ export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
   // TODO: а что если нет прям полгого совпадения в параметрах ????
 
   for (let route of allRoutes) {
-    const regExpStr = route.replace(/:[^\/]/g, '[^\\/]*');
+    const regExpStr = route.replace(new RegExp(`${PARAM_MARK}[^\/]`, 'g'), '[^\\/]*');
 
     if (urlPath.match(new RegExp(regExpStr))) {
       result.push(route);
@@ -77,7 +81,26 @@ export function filterRoutes(urlPath: string, allRoutes: string[]): string[] {
   return result;
 }
 
-export function parseRouteString(routeStr: string): MatchRouteResult {
-  //   // TODO: ищем ближайший параметр :id - и все что до него это baseUrl
+export function parseRouteString(url: string, route: string): MatchRouteResult {
+  const [ rawBasePath ] = splitFirstElement(route, PARAM_MARK);
+  const basePath = trimCharEnd(rawBasePath, URL_DELIMITER);
+  const params: {[index: string]: Primitives} = {};
 
+  // parse params
+  if (url !== basePath) {
+    const routeSplat: string[] = trimCharStart(route, URL_DELIMITER).split(URL_DELIMITER);
+    const urlSplat: string[] = trimCharStart(url, URL_DELIMITER).split(URL_DELIMITER);
+
+    for (let itemIndex in routeSplat) {
+      if (routeSplat[itemIndex].indexOf(PARAM_MARK) !== 0) continue;
+
+      params[routeSplat[itemIndex].slice(1)] = parseValue(urlSplat[itemIndex]);
+    }
+  }
+
+  return {
+    route,
+    basePath,
+    params,
+  };
 }
