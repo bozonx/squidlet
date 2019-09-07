@@ -1,7 +1,6 @@
 import {JsonTypes, Primitives} from '../interfaces/Types';
 import {ParsedUrl, parseUrl} from './url';
 import IndexedEvents from './IndexedEvents';
-import {clearObject} from './objects';
 import {matchRoute, MatchRouteResult, prepareRoute} from './route';
 import {HttpMethods} from '../interfaces/Http';
 // TODO: don't use dependencies
@@ -64,12 +63,12 @@ export default class HttpRouterLogic {
     const preparedMethod = method.toLowerCase() as HttpMethods;
     const routeId = this.makeRouteId(preparedMethod, preparedRoute);
 
-    this.registeredRoutes[routeId] = {
+    this.registeredRoutes.push({
       route: preparedRoute,
       method: preparedMethod,
       routeHandler,
       pinnedProps
-    };
+    });
   }
 
   /**
