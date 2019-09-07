@@ -6,6 +6,15 @@ describe.only 'system.lib.route', ->
     @url = '/path/to/action/myAction/sub-url/5/true'
     @route = '/path/to/action/:actionName/sub-url/:param1/:param2'
 
+  it 'prepareRoute', ->
+    assert.equal(helper.prepareRoute('/'), '/')
+    assert.equal(helper.prepareRoute('route'), '/route')
+    assert.equal(helper.prepareRoute('/route'), '/route')
+    assert.equal(helper.prepareRoute('/route/to/'), '/route/to')
+
+  it 'matchRoute', ->
+
+
   it 'filterRoutes', ->
     routes = [
       '/path/to/action',

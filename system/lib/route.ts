@@ -1,5 +1,5 @@
 import {URL_DELIMITER} from './url';
-import {splitFirstElement, splitLastElement, trimCharEnd, trimCharStart} from './strings';
+import {trimCharEnd, trimCharStart} from './strings';
 import {Primitives} from '../interfaces/Types';
 import {parseValue} from './common';
 
@@ -16,9 +16,11 @@ export interface MatchRouteResult {
  * Remove trailing slash and add slash to the beginning if it doesn't have it
  */
 export function prepareRoute(rawRoute: string): string {
+  if (rawRoute === URL_DELIMITER) return rawRoute;
+
   const trimmed = trimCharEnd(rawRoute.trim(), URL_DELIMITER);
 
-  if (trimmed.indexOf(URL_DELIMITER)) return trimmed;
+  if (trimmed.indexOf(URL_DELIMITER) === 0) return trimmed;
 
   return URL_DELIMITER + trimmed;
 }
