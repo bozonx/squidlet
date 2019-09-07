@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 
 import {HttpClientIo} from '../../system/interfaces/io/HttpClientIo';
-import {HttpRequest, HttpResponse} from '../../system/interfaces/io/HttpServerIo';
+import {HttpRequest, HttpResponse} from '../../system/interfaces/Http';
 
 
 export default class HttpClient implements HttpClientIo {

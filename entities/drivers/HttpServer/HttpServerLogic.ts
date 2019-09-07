@@ -1,15 +1,11 @@
 import {HttpRequestHandler, HttpServerIo, HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import Promised from 'system/lib/Promised';
-import {
-  HttpRequest,
-  HttpResponseHeaders
-} from 'system/interfaces/io/HttpServerIo';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {HttpRequestBase, HttpResponse} from 'system/interfaces/io/HttpServerIo';
 import {JsonTypes} from 'system/interfaces/Types';
-import {HttpContentType, parseBody, prepareBody, resolveBodyType} from 'system/lib/httpBody';
+import {parseBody, prepareBody, resolveBodyType} from 'system/lib/httpBody';
 import {omitUndefined} from 'system/lib/objects';
+import {HttpContentType, HttpRequest, HttpRequestBase, HttpResponse, HttpResponseHeaders} from 'system/interfaces/Http';
 
 
 export interface HttpDriverRequest extends HttpRequestBase {

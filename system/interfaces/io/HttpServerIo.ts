@@ -1,7 +1,8 @@
-import {HttpContentType} from '../../lib/httpBody';
+import {HttpRequest, HttpResponse} from '../Http';
 
 
 export const Methods = [
+  'destroy',
   'newServer',
   'closeServer',
   'onServerClose',
@@ -20,40 +21,11 @@ export enum HttpServerEvent {
   serverError,
 }
 
-export type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
 export type HttpRequestHandler = (requestId: number, request: HttpRequest) => void;
-
-interface CommonHeaders {
-  'content-type'?: HttpContentType;
-}
 
 export interface HttpServerProps {
   host: string;
   port: number;
-}
-
-export interface HttpRequestHeaders extends CommonHeaders {
-}
-
-export interface HttpResponseHeaders extends CommonHeaders {
-}
-
-// TODO: поддержка Uint8Array
-
-export interface HttpRequestBase {
-  method: HttpMethods;
-  url: string;
-  headers: HttpRequestHeaders;
-}
-
-export interface HttpRequest extends HttpRequestBase {
-  body?: string | Uint8Array;
-}
-
-export interface HttpResponse {
-  headers: HttpResponseHeaders;
-  status: number;
-  body?: string | Uint8Array;
 }
 
 

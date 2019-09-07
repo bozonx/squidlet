@@ -1,8 +1,9 @@
 import {HttpClientIo} from 'system/interfaces/io/HttpClientIo';
-import {HttpRequest, HttpResponse} from 'system/interfaces/io/HttpServerIo';
-import {HttpContentType, prepareBody, resolveBodyType} from 'system/lib/httpBody';
+import {prepareBody, resolveBodyType} from 'system/lib/httpBody';
 import {omitUndefined} from 'system/lib/objects';
+import {HttpContentType, HttpRequest, HttpResponse} from 'system/interfaces/Http';
 import {HttpDriverRequest} from '../HttpServer/HttpServerLogic';
+
 
 
 // TODO: save cookies

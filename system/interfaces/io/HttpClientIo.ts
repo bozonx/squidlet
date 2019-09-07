@@ -1,4 +1,4 @@
-import {HttpRequest, HttpResponse} from './HttpServerIo';
+import {HttpRequest, HttpResponse} from '../Http';
 
 
 export const Methods = [

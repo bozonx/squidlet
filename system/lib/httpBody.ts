@@ -1,15 +1,9 @@
 import {JsonTypes} from '../interfaces/Types';
+import {HttpContentType} from '../interfaces/Http';
 
 
 // TODO: does it need support of null????
 
-
-export type HttpContentType = 'text/plain'
-  | 'text/html'
-  | 'application/json'
-  | 'application/javascript'
-  | 'application/xml'
-  | 'application/octet-stream';
 
 const STRING_CONTENT_TYPES = ['text/plain', 'application/javascript', 'application/xml'];
 

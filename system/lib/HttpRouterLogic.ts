@@ -1,10 +1,9 @@
-import {JsonTypes} from '../interfaces/Types';
+import {JsonTypes, Primitives} from '../interfaces/Types';
 import {ParsedUrl, parseUrl} from './url';
 import IndexedEvents from './IndexedEvents';
 import {clearObject} from './objects';
 import {matchRoute, MatchRouteResult, prepareRoute} from './route';
-// TODO: don't use dependencies
-import {HttpMethods} from '../interfaces/io/HttpServerIo';
+import {HttpMethods} from '../interfaces/Http';
 // TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 
@@ -16,7 +15,7 @@ export interface Route {
   // string in format "method|path/to/route"
   routeId: string;
   // parsed url params like /path/to/:page => {page: 'myPageName'};
-  params: {[index: string]: string | number};
+  params: {[index: string]: Primitives};
   // route which has been set in addRoute()
   route: string;
   location: ParsedUrl;
