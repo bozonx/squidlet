@@ -17,6 +17,11 @@ describe 'system.lib.arrays', ->
   it 'compactUndefined', ->
     assert.deepEqual(arrays.compactUndefined([undefined, null, 0, 1, '', 'str']), [null, 0, 1, '', 'str'])
 
+  it 'clearArray', ->
+    arr = [0,1,2]
+    arrays.clearArray(arr)
+    assert.deepEqual(arr, [])
+
   it 'appendArray', ->
     arr = [1]
     arrays.appendArray(arr, [2])

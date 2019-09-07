@@ -1,7 +1,7 @@
 helper = require('../../../system/lib/route')
 
 
-describe.only 'system.lib.route', ->
+describe 'system.lib.route', ->
   beforeEach ->
     @url = '/path/to/action/myAction/sub-url/5/true'
     @route = '/path/to/action/:actionName/sub-url/:param1/:param2'

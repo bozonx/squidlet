@@ -48,6 +48,10 @@ export function compactUndefined(arr: any[]): any[] {
   return result;
 }
 
+export function clearArray(arr: any[]): void {
+  arr.splice(0, arr.length);
+}
+
 /**
  * Concat arrays but not create a new one.
  * It mutates the srcArr.

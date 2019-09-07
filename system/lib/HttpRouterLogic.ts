@@ -6,6 +6,7 @@ import {matchRoute, MatchRouteResult, prepareRoute} from './route';
 import {HttpMethods} from '../interfaces/Http';
 // TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
+import {clearArray} from './arrays';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -36,8 +37,7 @@ interface RouteItem {
 
 export default class HttpRouterLogic {
   private readonly enterEvents = new IndexedEvents<RouterEnterHandler>();
-  // TODO: лучше использовать массив так как важен порядок
-  private readonly registeredRoutes: {[index: string]: RouteItem} = {};
+  private readonly registeredRoutes: RouteItem[] = [];
   private readonly logDebug: (msg: string) => void;
 
 
@@ -47,7 +47,7 @@ export default class HttpRouterLogic {
 
   destroy() {
     this.enterEvents.removeAll();
-    clearObject(this.registeredRoutes);
+    clearArray(this.registeredRoutes);
   }
 
 
