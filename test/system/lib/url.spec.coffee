@@ -38,6 +38,64 @@ describe.only 'system.lib.url', ->
     assert.deepEqual(url.parseUserPassword(''), {})
     assert.throws(() => url.parseHostPort('username:password:other'))
 
+  it 'parseLeftPartOfUrl - full url', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('https://username:password@host.com:8080/path'), {
+      scheme: 'https',
+      host: 'host.com',
+      port: 8080,
+      user: 'username',
+      password: 'password',
+    })
+
+  it 'parseLeftPartOfUrl - username and not password', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('https://username@host.com'), {
+      scheme: 'https',
+      host: 'host.com',
+      user: 'username',
+    })
+
+  it 'parseLeftPartOfUrl - only protocol and host', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('https://host.com'), {
+      scheme: 'https',
+      host: 'host.com',
+    })
+
+  # TODO: наверное это не нужно
+#  it 'parseLeftPartOfUrl - only host', ->
+#    assert.deepEqual(url.parseLeftPartOfUrl('host.com'), {
+#      host: 'host.com',
+#    })
+
+  it 'parseRightPartOfUrl - full', ->
+    assert.deepEqual(url.parseRightPartOfUrl('/path/to/route/?param1=value1&param2#anc'), {
+      path: '/path/to/route/',
+      search: {
+        param1: 'value1',
+        param2: '',
+      },
+      anchor: 'anc',
+    })
+
+  it 'parseRightPartOfUrl - stripped', ->
+    assert.deepEqual(url.parseRightPartOfUrl('path/to/route/?'), {
+      path: 'path/to/route/',
+      search: {},
+    })
+
+  it 'parseRightPartOfUrl - anchor', ->
+    assert.deepEqual(url.parseRightPartOfUrl('path#anc'), {
+      path: 'path',
+      search: {},
+      anchor: 'anc',
+    })
+
+  it 'parseRightPartOfUrl - anchor with slash', ->
+    assert.deepEqual(url.parseRightPartOfUrl('path/#anc'), {
+      path: 'path/',
+      search: {},
+      anchor: 'anc',
+    })
+
   it 'parseUrl - full', ->
     testUrl = 'https://username:password@host.com:8080/path/to/route/?param1=value1&param2'
     assert.deepEqual(url.parseUrl(testUrl), {
@@ -88,9 +146,9 @@ describe.only 'system.lib.url', ->
     })
 
   it 'parseUrl - anchor', ->
-    testUrl = 'path/to/route#anc'
+    testUrl = 'path#anc'
     assert.deepEqual(url.parseUrl(testUrl), {
-      path: 'path/to/route',
+      path: 'path',
       search: {},
       anchor: 'anc',
     })
@@ -105,3 +163,5 @@ describe.only 'system.lib.url', ->
     assert.throws(() => url.parseUrl('http:/host.com/path'))
     # TODO: had to throw an exeption
     #assert.throws(() => url.parseUrl('http://host.com/path&p'))
+
+# TODO: - no protocol and with host

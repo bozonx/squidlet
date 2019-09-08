@@ -1,4 +1,5 @@
 import {JsonTypes} from '../interfaces/Types';
+import {omitUndefined} from './objects';
 
 // TODO: add null support
 
@@ -38,14 +39,17 @@ export interface ParsedUrl {
 // protocol, username, password, host, port
 const leftUrlPartRegex = ''
   + /(?:(?:(https?|ftp):)?\/\/)/.source     // protocol
-  + /(?:([^:\n\r]+):([^@\n\r]+)@)?/.source  // user:pass
-  + /(?:(?:www\.)?([^\/\n\r]+))/.source     // domain
-  //+ /(\/[^?\n\r]+)?/.source                 // request
+  + /(?:([^\n\r]+)@)?/.source  // user:pass
+  + /([^\/]+)?/.source  // domain
+  //+ /(?:([^:\n\r]+):([^@\n\r]+)@)?/.source  // user:pass
+  //+ /(?:(?:www\.)?([^\/\n\r]+))/.source     // domain
 ;
 const urlPathRegex = ''
-  + /(\/?[^?\n\r]+)?/.source                 // request
-  + /(\?[^#\n\r]*)?/.source                 // query
-  + /(#?[^\n\r]*)?/.source                  // anchor
+  + /(\/?[^?#\n\r]+)?/.source                 // request
+  + /\??/.source
+  + /([^#\n\r]*)?/.source                    // query
+  + /#?/.source
+  + /([^\n\r]*)?/.source                     // anchor
 ;
 
 /**
@@ -126,10 +130,12 @@ export function parseUserPassword(rawStr: string): {user?: string; password?: st
 export function parseUrl(rawUrl: string): ParsedUrl {
   if (!rawUrl) throw new Error(`Invalid url "${rawUrl}"`);
 
-  const decodedUrl = decodeURI(rawUrl).trim();
-  const splitUrlMatch = decodedUrl.match(/^([^\/]*)(.*)$/);
+  const decodedUrl = decodeURI(rawUrl.trim());
+  const splitUrlMatch = decodedUrl.match(/^([^:]*:?\/?\/?[^\/]+)(.*)$/);
 
-  if (!splitUrlMatch) throw new Error(`Can't parse url "${decodedUrl}"`);
+  console.log(1111111, splitUrlMatch)
+
+  if (!splitUrlMatch) throw new Error(`Can't recognize parts of url "${decodedUrl}"`);
 
   if (splitUrlMatch[2]) {
     // full url
@@ -163,21 +169,23 @@ export function parseLeftPartOfUrl(url: string): LeftPartOfUrl {
   // else parse a path
   const match = url.match(leftUrlPartRegex);
 
-  console.log(11111111, match)
+  console.log(11111111, match);
 
   if (!match) {
     throw new Error(`Can't parse url "${url}"`);
   }
-  else if (!match[2]) {
-    throw new Error(`Invalid auth and host part of url`);
-  }
+  // else if (!match[2]) {
+  //   throw new Error(`Invalid auth and host part of url`);
+  // }
 
-  const authHostSplat = match[2].split('@');
+  //const authHostSplat = match[2].split('@');
 
   return {
     scheme: match[1],
-    ...parseHostPort(authHostSplat[(authHostSplat.length === 2) ? 1 : 0]),
-    ...(authHostSplat.length === 2) ? parseUserPassword(authHostSplat[0]) : {},
+    ...(match[2]) ? parseUserPassword(match[2]) : {},
+    ...parseHostPort(match[3]),
+    // ...parseHostPort(authHostSplat[(authHostSplat.length === 2) ? 1 : 0]),
+    // ...(authHostSplat.length === 2) ? parseUserPassword(authHostSplat[0]) : {},
   };
 }
 
@@ -188,11 +196,13 @@ export function parseRightPartOfUrl(url: string): RightPartOfUrl {
     throw new Error(`Can't parse url "${url}"`);
   }
 
-  console.log(11111111, match)
+  // TODO: наверное лучше не передавать search если нету параметров
 
-  return {
+  const result: RightPartOfUrl = {
     path: match[1],
     search: parseSearch(match[2]),
     anchor: match[3],
   };
+
+  return omitUndefined(result) as RightPartOfUrl;
 }
