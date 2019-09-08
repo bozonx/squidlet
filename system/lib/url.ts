@@ -1,20 +1,52 @@
 import {JsonTypes} from '../interfaces/Types';
 
+// TODO: add null support
 
 export const URL_DELIMITER = '/';
 
-export interface ParsedUrl {
+interface LeftPartOfUrl {
   // protocol
   scheme: string;
   user?: string;
   password?: string;
   host: string;
   port?: number;
+}
+
+interface RightPartOfUrl {
   // relative part of url e.g / or /page/ or empty string
   path: string;
   search: {[index: string]: JsonTypes};
+  anchor?: string;
 }
 
+export interface ParsedUrl {
+  // protocol
+  scheme?: string;
+  user?: string;
+  password?: string;
+  host?: string;
+  port?: number;
+  // relative part of url e.g / or /page/ or empty string
+  path?: string;
+  search?: {[index: string]: JsonTypes};
+  anchor?: string;
+}
+
+//const match = decodedUrl.trim().match(/^([\w\d]+:?\/?)\/?([^\/]+)([^?]*)\??(.*)$/);
+
+// protocol, username, password, host, port
+const leftUrlPartRegex = ''
+  + /(?:(?:(https?|ftp):)?\/\/)/.source     // protocol
+  + /(?:([^:\n\r]+):([^@\n\r]+)@)?/.source  // user:pass
+  + /(?:(?:www\.)?([^\/\n\r]+))/.source     // domain
+  //+ /(\/[^?\n\r]+)?/.source                 // request
+;
+const urlPathRegex = ''
+  + /(\/?[^?\n\r]+)?/.source                 // request
+  + /(\?[^#\n\r]*)?/.source                 // query
+  + /(#?[^\n\r]*)?/.source                  // anchor
+;
 
 /**
  * Parses value of search param.
@@ -94,11 +126,47 @@ export function parseUserPassword(rawStr: string): {user?: string; password?: st
 export function parseUrl(rawUrl: string): ParsedUrl {
   if (!rawUrl) throw new Error(`Invalid url "${rawUrl}"`);
 
-  const decodedUrl = decodeURI(rawUrl);
-  const match = decodedUrl.trim().match(/^([\w\d]+):\/\/([^\/]+)([^?]*)\??(.*)$/);
+  const decodedUrl = decodeURI(rawUrl).trim();
+  const splitUrlMatch = decodedUrl.match(/^([^\/]*)(.*)$/);
+
+  if (!splitUrlMatch) throw new Error(`Can't parse url "${decodedUrl}"`);
+
+  if (splitUrlMatch[2]) {
+    // full url
+    return {
+      ...parseLeftPartOfUrl(splitUrlMatch[1]),
+      ...parseRightPartOfUrl(splitUrlMatch[2]),
+    };
+  }
+  else {
+    // only path or only first part
+    if (splitUrlMatch[1].match(/[\/#?&%]/)) {
+      // path part
+      return {
+        ...parseRightPartOfUrl(splitUrlMatch[1]),
+      };
+    }
+    else if (splitUrlMatch[1].match(/[:.@]/)) {
+      return {
+        ...parseLeftPartOfUrl(splitUrlMatch[1]),
+      };
+    }
+
+    return {
+      host: splitUrlMatch[1],
+    };
+  }
+}
+
+
+export function parseLeftPartOfUrl(url: string): LeftPartOfUrl {
+  // else parse a path
+  const match = url.match(leftUrlPartRegex);
+
+  console.log(11111111, match)
 
   if (!match) {
-    throw new Error(`Can't parse url "${decodedUrl}"`);
+    throw new Error(`Can't parse url "${url}"`);
   }
   else if (!match[2]) {
     throw new Error(`Invalid auth and host part of url`);
@@ -108,9 +176,23 @@ export function parseUrl(rawUrl: string): ParsedUrl {
 
   return {
     scheme: match[1],
-    path: match[3],
-    search: parseSearch(match[4]),
     ...parseHostPort(authHostSplat[(authHostSplat.length === 2) ? 1 : 0]),
     ...(authHostSplat.length === 2) ? parseUserPassword(authHostSplat[0]) : {},
+  };
+}
+
+export function parseRightPartOfUrl(url: string): RightPartOfUrl {
+  const match = url.match(urlPathRegex);
+
+  if (!match) {
+    throw new Error(`Can't parse url "${url}"`);
+  }
+
+  console.log(11111111, match)
+
+  return {
+    path: match[1],
+    search: parseSearch(match[2]),
+    anchor: match[3],
   };
 }

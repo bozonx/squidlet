@@ -1,7 +1,7 @@
 url = require('../../../system/lib/url')
 
 
-describe 'system.lib.url', ->
+describe.only 'system.lib.url', ->
   it 'parseSearch', ->
     assert.deepEqual(url.parseSearch('param1=value1&param2&param3=5&param4=true'), {
       param1: 'value1',
@@ -38,7 +38,7 @@ describe 'system.lib.url', ->
     assert.deepEqual(url.parseUserPassword(''), {})
     assert.throws(() => url.parseHostPort('username:password:other'))
 
-  it 'parseUrl', ->
+  it 'parseUrl - full', ->
     testUrl = 'https://username:password@host.com:8080/path/to/route/?param1=value1&param2'
     assert.deepEqual(url.parseUrl(testUrl), {
       scheme: 'https',
@@ -52,3 +52,56 @@ describe 'system.lib.url', ->
       user: 'username',
       password: 'password',
     })
+
+  it 'parseUrl - simplified', ->
+    testUrl = 'http://host.com/'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      scheme: 'http',
+      host: 'host.com',
+      path: '/',
+      search: {}
+    })
+
+  it 'parseUrl - trailing ?', ->
+    testUrl = 'http://host.com/path?'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      scheme: 'http',
+      host: 'host.com',
+      path: '/path',
+      search: {}
+    })
+
+  it 'parseUrl - url path', ->
+    testUrl = '/path/to/route/?param1=value1'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      path: '/path/to/route/',
+      search: {
+        param1: 'value1',
+      },
+    })
+
+  it 'parseUrl - url path - no params', ->
+    testUrl = 'path/to/route'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      path: 'path/to/route',
+      search: {},
+    })
+
+  it 'parseUrl - anchor', ->
+    testUrl = 'path/to/route#anc'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      path: 'path/to/route',
+      search: {},
+      anchor: 'anc',
+    })
+
+  it 'parseUrl - only host', ->
+    testUrl = 'something'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      host: 'something',
+    })
+
+  it 'parseUrl - bad url', ->
+    assert.throws(() => url.parseUrl('http:/host.com/path'))
+    # TODO: had to throw an exeption
+    #assert.throws(() => url.parseUrl('http://host.com/path&p'))

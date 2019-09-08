@@ -78,6 +78,14 @@ export default class HttpRouterLogic {
    */
   async incomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
     const location: ParsedUrl = parseUrl(request.url);
+
+    if (!location.path) {
+      return {
+        status: 404,
+        body: `Not specified path part of url "${request.url}`
+      };
+    }
+
     const matchedRoute: MatchRouteResult | undefined = this.resolveRoute(request.method, location.path);
     const routeItem: RouteItem | undefined = this.findRoute(
       request.method,
@@ -87,7 +95,7 @@ export default class HttpRouterLogic {
     if (!matchedRoute || !routeItem) {
       return {
         status: 404,
-        body: `route for url "${request.url}: isn't registered!`
+        body: `route for url "${request.url} isn't registered!`
       };
     }
 
