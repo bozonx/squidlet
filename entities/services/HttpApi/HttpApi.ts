@@ -2,7 +2,7 @@ import {GetDriverDep} from 'system/base/EntityBase';
 import ServiceBase from 'system/base/ServiceBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import {Route} from 'system/lib/HttpRouterLogic';
-import {JsonTypes} from 'system/interfaces/Types';
+import {JsonTypes, Primitives} from 'system/interfaces/Types';
 import {parseArgs} from 'system/lib/helpers';
 
 import {HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
@@ -37,7 +37,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
 
 
   private handleRoute = async (route: Route): Promise<HttpDriverResponse> => {
-    const methodName: string | number | undefined = route.params.methodName;
+    const methodName: Primitives | undefined = route.params.methodName;
 
     if (typeof methodName !== 'string') {
       return {

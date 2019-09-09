@@ -1,8 +1,8 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {HttpClientIo} from 'system/interfaces/io/HttpClientIo';
+import {HttpResponse} from 'system/interfaces/Http';
 import HttpClientLogic, {HttpClientProps} from './HttpClientLogic';
-import {HttpResponse} from 'system/interfaces/io/HttpServerIo';
 import {HttpDriverRequest} from '../HttpServer/HttpServerLogic';
 
 

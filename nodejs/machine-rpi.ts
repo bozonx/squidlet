@@ -8,6 +8,8 @@ const machineConfig: MachineConfig = {
     './ios/WebSocketClient.ts',
     './ios/WebSocketServer.ts',
     './ios/Sys.ts',
+    './ios/HttpClient.ts',
+    './ios/HttpServer.ts',
 
     './ios/Digital.ts',
     './ios/I2cMaster.ts',

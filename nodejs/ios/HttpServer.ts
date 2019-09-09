@@ -3,9 +3,7 @@ import {Express, NextFunction, Request, Response} from 'express';
 import {Server} from 'http';
 
 import {
-  HttpRequest,
   HttpRequestHandler,
-  HttpResponse,
   HttpServerEvent,
   HttpServerIo,
   HttpServerProps
@@ -15,6 +13,7 @@ import {AnyHandler} from 'system/lib/IndexedEvents';
 import {WAIT_RESPONSE_TIMEOUT} from 'system/constants';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import {callPromised} from 'system/lib/common';
+import {HttpRequest, HttpResponse} from 'system/interfaces/Http';
 
 
 enum ITEM_POSITION {

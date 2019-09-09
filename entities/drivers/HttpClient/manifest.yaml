@@ -4,4 +4,4 @@ main: HttpClient.ts
 ios:
   - HttpClient
 
-props:
+props: {}

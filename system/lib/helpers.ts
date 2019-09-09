@@ -2,7 +2,7 @@ import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {compactUndefined} from './arrays';
 import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
-import {JsonTypes} from '../interfaces/Types';
+import {JsonTypes, Primitives} from '../interfaces/Types';
 import {parseValue} from './common';
 
 
@@ -103,7 +103,7 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
 /**
  * Parse comma separated args like: param1,5,true to ['param1', 5, true];
  */
-export function parseArgs(data: string | number | boolean| undefined): JsonTypes[] {
+export function parseArgs(data: Primitives | undefined): JsonTypes[] {
   if (typeof data === 'undefined') {
     return [];
   }

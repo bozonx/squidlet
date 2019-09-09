@@ -9,8 +9,8 @@ import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
 import {HttpClientIo} from '../../system/interfaces/io/HttpClientIo';
 import HttpClient from '../ios/HttpClient';
-import {HttpResponse} from '../../system/interfaces/io/HttpServerIo';
 import {compactUndefined} from '../../system/lib/arrays';
+import {HttpResponse} from '../../system/interfaces/Http';
 
 
 const httpClientIo: HttpClientIo = new HttpClient();

@@ -54,7 +54,7 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
     routeHandler: RouterRequestHandler,
     pinnedProps?: {[index: string]: JsonTypes}
   ) {
-    if (!route.indexOf(URL_DELIMITER)) {
+    if (route.indexOf(URL_DELIMITER) !== 0) {
       this.log.warn(
         `HttpServerRouter.addRoute: The route "${route}" doesn't have a "/" at the beginning.` +
         `Better to add it`
