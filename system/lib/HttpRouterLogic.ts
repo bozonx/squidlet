@@ -83,7 +83,7 @@ export default class HttpRouterLogic {
     if (!location.path) {
       return {
         status: 404,
-        body: `Not specified path part of url "${request.url}`
+        body: `Not specified path part of url "${request.url}"`
       };
     }
 
@@ -96,7 +96,7 @@ export default class HttpRouterLogic {
     if (!matchedRoute || !routeItem) {
       return {
         status: 404,
-        body: `route for url "${request.url} isn't registered!`
+        body: `route for url "${request.url}" isn't registered!`
       };
     }
 
@@ -152,9 +152,9 @@ export default class HttpRouterLogic {
     const LENGTH_OF_DELIMITER = 1;
     const pathOfIdToStripLength: number = method.length + LENGTH_OF_DELIMITER;
     // routes matched to method and stripped - only route path of id.
-    const routesMatchedToMethod: string[] = Object.keys(this.registeredRoutes)
-      .filter((routeId: string): boolean => routeId.indexOf(method as string) === 0)
-      .map((routeId: string) => routeId.slice(0, pathOfIdToStripLength));
+    const routesMatchedToMethod: string[] = this.registeredRoutes
+      .filter((item): boolean => item.routeId.indexOf(method as string) === 0)
+      .map((item) => item.routeId.slice(pathOfIdToStripLength));
 
     if (!routesMatchedToMethod.length) return;
 

@@ -1,7 +1,7 @@
 HttpRouterLogic = require('../../../system/lib/HttpRouterLogic').default
 
 
-describe 'system.lib.HttpRouterLogic', ->
+describe.only 'system.lib.HttpRouterLogic', ->
   beforeEach ->
     @router = new HttpRouterLogic(() => )
     @pinnedProps = {param1: 1}
@@ -43,3 +43,20 @@ describe 'system.lib.HttpRouterLogic', ->
 #    sinon.assert.notCalled(handler5)
 #    sinon.assert.calledOnce(handler6)
 #    sinon.assert.calledWith(handler6, route, @request)
+
+  it 'private resolveRoute', ->
+    routeHandler = sinon.spy()
+
+    @router.registeredRoutes = [
+      {
+        routeId: 'get|/myroute/:param'
+        route: '/myroute/:param'
+        method: 'get'
+        routeHandler
+      }
+    ]
+
+    assert.deepEqual(@router.resolveRoute('get', '/myroute/5'), {
+      route: '/myroute/:param',
+      params: { param: 5 }
+    })
