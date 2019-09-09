@@ -83,12 +83,7 @@ describe.only 'system.lib.HttpRouterLogic', ->
     result = await @router.incomeRequest(request)
 
     route = {
-      location: {
-        host: 'host',
-        path: '/api/getState/0,bedroom.light1',
-        port: 8087,
-        scheme: 'http'
-      },
+      location: { host: 'host', path: '/api/getState/0,bedroom.light1', port: 8087, scheme: 'http' },
       params: { apiMethodName: 'getState', args: '0,bedroom.light1' },
       route: '/api/:apiMethodName/:args',
       routeId: 'get|/api/:apiMethodName/:args'

@@ -6,6 +6,7 @@ import {HttpMethods} from '../interfaces/Http';
 import {clearArray} from './arrays';
 // TODO: don't use dependencies
 import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
+import {omitUndefined} from './objects';
 
 
 const EVENT_NAME_DELIMITER = '|';
@@ -139,13 +140,15 @@ export default class HttpRouterLogic {
     routeItem: RouteItem,
     matchedRoute: MatchRouteResult,
   ): Route {
-    return {
+    const route: Route = {
       routeId: routeItem.routeId,
       route: matchedRoute.route,
       params: matchedRoute.params,
       pinnedProps: routeItem.pinnedProps,
       location,
     };
+
+    return omitUndefined(route) as Route;
   }
 
   private resolveRoute(method: HttpMethods, urlPath: string): MatchRouteResult | undefined {
