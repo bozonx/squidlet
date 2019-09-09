@@ -61,7 +61,9 @@ export default class Api {
 
   // TODO: rename to state ???
   getState(category: StateCategories, stateName: string): Dictionary | undefined {
-    return this.context.state.getState(parseInt(category as any), stateName);
+    console.log(1111111111, category, stateName, this.context.state.getState(parseInt(category as any), stateName))
+
+    return this.context.state.getState(category, stateName);
   }
 
   switchToIoServer() {

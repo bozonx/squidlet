@@ -58,10 +58,12 @@ export default class ApiManager {
     delete this.remoteCalls[sessionId];
   }
 
+  callApi = async (methodName: string, args: any[]): Promise<any> => {
+    this.context.log.debug(`ApiManager: called api method: ${methodName}(${args.join(', ')})`);
 
-  private callApi = async (methodName: string, args: any[]): Promise<any> => {
     return (this.context.system.api as any)[methodName](...args);
   }
+
 
   private makeNewSession(sessionId: string) {
     this.remoteCalls[sessionId] = new RemoteCall(

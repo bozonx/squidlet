@@ -149,7 +149,7 @@ export default class HttpServerLogic {
   }
 
   private handleRequest = (requestId: number, request: HttpRequest) => {
-    this.logDebug(`HttpServerLogic: income message on server ${this.props.host}:${this.props.port} has been closed, request ${JSON.stringify(request)}`);
+    this.logDebug(`HttpServerLogic: income message of server ${this.props.host}:${this.props.port}, request ${JSON.stringify(request)}`);
     this.requestEvents.emit(requestId, request);
   }
 

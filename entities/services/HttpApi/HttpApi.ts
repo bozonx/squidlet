@@ -32,33 +32,48 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     this.depsInstances.router = await getDriverDep('HttpServerRouter')
       .getInstance(this.props);
 
-    this.router.addRoute('get', '/api/:methodName/:args', this.handleRoute);
-    this.router.addRoute('get', '/api/:methodName', this.handleRoute);
+    this.router.addRoute('get', '/api/:apiMethodName/:args', this.handleRoute);
+    this.router.addRoute('get', '/api/:apiMethodName', this.handleRoute);
   }
 
 
   private handleRoute = async (route: Route): Promise<HttpDriverResponse> => {
-    const methodName: Primitives | undefined = route.params.methodName;
+    const apiMethodName: Primitives | undefined = route.params.apiMethodName;
 
-    if (typeof methodName !== 'string') {
+    if (typeof apiMethodName !== 'string') {
       return {
         status: 400,
-        body: `Unexpected type of method "${methodName}"`,
+        body: `Unexpected type of method "${apiMethodName}"`,
       };
     }
-    if (!allowedApiMethodsToCall.includes(methodName)) {
+    if (!allowedApiMethodsToCall.includes(apiMethodName)) {
       return {
         status: 404,
-        body: `Api method "${methodName}" not found`,
+        body: `Api method "${apiMethodName}" not found`,
       };
     }
 
     const args: JsonTypes[] = parseArgs(route.params.args);
-    const result = await (this.context.system.api as any)[methodName](...args);
+    let result: any;
+
+    console.log(2222222222, JSON.stringify(route, null, 2), args)
+
+    try {
+      result = await this.context.system.apiManager.callApi(apiMethodName, args);
+    }
+    catch (err) {
+      return {
+        status: 500,
+        body: {
+          error: String(err),
+        },
+      };
+    }
 
     return {
       body: {
-        result
+        result,
+        success: true,
       },
     };
   }

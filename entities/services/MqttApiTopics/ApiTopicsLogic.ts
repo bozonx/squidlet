@@ -100,16 +100,16 @@ export default class ApiTopicsLogic {
     }
   }
 
-  private async callApi(methodName: string, data: string): Promise<void> {
-    if (!allowedApiMethodsToCall.includes(methodName)) {
-      return this.context.log.warn(`Restricted or unsupported api method has been called "${methodName}"`);
+  private async callApi(apiMethodName: string, data: string): Promise<void> {
+    if (!allowedApiMethodsToCall.includes(apiMethodName)) {
+      return this.context.log.warn(`Restricted or unsupported api method has been called "${apiMethodName}"`);
     }
 
-    this.context.log.debug(`ApiTopicsLogic income call api method "${methodName}": ${data}`);
+    this.context.log.debug(`ApiTopicsLogic income call api method "${apiMethodName}": ${data}`);
 
     const args: JsonTypes[] = parseArgs(data);
 
-    await (this.context.system.api as any)[methodName](...args);
+    await this.context.system.apiManager.callApi(apiMethodName, args);
   }
 
   private async action(deviceId: string, actionName?: string, data?: string) {
