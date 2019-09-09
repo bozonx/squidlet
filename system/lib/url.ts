@@ -16,7 +16,7 @@ interface LeftPartOfUrl {
 interface RightPartOfUrl {
   // relative part of url e.g / or /page/ or empty string
   path: string;
-  search: {[index: string]: JsonTypes};
+  search?: {[index: string]: JsonTypes};
   anchor?: string;
 }
 
@@ -36,7 +36,9 @@ export interface ParsedUrl {
 
 /**
  * Parses whole url
- * @param rawUrl
+ * WARNING: be careful with the next type of urls
+ * * to/route - will be recognized as host "to" and path "/route"
+ * * localhost#anchor - it is allowed but better to use slash - localhost/#anchor
  */
 export function parseUrl(rawUrl: string): ParsedUrl {
   if (!rawUrl) throw new Error(`Invalid url "${rawUrl}"`);
@@ -57,7 +59,7 @@ const leftUrlPartRegex = '^' +
   '([^/]+)'+ // domain:port
   //'([a-zA-Z0-9.\\-\:]+)'+ // domain:port
   '.*$';
-;
+
 const urlPathRegex = ''
   + /(\/?[^?#\n\r]+)?/.source                 // request
   + /\??/.source
@@ -69,7 +71,6 @@ const urlPathRegex = ''
 // const fullRegExp = '^' +
 //   '([a-z0-9]+://)?' + // protocol
 //   '([^@]+@)?' +            // user:pass
-//   // TODO: уточникть набор символов
 //   '([a-zA-Z0-9.\\-\:]+)(?!/)' + // domain
 //   '(/?.*)' +
 //   '$';
@@ -85,8 +86,6 @@ const urlPathRegex = ''
  */
 export function parseSearchValue(rawValue: string | undefined): JsonTypes {
   if (!rawValue) return '';
-
-// TODO: add null support
 
   const trimmed: string = rawValue.trim();
 
@@ -197,11 +196,9 @@ export function parseRightPartOfUrl(url: string): RightPartOfUrl {
     throw new Error(`Can't parse url "${url}"`);
   }
 
-  // TODO: наверное лучше не передавать search если нету параметров
-
   const result: RightPartOfUrl = {
     path: match[1],
-    search: parseSearch(match[2]),
+    search: (match[2]) ? parseSearch(match[2]) : undefined,
     anchor: match[3],
   };
 
@@ -212,12 +209,10 @@ export function parseRightPartOfUrl(url: string): RightPartOfUrl {
  * Split url to left and rigth parts.
  */
 export function splitUrl(url: string): { left?: string, right?: string } {
-  //const splitUrlMatch = decodedUrl.match(/^([^:]*:?\/?\/?[^\/]+)(.*)$/);
+  // TODO: в пароле наверное разрешенно больше символов
   const splitUrlMatch = url.match(/^(([^:]+:\/\/)?[a-zA-Z0-9.\-:@]*)(.*)$/);
 
   if (!splitUrlMatch) throw new Error(`Can't recognize parts of url "${url}"`);
-
-  console.log(1111111, splitUrlMatch)
 
   if (splitUrlMatch[3]) {
     // full url
@@ -244,7 +239,5 @@ export function splitUrl(url: string): { left?: string, right?: string } {
       left: splitUrlMatch[1],
     };
   }
-
-//const match = decodedUrl.trim().match(/^([\w\d]+:?\/?)\/?([^\/]+)([^?]*)\??(.*)$/);
 
 }
