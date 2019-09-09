@@ -193,8 +193,8 @@ export default class HttpServer implements HttpServerIo {
     }
 
     return  {
-      // method in lower case format
-      method: req.method as any,
+      // method in express's request is in upper case format
+      method: req.method.toLowerCase() as any,
       url: req.url,
       headers: req.headers as any,
       body,
