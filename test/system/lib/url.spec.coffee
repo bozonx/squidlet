@@ -1,7 +1,7 @@
 url = require('../../../system/lib/url')
 
 
-describe.only 'system.lib.url', ->
+describe 'system.lib.url', ->
   it 'parseSearch', ->
     assert.deepEqual(url.parseSearch('param1=value1&param2&param3=5&param4=true'), {
       param1: 'value1',

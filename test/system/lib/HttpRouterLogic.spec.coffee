@@ -1,7 +1,7 @@
 HttpRouterLogic = require('../../../system/lib/HttpRouterLogic').default
 
 
-describe 'system.lib.HttpRouterLogic', ->
+describe.only 'system.lib.HttpRouterLogic', ->
   beforeEach ->
     @router = new HttpRouterLogic(() => )
     @pinnedProps = {param1: 1}
@@ -69,3 +69,31 @@ describe 'system.lib.HttpRouterLogic', ->
       route: '/myroute/:param',
       params: { param: 5 }
     })
+
+  it 'request with decoded chars', ->
+    handler1 = sinon.stub().returns(Promise.resolve(@response))
+    request = {
+      method: 'get'
+      headers: {'content-type': 'application/json'}
+      url: 'http://host:8087/api/getState/0,bedroom.light1'
+    }
+
+    @router.addRoute('get', '/api/:apiMethodName/:args', handler1);
+
+    result = await @router.incomeRequest(request)
+
+    route = {
+      location: {
+        host: 'host',
+        path: '/api/getState/0,bedroom.light1',
+        port: 8087,
+        scheme: 'http'
+      },
+      params: { apiMethodName: 'getState', args: '0,bedroom.light1' },
+      route: '/api/:apiMethodName/:args',
+      routeId: 'get|/api/:apiMethodName/:args'
+    }
+
+    assert.deepEqual(result, @response)
+    sinon.assert.calledOnce(handler1)
+    sinon.assert.calledWith(handler1, route, request)
