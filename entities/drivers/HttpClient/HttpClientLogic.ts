@@ -23,9 +23,6 @@ export default class HttpClientLogic {
     this.props = props;
   }
 
-  async destroy() {
-  }
-
 
   async fetch(request: HttpDriverRequest): Promise<HttpResponse> {
     const contentType: HttpContentType | undefined = (request.headers && request.headers['content-type'])

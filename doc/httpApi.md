@@ -3,11 +3,13 @@
 All the methods use GET http method for better use. Template of requests lite this:
 
     GET http://myServer:8087/api/methodName/param1,5
+    
+Default port is `8087`
 
 ## Get host info
 
     /api/info
-    
+
 ## Call device action
 
     /api/action/<room.deviceId>,<actionName>,<value>

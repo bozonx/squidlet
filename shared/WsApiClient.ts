@@ -13,7 +13,7 @@ import {makeUniqId} from '../system/lib/uniqId';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 
 
-const wsClientManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');
+const wsApiManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');
 const wsClientIo = new WebSocketClient();
 
 
@@ -111,11 +111,11 @@ export default class WsApiClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
-    const yamlContent: string = fs.readFileSync(wsClientManifestPath, ENCODE);
-    const clientManifest = yaml.safeLoad(yamlContent);
-    const clientProps = collectPropsDefaults(clientManifest.props);
+    const yamlContent: string = fs.readFileSync(wsApiManifestPath, ENCODE);
+    const serviceManifest = yaml.safeLoad(yamlContent);
+    const serviceProps = collectPropsDefaults(serviceManifest.props);
     const host: string = specifiedHost || 'localhost';
-    const port: number= specifiedPort || clientProps.port;
+    const port: number= specifiedPort || serviceProps.port;
     const url = `ws://${host}:${port}`;
 
     return  {

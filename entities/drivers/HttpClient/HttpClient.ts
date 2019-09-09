@@ -20,9 +20,9 @@ export class HttpClient extends DriverBase<HttpClientProps> {
     );
   }
 
-  destroy = async () => {
-    this.client && await this.client.destroy();
-  }
+  // destroy = async () => {
+  //   this.client && await this.client.destroy();
+  // }
 
 
   async fetch(request: HttpDriverRequest): Promise<HttpResponse> {
