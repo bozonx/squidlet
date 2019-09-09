@@ -9,7 +9,7 @@ import {HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
 import {HttpServerRouter} from '../../drivers/HttpServerRouter/HttpServerRouter';
 
 
-interface HttpApiBody {
+export interface HttpApiBody {
   result?: JsonTypes;
   error?: string;
 }

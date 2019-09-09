@@ -11,6 +11,7 @@ import {ENCODE} from '../system/constants';
 import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
+import {JsonTypes} from '../system/interfaces/Types';
 
 
 const wsApiManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');
@@ -72,8 +73,8 @@ export default class WsApiClient {
   /**
    * Call api's method
    */
-  callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
-    return this.remoteCall.callMethod(pathToMethod, ...args);
+  callMethod(apiMethodName: string, ...args: any[]): Promise<JsonTypes> {
+    return this.remoteCall.callMethod(apiMethodName, ...args);
   }
 
   async close() {

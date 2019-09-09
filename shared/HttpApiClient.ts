@@ -6,6 +6,10 @@ import HttpClientLogic from '../entities/drivers/HttpClient/HttpClientLogic';
 import {ENCODE} from '../system/constants';
 import * as yaml from 'js-yaml';
 import {collectPropsDefaults} from '../system/lib/helpers';
+import {HttpDriverRequest} from '../entities/drivers/HttpServer/HttpServerLogic';
+import {HttpApiBody} from '../entities/services/HttpApi/HttpApi';
+import {JsonTypes} from '../system/interfaces/Types';
+import {HttpResponse} from '../system/interfaces/Http';
 
 
 const httpApiManifestPath = path.resolve(__dirname, '../entities/services/HttpApi/manifest.yaml');
@@ -14,8 +18,6 @@ const httpClientIo = new HttpClient();
 
 export default class HttpApiClient {
   private readonly client: HttpClientLogic;
-  private readonly host: string;
-  private readonly port: number;
   private readonly baseUrl: string;
 
 
@@ -25,14 +27,24 @@ export default class HttpApiClient {
       {}
     );
 
-    this.host = host;
-    this.port = (port) ? port : this.loadDefaultPort();
-    this.baseUrl = `http://${host}:${port}/api`;
+    const resolvedPort = (port) ? port : this.loadDefaultPort();
+
+    this.baseUrl = `http://${host}:${resolvedPort}/api`;
   }
 
 
-  async callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
-    return;
+  async callMethod(apiMethodName: string, ...args: any[]): Promise<JsonTypes> {
+    const url = `${this.baseUrl}/${apiMethodName}/${this.prepareArgsString(args)}`;
+
+    const request: HttpDriverRequest = {
+      url,
+      method: 'get',
+      headers: {},
+    };
+
+    const result = await this.client.fetch(request);
+
+    return this.parseResult(url, result);
   }
 
 
@@ -42,6 +54,32 @@ export default class HttpApiClient {
     const serviceProps = collectPropsDefaults(serviceManifest.props);
 
     return serviceProps.port;
+  }
+
+  private prepareArgsString(args: any[]): string {
+    const result = args.map((item) => JSON.stringify(item)).join(',');
+
+    return encodeURIComponent(result);
+  }
+
+  private parseResult(url: string, result: HttpResponse): JsonTypes {
+    if (!result.body) {
+      throw new Error(`Result of request "${url}" doesn't content body`);
+    }
+
+    const body: HttpApiBody = result.body as any;
+
+    if (result.status !== 200) {
+      if (body.error) throw new Error(body.error);
+
+      throw new Error(`Result of request "${url}" returns not successful status "${result.status}" but there isn't error string.`);
+    }
+
+    if (!body.result) {
+      throw new Error(`Result of request "${url}" doesn't content "result" in the body`);
+    }
+
+    return body.result;
   }
 
 }
