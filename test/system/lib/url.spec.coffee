@@ -120,6 +120,13 @@ describe.only 'system.lib.url', ->
       search: {}
     })
 
+  it 'parseUrl - simplified, no path', ->
+    testUrl = 'http://host.com'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      scheme: 'http',
+      host: 'host.com',
+    })
+
   it 'parseUrl - trailing ?', ->
     testUrl = 'http://host.com/path?'
     assert.deepEqual(url.parseUrl(testUrl), {
@@ -138,6 +145,7 @@ describe.only 'system.lib.url', ->
       },
     })
 
+  # TODO: review
   it 'parseUrl - url path - no params', ->
     testUrl = 'path/to/route'
     assert.deepEqual(url.parseUrl(testUrl), {
@@ -153,15 +161,21 @@ describe.only 'system.lib.url', ->
       anchor: 'anc',
     })
 
+  it 'parseUrl - no protocol', ->
+    testUrl = 'host.com/path'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      host: 'something',
+      path: '/path'
+    })
+
   it 'parseUrl - only host', ->
     testUrl = 'something'
     assert.deepEqual(url.parseUrl(testUrl), {
       host: 'something',
     })
 
+
   it 'parseUrl - bad url', ->
     assert.throws(() => url.parseUrl('http:/host.com/path'))
     # TODO: had to throw an exeption
     #assert.throws(() => url.parseUrl('http://host.com/path&p'))
-
-# TODO: - no protocol and with host
