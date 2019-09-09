@@ -15,6 +15,8 @@ export interface HostConfigConfig {
   rcResponseTimoutSec: number;
   // default timeout for jobs in RequestQueue
   queueJobTimeoutSec: number;
+  // delay before rebooting a host in seconds
+  rebootDelaySec: number;
 
   // custom params
   //params: {[index: string]: any};

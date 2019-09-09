@@ -9,6 +9,7 @@ const config: HostConfigConfig = {
   senderResendTimeout: 1,
   rcResponseTimoutSec: 30,
   queueJobTimeoutSec: 120,
+  rebootDelaySec: 5,
 
   // default params for connections
   // connections: {

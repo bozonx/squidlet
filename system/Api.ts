@@ -77,10 +77,15 @@ export default class Api {
     // TODO: publish all the states of all the devices etc
   }
 
-  async reboot() {
+  async reboot(): Promise<string> {
     const Sys = this.context.system.ioManager.getIo<SysIo>('Sys');
 
-    return Sys.reboot();
+    setTimeout(() => {
+      Sys.reboot()
+        .catch(this.context.log.error);
+    }, this.context.config.config.rebootDelaySec * 1000);
+
+    return `It will be rebooted in 5 seconds`;
   }
 
 
