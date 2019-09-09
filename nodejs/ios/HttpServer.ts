@@ -27,7 +27,7 @@ const RESPONSE_EVENT = 'res';
 type ServerItem = [ Express, Server, IndexedEventEmitter<AnyHandler> ];
 
 
-export default class HttpServer implements HttpServerIo{
+export default class HttpServer implements HttpServerIo {
   private readonly servers: ServerItem[] = [];
 
 
@@ -150,9 +150,6 @@ export default class HttpServer implements HttpServerIo{
       const requestId: number = makeUniqNumber();
       const httpRequest: HttpRequest = this.makeRequestObject(req);
 
-      // TODO: remove
-      console.log('------ httpRequest', httpRequest);
-
       const respHandler = (receivedRequestId: number, response: HttpResponse) => {
         // listen only expected requestId
         if (receivedRequestId !== requestId) return;
@@ -185,7 +182,7 @@ export default class HttpServer implements HttpServerIo{
   }
 
   private makeRequestObject(req: Request): HttpRequest {
-    let body: string | Buffer;
+    let body: string | Buffer | undefined;
 
     if (typeof req.body === 'string') {
       body = req.body;
@@ -196,8 +193,8 @@ export default class HttpServer implements HttpServerIo{
     }
 
     return  {
-      // TODO: в каком формате method и форматируется ли он??? нуно ли делать toLowerCase()
-      method: req.method.toLowerCase() as any,
+      // method in lower case format
+      method: req.method as any,
       url: req.url,
       headers: req.headers as any,
       body,

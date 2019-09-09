@@ -29,6 +29,61 @@ export default class Api {
     return device.action(actionName, ...args);
   }
 
+  /**
+   * The same info for System and for IoServer
+   */
+  info(): HostInfo {
+    return {
+      hostType: 'app',
+      platform: this.context.config.platform,
+      machine: this.context.config.machine,
+      usedIo: this.context.system.ioManager.getNames(),
+    };
+  }
+
+  // getHostConfig(): HostInfo {
+  //   return {
+  // hostId: this.context.config.id,
+  //     // TODO: add used drivers, services, devices and its defenitions
+  //     config: this.context.config,
+  //   };
+  // }
+
+  // TODO: rename to deviceStatus ???
+  getDeviceStatus(deviceId: string): Dictionary | undefined {
+    return this.context.state.getState(StateCategories.devicesStatus, deviceId);
+  }
+
+  // TODO: rename to deviceConfig ???
+  getDeviceConfig(deviceId: string): Dictionary | undefined {
+    return this.context.state.getState(StateCategories.devicesConfig, deviceId);
+  }
+
+  // TODO: rename to state ???
+  getState(category: StateCategories, stateName: string): Dictionary | undefined {
+    return this.context.state.getState(category, stateName);
+  }
+
+  switchToIoServer() {
+    if (!this.context.config.ioServer) {
+      throw new Error(`Switching to IO-server isn't allowed it config`);
+    }
+
+    this.context.log.info(`Switching to IO server`);
+    this.context.system.shutdownRequest('switchToIoServer');
+  }
+
+  publishWholeState() {
+    // TODO: publish all the states of all the devices etc
+  }
+
+  async reboot() {
+    const Sys = this.context.system.ioManager.getIo<SysIo>('Sys');
+
+    return Sys.reboot();
+  }
+
+
   listenDeviceStatus(
     deviceId: string,
     statusName: string | undefined,
@@ -78,44 +133,11 @@ export default class Api {
     return this.context.state.onChange(handlerWrapper);
   }
 
-  getDeviceStatus(deviceId: string): Dictionary | undefined {
-    return this.context.state.getState(StateCategories.devicesStatus, deviceId);
-  }
-
-  getDeviceConfig(deviceId: string): Dictionary | undefined {
-    return this.context.state.getState(StateCategories.devicesConfig, deviceId);
-  }
-
   async setDeviceConfig(deviceId: string, partialState: Dictionary): Promise<void> {
     const device = this.context.system.devicesManager.getDevice(deviceId);
 
     if (device.setConfig) return device.setConfig(partialState);
   }
-
-  getState(category: StateCategories, stateName: string): Dictionary | undefined {
-    return this.context.state.getState(category, stateName);
-  }
-
-  /**
-   * The same info for System and for IoServer
-   */
-  info(): HostInfo {
-    return {
-      hostType: 'app',
-      platform: this.context.config.platform,
-      machine: this.context.config.machine,
-      usedIo: this.context.system.ioManager.getNames(),
-    };
-  }
-
-  // getHostConfig(): HostInfo {
-  //   return {
-  // hostId: this.context.config.id,
-  //     // TODO: add used drivers, services, devices and its defenitions
-  //     config: this.context.config,
-  //   };
-  // }
-
 
   getSessionStore(sessionId: string, key: string): JsonTypes | undefined {
     return this.context.sessions.getStorage(sessionId, key);
@@ -127,25 +149,6 @@ export default class Api {
     return this.context.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
       if (allowedLogLevels.includes(level)) cb(message);
     });
-  }
-
-  switchToIoServer() {
-    if (!this.context.config.ioServer) {
-      throw new Error(`Switching to IO-server isn't allowed it config`);
-    }
-
-    this.context.log.info(`Switching to IO server`);
-    this.context.system.shutdownRequest('switchToIoServer');
-  }
-
-  publishWholeState() {
-    // TODO: publish all the states of all the devices etc
-  }
-
-  async reboot() {
-    const Sys = this.context.system.ioManager.getIo<SysIo>('Sys');
-
-    return Sys.reboot();
   }
 
   /**

@@ -122,7 +122,7 @@ export default class ApiCall {
   /**
    * Print host's info to console
    */
-  async hostInfo(host?: string, port?: string) {
+  async info(host?: string, port?: string) {
     const apiClient = await this.connect(host, port);
 
     const result =  await apiClient.callMethod('info');
