@@ -33,6 +33,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
       .getInstance(this.props);
 
     this.router.addRoute('get', '/api/:methodName/:args', this.handleRoute);
+    this.router.addRoute('get', '/api/:methodName', this.handleRoute);
   }
 
 

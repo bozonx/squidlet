@@ -98,6 +98,7 @@ export default class Api {
    */
   getHostInfo(): HostInfo {
     return {
+      hostType: 'app',
       platform: this.context.config.platform,
       machine: this.context.config.machine,
       usedIo: this.context.system.ioManager.getNames(),
