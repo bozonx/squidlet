@@ -56,8 +56,6 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     const args: JsonTypes[] = parseArgs(route.params.args);
     let result: any;
 
-    console.log(2222222222, JSON.stringify(route, null, 2), args)
-
     try {
       result = await this.context.system.apiManager.callApi(apiMethodName, args);
     }

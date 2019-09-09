@@ -150,8 +150,6 @@ export default class HttpServer implements HttpServerIo {
       const requestId: number = makeUniqNumber();
       const httpRequest: HttpRequest = this.makeRequestObject(req);
 
-      console.log(333333333, httpRequest)
-
       const respHandler = (receivedRequestId: number, response: HttpResponse) => {
         // listen only expected requestId
         if (receivedRequestId !== requestId) return;

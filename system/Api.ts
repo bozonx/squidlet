@@ -44,7 +44,7 @@ export default class Api {
   action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
     const device = this.context.system.devicesManager.getDevice(deviceId);
 
-    this.context.log.info(`Api: called device's ${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
+    this.context.log.info(`Api: called device's "${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
 
     return device.action(actionName, ...args);
   }
@@ -61,9 +61,13 @@ export default class Api {
 
   // TODO: rename to state ???
   getState(category: StateCategories, stateName: string): Dictionary | undefined {
-    console.log(1111111111, category, stateName, this.context.state.getState(parseInt(category as any), stateName))
+    const result: Dictionary | undefined = this.context.state.getState(category, stateName);
 
-    return this.context.state.getState(category, stateName);
+    if (!result) {
+      throw new Error(`Can't find the state: category "${category}", stateName: "${stateName}"`);
+    }
+
+    return result;
   }
 
   switchToIoServer() {
