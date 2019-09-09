@@ -77,6 +77,7 @@ export default class HttpRouterLogic {
    * Call this only when a new request came.
    */
   async incomeRequest(request: HttpDriverRequest): Promise<HttpDriverResponse> {
+    // TODO: для коротких url - надо задавать начальный slash его нет - проверить
     const location: ParsedUrl = parseUrl(request.url);
 
     if (!location.path) {

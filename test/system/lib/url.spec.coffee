@@ -15,6 +15,7 @@ describe.only 'system.lib.url', ->
     assert.deepEqual(url.parseSearch('param1={"a": "str", "b": 5, "c": true}'), {
       param1: {a: "str", b: 5, c: true}
     })
+
   it 'parseHostPort', ->
     assert.deepEqual(url.parseHostPort('pre.host.com:8080'), {
       host: 'pre.host.com',
@@ -60,11 +61,27 @@ describe.only 'system.lib.url', ->
       host: 'host.com',
     })
 
-  # TODO: наверное это не нужно
-#  it 'parseLeftPartOfUrl - only host', ->
-#    assert.deepEqual(url.parseLeftPartOfUrl('host.com'), {
-#      host: 'host.com',
-#    })
+  it 'parseLeftPartOfUrl - ip', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('https://192.168.0.1:80'), {
+      scheme: 'https',
+      host: '192.168.0.1',
+      port: 80,
+    })
+
+  it 'parseLeftPartOfUrl - ip only', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('192.168.0.1'), {
+      host: '192.168.0.1',
+    })
+
+  it 'parseLeftPartOfUrl - only host', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('host.com'), {
+      host: 'host.com',
+    })
+
+  it 'parseLeftPartOfUrl - local host', ->
+    assert.deepEqual(url.parseLeftPartOfUrl('localhost'), {
+      host: 'localhost',
+    })
 
   it 'parseRightPartOfUrl - full', ->
     assert.deepEqual(url.parseRightPartOfUrl('/path/to/route/?param1=value1&param2#anc'), {
@@ -95,6 +112,54 @@ describe.only 'system.lib.url', ->
       search: {},
       anchor: 'anc',
     })
+
+  it 'splitUrl - full', ->
+    assert.deepEqual(url.splitUrl('https://u:p@host.com:80/path?p1=v1#a'), {
+      left: 'https://u:p@host.com:80',
+      right: '/path?p1=v1#a'
+    })
+
+  it 'splitUrl - short', ->
+    assert.deepEqual(url.splitUrl('host.com/path/'), {
+      left: 'host.com',
+      right: '/path/'
+    })
+
+  it 'splitUrl - only left', ->
+    assert.deepEqual(url.splitUrl('http://host.com'), {
+      left: 'http://host.com'
+    })
+
+  it 'splitUrl - only left - only host', ->
+    assert.deepEqual(url.splitUrl('host.com'), {
+      left: 'host.com'
+    })
+
+  it 'splitUrl - only left - local host', ->
+    assert.deepEqual(url.splitUrl('localhost'), {
+      left: 'localhost'
+    })
+
+  it 'splitUrl - only left - ip', ->
+    assert.deepEqual(url.splitUrl('192.168.0.1'), {
+      left: '192.168.0.1'
+    })
+
+  it 'splitUrl - only right', ->
+    assert.deepEqual(url.splitUrl('/path'), {
+      right: '/path'
+    })
+
+  it 'splitUrl - only right - anchor', ->
+    assert.deepEqual(url.splitUrl('/#anc'), {
+      right: '/#anc'
+    })
+
+  it 'splitUrl - only right - anchor at the beginning', ->
+    assert.deepEqual(url.splitUrl('#anc'), {
+      right: '#anc'
+    })
+
 
   it 'parseUrl - full', ->
     testUrl = 'https://username:password@host.com:8080/path/to/route/?param1=value1&param2'
@@ -145,13 +210,13 @@ describe.only 'system.lib.url', ->
       },
     })
 
-  # TODO: review
-  it 'parseUrl - url path - no params', ->
-    testUrl = 'path/to/route'
-    assert.deepEqual(url.parseUrl(testUrl), {
-      path: 'path/to/route',
-      search: {},
-    })
+#  # TODO: review
+#  it 'parseUrl - url path - no params', ->
+#    testUrl = 'path/to/route'
+#    assert.deepEqual(url.parseUrl(testUrl), {
+#      path: 'path/to/route',
+#      search: {},
+#    })
 
   it 'parseUrl - anchor', ->
     testUrl = 'path#anc'
@@ -175,7 +240,11 @@ describe.only 'system.lib.url', ->
     })
 
 
-  it 'parseUrl - bad url', ->
-    assert.throws(() => url.parseUrl('http:/host.com/path'))
-    # TODO: had to throw an exeption
-    #assert.throws(() => url.parseUrl('http://host.com/path&p'))
+#  it 'parseUrl - bad url', ->
+#    assert.throws(() => url.parseUrl('http:/host.com/path'))
+#    # TODO: no host with port
+#    # TODO: had to throw an exeption
+#    #assert.throws(() => url.parseUrl('http://host.com/path&p'))
+
+# TODO: test ip
+# TODO: ancfor идет сразу после host

@@ -1,7 +1,6 @@
 import {JsonTypes} from '../interfaces/Types';
 import {omitUndefined} from './objects';
 
-// TODO: add null support
 
 export const URL_DELIMITER = '/';
 
@@ -34,16 +33,30 @@ export interface ParsedUrl {
   anchor?: string;
 }
 
-//const match = decodedUrl.trim().match(/^([\w\d]+:?\/?)\/?([^\/]+)([^?]*)\??(.*)$/);
+
+/**
+ * Parses whole url
+ * @param rawUrl
+ */
+export function parseUrl(rawUrl: string): ParsedUrl {
+  if (!rawUrl) throw new Error(`Invalid url "${rawUrl}"`);
+
+  const decodedUrl = decodeURI(rawUrl.trim());
+  const { left, right } = splitUrl(decodedUrl);
+
+  return {
+    ...(left) ? parseLeftPartOfUrl(left) : {},
+    ...(right) ? parseRightPartOfUrl(right) : {},
+  };
+}
 
 // protocol, username, password, host, port
-// TODO: review
-const leftUrlPartRegex = ''
-  + /(?:(?:(https?|ftp):)?\/\/)/.source     // protocol
-  + /(?:([^\n\r]+)@)?/.source  // user:pass
-  + /([^\/]+)?/.source  // domain
-  //+ /(?:([^:\n\r]+):([^@\n\r]+)@)?/.source  // user:pass
-  //+ /(?:(?:www\.)?([^\/\n\r]+))/.source     // domain
+const leftUrlPartRegex = '^' +
+  '(([a-z0-9]+)://)?' + // protocol
+  '(([^@]+)@)?' +            // user:pass
+  '([^/]+)'+ // domain:port
+  //'([a-zA-Z0-9.\\-\:]+)'+ // domain:port
+  '.*$';
 ;
 const urlPathRegex = ''
   + /(\/?[^?#\n\r]+)?/.source                 // request
@@ -53,17 +66,13 @@ const urlPathRegex = ''
   + /([^\n\r]*)?/.source                     // anchor
 ;
 
-/*
- не отрабоатывает:
- http://aa.aо
- */
-const fullRegExp = '^' +
-  '([a-z0-9]+://)?' + // protocol
-  '([^@]+@)?' +            // user:pass
-  // TODO: уточникть набор символов
-  '([a-zA-Z0-9.\\-]+(?!/))?' + // domain
-  '(/?.*)' +
-  '$';
+// const fullRegExp = '^' +
+//   '([a-z0-9]+://)?' + // protocol
+//   '([^@]+@)?' +            // user:pass
+//   // TODO: уточникть набор символов
+//   '([a-zA-Z0-9.\\-\:]+)(?!/)' + // domain
+//   '(/?.*)' +
+//   '$';
 
 /**
  * Parses value of search param.
@@ -77,6 +86,8 @@ const fullRegExp = '^' +
 export function parseSearchValue(rawValue: string | undefined): JsonTypes {
   if (!rawValue) return '';
 
+// TODO: add null support
+
   const trimmed: string = rawValue.trim();
 
   if (!trimmed) return '';
@@ -89,6 +100,12 @@ export function parseSearchValue(rawValue: string | undefined): JsonTypes {
   }
 }
 
+/**
+ * Parse search part of url. Arrays and objects are supported:
+ * * param1=value1&param2&param3=5&param4=true => { param1: 'value1', param2: '', param3: 5, param4: true }
+ * * param1=[1, true, "str"] => { param1: [1, true, 'str'] }
+ * * param1={"a": "str", "b": 5, "c": true} => { param1: {a: "str", b: 5, c: true} }
+ */
 export function parseSearch(rawSearch: string): {[index: string]: JsonTypes} {
   if (!rawSearch) return {};
 
@@ -104,6 +121,11 @@ export function parseSearch(rawSearch: string): {[index: string]: JsonTypes} {
   return result;
 }
 
+/**
+ * Parse string:
+ * * "host.com:8080" => { host: 'host.com', port: 8080 }
+ * * "host.com" => { host: 'host.com' }
+ */
 export function parseHostPort(rawStr: string): { host: string, port?: number } {
   if (!rawStr) {
     throw new Error(`Invalid host part of url`);
@@ -125,6 +147,11 @@ export function parseHostPort(rawStr: string): { host: string, port?: number } {
   return { host: splat[0] };
 }
 
+/**
+ * Parse string like:
+ * * "userName:password" => { user: 'userName', password: 'password' }
+ * * "userName" => { user: 'userName' }
+ */
 export function parseUserPassword(rawStr: string): {user?: string; password?: string} {
   if (!rawStr) return {};
 
@@ -140,70 +167,29 @@ export function parseUserPassword(rawStr: string): {user?: string; password?: st
   return { user: splat[0] };
 }
 
-export function parseUrl(rawUrl: string): ParsedUrl {
-  if (!rawUrl) throw new Error(`Invalid url "${rawUrl}"`);
-
-  const decodedUrl = decodeURI(rawUrl.trim());
-
-  //const splitUrlMatch = decodedUrl.match(/^([^:]*:?\/?\/?[^\/]+)(.*)$/);
-  const splitUrlMatch = decodedUrl.match(/^(([^:]+:\/\/)?[^\/]*)(.*)$/);
-
-  if (!splitUrlMatch) throw new Error(`Can't recognize parts of url "${decodedUrl}"`);
-
-  console.log(1111111, splitUrlMatch)
-
-  if (splitUrlMatch[3]) {
-    // full url
-    return {
-      ...(splitUrlMatch[1]) ? parseLeftPartOfUrl(splitUrlMatch[1]) : {},
-      ...parseRightPartOfUrl(splitUrlMatch[3]),
-    };
-  }
-  else {
-    // only path or only first part
-    if (splitUrlMatch[1].match(/[:.@]/)) {
-      return {
-        ...parseLeftPartOfUrl(splitUrlMatch[1]),
-      };
-    }
-    else if (splitUrlMatch[1].match(/[\/#?&%]/)) {
-      // path part
-      return {
-        ...parseRightPartOfUrl(splitUrlMatch[1]),
-      };
-    }
-
-    return {
-      host: splitUrlMatch[1],
-    };
-  }
-}
-
-
+/**
+ * Parses protocol, username, password, hostname and port of url
+ */
 export function parseLeftPartOfUrl(url: string): LeftPartOfUrl {
   // else parse a path
-  const match = url.match(leftUrlPartRegex);
-
-  console.log(11111111, match);
+  const match = url.match(new RegExp(leftUrlPartRegex));
 
   if (!match) {
     throw new Error(`Can't parse url "${url}"`);
   }
-  // else if (!match[2]) {
-  //   throw new Error(`Invalid auth and host part of url`);
-  // }
 
-  //const authHostSplat = match[2].split('@');
-
-  return {
-    scheme: match[1],
-    ...(match[2]) ? parseUserPassword(match[2]) : {},
-    ...parseHostPort(match[3]),
-    // ...parseHostPort(authHostSplat[(authHostSplat.length === 2) ? 1 : 0]),
-    // ...(authHostSplat.length === 2) ? parseUserPassword(authHostSplat[0]) : {},
+  const result: LeftPartOfUrl = {
+    scheme: match[2],
+  ...(match[4]) ? parseUserPassword(match[4]) : {},
+  ...parseHostPort(match[5]),
   };
+
+  return omitUndefined(result) as LeftPartOfUrl;
 }
 
+/**
+ * Parses path, search and anchor.
+ */
 export function parseRightPartOfUrl(url: string): RightPartOfUrl {
   const match = url.match(urlPathRegex);
 
@@ -220,4 +206,45 @@ export function parseRightPartOfUrl(url: string): RightPartOfUrl {
   };
 
   return omitUndefined(result) as RightPartOfUrl;
+}
+
+/**
+ * Split url to left and rigth parts.
+ */
+export function splitUrl(url: string): { left?: string, right?: string } {
+  //const splitUrlMatch = decodedUrl.match(/^([^:]*:?\/?\/?[^\/]+)(.*)$/);
+  const splitUrlMatch = url.match(/^(([^:]+:\/\/)?[a-zA-Z0-9.\-:@]*)(.*)$/);
+
+  if (!splitUrlMatch) throw new Error(`Can't recognize parts of url "${url}"`);
+
+  console.log(1111111, splitUrlMatch)
+
+  if (splitUrlMatch[3]) {
+    // full url
+    return omitUndefined({
+      left: splitUrlMatch[1] || undefined,
+      right: splitUrlMatch[3],
+    });
+  }
+  else {
+    // only path or only first part
+    if (splitUrlMatch[1].match(/[:.@]/)) {
+      return {
+        left: splitUrlMatch[1],
+      };
+    }
+    else if (splitUrlMatch[1].match(/[\/#?&%]/)) {
+      // path part
+      return {
+        right: splitUrlMatch[1],
+      };
+    }
+
+    return {
+      left: splitUrlMatch[1],
+    };
+  }
+
+//const match = decodedUrl.trim().match(/^([\w\d]+:?\/?)\/?([^\/]+)([^?]*)\??(.*)$/);
+
 }
