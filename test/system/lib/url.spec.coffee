@@ -1,7 +1,7 @@
 url = require('../../../system/lib/url')
 
 
-describe 'system.lib.url', ->
+describe.only 'system.lib.url', ->
   it 'parseSearch', ->
     assert.deepEqual(url.parseSearch('param1=value1&param2&param3=5&param4=true'), {
       param1: 'value1',
@@ -239,8 +239,16 @@ describe 'system.lib.url', ->
       path: '/path',
     })
 
+  it 'parseUrl - decoded values in a path', ->
+    testUrl = '127.0.0.1:8087/api/getState/0,bedroom.light1'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      host: '127.0.0.1',
+      port: 8087,
+      path: '/api/getState/0,bedroom.light1',
+    })
 
-  it 'parseUrl - bad url', ->
+
+  #it 'parseUrl - bad url', ->
     # bad protocol
     #assert.throws(() => url.parseUrl('http:/host.com/path'))
     # bad search
