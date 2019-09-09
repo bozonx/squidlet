@@ -42,7 +42,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   }
 
   async init() {
-    this.remoteHostInfo = await this.getHostInfo();
+    this.remoteHostInfo = await this.info();
     await super.init();
 
     console.info(`Using remote ioset of host "${this.joinHostPort()}"`);
@@ -98,7 +98,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     };
   }
 
-  private async getHostInfo(): Promise<HostInfo> {
+  private async info(): Promise<HostInfo> {
     // TODO: use HttpClientLogic
     // TODO: how to switch protocol???
     const url = `http://${this.joinHostPort()}/api/info`;
@@ -111,6 +111,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     // TODO: ask ioServer via http api for platform and machine
     // TODO: set result
     return {
+      hostType: 'ioServer',
       platform: 'nodejs',
       machine: 'rpi',
       usedIo: [],

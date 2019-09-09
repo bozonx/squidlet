@@ -12,7 +12,7 @@ export default class ApiCall {
   async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
     const apiClient = await this.connect(host, port);
 
-    const result = await apiClient.callMethod('callDeviceAction', deviceId, actionName, ...args);
+    const result = await apiClient.callMethod('action', deviceId, actionName, ...args);
 
     console.info(JSON.stringify(result));
 
@@ -125,7 +125,7 @@ export default class ApiCall {
   async hostInfo(host?: string, port?: string) {
     const apiClient = await this.connect(host, port);
 
-    const result =  await apiClient.callMethod('getHostInfo');
+    const result =  await apiClient.callMethod('info');
 
     // TODO: don't use null
     console.info(JSON.stringify(result, null, 2));

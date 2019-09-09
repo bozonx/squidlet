@@ -18,7 +18,10 @@ export default class Api {
   }
 
 
-  callDeviceAction(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
+  /**
+   * Call device action
+   */
+  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
     const device = this.context.system.devicesManager.getDevice(deviceId);
 
     this.context.log.info(`Api: called device's ${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
@@ -96,7 +99,7 @@ export default class Api {
   /**
    * The same info for System and for IoServer
    */
-  getHostInfo(): HostInfo {
+  info(): HostInfo {
     return {
       hostType: 'app',
       platform: this.context.config.platform,

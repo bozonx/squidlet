@@ -59,7 +59,7 @@ export default class ApiTopicsLogic {
       case 'device':
         const [deviceId, actionName] = splitFirstElement(body, TOPIC_SEPARATOR);
 
-        await this.callDeviceAction(deviceId, actionName, data);
+        await this.action(deviceId, actionName, data);
         break;
       case 'api':
         await this.callApi(body, data);
@@ -112,9 +112,9 @@ export default class ApiTopicsLogic {
     await (this.context.system.api as any)[methodName](...args);
   }
 
-  private async callDeviceAction(deviceId: string, actionName?: string, data?: string) {
+  private async action(deviceId: string, actionName?: string, data?: string) {
     if (!actionName) {
-      throw new Error(`ApiTopicsLogic.callDeviceAction: no actionName: "${deviceId}"`);
+      throw new Error(`ApiTopicsLogic.action: no actionName: "${deviceId}"`);
     }
 
     // income string-type api message - call device action
@@ -122,7 +122,7 @@ export default class ApiTopicsLogic {
 
     const args: JsonTypes[] = parseArgs(data);
 
-    await this.context.system.api.callDeviceAction(deviceId, actionName, ...args);
+    await this.context.system.api.action(deviceId, actionName, ...args);
   }
 
   /**
