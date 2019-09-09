@@ -2,4 +2,41 @@
 
 All the methods use GET http method for better use. Template of requests lite this:
 
-        GET http://myServer:8087/api/methodName/param1,5
+    GET http://myServer:8087/api/methodName/param1,5
+
+## Get host info
+
+    /api/info
+    
+## Call device action
+
+    /api/action/<room.deviceId>,<actionName>,<value>
+
+## Get device status
+
+    /api/getDeviceStatus/<room.deviceId>
+
+## Get device config
+
+    /api/getDeviceConfig/<room.deviceId>
+
+## Get any state
+
+Categories:
+* 0 - device state
+* 1 - device config
+
+
+    /api/getState/<categoryNumber>,<room.deviceId>
+
+## Republish all the states
+
+    /api/republishWholeState
+    
+## Switch app to IO server
+
+    /api/switchToIoServer
+
+## Reboot host
+
+    /api/reboot

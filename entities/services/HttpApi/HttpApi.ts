@@ -10,14 +10,14 @@ import {HttpServerRouter} from '../../drivers/HttpServerRouter/HttpServerRouter'
 
 
 const allowedApiMethodsToCall = [
+  'info',
   'action',
   'getDeviceStatus',
   'getDeviceConfig',
   'getState',
-  'info',
-  'getSessionStore',
+  //'getSessionStore',
+  'republishWholeState',
   'switchToIoServer',
-  'publishWholeState',
   'reboot',
 ];
 

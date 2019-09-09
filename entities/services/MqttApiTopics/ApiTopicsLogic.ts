@@ -15,7 +15,7 @@ const topicTypes = ['device', 'api'];
 const allowedApiMethodsToCall = [
   'setDeviceConfig',
   'switchToIoServer',
-  'publishWholeState',
+  'republishWholeState',
   'reboot',
 ];
 export const TOPIC_TYPE_SEPARATOR = '|';
@@ -26,7 +26,7 @@ export const TOPIC_SEPARATOR = '/';
  * Types of topics
  * device - means call device action
  * api - call specific api
- * * publishWholeState - publish while device etc states
+ * * republishWholeState - publish while device etc states
  * * blockIo true|false
  */
 export default class ApiTopicsLogic {

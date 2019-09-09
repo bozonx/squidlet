@@ -19,17 +19,6 @@ export default class Api {
 
 
   /**
-   * Call device action
-   */
-  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
-    const device = this.context.system.devicesManager.getDevice(deviceId);
-
-    this.context.log.info(`Api: called device's ${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
-
-    return device.action(actionName, ...args);
-  }
-
-  /**
    * The same info for System and for IoServer
    */
   info(): HostInfo {
@@ -49,6 +38,17 @@ export default class Api {
   //   };
   // }
 
+  /**
+   * Call device action
+   */
+  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
+    const device = this.context.system.devicesManager.getDevice(deviceId);
+
+    this.context.log.info(`Api: called device's ${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
+
+    return device.action(actionName, ...args);
+  }
+
   // TODO: rename to deviceStatus ???
   getDeviceStatus(deviceId: string): Dictionary | undefined {
     return this.context.state.getState(StateCategories.devicesStatus, deviceId);
@@ -61,7 +61,7 @@ export default class Api {
 
   // TODO: rename to state ???
   getState(category: StateCategories, stateName: string): Dictionary | undefined {
-    return this.context.state.getState(category, stateName);
+    return this.context.state.getState(parseInt(category as any), stateName);
   }
 
   switchToIoServer() {
@@ -73,7 +73,7 @@ export default class Api {
     this.context.system.shutdownRequest('switchToIoServer');
   }
 
-  publishWholeState() {
+  republishWholeState() {
     // TODO: publish all the states of all the devices etc
   }
 
