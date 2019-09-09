@@ -4,7 +4,7 @@
 export function parseValue(rawValue: any): any {
   if (
     typeof rawValue === 'undefined'
-    // TODO: don't use null
+    // TODO: don't use null???
     || rawValue === null
     || typeof rawValue === 'boolean'
     || Number.isNaN(rawValue)
@@ -32,19 +32,18 @@ export function parseValue(rawValue: any): any {
   else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
     return rawValue;
   }
+  else if (typeof rawValue === 'object') {
+    return rawValue;
+  }
 
-  const toNumber = parseFloat(rawValue);
+  const toNumber = Number(rawValue);
 
   if (!Number.isNaN(toNumber)) {
     // it's number
     return toNumber;
   }
 
-  if (typeof rawValue === 'string') {
-    return rawValue;
-  }
-
-  // array or object - as is
+  // string returns as is
   return rawValue;
 }
 

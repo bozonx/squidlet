@@ -24,6 +24,7 @@ describe 'system.lib.common', ->
     assert.equal(common.parseValue('-5'), -5)
     assert.equal(common.parseValue('2.'), '2.')
     assert.equal(common.parseValue('0.5'), 0.5)
+    assert.equal(common.parseValue('0,bedroom.light1'), '0,bedroom.light1')
 
   it 'callPromised', ->
     data = 'param1'

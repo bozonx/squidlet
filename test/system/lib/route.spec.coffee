@@ -46,3 +46,7 @@ describe 'system.lib.route', ->
     assert.deepEqual(helper.parseRouteParams(@url, @route), @params)
     assert.deepEqual(helper.parseRouteParams('/action', '/action'), {})
     assert.deepEqual(helper.parseRouteParams('/', '/'), {})
+    assert.deepEqual(helper.parseRouteParams(
+      '/api/getState/0,bedroom.light1',
+      '/api/:apiMethodName/:args'
+    ), { apiMethodName: 'getState', args: '0,bedroom.light1' })
