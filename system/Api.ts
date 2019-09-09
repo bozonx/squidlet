@@ -91,7 +91,7 @@ export default class Api {
         .catch(this.context.log.error);
     }, this.context.config.config.rebootDelaySec * 1000);
 
-    return `It will be rebooted in 5 seconds`;
+    return `It will be rebooted in ${this.context.config.config.rebootDelaySec} seconds`;
   }
 
 

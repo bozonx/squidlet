@@ -9,6 +9,12 @@ import {HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
 import {HttpServerRouter} from '../../drivers/HttpServerRouter/HttpServerRouter';
 
 
+interface HttpApiBody {
+  result?: JsonTypes;
+  error?: string;
+}
+
+
 const allowedApiMethodsToCall = [
   'info',
   'action',
@@ -39,41 +45,48 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
 
   private handleRoute = async (route: Route): Promise<HttpDriverResponse> => {
     const apiMethodName: Primitives | undefined = route.params.apiMethodName;
+    let body: HttpApiBody;
 
     if (typeof apiMethodName !== 'string') {
+      body = { error: `Unexpected type of method "${apiMethodName}"` };
+
       return {
         status: 400,
-        body: `Unexpected type of method "${apiMethodName}"`,
+        body,
       };
     }
     if (!allowedApiMethodsToCall.includes(apiMethodName)) {
+      body = { error: `Api method "${apiMethodName}" not found` };
+
       return {
         status: 404,
-        body: `Api method "${apiMethodName}" not found`,
+        body,
       };
     }
 
+    return await this.callApiMethod(route, apiMethodName);
+  }
+
+  private async callApiMethod(route: Route, apiMethodName: string): Promise<HttpDriverResponse> {
     const args: JsonTypes[] = parseArgs(route.params.args);
+    let body: HttpApiBody;
     let result: any;
 
     try {
       result = await this.context.system.apiManager.callApi(apiMethodName, args);
     }
     catch (err) {
+      body = { error: String(err) };
+
       return {
         status: 500,
-        body: {
-          error: String(err),
-        },
+        body,
       };
     }
 
-    return {
-      body: {
-        result,
-        success: true,
-      },
-    };
+    body = { result };
+
+    return { body };
   }
 
 }

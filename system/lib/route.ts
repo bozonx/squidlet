@@ -82,11 +82,6 @@ export function parseRouteParams(url: string, route: string): {[index: string]: 
 
   for (let itemIndex in routeSplat) {
     if (routeSplat[itemIndex].indexOf(PARAM_MARK) !== 0) continue;
-
-    console.log(999999999, urlSplat[itemIndex], parseValue(urlSplat[itemIndex]));
-
-    // TODO: parse value - нерпвлиьно парсит строку 0,eee.ee
-
     params[routeSplat[itemIndex].slice(1)] = parseValue(urlSplat[itemIndex]);
   }
 
