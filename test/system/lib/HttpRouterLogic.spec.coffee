@@ -1,17 +1,16 @@
 HttpRouterLogic = require('../../../system/lib/HttpRouterLogic').default
 
 
-describe.only 'system.lib.HttpRouterLogic', ->
+describe 'system.lib.HttpRouterLogic', ->
   beforeEach ->
     @router = new HttpRouterLogic(() => )
     @pinnedProps = {param1: 1}
     @request = {
       method: 'get'
       headers: {'content-type': 'application/json'}
-      url: '/path/to/myAction/subpath/5'
+      url: 'http://host:8080/path/to/myAction/subpath/5#anchor'
     }
     @response = {
-      #headers: {'content-type': 'application/json'}
       body: {res: 1}
     }
 
@@ -32,17 +31,27 @@ describe.only 'system.lib.HttpRouterLogic', ->
     result = await @router.incomeRequest(@request)
 
     route = {
-      # TODO: add
+      location: {
+        anchor: 'anchor',
+        host: 'host',
+        path: '/path/to/myAction/subpath/5',
+        port: 8080,
+        scheme: 'http'
+      },
+      params: { action: 'myAction', param1: 5 },
+      pinnedProps: { param1: 1 },
+      route: '/path/to/:action/subpath/:param1',
+      routeId: 'get|/path/to/:action/subpath/:param1'
     }
 
     assert.deepEqual(result, @response)
-#    sinon.assert.notCalled(handler1)
-#    sinon.assert.notCalled(handler2)
-#    sinon.assert.notCalled(handler3)
-#    sinon.assert.notCalled(handler4)
-#    sinon.assert.notCalled(handler5)
-#    sinon.assert.calledOnce(handler6)
-#    sinon.assert.calledWith(handler6, route, @request)
+    sinon.assert.notCalled(handler1)
+    sinon.assert.notCalled(handler2)
+    sinon.assert.notCalled(handler3)
+    sinon.assert.notCalled(handler4)
+    sinon.assert.notCalled(handler5)
+    sinon.assert.calledOnce(handler6)
+    sinon.assert.calledWith(handler6, route, @request)
 
   it 'private resolveRoute', ->
     routeHandler = sinon.spy()
