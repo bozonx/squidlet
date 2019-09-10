@@ -198,7 +198,7 @@ export default class WsServerLogic {
     const messageIndex: number = await this.wsServerIo.onMessage(
       this.serverId,
       (connectionId: string, data: string | Uint8Array) => {
-        this.logDebug(`WsServerLogic income message on server ${this.props.host}:${this.props.port} has been closed, connection id ${connectionId}, data length ${data.length}`);
+        this.logDebug(`WsServerLogic income message on server ${this.props.host}:${this.props.port}, connection id ${connectionId}, data length ${data.length}`);
         this.events.emit(WS_SERVER_EVENTS.incomeMessage, connectionId, data);
       }
     );

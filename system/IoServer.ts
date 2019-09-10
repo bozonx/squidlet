@@ -12,16 +12,18 @@ import systemConfig from './systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
 import {ShutdownHandler} from './System';
 import IoItem, {IoItemDefinition} from './interfaces/IoItem';
-// TODO: use ioSet's - use driver
-import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
-// TODO: use ioSet's - use driver
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../entities/drivers/HttpServer/HttpServerLogic';
 import {HttpServerIo, HttpServerProps} from './interfaces/io/HttpServerIo';
 import {ParsedUrl, parseUrl} from './lib/url';
 import {prepareRoute} from './lib/route';
-import HostInfo, {HostType} from './interfaces/HostInfo';
+import HostInfo from './interfaces/HostInfo';
+// TODO: use from system's interfaces
 import {HttpApiBody} from '../entities/services/HttpApi/HttpApi';
-import Platforms from './interfaces/Platforms';
+// TODO: use from system's interfaces
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../entities/drivers/HttpServer/HttpServerLogic';
+// TODO: use ioSet's - use driver
+import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
+// TODO: use ioSet's - use driver
+
 
 
 export const METHOD_DELIMITER = '.';
@@ -37,16 +39,16 @@ export default class IoServer {
   private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;
   private connectionId?: string;
-  private _httpServer?: HttpServerLogic;
+  private httpServer?: HttpServerLogic;
   private _wsServer?: WsServerLogic;
 
   private get hostConfig(): HostConfig {
     return this._hostConfig as any;
   }
 
-  private get httpServer(): HttpServerLogic {
-    return this._httpServer as any;
-  }
+  // private get httpServer(): HttpServerLogic {
+  //   return this._httpServer as any;
+  // }
 
   private get wsServer(): WsServerLogic {
     return this._wsServer as any;
@@ -83,13 +85,13 @@ export default class IoServer {
 
   destroy = async () => {
     this.logInfo('... destroying IoServer');
-    await this.httpServer.destroy();
+    this.httpServer && await this.httpServer.destroy();
     await this.wsServer.destroy();
     this.remoteCall && await this.remoteCall.destroy();
   }
 
 
-  private handleNewConnection = (connectionId: string) => {
+  private handleNewIoClientConnection = (connectionId: string) => {
     if (this.connectionId) {
       const msg = `Only one connection is allowed`;
 
@@ -110,6 +112,12 @@ export default class IoServer {
       makeUniqId
     );
 
+    // TODO: нет гарантии что он успеет остановиться перед запросом создания нового сервера
+    this.httpServer && this.httpServer.destroy()
+      .catch(this.logError);
+
+    delete this.httpServer;
+
     this.logInfo(`New IO client has been connected`);
   }
 
@@ -126,6 +134,20 @@ export default class IoServer {
     this.logDebug(`Income IO message: ${JSON.stringify(msg)}`);
 
     return this.remoteCall && this.remoteCall.incomeMessage(msg);
+  }
+
+  private handleIoClientCloseConnection = () => {
+    this.connectionId = undefined;
+
+    this.remoteCall && this.remoteCall.destroy()
+      .catch(this.logError);
+
+    if (!this.httpServer) {
+      this.initHttpApiServer()
+        .catch(this.logError);
+    }
+
+    this.logInfo(`IO client has been disconnected`);
   }
 
   private sendToClient = async (message: RemoteCallMessage): Promise<void> => {
@@ -179,7 +201,7 @@ export default class IoServer {
     const props: HttpServerProps = { host: '0.0.0.0', port: 8087 };
     const httpServerIo = this.ioSet.getIo<HttpServerIo>('HttpServer');
 
-    this._httpServer = new HttpServerLogic(
+    this.httpServer = new HttpServerLogic(
       httpServerIo,
       props,
       () => this.logError(`Http server has been closed`),
@@ -213,15 +235,8 @@ export default class IoServer {
     await this.wsServer.init();
 
     this.wsServer.onMessage(this.handleIncomeMessages);
-    this.wsServer.onConnection(this.handleNewConnection);
-    this.wsServer.onConnectionClose(() => {
-      this.connectionId = undefined;
-
-      this.remoteCall && this.remoteCall.destroy()
-        .catch(this.logError);
-
-      this.logInfo(`IO client has been disconnected`);
-    });
+    this.wsServer.onConnection(this.handleNewIoClientConnection);
+    this.wsServer.onConnectionClose(this.handleIoClientCloseConnection);
   }
 
   private async configureIoSet() {
