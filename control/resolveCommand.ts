@@ -2,11 +2,13 @@ import * as yargs from 'yargs';
 
 import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
+import HttpApiCall from './HttpApiCall';
 import WsApiCall from './WsApiCall';
 import {omitObj} from '../system/lib/objects';
 
 
-const apiCall = new WsApiCall();
+const httpApiCall = new HttpApiCall();
+const wsApiCall = new WsApiCall();
 
 
 async function startCommand(command: string, positionArgsRest: string[], args: {[index: string]: any}) {
@@ -18,9 +20,9 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();
     case 'log':
-      return apiCall.log(args.level, args.host, args.port);
+      return wsApiCall.log(args.level, args.host, args.port);
     case 'action':
-      return apiCall.action(
+      return wsApiCall.action(
         positionArgsRest[0],
         positionArgsRest[1],
         positionArgsRest.slice(2),
@@ -28,17 +30,17 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
         args.port
       );
     case 'status':
-      return apiCall.status(positionArgsRest[0], args.host, args.port, args.watch);
+      return wsApiCall.status(positionArgsRest[0], args.host, args.port, args.watch);
     case 'config':
-      return apiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
+      return wsApiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
     case 'state':
-      return apiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
+      return wsApiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
     case 'reboot':
-      return apiCall.reboot(args.host, args.port);
+      return wsApiCall.reboot(args.host, args.port);
     case 'info':
-      return apiCall.info(args.host, args.port);
+      return httpApiCall.info(args.host, args.port);
     case 'switch-to-ioserver':
-      return apiCall.switchToIoServer(args.host, args.port);
+      return wsApiCall.switchToIoServer(args.host, args.port);
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);

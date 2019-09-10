@@ -73,7 +73,7 @@ export default class WsApiClient {
   /**
    * Call api's method
    */
-  callMethod(apiMethodName: string, ...args: any[]): Promise<JsonTypes> {
+  callMethod(apiMethodName: string, ...args: any[]): Promise<any> {
     return this.remoteCall.callMethod(apiMethodName, ...args);
   }
 
