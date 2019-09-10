@@ -13,13 +13,23 @@ import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {WsCloseStatus} from 'system/interfaces/io/WebSocketClientIo';
 
 
-type ServerItem = [ WebSocket.Server, IndexedEventEmitter<AnyHandler>, WebSocket[] ];
+type ServerItem = [
+  // server instance
+  WebSocket.Server,
+  // server's events
+  IndexedEventEmitter<AnyHandler>,
+  // connection instances
+  WebSocket[],
+  // is server listening.
+  boolean
+];
 
 enum ITEM_POSITION {
   wsServer,
   events,
   // saved Socket instances
-  connections
+  connections,
+  listeningState,
 }
 
 
@@ -176,7 +186,7 @@ export default class WebSocketServer implements WebSocketServerIo {
     const server = new WebSocket.Server(props);
 
     server.on('close', () => events.emit(WsServerEvent.serverClose));
-    server.on('listening', () => events.emit(WsServerEvent.listening));
+    server.on('listening', () => this.handleServerStartListening(serverId));
     server.on('error', (err) => events.emit(WsServerEvent.serverError, err));
     server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
       this.handleIncomeConnection(serverId, socket, request);
@@ -187,7 +197,17 @@ export default class WebSocketServer implements WebSocketServerIo {
       events,
       // an empty connections
       [],
+      // not listening at the moment
+      false
     ];
+  }
+
+  private handleServerStartListening = (serverId: string) => {
+    const serverItem = this.getServerItem(serverId);
+
+    serverItem[ITEM_POSITION.listeningState] = true;
+
+    serverItem[ITEM_POSITION.events].emit(WsServerEvent.listening);
   }
 
   private async destroyServer(serverId: string) {
