@@ -43,7 +43,8 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
     await super.init();
 
-    console.info(`Using remote ioset of host "${this.joinHostPort()}"`);
+    console.info(`Using remote ioset of host "${this.joinHostPort()}".`);
+    console.info(`Remote machine: ${this.remoteHostInfo.machine} ${this.remoteHostInfo.platform}`);
   }
 
 
