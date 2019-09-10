@@ -33,7 +33,7 @@ export default class HttpApiClient {
   }
 
 
-  async callMethod(apiMethodName: string, ...args: any[]): Promise<JsonTypes> {
+  async callMethod<T = JsonTypes>(apiMethodName: string, ...args: any[]): Promise<T> {
     const url = `${this.baseUrl}/${apiMethodName}/${this.prepareArgsString(args)}`;
 
     const request: HttpDriverRequest = {
@@ -44,7 +44,7 @@ export default class HttpApiClient {
 
     const result = await this.client.fetch(request);
 
-    return this.parseResult(url, result);
+    return this.parseResult<T>(url, result);
   }
 
 
@@ -62,7 +62,7 @@ export default class HttpApiClient {
     return encodeURIComponent(result);
   }
 
-  private parseResult(url: string, result: HttpResponse): JsonTypes {
+  private parseResult<T extends JsonTypes>(url: string, result: HttpResponse): T {
     if (!result.body) {
       throw new Error(`Result of request "${url}" doesn't content body`);
     }
@@ -79,7 +79,7 @@ export default class HttpApiClient {
       throw new Error(`Result of request "${url}" doesn't content "result" in the body`);
     }
 
-    return body.result;
+    return body.result as T;
   }
 
 }

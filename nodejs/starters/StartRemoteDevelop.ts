@@ -7,13 +7,8 @@ import SystemStarter from './SystemStarter';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
-import {HttpClientIo} from '../../system/interfaces/io/HttpClientIo';
-import HttpClient from '../ios/HttpClient';
 import {compactUndefined} from '../../system/lib/arrays';
-import {HttpResponse} from '../../system/interfaces/Http';
-
-
-const httpClientIo: HttpClientIo = new HttpClient();
+import HttpApiClient from '../../shared/HttpApiClient';
 
 
 export default class StartRemoteDevelop extends StartDevelopBase {
@@ -21,6 +16,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   private remoteHostInfo?: HostInfo;
   private readonly host: string;
   private readonly port?: number;
+  private readonly httpApiClient: HttpApiClient;
 
 
   constructor(
@@ -39,10 +35,12 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
     this.host = host;
     this.port = port;
+    this.httpApiClient = new HttpApiClient(this.host);
   }
 
   async init() {
-    this.remoteHostInfo = await this.info();
+    this.remoteHostInfo = await this.httpApiClient.callMethod<HostInfo>('info');
+
     await super.init();
 
     console.info(`Using remote ioset of host "${this.joinHostPort()}"`);
@@ -51,6 +49,8 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
   async start() {
     await super.start();
+
+    // TODO: проверить тип хоста и переключить хост в режим ioServer если нужно
 
     const ioSet: IoSet = await this.makeIoSet();
     const systemStarter = new SystemStarter(this.os, this.props);
@@ -63,7 +63,6 @@ export default class StartRemoteDevelop extends StartDevelopBase {
    */
   protected async makeIoSet(): Promise<IoSet> {
     if (!this.remoteHostInfo) throw new  Error(`No remote host info`);
-
 
     const ioSet = new IoSetDevelopRemote(
       this.os,
@@ -95,26 +94,6 @@ export default class StartRemoteDevelop extends StartDevelopBase {
     return {
       platform: this.remoteHostInfo.platform,
       machine: this.remoteHostInfo.machine,
-    };
-  }
-
-  private async info(): Promise<HostInfo> {
-    // TODO: use HttpClientLogic
-    // TODO: how to switch protocol???
-    const url = `http://${this.joinHostPort()}/api/info`;
-    const result: HttpResponse = await httpClientIo.fetch({
-      method: 'get',
-      url,
-      // TODO: remove
-      headers: {},
-    });
-    // TODO: ask ioServer via http api for platform and machine
-    // TODO: set result
-    return {
-      hostType: 'ioServer',
-      platform: 'nodejs',
-      machine: 'rpi',
-      usedIo: [],
     };
   }
 
