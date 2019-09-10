@@ -5,26 +5,13 @@ import {listenScriptEnd} from '../shared/helpers';
 import {consoleError} from '../system/lib/helpers';
 
 
-export default class ApiCall {
-  /**
-   * Call device's action
-   */
-  async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
-    const apiClient = await this.connect(host, port);
-
-    const result = await apiClient.callMethod('action', deviceId, actionName, ...args);
-
-    console.info(JSON.stringify(result));
-
-    await apiClient.close();
-  }
-
+export default class WsApiCall {
   /**
    * Print device's status to console.
    * If watch param is set then it will listen to changes.
    */
   async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
-    const apiClient = await this.connect(host, port);
+    const apiClient = await this.makeClient(host, port);
 
     if (watch) {
       const handlerIndex = await apiClient.callMethod(
@@ -58,7 +45,7 @@ export default class ApiCall {
    * If watch param is set then it will listen to changes.
    */
   async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
-    const apiClient = await this.connect(host, port);
+    const apiClient = await this.makeClient(host, port);
 
     if (watch) {
       const handlerIndex = await apiClient.callMethod(
@@ -84,7 +71,7 @@ export default class ApiCall {
    * If watch param is set then it will listen to changes.
    */
   async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
-    const apiClient = await this.connect(host, port);
+    const apiClient = await this.makeClient(host, port);
 
     if (watch) {
       const handlerIndex = await apiClient.callMethod(
@@ -107,37 +94,11 @@ export default class ApiCall {
   }
 
   /**
-   * Print host's info to console
-   */
-  async reboot(host?: string, port?: string) {
-    const apiClient = await this.connect(host, port);
-
-    await apiClient.callMethod('reboot');
-
-    console.info('The remote host was rebooted successfully');
-    await apiClient.close();
-    process.exit(0);
-  }
-
-  /**
-   * Print host's info to console
-   */
-  async info(host?: string, port?: string) {
-    const apiClient = await this.connect(host, port);
-
-    const result =  await apiClient.callMethod('info');
-
-    // TODO: don't use null
-    console.info(JSON.stringify(result, null, 2));
-    await apiClient.close();
-  }
-
-  /**
    * Listen logs and print them to console
    */
   // TODO: убрать параметр по умолчанию
   async log(level: string = 'info', host?: string, port?: string) {
-    const apiClient = await this.connect(host, port);
+    const apiClient = await this.makeClient(host, port);
 
     const handlerIndex = await apiClient.callMethod('listenLog', level, (message: string) => {
       console.log(message);
@@ -146,17 +107,8 @@ export default class ApiCall {
     listenScriptEnd(() => apiClient.callMethod('removeLogListener', handlerIndex));
   }
 
-  async switchToIoServer(host?: string, port?: string) {
-    const apiClient = await this.connect(host, port);
 
-    await apiClient.callMethod('switchToIoServer');
-
-    console.info(`Switched to io server successfully`);
-    await apiClient.close();
-  }
-
-
-  private async connect(host?: string, port?: string): Promise<WsApiClient> {
+  private async makeClient(host?: string, port?: string): Promise<WsApiClient> {
     const client: WsApiClient = new WsApiClient(
       hostDefaultConfig.config.rcResponseTimoutSec,
       console.log,
@@ -171,3 +123,52 @@ export default class ApiCall {
     return client;
   }
 }
+
+//
+// async switchToIoServer(host?: string, port?: string) {
+//   const apiClient = await this.connect(host, port);
+//
+//   await apiClient.callMethod('switchToIoServer');
+//
+//   console.info(`Switched to io server successfully`);
+//   await apiClient.close();
+// }
+
+// /**
+//  * Call device's action
+//  */
+// async action(deviceId: string, actionName: string, args: string[], host?: string, port?: string) {
+//   const apiClient = await this.connect(host, port);
+//
+//   const result = await apiClient.callMethod('action', deviceId, actionName, ...args);
+//
+//   console.info(JSON.stringify(result));
+//
+//   await apiClient.close();
+// }
+
+// /**
+//  * Print host's info to console
+//  */
+// async reboot(host?: string, port?: string) {
+//   const apiClient = await this.connect(host, port);
+//
+//   await apiClient.callMethod('reboot');
+//
+//   console.info('The remote host was rebooted successfully');
+//   await apiClient.close();
+//   process.exit(0);
+// }
+//
+// /**
+//  * Print host's info to console
+//  */
+// async info(host?: string, port?: string) {
+//   const apiClient = await this.connect(host, port);
+//
+//   const result =  await apiClient.callMethod('info');
+//
+//   // TODO: don't use null
+//   console.info(JSON.stringify(result, null, 2));
+//   await apiClient.close();
+// }

@@ -2,11 +2,11 @@ import * as yargs from 'yargs';
 
 import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
-import ApiCall from './ApiCall';
+import WsApiCall from './WsApiCall';
 import {omitObj} from '../system/lib/objects';
 
 
-const apiCall = new ApiCall();
+const apiCall = new WsApiCall();
 
 
 async function startCommand(command: string, positionArgsRest: string[], args: {[index: string]: any}) {

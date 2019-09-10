@@ -17,14 +17,17 @@ const httpClientIo = new HttpClient();
 
 
 export default class HttpApiClient {
+  private readonly logDebug: (msg: string) => void;
   private readonly client: HttpClientLogic;
   private readonly baseUrl: string;
 
 
-  constructor(host: string = 'localhost', port?: number) {
+  constructor(logDebug: (msg: string) => void, host: string = 'localhost', port?: number) {
+    this.logDebug = logDebug;
     this.client = new HttpClientLogic(
       httpClientIo,
-      {}
+      {},
+      this.logDebug
     );
 
     const resolvedPort = (port) ? port : this.loadDefaultPort();
@@ -41,6 +44,8 @@ export default class HttpApiClient {
       method: 'get',
       headers: {},
     };
+
+    this.logDebug(`HttpApiClient: request url: ${url}`);
 
     const result = await this.client.fetch(request);
 

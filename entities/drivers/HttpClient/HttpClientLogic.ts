@@ -14,13 +14,15 @@ export interface HttpClientProps {
 
 
 export default class HttpClientLogic {
+  private readonly logDebug: (msg: string) => void;
   private readonly httpClientIo: HttpClientIo;
   private readonly props: HttpClientProps;
 
 
-  constructor(httpClientIo: HttpClientIo, props: HttpClientProps) {
+  constructor(httpClientIo: HttpClientIo, props: HttpClientProps, logDebug: (msg: string) => void, ) {
     this.httpClientIo = httpClientIo;
     this.props = props;
+    this.logDebug = logDebug;
   }
 
 
@@ -36,6 +38,8 @@ export default class HttpClientLogic {
       }),
       body: prepareBody(contentType, request.body),
     };
+
+    this.logDebug(`HttpClientLogic: request ${JSON.stringify(request)}`);
 
     return await this.httpClientIo.fetch(preparedRequest);
   }

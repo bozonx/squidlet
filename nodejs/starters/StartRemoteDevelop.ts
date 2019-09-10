@@ -35,7 +35,7 @@ export default class StartRemoteDevelop extends StartDevelopBase {
 
     this.host = host;
     this.port = port;
-    this.httpApiClient = new HttpApiClient(this.host);
+    this.httpApiClient = new HttpApiClient(console.log, this.host);
   }
 
   async init() {

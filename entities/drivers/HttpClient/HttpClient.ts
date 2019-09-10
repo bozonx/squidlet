@@ -17,6 +17,7 @@ export class HttpClient extends DriverBase<HttpClientProps> {
     this.client = new HttpClientLogic(
       this.httpClientIo,
       this.props,
+      this.log.debug
     );
   }
 
