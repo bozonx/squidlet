@@ -40,10 +40,6 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.openPromise = new Promised<void>();
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
-    this.connectionId = await this.mqttIo.newConnection(
-      this.props.url,
-      omitObj(this.props, 'url')
-    );
 
     await this.mqttIo.onMessage((connectionId: string, topic: string, data: string | Uint8Array) => {
       if (connectionId !== this.connectionId) return;
@@ -75,6 +71,11 @@ export class Mqtt extends DriverBase<MqttProps> {
 
       this.log.error(`Mqtt connection "${connectionId}": ${error}`);
     });
+
+    this.connectionId = await this.mqttIo.newConnection(
+      this.props.url,
+      omitObj(this.props, 'url')
+    );
 
     // wait for connection established
     await this.connectedPromise;
