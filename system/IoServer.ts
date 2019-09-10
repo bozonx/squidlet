@@ -11,9 +11,17 @@ import {pathJoin} from './lib/paths';
 import systemConfig from './systemConfig';
 import StorageIo from './interfaces/io/StorageIo';
 import {ShutdownHandler} from './System';
+import IoItem, {IoItemDefinition} from './interfaces/IoItem';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
-import IoItem, {IoItemDefinition} from './interfaces/IoItem';
+// TODO: use ioSet's - use driver
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../entities/drivers/HttpServer/HttpServerLogic';
+import {HttpServerIo, HttpServerProps} from './interfaces/io/HttpServerIo';
+import {ParsedUrl, parseUrl} from './lib/url';
+import {prepareRoute} from './lib/route';
+import HostInfo, {HostType} from './interfaces/HostInfo';
+import {HttpApiBody} from '../entities/services/HttpApi/HttpApi';
+import Platforms from './interfaces/Platforms';
 
 
 export const METHOD_DELIMITER = '.';
@@ -23,13 +31,22 @@ const initCfg: InitializationConfig = initializationConfig();
 export default class IoServer {
   private readonly ioSet: IoSet;
   private readonly shutdownRequest: ShutdownHandler;
-  private hostConfig?: HostConfig;
+  private _hostConfig?: HostConfig;
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private remoteCall?: RemoteCall;
   private connectionId?: string;
+  private _httpServer?: HttpServerLogic;
   private _wsServer?: WsServerLogic;
+
+  private get hostConfig(): HostConfig {
+    return this._hostConfig as any;
+  }
+
+  private get httpServer(): HttpServerLogic {
+    return this._httpServer as any;
+  }
 
   private get wsServer(): WsServerLogic {
     return this._wsServer as any;
@@ -52,12 +69,13 @@ export default class IoServer {
   }
 
   async start() {
-    this.hostConfig = await this.loadConfig<HostConfig>(initCfg.fileNames.hostConfig);
+    this._hostConfig = await this.loadConfig<HostConfig>(initCfg.fileNames.hostConfig);
 
     this.logInfo('--> Configuring Io');
     await this.configureIoSet();
 
-    this.logInfo('--> Initializing websocket server');
+    this.logInfo('--> Initializing websocket and http servers');
+    await this.initHttpApiServer();
     await this.initWsIoServer();
 
     this.logInfo('===> IoServer initialization has been finished');
@@ -65,6 +83,7 @@ export default class IoServer {
 
   destroy = async () => {
     this.logInfo('... destroying IoServer');
+    await this.httpServer.destroy();
     await this.wsServer.destroy();
     this.remoteCall && await this.remoteCall.destroy();
   }
@@ -82,8 +101,6 @@ export default class IoServer {
     }
 
     this.connectionId = connectionId;
-
-    if (!this.hostConfig) return this.logError(`No host config`);
 
     this.remoteCall = new RemoteCall(
       this.sendToClient,
@@ -144,10 +161,6 @@ export default class IoServer {
     return IoItem[methodName](...args);
   }
 
-  private handleClose = () => {
-    this.logError(`Websocket server has been closed`);
-  }
-
   private async loadConfig<T>(configFileName: string): Promise<T> {
     const pathToFile = pathJoin(
       systemConfig.rootDirs.envSet,
@@ -161,19 +174,37 @@ export default class IoServer {
     return JSON.parse(configStr);
   }
 
+  private async initHttpApiServer() {
+    // TODO: где берем хост и порт???
+    const props: HttpServerProps = { host: '0.0.0.0', port: 8087 };
+    const httpServerIo = this.ioSet.getIo<HttpServerIo>('HttpServer');
+
+    this._httpServer = new HttpServerLogic(
+      httpServerIo,
+      props,
+      () => this.logError(`Http server has been closed`),
+      this.logDebug,
+      this.logInfo,
+      this.logError,
+    );
+
+    await this.httpServer.init();
+
+    this.httpServer.onRequest(this.handleHttpRequest);
+  }
+
   private async initWsIoServer() {
-    if (!this.hostConfig || !this.hostConfig.ioServer) {
+    if (!this.hostConfig.ioServer) {
       throw new Error(`Can't init ioServer because it isn't allowed in a host config`);
     }
 
     const wsServerIo = this.ioSet.getIo<WebSocketServerIo>('WebSocketServer');
-    // TODO: ioServer может быть не указан
     const props = this.hostConfig.ioServer;
 
     this._wsServer = new WsServerLogic(
       wsServerIo,
       props,
-      this.handleClose,
+      () => this.logError(`Websocket server has been closed`),
       this.logDebug,
       this.logInfo,
       this.logError,
@@ -203,6 +234,44 @@ export default class IoServer {
 
       ioItem.configure && await ioItem.configure(ioParams[ioName]);
     }
+  }
+
+  private handleHttpRequest = async (request: HttpDriverRequest): Promise<HttpDriverResponse> => {
+    const parsedUrl: ParsedUrl = parseUrl(request.url);
+
+    if (!parsedUrl.path) {
+      return this.makeHttpApiErrorResponse(`Unsupported api call: not path part in the url`);
+    }
+
+    const preparedPath: string = prepareRoute(parsedUrl.path);
+
+    if (preparedPath !== '/api/info') {
+      return this.makeHttpApiErrorResponse(`Unsupported api call: "${preparedPath}"`);
+    }
+
+    const info: HostInfo = {
+      hostType: 'ioServer',
+      platform: this.hostConfig.platform,
+      machine: this.hostConfig.machine,
+      usedIo: this.ioSet.getNames(),
+    };
+
+    const body: HttpApiBody = {
+      result: info,
+    };
+
+    return { body };
+  }
+
+  private makeHttpApiErrorResponse(error: string): HttpDriverResponse {
+    const body: HttpApiBody = {
+      error,
+    };
+
+    return {
+      status: 500,
+      body
+    };
   }
 
 }
