@@ -33,11 +33,13 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
       this.log.info,
       this.log.error
     );
+
+    await this.server.init();
   }
 
-  protected appDidInit = async () => {
-    this.server && await this.server.init();
-  }
+  // protected appDidInit = async () => {
+  //   this.server && await this.server.init();
+  // }
 
   destroy = async () => {
     if (!this.server) return;
