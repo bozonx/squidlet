@@ -76,9 +76,6 @@ export class Mqtt extends DriverBase<MqttProps> {
       this.props.url,
       omitObj(this.props, 'url')
     );
-
-    // wait for connection established
-    await this.connectedPromise;
   }
 
   destroy = async () => {

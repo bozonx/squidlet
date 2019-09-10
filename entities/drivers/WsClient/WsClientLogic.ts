@@ -92,9 +92,6 @@ export default class WsClientLogic {
     this.connectionId = await this.wsClientIo.newConnection(connectionProps);
 
     await this.listen();
-
-    // listen for connection established
-    //await this.connectedPromise;
   }
 
   async destroy() {

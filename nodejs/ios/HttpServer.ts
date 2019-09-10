@@ -10,11 +10,10 @@ import {
 } from 'system/interfaces/io/HttpServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
-import {WAIT_RESPONSE_TIMEOUT} from 'system/constants';
+import {WAIT_RESPONSE_TIMEOUT_SEC} from 'system/constants';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import {callPromised} from 'system/lib/common';
 import {HttpRequest, HttpResponse} from 'system/interfaces/Http';
-import {WsServerEvent} from '../../system/interfaces/io/WebSocketServerIo';
 
 
 type ServerItem = [
@@ -47,8 +46,8 @@ export default class HttpServer implements HttpServerIo {
       // destroy events of server
       this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
 
-      // TODO: what to do ????
-      //await this.destroyServer(serverId);
+      // TODO: not emit events
+      await this.closeServer(serverId);
     }
   }
 
@@ -133,19 +132,6 @@ export default class HttpServer implements HttpServerIo {
         });
     });
 
-    /*
-      // Your own super cool function
-      var logger = function(req, res, next) {
-          console.log("GOT REQUEST !");
-          next(); // Passing the request to the next handler in the stack.
-      }
-
-      app.configure(function(){
-          app.use(logger); // Here you add your logger to the stack.
-          app.use(app.router); // The Express routes handler.
-      });
-     */
-
     const server: Server = app.listen(props.port, props.host, () => this.handleServerStartListening(serverId));
 
     server.on('error', (err: Error) => events.emit(HttpServerEvent.serverError, String(err)));
@@ -194,7 +180,7 @@ export default class HttpServer implements HttpServerIo {
       waitTimeout = setTimeout(() => {
         events.removeListener(RESPONSE_EVENT, handlerIndex);
         reject(`Timeout has been exceeded. Server ${serverId}. ${req.method} ${req.url}`);
-      }, WAIT_RESPONSE_TIMEOUT);
+      }, WAIT_RESPONSE_TIMEOUT_SEC * 1000);
 
       events.emit(HttpServerEvent.request, requestId, httpRequest);
     });
