@@ -95,7 +95,13 @@ export default class WebSocketServer implements WebSocketServerIo {
   async onServerListening(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.listening, cb);
+    if (serverItem[ITEM_POSITION.listeningState]) {
+      cb();
+
+      return -1;
+    }
+
+    return serverItem[ITEM_POSITION.events].once(WsServerEvent.listening, cb);
   }
 
   async onServerClose(serverId: string, cb: () => void): Promise<number> {

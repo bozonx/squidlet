@@ -14,17 +14,28 @@ import {WAIT_RESPONSE_TIMEOUT} from 'system/constants';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import {callPromised} from 'system/lib/common';
 import {HttpRequest, HttpResponse} from 'system/interfaces/Http';
+import {WsServerEvent} from '../../system/interfaces/io/WebSocketServerIo';
 
+
+type ServerItem = [
+  // Express app
+  Express,
+  // Http server instance
+  Server,
+  // server's events
+  IndexedEventEmitter<AnyHandler>,
+  // is server listening.
+  boolean
+];
 
 enum ITEM_POSITION {
   app,
   server,
   events,
+  listeningState
 }
 
 const RESPONSE_EVENT = 'res';
-
-type ServerItem = [ Express, Server, IndexedEventEmitter<AnyHandler> ];
 
 
 export default class HttpServer implements HttpServerIo {
@@ -80,7 +91,13 @@ export default class HttpServer implements HttpServerIo {
   async onServerListening(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[ITEM_POSITION.events].addListener(HttpServerEvent.listening, cb);
+    if (serverItem[ITEM_POSITION.listeningState]) {
+      cb();
+
+      return -1;
+    }
+
+    return serverItem[ITEM_POSITION.events].once(HttpServerEvent.listening, cb);
   }
 
   async onRequest(serverId: string, cb: HttpRequestHandler): Promise<number> {
@@ -129,7 +146,7 @@ export default class HttpServer implements HttpServerIo {
       });
      */
 
-    const server: Server = app.listen(props.port, props.host, () => events.emit(HttpServerEvent.listening));
+    const server: Server = app.listen(props.port, props.host, () => this.handleServerStartListening(serverId));
 
     server.on('error', (err: Error) => events.emit(HttpServerEvent.serverError, String(err)));
     server.on('close', () => events.emit(HttpServerEvent.serverClose));
@@ -138,7 +155,17 @@ export default class HttpServer implements HttpServerIo {
       app,
       server,
       events,
+      // not listening at the moment
+      false
     ];
+  }
+
+  private handleServerStartListening = (serverId: string) => {
+    const serverItem = this.getServerItem(serverId);
+
+    serverItem[ITEM_POSITION.listeningState] = true;
+
+    serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
   }
 
   private handleIncomeRequest(serverId: string, req: Request, res: Response): Promise<void> {
