@@ -66,7 +66,6 @@ export default class StartIoServerStandalone extends StartDevelopBase {
   protected async makeIoSet(): Promise<IoSet> {
     const ioSet: IoSet = new IoSetDevelopSrc(this.os, this.envBuilder);
 
-    ioSet.prepare && await ioSet.prepare();
     ioSet.init && await ioSet.init();
     await this.configureStorage(ioSet);
 

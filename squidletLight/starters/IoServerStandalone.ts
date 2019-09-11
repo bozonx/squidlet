@@ -50,7 +50,7 @@ export class IoServerStandalone {
   private async makeIoSet(): Promise<IoSet> {
     const ioSet: IoSet = new IoSetBuiltin();
 
-    ioSet.prepare && await ioSet.prepare();
+    //ioSet.prepare && await ioSet.prepare();
     ioSet.init && await ioSet.init();
 
     return ioSet;

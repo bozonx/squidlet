@@ -16,7 +16,7 @@ export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
   private readonly remoteIoNames: string[];
-  private storageWrapper?: StorageEnvMemoryWrapper;
+  private readonly storageWrapper: StorageEnvMemoryWrapper;
   private wrappedStorageIo?: StorageIo;
   private remoteIoCollection: RemoteIoCollection;
 
@@ -32,9 +32,7 @@ export default class IoSetDevelopRemote implements IoSet {
     this.envBuilder = envBuilder;
     this.remoteIoNames = remoteIoNames;
     this.remoteIoCollection = new RemoteIoCollection(this.remoteIoNames, host, port);
-  }
 
-  async prepare() {
     console.info(`===> generate development envSet`);
 
     const envSet: HostEnvSet = this.envBuilder.generateDevelopEnvSet();

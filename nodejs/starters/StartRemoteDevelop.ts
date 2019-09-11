@@ -73,8 +73,6 @@ export default class StartRemoteDevelop extends StartDevelopBase {
       this.port
     );
 
-    ioSet.prepare && await ioSet.prepare();
-
     return ioSet;
   }
 

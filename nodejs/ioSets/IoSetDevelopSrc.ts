@@ -17,7 +17,7 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 export default class IoSetDevelopSrc implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
-  private storageWrapper?: StorageEnvMemoryWrapper;
+  private readonly storageWrapper: StorageEnvMemoryWrapper;
   private ioCollection: {[index: string]: IoItem} = {};
 
 
@@ -25,9 +25,6 @@ export default class IoSetDevelopSrc implements IoSet {
     this.os = os;
     this.envBuilder = envBuilder;
 
-  }
-
-  async prepare() {
     console.info(`===> generate development envSet`);
 
     const envSet: HostEnvSet = this.envBuilder.generateDevelopEnvSet();
