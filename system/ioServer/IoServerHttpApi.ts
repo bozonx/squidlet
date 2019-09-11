@@ -1,16 +1,39 @@
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 import {ParsedUrl, parseUrl} from '../lib/url';
 import {prepareRoute} from '../lib/route';
 import HostInfo from '../interfaces/HostInfo';
-import {HttpApiBody} from '../../entities/services/HttpApi/HttpApi';
 import {HttpServerIo, HttpServerProps} from '../interfaces/io/HttpServerIo';
+import {HttpApiBody} from '../../entities/services/HttpApi/HttpApi';
+import IoSet from '../interfaces/IoSet';
+import HostConfig from '../interfaces/HostConfig';
+// TODO: use from system's interfaces
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
+
 
 export default class IoServerHttpApi {
-  private httpServer?: HttpServerLogic;
+  private readonly ioSet: IoSet;
+  private readonly hostConfig: HostConfig;
+  private readonly logDebug: (msg: string) => void;
+  private readonly logInfo: (msg: string) => void;
+  private readonly logError: (msg: string) => void;
+  private _httpServer?: HttpServerLogic;
+
+  private get httpServer(): HttpServerLogic {
+    return this._httpServer as any;
+  }
 
 
-  constructor() {
-
+  constructor(
+    ioSet: IoSet,
+    hostConfig: HostConfig,
+    logDebug: (msg: string) => void,
+    logInfo: (msg: string) => void,
+    logError: (msg: string) => void
+  ) {
+    this.ioSet = ioSet;
+    this.hostConfig = hostConfig;
+    this.logDebug = logDebug;
+    this.logInfo = logInfo;
+    this.logError = logError;
   }
 
   async init() {
@@ -18,7 +41,7 @@ export default class IoServerHttpApi {
     const props: HttpServerProps = { host: '0.0.0.0', port: 8087 };
     const httpServerIo = this.ioSet.getIo<HttpServerIo>('HttpServer');
 
-    this.httpServer = new HttpServerLogic(
+    this._httpServer = new HttpServerLogic(
       httpServerIo,
       props,
       () => this.logError(`Http server has been closed`),
@@ -35,7 +58,7 @@ export default class IoServerHttpApi {
   async destroy() {
     await this.httpServer.destroy();
 
-    delete this.httpServer;
+    delete this._httpServer;
   }
 
 
@@ -52,18 +75,20 @@ export default class IoServerHttpApi {
       return this.makeHttpApiErrorResponse(`Unsupported api call: "${preparedPath}"`);
     }
 
-    const info: HostInfo = {
+    const body: HttpApiBody = {
+      result: this.makeHostInfo(),
+    };
+
+    return { body };
+  }
+
+  private makeHostInfo(): HostInfo {
+    return {
       hostType: 'ioServer',
       platform: this.hostConfig.platform,
       machine: this.hostConfig.machine,
       usedIo: this.ioSet.getNames(),
     };
-
-    const body: HttpApiBody = {
-      result: info,
-    };
-
-    return { body };
   }
 
   private makeHttpApiErrorResponse(error: string): HttpDriverResponse {

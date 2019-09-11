@@ -4,7 +4,10 @@ import RemoteCall from '../lib/remoteCall/RemoteCall';
 import {makeUniqId} from '../lib/uniqId';
 import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 import {deserializeJson, serializeJson} from '../lib/serialize';
-import {METHOD_DELIMITER} from './';
+
+
+export const METHOD_DELIMITER = '.';
+
 
 /**
  * Serving of connection to IO server

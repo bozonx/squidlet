@@ -8,14 +8,6 @@ import systemConfig from '../systemConfig';
 import StorageIo from '../interfaces/io/StorageIo';
 import {ShutdownHandler} from '../System';
 import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
-import {HttpServerIo, HttpServerProps} from '../interfaces/io/HttpServerIo';
-import {ParsedUrl, parseUrl} from '../lib/url';
-import {prepareRoute} from '../lib/route';
-import HostInfo from '../interfaces/HostInfo';
-// TODO: use from system's interfaces
-import {HttpApiBody} from '../../entities/services/HttpApi/HttpApi';
-// TODO: use from system's interfaces
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
 
@@ -24,7 +16,6 @@ import IoServerHttpApi from './IoServerHttpApi';
 
 
 
-export const METHOD_DELIMITER = '.';
 const initCfg: InitializationConfig = initializationConfig();
 
 
@@ -35,7 +26,6 @@ export default class IoServer {
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
-  private connectionId?: string;
   private _wsServer?: WsServerLogic;
   private ioConnection?: IoServerConnection;
   private httpApi?: IoServerHttpApi;
@@ -71,9 +61,7 @@ export default class IoServer {
     await this.configureIoSet();
 
     this.logInfo('--> Initializing websocket and http servers');
-    this.httpApi = new IoServerHttpApi();
-
-    await this.httpApi.init();
+    await this.startHttpApi();
     await this.initWsIoServer();
 
     this.logInfo('===> IoServer initialization has been finished');
@@ -90,7 +78,7 @@ export default class IoServer {
 
 
   private handleNewIoClientConnection = async (connectionId: string) => {
-    if (this.connectionId) {
+    if (this.ioConnection) {
       const msg = `Only one connection is allowed`;
 
       this.logError(msg);
@@ -99,9 +87,7 @@ export default class IoServer {
       return;
     }
 
-    // TODO: move to ioConnection
-    this.connectionId = connectionId;
-    this.ioConnection = new IoServerConnection(this.connectionId, this.logDebug, this.logError);
+    this.ioConnection = new IoServerConnection(connectionId, this.logDebug, this.logError);
 
     await this.ioConnection.init();
 
@@ -114,15 +100,25 @@ export default class IoServer {
   }
 
   private handleIoClientCloseConnection = async () => {
-    delete this.connectionId;
-
     this.ioConnection && await this.ioConnection.destroy();
-
-    // TODO: что если destroy не прошел
 
     delete this.ioConnection;
 
     this.logInfo(`IO client has been disconnected`);
+    this.logInfo(`Starting own http api`);
+    await this.startHttpApi();
+  }
+
+  private async startHttpApi() {
+    this.httpApi = new IoServerHttpApi(
+      this.ioSet,
+      this.hostConfig,
+      this.logDebug,
+      this.logInfo,
+      this.logError
+    );
+
+    await this.httpApi.init();
   }
 
   private async loadConfig<T>(configFileName: string): Promise<T> {
