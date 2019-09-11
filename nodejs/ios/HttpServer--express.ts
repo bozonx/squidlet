@@ -1,4 +1,7 @@
-import {createServer, IncomingMessage, Server, ServerResponse} from 'http';
+// @ts-ignore
+import express from 'express';
+import {Express, NextFunction, Request, Response} from 'express';
+import {Server} from 'http';
 
 import {
   HttpRequestHandler,
@@ -15,6 +18,8 @@ import {HttpRequest, HttpResponse} from 'system/interfaces/Http';
 
 
 type ServerItem = [
+  // Express app
+  Express,
   // Http server instance
   Server,
   // server's events
@@ -24,6 +29,7 @@ type ServerItem = [
 ];
 
 enum ITEM_POSITION {
+  app,
   server,
   events,
   listeningState
@@ -115,17 +121,25 @@ export default class HttpServer implements HttpServerIo {
 
   private makeServer(serverId: string, props: HttpServerProps): ServerItem {
     const events = new IndexedEventEmitter();
-    const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {
-        this.handleIncomeRequest(serverId, req, res)
-          .catch((err) => events.emit(HttpServerEvent.serverError, err));
+    const app: Express = express();
+
+    app.all('*', (req: Request, res: Response, next: NextFunction) => {
+      this.handleIncomeRequest(serverId, req, res)
+        .then(next)
+        .catch((err) => {
+          events.emit(HttpServerEvent.serverError, err);
+          // TODO: проверить что вернуться в случае ошибки
+          next(err);
+        });
     });
+
+    const server: Server = app.listen(props.port, props.host, () => this.handleServerStartListening(serverId));
 
     server.on('error', (err: Error) => events.emit(HttpServerEvent.serverError, String(err)));
     server.on('close', () => events.emit(HttpServerEvent.serverClose));
 
-    server.listen(props.port, props.host, () => this.handleServerStartListening(serverId));
-
     return [
+      app,
       server,
       events,
       // not listening at the moment
@@ -141,8 +155,7 @@ export default class HttpServer implements HttpServerIo {
     serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
   }
 
-  private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
-    // TODO: review
+  private handleIncomeRequest(serverId: string, req: Request, res: Response): Promise<void> {
     const events = this.servers[Number(serverId)][ITEM_POSITION.events];
 
     return new Promise<void>((resolve, reject) => {
@@ -174,8 +187,15 @@ export default class HttpServer implements HttpServerIo {
     });
   }
 
-  private makeRequestObject(req: IncomingMessage): HttpRequest {
-    // TODO: review
+  private getServerItem(serverId: string): ServerItem {
+    if (!this.servers[Number(serverId)]) {
+      throw new Error(`РеезServer: Server "${serverId}" hasn't been found`);
+    }
+
+    return this.servers[Number(serverId)];
+  }
+
+  private makeRequestObject(req: Request): HttpRequest {
     let body: string | Buffer | undefined;
 
     if (typeof req.body === 'string') {
@@ -196,7 +216,6 @@ export default class HttpServer implements HttpServerIo {
   }
 
   private setupResponse(response: HttpResponse, expressRes: Response) {
-    // TODO: review
     for (let headerName of Object.keys(response.headers)) {
       expressRes.setHeader(headerName, (response.headers as any)[headerName]);
     }
@@ -209,14 +228,6 @@ export default class HttpServer implements HttpServerIo {
     else {
       // TODO: support of Buffer - convert from Uint8Arr to Buffer
     }
-  }
-
-  private getServerItem(serverId: string): ServerItem {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`РеезServer: Server "${serverId}" hasn't been found`);
-    }
-
-    return this.servers[Number(serverId)];
   }
 
 }
