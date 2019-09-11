@@ -2,6 +2,23 @@ import IoSet from '../system/interfaces/IoSet';
 import IoItem from '../system/interfaces/IoItem';
 import {pathJoin} from '../system/lib/paths';
 import systemConfig from '../system/systemConfig';
+import HttpServer from '../nodejs/ios/HttpServer';
+import Storage from '../nodejs/ios/Storage';
+import Sys from '../lowjs/ios/Sys';
+import WebSocketServer from '../nodejs/ios/WebSocketServer';
+import WebSocketClient from '../nodejs/ios/WebSocketClient';
+import HttpClient from '../nodejs/ios/HttpClient';
+
+
+// TODO: remake
+const ioClasses: {[index: string]: any} = {
+  HttpClient,
+  HttpServer,
+  Storage,
+  Sys,
+  WebSocketClient,
+  WebSocketServer,
+};
 
 
 export default class IoSetBuiltin implements IoSet {
@@ -13,14 +30,6 @@ export default class IoSetBuiltin implements IoSet {
    * It will be called on system start
    */
   async init(): Promise<void> {
-    const pathToIoSetIndex = pathJoin(
-      systemConfig.rootDirs.envSet,
-      systemConfig.envSetDirs.ios,
-    );
-
-    // Load io collection workDir/io/index.js
-    const ioClasses = this.requireIoSetIndex(pathToIoSetIndex);
-
     // make dev instances
     for (let ioName of Object.keys(ioClasses)) {
       this.ioCollection[ioName] = new ioClasses[ioName]();
@@ -44,9 +53,4 @@ export default class IoSetBuiltin implements IoSet {
     return Object.keys(this.ioCollection);
   }
 
-
-  // it is need for test purpose
-  private requireIoSetIndex(pathToIoSetIndex: string): {[index: string]: new () => IoItem} {
-    return require(pathToIoSetIndex);
-  }
 }
