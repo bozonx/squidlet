@@ -182,13 +182,13 @@ export default class HttpServer implements HttpServerIo {
 
     //req.
 
-    if (typeof req.body === 'string') {
-      body = req.body;
-    }
-    else {
-      // TODO: convert Uint8Array to Buffer
-      body = req.body;
-    }
+    // if (typeof req.body === 'string') {
+    //   body = req.body;
+    // }
+    // else {
+    //   // TODO: convert Uint8Array to Buffer
+    //   body = req.body;
+    // }
 
     console.log(111111, req.method, req.url, req.headers);
 

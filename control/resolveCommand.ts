@@ -22,7 +22,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'log':
       return wsApiCall.log(args.level, args.host, args.port);
     case 'action':
-      return wsApiCall.action(
+      return httpApiCall.action(
         positionArgsRest[0],
         positionArgsRest[1],
         positionArgsRest.slice(2),
@@ -36,11 +36,13 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
     case 'state':
       return wsApiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
     case 'reboot':
-      return wsApiCall.reboot(args.host, args.port);
+      return httpApiCall.reboot(args.host, args.port);
     case 'info':
       return httpApiCall.info(args.host, args.port);
     case 'switch-to-ioserver':
-      return wsApiCall.switchToIoServer(args.host, args.port);
+      return httpApiCall.switchToIoServer(args.host, args.port);
+    case 'switch-to-app':
+      return httpApiCall.switchToApp(args.host, args.port);
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);

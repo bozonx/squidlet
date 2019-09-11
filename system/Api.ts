@@ -79,6 +79,10 @@ export default class Api {
     this.context.system.shutdownRequest('switchToIoServer');
   }
 
+  switchToApp() {
+    return `Can't switch to app because app is already running`;
+  }
+
   republishWholeState() {
     // TODO: publish all the states of all the devices etc
   }

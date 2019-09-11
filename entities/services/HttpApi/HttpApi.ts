@@ -24,6 +24,7 @@ const allowedApiMethodsToCall = [
   //'getSessionStore',
   'republishWholeState',
   'switchToIoServer',
+  'switchToApp',
   'reboot',
 ];
 

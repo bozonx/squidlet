@@ -12,7 +12,7 @@ import WebSocketClient from '../nodejs/ios/WebSocketClient';
 const ioClasses: {[index: string]: any} = {
   //HttpClient,
   HttpServer,
-  Storage,
+  //Storage,
   Sys,
   WebSocketClient,
   WebSocketServer,

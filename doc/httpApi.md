@@ -38,6 +38,10 @@ Categories:
 ## Switch app to IO server
 
     /api/switchToIoServer
+    
+## Switch IO server to app
+
+    /api/switchToApp
 
 ## Reboot host
 

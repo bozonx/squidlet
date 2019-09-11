@@ -191,7 +191,13 @@ Params
 
 ## Switch to io server
 
-Switch host to io server for development purpose.
+Switch app to io server for development purpose.
 It reboot a micro-controller and boots to io-server mode.
 
     squidletctl switch-to-ioserver --host=my-host [--port=8089]
+
+## Switch to io server
+
+Switch io server to app.
+
+    squidletctl switch-to-app --host=my-host [--port=8089]
