@@ -190,10 +190,10 @@ export default class HttpServer implements HttpServerIo {
     //   body = req.body;
     // }
 
-    console.log(111111, req.method, req.url, req.headers);
+    //console.log(111111, req.method, req.url, req.headers);
 
     return  {
-      // method in express's request is in upper case format
+      // method of http request is in upper case format
       method: (req.method || 'get').toLowerCase() as any,
       url: req.url || '',
       headers: req.headers as any,
@@ -202,8 +202,6 @@ export default class HttpServer implements HttpServerIo {
   }
 
   private setupResponse(response: HttpResponse, httpRes: ServerResponse) {
-    // TODO: проверить чтобы headers были в нужном формате - ??? Content-Type
-    //console.log('-------- headers res', response.headers);
     httpRes.writeHead(response.status, response.headers as {[index: string]: string});
 
     if (typeof response.body === 'string') {
