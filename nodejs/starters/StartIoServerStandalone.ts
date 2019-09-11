@@ -21,6 +21,8 @@ export default class StartIoServerStandalone extends StartDevelopBase {
 
   // TODO: review
   async destroy() {
+    // TODO: destroy ioServer
+
     if (!this.ioSet) throw new Error(`No IoSet`);
 
     // destroy of ios
