@@ -120,6 +120,7 @@ export default class IoServer {
     this.httpApi = new IoServerHttpApi(
       this.ioSet,
       this.hostConfig,
+      this.shutdownRequest,
       this.logDebug,
       this.logInfo,
       this.logError
