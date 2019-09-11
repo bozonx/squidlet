@@ -20,6 +20,7 @@ import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../enti
 import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
 
 import IoServerConnection from './IoServerConnection';
+import IoServerHttpApi from './IoServerHttpApi';
 
 
 
@@ -35,9 +36,9 @@ export default class IoServer {
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
   private connectionId?: string;
-  private httpServer?: HttpServerLogic;
   private _wsServer?: WsServerLogic;
   private ioConnection?: IoServerConnection;
+  private httpApi?: IoServerHttpApi;
 
   private get hostConfig(): HostConfig {
     return this._hostConfig as any;
@@ -70,7 +71,9 @@ export default class IoServer {
     await this.configureIoSet();
 
     this.logInfo('--> Initializing websocket and http servers');
-    await this.initHttpApiServer();
+    this.httpApi = new IoServerHttpApi();
+
+    await this.httpApi.init();
     await this.initWsIoServer();
 
     this.logInfo('===> IoServer initialization has been finished');
@@ -78,11 +81,10 @@ export default class IoServer {
 
   destroy = async () => {
     this.logInfo('... destroying IoServer');
-    this.httpServer && await this.httpServer.destroy();
-    await this.wsServer.destroy();
+    this.httpApi && await this.httpApi.init();
     this.ioConnection && await this.ioConnection.destroy();
+    await this.wsServer.destroy();
 
-    delete this.httpServer;
     delete this.ioConnection;
   }
 
@@ -104,9 +106,9 @@ export default class IoServer {
     await this.ioConnection.init();
 
     // stop IoServer's http api server to not to busy the port
-    this.httpServer && await this.httpServer.destroy();
+    this.httpApi && await this.httpApi.destroy();
 
-    delete this.httpServer;
+    delete this.httpApi;
 
     this.logInfo(`New IO client has been connected`);
   }
@@ -134,25 +136,6 @@ export default class IoServer {
     const configStr: string = await storage.readFile(pathToFile);
 
     return JSON.parse(configStr);
-  }
-
-  private async initHttpApiServer() {
-    // TODO: где берем хост и порт???
-    const props: HttpServerProps = { host: '0.0.0.0', port: 8087 };
-    const httpServerIo = this.ioSet.getIo<HttpServerIo>('HttpServer');
-
-    this.httpServer = new HttpServerLogic(
-      httpServerIo,
-      props,
-      () => this.logError(`Http server has been closed`),
-      this.logDebug,
-      this.logInfo,
-      this.logError,
-    );
-
-    await this.httpServer.init();
-
-    this.httpServer.onRequest(this.handleHttpRequest);
   }
 
   private async initWsIoServer() {
@@ -202,44 +185,6 @@ export default class IoServer {
 
       ioItem.configure && await ioItem.configure(ioParams[ioName]);
     }
-  }
-
-  private handleHttpRequest = async (request: HttpDriverRequest): Promise<HttpDriverResponse> => {
-    const parsedUrl: ParsedUrl = parseUrl(request.url);
-
-    if (!parsedUrl.path) {
-      return this.makeHttpApiErrorResponse(`Unsupported api call: not path part in the url`);
-    }
-
-    const preparedPath: string = prepareRoute(parsedUrl.path);
-
-    if (preparedPath !== '/api/info') {
-      return this.makeHttpApiErrorResponse(`Unsupported api call: "${preparedPath}"`);
-    }
-
-    const info: HostInfo = {
-      hostType: 'ioServer',
-      platform: this.hostConfig.platform,
-      machine: this.hostConfig.machine,
-      usedIo: this.ioSet.getNames(),
-    };
-
-    const body: HttpApiBody = {
-      result: info,
-    };
-
-    return { body };
-  }
-
-  private makeHttpApiErrorResponse(error: string): HttpDriverResponse {
-    const body: HttpApiBody = {
-      error,
-    };
-
-    return {
-      status: 500,
-      body
-    };
   }
 
 }
