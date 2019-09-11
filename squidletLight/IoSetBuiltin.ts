@@ -8,7 +8,7 @@ import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import StorageEnvMemoryWrapper from '../shared/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
-// import HttpClient from '../nodejs/ios/HttpClient';
+import StorageIo from '../system/interfaces/io/StorageIo';
 
 
 // TODO: remake
@@ -67,7 +67,7 @@ export default class IoSetBuiltin implements IoSet {
   async init(): Promise<void> {
     // make dev instances
     for (let ioName of Object.keys(ioClasses)) {
-      this.ioCollection[ioName] = new ioClasses[ioName]();
+      this.ioCollection[ioName] = this.instantiateIo(ioName, ioClasses[ioName]);
     }
   }
 
@@ -86,6 +86,17 @@ export default class IoSetBuiltin implements IoSet {
 
   getNames(): string[] {
     return Object.keys(this.ioCollection);
+  }
+
+
+  private instantiateIo(ioName: string, IoItemClass: new () => IoItem): IoItem {
+    // make wrapper of Storage to get configs and manifests from memory
+    if (ioName === 'Storage') {
+      return this.storageWrapper.makeWrapper(new IoItemClass() as StorageIo);
+    }
+    else {
+      return new IoItemClass();
+    }
   }
 
 }
