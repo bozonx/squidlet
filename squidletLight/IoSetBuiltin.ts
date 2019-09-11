@@ -9,6 +9,7 @@ import StorageEnvMemoryWrapper from '../shared/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import StorageIo from '../system/interfaces/io/StorageIo';
+import I2cMaster from '../lowjs/ios/I2cMaster';
 
 
 // TODO: remake
@@ -19,6 +20,7 @@ const ioClasses: {[index: string]: any} = {
   Sys,
   WebSocketClient,
   WebSocketServer,
+  I2cMaster,
 };
 // TODO: remake
 const envSet: HostEnvSet = {
@@ -26,7 +28,7 @@ const envSet: HostEnvSet = {
     config: {
       id: 'lowjs-test',
       platform: 'lowjs',
-      machine: 'esp32',
+      machine: 'esp32wrover',
       ...hostDefaultConfig,
       ioServer: {
         ...hostDefaultConfig.ioServer,

@@ -1,0 +1,16 @@
+# ./squidletctl start ./test/test-esp32wrover.yaml
+
+id: testHost
+config: {}
+
+httpApi:
+  host: 0.0.0.0
+wsApi:
+  host: 0.0.0.0
+ioServer:
+  host: 0.0.0.0
+
+devices:
+  bedroom:
+    people-count-sensor:
+      device: FakePeopleCount

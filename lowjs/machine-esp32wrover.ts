@@ -3,19 +3,22 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 const machineConfig: MachineConfig = {
   ios: [
-    '../shared/nodejs/Storage.ts',
-    '../shared/nodejs/WebSocketClient.js',
-    '../shared/nodejs/WebSocketServer.ts',
-    //'Sha1',
-    './ios/Digital.ts',
-    //'Pwm',
-    //'Serial',
-    //'Spi',
-    './ios/Wifi',
-    //'Bluetooth',
-    './ios/I2cMaster.ts',
+    //'./ios/Mqtt.ts',
+    './nodejs/ios/Storage.ts',
+    './nodejs/ios/WebSocketClient.ts',
+    './nodejs/ios/WebSocketServer.ts',
+    './ios/Sys.ts',
+    './nodejs/ios/HttpClient.ts',
+    './nodejs/ios/HttpServer.ts',
 
-    //'Mqtt',
+    //'./ios/Digital.ts',
+    './ios/I2cMaster.ts',
+    //'Serial',
+
+    //'Pwm',
+    //'Spi',
+    //'./ios/Wifi',
+    //'Bluetooth',
 
     //'Adc',
     //'Dac',
