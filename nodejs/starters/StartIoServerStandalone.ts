@@ -1,4 +1,4 @@
-import IoServer from '../../system/IoServer';
+import IoServer from '../../system/ioServer/IoServer';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';

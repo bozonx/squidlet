@@ -1,23 +1,23 @@
-import IoSet from './interfaces/IoSet';
-import WebSocketServerIo from './interfaces/io/WebSocketServerIo';
-import HostConfig from './interfaces/HostConfig';
-import InitializationConfig from './interfaces/InitializationConfig';
-import initializationConfig from './initializationConfig';
-import {pathJoin} from './lib/paths';
-import systemConfig from './systemConfig';
-import StorageIo from './interfaces/io/StorageIo';
-import {ShutdownHandler} from './System';
-import IoItem, {IoItemDefinition} from './interfaces/IoItem';
-import {HttpServerIo, HttpServerProps} from './interfaces/io/HttpServerIo';
-import {ParsedUrl, parseUrl} from './lib/url';
-import {prepareRoute} from './lib/route';
-import HostInfo from './interfaces/HostInfo';
+import IoSet from '../interfaces/IoSet';
+import WebSocketServerIo from '../interfaces/io/WebSocketServerIo';
+import HostConfig from '../interfaces/HostConfig';
+import InitializationConfig from '../interfaces/InitializationConfig';
+import initializationConfig from '../initializationConfig';
+import {pathJoin} from '../lib/paths';
+import systemConfig from '../systemConfig';
+import StorageIo from '../interfaces/io/StorageIo';
+import {ShutdownHandler} from '../System';
+import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
+import {HttpServerIo, HttpServerProps} from '../interfaces/io/HttpServerIo';
+import {ParsedUrl, parseUrl} from '../lib/url';
+import {prepareRoute} from '../lib/route';
+import HostInfo from '../interfaces/HostInfo';
 // TODO: use from system's interfaces
-import {HttpApiBody} from '../entities/services/HttpApi/HttpApi';
+import {HttpApiBody} from '../../entities/services/HttpApi/HttpApi';
 // TODO: use from system's interfaces
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../entities/drivers/HttpServer/HttpServerLogic';
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 // TODO: use ioSet's - use driver
-import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
+import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
 
 import IoServerConnection from './IoServerConnection';
 

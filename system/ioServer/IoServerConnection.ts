@@ -1,10 +1,10 @@
-import HttpServerLogic from '../entities/drivers/HttpServer/HttpServerLogic';
-import Promised from './lib/Promised';
-import RemoteCall from './lib/remoteCall/RemoteCall';
-import {makeUniqId} from './lib/uniqId';
-import RemoteCallMessage from './interfaces/RemoteCallMessage';
-import {deserializeJson, serializeJson} from './lib/serialize';
-import {METHOD_DELIMITER} from './IoServer';
+import HttpServerLogic from '../../entities/drivers/HttpServer/HttpServerLogic';
+import Promised from '../lib/Promised';
+import RemoteCall from '../lib/remoteCall/RemoteCall';
+import {makeUniqId} from '../lib/uniqId';
+import RemoteCallMessage from '../interfaces/RemoteCallMessage';
+import {deserializeJson, serializeJson} from '../lib/serialize';
+import {METHOD_DELIMITER} from './';
 
 /**
  * Serving of connection to IO server

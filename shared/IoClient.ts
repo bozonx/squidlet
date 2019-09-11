@@ -4,7 +4,7 @@ import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
-import {METHOD_DELIMITER} from '../system/IoServer';
+import {METHOD_DELIMITER} from '../system/ioServer/IoServer';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 

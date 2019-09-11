@@ -1,6 +1,6 @@
 import IoSet from './interfaces/IoSet';
 import System from './System';
-import IoServer from './IoServer';
+import IoServer from './ioServer/IoServer';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import IoItem from './interfaces/IoItem';
 import {consoleError} from './lib/helpers';
