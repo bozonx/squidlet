@@ -142,7 +142,6 @@ export default class HttpServer implements HttpServerIo {
   }
 
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
-    // TODO: review
     const events = this.servers[Number(serverId)][ITEM_POSITION.events];
 
     return new Promise<void>((resolve, reject) => {
@@ -167,7 +166,10 @@ export default class HttpServer implements HttpServerIo {
 
       waitTimeout = setTimeout(() => {
         events.removeListener(RESPONSE_EVENT, handlerIndex);
-        reject(`Timeout has been exceeded. Server ${serverId}. ${req.method} ${req.url}`);
+        reject(
+          `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
+          `Server ${serverId}. ${req.method} ${req.url}`
+        );
       }, WAIT_RESPONSE_TIMEOUT_SEC * 1000);
 
       events.emit(HttpServerEvent.request, requestId, httpRequest);
@@ -195,16 +197,13 @@ export default class HttpServer implements HttpServerIo {
     };
   }
 
-  private setupResponse(response: HttpResponse, expressRes: Response) {
-    // TODO: review
-    for (let headerName of Object.keys(response.headers)) {
-      expressRes.setHeader(headerName, (response.headers as any)[headerName]);
-    }
-
-    expressRes.status(response.status);
+  private setupResponse(response: HttpResponse, httpRes: ServerResponse) {
+    // TODO: проверить чтобы headers были в нужном формате
+    //console.log('-------- headers res', response.headers);
+    httpRes.writeHead(response.status, response.headers as {[index: string]: string});
 
     if (typeof response.body === 'string') {
-      expressRes.send(response.body);
+      httpRes.end(response.body);
     }
     else {
       // TODO: support of Buffer - convert from Uint8Arr to Buffer
