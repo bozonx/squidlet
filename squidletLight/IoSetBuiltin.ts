@@ -5,6 +5,9 @@ import Storage from '../nodejs/ios/Storage';
 import Sys from '../lowjs/ios/Sys';
 import WebSocketServer from '../nodejs/ios/WebSocketServer';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
+import StorageEnvMemoryWrapper from '../shared/StorageEnvMemoryWrapper';
+import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
+import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 // import HttpClient from '../nodejs/ios/HttpClient';
 
 
@@ -17,10 +20,44 @@ const ioClasses: {[index: string]: any} = {
   WebSocketClient,
   WebSocketServer,
 };
+// TODO: remake
+const envSet: HostEnvSet = {
+  configs: {
+    config: {
+      id: 'lowjs-test',
+      platform: 'lowjs',
+      machine: 'esp32',
+      ...hostDefaultConfig,
+      ioServer: {
+        ...hostDefaultConfig.ioServer,
+        host: '0.0.0.0',
+      },
+    },
+    systemDrivers: [],
+    regularDrivers: [],
+    systemServices: [],
+    regularServices: [],
+    devicesDefinitions: [],
+    driversDefinitions: {},
+    servicesDefinitions: {},
+    iosDefinitions: {},
+  },
+  entities: {
+    devices: {},
+    drivers: {},
+    services: {},
+  }
+};
 
 
 export default class IoSetBuiltin implements IoSet {
   private ioCollection: {[index: string]: IoItem} = {};
+  private readonly storageWrapper: StorageEnvMemoryWrapper;
+
+
+  constructor() {
+    this.storageWrapper = new StorageEnvMemoryWrapper(envSet);
+  }
 
 
   /**
