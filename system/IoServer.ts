@@ -1,9 +1,5 @@
 import IoSet from './interfaces/IoSet';
-import {deserializeJson, serializeJson} from './lib/serialize';
 import WebSocketServerIo from './interfaces/io/WebSocketServerIo';
-import RemoteCall from './lib/remoteCall/RemoteCall';
-import RemoteCallMessage from './interfaces/RemoteCallMessage';
-import {makeUniqId} from './lib/uniqId';
 import HostConfig from './interfaces/HostConfig';
 import InitializationConfig from './interfaces/InitializationConfig';
 import initializationConfig from './initializationConfig';
@@ -22,8 +18,8 @@ import {HttpApiBody} from '../entities/services/HttpApi/HttpApi';
 import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../entities/drivers/HttpServer/HttpServerLogic';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
-import Promised from './lib/Promised';
-// TODO: use ioSet's - use driver
+
+import IoServerConnection from './IoServerConnection';
 
 
 
@@ -38,20 +34,14 @@ export default class IoServer {
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
-  private remoteCall?: RemoteCall;
   private connectionId?: string;
   private httpServer?: HttpServerLogic;
-  // wait for connection is prepared
-  private connectionPrepared?: Promised<void>;
   private _wsServer?: WsServerLogic;
+  private ioConnection?: IoServerConnection;
 
   private get hostConfig(): HostConfig {
     return this._hostConfig as any;
   }
-
-  // private get httpServer(): HttpServerLogic {
-  //   return this._httpServer as any;
-  // }
 
   private get wsServer(): WsServerLogic {
     return this._wsServer as any;
@@ -90,7 +80,10 @@ export default class IoServer {
     this.logInfo('... destroying IoServer');
     this.httpServer && await this.httpServer.destroy();
     await this.wsServer.destroy();
-    this.remoteCall && await this.remoteCall.destroy();
+    this.ioConnection && await this.ioConnection.destroy();
+
+    delete this.httpServer;
+    delete this.ioConnection;
   }
 
 
@@ -104,96 +97,30 @@ export default class IoServer {
       return;
     }
 
-    this.connectionPrepared = new Promised<void>();
+    // TODO: move to ioConnection
     this.connectionId = connectionId;
+    this.ioConnection = new IoServerConnection(this.connectionId, this.logDebug, this.logError);
 
-    this.remoteCall = new RemoteCall(
-      this.sendToClient,
-      this.callIoMethod,
-      this.hostConfig.config.rcResponseTimoutSec,
-      this.logError,
-      makeUniqId
-    );
+    await this.ioConnection.init();
 
+    // stop IoServer's http api server to not to busy the port
     this.httpServer && await this.httpServer.destroy();
 
     delete this.httpServer;
 
-    this.connectionPrepared.resolve();
-
     this.logInfo(`New IO client has been connected`);
   }
 
-  private handleIncomeMessages = async (connectionId: string, data: string | Uint8Array) => {
-    let msg: RemoteCallMessage;
-
-    try {
-      msg = deserializeJson(data);
-    }
-    catch (err) {
-      throw new Error(`IoServer: Can't decode message: ${err}`);
-    }
-
-    if (!this.connectionPrepared) {
-      throw new Error(`IoServer: no promise which waits for connection is prepared`);
-    }
-    else if (!this.remoteCall) {
-      throw new Error(`IoServer: remoteCall isn't defined`);
-    }
-
-    await this.connectionPrepared.promise;
-
-    this.logDebug(`Income IO message: ${JSON.stringify(msg)}`);
-
-    return await this.remoteCall.incomeMessage(msg);
-  }
-
   private handleIoClientCloseConnection = async () => {
-    // TODO: review
-    this.connectionId = undefined;
+    delete this.connectionId;
 
-    this.remoteCall && this.remoteCall.destroy()
-      .catch(this.logError);
+    this.ioConnection && await this.ioConnection.destroy();
 
-    if (!this.httpServer) {
-      this.initHttpApiServer()
-        .catch(this.logError);
-    }
+    // TODO: что если destroy не прошел
+
+    delete this.ioConnection;
 
     this.logInfo(`IO client has been disconnected`);
-  }
-
-  private sendToClient = async (message: RemoteCallMessage): Promise<void> => {
-    if (!this.connectionId) return;
-
-    let binData: Uint8Array;
-
-    try {
-      binData = serializeJson(message);
-    }
-    catch (err) {
-      return this.logError(err);
-    }
-
-    this.logDebug(`Outcome IO message: ${JSON.stringify(message)}`);
-
-    return this.wsServer.send(this.connectionId, binData);
-  }
-
-  private callIoMethod = async (fullName: string, args: any[]): Promise<any> => {
-    const [ioName, methodName] = fullName.split(METHOD_DELIMITER);
-
-    if (!methodName) {
-      throw new Error(`No method name: "${fullName}"`);
-    }
-
-    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
-
-    if (!IoItem[methodName]) {
-      throw new Error(`Method doesn't exist: "${ioName}.${methodName}"`);
-    }
-
-    return IoItem[methodName](...args);
   }
 
   private async loadConfig<T>(configFileName: string): Promise<T> {
@@ -248,7 +175,11 @@ export default class IoServer {
     await this.wsServer.init();
 
     this.wsServer.onMessage((connectionId: string, data: string | Uint8Array) => {
-      this.handleIncomeMessages(connectionId, data)
+      if (!this.ioConnection) {
+        return this.logError(`IoServer.onMessage: no ioConnection`);
+      }
+
+      this.ioConnection.incomeMessage(connectionId, data)
         .catch(this.logError);
     });
     this.wsServer.onConnection((connectionId: string) => {
