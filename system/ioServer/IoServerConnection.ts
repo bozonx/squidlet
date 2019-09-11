@@ -1,9 +1,10 @@
-import HttpServerLogic from '../../entities/drivers/HttpServer/HttpServerLogic';
 import Promised from '../lib/Promised';
 import RemoteCall from '../lib/remoteCall/RemoteCall';
 import {makeUniqId} from '../lib/uniqId';
-import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 import {deserializeJson, serializeJson} from '../lib/serialize';
+import RemoteCallMessage from '../interfaces/RemoteCallMessage';
+import HostConfig from '../interfaces/HostConfig';
+import IoSet from '../interfaces/IoSet';
 
 
 export const METHOD_DELIMITER = '.';
@@ -14,52 +15,52 @@ export const METHOD_DELIMITER = '.';
  */
 export default class IoServerConnection {
   private readonly connectionId: string;
+  private readonly hostConfig: HostConfig;
+  private readonly ioSet: IoSet;
+  private readonly wsServerSend: (connectionId: string, data: string | Uint8Array) => Promise<void>;
   private readonly logDebug: (msg: string) => void;
   private readonly logError: (msg: string) => void;
-  private httpServer?: HttpServerLogic;
+  private readonly remoteCall: RemoteCall;
   // wait for connection is prepared
-  private connectionPrepared?: Promised<void>;
+  private readonly readyState = new Promised<void>();
 
 
   constructor(
     connectionId: string,
+    ioSet: IoSet,
+    hostConfig: HostConfig,
+    wsServerSend: (connectionId: string, data: string | Uint8Array) => Promise<void>,
     logDebug: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.connectionId = connectionId;
+    this.hostConfig = hostConfig;
+    this.ioSet = ioSet;
+    this.wsServerSend = wsServerSend;
     this.logDebug = logDebug;
     this.logError = logError;
-  }
-
-  async init() {
-    this.connectionPrepared = new Promised<void>();
-
     this.remoteCall = new RemoteCall(
       this.sendToClient,
       this.callIoMethod,
-      this.hostConfig.config.rcResponseTimoutSec,
+      hostConfig.config.rcResponseTimoutSec,
       this.logError,
       makeUniqId
     );
-
-    this.connectionPrepared.resolve();
-
   }
 
   async destroy() {
-    delete this.httpServer;
-    this.remoteCall && this.remoteCall.destroy()
-      .catch(this.logError);
-
-    if (!this.httpServer) {
-      this.initHttpApiServer()
-        .catch(this.logError);
-    }
-    this.remoteCall && await this.remoteCall.destroy();
-    delete this.remoteCall;
-    // TODO: connectionPrepared
+    await this.remoteCall.destroy();
+    this.readyState.destroy();
   }
 
+
+  /**
+   * Set ready state of connection.
+   * Call it after you prepared your things to connect them.
+   */
+  setReadyState() {
+    this.readyState.resolve();
+  }
 
   async incomeMessage(connectionId: string, data: string | Uint8Array) {
     let msg: RemoteCallMessage;
@@ -71,15 +72,14 @@ export default class IoServerConnection {
       throw new Error(`IoServer: Can't decode message: ${err}`);
     }
 
-
-    if (!this.connectionPrepared) {
+    if (!this.readyState) {
       throw new Error(`IoServer: no promise which waits for connection is prepared`);
     }
     else if (!this.remoteCall) {
       throw new Error(`IoServer: remoteCall isn't defined`);
     }
 
-    await this.connectionPrepared.promise;
+    await this.readyState.promise;
 
     this.logDebug(`Income IO message: ${JSON.stringify(msg)}`);
 
@@ -100,7 +100,7 @@ export default class IoServerConnection {
 
     this.logDebug(`Outcome IO message: ${JSON.stringify(message)}`);
 
-    return this.wsServer.send(this.connectionId, binData);
+    return this.wsServerSend(this.connectionId, binData);
   }
 
   private callIoMethod = async (fullName: string, args: any[]): Promise<any> => {

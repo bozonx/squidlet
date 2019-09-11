@@ -90,7 +90,7 @@ export default class WsServerLogic {
   /**
    * Send message to client
    */
-  send(connectionId: string, data: string | Uint8Array): Promise<void> {
+  send = (connectionId: string, data: string | Uint8Array): Promise<void> => {
     this.logDebug(`WsServerLogic.send from ${this.props.host}:${this.props.port} to connection ${connectionId}, data length ${data.length}`);
 
     return this.wsServerIo.send(this.serverId, connectionId, data);

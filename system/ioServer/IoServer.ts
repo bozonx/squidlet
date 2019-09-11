@@ -87,14 +87,21 @@ export default class IoServer {
       return;
     }
 
-    this.ioConnection = new IoServerConnection(connectionId, this.logDebug, this.logError);
-
-    await this.ioConnection.init();
+    this.ioConnection = new IoServerConnection(
+      connectionId,
+      this.ioSet,
+      this.hostConfig,
+      this.wsServer.send,
+      this.logDebug,
+      this.logError
+    );
 
     // stop IoServer's http api server to not to busy the port
     this.httpApi && await this.httpApi.destroy();
 
     delete this.httpApi;
+
+    this.ioConnection.setReadyState();
 
     this.logInfo(`New IO client has been connected`);
   }
