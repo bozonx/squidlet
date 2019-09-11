@@ -8,6 +8,7 @@ import StorageEnvMemoryWrapper from './StorageEnvMemoryWrapper';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import {getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 
 
 /**
@@ -16,18 +17,22 @@ import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 export default class IoSetDevelopSrc implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
-  private readonly storageWrapper: StorageEnvMemoryWrapper;
+  private storageWrapper?: StorageEnvMemoryWrapper;
   private ioCollection: {[index: string]: IoItem} = {};
 
 
   constructor(os: Os, envBuilder: EnvBuilder) {
     this.os = os;
     this.envBuilder = envBuilder;
-    this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
+
   }
 
   async prepare() {
-    await this.storageWrapper.init();
+    console.info(`===> generate development envSet`);
+
+    const envSet: HostEnvSet = this.envBuilder.generateDevelopEnvSet();
+
+    this.storageWrapper = new StorageEnvMemoryWrapper(envSet);
   }
 
   /**

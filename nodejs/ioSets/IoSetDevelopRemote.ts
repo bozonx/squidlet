@@ -6,6 +6,7 @@ import RemoteIoCollection from './RemoteIoCollection';
 import Os from '../../shared/Os';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {checkIoExistance} from '../../hostEnvBuilder/helpers';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 
 
 /**
@@ -15,7 +16,7 @@ export default class IoSetDevelopRemote implements IoSet {
   private readonly os: Os;
   private readonly envBuilder: EnvBuilder;
   private readonly remoteIoNames: string[];
-  private readonly storageWrapper: StorageEnvMemoryWrapper;
+  private storageWrapper?: StorageEnvMemoryWrapper;
   private wrappedStorageIo?: StorageIo;
   private remoteIoCollection: RemoteIoCollection;
 
@@ -30,12 +31,15 @@ export default class IoSetDevelopRemote implements IoSet {
     this.os = os;
     this.envBuilder = envBuilder;
     this.remoteIoNames = remoteIoNames;
-    this.storageWrapper = new StorageEnvMemoryWrapper(envBuilder);
     this.remoteIoCollection = new RemoteIoCollection(this.remoteIoNames, host, port);
   }
 
   async prepare() {
-    await this.storageWrapper.init();
+    console.info(`===> generate development envSet`);
+
+    const envSet: HostEnvSet = this.envBuilder.generateDevelopEnvSet();
+
+    this.storageWrapper = new StorageEnvMemoryWrapper(envSet);
   }
 
   async init() {

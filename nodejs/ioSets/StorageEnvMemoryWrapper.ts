@@ -3,7 +3,6 @@ import * as path from 'path';
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
 import StorageIo from '../../system/interfaces/io/StorageIo';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement, trimCharStart} from '../../system/lib/strings';
 import systemConfig from '../../system/systemConfig';
@@ -15,19 +14,11 @@ import {getFileNameOfPath} from '../../shared/helpers';
  * But other files it loads as an original Storage.
  */
 export default class StorageEnvMemoryWrapper {
-  private readonly envBuilder: EnvBuilder;
-  private envSet?: HostEnvSet;
+  private readonly envSet: HostEnvSet;
 
 
-  constructor(envBuilder: EnvBuilder) {
-    this.envBuilder = envBuilder;
-  }
-
-
-  async init() {
-    console.info(`===> generate development envSet`);
-
-    this.envSet = this.envBuilder.generateDevelopEnvSet();
+  constructor(envSet: HostEnvSet) {
+    this.envSet = envSet;
   }
 
 
@@ -83,7 +74,7 @@ export default class StorageEnvMemoryWrapper {
   private loadConfig(configName: string): {[index: string]: any} {
     // cut extension
     const strippedName: string = getFileNameOfPath(configName);
-    const config: any = (this.envSet && this.envSet.configs as any)[strippedName];
+    const config: any = (this.envSet.configs as any)[strippedName];
 
     if (!config) throw new Error(`StorageEnvMemoryWrapper.loadConfig: Can't find config "${configName}"`);
 
@@ -104,7 +95,7 @@ export default class StorageEnvMemoryWrapper {
     // get entity name of 'ConsoleLogger/manifest.json'
     const entityName: string = splitFirstElement(rest, path.sep)[0];
 
-    if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
+    if (!entityName || !this.envSet.entities[pluralType][entityName]) {
       throw new Error(`StorageEnvMemoryWrapper.loadManifest("${pluralType}", "${entityName}"): Can't find an entity`);
     }
 
