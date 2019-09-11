@@ -9,7 +9,7 @@ const commonConfig = rollupCommonConfig(envConfig);
 
 export default {
   ...commonConfig,
-  input: path.resolve(__dirname, `index.ts`),
+  input: path.resolve(__dirname, `ioServerIndex.ts`),
   output: [
     {
       ...makeOutputDefinition(envConfig, {}),

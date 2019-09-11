@@ -1,11 +1,11 @@
-import IoServer from '../system/ioServer/IoServer';
-import {consoleError} from '../system/lib/helpers';
-import IoSet from '../system/interfaces/IoSet';
-import IoSetBuiltin from './IoSetBuiltin';
-import IoItem from '../system/interfaces/IoItem';
+import IoServer from '../../system/ioServer/IoServer';
+import {consoleError} from '../../system/lib/helpers';
+import IoSet from '../../system/interfaces/IoSet';
+import IoSetBuiltin from '../IoSetBuiltin';
+import IoItem from '../../system/interfaces/IoItem';
 
 
-export class IoServerStarter {
+export class IoServerStandalone {
   private ioSet?: IoSet;
 
 
