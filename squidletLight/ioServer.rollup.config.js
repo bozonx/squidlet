@@ -28,8 +28,6 @@ export default {
   // },
   external: [
     ...commonConfig.external || [],
-    'express',
     'ws',
-    'axios',
   ],
 };

@@ -180,6 +180,8 @@ export default class HttpServer implements HttpServerIo {
     // TODO: review
     let body: string | Buffer | undefined;
 
+    //req.
+
     if (typeof req.body === 'string') {
       body = req.body;
     }
@@ -188,17 +190,19 @@ export default class HttpServer implements HttpServerIo {
       body = req.body;
     }
 
+    console.log(111111, req.method, req.url, req.headers);
+
     return  {
       // method in express's request is in upper case format
-      method: req.method.toLowerCase() as any,
-      url: req.url,
+      method: (req.method || 'get').toLowerCase() as any,
+      url: req.url || '',
       headers: req.headers as any,
       body,
     };
   }
 
   private setupResponse(response: HttpResponse, httpRes: ServerResponse) {
-    // TODO: проверить чтобы headers были в нужном формате
+    // TODO: проверить чтобы headers были в нужном формате - ??? Content-Type
     //console.log('-------- headers res', response.headers);
     httpRes.writeHead(response.status, response.headers as {[index: string]: string});
 

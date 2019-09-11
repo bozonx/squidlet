@@ -4,7 +4,7 @@ import HttpServer from '../nodejs/ios/HttpServer';
 import Storage from '../nodejs/ios/Storage';
 import Sys from '../lowjs/ios/Sys';
 import WebSocketServer from '../nodejs/ios/WebSocketServer';
-// import WebSocketClient from '../nodejs/ios/WebSocketClient';
+import WebSocketClient from '../nodejs/ios/WebSocketClient';
 // import HttpClient from '../nodejs/ios/HttpClient';
 
 
@@ -14,7 +14,7 @@ const ioClasses: {[index: string]: any} = {
   HttpServer,
   Storage,
   Sys,
-  //WebSocketClient,
+  WebSocketClient,
   WebSocketServer,
 };
 
