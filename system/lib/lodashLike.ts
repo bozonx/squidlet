@@ -9,40 +9,6 @@ import {isPlainObject} from './objects';
 
 
 
-// TODO: better to not use it at all
-export function isEqual(first: any, second: any): boolean {
-  if (
-    // TODO: don't use null
-    first === null
-    || typeof first === 'string'
-    || typeof first === 'number'
-    || typeof first === 'undefined'
-    || typeof first === 'function'
-    // TODO: don't use null
-    || second === null
-    || typeof second === 'string'
-    || typeof second === 'number'
-    || typeof second === 'undefined'
-    || typeof second === 'function'
-  ) {
-    return first === second;
-  }
-  else if (typeof first !== 'undefined' && typeof second === 'undefined') {
-    return false;
-  }
-  else if (typeof first === 'undefined' && typeof second !== 'undefined') {
-    return false;
-  }
-  else if (first instanceof Uint8Array && second instanceof Uint8Array) {
-    return first.toString() === second.toString();
-  }
-
-  // TODO: не будет учитываться undefined в объектах и array (переводятся в null)
-  // TODO: слишком дорогая процедура
-  // arrays and objects
-  return JSON.stringify(first) === JSON.stringify(second);
-}
-
 // it works properly but very expensive because of using of JSON.stringify -> JSON.parse.
 // !WARNING: undefined values which are obviously set in objects will be omitted
 // !WARNING: undefined values in arrays will be converted to null

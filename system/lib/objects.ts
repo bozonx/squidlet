@@ -1,5 +1,5 @@
-import {isEqual} from './lodashLike';
 import {compactArray} from './arrays';
+import {isEqual} from './helpers';
 
 
 /**
@@ -164,6 +164,7 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
     // TODO: isEqual не правильно отрабоатает с параметрами с undefined
     // TODO: желательно не делать глубокого сравнения
     // TODO: может использовать конструкцию - key in obj
+    // TODO: don't use isEqual
     if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
       diffKeys.push(key);
     }

@@ -3,9 +3,9 @@ import IndexedEvents from '../lib/IndexedEvents';
 import Polling from '../lib/Polling';
 import Sender from '../lib/Sender';
 //import {ImpulseInputProps} from '../drivers/Binary/ImpulseInput.driver';
-import {isEqual} from '../lib/lodashLike';
 import {findObj} from '../lib/objects';
 import {hexStringToHexNum} from '../lib/binaryHelpers';
+import {isEqual} from '../lib/helpers';
 
 
 // type of feedback - polling or interruption
@@ -168,6 +168,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // do nothing if it isn't polling data address
     if (typeof dataAddressStr === 'undefined' || !pollProps) return;
 
+    // TODO: don't use isEqual
     // if data is equal to previous data - do nothing
     if (isEqual(this.pollLastData[resolvedDataAddr], data)) return;
 

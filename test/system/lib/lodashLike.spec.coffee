@@ -1,34 +1,9 @@
 lodashLike = require('../../../system/lib/lodashLike')
 
 
-describe.only 'system.lib.lodashLike', ->
+describe 'system.lib.lodashLike', ->
 #  it 'values', ->
 #    assert.deepEqual(lodashLike.values({a: 0, b: 1}), [0, 1])
-
-  it 'isEqual', ->
-    assert.isTrue(lodashLike.isEqual(1, 1))
-    assert.isFalse(lodashLike.isEqual(1, 0))
-    assert.isTrue(lodashLike.isEqual('a', 'a'))
-    assert.isFalse(lodashLike.isEqual('a', 'b'))
-    assert.isTrue(lodashLike.isEqual(null, null))
-    assert.isFalse(lodashLike.isEqual(null, undefined))
-    assert.isTrue(lodashLike.isEqual(undefined, undefined))
-    assert.isFalse(lodashLike.isEqual(undefined, null))
-    fn = () =>
-    assert.isTrue(lodashLike.isEqual(fn, fn))
-    assert.isFalse(lodashLike.isEqual(fn, () =>))
-    assert.isTrue(lodashLike.isEqual(['a'], ['a']))
-    assert.isFalse(lodashLike.isEqual(['a'], ['a', 'b']))
-    assert.isTrue(lodashLike.isEqual({a: {aa: 1}}, {a: {aa: 1}}))
-    assert.isFalse(lodashLike.isEqual({a: {aa: 1}}, {a: {aa: 1, bb: 2}}))
-    assert.isFalse(lodashLike.isEqual({a: 1}, ['a']))
-    uint1 = new Uint8Array(1)
-    uint2 = new Uint8Array(1)
-    uint1[0] = 255
-    uint2[0] = 255
-    assert.isTrue(lodashLike.isEqual(uint1, uint2))
-    assert.isFalse(lodashLike.isEqual(uint1, new Uint8Array(1)))
-    assert.isFalse(lodashLike.isEqual(uint1, []))
 
 
 

@@ -1,13 +1,53 @@
 import {Edge} from '../interfaces/io/DigitalIo';
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
-import {compactUndefined} from './arrays';
+import {compactUndefined, isEqualArrays} from './arrays';
 import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
 import {JsonTypes, Primitives} from '../interfaces/Types';
 import {parseValue} from './common';
+import {isEqualUint8Array} from './binaryHelpers';
+import {isEqualObjects} from './objects';
 
 
 export const PATH_SEPARATOR = '/';
 
+
+// TODO: better not to use it
+export function isEqual(first: any, second: any): boolean {
+  if (
+    // TODO: don't use null
+    first === null
+    || typeof first === 'string'
+    || typeof first === 'number'
+    || typeof first === 'undefined'
+    || typeof first === 'function'
+    // TODO: don't use null
+    || second === null
+    || typeof second === 'string'
+    || typeof second === 'number'
+    || typeof second === 'undefined'
+    || typeof second === 'function'
+  ) {
+    return first === second;
+  }
+  else if (typeof first !== 'undefined' && typeof second === 'undefined') {
+    return false;
+  }
+  else if (typeof first === 'undefined' && typeof second !== 'undefined') {
+    return false;
+  }
+  else if (first instanceof Uint8Array || second instanceof Uint8Array) {
+    return isEqualUint8Array(first, second);
+  }
+  else if (Array.isArray(first) || Array.isArray(second)) {
+    return isEqualArrays(first, second);
+  }
+  else if (typeof first === 'object' || typeof second === 'object') {
+    return isEqualObjects(first, second);
+  }
+
+  // for the any other case
+  return JSON.stringify(first) === JSON.stringify(second);
+}
 
 /**
  * Convert value like 'on', 'true', 1, true, ... to boolean
