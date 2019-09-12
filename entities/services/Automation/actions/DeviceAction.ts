@@ -7,4 +7,10 @@ export default class DeviceAction implements ActionItem {
   constructor(manager: ActionsManager, definition: ActionDefinition) {
 
   }
+
+
+  execute() {
+
+  }
+
 }

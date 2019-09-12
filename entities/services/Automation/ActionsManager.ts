@@ -32,6 +32,17 @@ export class ActionsManager {
     this.actions = this.makeActions(ruleDefinition.action);
   }
 
+
+  /**
+   * Execute all the actions
+   */
+  execute() {
+    for (let action of this.actions) {
+      action.execute();
+    }
+  }
+
+
   private makeActions(action: ActionDefinition[]): ActionItem[] {
     const result: TriggerItem[] = [];
 

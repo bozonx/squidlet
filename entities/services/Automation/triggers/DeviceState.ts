@@ -7,4 +7,10 @@ export default class DeviceState implements TriggerItem {
   constructor(manager: TriggersManager, definition: TriggerDefinition) {
 
   }
+
+
+  onSwitch(cb: () => void) {
+
+  }
+
 }

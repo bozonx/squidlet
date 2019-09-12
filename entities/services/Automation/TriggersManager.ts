@@ -48,7 +48,13 @@ export class TriggersManager {
   private instantiateTriggerItem(triggerDefinition: TriggerDefinition): TriggerItem {
     const trigger: TriggerItem = new triggerClasses[triggerDefinition.type](this, triggerDefinition);
 
+    trigger.onSwitch(this.handleTriggerSwitch);
+
     return trigger;
+  }
+
+  private handleTriggerSwitch = () => {
+    this.actionsManager.execute();
   }
 
 }
