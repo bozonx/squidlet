@@ -1,6 +1,5 @@
-/**
- * The same for rpi and x86
- */
+// need to decrease of memory usage
+require('mqtt-packet').writeToStream.cacheNumbers = false;
 
 import * as mqtt from 'mqtt';
 
@@ -19,6 +18,9 @@ interface MqttPacket {
 }
 
 
+/**
+ * The same for rpi and x86
+ */
 export default class Mqtt implements MqttIo {
   private readonly events = new IndexedEventEmitter();
   private readonly connections: mqtt.MqttClient[] = [];

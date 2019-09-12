@@ -29,5 +29,7 @@ export default {
   external: [
     ...commonConfig.external || [],
     'ws',
+    'mqtt-packet',
+    'mqtt',
   ],
 };
