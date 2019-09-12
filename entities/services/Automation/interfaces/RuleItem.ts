@@ -1,9 +1,9 @@
-import TriggerItem from './TriggerItem';
-import ActionItem from './ActionItem';
+import {TriggersManager} from '../TriggersManager';
+import {ActionsManager} from '../ActionsManager';
 
 
 export default interface RuleItem {
   name: string;
-  triggers: TriggerItem[];
-  actions: ActionItem[];
+  triggers: TriggersManager;
+  actions: ActionsManager;
 }

@@ -1,10 +1,8 @@
 import ServiceBase from 'system/base/ServiceBase';
 import RuleItem from './interfaces/RuleItem';
-import RuleDefinition, {ActionDefinition, TriggerDefinition, TriggerTypes} from './interfaces/RuleDefinition';
-import TriggerItem, {TriggerItemClass} from './interfaces/TriggerItem';
-import ActionItem, {ActionItemClass} from './interfaces/ActionItem';
-import DeviceState from './triggers/DeviceState';
-import DeviceAction from './actions/DeviceAction';
+import RuleDefinition from './interfaces/RuleDefinition';
+import {TriggersManager} from './TriggersManager';
+import {ActionsManager} from './ActionsManager';
 
 
 interface Props {
@@ -12,12 +10,6 @@ interface Props {
 }
 
 let nameIndex: number = 0;
-const triggerClasses: {[index: string]: TriggerItemClass} = {
-  deviceState: DeviceState,
-};
-const actionsClasses: {[index: string]: ActionItemClass} = {
-  deviceAction: DeviceAction,
-};
 
 
 export default class Automation extends ServiceBase<Props> {
@@ -33,11 +25,12 @@ export default class Automation extends ServiceBase<Props> {
     for (let ruleDefinition of this.props.rules) {
       this.validateRule(ruleDefinition);
 
-      const triggers: TriggerItem[] = this.instantiateTriggers(ruleDefinition.trigger);
-      const actions: ActionItem[] = this.instantiateActions(ruleDefinition.action);
+      const name: string = ruleDefinition.name || this.generateUniqName();
+      const actions = new ActionsManager(this.context, this.rules, name, ruleDefinition);
+      const triggers = new TriggersManager(this.context, this.rules, name, ruleDefinition, actions);
 
       const ruleItem: RuleItem = {
-        name: ruleDefinition.name || this.generateQniqName(),
+        name,
         triggers,
         actions,
       };
@@ -46,31 +39,11 @@ export default class Automation extends ServiceBase<Props> {
     }
   }
 
-  private instantiateTriggers(trigger: TriggerDefinition[]): TriggerItem[] {
-    const result: TriggerItem[] = [];
-
-    for (let triggerDefinition of trigger) {
-      result.push(new triggerClasses[triggerDefinition.type](triggerDefinition));
-    }
-
-    return result;
-  }
-
-  private instantiateActions(action: ActionDefinition[]): ActionItem[] {
-    const result: TriggerItem[] = [];
-
-    for (let actionDefinition of action) {
-      result.push(new actionsClasses[actionDefinition.type](actionDefinition));
-    }
-
-    return result;
-  }
-
   private validateRule(ruleDefinition: RuleDefinition) {
     // TODO: validate rule definiton
   }
 
-  private generateQniqName(): string {
+  private generateUniqName(): string {
     nameIndex++;
 
     return String(nameIndex);
