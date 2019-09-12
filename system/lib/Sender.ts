@@ -1,4 +1,4 @@
-import {isEqual} from './lodashLike';
+
 
 class SenderRequest {
   readonly promise: Promise<any>;

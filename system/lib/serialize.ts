@@ -92,12 +92,12 @@ export function deserializeJson(serialized: Uint8Array | any) {
     throw new Error(`deserializeJson: serialized data has to be a Uint8Array`);
   }
 
-  const binJsonLength: Uint8Array = serialized.slice(0, 4);
+  const binJsonLength: Uint8Array = serialized.subarray(0, 4);
   const jsonLength: number = uint8ToNum(binJsonLength);
   // 4 is 4 bytes of length 32 bit number
-  const jsonBin: Uint8Array = serialized.slice(4, 4 + jsonLength);
+  const jsonBin: Uint8Array = serialized.subarray(4, 4 + jsonLength);
   const jsonString: string = uint8ArrayToText(jsonBin);
-  const binaryTail: Uint8Array = serialized.slice(4 + jsonLength);
+  const binaryTail: Uint8Array = serialized.subarray(4 + jsonLength);
 
   // TODO: не поддерживается undefined
 
@@ -108,7 +108,7 @@ export function deserializeJson(serialized: Uint8Array | any) {
       const start = Number(splat[0]);
       const length = Number(splat[1]);
 
-      return binaryTail.slice(start, start + length);
+      return binaryTail.subarray(start, start + length);
     }
 
     return value;
