@@ -3,6 +3,17 @@ import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../constants';
 
 
 /**
+ * Are uint8 arrays equal.
+ * If one of them not Uint8Array then it returns false.
+ */
+export function isEqualUint8Array(first?: Uint8Array, second?: Uint8Array): boolean {
+  if (!(first instanceof Uint8Array) || !(second instanceof Uint8Array)) return false;
+
+  // TODO: research for more optimized method
+  return first.toString() === second.toString();
+}
+
+/**
  * Better to use "keys" method which returned a iterator.
  * But it isn't supported on lowjs.
  */

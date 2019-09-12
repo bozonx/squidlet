@@ -1,3 +1,16 @@
+/**
+ * Are arrays equal.
+ * If one of them not Array then it returns false.
+ */
+export function isEqualArrays(first?: any[], second?: any[]): boolean {
+  if (!Array.isArray(first) || !Array.isArray(second)) return false;
+
+  // TODO: не будет учитываться undefined в объектах и array (переводятся в null)
+  // TODO: слишком дорогая процедура
+  return JSON.stringify(first) === JSON.stringify(second);
+}
+
+
 export function lastItem(arr: any[]): any {
   return arr[arr.length - 1];
 }

@@ -2,6 +2,14 @@ helpers = require('../../../system/lib/binaryHelpers')
 
 
 describe 'system.lib.binaryHelpers', ->
+  it 'isEqualUint8Array', ->
+    assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([]), new Uint8Array([])))
+    assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([1,2,3]), new Uint8Array([1,2,3])))
+    assert.isFalse(helpers.isEqualUint8Array(new Uint8Array([1,2,3]), new Uint8Array([1,2])))
+    assert.isFalse(helpers.isEqualUint8Array(new Uint8Array([]), undefined ))
+    assert.isFalse(helpers.isEqualUint8Array(undefined, new Uint8Array([])))
+    assert.isFalse(helpers.isEqualUint8Array([], []))
+
   it 'uint8ArrayKeys', ->
     arr = new Uint8Array([0,1,2,3,4])
 

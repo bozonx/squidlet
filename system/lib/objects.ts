@@ -2,6 +2,18 @@ import {isEqual} from './lodashLike';
 import {compactArray} from './arrays';
 
 
+/**
+ * Are objects equal.
+ * If one of them not Object then it returns false.
+ */
+export function isEqualObjects(first?: {[index: string]: any}, second?: {[index: string]: any}): boolean {
+  if (typeof first !== 'object' || typeof second !== 'object') return false;
+
+  // TODO: не будет учитываться undefined в объектах и array (переводятся в null)
+  // TODO: слишком дорогая процедура
+  return JSON.stringify(first) === JSON.stringify(second);
+}
+
 // /**
 //  * When undefined, null, '', [] or {}.
 //  * 0 is not empty!

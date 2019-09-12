@@ -2,6 +2,14 @@ objects = require('../../../system/lib/objects')
 
 
 describe 'system.lib.objects', ->
+  it 'isEqualObjects', ->
+    assert.isTrue(objects.isEqualObjects({}, {}))
+    assert.isTrue(objects.isEqualObjects({a:1,b:2}, {a:1,b:2}))
+    assert.isFalse(objects.isEqualObjects({a:1,b:2}, {a:1}))
+    assert.isFalse(objects.isEqualObjects({}, undefined ))
+    assert.isFalse(objects.isEqualObjects(undefined, {}))
+    assert.isFalse(objects.isEqualObjects(1, 1))
+
   it 'isEmptyObjectObject', ->
     assert.isTrue(objects.isEmptyObject(undefined))
     assert.isTrue(objects.isEmptyObject(null))

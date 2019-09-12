@@ -2,6 +2,14 @@ arrays = require('../../../system/lib/arrays')
 
 
 describe 'system.lib.arrays', ->
+  it 'isEqualArrays', ->
+    assert.isTrue(arrays.isEqualArrays([], []))
+    assert.isTrue(arrays.isEqualArrays([1,2,3], [1,2,3]))
+    assert.isFalse(arrays.isEqualArrays([1,2,3], [1,2]))
+    assert.isFalse(arrays.isEqualArrays([], undefined ))
+    assert.isFalse(arrays.isEqualArrays(undefined, []))
+    assert.isFalse(arrays.isEqualArrays({}, {}))
+
   it 'lastItem', ->
     assert.equal(arrays.lastItem([0,1,2]), 2)
 
