@@ -1,7 +1,13 @@
 helpers = require('../../../system/lib/binaryHelpers')
 
 
-describe 'system.lib.binaryHelpers', ->
+describe.only 'system.lib.binaryHelpers', ->
+  it 'uint8ArrayKeys', ->
+    arr = new Uint8Array([0,1,2,3,4])
+
+    assert.deepEqual(helpers.uint8ArrayKeys(arr), [0,1,2,3,4])
+    assert.deepEqual(helpers.uint8ArrayKeys(new Uint8Array([])), [])
+
   it 'withoutFirstItemUint8Arr', ->
     uint = new Uint8Array(2)
     uint[0] = 127

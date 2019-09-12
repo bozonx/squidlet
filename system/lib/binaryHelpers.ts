@@ -3,6 +3,18 @@ import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from '../constants';
 
 
 /**
+ * Better to use "keys" method which returned a iterator.
+ * But it isn't supported on lowjs.
+ */
+export function uint8ArrayKeys(arr: Uint8Array): number[] {
+  const result: number[] = [];
+
+  for (let i = 0; i < arr.length; i++) result.push(i);
+
+  return result;
+}
+
+/**
  * Make a new Uint8Array without the first item
  */
 export function withoutFirstItemUint8Arr(arr: Uint8Array): Uint8Array {
@@ -208,8 +220,8 @@ export function bytesToBits(bytes: Uint8Array): boolean[] {
 
   let result: boolean[] = [];
 
-  for (let index of bytes.keys()) {
-    result = result.concat(byteToBinArr(bytes[index]));
+  for (let i = 0; i < bytes.length; i++) {
+    result = result.concat(byteToBinArr(bytes[i]));
   }
 
   return result;
