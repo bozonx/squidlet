@@ -10,6 +10,20 @@ wsApi:
 ioServer:
   host: 0.0.0.0
 
+automation:
+  rules:
+    - name: switch_led
+      trigger:
+        - type: deviceState
+          id: bedroom.wall-light-toggle
+          state: default
+      action:
+        - type: deviceAction
+          id: bedroom.light1
+          action: turn
+          valueExp: 'deviceStatus.bedroom.wall-light-toggle.default'
+
+
 devices:
   bedroom:
     people-count-sensor:

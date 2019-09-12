@@ -2,7 +2,7 @@ import ServiceBase from 'system/base/ServiceBase';
 
 
 type TriggerTypes = 'deviceState' | 'automation' | 'mqtt' | 'http' | 'I2C';
-type ActionTypes = 'action' | 'automation' | 'mqtt' | 'http';
+type ActionTypes = 'deviceAction' | 'automation' | 'mqtt' | 'http';
 
 interface AutomationTrigger {
   type: TriggerTypes;
