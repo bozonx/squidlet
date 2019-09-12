@@ -14,3 +14,9 @@ devices:
   bedroom:
     people-count-sensor:
       device: FakePeopleCount
+    light1:
+      device: Relay
+      pin: 1
+    light2:
+      device: Relay
+      pin: 2

@@ -10,6 +10,7 @@ import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import I2cMaster from '../lowjs/ios/I2cMaster';
+import Digital from '../lowjs/ios/Digital';
 
 
 // TODO: remake
@@ -21,6 +22,7 @@ const ioClasses: {[index: string]: any} = {
   WebSocketClient,
   WebSocketServer,
   I2cMaster,
+  Digital,
 };
 // TODO: remake
 const envSet: HostEnvSet = {
