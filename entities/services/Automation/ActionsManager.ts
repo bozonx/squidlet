@@ -1,7 +1,6 @@
 import Context from 'system/Context';
 import RuleDefinition, {ActionDefinition} from './interfaces/RuleDefinition';
 import ActionItem, {ActionItemClass} from './interfaces/ActionItem';
-import TriggerItem from './interfaces/TriggerItem';
 import RuleItem from './interfaces/RuleItem';
 import DeviceAction from './actions/DeviceAction';
 
@@ -44,7 +43,7 @@ export class ActionsManager {
 
 
   private makeActions(action: ActionDefinition[]): ActionItem[] {
-    const result: TriggerItem[] = [];
+    const result: ActionItem[] = [];
 
     for (let actionDefinition of action) {
       result.push(this.instantiateActionItem(actionDefinition));

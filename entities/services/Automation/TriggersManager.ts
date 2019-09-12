@@ -12,12 +12,12 @@ const triggerClasses: {[index: string]: TriggerItemClass} = {
 
 
 export class TriggersManager {
-  private readonly context: Context;
-  private readonly rules: RuleItem[];
-  private readonly ruleName: string;
-  private readonly ruleDefinition: RuleDefinition;
-  private readonly actionsManager: ActionsManager;
-  private readonly triggers: TriggerItem[];
+  readonly context: Context;
+  readonly rules: RuleItem[];
+  readonly ruleName: string;
+  readonly ruleDefinition: RuleDefinition;
+  readonly actionsManager: ActionsManager;
+  readonly triggers: TriggerItem[];
 
 
   constructor(
