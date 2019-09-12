@@ -1,12 +1,12 @@
-type TriggerTypes = 'deviceState' | 'automation' | 'mqtt' | 'http' | 'I2C';
-type ActionTypes = 'deviceAction' | 'automation' | 'mqtt' | 'http';
+export type TriggerTypes = 'deviceState' | 'automation' | 'mqtt' | 'http' | 'I2C';
+export type ActionTypes = 'deviceAction' | 'automation' | 'mqtt' | 'http';
 
 
-interface TriggerDefinition {
+export interface TriggerDefinition {
   type: TriggerTypes;
 }
 
-interface ActionDefinition {
+export interface ActionDefinition {
   type: ActionTypes;
 }
 
@@ -14,6 +14,6 @@ interface ActionDefinition {
 export default interface RuleDefinition {
   // optional name. If set you can access to it by name
   name?: string;
-  trigger: TriggerDefinition;
-  action: ActionDefinition;
+  trigger: TriggerDefinition[];
+  action: ActionDefinition[];
 }
