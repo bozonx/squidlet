@@ -1,31 +1,19 @@
 import ServiceBase from 'system/base/ServiceBase';
+import RuleItem from './interfaces/RuleItem';
+import RuleDefinition from './interfaces/RuleDefinition';
 
-
-type TriggerTypes = 'deviceState' | 'automation' | 'mqtt' | 'http' | 'I2C';
-type ActionTypes = 'deviceAction' | 'automation' | 'mqtt' | 'http';
-
-interface AutomationTrigger {
-  type: TriggerTypes;
-}
-
-interface AutomationAction {
-  type: ActionTypes;
-}
-
-interface AutomationRule {
-  // optional name. If set you can access to it by name
-  name?: string;
-  trigger: AutomationTrigger;
-  action: AutomationAction;
-}
 
 interface Props {
-  rules: AutomationRule[];
+  rules: RuleDefinition[];
 }
 
 
 export default class Automation extends ServiceBase<Props> {
-  protected didInit = async () => {
+  private readonly rules: RuleItem[] = [];
+
+
+  protected willInit = async () => {
+
   }
 
 }

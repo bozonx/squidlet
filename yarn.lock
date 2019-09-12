@@ -1056,6 +1056,11 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
+bcx-expression-evaluator@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/bcx-expression-evaluator/-/bcx-expression-evaluator-1.0.1.tgz#2a46d8ddd92edfb3e520bad566ac1bb59b6941f9"
+  integrity sha512-RZ7lqGLBgJEVE3TlkMhNUm4rA7+XPKMFXvbbe1X6AmxXuMoBPnZPTK5vfQH60yVSD8TdS+VVzUYcJa4151xAyQ==
+
 binary-extensions@^1.0.0:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.13.1.tgz#598afe54755b2868a5330d2aff9d4ebb53209b65"
