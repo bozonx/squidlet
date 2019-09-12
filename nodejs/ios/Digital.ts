@@ -180,7 +180,7 @@ export default class Digital implements DigitalIo {
 
   private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
     if (!this.pinInstances[pin]) {
-      throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
+      throw new Error(`Nodejs Digital io ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
 
     return this.pinInstances[pin];
