@@ -20,3 +20,8 @@ devices:
     light2:
       device: Relay
       pin: 2
+    wall-light-toggle:
+      device: WallClickSensor
+      pin: 3
+      pullup: true
+      publish: both

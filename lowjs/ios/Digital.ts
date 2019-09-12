@@ -54,11 +54,11 @@ export default class Digital implements DigitalIo {
    * It throws an error if pin hasn't configured before
    */
   async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    if (!gpio[pin]) {
+    if (!gpio.pins[pin]) {
       throw new Error(`Lowjs Digital io getPinMode: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
 
-    const pinType: number = gpio[pin].getType();
+    const pinType: number = gpio.pins[pin].getType();
 
     // TODO: check it
 
@@ -91,6 +91,7 @@ export default class Digital implements DigitalIo {
   async write(pin: number, value: boolean): Promise<void> {
     const numValue = (value) ? 1 : 0;
 
+    // TODO: почему не асинхронно???
     return gpio.pins[pin].setValue(numValue);
   }
 
@@ -120,8 +121,8 @@ export default class Digital implements DigitalIo {
 
     // TODO: учитывать edge
     // start listen
-    gpio[pin].on('fall', () => handlerWrapper(0));
-    gpio[pin].on('rise', () => handlerWrapper(1));
+    gpio.pins[pin].on('fall', () => handlerWrapper(0));
+    gpio.pins[pin].on('rise', () => handlerWrapper(1));
 
     // return an index
     return this.alertListeners.length - 1;
@@ -139,8 +140,8 @@ export default class Digital implements DigitalIo {
 
     // TODO: check it
 
-    gpio[pin].off('fall', handler);
-    gpio[pin].off('rise', handler);
+    gpio.pins[pin].off('fall', handler);
+    gpio.pins[pin].off('rise', handler);
 
     delete this.alertListeners[id];
   }
