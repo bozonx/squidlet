@@ -43,7 +43,10 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
   const itemsToAdd = 1;
   const result = new Uint8Array(arr.length + itemsToAdd);
   result[0] = itemToAdd;
-  arr.forEach((item, index) => result[index + itemsToAdd] = item);
+
+  for (let i = 0; i < arr.length; i++) {
+    result[i + itemsToAdd] = arr[i];
+  }
 
   return result;
 }
@@ -73,9 +76,9 @@ export function hexStringToUint8Arr(hex: string): Uint8Array {
 export function uint8ArrToHexString(bytesArr: Uint8Array): string {
   let result = '';
 
-  bytesArr.forEach((byte: number) => {
+  for (let byte of bytesArr) {
     result += int16ToHexString(Number(byte));
-  });
+  }
 
   return result;
 }

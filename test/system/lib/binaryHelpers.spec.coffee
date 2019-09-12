@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/binaryHelpers')
 
 
-describe.only 'system.lib.binaryHelpers', ->
+describe 'system.lib.binaryHelpers', ->
   it 'uint8ArrayKeys', ->
     arr = new Uint8Array([0,1,2,3,4])
 
