@@ -11,7 +11,7 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import I2cMaster from '../lowjs/ios/I2cMaster';
 import Digital from '../lowjs/ios/Digital';
-import Mqtt from '../nodejs/ios/Mqtt';
+//import Mqtt from '../nodejs/ios/Mqtt';
 
 
 // TODO: remake
@@ -24,7 +24,7 @@ const ioClasses: {[index: string]: any} = {
   WebSocketServer,
   I2cMaster,
   Digital,
-  Mqtt,
+  //Mqtt,
 };
 // TODO: remake
 const envSet: HostEnvSet = {

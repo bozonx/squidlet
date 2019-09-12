@@ -31,8 +31,6 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
-
-    // TODO: review
     // save debounce time
     this.debounceTimes[pin] = debounce;
 
@@ -111,6 +109,7 @@ export default class Digital implements DigitalIo {
         // wait for debounce and read current level
         this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
           const realLevel = await this.read(pin);
+
           handler(realLevel);
         });
       }
@@ -119,10 +118,11 @@ export default class Digital implements DigitalIo {
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
 
-    // TODO: make it
-
+    // TODO: учитывать edge
     // start listen
-    //pinInstance.on('interrupt', handlerWrapper);
+    gpio[pin].on('fall', () => handlerWrapper(0));
+    gpio[pin].on('rise', () => handlerWrapper(1));
+
     // return an index
     return this.alertListeners.length - 1;
   }
@@ -137,9 +137,10 @@ export default class Digital implements DigitalIo {
 
     const {pin, handler} = this.alertListeners[id];
 
-    // TODO: make it
+    // TODO: check it
 
-    //pinInstance.off('interrupt', handler);
+    gpio[pin].off('fall', handler);
+    gpio[pin].off('rise', handler);
 
     delete this.alertListeners[id];
   }

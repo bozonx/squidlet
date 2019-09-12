@@ -103,6 +103,7 @@ export default class Digital implements DigitalIo {
         // wait for debounce and read current level
         this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
           const realLevel = await this.read(pin);
+
           handler(realLevel);
         });
       }
