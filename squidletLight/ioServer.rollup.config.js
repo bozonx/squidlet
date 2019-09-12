@@ -8,7 +8,7 @@ import rollupCommonConfig, {makeOutputDefinition} from './rollupCommonConfig';
 const envConfig = {
   buildDir: path.resolve(__dirname, '../build/ioServer'),
   sourceMaps: false,
-  minimize: false,
+  minimize: true,
 };
 
 const commonConfig = rollupCommonConfig(envConfig);

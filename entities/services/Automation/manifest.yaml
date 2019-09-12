@@ -1,0 +1,6 @@
+name: Automation
+main: Automation.ts
+
+props:
+  rules:
+    type: "'array'"
