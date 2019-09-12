@@ -85,12 +85,9 @@ export default class Digital implements DigitalIo {
   }
 
   async read(pin: number): Promise<boolean> {
+    const result: number = await callPromised(gpio.pins[pin].getValue);
 
-    // TODO: что вернет ??? bool or num?
-
-    console.log(111111111, gpio.pins[pin].getValue());
-
-    return callPromised(gpio.pins[pin].getValue);
+    return Boolean(result);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
