@@ -20,6 +20,8 @@ describe 'envBuilder.helpers', ->
     assert.equal(helpers.clearRelativePath('../rel'), 'rel')
     assert.equal(helpers.clearRelativePath('../rel/../to'), 'rel/to')
 
+  it 'convertEntityTypePluralToSingle', ->
+    assert.equal(helpers.convertEntityTypePluralToSingle('drivers'), 'driver');
 
  # it 'yamlToJs', ->
 #    testYaml = '''
