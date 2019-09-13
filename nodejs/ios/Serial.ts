@@ -1,20 +1,63 @@
 import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/lib/serialize';
-import SerialIo, {BaudRate, EventName, Options} from 'system/interfaces/io/SerialIo';
+import SerialIo, {BaudRate, EventName, Options, SerialEvents} from 'system/interfaces/io/SerialIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {AnyHandler} from 'system/lib/IndexedEvents';
 
 
 // TODO: проверить чтобы когда драйвер дестроится - то события должны отписаться
 
+type SerialItem = [
+  SerialPort,
+  IndexedEventEmitter<AnyHandler>
+];
+
 
 export default class Serial implements SerialIo {
-  private readonly instances: SerialPort[] = [];
+  private readonly instances: SerialItem[] = [];
 
-  // TODO: rise dataString - data as string
-  // TODO: listen to errors
 
-  on(uartNum: number, eventsName: EventName, handler: (...params: any[]) => void): number {
+  async setup(uartNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
+    let portOptions: {[index: string]: any} = {
+      baudRate,
+    };
+
+    if (options) {
+      portOptions = {
+        ...portOptions,
+        databits: options.bytesize,
+        // TODO: какие значения принимает ???
+        parity: options.parity,
+        stopbits: options.stopbits,
+      };
+    }
+
+    // TODO: !!!!!!! make platform specific - support /dev/ttyUSB0
+    const uartName: string = `/dev/serial${uartNum}`;
+    const serialPort: SerialPort = new SerialPort(uartName, portOptions);
+    const events = new IndexedEventEmitter<AnyHandler>();
+    const item: SerialItem = [
+      serialPort,
+      events
+    ];
+
+    // TODO: может ли быть undefined????
+    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(uartNum, data));
+    serialPort.on('error', (err) => {
+      events.emit(SerialEvents.error, err.message);
+    });
+
+    this.instances[uartNum] = item;
+  }
+
+  async destroyPort(uartNum: number) {
+    // TODO: remove listeners
+  }
+
+
+  async onBinData(uartNum: number, handler: (data: Uint8Array) => void): Promise<number> {
 
     // TODO: convert event name if need
     // TODO: если open и serial был уже открыт то сразу поднять событие
@@ -25,6 +68,18 @@ export default class Serial implements SerialIo {
 
     return 0;
   }
+
+  async onStringData(uartNum: number, handler: (data: string) => void): Promise<number> {
+    // TODO: rise dataString - data as string
+  }
+
+  async onError(uartNum: number, handler: (err: string) => void): Promise<number> {
+    // TODO: listen to errors
+  }
+
+  // async onOpen(uartNum: number, handler: () => void): Promise<number> {
+  //
+  // }
 
 
   async write(uartNum: number, data: Uint8Array): Promise<void> {
@@ -69,30 +124,7 @@ export default class Serial implements SerialIo {
     }
   }
 
-  setup(uartNum: number, baudRate?: BaudRate, options?: Options): void {
-    let portOptions: {[index: string]: any} = {
-      baudRate,
-    };
-
-    if (options) {
-      portOptions = {
-        ...portOptions,
-        databits: options.bytesize,
-        // TODO: какие значения принимает ???
-        parity: options.parity,
-        stopbits: options.stopbits,
-      };
-    }
-
-    // TODO: rise open error
-
-    // TODO: make platform specific
-    const uartName: string = `/dev/serial${uartNum}`;
-
-    this.instances[uartNum] = new SerialPort(uartName, portOptions);
-  }
-
-  removeListener(handlerIndex: number): void {
+  async removeListener(eventName: SerialEvents, handlerIndex: number): Promise<void> {
     // TODO: add
   }
 
@@ -103,6 +135,12 @@ export default class Serial implements SerialIo {
     }
 
     return this.instances[uartNum];
+  }
+
+  private handleIncomeData(uartNum: string, data: string | Buffer) {
+    // TODO: определить что это
+    // TODO: если string - то отправить в событие string
+    // TODO: если buffer - то преобразовать в Uint8
   }
 
 }
