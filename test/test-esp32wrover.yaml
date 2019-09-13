@@ -22,7 +22,7 @@ automation:
           id: bedroom.light1
           #action: toggle
           action: turn
-          params: 'deviceStatus.bedroom.wall-light-toggle.default'
+          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
 
 devices:
   bedroom:

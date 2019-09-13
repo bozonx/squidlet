@@ -20,7 +20,7 @@ export default class Automation extends ServiceBase<Props> {
 
   protected appDidInit = async () => {
     this.log.debug(`Automation: start prepare rules`);
-    this.expressionManager = new ExpressionManager();
+    this.expressionManager = new ExpressionManager(this.context);
     this.prepareRules();
   }
 
