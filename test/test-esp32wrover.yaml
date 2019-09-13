@@ -20,9 +20,9 @@ automation:
       action:
         - type: deviceAction
           id: bedroom.light1
-          action: toggle
-          #action: turn
-          #valueExp: 'deviceStatus.bedroom.wall-light-toggle.default'
+          #action: toggle
+          action: turn
+          params: 'deviceStatus.bedroom.wall-light-toggle.default'
 
 devices:
   bedroom:
@@ -38,4 +38,5 @@ devices:
       device: WallClickSensor
       pin: 3
       pullup: true
-      publish: both
+      publish: down
+      #publish: both

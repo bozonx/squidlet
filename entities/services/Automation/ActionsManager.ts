@@ -3,6 +3,7 @@ import RuleDefinition, {ActionDefinition} from './interfaces/RuleDefinition';
 import ActionItem, {ActionItemClass} from './interfaces/ActionItem';
 import RuleItem from './interfaces/RuleItem';
 import DeviceAction from './actions/DeviceAction';
+import ExpressionManager from './ExpressionManager';
 
 
 const actionsClasses: {[index: string]: ActionItemClass} = {
@@ -12,6 +13,7 @@ const actionsClasses: {[index: string]: ActionItemClass} = {
 
 export class ActionsManager {
   readonly context: Context;
+  readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
@@ -20,11 +22,13 @@ export class ActionsManager {
 
   constructor(
     context: Context,
+    expressionManager: ExpressionManager,
     rules: RuleItem[],
     ruleName: string,
     ruleDefinition: RuleDefinition
   ) {
     this.context = context;
+    this.expressionManager = expressionManager;
     this.rules = rules;
     this.ruleName = ruleName;
     this.ruleDefinition = ruleDefinition;

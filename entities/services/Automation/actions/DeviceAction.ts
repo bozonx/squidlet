@@ -9,6 +9,8 @@ interface DeviceActionDefinition extends ActionDefinition {
   id: string;
   // name of action
   action: string;
+  // javascript expression or a list of expressions
+  params?: string | string[];
 }
 
 
@@ -28,12 +30,21 @@ export default class DeviceAction implements ActionItem {
   execute() {
     const device: DeviceBase = this.manager.context.system.devicesManager.getDevice(this.definition.id);
 
-    device.action(this.definition.action, ...this.makeArgs())
+    device.action(this.definition.action, ...await this.makeArgs())
       .catch(this.manager.context.log.error);
   }
 
 
-  private makeArgs(): any[] {
+  private async makeArgs(): Promise<any[]> {
+    if (typeof this.definition.params === 'undefined') {
+      return [];
+    }
+    else if (typeof this.definition.params === 'string') {
+      return await this.manager.expressionManager.execute(this.definition.params);
+    }
+
+
+
     // TODO: parse expressions
     return [];
   }

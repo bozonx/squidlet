@@ -4,6 +4,7 @@ import TriggerItem, {TriggerItemClass} from './interfaces/TriggerItem';
 import {ActionsManager} from './ActionsManager';
 import RuleItem from './interfaces/RuleItem';
 import DeviceState from './triggers/DeviceState';
+import ExpressionManager from './ExpressionManager';
 
 
 const triggerClasses: {[index: string]: TriggerItemClass} = {
@@ -13,6 +14,7 @@ const triggerClasses: {[index: string]: TriggerItemClass} = {
 
 export class TriggersManager {
   readonly context: Context;
+  readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
@@ -22,12 +24,14 @@ export class TriggersManager {
 
   constructor(
     context: Context,
+    expressionManager: ExpressionManager,
     rules: RuleItem[],
     ruleName: string,
     ruleDefinition: RuleDefinition,
     actionsManager: ActionsManager
   ) {
     this.context = context;
+    this.expressionManager = expressionManager;
     this.rules = rules;
     this.ruleName = ruleName;
     this.ruleDefinition = ruleDefinition;
