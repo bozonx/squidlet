@@ -16,13 +16,13 @@ automation:
       trigger:
         - type: deviceState
           id: bedroom.wall-light-toggle
-          state: default
+          #state: default
       action:
         - type: deviceAction
           id: bedroom.light1
-          action: turn
-          valueExp: 'deviceStatus.bedroom.wall-light-toggle.default'
-
+          action: toggle
+          #action: turn
+          #valueExp: 'deviceStatus.bedroom.wall-light-toggle.default'
 
 devices:
   bedroom:

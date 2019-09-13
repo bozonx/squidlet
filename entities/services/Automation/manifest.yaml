@@ -3,4 +3,4 @@ main: Automation.ts
 
 props:
   rules:
-    type: "'array'"
+    type: object[]

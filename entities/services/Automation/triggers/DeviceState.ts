@@ -4,23 +4,45 @@ import {TriggerDefinition} from '../interfaces/RuleDefinition';
 import {TriggersManager} from '../TriggersManager';
 
 
+interface DeviceStateDefinition extends TriggerDefinition {
+  // device id
+  id: string;
+  // if state param isn't defined it means any state. If defined - then check specified param
+  state?: string;
+}
+
+
 export default class DeviceState implements TriggerItem {
   private readonly manager: TriggersManager;
-  private readonly definition: TriggerDefinition;
+  private readonly definition: DeviceStateDefinition;
 
 
   constructor(manager: TriggersManager, definition: TriggerDefinition) {
+    this.validate(definition);
+
     this.manager = manager;
-    this.definition = definition;
+    this.definition = definition as DeviceStateDefinition;
   }
 
 
   onSwitch(cb: () => void): number {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
-      if (category !== StateCategories.devicesStatus) return;
+      if (
+        category !== StateCategories.devicesStatus
+        || stateName !== this.definition.id
+      ) return;
+
+      if (this.definition.state && !changedParams.includes(this.definition.state)) return;
+
+      cb();
     };
 
     return this.manager.context.state.onChange(handlerWrapper);
+  }
+
+
+  private validate(definition: TriggerDefinition) {
+    // TODO: validate
   }
 
 }
