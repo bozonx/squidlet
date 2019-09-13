@@ -37,11 +37,12 @@ export class ActionsManager {
 
 
   /**
-   * Execute all the actions
+   * Execute all the actions synchronously
    */
   execute() {
     for (let action of this.actions) {
-      action.execute();
+      action.execute()
+        .catch(this.context.log.error);
     }
   }
 

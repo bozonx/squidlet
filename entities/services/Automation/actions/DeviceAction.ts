@@ -27,7 +27,7 @@ export default class DeviceAction implements ActionItem {
   }
 
 
-  execute() {
+  async execute() {
     const device: DeviceBase = this.manager.context.system.devicesManager.getDevice(this.definition.id);
 
     device.action(this.definition.action, ...await this.makeArgs())

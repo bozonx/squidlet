@@ -5,5 +5,5 @@ import {ActionsManager} from '../ActionsManager';
 export type ActionItemClass = new (manager: ActionsManager, definition: ActionDefinition) => ActionItem;
 
 export default interface ActionItem {
-  execute(): void;
+  execute(): Promise<void>;
 }
