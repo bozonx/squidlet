@@ -39,6 +39,8 @@ export default class Serial implements SerialIo {
     }
 
     portsParams = result;
+
+    // TODO: может сразу создать инстансы
   }
 
   async destroy() {
