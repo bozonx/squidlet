@@ -2,11 +2,6 @@ import IoItem from '../IoItem';
 
 
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
-// export type EventName = 'data'
-//   | 'dataString'
-//   | 'error'
-// //  | 'open'
-// ;
 
 export enum SerialEvents {
   data,
@@ -15,15 +10,28 @@ export enum SerialEvents {
 }
 
 
-export interface Options {
-  bytesize?: 7 | 8;                      // (default 8)How many data bits - 7 or 8
-  // TODO: не использовать null
-  parity?: null | 'none' | 'o' | 'odd' | 'e' | 'even'; // (default none) Parity bit
-  stopbits?: number;                     // (default 1) Number of stop bits to use
+export interface SerialParams {
+  // device name. It uses only if squidlet runs on OS. Like /dev/ttyUSB0
+  dev?: string;
+  // default is 9600
+  baudRate?: BaudRate;
+  // bytesize?: 7 | 8;                      // (default 8)How many data bits - 7 or 8
+  // // TODO: не использовать null
+  // parity?: null | 'none' | 'o' | 'odd' | 'e' | 'even'; // (default none) Parity bit
+  // stopbits?: number;                     // (default 1) Number of stop bits to use
+}
+
+export interface SerialDefinition {
+  ports: (SerialParams | undefined)[];
 }
 
 
+export const defaultSerialParams: SerialParams = {
+  baudRate: 9600
+};
+
 export const Methods = [
+  'configure',
   'setup',
   'destroyPort',
   'onBinData',
@@ -43,13 +51,9 @@ export const Methods = [
  * uartNum - it's number of UART interface on specified platform
  */
 export default interface SerialIo extends IoItem {
-  /**
-   * Setup serial
-   * @param uartNum
-   * @param baudRate - default is 9600
-   * @param options
-   */
-  setup(uartNum: number, baudRate?: BaudRate, options?: Options): Promise<void>;
+  //setup(uartNum: number, options?: Options): Promise<void>;
+  configure(props: SerialDefinition): Promise<void>;
+  destroy(): Promise<void>;
   destroyPort(uartNum: number): Promise<void>;
 
   onBinData(uartNum: number, handler: (data: Uint8Array) => void): Promise<number>;

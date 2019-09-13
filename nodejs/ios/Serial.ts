@@ -1,56 +1,51 @@
 import * as SerialPort from 'serialport';
 
 import {textToUint8Array} from 'system/lib/serialize';
-import SerialIo, {BaudRate, EventName, Options, SerialEvents} from 'system/interfaces/io/SerialIo';
+import SerialIo, {
+  BaudRate,
+  defaultSerialParams,
+  Options,
+  SerialDefinition,
+  SerialEvents,
+  SerialParams
+} from 'system/interfaces/io/SerialIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
 
-
-// TODO: проверить чтобы когда драйвер дестроится - то события должны отписаться
 
 type SerialItem = [
   SerialPort,
   IndexedEventEmitter<AnyHandler>
 ];
 
+let portsParams: (SerialParams)[] = [];
+
 
 export default class Serial implements SerialIo {
   private readonly instances: SerialItem[] = [];
 
 
-  async setup(uartNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
-    let portOptions: {[index: string]: any} = {
-      baudRate,
-    };
+  async configure(definition: SerialDefinition) {
+    const result : SerialParams[]= [];
 
-    if (options) {
-      portOptions = {
-        ...portOptions,
-        databits: options.bytesize,
-        // TODO: какие значения принимает ???
-        parity: options.parity,
-        stopbits: options.stopbits,
-      };
+    for (let item of definition.ports) {
+      //if (typeof item === 'undefined') result.push(undefined);
+
+      result.push({
+        ...defaultSerialParams,
+        ...item,
+      });
     }
 
-    // TODO: !!!!!!! make platform specific - support /dev/ttyUSB0
-    const uartName: string = `/dev/serial${uartNum}`;
-    const serialPort: SerialPort = new SerialPort(uartName, portOptions);
-    const events = new IndexedEventEmitter<AnyHandler>();
-    const item: SerialItem = [
-      serialPort,
-      events
-    ];
-
-    // TODO: может ли быть undefined????
-    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(uartNum, data));
-    serialPort.on('error', (err) => {
-      events.emit(SerialEvents.error, err.message);
-    });
-
-    this.instances[uartNum] = item;
+    portsParams = result;
   }
+
+  async destroy() {
+    // TODO: проверить чтобы когда драйвер дестроится - то события должны отписаться
+  }
+
+
 
   async destroyPort(uartNum: number) {
     // TODO: remove listeners
@@ -141,6 +136,41 @@ export default class Serial implements SerialIo {
     // TODO: определить что это
     // TODO: если string - то отправить в событие string
     // TODO: если buffer - то преобразовать в Uint8
+  }
+
+
+  private async makeInstance(uartNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
+    // TODO: config undefined - use defaults
+    let portOptions: {[index: string]: any} = {
+      baudRate,
+    };
+
+    if (options) {
+      portOptions = {
+        ...portOptions,
+        databits: options.bytesize,
+        // TODO: какие значения принимает ???
+        parity: options.parity,
+        stopbits: options.stopbits,
+      };
+    }
+
+    // TODO: !!!!!!! make platform specific - support /dev/ttyUSB0
+    const uartName: string = `/dev/serial${uartNum}`;
+    const serialPort: SerialPort = new SerialPort(uartName, portOptions);
+    const events = new IndexedEventEmitter<AnyHandler>();
+    const item: SerialItem = [
+      serialPort,
+      events
+    ];
+
+    // TODO: может ли быть undefined????
+    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(uartNum, data));
+    serialPort.on('error', (err) => {
+      events.emit(SerialEvents.error, err.message);
+    });
+
+    this.instances[uartNum] = item;
   }
 
 }
