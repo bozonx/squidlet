@@ -36,17 +36,21 @@ export default class DeviceAction implements ActionItem {
 
 
   private async makeArgs(): Promise<any[]> {
+    const result: any[] = [];
+
     if (typeof this.definition.params === 'undefined') {
       return [];
     }
     else if (typeof this.definition.params === 'string') {
-      return await this.manager.expressionManager.execute(this.definition.params);
+      result.push(await this.manager.expressionManager.execute(this.definition.params));
+    }
+    else {
+      for (let expr of this.definition.params) {
+        result.push(await this.manager.expressionManager.execute(expr));
+      }
     }
 
-
-
-    // TODO: parse expressions
-    return [];
+    return result;
   }
 
   private validate(definition: ActionDefinition) {
