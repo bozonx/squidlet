@@ -58,6 +58,7 @@ export class TriggersManager {
   }
 
   private handleTriggerSwitch = () => {
+    this.context.log.debug(`Automation: triggered rule "${this.ruleName}"`);
     this.actionsManager.execute();
   }
 

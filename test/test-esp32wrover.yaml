@@ -38,5 +38,4 @@ devices:
       device: WallClickSensor
       pin: 3
       pullup: true
-      publish: down
-      #publish: both
+      publish: both

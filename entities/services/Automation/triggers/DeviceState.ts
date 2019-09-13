@@ -26,6 +26,9 @@ export default class DeviceState implements TriggerItem {
 
 
   onSwitch(cb: () => void): number {
+
+    // TODO: может делать через device
+
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (
         category !== StateCategories.devicesStatus
