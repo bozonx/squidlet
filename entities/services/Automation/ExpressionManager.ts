@@ -1,7 +1,6 @@
-import {evaluate} from 'bcx-expression-evaluator';
-
 import Context from 'system/Context';
 import DeviceBase from 'system/base/DeviceBase';
+import runExpr from './expressionHelper';
 
 
 export default class ExpressionManager {
@@ -17,7 +16,7 @@ export default class ExpressionManager {
 
   async execute(expression: string): Promise<any> {
     // TODO: без await в выражениях сложные выражения будут работать некорректно
-    return await evaluate(expression, this.scope);
+    return await runExpr(expression, this.scope);
   }
 
 
