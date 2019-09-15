@@ -1,8 +1,8 @@
 import * as SerialPort from 'serialport';
+import {OpenOptions} from 'serialport';
 
 import {textToUint8Array} from 'system/lib/serialize';
 import SerialIo, {
-  BaudRate,
   defaultSerialParams,
   SerialDefinition,
   SerialEvents,
@@ -11,6 +11,7 @@ import SerialIo, {
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
+import {omitObj} from '../../system/lib/objects';
 
 
 type SerialItem = [
@@ -23,24 +24,26 @@ enum ItemPostion {
   events,
 }
 
-let portsParams: {[index: string]: SerialParams} = {};
+let portParams: {[index: string]: SerialParams} = {};
 
 
 export default class Serial implements SerialIo {
   private readonly instances: {[index: string]: SerialItem} = {};
 
 
-  async configure(definition: SerialDefinition) {
-    const result: {[index: string]: SerialParams} = {};
+  async configure(newDefinition: SerialDefinition) {
+    portParams = newDefinition.ports;
 
-    for (let portNum of Object.keys(definition.ports)) {
-      result[portNum] = {
-        ...defaultSerialParams,
-        ...definition.ports[portNum],
-      };
-    }
-
-    portsParams = result;
+    // const result: {[index: string]: SerialParams} = {};
+    //
+    // for (let portNum of Object.keys(definition.ports)) {
+    //   result[portNum] = {
+    //     ...defaultSerialParams,
+    //     ...definition.ports[portNum],
+    //   };
+    // }
+    //
+    // portsParams = result;
   }
 
   async destroy() {
@@ -129,6 +132,41 @@ export default class Serial implements SerialIo {
     this.getItem(portNum)[ItemPostion.events].removeListener(eventName, handlerIndex);
   }
 
+  private getItem(portNum: number): SerialItem {
+    if (this.instances[portNum]) return this.instances[portNum];
+
+    this.instances[portNum] = this.makePortItem(portNum);
+
+    return this.instances[portNum];
+  }
+
+  private makePortItem(portNum: number): SerialItem {
+    const params: SerialParams = {
+      ...defaultSerialParams,
+      ...portParams[portNum],
+    };
+
+    if (!params.dev) {
+      throw new Error(
+        `Params of serial port ${portNum} has to have a "dev" parameter ` +
+        `which points to serial device`
+      );
+    }
+
+    const options: OpenOptions = omitObj(params, 'dev', 'rxPin', 'txPin');
+    const serialPort: SerialPort = new SerialPort(params.dev, options);
+    const events = new IndexedEventEmitter<AnyHandler>();
+
+    // TODO: может ли быть undefined????
+    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
+    serialPort.on('error', (err) => events.emit(SerialEvents.error, err.message));
+    // TODO: on open
+
+    return [
+      serialPort,
+      events
+    ];
+  }
 
   private handleIncomeData(portNum: number, data: string | Buffer) {
     // TODO: определить что это
@@ -136,47 +174,5 @@ export default class Serial implements SerialIo {
     // TODO: если buffer - то преобразовать в Uint8
   }
 
-
-  private getItem(portNum: number): SerialItem {
-    if (!this.instances[portNum]) {
-      throw new Error(`You have to do setup before acting with serial`);
-    }
-
-    return this.instances[portNum];
-  }
-
-  private async makeInstance(portNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
-    // TODO: config undefined - use defaults
-    let portOptions: {[index: string]: any} = {
-      baudRate,
-    };
-
-    if (options) {
-      portOptions = {
-        ...portOptions,
-        databits: options.bytesize,
-        // TODO: какие значения принимает ???
-        parity: options.parity,
-        stopbits: options.stopbits,
-      };
-    }
-
-    // TODO: !!!!!!! make platform specific - support /dev/ttyUSB0
-    const uartName: string = `/dev/serial${portNum}`;
-    const serialPort: SerialPort = new SerialPort(uartName, portOptions);
-    const events = new IndexedEventEmitter<AnyHandler>();
-    const item: SerialItem = [
-      serialPort,
-      events
-    ];
-
-    // TODO: может ли быть undefined????
-    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
-    serialPort.on('error', (err) => {
-      events.emit(SerialEvents.error, err.message);
-    });
-
-    this.instances[portNum] = item;
-  }
 
 }
