@@ -56,13 +56,12 @@ export default class Serial implements SerialIo {
     delete this.instances[portNum];
   }
 
-
   async onBinData(portNum: number, handler: (data: Uint8Array) => void): Promise<number> {
 
     // TODO: convert event name if need
     // TODO: если open и serial был уже открыт то сразу поднять событие
 
-    this.getSerial(portNum).on(eventsName, handler);
+    this.getItem(portNum).on(eventsName, handler);
 
     // TODO: return index
 
@@ -74,9 +73,10 @@ export default class Serial implements SerialIo {
   }
 
   async onError(portNum: number, handler: (err: string) => void): Promise<number> {
-    // TODO: listen to errors
+    return this.getItem(portNum)[ItemPostion.events].addListener(SerialEvents.error, handler);
   }
 
+  // TODO: add
   // async onOpen(portNum: number, handler: () => void): Promise<number> {
   //
   // }
@@ -93,19 +93,20 @@ export default class Serial implements SerialIo {
       value = Buffer.from(data as any);
     }
 
-    this.getSerial(portNum).write(value);
+    // TODO: use async varsion
+    this.getItem(portNum)[ItemPostion.serialPort].write(value);
   }
 
   async print(portNum: number, data: string): Promise<void> {
-    this.getSerial(portNum).write(data);
+    this.getItem(portNum)[ItemPostion.serialPort].write(data);
   }
 
   async println(portNum: number, data: string): Promise<void> {
-    this.getSerial(portNum).write(`${data}\r\n`);
+    this.getItem(portNum)[ItemPostion.serialPort].write(`${data}\r\n`);
   }
 
   async read(portNum: number, length?: number): Promise<Uint8Array> {
-    const result: string | Buffer | null = this.getSerial(portNum).read(length);
+    const result: string | Buffer | null = this.getItem(portNum)[ItemPostion.serialPort].read(length);
 
     if (result === null) {
       return new Uint8Array(0);
@@ -124,25 +125,25 @@ export default class Serial implements SerialIo {
     }
   }
 
-  async removeListener(eventName: SerialEvents, handlerIndex: number): Promise<void> {
-    // TODO: add
+  async removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void> {
+    this.getItem(portNum)[ItemPostion.events].removeListener(eventName, handlerIndex);
   }
 
 
-  private getSerial(portNum: number): SerialPort {
+  private handleIncomeData(portNum: number, data: string | Buffer) {
+    // TODO: определить что это
+    // TODO: если string - то отправить в событие string
+    // TODO: если buffer - то преобразовать в Uint8
+  }
+
+
+  private getItem(portNum: number): SerialItem {
     if (!this.instances[portNum]) {
       throw new Error(`You have to do setup before acting with serial`);
     }
 
     return this.instances[portNum];
   }
-
-  private handleIncomeData(portNum: string, data: string | Buffer) {
-    // TODO: определить что это
-    // TODO: если string - то отправить в событие string
-    // TODO: если buffer - то преобразовать в Uint8
-  }
-
 
   private async makeInstance(portNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
     // TODO: config undefined - use defaults

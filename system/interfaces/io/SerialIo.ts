@@ -36,7 +36,7 @@ export const defaultSerialParams: SerialParams = {
 
 export const Methods = [
   'configure',
-  'setup',
+  'destroy',
   'destroyPort',
   'onBinData',
   'onStringData',
@@ -80,5 +80,5 @@ export default interface SerialIo extends IoItem {
    */
   read(portNum: number, length?: number): Promise<Uint8Array>;
 
-  removeListener(eventName: SerialEvents, handlerIndex: number): Promise<void>;
+  removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 }
