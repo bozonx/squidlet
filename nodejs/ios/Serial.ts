@@ -4,7 +4,6 @@ import {textToUint8Array} from 'system/lib/serialize';
 import SerialIo, {
   BaudRate,
   defaultSerialParams,
-  Options,
   SerialDefinition,
   SerialEvents,
   SerialParams
@@ -19,7 +18,7 @@ type SerialItem = [
   IndexedEventEmitter<AnyHandler>
 ];
 
-let portsParams: (SerialParams)[] = [];
+let portsParams: {[index: string]: SerialParams} = {};
 
 
 export default class Serial implements SerialIo {
@@ -27,20 +26,16 @@ export default class Serial implements SerialIo {
 
 
   async configure(definition: SerialDefinition) {
-    const result : SerialParams[]= [];
+    const result: {[index: string]: SerialParams} = {};
 
-    for (let item of definition.ports) {
-      //if (typeof item === 'undefined') result.push(undefined);
-
-      result.push({
+    for (let portNum of Object.keys(definition.ports)) {
+      result[portNum] = {
         ...defaultSerialParams,
-        ...item,
-      });
+        ...definition.ports[portNum],
+      };
     }
 
     portsParams = result;
-
-    // TODO: может сразу создать инстансы
   }
 
   async destroy() {

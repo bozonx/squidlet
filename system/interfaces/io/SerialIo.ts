@@ -13,9 +13,9 @@ export enum SerialEvents {
 export interface SerialParams {
   // device name. It uses only if squidlet runs on OS. Like /dev/ttyUSB0
   dev?: string;
-  // rx pin
+  // rx pin. Uses on micro-controller or Raspberry pi like boards.
   rxPin?: number;
-  // tx pin
+  // tx pin. Uses on micro-controller or Raspberry pi like boards.
   txPin?: number;
   // default is 9600
   baudRate?: BaudRate;
@@ -26,7 +26,7 @@ export interface SerialParams {
 }
 
 export interface SerialDefinition {
-  ports: (SerialParams | undefined)[];
+  ports: {[index: string]: SerialParams};
 }
 
 
@@ -52,33 +52,33 @@ export const Methods = [
 
 /**
  * Uart api
- * uartNum - it's number of UART interface on specified platform
+ * portNum - it's number of UART interface on specified platform
  */
 export default interface SerialIo extends IoItem {
-  //setup(uartNum: number, options?: Options): Promise<void>;
+  //setup(portNum: number, options?: Options): Promise<void>;
   configure(props: SerialDefinition): Promise<void>;
   destroy(): Promise<void>;
-  destroyPort(uartNum: number): Promise<void>;
+  destroyPort(portNum: number): Promise<void>;
 
-  onBinData(uartNum: number, handler: (data: Uint8Array) => void): Promise<number>;
-  onStringData(uartNum: number, handler: (data: string) => void): Promise<number>;
-  onError(uartNum: number, handler: (err: string) => void): Promise<number>;
+  onBinData(portNum: number, handler: (data: Uint8Array) => void): Promise<number>;
+  onStringData(portNum: number, handler: (data: string) => void): Promise<number>;
+  onError(portNum: number, handler: (err: string) => void): Promise<number>;
   // It rises on Serial initialization event or immediately if serial is initialized
-  //onOpen(uartNum: number, handler: () => void): Promise<number>;
+  //onOpen(portNum: number, handler: () => void): Promise<number>;
 
   // write binary data
-  write(uartNum: number, data: Uint8Array): Promise<void>;
+  write(portNum: number, data: Uint8Array): Promise<void>;
   // Print to the serial port - without a line break
-  print(uartNum: number, data: string): Promise<void>;
+  print(portNum: number, data: string): Promise<void>;
   // Print a line to the serial port with a newline (\r\n) at the end of it.
-  println(uartNum: number, data: string): Promise<void>;
+  println(portNum: number, data: string): Promise<void>;
 
   /**
    * Return a string containing characters that have been received
-   * @param uartNum
+   * @param portNum
    * @param length - The number of characters to read, or undefined/0 for all available
    */
-  read(uartNum: number, length?: number): Promise<Uint8Array>;
+  read(portNum: number, length?: number): Promise<Uint8Array>;
 
   removeListener(eventName: SerialEvents, handlerIndex: number): Promise<void>;
 }
