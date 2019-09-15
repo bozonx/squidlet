@@ -1,7 +1,6 @@
 import * as SerialPort from 'serialport';
 import {OpenOptions} from 'serialport';
 
-import {textToUint8Array} from 'system/lib/serialize';
 import SerialIo, {
   defaultSerialParams,
   SerialDefinition,
@@ -11,7 +10,7 @@ import SerialIo, {
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
-import {omitObj} from '../../system/lib/objects';
+import {omitObj} from 'system/lib/objects';
 
 
 type SerialItem = [
@@ -64,7 +63,7 @@ export default class Serial implements SerialIo {
     // TODO: convert event name if need
     // TODO: если open и serial был уже открыт то сразу поднять событие
 
-    this.getItem(portNum).on(eventsName, handler);
+    //this.getItem(portNum).on(eventsName, handler);
 
     // TODO: return index
 
@@ -108,24 +107,10 @@ export default class Serial implements SerialIo {
     this.getItem(portNum)[ItemPostion.serialPort].write(`${data}\r\n`);
   }
 
-  async read(portNum: number, length?: number): Promise<Uint8Array> {
+  async read(portNum: number, length?: number): Promise<string | Uint8Array> {
     const result: string | Buffer | null = this.getItem(portNum)[ItemPostion.serialPort].read(length);
 
-    if (result === null) {
-      return new Uint8Array(0);
-    }
-    else if (typeof result === 'string') {
-
-      // TODO: review
-
-      return textToUint8Array(result);
-    }
-    else if (Buffer.isBuffer(result)) {
-      return convertBufferToUint8Array(result as Buffer);
-    }
-    else {
-      throw new Error(`Unknown type of returned value "${JSON.stringify(result)}"`);
-    }
+    return this.parseIncomeData(result);
   }
 
   async removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void> {
@@ -157,7 +142,6 @@ export default class Serial implements SerialIo {
     const serialPort: SerialPort = new SerialPort(params.dev, options);
     const events = new IndexedEventEmitter<AnyHandler>();
 
-    // TODO: может ли быть undefined????
     serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
     serialPort.on('error', (err) => events.emit(SerialEvents.error, err.message));
     // TODO: on open
@@ -168,11 +152,30 @@ export default class Serial implements SerialIo {
     ];
   }
 
-  private handleIncomeData(portNum: number, data: string | Buffer) {
-    // TODO: определить что это
-    // TODO: если string - то отправить в событие string
-    // TODO: если buffer - то преобразовать в Uint8
+  private handleIncomeData(portNum: number, data: string | Buffer | null) {
+    const parsedData: string | Uint8Array = this.parseIncomeData(data);
+
+    this.getItem(portNum)[ItemPostion.events].emit(SerialEvents.data, parsedData);
   }
 
+  private parseIncomeData(data: string | Buffer | null): string | Uint8Array {
+    if (!data) {
+      return '';
+    }
+    else if (typeof data === 'string') {
+
+      // TODO: review
+
+      //return textToUint8Array(data);
+
+      return data;
+    }
+    else if (Buffer.isBuffer(data)) {
+      return convertBufferToUint8Array(data as Buffer);
+    }
+    else {
+      throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
+    }
+  }
 
 }

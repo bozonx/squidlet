@@ -5,7 +5,6 @@ export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 
 
 export enum SerialEvents {
   data,
-  dataString,
   error,
 }
 
@@ -74,11 +73,11 @@ export default interface SerialIo extends IoItem {
   println(portNum: number, data: string): Promise<void>;
 
   /**
-   * Return a string containing characters that have been received
+   * Return a string or binary data or undefined containing characters that have been received
    * @param portNum
    * @param length - The number of characters to read, or undefined/0 for all available
    */
-  read(portNum: number, length?: number): Promise<Uint8Array>;
+  read(portNum: number, length?: number): Promise<string | Uint8Array>;
 
   removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 }
