@@ -18,11 +18,16 @@ type SerialItem = [
   IndexedEventEmitter<AnyHandler>
 ];
 
+enum ItemPostion {
+  serialPort,
+  events,
+}
+
 let portsParams: {[index: string]: SerialParams} = {};
 
 
 export default class Serial implements SerialIo {
-  private readonly instances: SerialItem[] = [];
+  private readonly instances: {[index: string]: SerialItem} = {};
 
 
   async configure(definition: SerialDefinition) {
@@ -39,42 +44,45 @@ export default class Serial implements SerialIo {
   }
 
   async destroy() {
-    // TODO: проверить чтобы когда драйвер дестроится - то события должны отписаться
+    for (let portNum of Object.keys(this.instances)) {
+      this.destroyPort(Number(portNum));
+    }
   }
 
 
-
-  async destroyPort(uartNum: number) {
-    // TODO: remove listeners
+  async destroyPort(portNum: number) {
+    this.instances[portNum][ItemPostion.events].destroy();
+    // TODO: отписать хэндлеры
+    delete this.instances[portNum];
   }
 
 
-  async onBinData(uartNum: number, handler: (data: Uint8Array) => void): Promise<number> {
+  async onBinData(portNum: number, handler: (data: Uint8Array) => void): Promise<number> {
 
     // TODO: convert event name if need
     // TODO: если open и serial был уже открыт то сразу поднять событие
 
-    this.getSerial(uartNum).on(eventsName, handler);
+    this.getSerial(portNum).on(eventsName, handler);
 
     // TODO: return index
 
     return 0;
   }
 
-  async onStringData(uartNum: number, handler: (data: string) => void): Promise<number> {
+  async onStringData(portNum: number, handler: (data: string) => void): Promise<number> {
     // TODO: rise dataString - data as string
   }
 
-  async onError(uartNum: number, handler: (err: string) => void): Promise<number> {
+  async onError(portNum: number, handler: (err: string) => void): Promise<number> {
     // TODO: listen to errors
   }
 
-  // async onOpen(uartNum: number, handler: () => void): Promise<number> {
+  // async onOpen(portNum: number, handler: () => void): Promise<number> {
   //
   // }
 
 
-  async write(uartNum: number, data: Uint8Array): Promise<void> {
+  async write(portNum: number, data: Uint8Array): Promise<void> {
     let value: Buffer;
 
     if (typeof data === 'object' && (data as any).data && (data as any).count) {
@@ -85,19 +93,19 @@ export default class Serial implements SerialIo {
       value = Buffer.from(data as any);
     }
 
-    this.getSerial(uartNum).write(value);
+    this.getSerial(portNum).write(value);
   }
 
-  async print(uartNum: number, data: string): Promise<void> {
-    this.getSerial(uartNum).write(data);
+  async print(portNum: number, data: string): Promise<void> {
+    this.getSerial(portNum).write(data);
   }
 
-  async println(uartNum: number, data: string): Promise<void> {
-    this.getSerial(uartNum).write(`${data}\r\n`);
+  async println(portNum: number, data: string): Promise<void> {
+    this.getSerial(portNum).write(`${data}\r\n`);
   }
 
-  async read(uartNum: number, length?: number): Promise<Uint8Array> {
-    const result: string | Buffer | null = this.getSerial(uartNum).read(length);
+  async read(portNum: number, length?: number): Promise<Uint8Array> {
+    const result: string | Buffer | null = this.getSerial(portNum).read(length);
 
     if (result === null) {
       return new Uint8Array(0);
@@ -121,22 +129,22 @@ export default class Serial implements SerialIo {
   }
 
 
-  private getSerial(uartNum: number): SerialPort {
-    if (!this.instances[uartNum]) {
+  private getSerial(portNum: number): SerialPort {
+    if (!this.instances[portNum]) {
       throw new Error(`You have to do setup before acting with serial`);
     }
 
-    return this.instances[uartNum];
+    return this.instances[portNum];
   }
 
-  private handleIncomeData(uartNum: string, data: string | Buffer) {
+  private handleIncomeData(portNum: string, data: string | Buffer) {
     // TODO: определить что это
     // TODO: если string - то отправить в событие string
     // TODO: если buffer - то преобразовать в Uint8
   }
 
 
-  private async makeInstance(uartNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
+  private async makeInstance(portNum: number, baudRate?: BaudRate, options?: Options): Promise<void> {
     // TODO: config undefined - use defaults
     let portOptions: {[index: string]: any} = {
       baudRate,
@@ -153,7 +161,7 @@ export default class Serial implements SerialIo {
     }
 
     // TODO: !!!!!!! make platform specific - support /dev/ttyUSB0
-    const uartName: string = `/dev/serial${uartNum}`;
+    const uartName: string = `/dev/serial${portNum}`;
     const serialPort: SerialPort = new SerialPort(uartName, portOptions);
     const events = new IndexedEventEmitter<AnyHandler>();
     const item: SerialItem = [
@@ -162,12 +170,12 @@ export default class Serial implements SerialIo {
     ];
 
     // TODO: может ли быть undefined????
-    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(uartNum, data));
+    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
     serialPort.on('error', (err) => {
       events.emit(SerialEvents.error, err.message);
     });
 
-    this.instances[uartNum] = item;
+    this.instances[portNum] = item;
   }
 
 }
