@@ -32,17 +32,6 @@ export default class Serial implements SerialIo {
 
   async configure(newDefinition: SerialDefinition) {
     portParams = newDefinition.ports;
-
-    // const result: {[index: string]: SerialParams} = {};
-    //
-    // for (let portNum of Object.keys(definition.ports)) {
-    //   result[portNum] = {
-    //     ...defaultSerialParams,
-    //     ...definition.ports[portNum],
-    //   };
-    // }
-    //
-    // portsParams = result;
   }
 
   async destroy() {
@@ -58,31 +47,13 @@ export default class Serial implements SerialIo {
     delete this.instances[portNum];
   }
 
-  async onBinData(portNum: number, handler: (data: Uint8Array) => void): Promise<number> {
-
-    // TODO: convert event name if need
-    // TODO: если open и serial был уже открыт то сразу поднять событие
-
-    //this.getItem(portNum).on(eventsName, handler);
-
-    // TODO: return index
-
-    return 0;
-  }
-
-  async onStringData(portNum: number, handler: (data: string) => void): Promise<number> {
-    // TODO: rise dataString - data as string
+  async onData(portNum: number, handler: (data: string | Uint8Array) => void): Promise<number> {
+    return this.getItem(portNum)[ItemPostion.events].addListener(SerialEvents.data, handler);
   }
 
   async onError(portNum: number, handler: (err: string) => void): Promise<number> {
     return this.getItem(portNum)[ItemPostion.events].addListener(SerialEvents.error, handler);
   }
-
-  // TODO: add
-  // async onOpen(portNum: number, handler: () => void): Promise<number> {
-  //
-  // }
-
 
   async write(portNum: number, data: Uint8Array): Promise<void> {
     let value: Buffer;
@@ -95,7 +66,7 @@ export default class Serial implements SerialIo {
       value = Buffer.from(data as any);
     }
 
-    // TODO: use async varsion
+    // TODO: use async version
     this.getItem(portNum)[ItemPostion.serialPort].write(value);
   }
 
@@ -144,7 +115,14 @@ export default class Serial implements SerialIo {
 
     serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
     serialPort.on('error', (err) => events.emit(SerialEvents.error, err.message));
-    // TODO: on open
+
+    if (serialPort.isOpen) {
+      // TODO: заем сразу поднимать????
+      events.emit(SerialEvents.open);
+    }
+    else {
+      serialPort.on('open', () => events.emit(SerialEvents.open));
+    }
 
     return [
       serialPort,
@@ -163,9 +141,6 @@ export default class Serial implements SerialIo {
       return '';
     }
     else if (typeof data === 'string') {
-
-      // TODO: review
-
       //return textToUint8Array(data);
 
       return data;
@@ -173,9 +148,8 @@ export default class Serial implements SerialIo {
     else if (Buffer.isBuffer(data)) {
       return convertBufferToUint8Array(data as Buffer);
     }
-    else {
-      throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
-    }
+
+    throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
   }
 
 }

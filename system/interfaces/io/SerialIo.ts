@@ -37,14 +37,15 @@ export const Methods = [
   'configure',
   'destroy',
   'destroyPort',
-  'onBinData',
-  'onStringData',
+
+  'onData',
   'onError',
-  //'onOpen',
+
   'write',
   'print',
   'println',
   'read',
+
   'removeListener',
 ];
 
@@ -59,11 +60,8 @@ export default interface SerialIo extends IoItem {
   destroy(): Promise<void>;
   destroyPort(portNum: number): Promise<void>;
 
-  onBinData(portNum: number, handler: (data: Uint8Array) => void): Promise<number>;
-  onStringData(portNum: number, handler: (data: string) => void): Promise<number>;
+  onData(portNum: number, handler: (data: string | Uint8Array) => void): Promise<number>;
   onError(portNum: number, handler: (err: string) => void): Promise<number>;
-  // It rises on Serial initialization event or immediately if serial is initialized
-  //onOpen(portNum: number, handler: () => void): Promise<number>;
 
   // write binary data
   write(portNum: number, data: Uint8Array): Promise<void>;
@@ -71,7 +69,6 @@ export default interface SerialIo extends IoItem {
   print(portNum: number, data: string): Promise<void>;
   // Print a line to the serial port with a newline (\r\n) at the end of it.
   println(portNum: number, data: string): Promise<void>;
-
   /**
    * Return a string or binary data or undefined containing characters that have been received
    * @param portNum
