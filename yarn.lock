@@ -1479,6 +1479,11 @@ core-util-is@~1.0.0:
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
 
+crc@3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/crc/-/crc-3.4.0.tgz#4258e351613a74ef1153dfcb05e820c3e9715d7f"
+  integrity sha1-QljjUWE6dO8RU9/LBeggw+lxXX8=
+
 cross-spawn@^5.1.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
@@ -3072,6 +3077,14 @@ jsesc@~0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
+
+jsmodbus@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/jsmodbus/-/jsmodbus-3.1.4.tgz#d742966e2266e26d62e36583f805779bcaece563"
+  integrity sha512-TbNI69ylRrllcPjb9K2PK6U+vYQtnTuxSeSjJcveB96O9v8++ldqP/QUNm4byIG6/S6vqSYSIntPG7BelXCEjA==
+  dependencies:
+    crc "3.4.0"
+    debug "^3.1.0"
 
 json-schema-traverse@^0.3.0:
   version "0.3.1"

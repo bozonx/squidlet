@@ -20,6 +20,7 @@
     "bcx-expression-evaluator": "^1.0.1",
     "immutable": "^4.0.0-rc.12",
     "js-yaml": "^3.13.1",
+    "jsmodbus": "^3.1.4",
     "lodash": "^4.17.15",
     "mqtt": "^3.0.0",
     "mqtt-packet": "^6.2.1",
