@@ -7,5 +7,13 @@ ios:
 
 props:
   portNum:
-    type: object
+    type: number
     required: true
+  dev:
+    type: string
+  rxPin:
+    type: number
+  txPin:
+    type: number
+  baudRate:
+    type: number
