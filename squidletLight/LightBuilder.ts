@@ -1,34 +1,50 @@
+import * as path from 'path';
+
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import * as path from "path";
-import {HOST_ENVSET_DIR} from '../shared/constants';
+import {HOST_TMP_DIR} from '../shared/constants';
 import Os from '../shared/Os';
-import {getFileNameOfPath, loadMachineConfigInPlatformDir, resolvePlatformDir} from '../shared/helpers';
-import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
+import {getFileNameOfPath} from '../shared/helpers';
 import {IOS_GLOBAL_CONST} from './constants';
+import Platforms from '../system/interfaces/Platforms';
+
 
 export default class LightBuilder {
+  private readonly workDir: string;
+  private readonly platform: Platforms;
+  private readonly machine: string;
+  private readonly tmpDir: string;
   private readonly os: Os = new Os();
   private readonly envBuilder: EnvBuilder;
 
 
-  constructor() {
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+  constructor(workDir: string, platform: Platforms, machine: string, hostConfigPath: string) {
+    this.workDir = workDir;
+    this.platform = platform;
+    this.machine = machine;
+    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
 
     this.envBuilder = new EnvBuilder(
-      // this.props.hostConfig,
-      // this.props.envSetDir,
-      // tmpDir,
-      // this.props.platform,
-      // this.props.machine,
+      hostConfigPath,
+      this.workDir,
+      this.tmpDir,
+      this.platform,
+      this.machine,
     );
   }
 
 
   async build() {
+    await this.os.mkdirP(this.tmpDir);
+
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    // await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
+    const indexFileStr = this.makeIndexFile();
+    const indexFilePath = path.join(this.workDir, 'index.ts');
+
+    await this.os.writeFile(indexFilePath, indexFileStr);
+
+    await this.rollup();
   }
 
 
@@ -61,7 +77,7 @@ export default class LightBuilder {
     return '1111';
   }
 
-  private rollup() {
+  private async rollup() {
 
   }
 
