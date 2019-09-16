@@ -2,6 +2,7 @@ import {I2cBus, openSync} from 'i2c-bus';
 
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import {callPromised} from '../../system/lib/common';
 
 
 /**
@@ -9,6 +10,14 @@ import {convertBufferToUint8Array} from 'system/lib/buffer';
  */
 export default class I2cMaster implements I2cMasterIo {
   private readonly instances: {[index: string]: I2cBus} = {};
+
+
+  async destroy() {
+    for (let bus of Object.keys(this.instances)) {
+      await callPromised(this.instances[bus].close);
+      delete this.instances[bus];
+    }
+  }
 
 
   // writeTo(bus: string, addrHex: number, data: Uint8Array | undefined): Promise<void> {
@@ -51,8 +60,6 @@ export default class I2cMaster implements I2cMasterIo {
 
         resolve(uIntArr);
       };
-
-      console.log(9999999, bus, addrHex, quantity);
 
       this.getI2cBus(bus).i2cRead(addrHex, quantity, bufferToRead, callback);
     });
