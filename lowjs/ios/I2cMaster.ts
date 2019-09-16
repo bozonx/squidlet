@@ -1,3 +1,5 @@
+const i2c = require('i2c');
+
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
@@ -32,7 +34,13 @@ export default class I2cMaster implements I2cMasterIo {
   private getI2cBus(bus: string): any {
     if (this.instances[bus]) return this.instances[bus];
 
-    this.instances[bus] = openSync(parseInt(bus));
+    // TODO: взять конфиг из ранее скорфигурированного bus
+
+    this.instances[bus] = new i2c.I2C({
+      pinSDA: 4,
+      pinSCL: 5,
+      clockHz: 100000,
+    });
 
     return this.instances[bus];
   }

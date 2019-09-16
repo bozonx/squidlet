@@ -42,7 +42,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'I2cToSlave/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cSlave/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cToMaster/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2cDuplex/manifest.yaml'));
+  //await env.addDriver(path.join(driversRoot, 'I2cDuplex/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Mqtt/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SerialDuplex/manifest.yaml'));
@@ -71,9 +71,9 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
       await env.addUsedEntity('driver', 'Digital_local');
     }
 
-    if (machineIos.includes('Serial')) {
-      await env.addUsedEntity('driver', 'SerialDuplex');
-    }
+    // if (machineIos.includes('Serial')) {
+    //   await env.addUsedEntity('driver', 'SerialDuplex');
+    // }
 
     if (machineIos.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');

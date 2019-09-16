@@ -10,30 +10,42 @@ wsApi:
 ioServer:
   host: 0.0.0.0
 
-automation:
-  rules:
-    - name: switch_led
-      trigger:
-        - type: deviceState
-          id: bedroom.wall-light-toggle
-          #state: default
-      action:
-        - type: deviceAction
-          id: bedroom.light1
-          #action: toggle
-          action: turn
-          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
+#automation:
+#  rules:
+#    - name: switch_led
+#      trigger:
+#        - type: deviceState
+#          id: bedroom.wall-light-toggle
+#          #state: default
+#      action:
+#        - type: deviceAction
+#          id: bedroom.light1
+#          #action: toggle
+#          action: turn
+#          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
 
 devices:
   bedroom:
-    people-count-sensor:
-      device: FakePeopleCount
+#    people-count-sensor:
+#      device: FakePeopleCount
+#    light1:
+#      device: Relay
+#      pin: 1
+
+    expander:
+      device: Pcf8574
+      address: 20
+
     light1:
       device: Relay
-      pin: 1
+      source: 'pcf8574'
+      pin: 0
+      expander: bedroom.expander
+
     light2:
       device: Relay
       pin: 2
+
     wall-light-toggle:
       device: WallClickSensor
       pin: 3
