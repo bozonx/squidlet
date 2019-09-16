@@ -8,13 +8,13 @@ import {
   HttpServerEvent,
   HttpServerIo,
   HttpServerProps
-} from 'system/interfaces/io/HttpServerIo';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {AnyHandler} from 'system/lib/IndexedEvents';
-import {WAIT_RESPONSE_TIMEOUT_SEC} from 'system/constants';
-import {makeUniqNumber} from 'system/lib/uniqId';
-import {callPromised} from 'system/lib/common';
-import {HttpRequest, HttpResponse} from 'system/interfaces/Http';
+} from 'interfaces/io/HttpServerIo';
+import IndexedEventEmitter from 'lib/IndexedEventEmitter';
+import {AnyHandler} from 'lib/IndexedEvents';
+import {WAIT_RESPONSE_TIMEOUT_SEC} from 'constants';
+import {makeUniqNumber} from 'lib/uniqId';
+import {callPromised} from 'lib/common';
+import {HttpRequest, HttpResponse} from 'interfaces/Http';
 
 
 type ServerItem = [

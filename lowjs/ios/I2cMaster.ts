@@ -9,25 +9,28 @@ import {I2cMasterBusLike, I2cParams} from 'system/interfaces/io/I2cMasterIo';
 
 export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
   protected async createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike> {
-    const i2Bus: any = new i2c.I2C(params);
+    if (typeof params.pinSDA === 'undefined') {
+      throw new Error(`Can't create a connection to I2C master bus number ${busNum}: no "pinSDA" param`);
+    }
+    else if (typeof params.pinSCL === 'undefined') {
+      throw new Error(`Can't create a connection to I2C master bus number ${busNum}: no "pinSCL" param`);
+    }
 
-    // pinSDA: 8,
-    // pinSCL: 9,
-    // clockHz: 100000,
+    const i2cBus: any = new i2c.I2C(params);
 
     return {
       read: async (addrHex: number, quantity: number): Promise<Uint8Array> => {
         //const result: Buffer = await callPromised(this.getI2cBus(bus).read, addrHex, quantity);
-        const result: Buffer = await callPromised(i2Bus.transfer.bind(i2Bus), addrHex, null, quantity);
+        const result: Buffer = await callPromised(i2cBus.transfer.bind(i2cBus), addrHex, null, quantity);
 
         return convertBufferToUint8Array(result);
       },
       write: async (addrHex: number, data: Uint8Array): Promise<void> => {
         const buffer = Buffer.from(data);
         //await callPromised(this.getI2cBus(bus).write, addrHex, buffer);
-        await callPromised(i2Bus.transfer.bind(i2Bus), addrHex, buffer, 0);
+        await callPromised(i2cBus.transfer.bind(i2cBus), addrHex, buffer, 0);
       },
-      destroy: i2Bus.destroy.bind(i2Bus),
+      destroy: i2cBus.destroy.bind(i2cBus),
     };
   }
 
