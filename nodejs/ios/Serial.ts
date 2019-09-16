@@ -69,27 +69,23 @@ export default class Serial implements SerialIo {
     return this.getItem(portNum)[ItemPostion.events].addListener(SerialEvents.error, handler);
   }
 
-  async write(portNum: number, data: string | Uint8Array): Promise<void> {
-    if (typeof data === 'string') {
-      return callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, data, ENCODE);
-    }
-    // binary
+  async write(portNum: number, data: Uint8Array): Promise<void> {
     await callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, Buffer.from(data));
   }
 
   async print(portNum: number, data: string): Promise<void> {
-    this.getItem(portNum)[ItemPostion.serialPort].write(data);
+    await callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, data, ENCODE);
   }
 
   async println(portNum: number, data: string): Promise<void> {
-    this.getItem(portNum)[ItemPostion.serialPort].write(`${data}\r\n`);
+    await callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, `${data}\n`, ENCODE);
   }
 
-  async read(portNum: number, length?: number): Promise<string | Uint8Array> {
-    const result: string | Buffer | null = this.getItem(portNum)[ItemPostion.serialPort].read(length);
-
-    return this.parseIncomeData(result);
-  }
+  // async read(portNum: number, length?: number): Promise<string | Uint8Array> {
+  //   const result: string | Buffer | null = this.getItem(portNum)[ItemPostion.serialPort].read(length);
+  //
+  //   return this.parseIncomeData(result);
+  // }
 
   async removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void> {
     this.getItem(portNum)[ItemPostion.events].removeListener(eventName, handlerIndex);

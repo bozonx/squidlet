@@ -79,12 +79,12 @@ export default interface SerialIo extends IoItem {
   print(portNum: number, data: string): Promise<void>;
   // Print a line to the serial port with a newline (\r\n) at the end of it.
   println(portNum: number, data: string): Promise<void>;
-  /**
-   * Return a string or binary data or undefined containing characters that have been received
-   * @param portNum
-   * @param length - The number of characters to read, or undefined/0 for all available
-   */
-  read(portNum: number, length?: number): Promise<string | Uint8Array>;
+  // /**
+  //  * Return a string or binary data or undefined containing characters that have been received
+  //  * @param portNum
+  //  * @param length - The number of characters to read, or undefined/0 for all available
+  //  */
+  // read(portNum: number, length?: number): Promise<string | Uint8Array>;
 
   removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 }
