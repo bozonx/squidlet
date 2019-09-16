@@ -3,7 +3,6 @@ import {ENCODE} from '../constants';
 import {callPromised} from '../lib/common';
 import IndexedEventEmitter from '../lib/IndexedEventEmitter';
 import {AnyHandler} from '../lib/IndexedEvents';
-import {convertBufferToUint8Array} from '../lib/buffer';
 
 
 export interface SerialPortLike {
@@ -33,7 +32,16 @@ export default abstract class SerialIoBase {
 
 
   protected abstract createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike>;
+
+  /**
+   * Convert binary data which will be written.
+   */
   protected abstract prepareBinaryDataToWrite(data: Uint8Array): any;
+
+  /**
+   * Convert binary data which is received from bus.
+   */
+  protected abstract convertIncomeBinaryData(data: any): Uint8Array;
 
 
   async configure(newDefinition: SerialDefinition) {
@@ -118,13 +126,13 @@ export default abstract class SerialIoBase {
     return this.instances[portNum];
   }
 
-  protected handleIncomeData(portNum: number, data: string | Buffer | null) {
+  protected handleIncomeData(portNum: number, data: any) {
     const parsedData: string | Uint8Array = this.parseIncomeData(data);
 
     this.getItem(portNum)[ItemPostion.events].emit(SerialEvents.data, parsedData);
   }
 
-  protected parseIncomeData(data: string | Buffer | null): string | Uint8Array {
+  protected parseIncomeData(data: any): string | Uint8Array {
     if (!data) {
       return '';
     }
@@ -133,11 +141,8 @@ export default abstract class SerialIoBase {
 
       return data;
     }
-    else if (Buffer.isBuffer(data)) {
-      return convertBufferToUint8Array(data as Buffer);
-    }
 
-    throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
+    return this.convertIncomeBinaryData(data);
   }
 
   protected async makePortItem(portNum: number, paramsOverride: SerialParams): Promise<SerialItem> {
@@ -150,7 +155,7 @@ export default abstract class SerialIoBase {
     const serialPort: SerialPortLike = await this.createConnection(portNum, params);
     const events = new IndexedEventEmitter<AnyHandler>();
 
-    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
+    serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));
     // TODO: скорее всего err другой
     serialPort.on('error', (err: {message: string}) => events.emit(SerialEvents.error, err.message));
 
