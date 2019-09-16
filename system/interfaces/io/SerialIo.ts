@@ -56,9 +56,17 @@ export const Methods = [
  * portNum - it's number of UART interface on specified platform
  */
 export default interface SerialIo extends IoItem {
-  //setup(portNum: number, options?: Options): Promise<void>;
+  /**
+   * Pre define props of port.
+   * These props will be used when the "newPort" method will be called.
+   */
   configure(props: SerialDefinition): Promise<void>;
-  newPort(portNum: number): Promise<number>;
+
+  /**
+   * Create a new port and wait while it opens.
+   * If you don't specify a portNum then a new one will be created and this number will be returned.
+   */
+  newPort(portNum: number | undefined, paramsOverride: SerialParams): Promise<number>;
   destroy(): Promise<void>;
   destroyPort(portNum: number): Promise<void>;
 

@@ -26,6 +26,7 @@ enum ItemPostion {
 }
 
 let portParams: {[index: string]: SerialParams} = {};
+let unnamedPortNumIndex = 0;
 
 
 export default class Serial implements SerialIo {
@@ -36,8 +37,14 @@ export default class Serial implements SerialIo {
     portParams = newDefinition.ports;
   }
 
-  async newPort(portNum: number): Promise<number> {
+  async newPort(portNum: number | undefined, paramsOverride: SerialParams): Promise<number> {
+    const resolvedPortNum = this.resolvePortNum(portNum);
 
+    if (!this.instances[resolvedPortNum]) {
+      this.instances[resolvedPortNum] = await this.makePortItem(resolvedPortNum, paramsOverride);
+    }
+
+    return resolvedPortNum;
   }
 
   async destroy() {
@@ -49,7 +56,7 @@ export default class Serial implements SerialIo {
 
   async destroyPort(portNum: number) {
     await callPromised(this.instances[portNum][ItemPostion.serialPort].close);
-    // TODO: remove hadnlers???
+    // TODO: remove handlers???
     this.instances[portNum][ItemPostion.events].destroy();
     delete this.instances[portNum];
   }
@@ -89,17 +96,18 @@ export default class Serial implements SerialIo {
   }
 
   private getItem(portNum: number): SerialItem {
-    if (this.instances[portNum]) return this.instances[portNum];
-
-    this.instances[portNum] = this.makePortItem(portNum);
+    if (!this.instances[portNum]) {
+      throw new Error(`Serial IO: port "${portNum}" hasn't been instantiated`);
+    }
 
     return this.instances[portNum];
   }
 
-  private async makePortItem(portNum: number): Promise<SerialItem> {
+  private async makePortItem(portNum: number, paramsOverride: SerialParams): Promise<SerialItem> {
     const params: SerialParams = {
       ...defaultSerialParams,
       ...portParams[portNum],
+      ...paramsOverride,
     };
 
     if (!params.dev) {
@@ -110,21 +118,11 @@ export default class Serial implements SerialIo {
     }
 
     const options: OpenOptions = omitObj(params, 'dev', 'rxPin', 'txPin');
-    const serialPort: SerialPort = new SerialPort(params.dev, options);
+    const serialPort: SerialPort = await this.createConnection(params.dev, options);
     const events = new IndexedEventEmitter<AnyHandler>();
 
     serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
     serialPort.on('error', (err) => events.emit(SerialEvents.error, err.message));
-
-    // if (serialPort.isOpen) {
-    //   // TODO: заем сразу поднимать????
-    //   events.emit(SerialEvents.open);
-    // }
-    // else {
-    //   serialPort.on('open', () => events.emit(SerialEvents.open));
-    // }
-
-
 
     return [
       serialPort,
@@ -184,6 +182,14 @@ export default class Serial implements SerialIo {
     }
 
     throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
+  }
+
+  private resolvePortNum(portNum: number | undefined): number {
+    if (typeof portNum === 'number') return portNum;
+
+    unnamedPortNumIndex++;
+
+    return unnamedPortNumIndex;
   }
 
 }
