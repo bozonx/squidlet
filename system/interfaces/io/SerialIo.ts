@@ -35,6 +35,7 @@ export const defaultSerialParams: SerialParams = {
 
 export const Methods = [
   'configure',
+  'newPort',
   'destroy',
   'destroyPort',
 
@@ -57,6 +58,7 @@ export const Methods = [
 export default interface SerialIo extends IoItem {
   //setup(portNum: number, options?: Options): Promise<void>;
   configure(props: SerialDefinition): Promise<void>;
+  newPort(portNum: number): Promise<number>;
   destroy(): Promise<void>;
   destroyPort(portNum: number): Promise<void>;
 

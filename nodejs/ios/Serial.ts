@@ -11,6 +11,8 @@ import {convertBufferToUint8Array} from 'system/lib/buffer';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {AnyHandler} from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
+import {callPromised} from 'system/lib/common';
+import {ENCODE, SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 
 
 type SerialItem = [
@@ -34,6 +36,10 @@ export default class Serial implements SerialIo {
     portParams = newDefinition.ports;
   }
 
+  async newPort(portNum: number): Promise<number> {
+
+  }
+
   async destroy() {
     for (let portNum of Object.keys(this.instances)) {
       this.destroyPort(Number(portNum));
@@ -42,8 +48,9 @@ export default class Serial implements SerialIo {
 
 
   async destroyPort(portNum: number) {
+    await callPromised(this.instances[portNum][ItemPostion.serialPort].close);
+    // TODO: remove hadnlers???
     this.instances[portNum][ItemPostion.events].destroy();
-    // TODO: отписать хэндлеры
     delete this.instances[portNum];
   }
 
@@ -55,19 +62,12 @@ export default class Serial implements SerialIo {
     return this.getItem(portNum)[ItemPostion.events].addListener(SerialEvents.error, handler);
   }
 
-  async write(portNum: number, data: Uint8Array): Promise<void> {
-    let value: Buffer;
-
-    if (typeof data === 'object' && (data as any).data && (data as any).count) {
-      // TODO: взять только заданную длинну или просто проверить что данные нужно длинны ???
-      value = Buffer.from(data as any);
+  async write(portNum: number, data: string | Uint8Array): Promise<void> {
+    if (typeof data === 'string') {
+      return callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, data, ENCODE);
     }
-    else {
-      value = Buffer.from(data as any);
-    }
-
-    // TODO: use async version
-    this.getItem(portNum)[ItemPostion.serialPort].write(value);
+    // binary
+    await callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, Buffer.from(data));
   }
 
   async print(portNum: number, data: string): Promise<void> {
@@ -96,7 +96,7 @@ export default class Serial implements SerialIo {
     return this.instances[portNum];
   }
 
-  private makePortItem(portNum: number): SerialItem {
+  private async makePortItem(portNum: number): Promise<SerialItem> {
     const params: SerialParams = {
       ...defaultSerialParams,
       ...portParams[portNum],
@@ -116,18 +116,52 @@ export default class Serial implements SerialIo {
     serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
     serialPort.on('error', (err) => events.emit(SerialEvents.error, err.message));
 
-    if (serialPort.isOpen) {
-      // TODO: заем сразу поднимать????
-      events.emit(SerialEvents.open);
-    }
-    else {
-      serialPort.on('open', () => events.emit(SerialEvents.open));
-    }
+    // if (serialPort.isOpen) {
+    //   // TODO: заем сразу поднимать????
+    //   events.emit(SerialEvents.open);
+    // }
+    // else {
+    //   serialPort.on('open', () => events.emit(SerialEvents.open));
+    // }
+
+
 
     return [
       serialPort,
       events
     ];
+  }
+
+  private async createConnection(dev: string, options: OpenOptions): Promise<SerialPort> {
+    return new Promise<SerialPort>((resolve, reject) => {
+      const serialPort: SerialPort = new SerialPort(dev, options);
+
+      let openTimeout: any;
+      let errorHandler: any;
+      let openHandler: any;
+
+      errorHandler = (err: {message: string}) => {
+        clearTimeout(openTimeout);
+        serialPort.off('error', errorHandler);
+        serialPort.off('open', openHandler);
+        reject(err.message);
+      };
+      openHandler = () => {
+        clearTimeout(openTimeout);
+        serialPort.off('error', errorHandler);
+        serialPort.off('open', openHandler);
+        resolve(serialPort);
+      };
+
+      serialPort.on('error', errorHandler);
+      serialPort.on('open', openHandler);
+
+      openTimeout = setTimeout(() => {
+        serialPort.off('error', errorHandler);
+        serialPort.off('open', openHandler);
+        reject(`Serial IO: timeout of opening a serial port has been exceeded`);
+      }, SERVER_STARTING_TIMEOUT_SEC * 1000);
+    });
   }
 
   private handleIncomeData(portNum: number, data: string | Buffer | null) {
