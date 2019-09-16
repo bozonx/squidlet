@@ -2,14 +2,17 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import SerialIo, {SerialParams} from 'system/interfaces/io/SerialIo';
 import {omitObj} from 'system/lib/objects';
+import IndexedEvents from 'system/lib/IndexedEvents';
 
 
+export type MessageHandler = (data: string | Uint8Array) => void;
 interface Props extends SerialParams {
   portNum: number;
 }
 
 
 export class Serial extends DriverBase<Props> {
+  private readonly messageEvents = new IndexedEvents<MessageHandler>();
   private get serialIo(): SerialIo {
     return this.getIo('Serial') as any;
   }
@@ -30,21 +33,34 @@ export class Serial extends DriverBase<Props> {
 
 
   destroy = async () => {
-    // TODO: !!!
+    this.messageEvents.removeAll();
+    await this.serialIo.destroyPort(this.portNum);
   }
 
 
-  onMessage(cb: (portNum: number, data: string | Uint8Array) => void): number {
-    // TODO: !!!
+  onMessage(cb: MessageHandler): number {
+    return this.messageEvents.addListener(cb);
+  }
+
+  async write(data: Uint8Array) {
+    await this.serialIo.write(this.portNum, data);
+  }
+
+  async print(data: string) {
+    return await this.serialIo.print(this.portNum, data);
+  }
+
+  async println(data: string) {
+    return await this.serialIo.print(this.portNum, data);
   }
 
   removeMessageListener(handlerIndex: number) {
-    // TODO: !!!
+    this.messageEvents.removeListener(handlerIndex);
   }
 
 
   private handleData(data: string | Uint8Array) {
-
+    this.messageEvents.emit(data);
   }
 
 }
@@ -53,8 +69,7 @@ export class Serial extends DriverBase<Props> {
 export default class Factory extends DriverFactoryBase<Serial> {
   protected DriverClass = Serial;
 
-  // TODO: review
-  // protected instanceIdCalc = (props: {[index: string]: any}): string => {
-  //   return String(props.uartNum);
-  // }
+  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+    return String(props.portNum);
+  }
 }
