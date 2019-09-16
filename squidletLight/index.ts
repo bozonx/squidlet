@@ -1,1 +1,6 @@
-// TODO: import starter and catch error
+import SquildletLight from './SquildletLight';
+
+const light = new SquildletLight();
+
+light.start()
+  .catch(console.error);
