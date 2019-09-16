@@ -1,13 +1,15 @@
-import {I2cDefinition, I2cParams} from '../interfaces/io/I2cMasterIo';
+import {defaultI2cParams, I2cDefinition, I2cMasterBusLike, I2cParams} from '../interfaces/io/I2cMasterIo';
 
 
 let preDefinedBusesParams: {[index: string]: I2cParams} = {};
 let unnamedBusNumIndex = 0;
 
 
-export default class I2cMasterIoBase {
-  // TODO: use I2cLike ???
-  private readonly instances: {[index: string]: any} = {};
+export default abstract class I2cMasterIoBase {
+  private readonly instances: {[index: string]: I2cMasterBusLike} = {};
+
+
+  protected abstract createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike>;
 
 
   async configure(newDefinition: I2cDefinition) {
@@ -36,6 +38,14 @@ export default class I2cMasterIoBase {
   }
 
 
+  protected getItem(busNum: number): I2cMasterBusLike {
+    if (!this.instances[busNum]) {
+      throw new Error(`I2cMaster IO: bus number "${busNum}" hasn't been instantiated`);
+    }
+
+    return this.instances[busNum];
+  }
+
   protected resolveBusNum(busNum: number | undefined): number {
     if (typeof busNum === 'number') return busNum;
 
@@ -44,11 +54,18 @@ export default class I2cMasterIoBase {
     return unnamedBusNumIndex;
   }
 
-  protected makeBusItem(busNum: number, paramsOverride: I2cParams) {
+  protected getPreDefinedBusesParams(): {[index: string]: I2cParams} {
+    return preDefinedBusesParams;
+  }
+
+  protected async makeBusItem(busNum: number, paramsOverride: I2cParams): Promise<I2cMasterBusLike> {
     const params = {
       ...defaultI2cParams,
+      ...this.getPreDefinedBusesParams()[busNum],
       ...paramsOverride,
     };
+
+    return this.createConnection(busNum, params);
   }
 
 }

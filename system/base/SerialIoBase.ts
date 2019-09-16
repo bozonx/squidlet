@@ -1,17 +1,15 @@
-import {defaultSerialParams, SerialDefinition, SerialEvents, SerialParams} from '../interfaces/io/SerialIo';
+import {
+  defaultSerialParams,
+  SerialDefinition,
+  SerialEvents,
+  SerialParams,
+  SerialPortLike
+} from '../interfaces/io/SerialIo';
 import {ENCODE} from '../constants';
 import {callPromised} from '../lib/common';
 import IndexedEventEmitter from '../lib/IndexedEventEmitter';
 import {AnyHandler} from '../lib/IndexedEvents';
 
-
-export interface SerialPortLike {
-  write(data: any, cb: (err: string) => void): void;
-  write(data: any, encode: string, cb: (err: string) => void): void;
-  close(cb: (err: string) => void): void;
-  on(eventName: 'data', cb: (data: any) => void): void;
-  on(eventName: 'error', cb: (err: {message: string}) => void): void;
-}
 
 export type SerialItem = [
   SerialPortLike,

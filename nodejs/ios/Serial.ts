@@ -1,10 +1,10 @@
 import * as SerialPort from 'serialport';
 import {OpenOptions} from 'serialport';
 
-import SerialIo, { SerialParams } from 'system/interfaces/io/SerialIo';
+import SerialIo, {SerialParams, SerialPortLike} from 'system/interfaces/io/SerialIo';
 import {omitObj} from 'system/lib/objects';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
-import SerialIoBase, {SerialPortLike} from 'system/base/SerialIoBase';
+import SerialIoBase from 'system/base/SerialIoBase';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 

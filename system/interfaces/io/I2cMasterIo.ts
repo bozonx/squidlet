@@ -16,6 +16,11 @@ export interface I2cDefinition {
   buses: {[index: string]: I2cParams};
 }
 
+// low level instance interface
+export interface I2cMasterBusLike {
+  destroy(): void;
+}
+
 
 export const defaultI2cParams: I2cParams = {
   clockHz: 100000,

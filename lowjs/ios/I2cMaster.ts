@@ -1,3 +1,5 @@
+import {I2cMasterBusLike, I2cParams} from '../../system/interfaces/io/I2cMasterIo';
+
 const i2c = require('i2c');
 
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
@@ -7,32 +9,7 @@ import I2cMasterIoBase from 'system/base/I2cMasterIoBase';
 
 
 export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
-  async writeTo(busNum: number, addrHex: number, data: Uint8Array): Promise<void> {
-    const buffer = Buffer.from(data);
-
-    //await callPromised(this.getI2cBus(bus).write, addrHex, buffer);
-    await callPromised(
-      this.getI2cBus(busNum).transfer.bind(this.getI2cBus(busNum)),
-      addrHex,
-      buffer,
-      0
-    );
-  }
-
-  async readFrom(busNum: number, addrHex: number, quantity: number): Promise<Uint8Array> {
-    //const result: Buffer = await callPromised(this.getI2cBus(bus).read, addrHex, quantity);
-    const result: Buffer = await callPromised(
-      this.getI2cBus(busNum).transfer.bind(this.getI2cBus(busNum)),
-      addrHex,
-      null,
-      quantity
-    );
-
-    return convertBufferToUint8Array(result);
-  }
-
-
-  private getI2cBus(busNum: number): any {
+  createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike> {
     if (this.instances[bus]) return this.instances[bus];
 
     // TODO: взять конфиг из ранее скорфигурированного bus
@@ -44,6 +21,27 @@ export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
     });
 
     return this.instances[bus];
+  }
+
+
+  async writeTo(busNum: number, addrHex: number, data: Uint8Array): Promise<void> {
+    const buffer = Buffer.from(data);
+
+    //await callPromised(this.getI2cBus(bus).write, addrHex, buffer);
+    await callPromised(
+      this.getItem(busNum).transfer.bind(this.getItem(busNum)),
+      addrHex,
+      buffer,
+      0
+    );
+  }
+
+  async readFrom(busNum: number, addrHex: number, quantity: number): Promise<Uint8Array> {
+    //const result: Buffer = await callPromised(this.getI2cBus(bus).read, addrHex, quantity);
+    const item: I2cMasterBusLike = this.getItem(busNum);
+    const result: Buffer = await callPromised(item.transfer.bind(item), addrHex, null, quantity);
+
+    return convertBufferToUint8Array(result);
   }
 
 }
