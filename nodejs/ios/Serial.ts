@@ -49,4 +49,8 @@ export default class Serial extends SerialIoBase implements SerialIo {
     });
   }
 
+  protected prepareBinaryDataToWrite(data: Uint8Array): any {
+    return Buffer.from(data);
+  }
+
 }

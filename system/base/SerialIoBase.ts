@@ -33,6 +33,7 @@ export default abstract class SerialIoBase {
 
 
   protected abstract createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike>;
+  protected abstract prepareBinaryDataToWrite(data: Uint8Array): any;
 
 
   async configure(newDefinition: SerialDefinition) {
@@ -72,8 +73,10 @@ export default abstract class SerialIoBase {
   }
 
   async write(portNum: number, data: Uint8Array): Promise<void> {
-    // TODO: сделать обертку для подготовки данных для отправки
-    await callPromised(this.getItem(portNum)[ItemPostion.serialPort].write, Buffer.from(data));
+    await callPromised(
+      this.getItem(portNum)[ItemPostion.serialPort].write,
+      this.prepareBinaryDataToWrite(data)
+    );
   }
 
   async print(portNum: number, data: string): Promise<void> {
