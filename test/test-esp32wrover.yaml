@@ -10,19 +10,19 @@ wsApi:
 ioServer:
   host: 0.0.0.0
 
-#automation:
-#  rules:
-#    - name: switch_led
-#      trigger:
-#        - type: deviceState
-#          id: bedroom.wall-light-toggle
-#          #state: default
-#      action:
-#        - type: deviceAction
-#          id: bedroom.light1
-#          #action: toggle
-#          action: turn
-#          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
+automation:
+  rules:
+    - name: switch_led
+      trigger:
+        - type: deviceState
+          id: bedroom.wall-light-toggle
+          #state: default
+      action:
+        - type: deviceAction
+          id: bedroom.light1
+          #action: toggle
+          action: turn
+          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
 
 devices:
   bedroom:
