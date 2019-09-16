@@ -3,10 +3,12 @@ import {I2cBus, openSync} from 'i2c-bus';
 import I2cMasterIo, {I2cMasterBusLike, I2cParams} from 'system/interfaces/io/I2cMasterIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import I2cMasterIoBase from 'system/base/I2cMasterIoBase';
+import {callPromised} from 'system/lib/common';
 
 
 /**
  * It's raspberry pi implementation of I2C master.
+ * It doesn't support setting clock. You should set it in your OS.
  */
 export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
   protected async createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike> {
@@ -14,7 +16,6 @@ export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
       throw new Error(`Can't create a connection to I2C master bus number ${busNum}: no "bus" param`);
     }
 
-    // TODO: pass clock
     const i2cBus: I2cBus = openSync(Number(params.bus));
 
     return {
@@ -59,8 +60,7 @@ export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
           i2cBus.i2cWrite(addrHex, buffer.length, buffer, callback);
         });
       },
-      // TODO: проверить
-      destroy: i2Bus.destroy.bind(i2Bus),
+      destroy: () => callPromised(i2cBus.close.bind(i2cBus)),
     };
   }
 

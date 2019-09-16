@@ -30,7 +30,7 @@ export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
         //await callPromised(this.getI2cBus(bus).write, addrHex, buffer);
         await callPromised(i2cBus.transfer.bind(i2cBus), addrHex, buffer, 0);
       },
-      destroy: i2cBus.destroy.bind(i2cBus),
+      destroy: async () => i2cBus.destroy(),
     };
   }
 
