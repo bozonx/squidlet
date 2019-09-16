@@ -16,18 +16,16 @@ export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
     // clockHz: 100000,
 
     return {
-      async read(addrHex: number, quantity: number): Promise<Uint8Array> {
+      read: async (addrHex: number, quantity: number): Promise<Uint8Array> => {
         //const result: Buffer = await callPromised(this.getI2cBus(bus).read, addrHex, quantity);
-        const item: any = this.getItem(busNum);
-        const result: Buffer = await callPromised(item.transfer.bind(item), addrHex, null, quantity);
+        const result: Buffer = await callPromised(i2Bus.transfer.bind(i2Bus), addrHex, null, quantity);
 
         return convertBufferToUint8Array(result);
       },
-      async write(addrHex: number, data: Uint8Array): Promise<void> {
+      write: async (addrHex: number, data: Uint8Array): Promise<void> => {
         const buffer = Buffer.from(data);
-        const item: any = this.getItem(busNum);
         //await callPromised(this.getI2cBus(bus).write, addrHex, buffer);
-        await callPromised(item.transfer.bind(item), addrHex, buffer, 0);
+        await callPromised(i2Bus.transfer.bind(i2Bus), addrHex, buffer, 0);
       },
       destroy: i2Bus.destroy.bind(i2Bus),
     };
