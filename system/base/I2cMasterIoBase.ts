@@ -37,6 +37,14 @@ export default abstract class I2cMasterIoBase {
     delete this.instances[busNum];
   }
 
+  async writeTo(busNum: number, addrHex: number, data: Uint8Array): Promise<void> {
+    await this.getItem(busNum).write(addrHex, data);
+  }
+
+  async readFrom(busNum: number, addrHex: number, quantity: number): Promise<Uint8Array> {
+    return await this.getItem(busNum).read(addrHex, quantity);
+  }
+
 
   protected getItem(busNum: number): I2cMasterBusLike {
     if (!this.instances[busNum]) {

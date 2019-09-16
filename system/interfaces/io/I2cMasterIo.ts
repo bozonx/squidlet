@@ -18,6 +18,8 @@ export interface I2cDefinition {
 
 // low level instance interface
 export interface I2cMasterBusLike {
+  read(addrHex: number, quantity: number): Promise<Uint8Array>;
+  write(addrHex: number, data: Uint8Array): Promise<void>;
   destroy(): void;
 }
 
