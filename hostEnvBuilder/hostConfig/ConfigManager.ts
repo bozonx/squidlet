@@ -29,6 +29,7 @@ export default class ConfigManager {
   dependencies?: {[index: string]: any};
   readonly platform: Platforms;
   readonly machine: string;
+  machinePlatformDir: string = '';
   get machineConfig(): MachineConfig {
     return this._machineConfig as any;
   }
@@ -58,6 +59,7 @@ export default class ConfigManager {
   async init() {
     const preHostConfig: PreHostConfig = await this.resolveHostConfig();
 
+    this.machinePlatformDir = resolvePlatformDir(this.platform);
     this._machineConfig = this.loadMachineConfig(preHostConfig);
 
     const normalizedConfig: PreHostConfig = this.preparePreHostConfig(preHostConfig);
@@ -137,9 +139,7 @@ export default class ConfigManager {
       throw new Error(`Host config "${preHostConfig.id}" doesn't have a machine param`);
     }
 
-    const platformDir = resolvePlatformDir(this.platform);
-
-    return loadMachineConfigInPlatformDir(this.os, platformDir, this.machine);
+    return loadMachineConfigInPlatformDir(this.os, this.machinePlatformDir, this.machine);
 
     //return loadMachineConfig(preHostConfig.platform, preHostConfig.machine);
   }
