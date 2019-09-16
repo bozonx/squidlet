@@ -1,6 +1,4 @@
-import SquildletLight from './SquildletLight';
+import starter from './starter';
 
-const light = new SquildletLight();
-
-light.start()
+starter()
   .catch(console.error);
