@@ -1,12 +1,21 @@
-import {SerialDefinition, SerialEvents, SerialParams} from '../interfaces/io/SerialIo';
+import {defaultSerialParams, SerialDefinition, SerialEvents, SerialParams} from '../interfaces/io/SerialIo';
 import {ENCODE} from '../constants';
 import {callPromised} from '../lib/common';
 import IndexedEventEmitter from '../lib/IndexedEventEmitter';
 import {AnyHandler} from '../lib/IndexedEvents';
+import {convertBufferToUint8Array} from '../lib/buffer';
 
 
-export type SerialItem<T> = [
-  T,
+export interface SerialPortLike {
+  write(data: any, cb: (err: string) => void): void;
+  write(data: any, encode: string, cb: (err: string) => void): void;
+  close(cb: (err: string) => void): void;
+  on(eventName: 'data', cb: (data: any) => void): void;
+  on(eventName: 'error', cb: (err: {message: string}) => void): void;
+}
+
+export type SerialItem = [
+  SerialPortLike,
   IndexedEventEmitter<AnyHandler>
 ];
 
@@ -19,13 +28,11 @@ let preDefinedPortsParams: {[index: string]: SerialParams} = {};
 let unnamedPortNumIndex = 0;
 
 
-export default abstract class SerialIoBase<SerialPortType> {
-  private readonly instances: {[index: string]: SerialItem<SerialPortType>} = {};
+export default abstract class SerialIoBase {
+  private readonly instances: {[index: string]: SerialItem} = {};
 
-  protected abstract async makePortItem(
-    portNum: number,
-    paramsOverride: SerialParams
-  ): Promise<SerialItem<SerialPortType>>;
+
+  protected abstract async createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike>;
 
 
   async configure(newDefinition: SerialDefinition) {
@@ -49,6 +56,7 @@ export default abstract class SerialIoBase<SerialPortType> {
   }
 
   async destroyPort(portNum: number) {
+    // TODO: а он есть ????
     await callPromised(this.instances[portNum][ItemPostion.serialPort].close);
     // TODO: remove handlers???
     this.instances[portNum][ItemPostion.events].destroy();
@@ -99,7 +107,7 @@ export default abstract class SerialIoBase<SerialPortType> {
     return unnamedPortNumIndex;
   }
 
-  protected getItem(portNum: number): SerialItem<SerialPortType> {
+  protected getItem(portNum: number): SerialItem {
     if (!this.instances[portNum]) {
       throw new Error(`Serial IO: port "${portNum}" hasn't been instantiated`);
     }
@@ -111,6 +119,42 @@ export default abstract class SerialIoBase<SerialPortType> {
     const parsedData: string | Uint8Array = this.parseIncomeData(data);
 
     this.getItem(portNum)[ItemPostion.events].emit(SerialEvents.data, parsedData);
+  }
+
+  protected parseIncomeData(data: string | Buffer | null): string | Uint8Array {
+    if (!data) {
+      return '';
+    }
+    else if (typeof data === 'string') {
+      //return textToUint8Array(data);
+
+      return data;
+    }
+    else if (Buffer.isBuffer(data)) {
+      return convertBufferToUint8Array(data as Buffer);
+    }
+
+    throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
+  }
+
+  protected async makePortItem(portNum: number, paramsOverride: SerialParams): Promise<SerialItem> {
+    const params: SerialParams = {
+      ...defaultSerialParams,
+      ...this.getPreDefinedPortParams()[portNum],
+      ...paramsOverride,
+    };
+
+    const serialPort: SerialPortLike = await this.createConnection(portNum, params);
+    const events = new IndexedEventEmitter<AnyHandler>();
+
+    serialPort.on('data', (data: string | Buffer) => this.handleIncomeData(portNum, data));
+    // TODO: скорее всего err другой
+    serialPort.on('error', (err: {message: string}) => events.emit(SerialEvents.error, err.message));
+
+    return [
+      serialPort,
+      events
+    ];
   }
 
 }
