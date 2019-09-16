@@ -32,7 +32,7 @@ export default abstract class SerialIoBase {
   private readonly instances: {[index: string]: SerialItem} = {};
 
 
-  protected abstract async createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike>;
+  protected abstract createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike>;
 
 
   async configure(newDefinition: SerialDefinition) {

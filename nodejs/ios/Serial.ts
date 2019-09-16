@@ -9,7 +9,7 @@ import SerialIoBase, {SerialPortLike} from 'system/base/SerialIoBase';
 
 
 export default class Serial extends SerialIoBase implements SerialIo {
-  protected async createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike> {
+  protected createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike> {
     return new Promise<SerialPortLike>((resolve, reject) => {
       if (!params.dev) {
         throw new Error(
@@ -18,7 +18,7 @@ export default class Serial extends SerialIoBase implements SerialIo {
         );
       }
 
-      const options: OpenOptions = omitObj(params, 'dev', 'rxPin', 'txPin');
+      const options: OpenOptions = omitObj(params, 'dev', 'pinRX', 'pinTX');
       const serialPort: SerialPort = new SerialPort(params.dev, options);
 
       let openTimeout: any;

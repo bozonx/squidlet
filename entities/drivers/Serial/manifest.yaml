@@ -11,9 +11,9 @@ props:
     required: true
   dev:
     type: string
-  rxPin:
+  pinRX:
     type: number
-  txPin:
+  pinTX:
     type: number
   baudRate:
     type: number

@@ -13,9 +13,9 @@ export interface SerialParams {
   // device name. It uses only if squidlet runs on OS. Like /dev/ttyUSB0
   dev?: string;
   // rx pin. Uses on micro-controller or Raspberry pi like boards.
-  rxPin?: number;
+  pinRX?: number;
   // tx pin. Uses on micro-controller or Raspberry pi like boards.
-  txPin?: number;
+  pinTX?: number;
   // default is 9600
   baudRate?: BaudRate;
   // databits?: 7 | 8;                      // (default 8)How many data bits - 7 or 8
