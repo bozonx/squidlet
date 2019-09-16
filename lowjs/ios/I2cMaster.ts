@@ -1,60 +1,28 @@
 const i2c = require('i2c');
 
-import I2cMasterIo, {I2cDefinition, I2cParams} from 'system/interfaces/io/I2cMasterIo';
+import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import I2cMasterIoBase from 'system/base/I2cMasterIoBase';
 
 
-let preDefinedBusesParams: {[index: string]: I2cParams} = {};
-let unnamedBusNumIndex = 0;
-
-
-export default class I2cMaster implements I2cMasterIo {
-  private readonly instances: {[index: string]: any} = {};
-
-
-  async configure(newDefinition: I2cDefinition) {
-    preDefinedBusesParams = newDefinition.ports;
-  }
-
-  async destroy() {
-    for (let busNum of Object.keys(this.instances)) {
-      await this.destroyBus(busNum);
-    }
-  }
-
-
-  async newBus(busNum: number | undefined, paramsOverride: I2cParams): Promise<number> {
-    const resolvedPortNum = this.resolveBusNum(busNum);
-
-    if (!this.instances[resolvedPortNum]) {
-      this.instances[resolvedPortNum] = await this.makePortItem(resolvedPortNum, paramsOverride);
-    }
-
-    return resolvedPortNum;
-  }
-
-  async destroyBus(portNum: number): Promise<void> {
-    this.instances[portNum].destroy();
-    delete this.instances[portNum];
-  }
-
-  async writeTo(bus: string, addrHex: number, data: Uint8Array): Promise<void> {
+export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
+  async writeTo(busNum: number, addrHex: number, data: Uint8Array): Promise<void> {
     const buffer = Buffer.from(data);
 
     //await callPromised(this.getI2cBus(bus).write, addrHex, buffer);
     await callPromised(
-      this.getI2cBus(bus).transfer.bind(this.getI2cBus(bus)),
+      this.getI2cBus(busNum).transfer.bind(this.getI2cBus(busNum)),
       addrHex,
       buffer,
       0
     );
   }
 
-  async readFrom(bus: string, addrHex: number, quantity: number): Promise<Uint8Array> {
+  async readFrom(busNum: number, addrHex: number, quantity: number): Promise<Uint8Array> {
     //const result: Buffer = await callPromised(this.getI2cBus(bus).read, addrHex, quantity);
     const result: Buffer = await callPromised(
-      this.getI2cBus(bus).transfer.bind(this.getI2cBus(bus)),
+      this.getI2cBus(busNum).transfer.bind(this.getI2cBus(busNum)),
       addrHex,
       null,
       quantity
@@ -64,7 +32,7 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
 
-  private getI2cBus(bus: string): any {
+  private getI2cBus(busNum: number): any {
     if (this.instances[bus]) return this.instances[bus];
 
     // TODO: взять конфиг из ранее скорфигурированного bus
@@ -76,15 +44,6 @@ export default class I2cMaster implements I2cMasterIo {
     });
 
     return this.instances[bus];
-  }
-
-
-  protected resolveBusNum(busNum: number | undefined): number {
-    if (typeof busNum === 'number') return busNum;
-
-    unnamedBusNumIndex++;
-
-    return unnamedBusNumIndex;
   }
 
 }

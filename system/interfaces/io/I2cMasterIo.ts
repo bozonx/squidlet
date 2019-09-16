@@ -17,8 +17,15 @@ export interface I2cDefinition {
 }
 
 
+export const defaultI2cParams: I2cParams = {
+  clockHz: 100000,
+};
+
 export const Methods = [
+  'configure',
   'destroy',
+  'newBus',
+  'destroyBus',
   'writeTo',
   'readFrom',
 ];

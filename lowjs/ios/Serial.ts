@@ -7,6 +7,14 @@ import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 export default class Serial extends SerialIoBase implements SerialIo {
   protected async createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike> {
+    if (typeof params.pinRX === 'undefined') {
+      throw new Error(`Can't create a connection to the Serial port ${portNum}: no "pinRX" param`);
+    }
+    else if (typeof params.pinTX === 'undefined') {
+      throw new Error(`Can't create a connection to the Serial port ${portNum}: no "pinTX" param`);
+    }
+
+
     let stream = new uart.UART({
       pinRX: params.pinRX,
       pinTX: params.pinTX,
