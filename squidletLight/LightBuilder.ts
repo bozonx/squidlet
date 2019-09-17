@@ -8,6 +8,7 @@ import Platforms from '../system/interfaces/Platforms';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../system/interfaces/EntityTypes';
+import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
 
 
 export default class LightBuilder {
@@ -43,17 +44,17 @@ export default class LightBuilder {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    const indexFilePath = path.join(this.workDir, 'index.ts');
+    const indexFilePath = path.join(this.tmpDir, 'index.ts');
     const indexFileStr: string = await this.makeIndexFile();
-    const iosFilePath: string = path.join(this.workDir, 'ios.ts');
+    const iosFilePath: string = path.join(this.tmpDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
-    const envSetPath: string = path.join(this.workDir, 'envSet.ts');
+    const envSetPath: string = path.join(this.tmpDir, 'envSet.ts');
     const envSetStr: string = await this.prepareEnvSetString();
-    const devicesFilePath: string = path.join(this.workDir, 'devicesMainFiles.ts');
+    const devicesFilePath: string = path.join(this.tmpDir, 'devicesMainFiles.ts');
     const devicesFileStr: string = await this.makeEntitiesMainFilesString('devices');
-    const driversFilePath: string = path.join(this.workDir, 'driversMainFiles.ts');
+    const driversFilePath: string = path.join(this.tmpDir, 'driversMainFiles.ts');
     const driversFileStr: string = await this.makeEntitiesMainFilesString('drivers');
-    const servicesFilePath: string = path.join(this.workDir, 'servicesMainFiles.ts');
+    const servicesFilePath: string = path.join(this.tmpDir, 'servicesMainFiles.ts');
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
     await this.os.writeFile(indexFilePath, indexFileStr);
@@ -69,11 +70,11 @@ export default class LightBuilder {
 
   private async makeIndexFile(): Promise<string> {
     const appSwitcherPath = path.relative(
-      this.workDir,
+      this.tmpDir,
       path.join(SYSTEM_DIR, APP_SWITCHER_FILE_NAME)
     );
     const ioSetPath = path.relative(
-      this.workDir,
+      this.tmpDir,
       path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
     );
 
@@ -103,7 +104,7 @@ export default class LightBuilder {
     for (let ioPath of machineIosList) {
       const ioName: string = getFileNameOfPath(ioPath);
       const ioRelPath: string = path.relative(
-        this.workDir,
+        this.tmpDir,
         path.resolve(platformDir, ioPath)
       );
 
@@ -116,7 +117,8 @@ export default class LightBuilder {
   private prepareEnvSetString(): string {
     const envSetStr = JSON.stringify(this.envBuilder.generateProdEnvSet(), null,2);
 
-    return `export default ${envSetStr}`;
+    return `const envSet: any = ${envSetStr};\n\n`
+      + `export default envSet;`;
   }
 
   private makeEntitiesMainFilesString(pluralName: EntityTypePlural): string {
@@ -127,7 +129,7 @@ export default class LightBuilder {
     for (let entityName of Object.keys(entities)) {
       const srcAbsDir: string = entities[entityName].srcDir;
       const relFileName: string = path.relative(
-        this.workDir,
+        this.tmpDir,
         path.join(srcAbsDir, entities[entityName].manifest.main)
       );
 
@@ -138,7 +140,7 @@ export default class LightBuilder {
   }
 
   private async rollup() {
-    // TODO: add
+    await rollupToOneFile();
   }
 
   private makeExportString(defaultImportName: string, pathToFile: string): string {
