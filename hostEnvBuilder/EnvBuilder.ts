@@ -128,6 +128,17 @@ export default class EnvBuilder {
     };
   }
 
+  /**
+   * Generate host config and entities without a "srcDir" property in manifests.
+   * It uses only in nodejs environment.
+   */
+  generateProdEnvSet(): HostEnvSet {
+    return {
+      configs: this.configsSet.getConfigSet(),
+      entities: this.usedEntities.getProdEntitiesSet(),
+    };
+  }
+
 
   /**
    * Start registering step of initialization

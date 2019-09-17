@@ -57,6 +57,32 @@ export default class UsedEntities {
     return this.entitiesSet;
   }
 
+  // TODO: test
+  /**
+   * Get entites set without a "srcDir"
+   */
+  getProdEntitiesSet(): HostEntitiesSet {
+    const prepareEntities = (entities: {[index: string]: HostEntitySet}): {[index: string]: HostEntitySet} => {
+      const result: {[index: string]: HostEntitySet} = {};
+
+      for (let entityName of Object.keys(entities)) {
+        const clone = { ...entities[entityName] };
+
+        delete clone.srcDir;
+
+        result[entityName] = clone;
+      }
+
+      return result;
+    };
+
+    return {
+      devices: prepareEntities(this.entitiesSet.devices),
+      drivers: prepareEntities(this.entitiesSet.drivers),
+      services: prepareEntities(this.entitiesSet.services),
+    };
+  }
+
   getEntitySet(entityType: EntityType, name: string): HostEntitySet {
     const entityTypePlural = convertEntityTypeToPlural(entityType);
 

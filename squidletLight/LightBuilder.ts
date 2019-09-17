@@ -4,7 +4,7 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import {HOST_TMP_DIR} from '../shared/constants';
 import Os from '../shared/Os';
 import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
-import {IOS_GLOBAL_CONST} from './constants';
+import {ENV_SET_GLOBAL_CONST, IOS_GLOBAL_CONST} from './constants';
 import Platforms from '../system/interfaces/Platforms';
 
 
@@ -49,7 +49,7 @@ export default class LightBuilder {
 
 
   private async makeIndexFile(): Promise<string> {
-    return `${await this.prepareIoClassesString()}\n${await this.prepareEnvSetString()}\n`;
+    return `${await this.prepareIoClassesString()}\n\n${await this.prepareEnvSetString()}\n`;
   }
 
   private async prepareIoClassesString(): Promise<string> {
@@ -60,7 +60,7 @@ export default class LightBuilder {
     // TODO: лучше брать только те что реально используются
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
     let imports = '';
-    let exportStr = `\nconst ${IOS_GLOBAL_CONST} = {\n`;
+    let exportStr = `\nglobal.${IOS_GLOBAL_CONST} = {\n`;
 
     // make imports
     for (let ioPath of machineIosList) {
@@ -71,14 +71,16 @@ export default class LightBuilder {
       );
 
       imports += this.makeImportString(ioName, ioRelPath);
-      exportStr += `${ioName},`;
+      exportStr += `  ${ioName},\n`;
     }
 
     return imports + exportStr + `};`;
   }
 
   private async prepareEnvSetString(): Promise<string> {
-    return '1111';
+    const envSetStr = JSON.stringify(this.envBuilder.generateProdEnvSet(), null,2);
+
+    return `global.${ENV_SET_GLOBAL_CONST} = ${envSetStr}`;
   }
 
   private async rollup() {
