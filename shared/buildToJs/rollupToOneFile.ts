@@ -2,17 +2,29 @@ import * as rollup from 'rollup';
 import {ModuleFormat} from 'rollup';
 
 
-export default async function(outputFilePath: string, globals?: string[], sourceMaps?: boolean) {
+export default async function(
+  name: string,
+  indexFilePath: string,
+  outputFilePath: string,
+  globals?: string[],
+  external?: string[],
+  sourceMaps?: boolean,
+  minimize?: boolean,
+) {
+  // TODO: use minimize
+  const inputOptions = {
+    input: indexFilePath,
+    external,
+  };
   // create a bundle
   const bundle = await rollup.rollup(inputOptions);
   const format: ModuleFormat = 'umd';
   const outputOptions = {
+    name,
     file: outputFilePath,
     format,
     sourcemap: sourceMaps,
-    globals: {
-      ...globals,
-    },
+    globals,
   };
 
   // generate code

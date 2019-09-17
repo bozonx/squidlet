@@ -140,7 +140,23 @@ export default class LightBuilder {
   }
 
   private async rollup() {
-    await rollupToOneFile();
+    const indexFilePath = path.join(this.tmpDir, 'index.ts');
+    const outputFilePath = path.join(this.workDir, 'index.js');
+
+    await rollupToOneFile(
+      'Squidlet',
+      indexFilePath,
+      outputFilePath,
+      undefined,
+      // TODO: или лучше всетаки вбилживать???
+      [
+        'ws',
+        'mqtt-packet',
+        'mqtt',
+      ],
+      false,
+      true,
+    );
   }
 
   private makeExportString(defaultImportName: string, pathToFile: string): string {
