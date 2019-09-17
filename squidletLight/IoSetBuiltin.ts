@@ -9,6 +9,9 @@ import StorageEnvMemoryWrapper from '../shared/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 //import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import StorageIo from '../system/interfaces/io/StorageIo';
+import {PATH_SEP} from '../system/lib/paths';
+import systemConfig from '../system/systemConfig';
+import {EntityTypePlural} from '../system/interfaces/EntityTypes';
 // import I2cMaster from '../lowjs/ios/I2cMaster';
 // import Digital from '../lowjs/ios/Digital';
 // import Serial from '../lowjs/ios/Serial';
@@ -57,9 +60,20 @@ import StorageIo from '../system/interfaces/io/StorageIo';
 //   }
 // };
 
+interface MainFiles {
+  devices: {[index: string]: any};
+  drivers: {[index: string]: any};
+  services: {[index: string]: any};
+}
+
 
 export default class IoSetBuiltin implements IoSet {
   private readonly ioClasses: {[index: string]: any};
+  private readonly mainFiles: MainFiles = {
+    devices: {},
+    drivers: {},
+    services: {},
+  };
   private ioCollection: {[index: string]: IoItem} = {};
   private readonly storageWrapper: StorageEnvMemoryWrapper;
 
@@ -73,6 +87,9 @@ export default class IoSetBuiltin implements IoSet {
   ) {
     this.ioClasses = ioClasses;
     this.storageWrapper = new StorageEnvMemoryWrapper(envSet);
+    this.mainFiles.devices = devicesMainClasses;
+    this.mainFiles.drivers = driversMainClasses;
+    this.mainFiles.services = servicesMainClasses;
   }
 
 
@@ -105,8 +122,32 @@ export default class IoSetBuiltin implements IoSet {
   }
 
   async requireLocalFile(fileName: string): Promise<any> {
-    // TODO: resolve main file - use srcDir
-    //return require(fileName);
+    console.log(111111111, fileName);
+
+    if (!fileName || fileName.indexOf(systemConfig.rootDirs.envSet) !== 0) {
+      throw new Error(`IoSetBuiltin.requireLocalFile: Bad file name "${fileName}:`);
+    }
+
+    const splat: string[] = fileName.split(PATH_SEP);
+
+    if (splat.length !== 5) {
+      throw new Error(`IoSetBuiltin.requireLocalFile: Can't parse file name "${fileName}"`);
+    }
+    else if (splat[1] !== systemConfig.envSetDirs.entities) {
+      throw new Error(`IoSetBuiltin.requireLocalFile: Supported only loading of main files. "${fileName}"`);
+    }
+    else if (!['devices', 'drivers', 'services'].includes(splat[2])) {
+      throw new Error(`IoSetBuiltin.requireLocalFile: Supported only loading of main files. "${fileName}"`);
+    }
+
+    const pluralType: EntityTypePlural = splat[2] as any;
+    const entityName: string = splat[3];
+
+    if (!this.mainFiles[pluralType][entityName]) {
+      throw new Error(`IoSetBuiltin.requireLocalFile: Can't the file "${fileName}"`);
+    }
+
+    return this.mainFiles[pluralType][entityName];
   }
 
 

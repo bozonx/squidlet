@@ -2,7 +2,7 @@ import {PATH_SEPARATOR} from './helpers';
 import {trimCharEnd} from './strings';
 
 
-const SEP = '/';
+export const PATH_SEP = '/';
 
 
 /**
@@ -19,12 +19,12 @@ export function pathJoin (...paths: string[]): string {
       throw new Error(`pathJoin: paths have to be strings`);
     }
     else if (i === 0) {
-      const regexp = `\\${SEP}$`;
+      const regexp = `\\${PATH_SEP}$`;
 
       cleared = paths[i].replace(new RegExp(regexp), '');
     }
     else {
-      const regexp = `^\\${SEP}(.+)\\${SEP}$`;
+      const regexp = `^\\${PATH_SEP}(.+)\\${PATH_SEP}$`;
 
       cleared = paths[i].replace(new RegExp(regexp), '$1');
     }
@@ -32,7 +32,7 @@ export function pathJoin (...paths: string[]): string {
     prepared.push(cleared);
   }
 
-  return prepared.join(SEP);
+  return prepared.join(PATH_SEP);
 }
 
 export function pathIsAbsolute(pathToDirOrFile: string): boolean {
@@ -44,7 +44,7 @@ export function pathIsAbsolute(pathToDirOrFile: string): boolean {
 }
 
 export function pathDirname(pathToDirOrFile: string): string {
-  const pathParts: string[] = trimCharEnd(pathToDirOrFile, SEP).split(PATH_SEPARATOR);
+  const pathParts: string[] = trimCharEnd(pathToDirOrFile, PATH_SEP).split(PATH_SEPARATOR);
 
   pathParts.pop();
 
