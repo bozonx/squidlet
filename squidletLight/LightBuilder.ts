@@ -4,8 +4,10 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import {HOST_TMP_DIR} from '../shared/constants';
 import Os from '../shared/Os';
 import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
-import {ENV_SET_GLOBAL_CONST, IOS_GLOBAL_CONST} from './constants';
+import {ENV_SET_GLOBAL_CONST, IOS_GLOBAL_CONST, MAIN_FILES_GLOBAL_CONST} from './constants';
 import Platforms from '../system/interfaces/Platforms';
+import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
+import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
 
 
 export default class LightBuilder {
@@ -49,13 +51,15 @@ export default class LightBuilder {
 
 
   private async makeIndexFile(): Promise<string> {
-    return `${await this.prepareIoClassesString()}\n\n${await this.prepareEnvSetString()}\n`;
+    return this.prepareIoClassesString()
+      + '\n\n'
+      + this.prepareEnvSetString()
+      + '\n\n'
+      + this.prepareMainFilesString()
+      + '\n';
   }
 
-  private async prepareIoClassesString(): Promise<string> {
-    // const platformDir = resolvePlatformDir(this.platform);
-    // const machineConfig: MachineConfig = loadMachineConfigInPlatformDir(this.os, platformDir, this.machine);
-
+  private prepareIoClassesString(): string {
     const platformDir = this.envBuilder.configManager.machinePlatformDir;
     // TODO: лучше брать только те что реально используются
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
@@ -77,14 +81,30 @@ export default class LightBuilder {
     return imports + exportStr + `};`;
   }
 
-  private async prepareEnvSetString(): Promise<string> {
+  private prepareEnvSetString(): string {
     const envSetStr = JSON.stringify(this.envBuilder.generateProdEnvSet(), null,2);
 
     return `global.${ENV_SET_GLOBAL_CONST} = ${envSetStr}`;
   }
 
-  private async rollup() {
+  private prepareMainFilesString(): string {
+    const envSet: HostEnvSet = this.envBuilder.generateDevelopEnvSet();
+    let imports = '';
+    let exportStr = `\nglobal.${MAIN_FILES_GLOBAL_CONST} = {\n`;
 
+    const eachEntity = (entities: {[index: string]: HostEntitySet}) => {
+      // TODO: add
+    };
+
+    eachEntity(envSet.entities.devices);
+    eachEntity(envSet.entities.drivers);
+    eachEntity(envSet.entities.services);
+
+    return imports + exportStr + `};`;
+  }
+
+  private async rollup() {
+    // TODO: add
   }
 
   private makeImportString(defaultImportName: string, pathToFile: string): string {
