@@ -179,6 +179,14 @@ export function listenScriptEnd(cb: () => Promise<void>) {
   });
 }
 
+export function removeExtFromFileName(filename: string): string {
+  const splat: string[] = filename.split('.');
+
+  if (splat.length <= 1) return filename;
+
+  return splat.slice(0, -1).join('.');
+}
+
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
 //   const platformDir: string = resolvePlatformDir(platform);
 //   const machineConfigPath = path.join(platformDir, `machine-${machine}`);

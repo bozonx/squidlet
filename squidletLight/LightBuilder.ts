@@ -3,7 +3,7 @@ import * as path from 'path';
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import {HOST_TMP_DIR} from '../shared/constants';
 import Os from '../shared/Os';
-import {getFileNameOfPath} from '../shared/helpers';
+import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
 import {IOS_GLOBAL_CONST} from './constants';
 import Platforms from '../system/interfaces/Platforms';
 
@@ -86,7 +86,7 @@ export default class LightBuilder {
   }
 
   private makeImportString(defaultImportName: string, pathToFile: string): string {
-    return `import ${defaultImportName} from '${pathToFile}';\n`;
+    return `import ${defaultImportName} from '${removeExtFromFileName(pathToFile)}';\n`;
   }
 
 }
