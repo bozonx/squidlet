@@ -39,7 +39,7 @@ export default class LightBuilder {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    const indexFileStr = this.makeIndexFile();
+    const indexFileStr: string = await this.makeIndexFile();
     const indexFilePath = path.join(this.workDir, 'index.ts');
 
     await this.os.writeFile(indexFilePath, indexFileStr);
@@ -48,8 +48,8 @@ export default class LightBuilder {
   }
 
 
-  private makeIndexFile(): string {
-    return `${this.prepareIoClassesString()}\n${this.prepareEnvSetString()}\n`;
+  private async makeIndexFile(): Promise<string> {
+    return `${await this.prepareIoClassesString()}\n${await this.prepareEnvSetString()}\n`;
   }
 
   private async prepareIoClassesString(): Promise<string> {
@@ -60,20 +60,24 @@ export default class LightBuilder {
     // TODO: лучше брать только те что реально используются
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
     let imports = '';
-    let exportStr = `const ${IOS_GLOBAL_CONST} = {\n`;
+    let exportStr = `\nconst ${IOS_GLOBAL_CONST} = {\n`;
 
     // make imports
     for (let ioPath of machineIosList) {
       const ioName: string = getFileNameOfPath(ioPath);
+      const ioRelPath: string = path.relative(
+        this.workDir,
+        path.resolve(platformDir, ioPath)
+      );
 
-      imports += this.makeImportString(ioName, path.resolve(platformDir, ioPath));
+      imports += this.makeImportString(ioName, ioRelPath);
       exportStr += `${ioName},`;
     }
 
     return imports + exportStr + `};`;
   }
 
-  private prepareEnvSetString(): string {
+  private async prepareEnvSetString(): Promise<string> {
     return '1111';
   }
 

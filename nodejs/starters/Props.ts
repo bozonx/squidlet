@@ -6,7 +6,8 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {
   HOST_ENVSET_DIR,
-  HOST_TMP_DIR, HOST_VAR_DATA_DIR,
+  HOST_TMP_DIR,
+  HOST_VAR_DATA_DIR,
   HOSTS_WORK_DIRS,
 } from '../../shared/constants';
 import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
