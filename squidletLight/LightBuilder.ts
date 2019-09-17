@@ -16,15 +16,23 @@ export default class LightBuilder {
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly tmpDir: string;
+  private readonly minimize: boolean;
   private readonly os: Os = new Os();
   private readonly envBuilder: EnvBuilder;
 
 
-  constructor(workDir: string, platform: Platforms, machine: string, hostConfigPath: string) {
+  constructor(
+    workDir: string,
+    platform: Platforms,
+    machine: string,
+    hostConfigPath: string,
+    minimize: boolean = true
+  ) {
     this.workDir = workDir;
     this.platform = platform;
     this.machine = machine;
     this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+    this.minimize = minimize;
 
     this.envBuilder = new EnvBuilder(
       hostConfigPath,
@@ -158,8 +166,7 @@ export default class LightBuilder {
         'bcx-expression-evaluator',
       ],
       false,
-      // TODO: set to true
-      true,
+      this.minimize,
     );
   }
 

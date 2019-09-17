@@ -9,6 +9,14 @@ import {REPO_ROOT} from '../shared/helpers';
 const SQUIDLET_LIGTH_WORKDIR = 'light';
 
 
+/**
+ * Supported params:
+ * * --work-dir - optional. default is in the build dir of repository
+ * * --platform - required
+ * * --machine - required
+ * * --minimize - default is true
+ * * config path
+ */
 export function resolveWorkDir(argWorkDir?: string): string {
   if (argWorkDir) {
     // if it set as an argument - make it absolute
@@ -42,7 +50,8 @@ export default async function(): Promise<void> {
     workDir,
     platform,
     machine,
-    hostConfigPath
+    hostConfigPath,
+    yargs.argv.minimize !== 'false'
   );
 
   await builder.build();
