@@ -88,12 +88,10 @@ export default class LightBuilder {
       + '\n\n'
       + `const ioSet: any = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);\n`
       // TODO: make real restart
-      + `const restartHandler = () => console.log('!!!! restart');\n`
+      + `const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);\n`
       + `const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler);\n`
       + '\n'
       + `app.start().catch(console.error);\n`;
-
-    // TODO: add System starter
   }
 
   private prepareIoClassesString(): string {

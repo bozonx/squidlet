@@ -14,56 +14,64 @@ import Digital from '../lowjs/ios/Digital';
 import Serial from '../lowjs/ios/Serial';
 //import Mqtt from '../nodejs/ios/Mqtt';
 
-
-// TODO: remake
-const ioClasses: {[index: string]: any} = {
-  //HttpClient,
-  HttpServer,
-  Storage,
-  Sys,
-  WebSocketClient,
-  WebSocketServer,
-  I2cMaster,
-  Digital,
-  Serial,
-  //Mqtt,
-};
-// TODO: remake
-const envSet: HostEnvSet = {
-  configs: {
-    config: {
-      id: 'lowjs-test',
-      platform: 'lowjs',
-      machine: 'esp32wrover',
-      ...hostDefaultConfig,
-      ioServer: {
-        ...hostDefaultConfig.ioServer,
-        host: '0.0.0.0',
-      },
-    },
-    systemDrivers: [],
-    regularDrivers: [],
-    systemServices: [],
-    regularServices: [],
-    devicesDefinitions: [],
-    driversDefinitions: {},
-    servicesDefinitions: {},
-    iosDefinitions: {},
-  },
-  entities: {
-    devices: {},
-    drivers: {},
-    services: {},
-  }
-};
+//
+// // TODO: remake
+// const ioClasses: {[index: string]: any} = {
+//   //HttpClient,
+//   HttpServer,
+//   Storage,
+//   Sys,
+//   WebSocketClient,
+//   WebSocketServer,
+//   I2cMaster,
+//   Digital,
+//   Serial,
+//   //Mqtt,
+// };
+// // TODO: remake
+// const envSet: HostEnvSet = {
+//   configs: {
+//     config: {
+//       id: 'lowjs-test',
+//       platform: 'lowjs',
+//       machine: 'esp32wrover',
+//       ...hostDefaultConfig,
+//       ioServer: {
+//         ...hostDefaultConfig.ioServer,
+//         host: '0.0.0.0',
+//       },
+//     },
+//     systemDrivers: [],
+//     regularDrivers: [],
+//     systemServices: [],
+//     regularServices: [],
+//     devicesDefinitions: [],
+//     driversDefinitions: {},
+//     servicesDefinitions: {},
+//     iosDefinitions: {},
+//   },
+//   entities: {
+//     devices: {},
+//     drivers: {},
+//     services: {},
+//   }
+// };
 
 
 export default class IoSetBuiltin implements IoSet {
+  private readonly ioClasses: {[index: string]: any};
   private ioCollection: {[index: string]: IoItem} = {};
   private readonly storageWrapper: StorageEnvMemoryWrapper;
 
 
-  constructor() {
+  constructor(
+    envSet: HostEnvSet,
+    ioClasses: {[index: string]: any},
+    devicesMainClasses: {[index: string]: any},
+    driversMainClasses: {[index: string]: any},
+    servicesMainClasses: {[index: string]: any}
+  ) {
+    this.ioClasses = ioClasses;
     this.storageWrapper = new StorageEnvMemoryWrapper(envSet);
   }
 
@@ -74,8 +82,8 @@ export default class IoSetBuiltin implements IoSet {
    */
   async init(): Promise<void> {
     // make dev instances
-    for (let ioName of Object.keys(ioClasses)) {
-      this.ioCollection[ioName] = this.instantiateIo(ioName, ioClasses[ioName]);
+    for (let ioName of Object.keys(this.ioClasses)) {
+      this.ioCollection[ioName] = this.instantiateIo(ioName, this.ioClasses[ioName]);
     }
   }
 
