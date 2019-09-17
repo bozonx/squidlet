@@ -78,13 +78,13 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
     if (machineIos.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');
       await env.addUsedEntity('driver', 'I2cToSlave');
-      await env.addUsedEntity('driver', 'I2cDuplex');
+      //await env.addUsedEntity('driver', 'I2cDuplex');
     }
 
     if (machineIos.includes('I2cSlave')) {
       //await env.addUsedEntity('drivers', 'I2cSlave');
       await env.addUsedEntity('driver', 'I2cToMaster');
-      await env.addUsedEntity('driver', 'I2cDuplex');
+      //await env.addUsedEntity('driver', 'I2cDuplex');
     }
   });
 }
