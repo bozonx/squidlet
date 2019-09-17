@@ -4,7 +4,7 @@ import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import {HOST_TMP_DIR} from '../shared/constants';
 import Os from '../shared/Os';
 import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
-import {ENV_SET_GLOBAL_CONST, IOS_GLOBAL_CONST, MAIN_FILES_GLOBAL_CONST} from './constants';
+import {ENV_SET_GLOBAL_CONST} from './constants';
 import Platforms from '../system/interfaces/Platforms';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
@@ -37,6 +37,8 @@ export default class LightBuilder {
 
 
   async build() {
+    // TODO: удаляет все вместе с родительской директорией, но лучше чтобы только содержимое
+    await this.os.rimraf(this.workDir);
     await this.os.mkdirP(this.tmpDir);
 
     console.info(`===> collect env set`);
@@ -46,11 +48,11 @@ export default class LightBuilder {
     const indexFileStr: string = await this.makeIndexFile();
     const iosFilePath: string = path.join(this.workDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
-    const devicesFilePath: string = path.join(this.workDir, 'devices.ts');
+    const devicesFilePath: string = path.join(this.workDir, 'devicesMainFiles.ts');
     const devicesFileStr: string = await this.makeEntitiesMainFilesString('devices');
-    const driversFilePath: string = path.join(this.workDir, 'drivers.ts');
+    const driversFilePath: string = path.join(this.workDir, 'driversMainFiles.ts');
     const driversFileStr: string = await this.makeEntitiesMainFilesString('drivers');
-    const servicesFilePath: string = path.join(this.workDir, 'services.ts');
+    const servicesFilePath: string = path.join(this.workDir, 'servicesMainFiles.ts');
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
     await this.os.writeFile(indexFilePath, indexFileStr);
@@ -74,10 +76,8 @@ export default class LightBuilder {
     const platformDir = this.envBuilder.configManager.machinePlatformDir;
     // TODO: лучше брать только те что реально используются
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
-    let imports = '';
-    let exportStr = `// @ts-ignore\nglobal.${IOS_GLOBAL_CONST} = {\n`;
+    let exportsStr = '';
 
-    // make imports
     for (let ioPath of machineIosList) {
       const ioName: string = getFileNameOfPath(ioPath);
       const ioRelPath: string = path.relative(
@@ -85,11 +85,10 @@ export default class LightBuilder {
         path.resolve(platformDir, ioPath)
       );
 
-      imports += this.makeImportString(ioName, ioRelPath);
-      exportStr += `  ${ioName},\n`;
+      exportsStr += this.makeExportString(ioName, ioRelPath);
     }
 
-    return `${imports}\n${exportStr}};`;
+    return exportsStr;
   }
 
   private prepareEnvSetString(): string {
@@ -101,26 +100,28 @@ export default class LightBuilder {
   private makeEntitiesMainFilesString(pluralName: EntityTypePlural): string {
     const envSet: HostEnvSet = this.envBuilder.generateDevelopEnvSet();
     const entities: {[index: string]: HostEntitySet} = envSet.entities[pluralName];
-    let imports = '';
-    let exportStr = `export default {\n`;
+    let exportsStr = '';
 
     for (let entityName of Object.keys(entities)) {
       const srcAbsDir: string = entities[entityName].srcDir;
       const fileName = path.join(srcAbsDir, entities[entityName].manifest.main);
 
-      imports += this.makeImportString(entities[entityName].manifest.name, fileName);
-      exportStr += `  ${entities[entityName].manifest.name},\n`;
+      exportsStr += this.makeExportString(entities[entityName].manifest.name, fileName);
     }
 
-    return `${imports}\n${exportStr}};`;
+    return exportsStr;
   }
 
   private async rollup() {
     // TODO: add
   }
 
-  private makeImportString(defaultImportName: string, pathToFile: string): string {
-    return `import ${defaultImportName} from '${removeExtFromFileName(pathToFile)}';\n`;
+  private makeExportString(defaultImportName: string, pathToFile: string): string {
+    return `export {default as ${defaultImportName}} from '${removeExtFromFileName(pathToFile)}';\n`;
   }
+
+  // private makeImportString(defaultImportName: string, pathToFile: string): string {
+  //   return `import ${defaultImportName} from '${removeExtFromFileName(pathToFile)}';\n`;
+  // }
 
 }
