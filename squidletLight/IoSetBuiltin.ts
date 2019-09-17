@@ -12,6 +12,7 @@ import StorageIo from '../system/interfaces/io/StorageIo';
 import {PATH_SEP} from '../system/lib/paths';
 import systemConfig from '../system/systemConfig';
 import {EntityTypePlural} from '../system/interfaces/EntityTypes';
+import {trimChar} from '../system/lib/strings';
 // import I2cMaster from '../lowjs/ios/I2cMaster';
 // import Digital from '../lowjs/ios/Digital';
 // import Serial from '../lowjs/ios/Serial';
@@ -122,13 +123,11 @@ export default class IoSetBuiltin implements IoSet {
   }
 
   async requireLocalFile(fileName: string): Promise<any> {
-    console.log(111111111, fileName);
-
     if (!fileName || fileName.indexOf(systemConfig.rootDirs.envSet) !== 0) {
       throw new Error(`IoSetBuiltin.requireLocalFile: Bad file name "${fileName}:`);
     }
 
-    const splat: string[] = fileName.split(PATH_SEP);
+    const splat: string[] = trimChar(fileName, PATH_SEP).split(PATH_SEP);
 
     if (splat.length !== 5) {
       throw new Error(`IoSetBuiltin.requireLocalFile: Can't parse file name "${fileName}"`);

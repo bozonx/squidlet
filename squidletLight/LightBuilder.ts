@@ -95,12 +95,19 @@ export default class LightBuilder {
       + `import AppSwitcher from '${appSwitcherPath}';\n`
       + `import IoSetBuiltin from '${ioSetPath}';\n`
       + '\n\n'
-      + `const ioSet: any = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);\n`
+      + `async function start() {\n`
+      + `  const ioSet: any = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);\n`
+      + `\n`
+      + `  await ioSet.init();\n`
+      + `\n`
       // TODO: make real restart
-      + `const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);\n`
-      + `const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler);\n`
+      + `  const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);\n`
+      + `  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler);\n`
       + '\n'
-      + `app.start().catch(console.error);\n`;
+      + `  await app.start();\n`
+      + '}\n'
+      + '\n'
+      + 'start().catch(console.error);\n';
   }
 
   private prepareIoClassesString(): string {
