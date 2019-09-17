@@ -68,6 +68,7 @@ export default class AppSwitcher {
   }
 
   private handleShutdownRequest = (reason: ShutdownReason) => {
+    // TODO: add timeout ???
     switch (reason) {
       case 'switchToIoServer':
         this.switchToIoServer()

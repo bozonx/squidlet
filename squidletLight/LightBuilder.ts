@@ -1,9 +1,9 @@
 import * as path from 'path';
 
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import {HOST_TMP_DIR} from '../shared/constants';
+import {APP_SWITCHER_FILE_NAME, HOST_TMP_DIR} from '../shared/constants';
 import Os from '../shared/Os';
-import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
+import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT, SYSTEM_DIR} from '../shared/helpers';
 import Platforms from '../system/interfaces/Platforms';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
@@ -68,11 +68,32 @@ export default class LightBuilder {
 
 
   private async makeIndexFile(): Promise<string> {
-    return '';
-    // TODO: add System starter import
-    // TODO: add ioSet import
-    // return this.prepareEnvSetString()
-    //   + '\n';
+    const appSwitcherPath = path.relative(
+      this.workDir,
+      path.join(SYSTEM_DIR, APP_SWITCHER_FILE_NAME)
+    );
+    const ioSetPath = path.relative(
+      this.workDir,
+      path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
+    );
+
+    // TODO: use constants
+    return `import envSet from './envSet';\n`
+      + `import * as ios from './ios';\n`
+      + `import * as devicesMainFiles from './devicesMainFiles';\n`
+      + `import * as driversMainFiles from './driversMainFiles';\n`
+      + `import * as servicesMainFiles from './servicesMainFiles';\n`
+      + `import AppSwitcher from '${appSwitcherPath}';\n`
+      + `import IoSetBuiltin from '${ioSetPath}';\n`
+      + '\n\n'
+      + `const ioSet: any = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);\n`
+      // TODO: make real restart
+      + `const restartHandler = () => console.log('!!!! restart');\n`
+      + `const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler);\n`
+      + '\n'
+      + `app.start().catch(console.error);\n`;
+
+    // TODO: add System starter
   }
 
   private prepareIoClassesString(): string {
