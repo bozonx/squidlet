@@ -1,7 +1,7 @@
 module.exports = {
   presets: [
     //['@babel/preset-env', {targets: {"safari": "6"}}],
-    ['@babel/preset-typescript'],
+    //['@babel/preset-typescript'],
   ],
   "plugins": [
     "@babel/proposal-class-properties",

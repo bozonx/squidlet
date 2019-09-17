@@ -10,6 +10,8 @@ const typescript = require('rollup-plugin-typescript2');
 const babel = require('rollup-plugin-babel');
 const { DEFAULT_EXTENSIONS } = require('@babel/core');
 
+const tsConfig: any = require('../../tsconfig.json');
+
 
 function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
   return [
@@ -24,15 +26,19 @@ function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
     // Allow bundling cjs modules
     resolve({
       extensions: ['.ts', '.js'],
+      preferBuiltins: true,
     }),
     // Allow node_modules resolution
     commonjs({
       include: 'node_modules/**'
     }),
     typescript({
+      //typescript: require('typescript'),
       useTsconfigDeclarationDir: true,
+      // TODO: может надо загрузить опции
       tsconfigOverride: {
         compilerOptions: {
+          ...tsConfig.compilerOptions,
           module: 'ESNext',
         }
       }
@@ -40,11 +46,17 @@ function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
 
     babel({
       extensions: [ ...DEFAULT_EXTENSIONS, '.ts', '.js' ],
+      presets: [
+        ['@babel/preset-typescript'],
+      ],
+      plugins: [
+        '@babel/proposal-class-properties',
+        '@babel/proposal-object-rest-spread',
+      ],
     }),
 
     // Allow json resolution
     json(),
-
     // Resolve source maps to the original source
     useSourceMaps && sourceMaps(),
     // minimize

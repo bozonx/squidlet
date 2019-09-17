@@ -153,11 +153,13 @@ export default class LightBuilder {
         'ws',
         'mqtt-packet',
         'mqtt',
+        'axios',
+        // TODO: надо вбилживать, но ошибка
+        'bcx-expression-evaluator',
       ],
-      // TODO: set to false
-      true,
-      // TODO: set to true
       false,
+      // TODO: set to true
+      true,
     );
   }
 

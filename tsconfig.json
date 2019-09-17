@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    //"baseUrl": "src",
     "experimentalDecorators": true,
     "downlevelIteration": true,
     "lib": ["es2018"],
@@ -8,19 +7,12 @@
     "moduleResolution": "node",
     "noEmitOnError": false,
     "noImplicitReturns": true,
-    //"noUnusedLocals": true,
-    //"outDir": "build",
     "preserveSymlinks": true,
     "removeComments": true,
     "sourceMap": true,
-    //"rootDir": "host",
     "strict": true,
     "resolveJsonModule": true,
     "target": "es5"
   },
   "exclude": ["build", "node_modules"]
-//  "include": [
-//    "host/**/*",
-//    "master/**/*"
-//  ]
 }
