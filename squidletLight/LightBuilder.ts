@@ -154,8 +154,10 @@ export default class LightBuilder {
         'mqtt-packet',
         'mqtt',
       ],
-      false,
+      // TODO: set to false
       true,
+      // TODO: set to true
+      false,
     );
   }
 

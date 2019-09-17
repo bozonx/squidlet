@@ -1,14 +1,14 @@
 import * as rollup from 'rollup';
-import {ModuleFormat} from 'rollup';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
+import {ModuleFormat, OutputOptions, RollupOptions} from 'rollup';
 import * as sourceMaps from 'rollup-plugin-sourcemaps';
 import * as json from 'rollup-plugin-json';
-import typescript from 'rollup-plugin-typescript2';
 import { terser } from 'rollup-plugin-terser';
-import {OutputOptions} from 'rollup';
 
+const resolve = require('rollup-plugin-node-resolve');
+const commonjs = require('rollup-plugin-commonjs');
+const typescript = require('rollup-plugin-typescript2');
 const babel = require('rollup-plugin-babel');
+const { DEFAULT_EXTENSIONS } = require('@babel/core');
 
 
 function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
@@ -21,6 +21,14 @@ function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
     //     envConfig,
     //   })
     // }),
+    // Allow bundling cjs modules
+    resolve({
+      extensions: ['.ts', '.js'],
+    }),
+    // Allow node_modules resolution
+    commonjs({
+      include: 'node_modules/**'
+    }),
     typescript({
       useTsconfigDeclarationDir: true,
       tsconfigOverride: {
@@ -29,20 +37,14 @@ function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
         }
       }
     }),
+
+    babel({
+      extensions: [ ...DEFAULT_EXTENSIONS, '.ts', '.js' ],
+    }),
+
     // Allow json resolution
     json(),
 
-    // Allow node_modules resolution
-    commonjs({
-      include: 'node_modules/**'
-    }),
-    babel({
-      extensions: ['.ts', '.js'],
-    }),
-    // Allow bundling cjs modules
-    resolve({
-      extensions: ['.ts', '.js'],
-    }),
     // Resolve source maps to the original source
     useSourceMaps && sourceMaps(),
     // minimize
@@ -60,7 +62,7 @@ export default async function(
   useSourceMaps?: boolean,
   minimize?: boolean,
 ) {
-  const inputOptions = {
+  const inputOptions: RollupOptions = {
     input: indexFilePath,
     external,
     plugins: makePlugins(useSourceMaps, minimize),
