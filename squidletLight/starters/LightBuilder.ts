@@ -1,14 +1,14 @@
 import * as path from 'path';
 
-import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
-import {APP_SWITCHER_FILE_NAME, HOST_TMP_DIR} from '../shared/constants';
-import Os from '../shared/Os';
-import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT, SYSTEM_DIR} from '../shared/helpers';
-import Platforms from '../system/interfaces/Platforms';
-import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
-import {EntityTypePlural} from '../system/interfaces/EntityTypes';
-import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import {APP_SWITCHER_FILE_NAME, HOST_TMP_DIR} from '../../shared/constants';
+import Os from '../../shared/Os';
+import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
+import Platforms from '../../system/interfaces/Platforms';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
+import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
+import rollupToOneFile from '../../shared/buildToJs/rollupToOneFile';
 
 
 export default class LightBuilder {

@@ -3,12 +3,12 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 const machineConfig: MachineConfig = {
   ios: [
-    './ios/Mqtt.ts',
+    //'./ios/Mqtt.ts',
     '../nodejs/ios/Storage.ts',
-    '../nodejs/ios/WebSocketClient.ts',
+    //'../nodejs/ios/WebSocketClient.ts',
     '../nodejs/ios/WebSocketServer.ts',
     './ios/Sys.ts',
-    '../nodejs/ios/HttpClient.ts',
+    //'../nodejs/ios/HttpClient.ts',
     '../nodejs/ios/HttpServer.ts',
 
     './ios/Digital.ts',

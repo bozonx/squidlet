@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import LightBuilder from './LightBuilder';
+import LightBuilder from './starters/LightBuilder';
 import Platforms from '../system/interfaces/Platforms';
 import {REPO_ROOT} from '../shared/helpers';
 
 
-const SQUIDLET_LIGTH_WORKDIR = 'light';
+const SQUIDLET_LIGHT_WORKDIR = 'light';
 
 
 /**
@@ -23,7 +23,7 @@ export function resolveWorkDir(argWorkDir?: string): string {
     return path.resolve(process.cwd(), argWorkDir);
   }
 
-  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGTH_WORKDIR);
+  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORKDIR);
 }
 
 
