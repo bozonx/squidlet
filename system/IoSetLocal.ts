@@ -47,6 +47,10 @@ export default class IoSetLocal implements IoSet {
     return Object.keys(this.ioCollection);
   }
 
+  async requireLocalFile(fileName: string): Promise<any> {
+    return require(fileName);
+  }
+
 
   // it is need for test purpose
   private requireIoSetIndex(pathToIoSetIndex: string): {[index: string]: new () => IoItem} {

@@ -104,6 +104,11 @@ export default class IoSetBuiltin implements IoSet {
     return Object.keys(this.ioCollection);
   }
 
+  async requireLocalFile(fileName: string): Promise<any> {
+    // TODO: resolve main file - use srcDir
+    //return require(fileName);
+  }
+
 
   private instantiateIo(ioName: string, IoItemClass: new () => IoItem): IoItem {
     // make wrapper of Storage to get configs and manifests from memory

@@ -62,6 +62,10 @@ export default class IoSetDevelopSrc implements IoSet {
     return Object.keys(this.ioCollection);
   }
 
+  async requireLocalFile(fileName: string): Promise<any> {
+    return require(fileName);
+  }
+
 
   private makeInstance(IoItemClass: new () => IoItem, ioName: string): IoItem {
     // make wrapper of Storage to get configs and manifests from memory

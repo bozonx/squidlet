@@ -25,4 +25,9 @@ export default interface IoSet {
    * Get all the names of io items
    */
   getNames(): string[];
+
+  /**
+   * Require js|ts file from local disk and execute it.
+   */
+  requireLocalFile(fileName: string): Promise<any>;
 }

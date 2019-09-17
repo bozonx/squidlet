@@ -70,7 +70,7 @@ export default class EnvSet {
     const mainFileName: string = splitFirstElement(manifest.main, '.')[0];
     const filePath: string = await this.resolveEntityFilePath(entityType, entityName, mainFileName, manifest.srcDir);
 
-    return require(filePath).default;
+    return (await this.context.system.ioManager.ioSet.requireLocalFile(filePath)).default;
   }
 
   /**

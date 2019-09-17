@@ -71,4 +71,8 @@ export default class IoSetDevelopRemote implements IoSet {
     return this.remoteIoNames;
   }
 
+  async requireLocalFile(fileName: string): Promise<any> {
+    return require(fileName);
+  }
+
 }

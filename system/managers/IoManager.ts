@@ -4,8 +4,9 @@ import Context from '../Context';
 
 
 export default class IoManager {
+  readonly ioSet: IoSet;
+
   private readonly context: Context;
-  private readonly ioSet: IoSet;
 
 
   constructor(context: Context, ioSet: IoSet) {
