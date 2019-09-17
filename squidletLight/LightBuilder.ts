@@ -148,13 +148,13 @@ export default class LightBuilder {
       indexFilePath,
       outputFilePath,
       undefined,
-      // TODO: или лучше всетаки вбилживать???
+      // TODO: better to build in
       [
         'ws',
         'mqtt-packet',
         'mqtt',
         'axios',
-        // TODO: надо вбилживать, но ошибка
+        // TODO: build in this
         'bcx-expression-evaluator',
       ],
       false,
@@ -166,9 +166,5 @@ export default class LightBuilder {
   private makeExportString(defaultImportName: string, pathToFile: string): string {
     return `export {default as ${defaultImportName}} from '${removeExtFromFileName(pathToFile)}';\n`;
   }
-
-  // private makeImportString(defaultImportName: string, pathToFile: string): string {
-  //   return `import ${defaultImportName} from '${removeExtFromFileName(pathToFile)}';\n`;
-  // }
 
 }

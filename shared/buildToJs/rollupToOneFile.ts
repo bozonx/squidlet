@@ -6,7 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 
 const resolve = require('rollup-plugin-node-resolve');
 const commonjs = require('rollup-plugin-commonjs');
-const typescript = require('rollup-plugin-typescript2');
+//const typescript = require('rollup-plugin-typescript2');
 const babel = require('rollup-plugin-babel');
 const { DEFAULT_EXTENSIONS } = require('@babel/core');
 
@@ -32,21 +32,20 @@ function makePlugins(useSourceMaps?: boolean, minimize?: boolean): any[] {
     commonjs({
       include: 'node_modules/**'
     }),
-    typescript({
-      //typescript: require('typescript'),
-      useTsconfigDeclarationDir: true,
-      // TODO: может надо загрузить опции
-      tsconfigOverride: {
-        compilerOptions: {
-          ...tsConfig.compilerOptions,
-          module: 'ESNext',
-        }
-      }
-    }),
+    // typescript({
+    //   useTsconfigDeclarationDir: true,
+    //   tsconfigOverride: {
+    //     compilerOptions: {
+    //       ...tsConfig.compilerOptions,
+    //       module: 'ESNext',
+    //     }
+    //   }
+    // }),
 
     babel({
       extensions: [ ...DEFAULT_EXTENSIONS, '.ts', '.js' ],
       presets: [
+        // TODO: поидее можно передать опции компиляции
         ['@babel/preset-typescript'],
       ],
       plugins: [
@@ -89,9 +88,6 @@ export default async function(
     sourcemap: useSourceMaps,
     globals,
   };
-
-  // generate code
-  //const { output } = await bundle.generate(outputOptions);
 
   // or write the bundle to disk
   await bundle.write(outputOptions);
