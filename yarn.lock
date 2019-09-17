@@ -641,6 +641,22 @@
     "@types/glob" "*"
     "@types/node" "*"
 
+"@types/rollup-plugin-json@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/rollup-plugin-json/-/rollup-plugin-json-3.0.2.tgz#1153136a515ed4fbb7ef214ace496f5fc3ed7796"
+  integrity sha512-eTRym5nG4HEKDR/KrTnCMYwF7V0hgVjEesvtJCK3V8ho/aT0ZFRFgsDtx38VarM30HCsN372+i4FKYwnhcwiVA==
+  dependencies:
+    "@types/node" "*"
+    rollup "^0.63.4"
+
+"@types/rollup-plugin-sourcemaps@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@types/rollup-plugin-sourcemaps/-/rollup-plugin-sourcemaps-0.4.2.tgz#ce3752116834aeb8b798da77a180612fb6ff617a"
+  integrity sha512-dqF1rMFy4O8yNlQYwYPos5Cfav0f6M7PLH8B33gsslQ0zA9MX1jMGokwNuJ3Z3EXAzsKF/xAWNHpFmELcgYJww==
+  dependencies:
+    "@types/node" "*"
+    rollup "^0.63.4"
+
 "@types/serialport@^7.0.4":
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/@types/serialport/-/serialport-7.0.4.tgz#ac7f01410ba94ef313194ba5c2fa556fcc2fd32f"
@@ -4523,6 +4539,14 @@ rollup-pluginutils@2.8.1, rollup-pluginutils@^2.0.1, rollup-pluginutils@^2.5.0, 
   integrity sha512-J5oAoysWar6GuZo0s+3bZ6sVZAC0pfqKz68De7ZgDi5z63jOVZn1uJL/+z1jeKHNbGII8kAyHF5q8LnxSX5lQg==
   dependencies:
     estree-walker "^0.6.1"
+
+rollup@^0.63.4:
+  version "0.63.5"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-0.63.5.tgz#5543eecac9a1b83b7e1be598b5be84c9c0a089db"
+  integrity sha512-dFf8LpUNzIj3oE0vCvobX6rqOzHzLBoblyFp+3znPbjiSmSvOoK2kMKx+Fv9jYduG1rvcCfCveSgEaQHjWRF6g==
+  dependencies:
+    "@types/estree" "0.0.39"
+    "@types/node" "*"
 
 rollup@^1.20.1:
   version "1.20.1"

@@ -61,6 +61,8 @@
     "@types/pigpio": "^1.2.1",
     "@types/pump": "^1.1.0",
     "@types/rimraf": "^2.0.2",
+    "@types/rollup-plugin-json": "^3.0.2",
+    "@types/rollup-plugin-sourcemaps": "^0.4.2",
     "@types/serialport": "^7.0.4",
     "@types/shelljs": "^0.8.5",
     "@types/uniqid": "^4.1.3",
