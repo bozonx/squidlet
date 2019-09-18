@@ -8,7 +8,7 @@ import Platforms from '../../system/interfaces/Platforms';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
-import {makeExportString, rollupBuild, prepareIoClassesString} from '../helpers';
+import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
 
 
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
@@ -62,7 +62,7 @@ export default class AppBuilder {
     const iosFilePath: string = path.join(this.tmpDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
     const envSetPath: string = path.join(this.tmpDir, 'envSet.ts');
-    const envSetStr: string = await this.prepareEnvSetString();
+    const envSetStr: string = await prepareEnvSetString(this.envBuilder.generateProdEnvSet());
     const devicesFilePath: string = path.join(this.tmpDir, `${DEVICES_MAIN_FILES}.ts`);
     const devicesFileStr: string = await this.makeEntitiesMainFilesString('devices');
     const driversFilePath: string = path.join(this.tmpDir, `${DRIVERS_MAIN_FILES}.ts`);
@@ -120,13 +120,6 @@ export default class AppBuilder {
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
 
     return prepareIoClassesString(machineIosList, platformDir, this.tmpDir);
-  }
-
-  private prepareEnvSetString(): string {
-    const envSetStr = JSON.stringify(this.envBuilder.generateProdEnvSet(), null,2);
-
-    return `const envSet: any = ${envSetStr};\n\n`
-      + `export default envSet;`;
   }
 
   private makeEntitiesMainFilesString(pluralName: EntityTypePlural): string {

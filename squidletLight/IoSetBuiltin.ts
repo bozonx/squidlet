@@ -1,65 +1,14 @@
 import IoSet from '../system/interfaces/IoSet';
 import IoItem from '../system/interfaces/IoItem';
-//import HttpServer from '../nodejs/ios/HttpServer';
 import Storage from '../nodejs/ios/Storage';
-// import Sys from '../lowjs/ios/Sys';
-// import WebSocketServer from '../nodejs/ios/WebSocketServer';
-// import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import StorageEnvMemoryWrapper from '../shared/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-//import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import {PATH_SEP} from '../system/lib/paths';
 import systemConfig from '../system/systemConfig';
 import {EntityTypePlural} from '../system/interfaces/EntityTypes';
 import {trimChar} from '../system/lib/strings';
-// import I2cMaster from '../lowjs/ios/I2cMaster';
-// import Digital from '../lowjs/ios/Digital';
-// import Serial from '../lowjs/ios/Serial';
-//import Mqtt from '../nodejs/ios/Mqtt';
 
-//
-// // TODO: remake
-// const ioClasses: {[index: string]: any} = {
-//   //HttpClient,
-//   HttpServer,
-//   Storage,
-//   Sys,
-//   WebSocketClient,
-//   WebSocketServer,
-//   I2cMaster,
-//   Digital,
-//   Serial,
-//   //Mqtt,
-// };
-// // TODO: remake
-// const envSet: HostEnvSet = {
-//   configs: {
-//     config: {
-//       id: 'lowjs-test',
-//       platform: 'lowjs',
-//       machine: 'esp32wrover',
-//       ...hostDefaultConfig,
-//       ioServer: {
-//         ...hostDefaultConfig.ioServer,
-//         host: '0.0.0.0',
-//       },
-//     },
-//     systemDrivers: [],
-//     regularDrivers: [],
-//     systemServices: [],
-//     regularServices: [],
-//     devicesDefinitions: [],
-//     driversDefinitions: {},
-//     servicesDefinitions: {},
-//     iosDefinitions: {},
-//   },
-//   entities: {
-//     devices: {},
-//     drivers: {},
-//     services: {},
-//   }
-// };
 
 interface MainFiles {
   devices: {[index: string]: any};

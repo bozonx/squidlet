@@ -2,6 +2,7 @@ import * as path from 'path';
 
 import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
 import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
+import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 
 
 export function prepareIoClassesString(
@@ -22,6 +23,13 @@ export function prepareIoClassesString(
   }
 
   return exportsStr;
+}
+
+export function prepareEnvSetString(envSet: HostEnvSet): string {
+  const envSetStr = JSON.stringify(envSet, null,2);
+
+  return `const envSet: any = ${envSetStr};\n\n`
+    + `export default envSet;`;
 }
 
 export function makeExportString(defaultImportName: string, pathToFile: string): string {
