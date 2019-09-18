@@ -1,5 +1,6 @@
-bus:
-  type: string | number
+busNum:
+  type: number
+  defautl: 0
 address:
   type: string | number
   required: true

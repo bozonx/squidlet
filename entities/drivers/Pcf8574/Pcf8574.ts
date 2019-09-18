@@ -60,7 +60,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   protected didInit = async () => {
-    this.i2cDriver.addPollErrorListener((dataAddressStr: number | string | undefined, err: Error) => {
+    this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
       this.log.error(String(err));
     });
 
@@ -246,7 +246,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
 
-  private handleIcStateChange = (dataAddressStr: number | string | undefined, data: Uint8Array) => {
+  private handleIcStateChange = (functionStr: number | string | undefined, data: Uint8Array) => {
     if (!data || data.length !== DATA_LENGTH) {
       throw new Error(`PCF8574Driver: No data has been received`);
     }
@@ -392,7 +392,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
 export default class Factory extends DriverFactoryBase<Pcf8574> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
-    return `${props.bus || 'default'}-${props.address}`;
+    return `${props.busNum}-${props.address}`;
   }
   protected DriverClass = Pcf8574;
 }

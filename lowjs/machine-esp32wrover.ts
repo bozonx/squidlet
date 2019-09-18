@@ -29,11 +29,11 @@ const machineConfig: MachineConfig = {
   // ],
 
   hostConfig: {
-    drivers: {
-      'I2cMaster': {
-        bus: 1,
-      }
-    },
+    // drivers: {
+    //   'I2cMaster': {
+    //     bus: 1,
+    //   }
+    // },
 
   }
 };
