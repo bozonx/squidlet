@@ -1,7 +1,7 @@
 import IoServer from '../../system/ioServer/IoServer';
 import {consoleError} from '../../system/lib/helpers';
 import IoSet from '../../system/interfaces/IoSet';
-import IoSetBuiltin from '../IoSetBuiltin';
+import IoSetBuiltin from '../../squidletLight/IoSetBuiltin';
 import IoItem from '../../system/interfaces/IoItem';
 
 

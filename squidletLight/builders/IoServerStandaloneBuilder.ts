@@ -1,11 +1,11 @@
 import * as path from 'path';
 import Platforms from '../../system/interfaces/Platforms';
-import {HOST_TMP_DIR} from '../../shared/constants';
+import {HOST_TMP_DIR, IO_SERVER_FILE_NAME} from '../../shared/constants';
 import Os from '../../shared/Os';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
-import {loadMachineConfigInPlatformDir, resolvePlatformDir} from '../../shared/helpers';
+import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DIR} from '../../shared/helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 
 
@@ -54,7 +54,32 @@ export class IoServerStandaloneBuilder {
 
 
   private makeIndexFile(): string {
-    // TODO: !!!
+    const ioServerPath = path.relative(
+      this.tmpDir,
+      path.join(SYSTEM_DIR, 'ioServer', IO_SERVER_FILE_NAME)
+    );
+    const ioSetPath = path.relative(
+      this.tmpDir,
+      path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
+    );
+
+    return `import envSet from './envSet';\n`
+      + `import * as ios from './ios';\n`
+      + `import IoServer from '${ioServerPath}';\n`
+      + `import IoSetBuiltin from '${ioSetPath}';\n`
+      + '\n\n'
+      + `async function start() {\n`
+      + `  const ioSet: any = new IoSetBuiltin(envSet, ios);\n`
+      + `\n`
+      + `  await ioSet.init();\n`
+      + `\n`
+      + `  const shutdownRequestCb = () => console.warn("WARNING: Restart isn't allowed in io-server standalone mode");\n`
+      + `  const app: IoServer = new IoServer(ioSet, shutdownRequestCb, console.log, console.info, console.error);\n`
+      + '\n'
+      + `  await app.start();\n`
+      + '}\n'
+      + '\n'
+      + 'start().catch(console.error);\n';
   }
 
   private prepareIoClassesString(): string {

@@ -31,9 +31,9 @@ export default class IoSetBuiltin implements IoSet {
   constructor(
     envSet: HostEnvSet,
     ioClasses: {[index: string]: any},
-    devicesMainClasses: {[index: string]: any},
-    driversMainClasses: {[index: string]: any},
-    servicesMainClasses: {[index: string]: any}
+    devicesMainClasses: {[index: string]: any} = {},
+    driversMainClasses: {[index: string]: any} = {},
+    servicesMainClasses: {[index: string]: any} = {}
   ) {
     this.ioClasses = ioClasses;
     this.storageWrapper = new StorageEnvMemoryWrapper(envSet);

@@ -23,3 +23,4 @@ export const IOSET_STRING_DELIMITER = ':';
 
 export const SYSTEM_FILE_NAME = 'System';
 export const APP_SWITCHER_FILE_NAME = 'AppSwitcher';
+export const IO_SERVER_FILE_NAME = 'IoServer';
