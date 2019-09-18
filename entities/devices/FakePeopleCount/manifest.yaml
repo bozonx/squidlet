@@ -1,8 +1,0 @@
-name: FakePeopleCount
-main: FakePeopleCount.ts
-type: none
-
-status:
-  default:
-    type: number
-    default: 0
