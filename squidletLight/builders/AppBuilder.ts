@@ -8,7 +8,7 @@ import Platforms from '../../system/interfaces/Platforms';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
-import {makeExportString, rollupBuild} from '../helpers';
+import {makeExportString, rollupBuild, prepareIoClassesString} from '../helpers';
 
 
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
@@ -112,6 +112,14 @@ export default class AppBuilder {
       + '}\n'
       + '\n'
       + 'start().catch(console.error);\n';
+  }
+
+  prepareIoClassesString(): string {
+    const platformDir = this.envBuilder.configManager.machinePlatformDir;
+    // TODO: лучше брать только те что реально используются
+    const machineIosList = this.envBuilder.configManager.machineConfig.ios;
+
+    return prepareIoClassesString(machineIosList, platformDir, this.tmpDir);
   }
 
   private prepareEnvSetString(): string {

@@ -4,16 +4,17 @@ import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
 import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
 
 
-export function prepareIoClassesString(): string {
-  const platformDir = this.envBuilder.configManager.machinePlatformDir;
-  // TODO: лучше брать только те что реально используются
-  const machineIosList = this.envBuilder.configManager.machineConfig.ios;
+export function prepareIoClassesString(
+  machineIosList: string[],
+  platformDir: string,
+  tmpDir: string
+): string {
   let exportsStr = '';
 
   for (let ioPath of machineIosList) {
     const ioName: string = getFileNameOfPath(ioPath);
     const ioRelPath: string = path.relative(
-      this.tmpDir,
+      tmpDir,
       path.resolve(platformDir, ioPath)
     );
 
