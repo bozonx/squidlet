@@ -3,6 +3,9 @@
 id: testHost
 config: {}
 
+consoleLogger:
+  logLevel: debug
+
 httpApi:
   host: 0.0.0.0
 #wsApi:

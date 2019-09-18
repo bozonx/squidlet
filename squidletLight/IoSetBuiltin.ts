@@ -95,7 +95,7 @@ export default class IoSetBuiltin implements IoSet {
       throw new Error(`IoSetBuiltin.requireLocalFile: Can't the file "${fileName}"`);
     }
 
-    return this.mainFiles[pluralType][entityName];
+    return { default: this.mainFiles[pluralType][entityName] };
   }
 
 
