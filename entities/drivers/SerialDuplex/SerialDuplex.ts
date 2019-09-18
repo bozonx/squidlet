@@ -3,7 +3,7 @@ import DriverBase from 'system/base/DriverBase';
 import SerialIo from 'system/interfaces/io/SerialIo';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
-import {DATA_ADDRESS_LENGTH} from 'system/constants';
+import {FUNCTION_NUMBER_LENGTH} from 'system/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 
 
@@ -107,7 +107,7 @@ export class SerialDuplex extends DriverBase<SerialDuplexProps> implements Duple
     const dataAddrHex: number = hexStringToHexNum(dataAddressStr);
 
     if (typeof data === 'undefined') {
-      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+      dataToWrite = new Uint8Array(FUNCTION_NUMBER_LENGTH);
       dataToWrite[0] = dataAddrHex;
     }
     else {

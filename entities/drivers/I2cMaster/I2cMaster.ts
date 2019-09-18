@@ -2,23 +2,16 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import { addFirstItemUint8Arr } from 'system/lib/binaryHelpers';
 import DriverBase from 'system/base/DriverBase';
-import {DATA_ADDRESS_LENGTH} from 'system/constants';
-
-
-// TODO: does it really need?
+import {FUNCTION_NUMBER_LENGTH} from 'system/constants';
 
 
 export interface I2cMasterProps {
-  bus: number | string;
-}
-
-export interface I2cMasterInstanceProps {
-  bus: string;
+  busNum: number;
 }
 
 
-export class I2cMaster extends DriverBase<I2cMasterInstanceProps> {
-  private get i2cMasterDev(): I2cMasterIo {
+export class I2cMaster extends DriverBase<I2cMasterProps> {
+  private get i2cMasterIo(): I2cMasterIo {
     return this.depsInstances.i2cMaster;
   }
 
@@ -31,102 +24,59 @@ export class I2cMaster extends DriverBase<I2cMasterInstanceProps> {
   /**
    * Read once from bus.
    * if data address is defined then it will write an empty command before read
-   * and code on other side cat prepare data to send.
+   * and code on other side can prepare data to send.
    */
-  read = async(addressHex: number, dataAddressHex: number | undefined, length: number): Promise<Uint8Array> => {
-    if (typeof dataAddressHex !== 'undefined') {
-      await this.write(addressHex, dataAddressHex);
+  read = async(addressHex: number, functionHex: number | undefined, length: number): Promise<Uint8Array> => {
+    if (typeof functionHex !== 'undefined') {
+      await this.write(addressHex, functionHex);
     }
 
     // read from bus
-    return this.i2cMasterDev.readFrom(this.props.bus, addressHex, length);
+    return this.i2cMasterIo.readFrom(this.props.busNum, addressHex, length);
   }
 
-  write = async (addressHex: number, dataAddressHex?: number, data?: Uint8Array): Promise<void> => {
-    let dataToWrite = data;
+  /**
+   * Write to the bus.
+   * @param addressHex - address of slave.
+   * @param functionHex - function number - one byte
+   * @param data - data to write
+   */
+  write = async (addressHex: number, functionHex?: number, data?: Uint8Array): Promise<void> => {
+    let dataToWrite = data || new Uint8Array(0);
 
-    if (typeof dataAddressHex !== 'undefined' && typeof data === 'undefined') {
-      dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
+    if (typeof functionHex !== 'undefined' && typeof data === 'undefined') {
+      // only function number
+      dataToWrite = new Uint8Array(FUNCTION_NUMBER_LENGTH);
     }
-    else if (typeof dataAddressHex !== 'undefined' && typeof data !== 'undefined') {
-      dataToWrite = addFirstItemUint8Arr(data, dataAddressHex);
+    else if (typeof functionHex !== 'undefined' && typeof data !== 'undefined') {
+      // function number and data
+      dataToWrite = addFirstItemUint8Arr(data, functionHex);
     }
-
-    // if (typeof dataAddressHex === 'undefined' && typeof data !== 'undefined') dataToWrite = data
-    // if (typeof dataAddressHex === 'undefined' && typeof data === 'undefined') dataToWrite = undefined;
 
     // TODO: выяснить поддерживается ли запись без данных
 
-    //await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
-
-    await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite || new Uint8Array(0));
-
-    // try {
-    //   await this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite || new Uint8Array(0));
-    //
-    //   console.log('==== i2c master SUCCESS', addressHex, dataAddressHex, data);
-    // }
-    // catch (err) {
-    //   console.log('==== i2c master ERROR', addressHex, dataAddressHex, data);
-    //
-    //   throw err;
-    // }
-
+    await this.i2cMasterIo.writeTo(this.props.busNum, addressHex, dataToWrite);
   }
 
   /**
    * Write and read from the same data address.
    */
-  request = async(addressHex: number, dataAddressHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> => {
-    await this.write(addressHex, dataAddressHex, dataToSend);
+  request = async(addressHex: number, functionHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> => {
+    await this.write(addressHex, functionHex, dataToSend);
 
-    return this.read(addressHex, dataAddressHex, readLength);
+    return this.read(addressHex, functionHex, readLength);
   }
-
-  // /**
-  //  * Write only a dataAddress to bus
-  //  */
-  // writeEmpty(addressHex: number, dataAddressHex: number): Promise<void> {
-  //   const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
-  //
-  //   dataToWrite[0] = dataAddressHex;
-  //
-  //   return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
-  // }
-
-  // /**
-  //  * Write only a dataAddress or nothing to bus
-  //  */
-  // writeEmpty(addressHex: number, dataAddress: number | undefined): Promise<void> {
-  //   // send nothing
-  //   if (typeof dataAddress === 'undefined') {
-  //     return this.i2cMasterDev.writeTo(this.props.bus, addressHex);
-  //   }
-  //
-  //   // send only a data address
-  //   const dataToWrite = new Uint8Array(DATA_ADDRESS_LENGTH);
-  //
-  //   dataToWrite[0] = dataAddress;
-  //
-  //   return this.i2cMasterDev.writeTo(this.props.bus, addressHex, dataToWrite);
-  // }
-
-  // protected validateProps = (props: I2cMasterDriverProps): string | undefined => {
-  //   return;
-  // }
 
 }
 
 
 export default class Factory extends DriverFactoryBase<I2cMaster> {
-  protected instanceByPropName = 'bus';
+  protected instanceByPropName = 'busNum';
   protected DriverClass = I2cMaster;
 
-  // TODO: review
-  async getInstance(props: I2cMasterProps): Promise<I2cMaster> {
-    const resolvedProps = (typeof props.bus === 'undefined') ? {} : { bus: String(props.bus) };
-
-    return super.getInstance(resolvedProps);
-  }
-
+  // async getInstance(props: I2cMasterProps): Promise<I2cMaster> {
+  //   const resolvedProps = (typeof props.busNum === 'undefined') ? {} : { busNum: String(props.busNum) };
+  //
+  //   return super.getInstance(resolvedProps);
+  // }
 }

@@ -93,7 +93,7 @@ export class IoServerStandaloneBuilder {
     const envSet: HostEnvSet = {
       configs: {
         config: {
-          id: 'ioserver',
+          id: 'io-server',
           platform: this.platform,
           machine: this.machine,
           ...hostDefaultConfig,

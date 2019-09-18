@@ -6,6 +6,6 @@ ios:
   - I2cMaster
 
 props:
-  bus:
-    type: string | number
+  busNum:
+    type: number
     required: true
