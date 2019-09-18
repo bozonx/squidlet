@@ -4,6 +4,7 @@ import * as yargs from 'yargs';
 import AppBuilder from './builders/AppBuilder';
 import Platforms from '../system/interfaces/Platforms';
 import {REPO_ROOT} from '../shared/helpers';
+import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
 
 
 const SQUIDLET_LIGHT_WORKDIR = 'light';
@@ -32,6 +33,7 @@ export default async function(): Promise<void> {
   const platform: Platforms | undefined = yargs.argv.platform as any;
   const machine: string | undefined = yargs.argv.machine as any;
   const hostConfigPath: string | undefined = yargs.argv._[0] as any;
+  const minimize: boolean = yargs.argv.minimize !== 'false';
 
   if (!platform) {
     console.error(`--platform is required`);
@@ -47,17 +49,26 @@ export default async function(): Promise<void> {
   }
 
   if (yargs.argv.ioServer) {
-    // TODO: io server standalone
-  }
-  else {
-    const builder = new AppBuilder(
+    // build io server standalone
+    const builder = new IoServerStandaloneBuilder(
       workDir,
       platform,
       machine,
       hostConfigPath,
-      yargs.argv.minimize !== 'false'
+      minimize
     );
 
-    await builder.build();
+    return await builder.build();
   }
+
+  // build app with app switcher
+  const builder = new AppBuilder(
+    workDir,
+    platform,
+    machine,
+    hostConfigPath,
+    minimize
+  );
+
+  await builder.build();
 }

@@ -27,7 +27,7 @@ export class IoServerStandaloneBuilder {
   }
 
 
-  async start() {
+  async build() {
     // load all the machine's io
     this.ioSet = await this.makeIoSet();
 
