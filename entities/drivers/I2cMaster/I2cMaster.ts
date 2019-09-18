@@ -1,11 +1,12 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
+import I2cMasterIo, {I2cParams} from 'system/interfaces/io/I2cMasterIo';
 import { addFirstItemUint8Arr } from 'system/lib/binaryHelpers';
 import DriverBase from 'system/base/DriverBase';
 import {FUNCTION_NUMBER_LENGTH} from 'system/constants';
+import {omitObj} from '../../../system/lib/objects';
 
 
-export interface I2cMasterProps {
+export interface I2cMasterProps extends I2cParams {
   busNum: number;
 }
 
@@ -18,6 +19,8 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
 
   protected willInit = async () => {
     this.depsInstances.i2cMaster = this.context.getIo('I2cMaster');
+
+    await this.i2cMasterIo.newBus(this.props.busNum, omitObj(this.props, 'busNum') as any);
   }
 
 
@@ -32,7 +35,11 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
     }
 
     // read from bus
-    return this.i2cMasterIo.readFrom(this.props.busNum, addressHex, length);
+    const result = await this.i2cMasterIo.readFrom(this.props.busNum, addressHex, length);
+
+    this.log.debug(`I2cMaster driver read. busNum ${this.props.busNum}, addrHex: ${addressHex}, result: ${JSON.stringify(result)}`);
+
+    return result;
   }
 
   /**
@@ -54,6 +61,8 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
     }
 
     // TODO: выяснить поддерживается ли запись без данных
+
+    this.log.debug(`I2cMaster driver write. busNum ${this.props.busNum}, addrHex: ${addressHex}, data: ${JSON.stringify(dataToWrite)}`);
 
     await this.i2cMasterIo.writeTo(this.props.busNum, addressHex, dataToWrite);
   }

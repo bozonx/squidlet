@@ -6,7 +6,7 @@ export interface I2cParams {
   bus?: string | number;
   // SDA pin on micro-controller
   pinSDA?: number;
-  // SDA pin on micro-controller
+  // SCL pin on micro-controller
   pinSCL?: number;
   // bus frequency. Default is 100000
   clockHz: number;

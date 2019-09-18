@@ -16,6 +16,7 @@ const SQUIDLET_LIGHT_WORKDIR = 'light';
  * * --platform - required
  * * --machine - required
  * * --minimize - default is true
+ * * --io-server - build IO server standalone instead of full app.
  * * config path
  */
 export function resolveWorkDir(argWorkDir?: string): string {

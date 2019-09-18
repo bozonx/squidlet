@@ -9,3 +9,15 @@ props:
   busNum:
     type: number
     required: true
+  # bus number on raspberry pi like hosts
+  bus:
+    type: string | number
+  # SDA pin on micro-controller
+  pinSDA:
+    type: number
+  # SCL pin on micro-controller
+  pinSCL:
+    type: number
+  # bus frequency. Only micro-controllers are supported. Default is 100000
+  clockHz:
+    type: number

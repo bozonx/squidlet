@@ -49,6 +49,7 @@ export default abstract class I2cMasterIoBase {
   protected getItem(busNum: number): I2cMasterBusLike {
     if (!this.instances[busNum]) {
       throw new Error(`I2cMaster IO: bus number "${busNum}" hasn't been instantiated`);
+      //this.instances[busNum] = await this.newBus(busNum);
     }
 
     return this.instances[busNum];
