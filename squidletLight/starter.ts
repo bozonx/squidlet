@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import LightBuilder from './starters/LightBuilder';
+import LightBuilder from './builders/LightBuilder';
 import Platforms from '../system/interfaces/Platforms';
 import {REPO_ROOT} from '../shared/helpers';
 

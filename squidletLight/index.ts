@@ -1,4 +1,6 @@
 import starter from './starter';
+import {consoleError} from '../system/lib/helpers';
+
 
 starter()
-  .catch(console.error);
+  .catch(consoleError);
