@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as yargs from 'yargs';
 
-import LightBuilder from './builders/LightBuilder';
+import AppBuilder from './builders/AppBuilder';
 import Platforms from '../system/interfaces/Platforms';
 import {REPO_ROOT} from '../shared/helpers';
 
@@ -46,13 +46,18 @@ export default async function(): Promise<void> {
     return process.exit(2);
   }
 
-  const builder = new LightBuilder(
-    workDir,
-    platform,
-    machine,
-    hostConfigPath,
-    yargs.argv.minimize !== 'false'
-  );
+  if (yargs.argv.ioServer) {
+    // TODO: io server standalone
+  }
+  else {
+    const builder = new AppBuilder(
+      workDir,
+      platform,
+      machine,
+      hostConfigPath,
+      yargs.argv.minimize !== 'false'
+    );
 
-  await builder.build();
+    await builder.build();
+  }
 }

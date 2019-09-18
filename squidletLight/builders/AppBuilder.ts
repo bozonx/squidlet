@@ -11,7 +11,7 @@ import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import rollupToOneFile from '../../shared/buildToJs/rollupToOneFile';
 
 
-export default class LightBuilder {
+export default class AppBuilder {
   private readonly workDir: string;
   private readonly platform: Platforms;
   private readonly machine: string;

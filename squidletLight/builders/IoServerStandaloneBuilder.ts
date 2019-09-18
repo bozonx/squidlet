@@ -5,7 +5,7 @@ import IoSetBuiltin from '../IoSetBuiltin';
 import IoItem from '../../system/interfaces/IoItem';
 
 
-export class IoServerStandalone {
+export class IoServerStandaloneBuilder {
   private ioSet?: IoSet;
 
 
