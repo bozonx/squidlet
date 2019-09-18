@@ -3,12 +3,17 @@ import * as path from 'path';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import {APP_SWITCHER_FILE_NAME, HOST_TMP_DIR} from '../../shared/constants';
 import Os from '../../shared/Os';
-import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
+import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
 import Platforms from '../../system/interfaces/Platforms';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
-import rollupToOneFile from '../../shared/buildToJs/rollupToOneFile';
+import {makeExportString, rollupBuild} from '../helpers';
+
+
+const DEVICES_MAIN_FILES = 'devicesMainFiles';
+const DRIVERS_MAIN_FILES = 'driversMainFiles';
+const SERViCES_MAIN_FILES = 'servicesMainFiles';
 
 
 export default class AppBuilder {
@@ -53,16 +58,16 @@ export default class AppBuilder {
     await this.envBuilder.collect();
 
     const indexFilePath = path.join(this.tmpDir, 'index.ts');
-    const indexFileStr: string = await this.makeIndexFile();
+    const indexFileStr: string = this.makeIndexFile();
     const iosFilePath: string = path.join(this.tmpDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
     const envSetPath: string = path.join(this.tmpDir, 'envSet.ts');
     const envSetStr: string = await this.prepareEnvSetString();
-    const devicesFilePath: string = path.join(this.tmpDir, 'devicesMainFiles.ts');
+    const devicesFilePath: string = path.join(this.tmpDir, `${DEVICES_MAIN_FILES}.ts`);
     const devicesFileStr: string = await this.makeEntitiesMainFilesString('devices');
-    const driversFilePath: string = path.join(this.tmpDir, 'driversMainFiles.ts');
+    const driversFilePath: string = path.join(this.tmpDir, `${DRIVERS_MAIN_FILES}.ts`);
     const driversFileStr: string = await this.makeEntitiesMainFilesString('drivers');
-    const servicesFilePath: string = path.join(this.tmpDir, 'servicesMainFiles.ts');
+    const servicesFilePath: string = path.join(this.tmpDir, `${SERViCES_MAIN_FILES}.ts`);
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
     await this.os.writeFile(indexFilePath, indexFileStr);
@@ -72,11 +77,11 @@ export default class AppBuilder {
     await this.os.writeFile(driversFilePath, driversFileStr);
     await this.os.writeFile(servicesFilePath, servicesFileStr);
 
-    await this.rollup();
+    await rollupBuild(this.workDir, this.tmpDir, this.minimize);
   }
 
 
-  private async makeIndexFile(): Promise<string> {
+  private makeIndexFile(): string {
     const appSwitcherPath = path.relative(
       this.tmpDir,
       path.join(SYSTEM_DIR, APP_SWITCHER_FILE_NAME)
@@ -86,17 +91,16 @@ export default class AppBuilder {
       path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
     );
 
-    // TODO: use constants
     return `import envSet from './envSet';\n`
       + `import * as ios from './ios';\n`
-      + `import * as devicesMainFiles from './devicesMainFiles';\n`
-      + `import * as driversMainFiles from './driversMainFiles';\n`
-      + `import * as servicesMainFiles from './servicesMainFiles';\n`
+      + `import * as ${DEVICES_MAIN_FILES} from './${DEVICES_MAIN_FILES}';\n`
+      + `import * as ${DRIVERS_MAIN_FILES} from './${DRIVERS_MAIN_FILES}';\n`
+      + `import * as ${SERViCES_MAIN_FILES} from './${SERViCES_MAIN_FILES}';\n`
       + `import AppSwitcher from '${appSwitcherPath}';\n`
       + `import IoSetBuiltin from '${ioSetPath}';\n`
       + '\n\n'
       + `async function start() {\n`
-      + `  const ioSet: any = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);\n`
+      + `  const ioSet: any = new IoSetBuiltin(envSet, ios, ${DEVICES_MAIN_FILES}, ${DRIVERS_MAIN_FILES}, ${SERViCES_MAIN_FILES});\n`
       + `\n`
       + `  await ioSet.init();\n`
       + `\n`
@@ -108,25 +112,6 @@ export default class AppBuilder {
       + '}\n'
       + '\n'
       + 'start().catch(console.error);\n';
-  }
-
-  private prepareIoClassesString(): string {
-    const platformDir = this.envBuilder.configManager.machinePlatformDir;
-    // TODO: лучше брать только те что реально используются
-    const machineIosList = this.envBuilder.configManager.machineConfig.ios;
-    let exportsStr = '';
-
-    for (let ioPath of machineIosList) {
-      const ioName: string = getFileNameOfPath(ioPath);
-      const ioRelPath: string = path.relative(
-        this.tmpDir,
-        path.resolve(platformDir, ioPath)
-      );
-
-      exportsStr += this.makeExportString(ioName, ioRelPath);
-    }
-
-    return exportsStr;
   }
 
   private prepareEnvSetString(): string {
@@ -148,37 +133,10 @@ export default class AppBuilder {
         path.join(srcAbsDir, entities[entityName].manifest.main)
       );
 
-      exportsStr += this.makeExportString(entities[entityName].manifest.name, relFileName);
+      exportsStr += makeExportString(entities[entityName].manifest.name, relFileName);
     }
 
     return exportsStr;
-  }
-
-  private async rollup() {
-    const indexFilePath = path.join(this.tmpDir, 'index.ts');
-    const outputFilePath = path.join(this.workDir, 'index.js');
-
-    await rollupToOneFile(
-      'Squidlet',
-      indexFilePath,
-      outputFilePath,
-      undefined,
-      // TODO: better to build in
-      [
-        'ws',
-        'mqtt-packet',
-        'mqtt',
-        'axios',
-        // TODO: build in this
-        'bcx-expression-evaluator',
-      ],
-      false,
-      this.minimize,
-    );
-  }
-
-  private makeExportString(defaultImportName: string, pathToFile: string): string {
-    return `export {default as ${defaultImportName}} from '${removeExtFromFileName(pathToFile)}';\n`;
   }
 
 }
