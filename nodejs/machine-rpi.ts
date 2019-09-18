@@ -27,10 +27,14 @@ const machineConfig: MachineConfig = {
   // ],
 
   hostConfig: {
-    drivers: {
-      'I2cMaster': {
-        bus: 1,
-      }
+    ios: {
+      I2cMaster: {
+        buses: {
+          0: {
+            bus: 1,
+          }
+        }
+      },
     },
     dependencies: {
       'i2c-bus': '^4.0.10',

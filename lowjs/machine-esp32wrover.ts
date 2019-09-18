@@ -29,13 +29,18 @@ const machineConfig: MachineConfig = {
   // ],
 
   hostConfig: {
-    // drivers: {
-    //   'I2cMaster': {
-    //     bus: 1,
-    //   }
-    // },
-
-  }
+    ios: {
+      I2cMaster: {
+        buses: {
+          0: {
+            pinSDA: 4,
+            pinSCL: 5,
+            clockHz: 100000,
+          }
+        }
+      },
+    },
+  },
 };
 
 export default machineConfig;

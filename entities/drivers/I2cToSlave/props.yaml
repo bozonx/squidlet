@@ -1,6 +1,6 @@
 busNum:
   type: number
-  defautl: 0
+  default: 0
 address:
   type: string | number
   required: true
