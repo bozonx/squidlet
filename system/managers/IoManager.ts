@@ -47,6 +47,7 @@ export default class IoManager {
         continue;
       }
 
+      this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioParams[ioName])}`);
       await ioItem.configure(ioParams[ioName]);
     }
   }

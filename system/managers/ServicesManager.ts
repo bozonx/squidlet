@@ -40,6 +40,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase> {
     );
 
     for (let serviceId of servicesIds) {
+      this.context.log.debug(`ServicesManager: initializing service "${serviceId}"`);
       this.instances[serviceId] = await this.makeInstance('service', definitions[serviceId]);
     }
 
