@@ -1,31 +1,28 @@
 # ./squidletctl start ./test/test-esp32wrover.yaml
 
 id: testHost
-config: {}
 
 consoleLogger:
   logLevel: debug
 
-httpApi:
-  host: 0.0.0.0
+#httpApi:
+#  host: 0.0.0.0
 #wsApi:
 #  host: 0.0.0.0
 #ioServer:
 #  host: 0.0.0.0
 
-#automation:
-#  rules:
-#    - name: switch_led
-#      trigger:
-#        - type: deviceState
-#          id: bedroom.wall-light-toggle
-#          #state: default
-#      action:
-#        - type: deviceAction
-#          id: bedroom.light1
-#          #action: toggle
-#          action: turn
-#          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
+automation:
+  rules:
+    - name: switch_led
+      trigger:
+        - type: deviceState
+          id: bedroom.wall-light-toggle
+      action:
+        - type: deviceAction
+          id: bedroom.light2
+          action: turn
+          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
 
 devices:
   bedroom:
@@ -46,11 +43,13 @@ devices:
 #      expander: bedroom.expander
 
     light2:
-      device: Relay
+      device: Switch
+      #device: Relay
       pin: 2
 
-#    wall-light-toggle:
-#      device: WallClickSensor
-#      pin: 3
-#      pullup: true
-#      publish: both
+    wall-light-toggle:
+      #device: WallClickSensor
+      device: ClickSensor
+      pin: 3
+      pullup: true
+      publish: both

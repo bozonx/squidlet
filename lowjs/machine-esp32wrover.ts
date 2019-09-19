@@ -9,10 +9,10 @@ const machineConfig: MachineConfig = {
     //'../nodejs/ios/WebSocketServer.ts',
     './ios/Sys.ts',
     //'../nodejs/ios/HttpClient.ts',
-    '../nodejs/ios/HttpServer.ts',
+    //'../nodejs/ios/HttpServer.ts',
 
     './ios/Digital.ts',
-    './ios/I2cMaster.ts',
+    //'./ios/I2cMaster.ts',
     //'./ios/Serial.ts',
 
     //'Pwm',
