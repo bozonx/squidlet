@@ -12,5 +12,5 @@ export const servicesShortcut: {[index: string]: string} = {
 export const defaultServices = [
   'consoleLogger',
   //'updater',
-  'httpApi',
+  //'httpApi',
 ];

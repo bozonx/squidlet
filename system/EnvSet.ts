@@ -68,7 +68,7 @@ export default class EnvSet {
   ): Promise<T> {
     const manifest: ManifestBase = await this.loadManifest(entityType, entityName);
     const mainFileName: string = splitFirstElement(manifest.main, '.')[0];
-    const filePath: string = await this.resolveEntityFilePath(entityType, entityName, mainFileName, manifest.srcDir);
+    const filePath: string = this.resolveEntityFilePath(entityType, entityName, mainFileName, manifest.srcDir);
 
     return (await this.context.system.ioManager.ioSet.requireLocalFile(filePath)).default;
   }
@@ -85,7 +85,7 @@ export default class EnvSet {
     fileName: string
   ): Promise<string> {
     const manifest: ManifestBase = await this.loadManifest(entityType, entityName);
-    const filePath: string = await this.resolveEntityFilePath(entityType, entityName, fileName, manifest.srcDir);
+    const filePath: string = this.resolveEntityFilePath(entityType, entityName, fileName, manifest.srcDir);
 
     return this.storageIo.readFile(filePath);
   }
@@ -102,18 +102,18 @@ export default class EnvSet {
     fileName: string
   ): Promise<Uint8Array> {
     const manifest: ManifestBase = await this.loadManifest(entityType, entityName);
-    const filePath: string = await this.resolveEntityFilePath(entityType, entityName, fileName, manifest.srcDir);
+    const filePath: string = this.resolveEntityFilePath(entityType, entityName, fileName, manifest.srcDir);
 
     return this.storageIo.readBinFile(filePath);
   }
 
 
-  private async resolveEntityFilePath(
+  private resolveEntityFilePath(
     entityType: EntityType,
     entityName: string,
     fileName: string,
     entitySrcDir?: string
-  ): Promise<string> {
+  ): string {
     // relative to entity src root (development mode)
     if (entitySrcDir) return pathJoin(entitySrcDir, fileName);
 
