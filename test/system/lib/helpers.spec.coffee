@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe.only 'system.lib.helpers', ->
+describe 'system.lib.helpers', ->
   it 'isEqual', ->
     assert.isTrue(helpers.isEqual(1, 1))
     assert.isFalse(helpers.isEqual(1, 0))
@@ -11,14 +11,17 @@ describe.only 'system.lib.helpers', ->
     assert.isFalse(helpers.isEqual(null, undefined))
     assert.isTrue(helpers.isEqual(undefined, undefined))
     assert.isFalse(helpers.isEqual(undefined, null))
+
     fn = () =>
     assert.isTrue(helpers.isEqual(fn, fn))
     assert.isFalse(helpers.isEqual(fn, () =>))
+
     assert.isTrue(helpers.isEqual(['a'], ['a']))
     assert.isFalse(helpers.isEqual(['a'], ['a', 'b']))
     assert.isTrue(helpers.isEqual({a: {aa: 1}}, {a: {aa: 1}}))
     assert.isFalse(helpers.isEqual({a: {aa: 1}}, {a: {aa: 1, bb: 2}}))
     assert.isFalse(helpers.isEqual({a: 1}, ['a']))
+
     uint1 = new Uint8Array(1)
     uint2 = new Uint8Array(1)
     uint1[0] = 255
@@ -26,7 +29,14 @@ describe.only 'system.lib.helpers', ->
     assert.isTrue(helpers.isEqual(uint1, uint2))
     assert.isFalse(helpers.isEqual(uint1, new Uint8Array(1)))
     assert.isFalse(helpers.isEqual(uint1, []))
-    # TODO: test instances
+
+    class cl1
+      param: 1
+    class cl2
+      param: 2
+    assert.isTrue(helpers.isEqual(cl1, cl1))
+    assert.isFalse(helpers.isEqual(cl1, cl2))
+    assert.isFalse(helpers.isEqual(cl1, cl2))
 
   it 'convertToLevel', ->
     assert.isTrue(helpers.convertToLevel(true))
