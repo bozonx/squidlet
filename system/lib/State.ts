@@ -33,18 +33,15 @@ export default class State {
   }
 
   updateState(category: number, stateName: string, newPartialState?: Dictionary) {
-    const changedParams: string[] = this.generateChangedParams(category, stateName, newPartialState);
+    const oldState: Dictionary | undefined = this.getState(category, stateName);
+    const changedParams: string[] = this.generateChangedParams(oldState, newPartialState);
 
     // don't do anything if value isn't changed
     if (!changedParams.length) return;
 
     if (!this.state[category]) this.state[category] = {};
 
-    // TODO: support of undefined which has keys
-    this.state[category][stateName] = mergeDeepObjects(
-      newPartialState,
-      this.getState(category, stateName)
-    );
+    this.state[category][stateName] = this.mergeState(oldState, newPartialState);
 
     // // emit all the params events
     // for (let paramName of Object.keys(newPartialState)) {
@@ -66,8 +63,7 @@ export default class State {
   }
 
 
-  private generateChangedParams(category: number, stateName: string, partialState?: Dictionary): string[] {
-    const oldState: Dictionary | undefined = this.getState(category, stateName);
+  private generateChangedParams(oldState?: Dictionary, partialState?: Dictionary): string[] {
     const result: string[] = [];
 
     if (!partialState) {
@@ -82,6 +78,13 @@ export default class State {
     }
 
     return result;
+  }
+
+  private mergeState(oldState?: Dictionary, newPartialState?: Dictionary): Dictionary {
+    return mergeDeepObjects(
+      newPartialState,
+      oldState
+    );
   }
 
 

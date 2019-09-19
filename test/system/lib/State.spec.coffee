@@ -7,6 +7,14 @@ describe.only 'system.lib.State', ->
     @stateName = 'deviceId'
     @partialState = { param: 'value' }
     @state = new State()
+    @ordinaryState = {
+      '0': {
+        deviceId: {
+          param: 'value old'
+          param2: 'not changed'
+        }
+      }
+    }
 
   it 'updateState, getState, onChange - ordinary state change', ->
     handler = sinon.spy()
@@ -39,14 +47,7 @@ describe.only 'system.lib.State', ->
     #sinon.assert.notCalled(paramHandler)
 
   it 'updateState - overwrite previous value', ->
-    @state.state = {
-      '0': {
-        deviceId: {
-          param: 'value old'
-          param2: 'not changed'
-        }
-      }
-    }
+    @state.state = @ordinaryState
 
     @state.updateState(@category, @stateName, @partialState)
 
@@ -56,14 +57,7 @@ describe.only 'system.lib.State', ->
     })
 
   it 'updateState - set param to undefined', ->
-    @state.state = {
-      '0': {
-        deviceId: {
-          param: 'value old'
-          param2: 'not changed'
-        }
-      }
-    }
+    @state.state = @ordinaryState
 
     @state.updateState(@category, @stateName, {param: undefined})
 
@@ -92,64 +86,38 @@ describe.only 'system.lib.State', ->
     #assert.isFalse(@state.changeParamEvents.hasListeners())
 
   it 'private generateChangedParams', ->
-    # old state is undefined
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName, @partialState), ['param'])
-    # both are undefined
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName), [])
-
-    @state.state = {
-      '0': {
-        deviceId: {
-          param: 'value old'
-          param2: 'not changed'
-        }
-      }
+    ordinaryState = {
+      param: 'value old'
+      param2: 'not changed'
     }
+
+    # old state is undefined
+    assert.deepEqual(@state.generateChangedParams(undefined, @partialState), ['param'])
+    # both are undefined
+    assert.deepEqual(@state.generateChangedParams(undefined, undefined), [])
+
     # new state is undefined
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName), [])
+    assert.deepEqual(@state.generateChangedParams(ordinaryState, undefined), [])
     # changed param
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName, @partialState), ['param'])
+    assert.deepEqual(@state.generateChangedParams(ordinaryState, @partialState), ['param'])
 
     # nothing is changed
-    @state.state = {
-      '0': {
-        deviceId: {
-          param: 'value'
-          param2: 'not changed'
-        }
-      }
-    }
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName, @partialState), [])
+    assert.deepEqual(@state.generateChangedParams({
+      param: 'value'
+      param2: 'not changed'
+    }, @partialState), [])
 
     # new param is undefined
-    @state.state = {
-      '0': {
-        deviceId: {
-          param: 'value'
-          param2: 'not changed'
-        }
-      }
-    }
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName, {param: undefined}), ['param'])
+    assert.deepEqual(@state.generateChangedParams(ordinaryState, {param: undefined}), ['param'])
 
     # both params are undefined
-    @state.state = {
-      '0': {
-        deviceId: {
-          param2: 'not changed'
-        }
-      }
-    }
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName, {param: undefined}), [])
-    @state.state = {
-      '0': {
-        deviceId: {
-          param: undefined
-          param2: 'not changed'
-        }
-      }
-    }
-    assert.deepEqual(@state.generateChangedParams(@category, @stateName, {param: undefined}), [])
+    assert.deepEqual(@state.generateChangedParams({
+      param2: 'not changed'
+    }, {param: undefined}), [])
+    assert.deepEqual(@state.generateChangedParams({
+      param: undefined
+      param2: 'not changed'
+    }, {param: undefined}), [])
 
 
 #  it 'updateStateParam, getStateParam, onChangeParam - change state param', ->
