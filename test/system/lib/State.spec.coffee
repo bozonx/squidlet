@@ -121,6 +121,35 @@ describe.only 'system.lib.State', ->
     }
     assert.deepEqual(@state.generateChangedParams(@category, @stateName, @partialState), [])
 
+    # new param is undefined
+    @state.state = {
+      '0': {
+        deviceId: {
+          param: 'value'
+          param2: 'not changed'
+        }
+      }
+    }
+    assert.deepEqual(@state.generateChangedParams(@category, @stateName, {param: undefined}), ['param'])
+
+    # both params are undefined
+    @state.state = {
+      '0': {
+        deviceId: {
+          param2: 'not changed'
+        }
+      }
+    }
+    assert.deepEqual(@state.generateChangedParams(@category, @stateName, {param: undefined}), [])
+    @state.state = {
+      '0': {
+        deviceId: {
+          param: undefined
+          param2: 'not changed'
+        }
+      }
+    }
+    assert.deepEqual(@state.generateChangedParams(@category, @stateName, {param: undefined}), [])
 
 
 #  it 'updateStateParam, getStateParam, onChangeParam - change state param', ->

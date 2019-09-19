@@ -78,7 +78,6 @@ export default class State {
     }
 
     for (let name of Object.keys(partialState)) {
-      // TODO: what about undefined with keys ????
       if (!isEqual(partialState[name], oldState[name])) result.push(name);
     }
 
