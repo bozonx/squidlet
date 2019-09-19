@@ -5,6 +5,7 @@ import {isEqual} from './helpers';
 /**
  * Are objects equal.
  * If one of them not Object then it returns false.
+ * For plain objects and instances
  */
 export function isEqualObjects(first?: {[index: string]: any}, second?: {[index: string]: any}): boolean {
   if (typeof first !== 'object' || typeof second !== 'object') return false;

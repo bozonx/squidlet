@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe 'system.lib.helpers', ->
+describe.only 'system.lib.helpers', ->
   it 'isEqual', ->
     assert.isTrue(helpers.isEqual(1, 1))
     assert.isFalse(helpers.isEqual(1, 0))
@@ -26,7 +26,7 @@ describe 'system.lib.helpers', ->
     assert.isTrue(helpers.isEqual(uint1, uint2))
     assert.isFalse(helpers.isEqual(uint1, new Uint8Array(1)))
     assert.isFalse(helpers.isEqual(uint1, []))
-
+    # TODO: test instances
 
   it 'convertToLevel', ->
     assert.isTrue(helpers.convertToLevel(true))

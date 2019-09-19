@@ -1,7 +1,7 @@
 State = require('../../../system/lib/State').default
 
 
-describe 'system.lib.State', ->
+describe.only 'system.lib.State', ->
   beforeEach ->
     @category = 0
     @stateName = 'deviceId'
