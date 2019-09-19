@@ -34,6 +34,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
 
     if (!driver) {
       this.context.log.error(`DriversManager.getDriver: Can't find the driver "${driverName}"`);
+
       throw new Error(`Can't find the driver "${driverName}"`);
     }
 
@@ -45,7 +46,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
     const definitions = await this.loadDriversDefinitions();
 
     for (let driverName of driverNames) {
-      this.context.log.debug(`DriversManager: initializing driver "${driverName}"`);
+      //this.context.log.debug(`DriversManager: initializing driver "${driverName}"`);
       this.instances[driverName] = await this.makeInstance('driver', definitions[driverName]);
     }
 

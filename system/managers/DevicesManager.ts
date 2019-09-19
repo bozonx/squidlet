@@ -7,7 +7,6 @@ import DeviceBase from '../base/DeviceBase';
  * Creates instances of local devices and prepare config for them.
  */
 export default class DevicesManager extends EntityManagerBase<DeviceBase> {
-
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */

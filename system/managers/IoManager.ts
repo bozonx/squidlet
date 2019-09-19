@@ -39,7 +39,8 @@ export default class IoManager {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
       if (!ioItem) {
-        this.context.log.warn(`ioDefinitions config has definition of io item which doesn't exist in ioSet`);
+        //this.context.log.warn(`ioDefinitions config has definition of io item which doesn't exist in ioSet`);
+        console.warn(`WARNING: ioDefinitions config has definition of io item which doesn't exist in ioSet`);
 
         continue;
       }
@@ -47,7 +48,7 @@ export default class IoManager {
         continue;
       }
 
-      this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioParams[ioName])}`);
+      //this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioParams[ioName])}`);
       await ioItem.configure(ioParams[ioName]);
     }
   }

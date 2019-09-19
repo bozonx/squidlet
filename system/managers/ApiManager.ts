@@ -13,7 +13,10 @@ export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) =
  */
 export default class ApiManager {
   private readonly context: Context;
+  // TODO: зачем это нужно если можно навешиваться на каждый remoteCall???
+  //  на внутренние событие по каждой сессии
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
+  // separate instance of RemoteCall for each session. It needs to destroy whole instance on session end.
   private remoteCalls: {[index: string]: RemoteCall} = {};
 
 
