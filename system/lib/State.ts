@@ -66,7 +66,6 @@ export default class State {
   }
 
 
-  // TODO: test
   private generateChangedParams(category: number, stateName: string, partialState?: Dictionary): string[] {
     const oldState: Dictionary | undefined = this.getState(category, stateName);
     const result: string[] = [];
@@ -79,6 +78,7 @@ export default class State {
     }
 
     for (let name of Object.keys(partialState)) {
+      // TODO: what about undefined with keys ????
       if (!isEqual(partialState[name], oldState[name])) result.push(name);
     }
 
