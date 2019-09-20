@@ -203,15 +203,20 @@ export function mergeDeepObjects(
   if (typeof top === 'undefined') return bottom || {};
 
   // make clone of top which doesn't have undefined values
-  const result: {[index: string]: any} = omitUndefined(top);
+  const result: {[index: string]: any} = {};
+  const topUndefinedKeys: string[] = [];
 
-  // for (let name of Object.keys(top)) {
-  //
-  // }
+  // get only not undefined values to result and collect keys which has a undefined values.
+  for (let key of Object.keys(top)) {
+    if (typeof top[key] === 'undefined') {
+      topUndefinedKeys.push(key);
+    }
+    else {
+      result[key] = top[key];
+    }
+  }
 
   if (typeof bottom === 'undefined') return result;
-
-  const topUndefinedKeys = Object.keys(top).filter((name) => typeof top[name] === 'undefined');
 
   for (let key of Object.keys(bottom)) {
     // only if it is not undefined
