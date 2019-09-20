@@ -1,7 +1,7 @@
 arrays = require('../../../system/lib/arrays')
 
 
-describe 'system.lib.arrays', ->
+describe.only 'system.lib.arrays', ->
   it 'isEqualArrays', ->
     assert.isTrue(arrays.isEqualArrays([], []))
     assert.isTrue(arrays.isEqualArrays([1,2,3], [1,2,3]))
@@ -29,26 +29,6 @@ describe 'system.lib.arrays', ->
     arr = [0,1,2]
     arrays.clearArray(arr)
     assert.deepEqual(arr, [])
-
-  it 'appendArray', ->
-    arr = [1]
-    arrays.appendArray(arr, [2])
-    assert.deepEqual(arr, [1,2])
-
-  it 'updateArray', ->
-    arr = [0,1,2]
-    arrays.updateArray(arr, ['a', 'b'])
-    assert.deepEqual(arr, ['a', 'b', 2])
-    # overflow
-    arr = [0]
-    arrays.updateArray(arr, [1,2])
-    assert.deepEqual(arr, [1,2])
-    # skip empty
-    arr = [0,1,2]
-    arr2 = []
-    arr2[2] = 5
-    arrays.updateArray(arr, arr2)
-    assert.deepEqual(arr, [0,1,5])
 
   it 'setArrayDimension', ->
     assert.deepEqual(arrays.setArrayDimension([0,1], 2), [0,1]);

@@ -112,6 +112,7 @@ export function isPlainObject(obj: any): boolean {
 export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
   const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
     for (let itemName of Object.keys(currentObj)) {
+      // TODO: review нужно ли использовать compactArray
       const pathOfItem: string = compactArray([currentPath, itemName]).join('.');
 
       if (pathOfItem === pathTo) return currentObj[itemName];

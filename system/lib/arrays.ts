@@ -12,9 +12,13 @@ export function isEqualArrays(first?: any[], second?: any[]): boolean {
 
 
 export function lastItem(arr: any[]): any {
+  // TODO: use constant
   return arr[arr.length - 1];
 }
 
+/**
+ * Make a new array which contains items which are different in samples
+ */
 export function arraysDifference(testArr: any[], samples: any[]): any[] {
   if (typeof testArr === 'undefined' || !testArr.length) return [];
   else if (typeof samples === 'undefined' || !samples.length) return testArr;
@@ -32,6 +36,8 @@ export function arraysDifference(testArr: any[], samples: any[]): any[] {
   return diffArr;
 }
 
+// TODO: лучше не использовать
+// TODO: use filter
 /**
  * Like lodash's compact. It removes undefined, null and '' from array.
  * It make a new array.
@@ -50,39 +56,14 @@ export function compactArray(arr: any[]): any[] {
 }
 
 export function compactUndefined(arr: any[]): any[] {
-  const result: any[] = [];
-
-  for (let value of arr) {
-    if (typeof value !== 'undefined') {
-      result.push(value);
-    }
-  }
-
-  return result;
+  return arr.filter((item) => typeof item !== 'undefined');
 }
 
 export function clearArray(arr: any[]): void {
   arr.splice(0, arr.length);
 }
 
-/**
- * Concat arrays but not create a new one.
- * It mutates the srcArr.
- */
-export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
-  if (!arrToAppend) return;
-
-  for (let item of arrToAppend) srcArr.push(item);
-}
-
-/**
- * Replace values if array.
- * It mutates an "arrToUpdate" array.
- */
-export function updateArray(arrToUpdate: any[], newValues: any[]): void {
-  for (let index in newValues) arrToUpdate[index] = newValues[index];
-}
-
+// TODO: неиспользуется почти - лучше убрать
 /**
  * Make new array with specified dimension.
  * If arr smaller than "count" then odd items will be empty
@@ -125,6 +106,9 @@ export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntr
   }
 }
 
+/**
+ * Concat arrays and remove duplicates
+ */
 export function concatUniqStrArrays(...arrays: string[][]): string[] {
   const result: {[index: string]: true} = {};
 

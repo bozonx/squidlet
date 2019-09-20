@@ -4,10 +4,14 @@ import PreHostConfig from '../interfaces/PreHostConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
 import MachineConfig from '../interfaces/MachineConfig';
 import Os from '../../shared/Os';
-import {appendArray} from '../../system/lib/arrays';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
-import {loadMachineConfigInPlatformDir, makeListOfNamesFromPaths, resolvePlatformDir} from '../../shared/helpers';
+import {
+  appendArray,
+  loadMachineConfigInPlatformDir,
+  makeListOfNamesFromPaths,
+  resolvePlatformDir
+} from '../../shared/helpers';
 import {IoItemDefinition} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';

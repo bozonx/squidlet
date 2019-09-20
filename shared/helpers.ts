@@ -12,6 +12,25 @@ export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 
 
 /**
+ * Concat arrays but not create a new one.
+ * It mutates the srcArr.
+ */
+export function appendArray<T>(srcArr: T[], arrToAppend?: T[]) {
+  if (!arrToAppend) return;
+
+  for (let item of arrToAppend) srcArr.push(item);
+}
+
+// TODO: не используется
+/**
+ * Replace values if array.
+ * It mutates an "arrToUpdate" array.
+ */
+export function updateArray(arrToUpdate: any[], newValues: any[]): void {
+  for (let index in newValues) arrToUpdate[index] = newValues[index];
+}
+
+/**
  * Make io name from io path without extension.
  * E.g "/path/to/file.ts" -> "file"
  */
