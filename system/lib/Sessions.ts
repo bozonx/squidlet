@@ -9,8 +9,10 @@ import {JsonTypes} from '../interfaces/Types';
 export default class Sessions {
   private readonly generateUniqId: () => string;
   private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
+  // TODO: make immutable
   private sessionStorage: {[index: string]: {[index: string]: any}} = {};
   private closeConnectionTimeouts: {[index: string]: any} = {};
+  // TODO: review
   // like {sessionId: expireSec}
   private activeSession: {[index: string]: number} = {};
 
@@ -76,6 +78,9 @@ export default class Sessions {
     this.newSessionTimeout(sessionId);
   }
 
+  /**
+   * Close session immediately but rise a close event
+   */
   shutDownImmediately(sessionId: string) {
     this.closeEvents.emit(sessionId);
     this.destroySession(sessionId);

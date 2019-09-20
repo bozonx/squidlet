@@ -1,5 +1,5 @@
 import {PATH_SEPARATOR} from './helpers';
-import {trimCharEnd} from './strings';
+import {trimChar, trimCharEnd, trimCharStart} from './strings';
 
 
 export const PATH_SEP = '/';
@@ -7,7 +7,8 @@ export const PATH_SEP = '/';
 
 /**
  * Join paths.
- * pathJoin('/path/', '/to/', './dir') => '/path/to/./dir'
+ * pathJoin('/path/', '/to/', './dir') => '/path/to/./dir'.
+ * It clears doubling of delimiters
  */
 export function pathJoin (...paths: string[]): string {
   const prepared: string[] = [];
@@ -19,14 +20,16 @@ export function pathJoin (...paths: string[]): string {
       throw new Error(`pathJoin: paths have to be strings`);
     }
     else if (i === 0) {
-      const regexp = `\\${PATH_SEP}$`;
-
-      cleared = paths[i].replace(new RegExp(regexp), '');
+      // the first one - clear right delimiter
+      cleared = trimCharEnd(paths[i], PATH_SEP);
+    }
+    else if (i === (paths.length -1)) {
+      // the right one - clear left delimiter
+      cleared = trimCharStart(paths[i], PATH_SEP);
     }
     else {
-      const regexp = `^\\${PATH_SEP}(.+)\\${PATH_SEP}$`;
-
-      cleared = paths[i].replace(new RegExp(regexp), '$1');
+      // in the middle - clear both delimiters
+      cleared = trimChar(paths[i], PATH_SEP);
     }
 
     prepared.push(cleared);

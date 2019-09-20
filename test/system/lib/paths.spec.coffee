@@ -1,9 +1,9 @@
 paths = require('../../../system/lib/paths');
 
 
-describe 'system.lib.paths', ->
+describe.only 'system.lib.paths', ->
   it "pathJoin", ->
-    assert.equal(paths.pathJoin('/path/', '/to/', './dir'), '/path/to/./dir')
+    assert.equal(paths.pathJoin('/path//', '/to/', './dir/'), '/path/to/./dir/')
 
   it "pathIsAbsolute", ->
     assert.isTrue(paths.pathIsAbsolute('/path'))
