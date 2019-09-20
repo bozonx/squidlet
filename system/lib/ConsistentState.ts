@@ -1,8 +1,7 @@
-import {mergeDeepObjects} from './objects';
+import {cloneDeepObject, mergeDeepObjects} from './objects';
 import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
 import RequestQueue from './RequestQueue';
-import {cloneDeep} from './lodashLike';
 import {pickObj} from './objects';
 import {arraysDifference} from './arrays';
 
@@ -144,8 +143,8 @@ export default class ConsistentState {
 
     // Save actual state. It has to be called only once on starting of cycle
     if (!this.actualRemoteState) {
-      // TODO: моно использовать mergeDeepObjects
-      this.actualRemoteState = cloneDeep(this.getState());
+      // TODO: review - можно ли обойтись без clone???
+      this.actualRemoteState = cloneDeepObject(this.getState());
     }
 
     // collect list of params which will be actually written

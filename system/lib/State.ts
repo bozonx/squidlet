@@ -41,7 +41,10 @@ export default class State {
 
     if (!this.state[category]) this.state[category] = {};
 
-    this.state[category][stateName] = this.mergeState(oldState, newPartialState);
+    this.state[category][stateName] = mergeDeepObjects(
+      newPartialState,
+      oldState
+    );
 
     // // emit all the params events
     // for (let paramName of Object.keys(newPartialState)) {
@@ -78,13 +81,6 @@ export default class State {
     }
 
     return result;
-  }
-
-  private mergeState(oldState?: Dictionary, newPartialState?: Dictionary): Dictionary {
-    return mergeDeepObjects(
-      newPartialState,
-      oldState
-    );
   }
 
 

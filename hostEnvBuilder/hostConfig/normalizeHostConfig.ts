@@ -1,11 +1,9 @@
-import _cloneDeep = require('lodash/cloneDeep');
-
 import PreHostConfig from '../interfaces/PreHostConfig';
 import {defaultServices, servicesShortcut} from '../dict/dict';
 import systemConfig from '../configs/systemConfig';
 import {EntityType} from '../../system/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import {omitObj} from '../../system/lib/objects';
+import {cloneDeepObject, omitObj} from '../../system/lib/objects';
 
 
 /**
@@ -104,7 +102,7 @@ function makeDefaultServices(
   preHostConfig: PreHostConfig,
   existentServices: {[index: string]: any}
 ): {[index: string]: any} {
-  const fullServices: {[index: string]: any} = _cloneDeep(existentServices);
+  const fullServices: {[index: string]: any} = cloneDeepObject(existentServices);
 
   for(let serviceId of defaultServices) {
     // if it has a definition of is disabled - do nothing

@@ -1,7 +1,7 @@
 objects = require('../../../system/lib/objects')
 
 
-describe 'system.lib.objects', ->
+describe.only 'system.lib.objects', ->
   it 'isEqualObjects', ->
     assert.isTrue(objects.isEqualObjects({}, {}))
     assert.isTrue(objects.isEqualObjects({a:1,b:2}, {a:1,b:2}))
@@ -99,6 +99,19 @@ describe 'system.lib.objects', ->
       objects.mergeDeepObjects({top: undefined}, {top: 'top', bottom: 'bottom'}),
       {bottom: 'bottom'}
     )
+
+  it 'cloneDeepObject', ->
+    obj = {a: 1}
+    assert.isFalse(objects.cloneDeepObject(obj) == obj)
+    assert.deepEqual(objects.cloneDeepObject(obj), obj)
+    arr = ['a']
+    assert.isFalse(objects.cloneDeepObject(arr) == arr)
+    assert.deepEqual(objects.cloneDeepObject(arr), arr)
+    uint = new Uint8Array(1)
+    uint[0] = 255
+    assert.isFalse(objects.cloneDeepObject(uint) == uint)
+    assert.deepEqual(objects.cloneDeepObject(uint), uint)
+
 
 #  it 'isEmptyObject', ->
 #    assert.equal(objects.isEmptyObject(undefined), true)

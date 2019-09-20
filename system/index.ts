@@ -7,7 +7,6 @@
 // // import './helpers/helpers';
 // // import './helpers/IndexedEventEmitter';
 // // import './helpers/IndexedEvents';
-// // import './helpers/lodashLike';
 // import './lib/mkdirPLogic';
 // // import './helpers/nodeLike';
 // // import './helpers/Polling';
