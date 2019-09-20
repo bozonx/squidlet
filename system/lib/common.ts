@@ -30,14 +30,10 @@ export function isEqual(first: any, second: any): boolean {
  * Parse string numbers and constants to pure numbers and constants
  */
 export function parseValue(rawValue: any): any {
-  if (
-    typeof rawValue === 'undefined'
-    || typeof rawValue === 'boolean'
-    || typeof rawValue === 'object'
-  ) {
+  if (typeof rawValue !== 'string') {
     return rawValue;
   }
-  if (rawValue === 'true') {
+  else if (rawValue === 'true') {
     return true;
   }
   else if (rawValue === 'false') {
@@ -46,7 +42,6 @@ export function parseValue(rawValue: any): any {
   else if (rawValue === 'undefined') {
     return undefined;
   }
-  // TODO: don't use null ???
   else if (rawValue === 'null') {
     return null;
   }
@@ -54,7 +49,7 @@ export function parseValue(rawValue: any): any {
     return NaN;
   }
   // it is for - 2. strings
-  else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
+  else if (rawValue.match(/^\d+\.$/)) {
     return rawValue;
   }
 
@@ -65,7 +60,7 @@ export function parseValue(rawValue: any): any {
     return toNumber;
   }
 
-  // string and others like null and Nan return as they are
+  // string returns as they are
   return rawValue;
 }
 
