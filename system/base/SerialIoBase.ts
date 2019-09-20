@@ -5,7 +5,7 @@ import {
   SerialParams,
   SerialPortLike
 } from '../interfaces/io/SerialIo';
-import {ENCODE} from '../constants';
+import {ENCODE} from '../lib/constants';
 import {callPromised} from '../lib/common';
 import IndexedEventEmitter from '../lib/IndexedEventEmitter';
 import {AnyHandler} from '../lib/IndexedEvents';

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import HttpClient from '../nodejs/ios/HttpClient';
 import HttpClientLogic from '../entities/drivers/HttpClient/HttpClientLogic';
-import {ENCODE} from '../system/constants';
+import {ENCODE} from '../system/lib/constants';
 import * as yaml from 'js-yaml';
 import {collectPropsDefaults} from '../system/lib/helpers';
 import {HttpDriverRequest} from '../entities/drivers/HttpServer/HttpServerLogic';

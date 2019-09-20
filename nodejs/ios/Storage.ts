@@ -5,7 +5,7 @@ import * as path from 'path';
 import StorageIo, {StatsSimplified, ConfigParams} from 'system/interfaces/io/StorageIo';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
-import {ENCODE} from 'system/constants';
+import {ENCODE} from 'system/lib/constants';
 
 
 let config: ConfigParams | undefined;

@@ -9,7 +9,7 @@ import {ChildProcess} from 'child_process';
 
 import {StatsSimplified} from '../system/interfaces/io/StorageIo';
 import {callPromised} from '../system/lib/common';
-import {ENCODE} from '../system/constants';
+import {ENCODE} from '../system/lib/constants';
 import {OwnerOptions} from './interfaces/OnwerOptions';
 
 

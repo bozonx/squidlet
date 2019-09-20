@@ -7,7 +7,7 @@ import {deserializeJson, serializeJson} from '../system/lib/serialize';
 import RemoteCallMessage from '../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../nodejs/ios/WebSocketClient';
-import {ENCODE} from '../system/constants';
+import {ENCODE} from '../system/lib/constants';
 import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
