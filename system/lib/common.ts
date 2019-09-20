@@ -32,15 +32,12 @@ export function isEqual(first: any, second: any): boolean {
 export function parseValue(rawValue: any): any {
   if (
     typeof rawValue === 'undefined'
-    // TODO: don't use null???
-    || rawValue === null
     || typeof rawValue === 'boolean'
-    || Number.isNaN(rawValue)
-    || rawValue === ''
+    || typeof rawValue === 'object'
   ) {
     return rawValue;
   }
-  else if (rawValue === 'true') {
+  if (rawValue === 'true') {
     return true;
   }
   else if (rawValue === 'false') {
@@ -60,9 +57,6 @@ export function parseValue(rawValue: any): any {
   else if (typeof rawValue === 'string' && rawValue.match(/^\d+\.$/)) {
     return rawValue;
   }
-  else if (typeof rawValue === 'object') {
-    return rawValue;
-  }
 
   const toNumber = Number(rawValue);
 
@@ -71,7 +65,7 @@ export function parseValue(rawValue: any): any {
     return toNumber;
   }
 
-  // string returns as is
+  // string and others like null and Nan return as they are
   return rawValue;
 }
 

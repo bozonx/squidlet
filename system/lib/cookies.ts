@@ -26,6 +26,8 @@ export function stringifyCookie(obj: {[index: string]: Primitives}): string {
 
   for (let key of Object.keys(obj)) {
     const value: Primitives = obj[key];
+
+    // TODO: упростить
     if (
       typeof value !== 'boolean'
       && typeof value !== 'string'
