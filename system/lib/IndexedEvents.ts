@@ -1,4 +1,4 @@
-import {LENGTH_AND_START_ARR_DIFFERENCE} from '../constants';
+import {lastItem} from './arrays';
 
 
 export type AnyHandler = (...args: any[]) => void;
@@ -60,7 +60,7 @@ export default class IndexedEvents<T extends AnyHandler> {
   addListener(handler: T): number {
     this.handlers.push(handler);
 
-    return this.handlers.length - LENGTH_AND_START_ARR_DIFFERENCE;
+    return lastItem(this.handlers);
   }
 
   once(handler: T): number {

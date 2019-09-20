@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
-import {LENGTH_AND_START_ARR_DIFFERENCE} from 'system/constants';
+import {lastItem} from 'system/lib/arrays';
 
 import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';
 
@@ -81,7 +81,7 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
 
         this.handlerIds.push(handlerId);
 
-        return this.handlerIds.length - LENGTH_AND_START_ARR_DIFFERENCE;
+        return lastItem(this.handlerIds);
       }
 
       throw new Error(this.expanderErrMsg('setWatch'));

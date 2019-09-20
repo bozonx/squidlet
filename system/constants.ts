@@ -1,8 +1,5 @@
-// 'verbose',
-export const LENGTH_AND_START_ARR_DIFFERENCE = 1;
 export const ASCII_NUMERIC_OFFSET = 48;
 export const BYTES_IN_WORD = 2;
-export const FUNCTION_NUMBER_LENGTH = 1;
 export const BITS_IN_BYTE = 8;
 export const ENCODE = 'utf8';
 // timeout to start listening for servers such as http or websocket
@@ -12,6 +9,9 @@ export const WAIT_RESPONSE_TIMEOUT_SEC = 60;
 
 export const HANDLER_EVENT_POSITION = 0;
 export const HANDLER_INDEX_POSITION = 1;
+
+// In protocols like I2C or modbus where function number is one byte length
+export const FUNCTION_NUMBER_LENGTH = 1;
 
 export enum AppLifeCycleEvents {
   devicesInitialized,

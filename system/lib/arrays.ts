@@ -12,8 +12,10 @@ export function isEqualArrays(first?: any[], second?: any[]): boolean {
 
 
 export function lastItem(arr: any[]): any {
-  // TODO: use constant
-  return arr[arr.length - 1];
+  // shift when you calculates length
+  const ARRAY_INDEX_SHIFT = 1;
+
+  return arr[arr.length - ARRAY_INDEX_SHIFT];
 }
 
 /**

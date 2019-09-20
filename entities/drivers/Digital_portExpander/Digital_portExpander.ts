@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
-import {LENGTH_AND_START_ARR_DIFFERENCE} from 'system/constants';
+import {lastItem} from 'system/lib/arrays';
 
 import {PortExpander} from '../PortExpander/PortExpander';
 
@@ -81,7 +81,7 @@ export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> im
 
         this.handlerIds.push(handlerId);
 
-        return this.handlerIds.length - LENGTH_AND_START_ARR_DIFFERENCE;
+        return lastItem(this.handlerIds);
       }
 
       throw new Error(this.expanderErrMsg('setWatch'));
