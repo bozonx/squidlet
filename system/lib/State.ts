@@ -1,7 +1,7 @@
 import {Dictionary} from '../interfaces/Types';
 import IndexedEvents from './IndexedEvents';
 import {mergeDeepObjects} from './objects';
-import {isEqual} from './helpers';
+import {isEqual} from './common';
 
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;

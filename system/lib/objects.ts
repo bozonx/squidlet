@@ -1,5 +1,5 @@
 import {compactArray} from './arrays';
-import {isEqual} from './helpers';
+import {isEqual} from './common';
 
 
 /**

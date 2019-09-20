@@ -5,7 +5,7 @@ import Sender from '../lib/Sender';
 //import {ImpulseInputProps} from '../drivers/Binary/ImpulseInput.driver';
 import {findObj} from '../lib/objects';
 import {hexStringToHexNum} from '../lib/binaryHelpers';
-import {isEqual} from '../lib/helpers';
+import {isEqual} from '../lib/common';
 
 
 // type of feedback - polling or interruption
