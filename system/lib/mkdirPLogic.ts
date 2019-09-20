@@ -1,5 +1,4 @@
-import {PATH_SEPARATOR} from './helpers';
-import {pathDirname, pathBasename, pathIsAbsolute} from './paths';
+import {pathDirname, pathBasename, pathIsAbsolute, PATH_SEP} from './paths';
 import {trimCharEnd} from './strings';
 
 
@@ -14,7 +13,7 @@ export default async function mkdirPLogic (
 
   if (isDirExists(pathToDir)) return false;
 
-  const preparedPath = trimCharEnd(pathToDir, PATH_SEPARATOR);
+  const preparedPath = trimCharEnd(pathToDir, PATH_SEP);
 
   // path parts from closest to further
   const pathParts: string[] = [];
@@ -22,9 +21,9 @@ export default async function mkdirPLogic (
 
   function recursionFind(localPathToDir: string) {
     // TODO: why ~ - only absolute paths are supported
-    //if (!localPathToDir || localPathToDir === PATH_SEPARATOR || localPathToDir === '~' || localPathToDir === `~${PATH_SEPARATOR}`) {
+    //if (!localPathToDir || localPathToDir === PATH_SEP || localPathToDir === '~' || localPathToDir === `~${PATH_SEP}`) {
     // skip root path
-    if (!localPathToDir || localPathToDir === PATH_SEPARATOR) {
+    if (!localPathToDir || localPathToDir === PATH_SEP) {
       return;
     }
     else if (isDirExists(localPathToDir)) {
@@ -53,8 +52,8 @@ export default async function mkdirPLogic (
   // create paths
   for (let pathIndex in pathParts.reverse()) {
     const pathPart = pathParts.slice(0, parseInt(pathIndex) + 1)
-      .join(PATH_SEPARATOR);
-    const fullPath = `${existentBasePath}${PATH_SEPARATOR}${pathPart}`;
+      .join(PATH_SEP);
+    const fullPath = `${existentBasePath}${PATH_SEP}${pathPart}`;
 
     mkdir(fullPath);
   }

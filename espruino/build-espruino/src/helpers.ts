@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as dependencyTree from 'dependency-tree';
 
 
-export const PATH_SEPARATOR = '/';
+const PATH_SEPARATOR = '/';
 
 
 interface BuildConfig {

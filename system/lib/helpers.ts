@@ -5,10 +5,7 @@ import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
 import {JsonTypes, Primitives} from '../interfaces/Types';
 import {parseValue} from './common';
 import {isEqualUint8Array} from './binaryHelpers';
-import {isEqualObjects, isPlainObject} from './objects';
-
-
-export const PATH_SEPARATOR = '/';
+import {isEqualObjects} from './objects';
 
 
 export function isEqual(first: any, second: any): boolean {

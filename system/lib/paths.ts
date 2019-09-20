@@ -1,4 +1,3 @@
-import {PATH_SEPARATOR} from './helpers';
 import {trimChar, trimCharEnd, trimCharStart} from './strings';
 
 
