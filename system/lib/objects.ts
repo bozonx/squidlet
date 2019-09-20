@@ -24,13 +24,14 @@ export function isEqualObjects(first?: {[index: string]: any}, second?: {[index:
 /**
  * Check is object is empty.
  * For other types it will return true.
+ * Null means an empty object too. Better is not to use null.
  */
 export function isEmptyObject(toCheck?: {[index: string]: any}): boolean {
-  // TODO: don't use null
-  if (Array.isArray(toCheck) || toCheck === null) return true;
-  else if (typeof toCheck === 'object') return !Object.keys(toCheck).length;
+  if (typeof toCheck !== 'object' || Array.isArray(toCheck)) {
+    return true;
+  }
 
-  return true;
+  return !Object.keys(toCheck).length;
 }
 
 export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
