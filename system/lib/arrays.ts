@@ -121,30 +121,29 @@ export function concatUniqStrArrays(...arrays: string[][]): string[] {
   return Object.keys(result);
 }
 
-/**
- * Find index of array.
- * Cb has to return boolean of undefined. If true then it means that item is found.
- */
-export function findIndexArray(arr: any[], cb: (item: any, index: number) => boolean | undefined): number {
-  if (typeof arr === 'undefined') {
-    return -1;
-  }
-  else if (!Array.isArray(arr)) {
-    throw new Error(`findIndexArray: unsupported type of "arr" param "${JSON.stringify(arr)}"`);
-  }
-
-  for (let index in arr) {
-    const indexNum: number = parseInt(index);
-    const result: any | undefined = cb(arr[indexNum], indexNum);
-
-    if (result === false || typeof result === 'undefined') continue;
-
-    return indexNum;
-  }
-
-  return -1;
-}
-
+// /**
+//  * Find index of array.
+//  * Cb has to return boolean of undefined. If true then it means that item is found.
+//  */
+// export function findIndexArray(arr: any[], cb: (item: any, index: number) => boolean | undefined): number {
+//   if (typeof arr === 'undefined') {
+//     return -1;
+//   }
+//   else if (!Array.isArray(arr)) {
+//     throw new Error(`findIndexArray: unsupported type of "arr" param "${JSON.stringify(arr)}"`);
+//   }
+//
+//   for (let index in arr) {
+//     const indexNum: number = parseInt(index);
+//     const result: any | undefined = cb(arr[indexNum], indexNum);
+//
+//     if (result === false || typeof result === 'undefined') continue;
+//
+//     return indexNum;
+//   }
+//
+//   return -1;
+// }
 
 // export function find(collection: any[] | {[index: string]: any}, cb: (item: any, index: string | number) => any): any | undefined {
 //   if (typeof collection === 'undefined') {

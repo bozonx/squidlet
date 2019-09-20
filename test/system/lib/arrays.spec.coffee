@@ -1,7 +1,7 @@
 arrays = require('../../../system/lib/arrays')
 
 
-describe.only 'system.lib.arrays', ->
+describe 'system.lib.arrays', ->
   it 'isEqualArrays', ->
     assert.isTrue(arrays.isEqualArrays([], []))
     assert.isTrue(arrays.isEqualArrays([1,2,3], [1,2,3]))
@@ -44,7 +44,7 @@ describe.only 'system.lib.arrays', ->
   it 'concatUniqStrArrays', ->
     assert.deepEqual(arrays.concatUniqStrArrays(['a', 'b'], ['b', 'c']), ['a', 'b', 'c'])
 
-  it 'findIndexArray', ->
-    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'b'), 1)
-    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'c'), -1)
-    assert.equal(arrays.findIndexArray(undefined, (item) => item == 'c'), -1)
+#  it 'findIndexArray', ->
+#    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'b'), 1)
+#    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'c'), -1)
+#    assert.equal(arrays.findIndexArray(undefined, (item) => item == 'c'), -1)
