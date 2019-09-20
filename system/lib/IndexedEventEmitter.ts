@@ -2,6 +2,7 @@ import IndexedEvents, {AnyHandler} from './IndexedEvents';
 
 
 export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
+  // TODO: общий пулл хэндлеров
   // IndexedEvents instances by event name
   private indexedEvents: {[index: string]: IndexedEvents<T>} = {};
 
@@ -37,7 +38,7 @@ export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
   }
 
   once(eventName: string | number, handler: T): number {
-    let wrapperIndex: number = -1;
+    let wrapperIndex: number;
     const wrapper = ((...args: any[]) => {
       this.removeListener(eventName, wrapperIndex);
       handler(...args);
@@ -59,6 +60,7 @@ export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
     }
   }
 
+  // TODO: remove
   removeAllListeners(eventName: string | number): void {
     if (!this.indexedEvents[eventName]) return;
 

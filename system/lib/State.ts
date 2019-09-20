@@ -5,12 +5,10 @@ import {isEqual} from './helpers';
 
 
 type ChangeHandler = (category: number, stateName: string, changedParams: string[]) => void;
-//type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;
 
 
 export default class State {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  //private readonly changeParamEvents = new IndexedEvents<ChangeParamHandler>();
   // TODO: better to use immutable
   // like { category: { stateName: { ... stateParams } } }
   private readonly state: {[index: string]: {[index: string]: Dictionary}} = {};
@@ -18,7 +16,6 @@ export default class State {
 
   destroy() {
     this.changeEvents.removeAll();
-    //this.changeParamEvents.removeAll();
   }
 
 
@@ -45,11 +42,6 @@ export default class State {
       newPartialState,
       oldState
     );
-
-    // // emit all the params events
-    // for (let paramName of Object.keys(newPartialState)) {
-    //   this.changeParamEvents.emit(category, stateName, paramName, newPartialState[paramName]);
-    // }
 
     this.changeEvents.emit(category, stateName, changedParams);
   }
@@ -83,6 +75,16 @@ export default class State {
     return result;
   }
 
+
+
+  //type ChangeParamHandler = (category: number, stateName: string, paramName: string, value: JsonTypes) => void;
+
+  //updateState(category: number, stateName: string, newPartialState?: Dictionary) {
+  // // emit all the params events
+  // for (let paramName of Object.keys(newPartialState)) {
+  //   this.changeParamEvents.emit(category, stateName, paramName, newPartialState[paramName]);
+  // }
+  //}
 
   // getStateParam(category: number, stateName: string, paramName: string): JsonTypes {
   //   if (!this.state[category]) return;

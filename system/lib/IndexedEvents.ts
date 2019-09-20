@@ -3,8 +3,11 @@ import {LENGTH_AND_START_ARR_DIFFERENCE} from '../constants';
 
 export type AnyHandler = (...args: any[]) => void;
 
+// TODO: можно формировать сткроковой индекс в виде байтов 16бит - тогда он может быть бесконечной длины
+
 
 export default class IndexedEvents<T extends AnyHandler> {
+  // TODO: если много создавать и удалять листенеров - то индекс может стать очень большим
   private handlers: (T | undefined)[] = [];
 
   /**
@@ -16,6 +19,7 @@ export default class IndexedEvents<T extends AnyHandler> {
   }
 
   hasListeners(): boolean {
+    // TODO: better to check length
     let hasInstance: boolean = false;
 
     for (let handler of this.handlers) {
@@ -35,6 +39,7 @@ export default class IndexedEvents<T extends AnyHandler> {
     }
   }) as T;
 
+  // TODO: review
   emitSync = ((...args: any[]): Promise<void> => {
     const promises: Promise<any>[] = [];
 
@@ -59,7 +64,7 @@ export default class IndexedEvents<T extends AnyHandler> {
   }
 
   once(handler: T): number {
-    let wrapperIndex: number = -1;
+    let wrapperIndex: number;
     const wrapper = ((...args: any[]) => {
       this.removeListener(wrapperIndex);
       handler(...args);

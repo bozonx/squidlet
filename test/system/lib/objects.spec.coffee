@@ -100,17 +100,17 @@ describe.only 'system.lib.objects', ->
       {bottom: 'bottom'}
     )
 
-  it 'cloneDeepObject', ->
-    obj = {a: 1}
-    assert.isFalse(objects.cloneDeepObject(obj) == obj)
-    assert.deepEqual(objects.cloneDeepObject(obj), obj)
-    arr = ['a']
-    assert.isFalse(objects.cloneDeepObject(arr) == arr)
-    assert.deepEqual(objects.cloneDeepObject(arr), arr)
-    uint = new Uint8Array(1)
-    uint[0] = 255
-    assert.isFalse(objects.cloneDeepObject(uint) == uint)
-    assert.deepEqual(objects.cloneDeepObject(uint), uint)
+#  it 'cloneDeepObject', ->
+#    obj = {a: 1}
+#    assert.isFalse(objects.cloneDeepObject(obj) == obj)
+#    assert.deepEqual(objects.cloneDeepObject(obj), obj)
+#    arr = ['a']
+#    assert.isFalse(objects.cloneDeepObject(arr) == arr)
+#    assert.deepEqual(objects.cloneDeepObject(arr), arr)
+#    uint = new Uint8Array(1)
+#    uint[0] = 255
+#    assert.isFalse(objects.cloneDeepObject(uint) == uint)
+#    assert.deepEqual(objects.cloneDeepObject(uint), uint)
 
 
 #  it 'isEmptyObject', ->
