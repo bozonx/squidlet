@@ -47,6 +47,9 @@ export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclud
   return result;
 }
 
+/**
+ * It creates a new object which doesn't include keys which values are undefined.
+ */
 export function omitUndefined(obj: {[index: string]: any} | undefined): {[index: string]: any} {
   if (!obj) return {};
 
@@ -191,19 +194,31 @@ export function clearObject(obj: {[index: string]: any}) {
 /**
  * Merges two objects deeply.
  * It doesn't mutate any object.
- * If you obviously set undefined to one of top's param - it will keep its undefined value
+ * If you obviously set undefined to one of top's param - it will removes this key from the result object.
  */
 export function mergeDeepObjects(
   top: {[index: string]: any} | undefined,
   bottom: {[index: string]: any} | undefined
 ): {[index: string]: any} {
   if (typeof top === 'undefined') return bottom || {};
-  if (typeof bottom === 'undefined') return top;
 
-  const result: {[index: string]: any} = { ...top };
+  // make clone of top which doesn't have undefined values
+  const result: {[index: string]: any} = omitUndefined(top);
+
+  // for (let name of Object.keys(top)) {
+  //
+  // }
+
+  if (typeof bottom === 'undefined') return result;
+
+  const topUndefinedKeys = Object.keys(top).filter((name) => typeof top[name] === 'undefined');
 
   for (let key of Object.keys(bottom)) {
-    if (!(key in result)) {
+    // only if it is not undefined
+    if (topUndefinedKeys.includes(key)) {
+      delete result[key];
+    }
+    else if (!(key in result)) {
       // set value which is absent on top
       result[key] = bottom[key];
     }

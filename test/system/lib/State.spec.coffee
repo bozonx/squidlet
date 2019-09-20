@@ -62,9 +62,9 @@ describe.only 'system.lib.State', ->
     @state.updateState(@category, @stateName, {param: undefined})
 
     assert.deepEqual(@state.getState(@category, @stateName), {
-      param: undefined
       param2: 'not changed'
     })
+    assert.deepEqual(Object.keys(@state.getState(@category, @stateName)), ['param2'])
 
   it 'removeListener', ->
     handler = sinon.spy()
