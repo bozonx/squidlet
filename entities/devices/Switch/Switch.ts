@@ -1,5 +1,5 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
-import {convertToLevel} from 'system/lib/helpers';
+import {resolveLevel} from 'system/lib/helpers';
 import {GetDriverDep} from 'system/base/EntityBase';
 import {Dictionary} from 'system/interfaces/Types';
 
@@ -43,7 +43,7 @@ export default class Switch extends DeviceBase<Props> {
       // skip while switch at block time
       if (this.binaryOutput.isBlocked()) return this.getStatus() as boolean;
 
-      const level: boolean = convertToLevel(onOrOff);
+      const level: boolean = resolveLevel(onOrOff);
 
       await this.setStatus(level);
 

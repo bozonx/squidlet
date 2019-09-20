@@ -38,19 +38,19 @@ describe 'system.lib.helpers', ->
     assert.isFalse(helpers.isEqual(cl1, cl2))
     assert.isFalse(helpers.isEqual(cl1, cl2))
 
-  it 'convertToLevel', ->
-    assert.isTrue(helpers.convertToLevel(true))
-    assert.isTrue(helpers.convertToLevel(1))
-    assert.isTrue(helpers.convertToLevel('high'))
-    assert.isTrue(helpers.convertToLevel('true'))
-    assert.isTrue(helpers.convertToLevel('1'))
-    assert.isTrue(helpers.convertToLevel('ON'))
-    assert.isTrue(helpers.convertToLevel('On'))
-    assert.isTrue(helpers.convertToLevel('on'))
-    assert.isFalse(helpers.convertToLevel(false))
-    assert.isFalse(helpers.convertToLevel(0))
-    assert.isFalse(helpers.convertToLevel(5))
-    assert.isFalse(helpers.convertToLevel('low, off and other...'))
+  it 'resolveLevel', ->
+    assert.isTrue(helpers.resolveLevel(true))
+    assert.isTrue(helpers.resolveLevel(1))
+    assert.isTrue(helpers.resolveLevel('high'))
+    assert.isTrue(helpers.resolveLevel('true'))
+    assert.isTrue(helpers.resolveLevel('1'))
+    assert.isTrue(helpers.resolveLevel('ON'))
+    assert.isTrue(helpers.resolveLevel('On'))
+    assert.isTrue(helpers.resolveLevel('on'))
+    assert.isFalse(helpers.resolveLevel(false))
+    assert.isFalse(helpers.resolveLevel(0))
+    assert.isFalse(helpers.resolveLevel(5))
+    assert.isFalse(helpers.resolveLevel('low, off and other...'))
 
   it 'isDigitalInputInverted', ->
     assert.isFalse(helpers.isDigitalInputInverted(false, false, false))

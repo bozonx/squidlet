@@ -3,7 +3,7 @@ import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
-import {convertToLevel, invertIfNeed} from 'system/lib/helpers';
+import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
@@ -158,7 +158,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   private resolveInitialLevel(): boolean {
-    const resolvedLevel: boolean = convertToLevel(this.props.initial);
+    const resolvedLevel: boolean = resolveLevel(this.props.initial);
 
     // inverting the initial level
     if (this.props.invert) {

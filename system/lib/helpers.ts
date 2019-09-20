@@ -31,7 +31,7 @@ export function isEqual(first: any, second: any): boolean {
 /**
  * Convert value like 'on', 'true', 1, true, ... to boolean
  */
-export function convertToLevel(value: any): boolean {
+export function resolveLevel(value: any): boolean {
   return value === true
     || value === 1
     || value === 'high'

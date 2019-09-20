@@ -46,15 +46,15 @@ export function pathIsAbsolute(pathToDirOrFile: string): boolean {
 }
 
 export function pathDirname(pathToDirOrFile: string): string {
-  const pathParts: string[] = trimCharEnd(pathToDirOrFile, PATH_SEP).split(PATH_SEPARATOR);
+  const pathParts: string[] = trimCharEnd(pathToDirOrFile, PATH_SEP).split(PATH_SEP);
 
   pathParts.pop();
 
-  return pathParts.join(PATH_SEPARATOR);
+  return pathParts.join(PATH_SEP);
 }
 
 export function pathBasename(pathToDirOrFile: string): string {
-  const pathParts: string[] = pathToDirOrFile.split(PATH_SEPARATOR);
+  const pathParts: string[] = pathToDirOrFile.split(PATH_SEP);
 
   return pathParts[pathParts.length - 1];
 }

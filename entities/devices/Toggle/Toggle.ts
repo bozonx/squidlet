@@ -1,6 +1,6 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
 import {GetDriverDep} from 'system/base/EntityBase';
-import {convertToLevel, invertIfNeed} from 'system/lib/helpers';
+import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
@@ -46,7 +46,7 @@ export default class Toggle extends DeviceBase<Props> {
 
       this.blockTimeInProgress = true;
 
-      const level: boolean = convertToLevel(onOrOff);
+      const level: boolean = resolveLevel(onOrOff);
 
       await this.setStatus(level);
 
