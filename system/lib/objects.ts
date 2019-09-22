@@ -34,13 +34,16 @@ export function isEmptyObject(toCheck?: {[index: string]: any}): boolean {
   return !Object.keys(toCheck).length;
 }
 
-export function omitObj(obj: {[index: string]: any} | undefined, ...propToExclude: string[]): {[index: string]: any} {
+/**
+ * Make a new object which doesn't include specified keys
+ */
+export function omitObj(obj: {[index: string]: any} | undefined, ...keysToExclude: string[]): {[index: string]: any} {
   if (!obj) return {};
 
   const result: {[index: string]: any} = {};
 
   for (let key of Object.keys(obj)) {
-    if (propToExclude.indexOf(key) < 0) {
+    if (keysToExclude.indexOf(key) < 0) {
       result[key] = obj[key];
     }
   }
@@ -65,12 +68,15 @@ export function omitUndefined(obj: {[index: string]: any} | undefined): {[index:
   return result;
 }
 
-export function pickObj(obj: {[index: string]: any} | undefined, ...propToPick: string[]): {[index: string]: any} {
+/**
+ * Create a new object which includes only specified keys
+ */
+export function pickObj(obj: {[index: string]: any} | undefined, ...keysToPick: string[]): {[index: string]: any} {
   if (!obj) return {};
 
   const result: {[index: string]: any} = {};
 
-  for (let key of propToPick) {
+  for (let key of keysToPick) {
     result[key] = obj[key];
   }
 
@@ -103,9 +109,8 @@ export function findObj<T extends any>(
 }
 
 export function isPlainObject(obj: any): boolean {
-  return  typeof obj === 'object' // separate from primitives
-    // TODO: don't use null
-    && obj !== null         // is obvious
+  return obj // not null
+    && typeof obj === 'object' // separate from primitives
     && obj.constructor === Object // separate instances (Array, DOM, ...)
     && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math
 }
@@ -179,6 +184,7 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
   return diffKeys;
 }
 
+// TODO: не нужно особо
 /**
  * Is an object (plain or instance of some class), not an array
  */
@@ -187,7 +193,8 @@ export function isExactlyObject(item: any): boolean {
 }
 
 /**
- * Clear all the props in object
+ * Clear all the props in object.
+ * It mutates the object.
  */
 export function clearObject(obj: {[index: string]: any}) {
   for (let name of Object.keys(obj)) delete obj[name];

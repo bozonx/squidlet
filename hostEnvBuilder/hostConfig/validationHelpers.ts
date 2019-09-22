@@ -39,6 +39,7 @@ export function isBoolean(value: any | undefined, paramName: string): string | u
   return;
 }
 
+// TODO: почему проверяется объект а не PlainObject ????
 export function isObject(value: any | undefined, paramName: string): string | undefined {
   if (typeof value === 'undefined') return;
   else if (!isExactlyObject(value)) return `${paramName} is not object`;
