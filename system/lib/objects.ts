@@ -213,6 +213,10 @@ export function mergeDeepObjects(
   const result: {[index: string]: any} = {};
   const topUndefinedKeys: string[] = [];
 
+  if (typeof top !== 'object' || typeof bottom !== 'object') {
+    throw new Error(`mergeDeepObjects: top and bottom has to be objects`);
+  }
+
   // Sort undefined keys.
   // Get only not undefined values to result and collect keys which has a undefined values.
   for (let key of Object.keys(top)) {

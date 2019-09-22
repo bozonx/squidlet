@@ -99,3 +99,15 @@ describe 'system.lib.common', ->
     assert.isFalse(common.isKindOfNumber(null))
     assert.isFalse(common.isKindOfNumber([]))
     assert.isFalse(common.isKindOfNumber({}))
+
+#  it 'isEmpty', ->
+#    assert.equal(objects.isEmpty(undefined), true)
+#    assert.equal(objects.isEmpty(null), true)
+#    assert.equal(objects.isEmpty(''), true)
+#    assert.equal(objects.isEmpty([]), true)
+#    assert.equal(objects.isEmpty({}), true)
+#    assert.equal(objects.isEmpty(0), false)
+#    assert.equal(objects.isEmpty('a'), false)
+#    assert.equal(objects.isEmpty([1]), false)
+#    assert.equal(objects.isEmpty({a:1}), false)
+#    assert.equal(objects.isEmpty(false), false)

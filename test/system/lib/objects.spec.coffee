@@ -111,30 +111,22 @@ describe.only 'system.lib.objects', ->
       {bottom: undefined, param: 1}
     )
 
-  it 'mergeDeepObjects - clone arrays', ->
+  it 'mergeDeepObjects - clone arrays - not mutate', ->
+    arr = [1]
+    top = {arr}
+    bottom = {}
 
+    result = objects.mergeDeepObjects(top, bottom)
+
+    assert.deepEqual(result, {arr: [1]})
+    assert.isFalse(arr == result.arr)
 
   it 'cloneDeepObject', ->
     obj = {a: 1}
+    assert.deepEqual(objects.cloneDeepObject(obj), {a: 1})
     assert.isFalse(objects.cloneDeepObject(obj) == obj)
-    assert.deepEqual(objects.cloneDeepObject(obj), obj)
-    arr = ['a']
-    assert.isFalse(objects.cloneDeepObject(arr) == arr)
-    assert.deepEqual(objects.cloneDeepObject(arr), arr)
-    uint = new Uint8Array(1)
-    uint[0] = 255
-    assert.isFalse(objects.cloneDeepObject(uint) == uint)
-    assert.deepEqual(objects.cloneDeepObject(uint), uint)
 
-
-#  it 'isEmptyObject', ->
-#    assert.equal(objects.isEmptyObject(undefined), true)
-#    assert.equal(objects.isEmptyObject(null), true)
-#    assert.equal(objects.isEmptyObject(''), true)
-#    assert.equal(objects.isEmptyObject([]), true)
-#    assert.equal(objects.isEmptyObject({}), true)
-#    assert.equal(objects.isEmptyObject(0), false)
-#    assert.equal(objects.isEmptyObject('a'), false)
-#    assert.equal(objects.isEmptyObject([1]), false)
-#    assert.equal(objects.isEmptyObject({a:1}), false)
-#    assert.equal(objects.isEmptyObject(false), false)
+    arr = [1]
+    objWithArr = {arr}
+    assert.deepEqual(objects.cloneDeepObject(objWithArr), {arr: [1]})
+    assert.isFalse(objects.cloneDeepObject(objWithArr) == arr)
