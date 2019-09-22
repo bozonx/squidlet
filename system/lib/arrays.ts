@@ -2,6 +2,8 @@
  * Are arrays equal.
  * If one of them not Array then it returns false.
  */
+import {cloneDeepObject} from './objects';
+
 export function isEqualArrays(first?: any[], second?: any[]): boolean {
   if (!Array.isArray(first) || !Array.isArray(second)) return false;
 
@@ -124,8 +126,25 @@ export function concatUniqStrArrays(...arrays: string[][]): string[] {
 }
 
 export function cloneDeepArray(arr?: any[]): any[] {
-  // TODO: add
-  return arr || [];
+  if (!arr) return [];
+
+  const result: any[] = [];
+
+  for (let item of arr) {
+    if (Array.isArray(item)) {
+      // go deeper
+      result.push(cloneDeepArray(item));
+    }
+    else if (typeof item === 'object') {
+      // clone object
+      result.push(cloneDeepObject(item));
+    }
+    else {
+      result.push(item);
+    }
+  }
+
+  return result;
 }
 
 // /**

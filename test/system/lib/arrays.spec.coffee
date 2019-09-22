@@ -45,9 +45,17 @@ describe.only 'system.lib.arrays', ->
     assert.deepEqual(arrays.concatUniqStrArrays(['a', 'b'], ['b', 'c']), ['a', 'b', 'c'])
 
   it 'cloneDeepArray', ->
-    arr = ['a']
-    assert.isFalse(objects.cloneDeepObject(arr) == arr)
-    assert.deepEqual(objects.cloneDeepObject(arr), arr)
+    assert.deepEqual(arrays.cloneDeepArray(), [])
+    assert.deepEqual(arrays.cloneDeepArray([undefined]), [undefined])
+
+    arr1 = ['a']
+    assert.deepEqual(arrays.cloneDeepArray(arr1), ['a'])
+    assert.isFalse(arrays.cloneDeepArray(arr1) == arr1)
+
+    obj = {a:1}
+    arr2 = [obj]
+    assert.deepEqual(arrays.cloneDeepArray(arr2), [{a:1}])
+    assert.isFalse(arrays.cloneDeepArray(arr2)[0] == obj)
 
 #  it 'findIndexArray', ->
 #    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'b'), 1)

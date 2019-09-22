@@ -122,6 +122,9 @@ describe.only 'system.lib.objects', ->
     assert.isFalse(arr == result.arr)
 
   it 'cloneDeepObject', ->
+    assert.deepEqual(objects.cloneDeepObject(), {})
+    assert.deepEqual(objects.cloneDeepObject({a: undefined}), {a: undefined})
+
     obj = {a: 1}
     assert.deepEqual(objects.cloneDeepObject(obj), {a: 1})
     assert.isFalse(objects.cloneDeepObject(obj) == obj)
