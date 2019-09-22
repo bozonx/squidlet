@@ -90,8 +90,11 @@ describe.only 'system.lib.objects', ->
   it 'mergeDeepObjects', ->
     top = {top: 'top', nested: {nestedTop: 'top'}}
     bottom = {top: 'bottom', bottom: 'bottom', nested: {nestedTop: 'bottom', nestedBottom: 'bottom'}}
-    result = {top: 'top', bottom: 'bottom', nested: {nestedTop: 'top', nestedBottom: 'bottom'}}
-    assert.deepEqual(objects.mergeDeepObjects(top, bottom), result)
+
+    assert.deepEqual(
+      objects.mergeDeepObjects(top, bottom),
+      {top: 'top', bottom: 'bottom', nested: {nestedTop: 'top', nestedBottom: 'bottom'}}
+    )
     # not mutated
     assert.deepEqual(top, {top: 'top', nested: {nestedTop: 'top'}})
     # set undefined obviously
@@ -99,18 +102,29 @@ describe.only 'system.lib.objects', ->
       objects.mergeDeepObjects({top: undefined}, {top: 'top', bottom: 'bottom'}),
       {bottom: 'bottom'}
     )
+    assert.deepEqual(
+      objects.mergeDeepObjects({top: undefined, param: 1}),
+      {param: 1}
+    )
+    assert.deepEqual(
+      objects.mergeDeepObjects(undefined , {bottom: undefined, param: 1}),
+      {bottom: undefined, param: 1}
+    )
 
-#  it 'cloneDeepObject', ->
-#    obj = {a: 1}
-#    assert.isFalse(objects.cloneDeepObject(obj) == obj)
-#    assert.deepEqual(objects.cloneDeepObject(obj), obj)
-#    arr = ['a']
-#    assert.isFalse(objects.cloneDeepObject(arr) == arr)
-#    assert.deepEqual(objects.cloneDeepObject(arr), arr)
-#    uint = new Uint8Array(1)
-#    uint[0] = 255
-#    assert.isFalse(objects.cloneDeepObject(uint) == uint)
-#    assert.deepEqual(objects.cloneDeepObject(uint), uint)
+  it 'mergeDeepObjects - clone arrays', ->
+
+
+  it 'cloneDeepObject', ->
+    obj = {a: 1}
+    assert.isFalse(objects.cloneDeepObject(obj) == obj)
+    assert.deepEqual(objects.cloneDeepObject(obj), obj)
+    arr = ['a']
+    assert.isFalse(objects.cloneDeepObject(arr) == arr)
+    assert.deepEqual(objects.cloneDeepObject(arr), arr)
+    uint = new Uint8Array(1)
+    uint[0] = 255
+    assert.isFalse(objects.cloneDeepObject(uint) == uint)
+    assert.deepEqual(objects.cloneDeepObject(uint), uint)
 
 
 #  it 'isEmptyObject', ->

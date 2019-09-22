@@ -123,6 +123,11 @@ export function concatUniqStrArrays(...arrays: string[][]): string[] {
   return Object.keys(result);
 }
 
+export function cloneDeepArray(arr?: any[]): any[] {
+  // TODO: add
+  return arr || [];
+}
+
 // /**
 //  * Find index of array.
 //  * Cb has to return boolean of undefined. If true then it means that item is found.
