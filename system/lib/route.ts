@@ -76,7 +76,6 @@ export function parseRouteParams(url: string, route: string): {[index: string]: 
   if (!route.match(PARAM_MARK)) return {};
 
   const params: {[index: string]: Primitives} = {};
-
   const routeSplat: string[] = trimCharStart(route, URL_DELIMITER).split(URL_DELIMITER);
   const urlSplat: string[] = trimCharStart(url, URL_DELIMITER).split(URL_DELIMITER);
 

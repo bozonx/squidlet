@@ -10,7 +10,7 @@ export function parseCookie(cookies?: string): {[index: string]: Primitives} {
   if (!cookies) return {};
 
   const splat: string[] = cookies.split(';');
-  const result: {[index: string]: any} = {};
+  const result: {[index: string]: Primitives} = {};
 
   for (let item of splat) {
     const [key, value] = item.split('=');
@@ -25,7 +25,7 @@ export function stringifyCookie(obj: {[index: string]: Primitives}): string {
   const result: string[] = [];
 
   for (let key of Object.keys(obj)) {
-    const value: Primitives = obj[key];
+    const value: Primitives | undefined = obj[key];
 
     if (value && typeof value === 'object') {
       throw new Error(`stringifyCookie: invalid type of value: ${typeof value}`);

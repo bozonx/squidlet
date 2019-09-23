@@ -23,7 +23,7 @@ export const basicTypes: string[] = [
 /**
  * Read type and decide is it type or constant
  */
-export function parseType(type: Primitives): ParsedType {
+export function parseType(type?: Primitives): ParsedType {
   if (typeof type === 'undefined') throw new  Error(`Type is required`);
   else if (
     (typeof type !== 'string' && typeof type !== 'number' && typeof type !== 'boolean')

@@ -100,7 +100,7 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
 /**
  * Parse comma separated args like: param1,5,true to ['param1', 5, true];
  */
-export function parseArgs(data: Primitives | undefined): JsonTypes[] {
+export function parseArgs(data?: Primitives): JsonTypes[] {
   if (typeof data === 'undefined') {
     return [];
   }
