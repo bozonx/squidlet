@@ -11,13 +11,6 @@ describe.only 'system.lib.arrays', ->
     assert.deepEqual(arrays.arraysDifference([], [1,2,3]), [])
     assert.deepEqual(arrays.arraysDifference([1,4], []), [1,4])
 
-#  it 'arraysFullDifference', ->
-#    assert.deepEqual(arrays.arraysDifference([1,4], [1,2,3]), [4])
-#    assert.deepEqual(arrays.arraysDifference([1,3], [1,2,3]), [])
-#    assert.deepEqual(arrays.arraysDifference([], [1,2,3]), [])
-#    assert.deepEqual(arrays.arraysDifference([1,4], []), [1,4])
-#    assert.deepEqual(arrays.arraysDifference(['aa'], [ 'aa', 'bb' ]), ['bb'])
-
   it 'compactUndefined', ->
     assert.deepEqual(arrays.compactUndefined([undefined, null, 0, 1, '', 'str']), [null, 0, 1, '', 'str'])
 

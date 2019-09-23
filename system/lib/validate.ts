@@ -100,7 +100,7 @@ export function whiteList(obj: any | undefined, allowedValues: any[], paramName:
   const diff: any[] = arraysDifference(Object.keys(obj), allowedValues);
 
   if (diff.length) {
-    return `${paramName} has not allowed params ${JSON.stringify(diff)}`;
+    return `${paramName} has forbidden params ${JSON.stringify(diff)}`;
   }
 
   return;

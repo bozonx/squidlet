@@ -260,6 +260,7 @@ export default class ConsistentState {
       ...this.actualRemoteState,
       ...dataToSave,
     };
+    // TODO: test
     // remove saved keys from the list
     this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));
   }
@@ -287,6 +288,7 @@ export default class ConsistentState {
 
     const newParams: Dictionary = {};
 
+    // TODO: test
     for (let paramName of arraysDifference(this.paramsListToSave, Object.keys(this.actualRemoteState))) {
       newParams[paramName] = undefined;
     }
@@ -302,6 +304,7 @@ export default class ConsistentState {
    * but don't update params which are saving at the moment.
    */
   private generateSafeNewState(mostActualState: Dictionary): Dictionary {
+    // TODO: test
     // get key witch won't be saved
     const keysToUpdate: string[] = arraysDifference(Object.keys(mostActualState), this.paramsListToSave || []);
 
