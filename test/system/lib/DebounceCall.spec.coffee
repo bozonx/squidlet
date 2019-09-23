@@ -1,7 +1,7 @@
 DebounceCall = require('../../../system/lib/DebounceCall').default;
 
 
-describe 'system.lib.DebounceCall', ->
+describe.only 'system.lib.DebounceCall', ->
   beforeEach ->
     @id = 'myId'
     @cb1 = sinon.spy()

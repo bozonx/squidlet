@@ -27,8 +27,7 @@ export function stringToBase64(base64Str: string): string {
 
 // see https://stackoverflow.com/questions/17191945/conversion-between-utf-8-arraybuffer-and-string
 export function uint8ArrayToText(uintArray: Uint8Array): string {
-  // TODO: don't use null
-  const encodedString = String.fromCharCode.apply(null, uintArray as any);
+  const encodedString = String.fromCharCode.apply(undefined, uintArray as any);
 
   return decodeURIComponent(escape(stringToBase64(encodedString)));
 

@@ -33,3 +33,13 @@ describe.only 'system.lib.serialize', ->
     deserialized = serialize.deserializeJson(serialized);
     assert.deepEqual(deserialized, json)
     assert.isTrue(deserialized.param2.binData instanceof Uint8Array)
+
+  it 'serializeJson and deserializeJson - support of undefined in objects and arrays', ->
+    json = {
+      param1: { a: 1, b: undefined }
+      param3: [undefined, null, 1]
+    }
+
+    serialized = serialize.serializeJson(json);
+
+    assert.deepEqual(serialize.deserializeJson(serialized), json)
