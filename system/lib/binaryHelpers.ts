@@ -66,7 +66,9 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
  * Converts hex like "ffff" to array of bytes [ 255, 255 ]
  */
 export function hexStringToUint8Arr(hex: string): Uint8Array {
-  if (hex.length < 2) throw new Error(`Incorrect length of hex data`);
+  if (hex.length < 2) {
+    throw new Error(`Incorrect length of hex data`);
+  }
   else if (hex.length / 2 !== Math.ceil(hex.length / 2)) {
     throw new Error(`Incorrect length of hex data. It has to be even`);
   }
@@ -151,6 +153,7 @@ export function byteToBinArr(hexValue: number): boolean[] {
  */
 export function numToWord(num: number): string {
   let result: string = int16ToHexString(num);
+
   if (result.length === 2) result = '00' + result;
 
   return result;

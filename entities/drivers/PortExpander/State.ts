@@ -1,4 +1,3 @@
-import {callOnDifferentValues} from 'system/lib/helpers';
 import {bytesToBits} from 'system/lib/binaryHelpers';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
@@ -18,6 +17,25 @@ export interface ExpanderState {
   analogInputs: AnalogState;
   analogOutputs: AnalogState;
 }
+
+
+
+// TODO: review
+// TODO: test
+export function callOnDifferentValues(
+  arr1: any[],
+  arr2: any[],
+  cb: (index: number, value1: any, value2: any) => void
+) {
+  for (let indexStr in arr1) {
+    const index: number = parseInt(indexStr);
+
+    if (arr1[index] !== arr2[index]) {
+      cb(index, arr1[index], arr2[index]);
+    }
+  }
+}
+
 
 
 export default class State {

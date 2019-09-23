@@ -2,7 +2,7 @@ import DriverBase from 'system/base/DriverBase';
 import {GetDriverDep} from 'system/base/EntityBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
-import {deferCall, invertIfNeed} from 'system/lib/helpers';
+import {invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';
 
 import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPinOutput/DigitalPinOutput';
@@ -18,6 +18,26 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
   // if true when sends 1 actually sends 0
   invert: boolean;
 }
+
+
+
+
+// TODO: review
+// TODO: test
+export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+  // TODO: rerutn an object and add method - cancel
+  return new Promise<T>((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        resolve(await cb());
+      }
+      catch(err) {
+        reject(err);
+      }
+    }, delayMs);
+  });
+}
+
 
 
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {

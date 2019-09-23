@@ -131,38 +131,6 @@ export function parseArgs(data: Primitives | undefined): JsonTypes[] {
   return result;
 }
 
-// TODO: review
-// TODO: test
-export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-  // TODO: rerutn an object and add method - cancel
-  return new Promise<T>((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        resolve(await cb());
-      }
-      catch(err) {
-        reject(err);
-      }
-    }, delayMs);
-  });
-}
-
-// TODO: review
-// TODO: test
-export function callOnDifferentValues(
-  arr1: any[],
-  arr2: any[],
-  cb: (index: number, value1: any, value2: any) => void
-) {
-  for (let indexStr in arr1) {
-    const index: number = parseInt(indexStr);
-
-    if (arr1[index] !== arr2[index]) {
-      cb(index, arr1[index], arr2[index]);
-    }
-  }
-}
-
 export function consoleError(msg: string) {
   console.error(`ERROR: ${msg}`);
 }
