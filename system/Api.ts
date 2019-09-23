@@ -41,7 +41,7 @@ export default class Api {
   /**
    * Call device action
    */
-  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes> {
+  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes | undefined> {
     const device = this.context.system.devicesManager.getDevice(deviceId);
 
     this.context.log.info(`Api: called device's "${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);

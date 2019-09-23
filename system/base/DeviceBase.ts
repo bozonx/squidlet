@@ -8,7 +8,7 @@ import {StateCategories} from '../interfaces/States';
 
 export const DEFAULT_STATUS = 'default';
 
-export type StatusChangeHandler = (paramName: string, value: JsonTypes) => void;
+export type StatusChangeHandler = (paramName: string, value?: JsonTypes) => void;
 export type ConfigChangeHandler = () => void;
 
 
@@ -113,12 +113,12 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   /**
    * Call action and return it's result.
    */
-  async action(actionName: string, ...params: any[]): Promise<JsonTypes> {
+  async action(actionName: string, ...params: any[]): Promise<JsonTypes | undefined> {
     if (!this.actions[actionName]) {
       throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
     }
 
-    let result: any;
+    let result: JsonTypes | undefined;
 
     try {
       result = await this.actions[actionName](...params);
@@ -135,7 +135,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   /**
    * Get specified status or default status.
    */
-  getStatus = (statusName: string = DEFAULT_STATUS): JsonTypes => {
+  getStatus = (statusName: string = DEFAULT_STATUS): JsonTypes | undefined => {
     if (!this.statusState) return;
 
     const state = this.statusState.getState();
@@ -178,7 +178,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
     }
 
-    const wrapper = (category: number, stateName: string, paramName: string, value: JsonTypes): void => {
+    const wrapper = (category: number, stateName: string, paramName: string, value?: JsonTypes): void => {
       if (category !== StateCategories.devicesStatus || stateName !== this.id) return;
 
       cb(paramName, value);

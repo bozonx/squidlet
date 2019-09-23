@@ -4,7 +4,7 @@ import {isKindOfNumber} from './common';
 
 export interface ParsedType {
   types: string[];
-  constants: Primitives[];
+  constants: (Primitives | undefined)[];
 }
 
 

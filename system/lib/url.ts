@@ -89,6 +89,7 @@ export function parseSearchValue(rawValue: string | undefined): JsonTypes {
 
   const trimmed: string = rawValue.trim();
 
+  // TODO: why not undefined ???
   if (!trimmed) return '';
 
   try {

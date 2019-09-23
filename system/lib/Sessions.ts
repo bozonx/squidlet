@@ -110,7 +110,7 @@ export default class Sessions {
     return this.sessionStorage[sessionId][key];
   }
 
-  setStorage(sessionId: string, key: string, data: JsonTypes) {
+  setStorage(sessionId: string, key: string, data?: JsonTypes) {
     if (!this.sessionStorage[sessionId]) this.sessionStorage[sessionId] = {};
 
     this.sessionStorage[sessionId][key] = data;

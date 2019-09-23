@@ -11,7 +11,6 @@ import {ENCODE} from '../system/lib/constants';
 import {collectPropsDefaults} from '../system/lib/helpers';
 import {makeUniqId} from '../system/lib/uniqId';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
-import {JsonTypes} from '../system/interfaces/Types';
 
 
 const wsApiManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');

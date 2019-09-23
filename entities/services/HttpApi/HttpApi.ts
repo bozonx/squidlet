@@ -53,7 +53,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
 
       return {
         status: 400,
-        body,
+        body: body as {[index: string]: Primitives},
       };
     }
     if (!allowedApiMethodsToCall.includes(apiMethodName)) {
@@ -61,7 +61,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
 
       return {
         status: 404,
-        body,
+        body: body as {[index: string]: Primitives},
       };
     }
 
@@ -69,7 +69,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
   }
 
   private async callApiMethod(route: Route, apiMethodName: string): Promise<HttpDriverResponse> {
-    const args: JsonTypes[] = parseArgs(route.params.args);
+    const args: (JsonTypes | undefined)[] = parseArgs(route.params.args);
     let body: HttpApiBody;
     let result: any;
 
@@ -81,13 +81,13 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
 
       return {
         status: 500,
-        body,
+        body: body as {[index: string]: Primitives},
       };
     }
 
     body = { result };
 
-    return { body };
+    return { body: body as {[index: string]: Primitives} };
   }
 
 }

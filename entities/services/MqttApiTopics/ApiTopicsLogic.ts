@@ -107,7 +107,7 @@ export default class ApiTopicsLogic {
 
     this.context.log.debug(`ApiTopicsLogic income call api method "${apiMethodName}": ${data}`);
 
-    const args: JsonTypes[] = parseArgs(data);
+    const args: (JsonTypes | undefined)[] = parseArgs(data);
 
     await this.context.system.apiManager.callApi(apiMethodName, args);
   }
@@ -120,7 +120,7 @@ export default class ApiTopicsLogic {
     // income string-type api message - call device action
     this.context.log.debug(`ApiTopicsLogic income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${data}`);
 
-    const args: JsonTypes[] = parseArgs(data);
+    const args: (JsonTypes | undefined)[] = parseArgs(data);
 
     await this.context.system.api.action(deviceId, actionName, ...args);
   }

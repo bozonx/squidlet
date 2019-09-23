@@ -24,12 +24,12 @@ export type RemoteCallMessageType =
 
 export interface ResultLikePayload {
   error: string | undefined;
-  result: JsonTypes;
+  result?: JsonTypes;
 }
 
 export interface CallMethodPayload {
   method: string;
-  args: JsonTypes[];
+  args: (JsonTypes | undefined)[];
 }
 
 export interface ResultMethodPayload extends ResultLikePayload {
@@ -38,7 +38,7 @@ export interface ResultMethodPayload extends ResultLikePayload {
 
 export interface CallCbPayload {
   cbId: string;
-  args: JsonTypes[];
+  args: (JsonTypes | undefined)[];
 }
 
 export interface ResultCbPayload extends ResultLikePayload {

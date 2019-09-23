@@ -4,4 +4,4 @@ export type InitialLevel = 1 | 0 | 'low' | 'high';
 export type Primitives = string | number | boolean | null;
 // TODO: review что не включает undefined
 export type JsonTypes = Primitives | Primitives[] | {[index: string]: Primitives};
-export type Dictionary = {[index: string]: JsonTypes};
+export type Dictionary = {[index: string]: JsonTypes | undefined};

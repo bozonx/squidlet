@@ -18,7 +18,10 @@ export function isHtml(str: any): boolean {
  * Parse request's body. It should correspond to content-type header.
  * But if content-type isn't supported then body will be used as is.
  */
-export function parseBody(contentType?: HttpContentType, body?: string | Uint8Array): JsonTypes | Uint8Array {
+export function parseBody(
+  contentType?: HttpContentType,
+  body?: string | Uint8Array
+): JsonTypes | Uint8Array | undefined {
   if (!contentType) {
     if (typeof body !== 'undefined') {
       throw new Error(`parseBody: Incorrect body: no content-type and body has to be undefined`);
@@ -84,7 +87,7 @@ export function parseBody(contentType?: HttpContentType, body?: string | Uint8Ar
  */
 export function prepareBody(
   contentType: HttpContentType | undefined,
-  fullBody: JsonTypes | Uint8Array
+  fullBody?: JsonTypes | Uint8Array
 ): string | Uint8Array | undefined {
   if (!contentType) {
     if (typeof fullBody !== 'undefined') {
@@ -151,7 +154,7 @@ export function prepareBody(
  * * string
  * * number, boolean, null, [] or {} => application/json
  */
-export function resolveBodyType(fullBody: JsonTypes | Uint8Array): HttpContentType | undefined {
+export function resolveBodyType(fullBody?: JsonTypes | Uint8Array): HttpContentType | undefined {
   if (typeof fullBody === 'undefined') {
     return;
   }
