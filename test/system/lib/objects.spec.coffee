@@ -132,4 +132,4 @@ describe.only 'system.lib.objects', ->
     arr = [1]
     objWithArr = {arr}
     assert.deepEqual(objects.cloneDeepObject(objWithArr), {arr: [1]})
-    assert.isFalse(objects.cloneDeepObject(objWithArr) == arr)
+    assert.isFalse(objects.cloneDeepObject(objWithArr).arr == arr)

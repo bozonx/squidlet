@@ -237,7 +237,7 @@ export function mergeDeepObjects(
     if (!(key in result) && !topUndefinedKeys.includes(key)) {
       // set value which is absent on top but exist on the bottom.
       // only if it obviously doesn't mark as undefined
-      if (Array.isArray(top[key])) {
+      if (Array.isArray(bottom[key])) {
         result[key] = cloneDeepArray(bottom[key]);
       }
       else {
