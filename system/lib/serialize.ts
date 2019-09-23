@@ -2,6 +2,7 @@ import {concatUint8Arr, int32ToUint8Arr, uint8ToNum} from './binaryHelpers';
 
 
 const BIN_MARK = '!BIN!';
+const UNDEFINED_MARK = '!UNDEF!';
 const BIN_LENGTH_SEP = ':';
 
 
@@ -55,11 +56,12 @@ export function textToUint8Array(str: string): Uint8Array {
  *   binary json,
  *   binary data from json
  * ]
+ * WARNING: undefined keys of objects will be omitted.
+ * WARNING: undefined values of array will be empty.
  */
 export function serializeJson(data: any): Uint8Array {
   let binDataTail = new Uint8Array();
 
-  // TODO: не поддерживается undefined
   const stringMsg: string = JSON.stringify(data, (key: string, value: any) => {
     if (value instanceof Uint8Array) {
       const start = binDataTail.length;
@@ -67,6 +69,9 @@ export function serializeJson(data: any): Uint8Array {
       binDataTail = concatUint8Arr(binDataTail, value);
 
       return BIN_MARK + start + BIN_LENGTH_SEP + length;
+    }
+    else if (typeof value === 'undefined') {
+      return UNDEFINED_MARK;
     }
 
     return value;
@@ -98,8 +103,6 @@ export function deserializeJson(serialized: Uint8Array | any) {
   const jsonString: string = uint8ArrayToText(jsonBin);
   const binaryTail: Uint8Array = serialized.subarray(4 + jsonLength);
 
-  // TODO: не поддерживается undefined
-
   return JSON.parse(jsonString, (key: string, value: any) => {
     if (typeof value === 'string' && value.indexOf(BIN_MARK) === 0) {
       const payload: string = value.split(BIN_MARK)[1];
@@ -108,6 +111,9 @@ export function deserializeJson(serialized: Uint8Array | any) {
       const length = Number(splat[1]);
 
       return binaryTail.subarray(start, start + length);
+    }
+    else if (typeof value === 'string' && value.indexOf(UNDEFINED_MARK) === 0) {
+      return undefined;
     }
 
     return value;

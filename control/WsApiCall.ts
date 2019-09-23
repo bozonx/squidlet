@@ -141,8 +141,7 @@ export default class WsApiCall {
   /**
    * Listen logs and print them to console
    */
-  // TODO: убрать параметр по умолчанию
-  async log(level: string = 'info', host?: string, port?: string) {
+  async log(level: string, host?: string, port?: string) {
     const apiClient = await this.makeClient(host, port);
 
     const handlerIndex = await apiClient.callMethod('listenLog', level, (message: string) => {
