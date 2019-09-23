@@ -64,11 +64,6 @@ describe 'system.lib.objects', ->
     assert.equal(objects.getKeyOfObject({a: 1, b: 2}, 2), 'b')
     assert.isUndefined(objects.getKeyOfObject({a: 1, b: 2}, 3))
 
-  it 'getDifferentKeys', ->
-    assert.deepEqual(objects.getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}), ['b'])
-    assert.deepEqual(objects.getDifferentKeys(undefined, {a:1, b:2}), ['a', 'b'])
-    assert.deepEqual(objects.getDifferentKeys({a:1, b:1, c:1}, undefined), [])
-
   it 'clearObject', ->
     obj = {a:1}
 
@@ -122,6 +117,11 @@ describe 'system.lib.objects', ->
     objWithArr = {arr}
     assert.deepEqual(objects.cloneDeepObject(objWithArr), {arr: [1]})
     assert.isFalse(objects.cloneDeepObject(objWithArr).arr == arr)
+
+#  it 'getDifferentKeys', ->
+#    assert.deepEqual(objects.getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}), ['b'])
+#    assert.deepEqual(objects.getDifferentKeys(undefined, {a:1, b:2}), ['a', 'b'])
+#    assert.deepEqual(objects.getDifferentKeys({a:1, b:1, c:1}, undefined), [])
 
 #  it 'isExactlyObject', ->
 #    cl = () ->

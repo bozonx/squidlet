@@ -115,34 +115,6 @@ export function getKeyOfObject(obj?: {[index: string]: any}, value?: any): strin
   return;
 }
 
-// TODO: review - не очевидная логика ???
-/**
- * Compare 2 objects and collect keys whose VALUES are different (not equals to the same key in the sourceObj).
- * PartialObj can omit some props of sourceObj
- * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
- */
-export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?: {[index: string]: any}): string[] {
-  if (!partialObj) {
-    return [];
-  }
-  else if (!sourceObj) {
-    return Object.keys(partialObj);
-  }
-
-  const diffKeys: string[] = [];
-
-  for (let key of Object.keys(sourceObj)) {
-    // TODO: желательно не делать глубокого сравнения
-    // TODO: может использовать конструкцию - key in obj
-    // TODO: don't use isEqual
-    if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
-      diffKeys.push(key);
-    }
-  }
-
-  return diffKeys;
-}
-
 /**
  * Clear all the props in object.
  * It mutates the object.
@@ -251,6 +223,34 @@ export function objGet(obj?: {[index: string]: any}, pathTo?: string, defaultVal
 
   return result;
 }
+
+
+// /**
+//  * Compare 2 objects and collect keys whose VALUES are different (not equals to the same key in the sourceObj).
+//  * PartialObj can omit some props of sourceObj
+//  * getDifferentKeys({a:1, b:1, c:1}, {a:1, b:2}) => ['b']
+//  */
+// export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?: {[index: string]: any}): string[] {
+//   if (!partialObj) {
+//     return [];
+//   }
+//   else if (!sourceObj) {
+//     return Object.keys(partialObj);
+//   }
+//
+//   const diffKeys: string[] = [];
+//
+//   for (let key of Object.keys(sourceObj)) {
+//     // T-O-D-O: желательно не делать глубокого сравнения
+//     // T-O-D-O: может использовать конструкцию - key in obj
+//     // T-O-D-O: don't use isEqual
+//     if (typeof partialObj[key] !== 'undefined' && !isEqual(sourceObj[key], partialObj[key])) {
+//       diffKeys.push(key);
+//     }
+//   }
+//
+//   return diffKeys;
+// }
 
 // /**
 //  * Is an object (plain or instance of some class), not an array
