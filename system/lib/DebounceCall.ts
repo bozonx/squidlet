@@ -1,71 +1,104 @@
+import Promised from './Promised';
+
+
+const DEFAULT_ID = 'default';
+
+enum ItemPosition {
+  lastCbToCall,
+  promiseForWholeDebounce,
+  timeoutId
+}
+type DebounceCb = (...args: any[]) => void;
+// Array like [ lastCbToCall, promiseForWholeDebounce, timeoutId ]
+type DebounceItem = [DebounceCb, Promised<void>, any];
+
+
 /**
  * Call only the LAST callback of specified id.
  * Timer sets up on the first call and the next calls don't increase it!
  */
 export default class DebounceCall {
-  private debounceTimeouts: {[index: string]: any} = {};
-  private lastCb?: (...args: any[]) => void;
+  // items by id
+  private items: {[index: string]: DebounceItem} = {};
 
 
-  invoke(id: string | number, debounce: number | undefined, cb: (...args: any[]) => void, ...args: any[]) {
-    // if there isn't debounce - call immediately
+  isInvoking(id: string | number = DEFAULT_ID): boolean {
+    return Boolean(this.items[id]);
+  }
+
+  async invoke(
+    cb: DebounceCb,
+    debounce: number | undefined,
+    id: string | number = DEFAULT_ID,
+  ): Promise<void> {
+    // if there isn't debounce time - call immediately
     if (!debounce) {
-      if (typeof this.debounceTimeouts[id] !== 'undefined') this.clear(id);
+      if (typeof this.items[id] !== 'undefined') this.clear(id);
 
-      return cb(...args);
+      return cb();
     }
 
-    this.lastCb = cb;
+    if (!this.items[id]) this.items[id] = [
+      cb,
+      new Promised<void>(),
+      undefined
+    ];
 
-    // if debounce is in progress - do nothing
-    if (typeof this.debounceTimeouts[id] !== 'undefined') return;
-
-    // making new debounce timeout
     const wrapper = () => {
-      if (this.lastCb) this.lastCb(...args);
-      delete this.debounceTimeouts[id];
-      delete this.lastCb;
+      if (!this.items[id]) {
+        this.clear(id);
+
+        return;
+      }
+
+      try {
+        this.items[id][ItemPosition.lastCbToCall]();
+      }
+      catch (err) {
+        return this.endOfDebounce(id, err);
+      }
+
+      this.endOfDebounce(id);
     };
 
-    this.debounceTimeouts[id] = setTimeout(wrapper, debounce);
+    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+
+    this.items[id][ItemPosition.timeoutId] = setTimeout(wrapper, debounce);
+
+    return this.items[id][ItemPosition.promiseForWholeDebounce].promise;
   }
 
   clear(id: string | number) {
-    clearTimeout(this.debounceTimeouts[id]);
-    delete this.debounceTimeouts[id];
-    delete this.lastCb;
+    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+    this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
+
+    delete this.items[id];
+  }
+
+  destroy() {
+    for (let id of Object.keys(this.items)) {
+      this.clear(id);
+
+      delete this.items[id];
+    }
+  }
+
+
+  private endOfDebounce(id: string | number, err?: Error) {
+    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+
+    const promised = this.items[id][ItemPosition.promiseForWholeDebounce];
+
+    delete this.items[id];
+
+    if (err) {
+      promised.reject(err);
+    }
+    else {
+      promised.resolve();
+    }
+
+    promised.destroy();
   }
 
 }
-
-
-// !!!! it calls the first one cb and other refuses
-// export default class DebounceCall {
-//   private debounceTimeouts: {[index: string]: any} = {};
-//
-//   invoke(id: string | number, debounce: number | undefined, cb: (...args: any[]) => void, ...args: any[]) {
-//     // if there isn't debounce - call immediately
-//     if (!debounce) {
-//       if (typeof this.debounceTimeouts[id] !== 'undefined') this.clear(id);
-//
-//       return cb(...args);
-//     }
-//
-//     // if debounce is in progress - do nothing
-//     if (typeof this.debounceTimeouts[id] !== 'undefined') return;
-//
-//     // making new debounce timeout
-//     const wrapper = () => {
-//       delete this.debounceTimeouts[id];
-//       cb(...args);
-//     };
-//
-//     this.debounceTimeouts[id] = setTimeout(wrapper, debounce);
-//   }
-//
-//   clear(id: string | number) {
-//     clearTimeout(this.debounceTimeouts[id]);
-//     delete this.debounceTimeouts[id];
-//   }
-//
-// }
