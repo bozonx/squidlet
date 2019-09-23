@@ -266,7 +266,7 @@ export function objGet(obj?: {[index: string]: any}, pathTo?: string, defaultVal
 // export function cloneDeep(value: any): any {
 //   // not cloneable
 //   if (
-//     // TODO: don't use null
+//     // T-O-D-O: don't use null
 //     value === null
 //     || typeof value === 'number'
 //     || typeof value === 'undefined'

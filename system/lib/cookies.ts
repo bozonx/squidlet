@@ -27,15 +27,9 @@ export function stringifyCookie(obj: {[index: string]: Primitives}): string {
   for (let key of Object.keys(obj)) {
     const value: Primitives = obj[key];
 
-    // TODO: упростить
-    if (
-      typeof value !== 'boolean'
-      && typeof value !== 'string'
-      && typeof value !== 'number'
-      && typeof value !== 'undefined'
-      // TODO: don't use null
-      && value !== null
-    ) throw new Error(`stringifyCookie: invalid received object`);
+    if (value && typeof value === 'object') {
+      throw new Error(`stringifyCookie: invalid type of value: ${typeof value}`);
+    }
 
     result.push(`${key}=${value}`);
   }
