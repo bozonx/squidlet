@@ -1,5 +1,5 @@
 import {isEqualUint8Array} from './binaryHelpers';
-import {arraysDifference} from './arrays';
+import {concatUniqStrArrays} from './arrays';
 
 
 /**
@@ -26,13 +26,12 @@ export function isEqual(first: any, second: any): boolean {
   }
   // plain objects and instances
   else if (typeof first === 'object' && typeof second === 'object') {
-    // TODO: use getDifferentKeys ???
-
     const firstKeys: string[] = Object.keys(first);
-    // if keys are different = aren't equal
-    if (arraysDifference(firstKeys, Object.keys(second)).length) return false;
 
-    for (let key of firstKeys) {
+    // keys of both objects
+    const keys: string[] = concatUniqStrArrays(firstKeys, Object.keys(second));
+
+    for (let key of keys) {
       if (!isEqual(first[key], second[key])) return false;
     }
 

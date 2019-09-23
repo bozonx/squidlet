@@ -137,6 +137,7 @@ export function getKeyOfObject(obj?: {[index: string]: any}, value?: any): strin
   return;
 }
 
+// TODO: review - не очевидная логика ???
 /**
  * Compare 2 objects and collect keys whose VALUES are different (not equals to the same key in the sourceObj).
  * PartialObj can omit some props of sourceObj
@@ -153,7 +154,6 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
   const diffKeys: string[] = [];
 
   for (let key of Object.keys(sourceObj)) {
-    // TODO: isEqual не правильно отрабоатает с параметрами с undefined
     // TODO: желательно не делать глубокого сравнения
     // TODO: может использовать конструкцию - key in obj
     // TODO: don't use isEqual

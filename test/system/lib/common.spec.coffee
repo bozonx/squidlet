@@ -1,7 +1,7 @@
 common = require('../../../system/lib/common')
 
 
-describe.only 'system.lib.common', ->
+describe 'system.lib.common', ->
   it 'isEqual', ->
     assert.isTrue(common.isEqual(1, 1))
     assert.isFalse(common.isEqual(1, 0))
@@ -38,20 +38,20 @@ describe.only 'system.lib.common', ->
     assert.isFalse(common.isEqual(['a'], ['a', 'b']))
     assert.isFalse(common.isEqual([], undefined ))
     assert.isFalse(common.isEqual(undefined, []))
-#    assert.isTrue(common.isEqual([undefined, null, 1], [undefined, null, 1]))
-#    assert.isFalse(common.isEqual([undefined, null, 1], [null, undefined, 1]))
+    assert.isTrue(common.isEqual([undefined, null, 1], [undefined, null, 1]))
+    assert.isFalse(common.isEqual([undefined, null, 1], [null, undefined, 1]))
 
     # objects
     assert.isTrue(common.isEqual({}, {}))
     assert.isTrue(common.isEqual({a: {aa: 1}}, {a: {aa: 1}}))
-#    assert.isFalse(common.isEqual({a: {aa: 1}}, {a: {aa: 1, bb: 2}}))
-#    assert.isFalse(common.isEqual({a: 1}, ['a']))
-#    assert.isFalse(common.isEqual({}, undefined ))
-#    assert.isFalse(common.isEqual(undefined, {}))
-#    # undefined hasn't to be converted to null
-#    assert.isTrue(common.isEqual({und: undefined, nl: null}, {und: undefined, nl: null}))
-#    assert.isFalse(common.isEqual({und: undefined, nl: undefined}, {und: undefined, nl: null}))
-#    assert.isTrue(common.isEqual({arr: [undefined, null]}, {arr: [undefined, null]}))
+    assert.isFalse(common.isEqual({a: {aa: 1}}, {a: {aa: 1, bb: 2}}))
+    assert.isFalse(common.isEqual({a: 1}, ['a']))
+    assert.isFalse(common.isEqual({}, undefined ))
+    assert.isFalse(common.isEqual(undefined, {}))
+    # undefined hasn't to be converted to null
+    assert.isTrue(common.isEqual({und: undefined, nl: null}, {und: undefined, nl: null}))
+    assert.isFalse(common.isEqual({und: undefined, nl: undefined}, {und: undefined, nl: null}))
+    assert.isTrue(common.isEqual({arr: [undefined, null]}, {arr: [undefined, null]}))
 
   it 'parseValue', ->
     assert.isUndefined(common.parseValue(undefined))

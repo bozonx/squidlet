@@ -13,9 +13,14 @@ export function lastItem(arr: any[]): any {
 }
 
 /**
- * Make a new array which contains items which are different in samples
+ * Make a new array which contains items which are different in samples.
+ * WARNING: be careful if samples has additional keys they won't be matched.
  */
 export function arraysDifference(testArr: any[], samples: any[]): any[] {
+
+  // TODO: странное поведение - смотрится только те ключи которых нет в samples
+  //       но если в samples если лишние ключи - то они не учтутся
+
   if (typeof testArr === 'undefined' || !testArr.length) return [];
   else if (typeof samples === 'undefined' || !samples.length) return testArr;
 
@@ -31,6 +36,27 @@ export function arraysDifference(testArr: any[], samples: any[]): any[] {
 
   return diffArr;
 }
+
+// /**
+//  * Compare two arrays and try to find values which are different in a both arrays.
+//  * Undefined doesn't match.
+//  */
+// export function arraysFullDifference(arr1: any[], arr2: any[]): any[] {
+//   if (typeof arr1 === 'undefined' || !arr1.length) return [...arr2];
+//   else if (typeof arr2 === 'undefined' || !arr2.length) return [...arr1];
+//
+//   const diffArr: any[] = [];
+//
+//   for (let key in (arr1.length > arr2.length) ? arr1 : arr2) {
+//     if (typeof item === 'undefined') continue;
+//
+//     if (arr1[key] !== arr2[key]) {
+//       diffArr.push(item);
+//     }
+//   }
+//
+//   return diffArr;
+// }
 
 // TODO: лучше не использовать
 // TODO: use filter
