@@ -1,17 +1,35 @@
 export function trimCharStart(src: string, char: string = ' '): string {
   if (typeof src !== 'string') return src;
 
-  const regex = new RegExp(`^\\${char}*`);
+  let countToCut = 0;
 
-  return src.replace(regex, '');
+  for (let i = 0; i < src.length; i++) {
+    if (src[i] === char) {
+      countToCut++;
+    }
+    else {
+      break;
+    }
+  }
+
+  return src.slice(countToCut);
 }
 
 export function trimCharEnd(src: string, char: string = ' '): string {
   if (typeof src !== 'string') return src;
 
-  const regex = new RegExp(`\\${char}*$`);
+  let countToCut = 0;
 
-  return src.replace(regex, '');
+  for (let i = src.length - 1; i >= 0; i--) {
+    if (src[i] === char) {
+      countToCut--;
+    }
+    else {
+      break;
+    }
+  }
+
+  return src.slice(0, countToCut);
 }
 
 export function trimChar(src: string, char: string = ' '): string {
@@ -83,4 +101,8 @@ export function padStart(srcString: string, length: number = 0, chars: string = 
   for (let i = 0; i < repeats; i ++) result += chars;
 
   return `${result}${srcString}`;
+
+  // const filled: string[] = new Array(repeats);
+  //
+  // return `${filled.fill(chars).join('')}${srcString}`;
 }
