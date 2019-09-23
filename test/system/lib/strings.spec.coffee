@@ -1,7 +1,7 @@
 strings = require('../../../system/lib/strings')
 
 
-describe.only 'system.lib.strings', ->
+describe 'system.lib.strings', ->
   it 'trimStart', ->
     assert.equal(strings.trimCharStart('  a  '), 'a  ')
     assert.equal(strings.trimCharStart('--a--', '-'), 'a--')

@@ -9,6 +9,10 @@ describe.only 'system.lib.objects', ->
     assert.isFalse(objects.isEqualObjects({}, undefined ))
     assert.isFalse(objects.isEqualObjects(undefined, {}))
     assert.isFalse(objects.isEqualObjects(1, 1))
+    # undefined hasn't to be converted to null
+    assert.isTrue(objects.isEqualObjects({und: undefined, nl: null}, {und: undefined, nl: null}))
+    assert.isFalse(objects.isEqualObjects({und: undefined, nl: undefined}, {und: undefined, nl: null}))
+    assert.isTrue(objects.isEqualObjects({arr: [undefined, null]}, {arr: [undefined, null]}))
 
   it 'isEmptyObject', ->
     assert.isTrue(objects.isEmptyObject(undefined))

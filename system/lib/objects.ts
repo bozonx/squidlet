@@ -10,7 +10,8 @@ import {isEqual} from './common';
 export function isEqualObjects(first?: {[index: string]: any}, second?: {[index: string]: any}): boolean {
   if (typeof first !== 'object' || typeof second !== 'object') return false;
 
-  // TODO: не будет учитываться undefined в объектах и array (переводятся в null)
+  // TODO: не будет учитываться undefined в объектах (undefined удаляется)
+  //       в массивах undefined переводится в null
   // TODO: слишком дорогая процедура
   return JSON.stringify(first) === JSON.stringify(second);
 }
