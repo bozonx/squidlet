@@ -184,14 +184,6 @@ export function getDifferentKeys(sourceObj?: {[index: string]: any}, partialObj?
   return diffKeys;
 }
 
-// TODO: не нужно особо
-/**
- * Is an object (plain or instance of some class), not an array
- */
-export function isExactlyObject(item: any): boolean {
-  return item && typeof item === 'object' && !Array.isArray(item) || false;
-}
-
 /**
  * Clear all the props in object.
  * It mutates the object.
@@ -260,6 +252,14 @@ export function mergeDeepObjects(
 export function cloneDeepObject(obj?: {[index: string]: any}): {[index: string]: any} {
   return mergeDeepObjects({}, obj);
 }
+
+
+// /**
+//  * Is an object (plain or instance of some class), not an array
+//  */
+// export function isExactlyObject(item: any): boolean {
+//   return item && typeof item === 'object' && !Array.isArray(item) || false;
+// }
 
 // // it works properly but very expensive because of using of JSON.stringify -> JSON.parse.
 // // !WARNING: undefined values which are obviously set in objects will be omitted

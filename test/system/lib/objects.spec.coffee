@@ -72,16 +72,6 @@ describe.only 'system.lib.objects', ->
     assert.deepEqual(objects.getDifferentKeys(undefined, {a:1, b:2}), ['a', 'b'])
     assert.deepEqual(objects.getDifferentKeys({a:1, b:1, c:1}, undefined), [])
 
-  it 'isExactlyObject', ->
-    cl = () ->
-    assert.isTrue(objects.isExactlyObject({}))
-    assert.isTrue(objects.isExactlyObject(new cl()))
-    assert.isFalse(objects.isExactlyObject([]))
-    assert.isFalse(objects.isExactlyObject(''))
-    assert.isFalse(objects.isExactlyObject(undefined))
-    assert.isFalse(objects.isExactlyObject(null))
-    assert.isFalse(objects.isExactlyObject(0))
-
   it 'clearObject', ->
     obj = {a:1}
 
@@ -135,3 +125,13 @@ describe.only 'system.lib.objects', ->
     objWithArr = {arr}
     assert.deepEqual(objects.cloneDeepObject(objWithArr), {arr: [1]})
     assert.isFalse(objects.cloneDeepObject(objWithArr).arr == arr)
+
+#  it 'isExactlyObject', ->
+#    cl = () ->
+#    assert.isTrue(objects.isExactlyObject({}))
+#    assert.isTrue(objects.isExactlyObject(new cl()))
+#    assert.isFalse(objects.isExactlyObject([]))
+#    assert.isFalse(objects.isExactlyObject(''))
+#    assert.isFalse(objects.isExactlyObject(undefined))
+#    assert.isFalse(objects.isExactlyObject(null))
+#    assert.isFalse(objects.isExactlyObject(0))
