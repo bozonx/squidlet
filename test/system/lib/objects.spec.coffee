@@ -62,6 +62,8 @@ describe.only 'system.lib.objects', ->
     assert.equal(objects.objGet(obj, 'level1.level2.unknown', 'default'), 'default')
 
   it 'getKeyOfObject', ->
+    assert.isUndefined(objects.getKeyOfObject(undefined))
+    assert.isUndefined(objects.getKeyOfObject({a:1}))
     assert.equal(objects.getKeyOfObject({a: 1, b: 2}, 2), 'b')
     assert.isUndefined(objects.getKeyOfObject({a: 1, b: 2}, 3))
 

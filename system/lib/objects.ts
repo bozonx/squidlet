@@ -142,19 +142,18 @@ export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue
  * Get key by value
  * E.g getKeyOfObject({key1: 'value1'}, 'value1') - then it returns 'key1'
  */
-export function getKeyOfObject(obj: {[index: string]: any}, value: any): string | undefined {
-  if (!isExactlyObject(obj)) {
+export function getKeyOfObject(obj?: {[index: string]: any}, value?: any): string | undefined {
+  if (!obj || typeof value === 'undefined') return;
+
+  if (typeof obj !== 'object' || Array.isArray(obj)) {
     throw new Error(`objects.getKeyOfObject: obj param has to be an object!`);
   }
 
-  const valuesOfObj: any[] = Object.values(obj);
-  const keys: string[] = Object.keys(obj);
-  const valueIndex: number = valuesOfObj.indexOf(value);
+  for (let key of Object.keys(obj)) {
+    if (obj[key] === value) return key;
+  }
 
-  // if -1 - didn't find
-  if (valueIndex < 0) return;
-
-  return keys[valueIndex];
+  return;
 }
 
 /**
