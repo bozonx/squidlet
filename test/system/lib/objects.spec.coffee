@@ -10,7 +10,7 @@ describe.only 'system.lib.objects', ->
     assert.isFalse(objects.isEqualObjects(undefined, {}))
     assert.isFalse(objects.isEqualObjects(1, 1))
 
-  it 'isEmptyObjectObject', ->
+  it 'isEmptyObject', ->
     assert.isTrue(objects.isEmptyObject(undefined))
     assert.isTrue(objects.isEmptyObject(null))
     assert.isTrue(objects.isEmptyObject(''))

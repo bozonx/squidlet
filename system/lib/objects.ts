@@ -26,12 +26,12 @@ export function isEqualObjects(first?: {[index: string]: any}, second?: {[index:
  * For other types it will return true.
  * Null means an empty object too. Better is not to use null.
  */
-export function isEmptyObject(toCheck?: {[index: string]: any}): boolean {
+export function isEmptyObject(toCheck: {[index: string]: any} = {}): boolean {
   if (typeof toCheck !== 'object' || Array.isArray(toCheck)) {
     return true;
   }
 
-  return !Object.keys(toCheck).length;
+  return !Object.keys(toCheck || {}).length;
 }
 
 /**
@@ -112,7 +112,8 @@ export function isPlainObject(obj: any): boolean {
   return obj // not null
     && typeof obj === 'object' // separate from primitives
     && obj.constructor === Object // separate instances (Array, DOM, ...)
-    && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math
+    && Object.prototype.toString.call(obj) === '[object Object]' // separate build-in like Math
+    || false;
 }
 
 export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {

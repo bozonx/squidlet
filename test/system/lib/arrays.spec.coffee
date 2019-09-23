@@ -1,7 +1,7 @@
 arrays = require('../../../system/lib/arrays')
 
 
-describe.only 'system.lib.arrays', ->
+describe 'system.lib.arrays', ->
   it 'isEqualArrays', ->
     assert.isTrue(arrays.isEqualArrays([], []))
     assert.isTrue(arrays.isEqualArrays([1,2,3], [1,2,3]))
