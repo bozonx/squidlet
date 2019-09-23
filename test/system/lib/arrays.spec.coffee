@@ -26,10 +26,10 @@ describe.only 'system.lib.arrays', ->
     arrays.clearArray(arr)
     assert.deepEqual(arr, [])
 
-  it 'setArrayDimension', ->
-    assert.deepEqual(arrays.setArrayDimension([0,1], 2), [0,1]);
-    assert.deepEqual(arrays.setArrayDimension([0], 2), [0, undefined]);
-    assert.deepEqual(arrays.setArrayDimension([0, 1, 2], 2), [0, 1]);
+  it 'makeSizedArray', ->
+    assert.deepEqual(arrays.makeSizedArray([0,1], 2), [0,1]);
+    assert.deepEqual(arrays.makeSizedArray([0], 2), [0, undefined]);
+    assert.deepEqual(arrays.makeSizedArray([0, 1, 2], 2), [0, 1]);
 
   it 'removeItemFromArray', ->
     arr = ['a', 'b', 'c', 'b']

@@ -66,13 +66,12 @@ export function clearArray(arr: any[]): void {
   arr.splice(0, arr.length);
 }
 
-// TODO: неиспользуется почти - лучше убрать
 /**
  * Make new array with specified dimension.
  * If arr smaller than "count" then odd items will be empty
  * If arr bigger than "count" then odd items will be omitted
  */
-export function setArrayDimension(arr: any[], count: number): any[] {
+export function makeSizedArray(arr: any[], count: number): any[] {
   const result: any[] = new Array(count);
 
   for (let i = 0; i < count; i++) result[i] = arr[i];
@@ -154,7 +153,7 @@ export function cloneDeepArray(arr?: any[]): any[] {
 //   const result: any[] = [];
 //
 //   for (let value of arr) {
-//     // TODO: don't use null
+//     // T-O-D-O: don't use null
 //     if (typeof value !== 'undefined' && value !== null && value !== '') {
 //       result.push(value);
 //     }

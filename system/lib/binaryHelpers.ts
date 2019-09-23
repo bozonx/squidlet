@@ -207,7 +207,7 @@ export function int32ToUint8Arr(int32: number): Uint8Array {
 
 /**
  * Converts [true,true,true,true,true,true,true,true,false,false,false,false,false,false,false,false] > [255,0]
- * To be sure that array of bits have strict length use helpers.setArrayDimension()
+ * To be sure that array of bits have strict length use helpers.makeSizedArray()
  */
 export function bitsToBytes(bits: (boolean | undefined)[]): Uint8Array {
   const bitsCount: number = bits.length;
