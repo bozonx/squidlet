@@ -3,26 +3,6 @@ import {isEqual} from './common';
 
 
 /**
- * Are objects equal.
- * If one of them not Object then it returns false.
- * For plain objects and instances
- */
-export function isEqualObjects(first?: {[index: string]: any}, second?: {[index: string]: any}): boolean {
-  if (typeof first !== 'object' || typeof second !== 'object') return false;
-
-  // TODO: не будет учитываться undefined в объектах (undefined удаляется)
-  //       в массивах undefined переводится в null
-  // TODO: слишком дорогая процедура
-  return JSON.stringify(first) === JSON.stringify(second);
-}
-
-// /**
-//  * When undefined, null, '', [] or {}.
-//  * 0 is not empty!
-//  * @param toCheck
-//  */
-
-/**
  * Check is object is empty.
  * For other types it will return true.
  * Null means an empty object too. Better is not to use null.

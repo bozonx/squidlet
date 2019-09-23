@@ -1,29 +1,45 @@
 import {isEqualUint8Array} from './binaryHelpers';
-import {isEqualArrays} from './arrays';
-import {isEqualObjects} from './objects';
+import {arraysDifference} from './arrays';
 
 
 /**
  * Compare any types and check equality of two values.
  */
 export function isEqual(first: any, second: any): boolean {
+  // primitives
   if (typeof first !== 'object' || typeof second !== 'object') {
     return first === second;
   }
-
+  // uint
   else if (first instanceof Uint8Array || second instanceof Uint8Array) {
     return isEqualUint8Array(first, second);
   }
-  else if (Array.isArray(first) || Array.isArray(second)) {
-    return isEqualArrays(first, second);
+  // arrays
+  else if (Array.isArray(first) && Array.isArray(second)) {
+    if (first.length !== second.length) return false;
+
+    for (let key in first) {
+      // TODO: собрать
+      isEqual(first[key], second[key]);
+    }
   }
   // plain objects and instances
-  else if (typeof first === 'object' || typeof second === 'object') {
-    return isEqualObjects(first, second);
+  else if (typeof first === 'object' && typeof second === 'object') {
+
+    // TODO: use getDifferentKeys ???
+
+    const firstKeys: string[] = Object.keys(first);
+    // if keys are different = aren't equal
+    if (arraysDifference(firstKeys, Object.keys(second)).length) return false;
+
+    for (let key of firstKeys) {
+      // TODO: собрать
+      isEqual(first[key], second[key]);
+    }
   }
 
-  // for the any other case e.g null
-  return JSON.stringify(first) === JSON.stringify(second);
+  // for the any other case when smb is undefined of for null compare
+  return first === first;
 }
 
 /**
@@ -92,3 +108,10 @@ export function isKindOfNumber(value: any): boolean {
 
   return typeof value === 'number';
 }
+
+
+// /**
+//  * When undefined, null, '', [] or {}.
+//  * 0 is not empty!
+//  * @param toCheck
+//  */

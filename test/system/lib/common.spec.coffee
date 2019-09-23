@@ -1,7 +1,7 @@
 common = require('../../../system/lib/common')
 
 
-describe 'system.lib.common', ->
+describe.only 'system.lib.common', ->
   it 'isEqual', ->
     assert.isTrue(common.isEqual(1, 1))
     assert.isFalse(common.isEqual(1, 0))
@@ -37,6 +37,26 @@ describe 'system.lib.common', ->
     assert.isTrue(common.isEqual(cl1, cl1))
     assert.isFalse(common.isEqual(cl1, cl2))
     assert.isFalse(common.isEqual(cl1, cl2))
+
+  it 'isEqualArrays', ->
+    assert.isTrue(arrays.isEqualArrays([], []))
+    assert.isTrue(arrays.isEqualArrays([1,2,3], [1,2,3]))
+    assert.isFalse(arrays.isEqualArrays([1,2,3], [1,2]))
+    assert.isFalse(arrays.isEqualArrays([], undefined ))
+    assert.isFalse(arrays.isEqualArrays(undefined, []))
+    assert.isFalse(arrays.isEqualArrays({}, {}))
+
+  it 'isEqualObjects', ->
+    assert.isTrue(objects.isEqualObjects({}, {}))
+    assert.isTrue(objects.isEqualObjects({a:1,b:2}, {a:1,b:2}))
+    assert.isFalse(objects.isEqualObjects({a:1,b:2}, {a:1}))
+    assert.isFalse(objects.isEqualObjects({}, undefined ))
+    assert.isFalse(objects.isEqualObjects(undefined, {}))
+    assert.isFalse(objects.isEqualObjects(1, 1))
+    # undefined hasn't to be converted to null
+    assert.isTrue(objects.isEqualObjects({und: undefined, nl: null}, {und: undefined, nl: null}))
+    assert.isFalse(objects.isEqualObjects({und: undefined, nl: undefined}, {und: undefined, nl: null}))
+    assert.isTrue(objects.isEqualObjects({arr: [undefined, null]}, {arr: [undefined, null]}))
 
   it 'parseValue', ->
     assert.isUndefined(common.parseValue(undefined))
