@@ -1,7 +1,7 @@
 objects = require('../../../system/lib/objects')
 
 
-describe.only 'system.lib.objects', ->
+describe 'system.lib.objects', ->
   it 'isEmptyObject', ->
     assert.isTrue(objects.isEmptyObject(undefined))
     assert.isTrue(objects.isEmptyObject(null))
@@ -52,6 +52,11 @@ describe.only 'system.lib.objects', ->
     assert.deepEqual(objects.objGet(obj, 'level1'), obj.level1)
     assert.isUndefined(objects.objGet(obj, 'level1.level2.unknown'))
     assert.equal(objects.objGet(obj, 'level1.level2.unknown', 'default'), 'default')
+    assert.equal(objects.objGet(obj, '', 'default'), 'default')
+    # arrays - aren't supported
+    assert.isUndefined(objects.objGet(obj, 'level1[1]'))
+    assert.deepEqual(objects.objGet({a: [1]}, 'a'), [1])
+    assert.isUndefined(objects.objGet({a: [1]}, 'a.b'))
 
   it 'getKeyOfObject', ->
     assert.isUndefined(objects.getKeyOfObject(undefined))

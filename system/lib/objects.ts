@@ -1,4 +1,4 @@
-import {cloneDeepArray, compactArray} from './arrays';
+import {cloneDeepArray} from './arrays';
 import {isEqual} from './common';
 
 
@@ -96,28 +96,6 @@ export function isPlainObject(obj: any): boolean {
     && Object.prototype.toString.call(obj) === '[object Object]' // separate build-in like Math
     || false;
 }
-
-export function objGet(obj: {[index: string]: any}, pathTo: string, defaultValue?: any): any {
-  const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
-    for (let itemName of Object.keys(currentObj)) {
-      // TODO: review нужно ли использовать compactArray
-      const pathOfItem: string = compactArray([currentPath, itemName]).join('.');
-
-      if (pathOfItem === pathTo) return currentObj[itemName];
-
-      if (isPlainObject(currentObj[itemName])) {
-        return recursive(currentObj[itemName], pathOfItem);
-      }
-    }
-  };
-
-  const result = recursive(obj, '');
-
-  if (typeof result === 'undefined' && typeof defaultValue !== 'undefined') return defaultValue;
-
-  return result;
-}
-
 
 /**
  * Get key by value
@@ -234,6 +212,45 @@ export function cloneDeepObject(obj?: {[index: string]: any}): {[index: string]:
   return mergeDeepObjects({}, obj);
 }
 
+/**
+ * Get value from deep object.
+ * If there isn't a value or node undefined or default value will be returned.
+ * WARNING: arrays doesn't supported!
+ */
+export function objGet(obj?: {[index: string]: any}, pathTo?: string, defaultValue?: any): any {
+  if (!obj || !pathTo) return defaultValue;
+
+  const recursive = (currentObj: {[index: string]: any}, currentPath: string): any => {
+    for (let itemName of Object.keys(currentObj)) {
+      const pathOfItem: string = (currentPath) ? [currentPath, itemName].join('.') : itemName;
+
+      if (pathTo.indexOf(pathOfItem) !== 0) {
+        // lost path
+        return;
+      }
+      else if (pathOfItem === pathTo) {
+        // found
+        return currentObj[itemName];
+      }
+      else if (Array.isArray(currentObj[itemName])) {
+        // arrays aren't supported
+        return;
+      }
+      // got deeper
+      else if (typeof currentObj[itemName] === 'object') {
+        return recursive(currentObj[itemName], pathOfItem);
+      }
+
+      // else do nothing
+    }
+  };
+
+  const result: any = recursive(obj, '');
+
+  if (typeof result === 'undefined' && typeof defaultValue !== 'undefined') return defaultValue;
+
+  return result;
+}
 
 // /**
 //  * Is an object (plain or instance of some class), not an array

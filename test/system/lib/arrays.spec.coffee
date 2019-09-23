@@ -18,9 +18,6 @@ describe.only 'system.lib.arrays', ->
 #    assert.deepEqual(arrays.arraysDifference([1,4], []), [1,4])
 #    assert.deepEqual(arrays.arraysDifference(['aa'], [ 'aa', 'bb' ]), ['bb'])
 
-  it 'compactArray', ->
-    assert.deepEqual(arrays.compactArray([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
-
   it 'compactUndefined', ->
     assert.deepEqual(arrays.compactUndefined([undefined, null, 0, 1, '', 'str']), [null, 0, 1, '', 'str'])
 
@@ -55,6 +52,9 @@ describe.only 'system.lib.arrays', ->
     arr2 = [obj]
     assert.deepEqual(arrays.cloneDeepArray(arr2), [{a:1}])
     assert.isFalse(arrays.cloneDeepArray(arr2)[0] == obj)
+
+#  it 'compactArray', ->
+#    assert.deepEqual(arrays.compactArray([undefined, null, 0, 1, '', 'str']), [0, 1, 'str'])
 
 #  it 'findIndexArray', ->
 #    assert.equal(arrays.findIndexArray(['a', 'b'], (item) => item == 'b'), 1)

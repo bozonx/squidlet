@@ -58,25 +58,6 @@ export function arraysDifference(testArr: any[], samples: any[]): any[] {
 //   return diffArr;
 // }
 
-// TODO: лучше не использовать
-// TODO: use filter
-/**
- * Like lodash's compact. It removes undefined, null and '' from array.
- * It make a new array.
- */
-export function compactArray(arr: any[]): any[] {
-  const result: any[] = [];
-
-  for (let value of arr) {
-    // TODO: don't use null
-    if (typeof value !== 'undefined' && value !== null && value !== '') {
-      result.push(value);
-    }
-  }
-
-  return result;
-}
-
 export function compactUndefined(arr: any[]): any[] {
   return arr.filter((item) => typeof item !== 'undefined');
 }
@@ -164,6 +145,23 @@ export function cloneDeepArray(arr?: any[]): any[] {
 
   return result;
 }
+
+// /**
+//  * Like lodash's compact. It removes undefined, null and '' from array.
+//  * It make a new array.
+//  */
+// export function compactArray(arr: any[]): any[] {
+//   const result: any[] = [];
+//
+//   for (let value of arr) {
+//     // TODO: don't use null
+//     if (typeof value !== 'undefined' && value !== null && value !== '') {
+//       result.push(value);
+//     }
+//   }
+//
+//   return result;
+// }
 
 // /**
 //  * Find index of array.
