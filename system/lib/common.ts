@@ -6,8 +6,8 @@ import {arraysDifference} from './arrays';
  * Compare any types and check equality of two values.
  */
 export function isEqual(first: any, second: any): boolean {
-  // primitives
-  if (typeof first !== 'object' || typeof second !== 'object') {
+  // primitives and null
+  if (typeof first !== 'object' || typeof second !== 'object' || !first || !second) {
     return first === second;
   }
   // uint
@@ -19,13 +19,13 @@ export function isEqual(first: any, second: any): boolean {
     if (first.length !== second.length) return false;
 
     for (let key in first) {
-      // TODO: собрать
-      isEqual(first[key], second[key]);
+      if (!isEqual(first[key], second[key])) return false;
     }
+
+    return true;
   }
   // plain objects and instances
   else if (typeof first === 'object' && typeof second === 'object') {
-
     // TODO: use getDifferentKeys ???
 
     const firstKeys: string[] = Object.keys(first);
@@ -33,12 +33,13 @@ export function isEqual(first: any, second: any): boolean {
     if (arraysDifference(firstKeys, Object.keys(second)).length) return false;
 
     for (let key of firstKeys) {
-      // TODO: собрать
-      isEqual(first[key], second[key]);
+      if (!isEqual(first[key], second[key])) return false;
     }
+
+    return true;
   }
 
-  // for the any other case when smb is undefined of for null compare
+  // for the any other case when smb is undefined
   return first === first;
 }
 
