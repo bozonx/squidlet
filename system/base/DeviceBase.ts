@@ -170,21 +170,29 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
   }
 
+  // TODO: review - похоже не используется
+  // TODO: почему бы не передать просто changedParams или не собрать partialState
   /**
    * Listen status change
    */
   onChange(cb: StatusChangeHandler): number {
-    if (!this.statusState) {
-      throw new Error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
-    }
-
-    const wrapper = (category: number, stateName: string, paramName: string, value?: JsonTypes): void => {
+    const wrapper = (category: number, stateName: string, changedParams: string[]): void => {
       if (category !== StateCategories.devicesStatus || stateName !== this.id) return;
 
-      cb(paramName, value);
+      if (!this.statusState) {
+        return this.log.error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
+      }
+
+      const currentState: Dictionary = this.statusState.getState();
+
+      for (let paramName of changedParams) {
+        cb(paramName, currentState[paramName]);
+      }
     };
 
-    return this.context.state.onChangeParam(wrapper);
+    // TODO: почему не используется statusState???
+
+    return this.context.state.onChange(wrapper);
   }
 
   getConfig(): Dictionary {
@@ -220,6 +228,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
   }
 
+  // TODO: review - похоже не используется
   /**
    * Listen status change
    */
@@ -234,6 +243,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       cb();
     };
 
+    // TODO: почему не используется statusState???
     return this.context.state.onChange(wrapper);
   }
 
