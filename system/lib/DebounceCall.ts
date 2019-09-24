@@ -44,26 +44,9 @@ export default class DebounceCall {
       undefined
     ];
 
-    const wrapper = () => {
-      if (!this.items[id]) {
-        this.clear(id);
-
-        return;
-      }
-
-      try {
-        this.items[id][ItemPosition.lastCbToCall]();
-      }
-      catch (err) {
-        return this.endOfDebounce(id, err);
-      }
-
-      this.endOfDebounce(id);
-    };
-
     clearTimeout(this.items[id][ItemPosition.timeoutId]);
 
-    this.items[id][ItemPosition.timeoutId] = setTimeout(wrapper, debounce);
+    this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounce);
 
     return this.items[id][ItemPosition.promiseForWholeDebounce].promise;
   }
@@ -83,6 +66,23 @@ export default class DebounceCall {
     }
   }
 
+
+  private callCb(id: string | number) {
+    if (!this.items[id]) {
+      this.clear(id);
+
+      return;
+    }
+
+    try {
+      this.items[id][ItemPosition.lastCbToCall]();
+    }
+    catch (err) {
+      return this.endOfDebounce(id, err);
+    }
+
+    this.endOfDebounce(id);
+  }
 
   private endOfDebounce(id: string | number, err?: Error) {
     clearTimeout(this.items[id][ItemPosition.timeoutId]);
