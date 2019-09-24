@@ -11,20 +11,22 @@ describe.only 'system.lib.DebounceCall', ->
   it "invoke", ->
     clock = sinon.useFakeTimers()
 
-    @debounceCall.invoke(@id, 1000, @cb1)
-    @debounceCall.invoke(@id, 1000, @cb2)
+    promise1 = @debounceCall.invoke(@cb1, 1000, @id)
+    promise2 = @debounceCall.invoke(@cb2, 1000, @id)
 
     clock.tick(1000)
 
     sinon.assert.notCalled(@cb1)
     sinon.assert.calledOnce(@cb2)
+    assert.isFulfilled(promise1)
+    assert.isFulfilled(promise2)
 
     clock.restore()
 
   it "clear", ->
     clock = sinon.useFakeTimers()
 
-    @debounceCall.invoke(@id, 1000, @cb1)
+    @debounceCall.invoke(@cb1, 1000, @id)
     @debounceCall.clear(@id)
 
     clock.tick(1000)

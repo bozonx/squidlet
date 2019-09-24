@@ -300,11 +300,11 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
     else {
       // wait for debounce and read current level
-      this.debounceCall.invoke(pinNum, this.pinDebounces[pinNum], async () => {
+      this.debounceCall.invoke(async () => {
         const realLevel = await this.read(pinNum);
 
         this.events.emit(pinNum, realLevel);
-      });
+      }, this.pinDebounces[pinNum], pinNum);
     }
   }
 
