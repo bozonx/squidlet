@@ -31,7 +31,7 @@ export default class DebounceCall {
    * Only the last time will be fulfilled.
    * It returns a promise which will be fulfilled at the end of full cycle.
    */
-  async invoke(
+  invoke(
     cb: DebounceCb,
     debounce: number | undefined,
     id: string | number = DEFAULT_ID,
@@ -40,20 +40,27 @@ export default class DebounceCall {
     if (!debounce) {
       if (typeof this.items[id] !== 'undefined') this.clear(id);
 
-      return cb();
+      try {
+        cb();
+
+        return Promise.resolve();
+      }
+      catch (e) {
+        return Promise.reject(e);
+      }
     }
 
     if (this.items[id]) {
       // update cb
       this.items[id][ItemPosition.lastCbToCall] = cb;
+      // clear previous timeout
+      clearTimeout(this.items[id][ItemPosition.timeoutId]);
     }
     else {
       // make new item
       this.items[id] = [ cb, new Promised<void>(), undefined ];
     }
 
-    // clear previous timeout
-    clearTimeout(this.items[id][ItemPosition.timeoutId]);
     // make a new timeout
     this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounce);
     // return promise of item

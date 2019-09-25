@@ -4,6 +4,7 @@ DebounceCall = require('../../../system/lib/DebounceCall').default;
 describe.only 'system.lib.DebounceCall', ->
   beforeEach ->
     @id = 'myId'
+    @debounce = 1000
     @cb1 = sinon.spy()
     @cb2 = sinon.spy()
     @debounceCall = new DebounceCall()
@@ -11,27 +12,31 @@ describe.only 'system.lib.DebounceCall', ->
   it "invoke with debounce", ->
     clock = sinon.useFakeTimers()
 
-    promise1 = @debounceCall.invoke(@cb1, 1000, @id)
+    assert.isFalse(@debounceCall.isInvoking(@id))
+
+    promise1 = @debounceCall.invoke(@cb1, @debounce, @id)
+
+    assert.isTrue(@debounceCall.isInvoking(@id))
 
     clock.tick(500)
 
-    promise2 = @debounceCall.invoke(@cb2, 1000, @id)
-    assert.isTrue(@debounceCall.isInvoking())
+    promise2 = @debounceCall.invoke(@cb2, @debounce, @id)
+    assert.isTrue(@debounceCall.isInvoking(@id))
+
+    assert.equal(promise1, promise2)
 
     clock.tick(500)
 
-    assert.isTrue(@debounceCall.isInvoking())
+    assert.isTrue(@debounceCall.isInvoking(@id))
     sinon.assert.notCalled(@cb1)
     sinon.assert.notCalled(@cb2)
-    # TODO: промисы не должны выполниться
 
     clock.tick(500)
 
-    assert.isFalse(@debounceCall.isInvoking())
+    assert.isFalse(@debounceCall.isInvoking(@id))
     sinon.assert.notCalled(@cb1)
     sinon.assert.calledOnce(@cb2)
     assert.isFulfilled(promise1)
-    assert.isFulfilled(promise2)
 
     clock.restore()
 
