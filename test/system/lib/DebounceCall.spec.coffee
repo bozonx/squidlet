@@ -67,6 +67,51 @@ describe.only 'system.lib.DebounceCall', ->
 
     clock.restore()
 
+  it "invoke with error case", ->
+    clock = sinon.useFakeTimers()
+
+    promise1 = @debounceCall.invoke(@cb1, @debounce, @id)
+    @debounceCall.invoke(
+      () =>
+        throw new Error('err')
+      ,
+      @debounce,
+      @id
+    )
+
+    clock.tick(@debounce)
+
+    assert.isRejected(promise1)
+    sinon.assert.notCalled(@cb1)
+
+    clock.restore()
+
+  it "invoke - call cb immediately", ->
+    promise1 = @debounceCall.invoke(@cb1, 0, @id)
+
+    assert.isFalse(@debounceCall.isInvoking(@id))
+    sinon.assert.calledOnce(@cb1)
+    assert.isFulfilled(promise1)
+
+  it "invoke - force current debounce", ->
+    clock = sinon.useFakeTimers()
+
+    promise1 = @debounceCall.invoke(@cb1, @debounce, @id)
+    @debounceCall.invoke(@cb2, 0, @id)
+
+    assert.isFalse(@debounceCall.isInvoking(@id))
+    sinon.assert.notCalled(@cb1)
+    sinon.assert.calledOnce(@cb2)
+    assert.isFulfilled(promise1)
+
+    clock.tick(@debounce)
+
+    assert.isFalse(@debounceCall.isInvoking(@id))
+    sinon.assert.notCalled(@cb1)
+    sinon.assert.calledOnce(@cb2)
+
+    clock.restore()
+
   it "clear", ->
     clock = sinon.useFakeTimers()
 
@@ -94,7 +139,3 @@ describe.only 'system.lib.DebounceCall', ->
     sinon.assert.notCalled(@cb2)
 
     clock.restore()
-
-  # TODO: test error case
-  # TODO: test stop waiting when added a new cb without a timeout
-  # TODO: test immediatelly call without timeout

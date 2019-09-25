@@ -37,18 +37,7 @@ export default class DebounceCall {
     id: string | number = DEFAULT_ID,
   ): Promise<void> {
     // if there isn't debounce time - call immediately
-    if (!debounce) {
-      if (typeof this.items[id] !== 'undefined') this.clear(id);
-
-      try {
-        cb();
-
-        return Promise.resolve();
-      }
-      catch (e) {
-        return Promise.reject(e);
-      }
-    }
+    if (!debounce) return this.callCbImmediately(id, cb);
 
     if (this.items[id]) {
       // update cb
@@ -102,6 +91,12 @@ export default class DebounceCall {
     }
 
     this.endOfDebounce(id);
+  }
+
+  private async callCbImmediately(id: string | number, cb: DebounceCb) {
+    if (typeof this.items[id] !== 'undefined') this.clear(id);
+
+    cb();
   }
 
   private endOfDebounce(id: string | number, err?: Error) {
