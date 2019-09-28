@@ -58,7 +58,7 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   once(eventName: string | number, handler: T): number {
     let wrapperIndex: number;
     const wrapper = ((...args: any[]) => {
-      this.removeListener(eventName, wrapperIndex);
+      this.removeListener(wrapperIndex, eventName);
       handler(...args);
     }) as T;
 
@@ -68,17 +68,27 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   }
 
   // TODO: удалять без указания eventName !!!!
-  removeListener(eventName: string | number, handlerIndex: number): void {
-    if (!this.indexes[eventName]) return;
+  /**
+   * Remove handler by index.
+   * You can omit eventName, but if you defined it then removing will be faster.
+   */
+  removeListener(handlerIndex: number, eventName?: string | number): void {
+    for (let eventName of Object.keys(this.indexes)) {
+      const found: number = this.indexes[eventName].find((item) => item === handlerIndex);
+    }
 
-    const index: number = this.indexes[eventName].findIndex((item) => item === handlerIndex);
+    // TODO: удалить indexes если больше ничего не осталось
 
-    if (index < 0) return;
-
-    // TODO: test
-    this.indexes[eventName].slice(index, 1);
-
-    delete this.handlers[index];
+    // if (!this.indexes[eventName]) return;
+    //
+    // const index: number = this.indexes[eventName].findIndex((item) => item === handlerIndex);
+    //
+    // if (index < 0) return;
+    //
+    // // TODO: test
+    // this.indexes[eventName].slice(index, 1);
+    //
+    // delete this.handlers[index];
   }
 
   removeAllListeners(eventName: string | number): void {
