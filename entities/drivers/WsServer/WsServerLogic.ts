@@ -5,7 +5,7 @@ import WebSocketServerIo, {
 } from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Promised from 'system/lib/Promised';
-import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION, SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
+import {HANDLER_INDEX_POSITION, SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
@@ -142,8 +142,8 @@ export default class WsServerLogic {
     return this.events.addListener(WS_SERVER_EVENTS.closeConnection, cb);
   }
 
-  removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
-    this.events.removeListener(String(eventName), handlerIndex);
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
   }
 
 
@@ -229,11 +229,7 @@ export default class WsServerLogic {
 
   private async removeListeners() {
     for (let handlerIndex of this.handlerIndexes) {
-      await this.wsServerIo.removeEventListener(
-        this.serverId,
-        handlerIndex[HANDLER_EVENT_POSITION],
-        handlerIndex[HANDLER_INDEX_POSITION]
-      );
+      await this.wsServerIo.removeListener(this.serverId, handlerIndex[HANDLER_INDEX_POSITION]);
     }
   }
 

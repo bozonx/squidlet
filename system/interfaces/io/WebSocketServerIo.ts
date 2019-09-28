@@ -13,7 +13,7 @@ export const Methods = [
   'onMessage',
   'onError',
   'onUnexpectedResponse',
-  'removeEventListener',
+  'removeListener',
   'send',
   'close',
   'destroyConnection',
@@ -105,7 +105,7 @@ export default interface WebSocketServerIo extends IoItem {
   /**
    * Remove one of server listeners
    */
-  removeEventListener(serverId: string, eventName: WsServerEvent, handlerIndex: number): Promise<void>;
+  removeListener(serverId: string, handlerIndex: number): Promise<void>;
 
   ////////// Connection's methods like in client, but without onOpen
 

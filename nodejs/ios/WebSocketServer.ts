@@ -116,10 +116,10 @@ export default class WebSocketServer implements WebSocketServerIo {
     return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.serverError, cb);
   }
 
-  async removeEventListener(serverId: string, eventName: WsServerEvent, handlerIndex: number): Promise<void> {
+  async removeListener(serverId: string, handlerIndex: number): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
-    return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(eventName, handlerIndex);
+    return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(handlerIndex);
   }
 
 

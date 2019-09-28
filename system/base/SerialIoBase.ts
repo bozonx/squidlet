@@ -99,8 +99,8 @@ export default abstract class SerialIoBase {
   //   return this.parseIncomeData(result);
   // }
 
-  async removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void> {
-    this.getItem(portNum)[ItemPostion.events].removeListener(eventName, handlerIndex);
+  async removeListener(portNum: number, handlerIndex: number): Promise<void> {
+    this.getItem(portNum)[ItemPostion.events].removeListener(handlerIndex);
   }
 
 

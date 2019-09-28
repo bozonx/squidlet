@@ -106,10 +106,10 @@ export default class HttpServer implements HttpServerIo {
     return serverItem[ITEM_POSITION.events].emit(RESPONSE_EVENT, requestId, response);
   }
 
-  async removeListener(serverId: string, eventName: HttpServerEvent, handlerIndex: number): Promise<void> {
+  async removeListener(serverId: string, handlerIndex: number): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
-    return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(eventName, handlerIndex);
+    return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(handlerIndex);
   }
 
 
@@ -155,7 +155,7 @@ export default class HttpServer implements HttpServerIo {
         if (receivedRequestId !== requestId) return;
 
         clearTimeout(waitTimeout);
-        events.removeListener(RESPONSE_EVENT, handlerIndex);
+        events.removeListener(handlerIndex, RESPONSE_EVENT);
 
         this.setupResponse(response, res);
 
@@ -165,7 +165,7 @@ export default class HttpServer implements HttpServerIo {
       handlerIndex = events.addListener(RESPONSE_EVENT, respHandler);
 
       waitTimeout = setTimeout(() => {
-        events.removeListener(RESPONSE_EVENT, handlerIndex);
+        events.removeListener(handlerIndex, RESPONSE_EVENT);
         reject(
           `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
           `Server ${serverId}. ${req.method} ${req.url}`

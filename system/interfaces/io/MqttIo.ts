@@ -14,7 +14,7 @@ export const Methods = [
   'onClose',
   'onMessage',
   'onError',
-  'removeEventListener',
+  'removeListener',
   'publish',
   'subscribe',
   'unsubscribe',
@@ -52,7 +52,7 @@ export default interface MqttIo extends IoItem {
    */
   onMessage(cb: (connectionId: string, topic: string, data: string | Uint8Array) => void): Promise<number>;
   onError(cb: (connectionId: string, err: Error) => void): Promise<number>;
-  removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void>;
+  removeListener(handlerId: number): Promise<void>;
 
   publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;
   /**

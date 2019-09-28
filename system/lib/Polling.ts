@@ -73,10 +73,8 @@ export default class Polling {
     return this.events.addListener(id, handler);
   }
 
-  removeListener(handlerIndex: number, uniqId?: string) {
-    const id = this.resolveId(uniqId);
-
-    this.events.removeListener(id, handlerIndex);
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
   }
 
   /**

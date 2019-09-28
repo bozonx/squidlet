@@ -8,7 +8,7 @@ import {mergeDeepObjects} from 'system/lib/objects';
 import {parseCookie, stringifyCookie} from 'system/lib/cookies';
 import Promised from 'system/lib/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
-import {HANDLER_EVENT_POSITION, HANDLER_INDEX_POSITION} from 'system/constants';
+import {HANDLER_INDEX_POSITION} from 'system/constants';
 
 
 export interface WsClientLogicProps {
@@ -334,11 +334,7 @@ export default class WsClientLogic {
 
   private async removeListeners() {
     for (let handlerIndex of this.handlerIndexes) {
-      await this.wsClientIo.removeEventListener(
-        this.connectionId,
-        handlerIndex[HANDLER_EVENT_POSITION],
-        handlerIndex[HANDLER_INDEX_POSITION]
-      );
+      await this.wsClientIo.removeListener(this.connectionId, handlerIndex[HANDLER_INDEX_POSITION]);
     }
   }
 

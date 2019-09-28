@@ -14,7 +14,7 @@ export const Methods = [
   'onError',
   'onUnexpectedResponse',
 
-  'removeEventListener',
+  'removeListener',
 
   'send',
   'close',
@@ -68,7 +68,7 @@ export default interface WebSocketClientIo extends IoItem {
   onError             (cb: (connectionId: string, err: Error) => void): Promise<number>;
   onUnexpectedResponse(cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>;
 
-  removeEventListener (connectionId: string, eventName: WsClientEvent, handlerIndex: number): Promise<void>;
+  removeListener (connectionId: string, handlerIndex: number): Promise<void>;
 
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;
   close               (connectionId: string, code: number, reason?: string): Promise<void>;

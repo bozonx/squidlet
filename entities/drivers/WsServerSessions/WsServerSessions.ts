@@ -137,8 +137,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
     return this.events.addListener(WS_SESSIONS_EVENTS.sessionClose, cb);
   }
 
-  removeListener(eventName: WS_SESSIONS_EVENTS, handlerIndex: number) {
-    this.events.removeListener(eventName, handlerIndex);
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
   }
 
 

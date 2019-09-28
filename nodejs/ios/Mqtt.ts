@@ -90,8 +90,8 @@ export default class Mqtt implements MqttIo {
     return this.events.addListener(MqttIoEvents.error, cb);
   }
 
-  async removeEventListener(eventName: MqttIoEvents, handlerId: number): Promise<void> {
-    this.events.removeListener(eventName, handlerId);
+  async removeListener(handlerId: number): Promise<void> {
+    this.events.removeListener(handlerId);
   }
 
   async publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void> {

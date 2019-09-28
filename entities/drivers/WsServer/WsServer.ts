@@ -102,10 +102,10 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
     return this.server.onConnectionClose(cb);
   }
 
-  removeListener(eventName: WS_SERVER_EVENTS, handlerIndex: number) {
+  removeListener(handlerIndex: number) {
     if (!this.server) return;
 
-    this.server.removeListener(eventName, handlerIndex);
+    this.server.removeListener(handlerIndex);
   }
 
 
