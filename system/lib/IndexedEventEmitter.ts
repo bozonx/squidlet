@@ -1,40 +1,58 @@
-import IndexedEvents, {AnyHandler} from './IndexedEvents';
+export type DefaultHandler = (...args: any[]) => void;
 
 
-export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
-  // TODO: общий пулл хэндлеров
-  // IndexedEvents instances by event name
-  private indexedEvents: {[index: string]: IndexedEvents<T>} = {};
+export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandler> {
+  // all the handlers
+  private handlers: T[] = [];
+  // indexes by event names
+  private indexes: {[index: string]: number[]} = {};
 
 
   emit(eventName: string | number, ...args: any[]) {
-    if (!this.indexedEvents[eventName]) return;
+    if (!this.indexes[eventName]) return;
 
-    this.indexedEvents[eventName].emit(...args);
+    for (let index of this.indexes[eventName]) {
+      this.handlers[index](...args);
+    }
   }
 
   // TODO: test
   emitSync(eventName: string | number, ...args: any[]): Promise<void> {
-    if (!this.indexedEvents[eventName]) return Promise.resolve();
+    if (!this.indexes[eventName]) return Promise.resolve();
 
-    return this.indexedEvents[eventName].emitSync(...args);
+    const promises: Promise<any>[] = [];
+
+    for (let index of this.indexes[eventName]) {
+      const result: any = this.handlers[index](...args);
+
+      if (result && typeof result === 'object' && result.then) promises.push(result);
+    }
+
+    return Promise.all(promises).then(() => undefined);
   }
 
   /**
    * Register listener and return its index
    */
   addListener(eventName: string | number, handler: T): number {
-    if (!this.indexedEvents[eventName]) {
-      this.indexedEvents[eventName] = new IndexedEvents();
+    if (!this.indexes[eventName]) {
+      this.indexes[eventName] = [];
     }
 
-    return this.indexedEvents[eventName].addListener(handler);
+    this.handlers.push(handler);
+
+    const index: number = this.handlers.length - 1;
+
+    this.indexes[eventName].push(index);
+
+    return index;
   }
 
-  getHandlers(eventName: string | number): (T | undefined)[] {
-    if (!this.indexedEvents[eventName]) return [];
+  // TODO: test
+  getHandlers(eventName: string | number): T[] {
+    if (!this.indexes[eventName]) return [];
 
-    return this.indexedEvents[eventName].getHandlers();
+    return this.indexes[eventName].map((index: number) => this.handlers[index]);
   }
 
   once(eventName: string | number, handler: T): number {
@@ -49,27 +67,32 @@ export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
     return wrapperIndex;
   }
 
+  // TODO: удалять без указания eventName !!!!
   removeListener(eventName: string | number, handlerIndex: number): void {
-    if (!this.indexedEvents[eventName]) return;
+    if (!this.indexes[eventName]) return;
 
-    this.indexedEvents[eventName].removeListener(handlerIndex);
+    const index: number = this.indexes[eventName].findIndex((item) => item === handlerIndex);
 
-    // remove instance if it doesn't have any instances
-    if (!this.indexedEvents[eventName].hasListeners()) {
-      this.removeAllListeners(eventName);
-    }
+    if (index < 0) return;
+
+    // TODO: test
+    this.indexes[eventName].slice(index, 1);
+
+    delete this.handlers[index];
   }
 
-  // TODO: remove
   removeAllListeners(eventName: string | number): void {
-    if (!this.indexedEvents[eventName]) return;
+    if (!this.indexes[eventName]) return;
 
-    this.indexedEvents[eventName].removeAll();
-    delete this.indexedEvents[eventName];
+    for (let index of this.indexes[eventName]) {
+      delete this.handlers[index];
+    }
+
+    delete this.indexes[eventName];
   }
 
   destroy() {
-    for (let eventName of Object.keys(this.indexedEvents)) {
+    for (let eventName of Object.keys(this.indexes)) {
       this.removeAllListeners(eventName);
     }
   }

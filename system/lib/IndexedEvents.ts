@@ -33,6 +33,7 @@ export default class IndexedEvents<T extends AnyHandler> {
     return hasInstance;
   }
 
+  // TODO: не должно же ничего возвращать!!!!
   emit: T = ((...args: any[]) => {
     for (let handler of this.handlers) {
       if (handler) handler(...args);
@@ -48,7 +49,7 @@ export default class IndexedEvents<T extends AnyHandler> {
 
       const result: any = handler(...args);
 
-      if (typeof result === 'object' && result.then) promises.push(result);
+      if (result && typeof result === 'object' && result.then) promises.push(result);
     }
 
     return Promise.all(promises).then(() => undefined);
