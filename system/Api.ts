@@ -174,7 +174,7 @@ export default class Api {
   }
 
   removeLogListener(handlerIndex: number) {
-    this.context.system.events.removeListener(LOGGER_EVENT, handlerIndex);
+    this.context.system.events.removeListener(handlerIndex, LOGGER_EVENT);
   }
 
 }

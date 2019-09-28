@@ -1,7 +1,7 @@
 Events = require('../../../system/lib/IndexedEventEmitter').default;
 
 
-describe 'system.lib.IndexedEventEmitter', ->
+describe.only 'system.lib.IndexedEventEmitter', ->
   beforeEach ->
     @eventName = 'name'
     @handler = sinon.spy()
@@ -26,7 +26,7 @@ describe 'system.lib.IndexedEventEmitter', ->
     handler2 = sinon.spy()
     index = @events.addListener(@eventName, @handler)
     @events.addListener(@eventName, handler2)
-    @events.removeListener(@eventName, index)
+    @events.removeListener(index, @eventName)
     @events.emit(@eventName)
 
     sinon.assert.notCalled(@handler)
