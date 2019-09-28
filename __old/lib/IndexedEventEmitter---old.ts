@@ -1,4 +1,4 @@
-import IndexedEvents, {AnyHandler} from './IndexedEvents';
+import IndexedEvents, {AnyHandler} from '../../system/lib/IndexedEvents';
 
 
 export default class IndexedEventEmitter<T extends AnyHandler = AnyHandler> {
