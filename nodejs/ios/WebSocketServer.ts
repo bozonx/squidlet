@@ -6,8 +6,7 @@ import WebSocketServerIo, {
   WebSocketServerProps,
   WsServerEvent,
 } from 'system/interfaces/io/WebSocketServerIo';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {AnyHandler} from 'system/lib/IndexedEvents';
+import IndexedEventEmitter, {DefaultHandler} from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {WsCloseStatus} from 'system/interfaces/io/WebSocketClientIo';
@@ -17,7 +16,7 @@ type ServerItem = [
   // server instance
   WebSocket.Server,
   // server's events
-  IndexedEventEmitter<AnyHandler>,
+  IndexedEventEmitter<DefaultHandler>,
   // connection instances
   WebSocket[],
   // is server listening.

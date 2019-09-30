@@ -6,8 +6,7 @@ import {
   HttpServerIo,
   HttpServerProps
 } from 'system/interfaces/io/HttpServerIo';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {AnyHandler} from 'system/lib/IndexedEvents';
+import IndexedEventEmitter, {DefaultHandler} from 'system/lib/IndexedEventEmitter';
 import {WAIT_RESPONSE_TIMEOUT_SEC} from 'system/constants';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import {callPromised} from 'system/lib/common';
@@ -18,7 +17,7 @@ type ServerItem = [
   // Http server instance
   Server,
   // server's events
-  IndexedEventEmitter<AnyHandler>,
+  IndexedEventEmitter<DefaultHandler>,
   // is server listening.
   boolean
 ];

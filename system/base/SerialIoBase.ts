@@ -7,13 +7,12 @@ import {
 } from '../interfaces/io/SerialIo';
 import {ENCODE} from '../lib/constants';
 import {callPromised} from '../lib/common';
-import IndexedEventEmitter from '../lib/IndexedEventEmitter';
-import {AnyHandler} from '../lib/IndexedEvents';
+import IndexedEventEmitter, {DefaultHandler} from '../lib/IndexedEventEmitter';
 
 
 export type SerialItem = [
   SerialPortLike,
-  IndexedEventEmitter<AnyHandler>
+  IndexedEventEmitter<DefaultHandler>
 ];
 
 export enum ItemPostion {
@@ -151,7 +150,7 @@ export default abstract class SerialIoBase {
     };
 
     const serialPort: SerialPortLike = await this.createConnection(portNum, params);
-    const events = new IndexedEventEmitter<AnyHandler>();
+    const events = new IndexedEventEmitter<DefaultHandler>();
 
     serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));
     // TODO: скорее всего err другой
