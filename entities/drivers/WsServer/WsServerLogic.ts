@@ -5,7 +5,7 @@ import WebSocketServerIo, {
 } from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Promised from 'system/lib/Promised';
-import {HANDLER_INDEX_POSITION, SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
+import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 
 
@@ -16,6 +16,8 @@ export enum WS_SERVER_EVENTS {
 }
 
 export const SETCOOKIE_LABEL = '__SET_COOKIE__';
+// TODO: review
+const HANDLER_INDEX_POSITION = 1;
 
 
 export default class WsServerLogic {

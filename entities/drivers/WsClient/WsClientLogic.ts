@@ -8,7 +8,10 @@ import {mergeDeepObjects} from 'system/lib/objects';
 import {parseCookie, stringifyCookie} from 'system/lib/cookies';
 import Promised from 'system/lib/Promised';
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
-import {HANDLER_INDEX_POSITION} from 'system/constants';
+
+
+// TODO: review
+const HANDLER_INDEX_POSITION = 1;
 
 
 export interface WsClientLogicProps {
