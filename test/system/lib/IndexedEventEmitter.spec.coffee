@@ -59,6 +59,13 @@ describe.only 'system.lib.IndexedEventEmitter', ->
     assert.equal(handlers[0], handler1)
     assert.equal(handlers[1], handler2)
 
+  it "hasListeners", ->
+    assert.isFalse(@events.hasListeners(@eventName))
+
+    @events.addListener(@eventName, @handler)
+
+    assert.isTrue(@events.hasListeners(@eventName))
+
   it "removeListener with eventName", ->
     handler2 = sinon.spy()
     index = @events.addListener(@eventName, @handler)

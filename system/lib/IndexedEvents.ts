@@ -18,15 +18,13 @@ export default class IndexedEvents<T extends AnyHandler> {
     return !this.handlers.length;
   }
 
-  // TODO: не должно же ничего возвращать!!!!
   emit: T = ((...args: any[]) => {
     for (let handler of this.handlers) {
       if (handler) handler(...args);
     }
   }) as T;
 
-  // TODO: review
-  emitSync = ((...args: any[]): Promise<void> => {
+  emitSync = async (...args: any[]): Promise<void> => {
     const promises: Promise<any>[] = [];
 
     for (let handler of this.handlers) {
@@ -34,19 +32,21 @@ export default class IndexedEvents<T extends AnyHandler> {
 
       const result: any = handler(...args);
 
-      if (result && typeof result === 'object' && result.then) promises.push(result);
+      if (result && typeof result === 'object' && result.then) {
+        promises.push(result);
+      }
     }
 
     return Promise.all(promises).then(() => undefined);
-  });
+  }
 
   /**
-   * Register listener and return its index
+   * Register listener and return its index.
    */
   addListener(handler: T): number {
     this.handlers.push(handler);
 
-    return lastItem(this.handlers);
+    return this.handlers.length - 1;
   }
 
   once(handler: T): number {

@@ -8,21 +8,29 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   private indexes: {[index: string]: number[]} = {};
 
 
-  emit(eventName: string | number, ...args: any[]) {
+  emit = (eventName: string | number, ...args: any[]) => {
     if (!this.indexes[eventName]) return;
 
     for (let index of this.indexes[eventName]) {
-      this.handlers[index](...args);
+      const handler: T | undefined = this.handlers[index];
+
+      if (!handler) continue;
+
+      handler(...args);
     }
   }
 
-  emitSync(eventName: string | number, ...args: any[]): Promise<void> {
+  emitSync = async (eventName: string | number, ...args: any[]): Promise<void> => {
     if (!this.indexes[eventName]) return Promise.resolve();
 
     const promises: Promise<any>[] = [];
 
     for (let index of this.indexes[eventName]) {
-      const result: any = this.handlers[index](...args);
+      const handler: T | undefined = this.handlers[index];
+
+      if (!handler) continue;
+
+      const result: any = handler(...args);
 
       if (result && typeof result === 'object' && result.then) {
         promises.push(result);
@@ -64,22 +72,21 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   getListeners(eventName: string | number): T[] {
     if (!this.indexes[eventName]) return [];
 
-    return this.indexes[eventName].map((index: number) => this.handlers[index]);
-  }
+    const result: T[] = [];
 
-  // TODO: add and test
-  hasListeners(): boolean {
-    let hasInstance: boolean = false;
+    for (let index of this.indexes[eventName]) {
+      const handler: T | undefined = this.handlers[index];
 
-    for (let handler of this.handlers) {
-      if (handler) {
-        hasInstance = true;
+      if (!handler) continue;
 
-        break;
-      }
+      result.push(handler);
     }
 
-    return hasInstance;
+    return result;
+  }
+
+  hasListeners(eventName: string | number): boolean {
+    return Boolean(this.indexes[eventName] && this.indexes[eventName].length);
   }
 
   /**
