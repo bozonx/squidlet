@@ -116,31 +116,15 @@ export function parseArgs(data?: Primitives): (JsonTypes | undefined)[] {
     throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
   }
 
-  const safeJson: string = data.replace(/undefined/, `"${undefinedReplace}"`);
+  const safeJson: string = data
+    .replace(/undefined/, `"${undefinedReplace}"`)
+    .replace(/({|,)\s*(.+?)\s*:/g, '$1 "$2":');
 
   return JSON.parse(`[${safeJson}]`, (key: string, value: any) => {
     if (value === undefinedReplace) return undefined;
 
     return value;
   });
-
-  // const splat: string[] = data.split(',');
-  // const result: JsonTypes[] = [];
-  //
-  // for (let item of splat) {
-  //   const trimmed = item.trim();
-  //
-  //   // remove quotes
-  //   if (trimmed.match(/^'.+'$/) || trimmed.match(/^".+"$/)) {
-  //     result.push(trimmed.replace(/^['"](.+)['"]$/, '$1'));
-  //
-  //     continue;
-  //   }
-  //
-  //   result.push( parseValue(trimmed.trim()) );
-  // }
-  //
-  // return result;
 }
 
 export function consoleError(msg: string) {
