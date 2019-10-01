@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe 'system.lib.helpers', ->
+describe.only 'system.lib.helpers', ->
   it 'resolveLevel', ->
     assert.isTrue(helpers.resolveLevel(true))
     assert.isTrue(helpers.resolveLevel(1))
@@ -76,8 +76,11 @@ describe 'system.lib.helpers', ->
     assert.deepEqual(helpers.parseArgs(), [])
     assert.deepEqual(helpers.parseArgs(5), [5])
     assert.deepEqual(helpers.parseArgs(true), [true])
+    # TODO: test
+    assert.deepEqual(helpers.parseArgs(null), [null])
+    assert.deepEqual(helpers.parseArgs('null'), [null])
     assert.deepEqual(helpers.parseArgs('5, "str", undefined, true'), [5, 'str', undefined, true])
-#    assert.deepEqual(helpers.parseArgs('[5, "str", undefined, true], 5'), [[5, "str", undefined, true], 5])
+    assert.deepEqual(helpers.parseArgs('[5, "str", undefined, true], 5'), [[5, "str", undefined, true], 5])
 #    assert.deepEqual(helpers.parseArgs('{a: 5, b: undefined, c: true}, 5'), [{a: 5, b: undefined, c: true}, 5])
 
 #  it 'splitTopicId', ->

@@ -101,34 +101,46 @@ export function convertEntityTypeToPlural(entityType: EntityType): EntityTypePlu
  * Parse comma separated args like: param1,5,true to ['param1', 5, true];
  */
 export function parseArgs(data?: Primitives): (JsonTypes | undefined)[] {
+  const undefinedReplace = '!!!UNDEFINED!!!';
+
   if (typeof data === 'undefined') {
     return [];
   }
   else if (typeof data === 'number' || typeof data === 'boolean') {
     return [data];
   }
+  else if (!data) {
+    return [data];
+  }
   else if (typeof data !== 'string') {
     throw new Error(`Invalid data, it has to be a string. "${JSON.stringify(data)}"`);
   }
 
-  // TODO: support of array and objects
-  const splat: string[] = data.split(',');
-  const result: JsonTypes[] = [];
+  const safeJson: string = data.replace(/undefined/, `"${undefinedReplace}"`);
 
-  for (let item of splat) {
-    const trimmed = item.trim();
+  return JSON.parse(`[${safeJson}]`, (key: string, value: any) => {
+    if (value === undefinedReplace) return undefined;
 
-    // remove quotes
-    if (trimmed.match(/^'.+'$/) || trimmed.match(/^".+"$/)) {
-      result.push(trimmed.replace(/^['"](.+)['"]$/, '$1'));
+    return value;
+  });
 
-      continue;
-    }
-
-    result.push( parseValue(trimmed.trim()) );
-  }
-
-  return result;
+  // const splat: string[] = data.split(',');
+  // const result: JsonTypes[] = [];
+  //
+  // for (let item of splat) {
+  //   const trimmed = item.trim();
+  //
+  //   // remove quotes
+  //   if (trimmed.match(/^'.+'$/) || trimmed.match(/^".+"$/)) {
+  //     result.push(trimmed.replace(/^['"](.+)['"]$/, '$1'));
+  //
+  //     continue;
+  //   }
+  //
+  //   result.push( parseValue(trimmed.trim()) );
+  // }
+  //
+  // return result;
 }
 
 export function consoleError(msg: string) {
