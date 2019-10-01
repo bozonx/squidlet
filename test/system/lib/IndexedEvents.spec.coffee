@@ -1,7 +1,7 @@
 Events = require('../../../system/lib/IndexedEvents').default;
 
 
-describe 'system.lib.IndexedEvents', ->
+describe.only 'system.lib.IndexedEvents', ->
   beforeEach ->
     @handler = sinon.spy()
     @events = new Events()
@@ -47,10 +47,10 @@ describe 'system.lib.IndexedEvents', ->
     sinon.assert.notCalled(@handler)
     sinon.assert.notCalled(handler2)
 
-  it "getHandlers", ->
+  it "getListeners", ->
     @events.addListener(@handler)
 
-    assert.deepEqual(@events.getHandlers(), [@handler])
+    assert.deepEqual(@events.getListeners(), [@handler])
 
   it "hasListeners", ->
     assert.isFalse(@events.hasListeners())

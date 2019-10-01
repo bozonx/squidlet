@@ -22,7 +22,7 @@ export default class Sessions {
   }
 
   destroy() {
-    this.closeEvents.removeAll();
+    this.closeEvents.destroy();
 
     for (let sessionId of Object.keys(this.closeConnectionTimeouts)) {
       clearTimeout(this.closeConnectionTimeouts[sessionId]);

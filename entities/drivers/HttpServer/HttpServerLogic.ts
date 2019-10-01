@@ -72,7 +72,7 @@ export default class HttpServerLogic {
       return this.logError(`HttpServerLogic.destroy: Server hasn't been initialized yet.`);
     }
 
-    this.requestEvents.removeAll();
+    this.requestEvents.destroy();
     // TODO: не должно поднять события
     await this.httpServerIo.closeServer(this.serverId);
 
@@ -144,6 +144,7 @@ export default class HttpServerLogic {
     // TODO: review
     this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
     delete this.serverId;
+    // TODO: maybe better use destroy???
     this.requestEvents.removeAll();
     this.onClose();
   }

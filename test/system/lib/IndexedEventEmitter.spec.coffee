@@ -2,7 +2,7 @@ Events = require('../../../system/lib/IndexedEventEmitter').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.lib.IndexedEventEmitter', ->
+describe.only 'system.lib.IndexedEventEmitter', ->
   beforeEach ->
     @eventName = 'name'
     @handler = sinon.spy()
@@ -48,13 +48,13 @@ describe 'system.lib.IndexedEventEmitter', ->
 
     sinon.assert.calledOnce(@handler)
 
-  it "getHandlers", ->
+  it "getListeners", ->
     handler1 = () =>
     handler2 = () =>
     @events.addListener(@eventName, handler1)
     @events.addListener(@eventName, handler2)
 
-    handlers = @events.getHandlers(@eventName)
+    handlers = @events.getListeners(@eventName)
 
     assert.equal(handlers[0], handler1)
     assert.equal(handlers[1], handler2)

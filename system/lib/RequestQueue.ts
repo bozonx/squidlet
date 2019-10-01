@@ -56,8 +56,8 @@ export default class RequestQueue {
 
   // TODO: test
   destroy() {
-    this.startJobEvents.removeAll();
-    this.endJobEvents.removeAll();
+    this.startJobEvents.destroy();
+    this.endJobEvents.destroy();
 
     if (this.currentJob) this.cancelCurrentJob(this.currentJob[JobPositions.id]);
 

@@ -2,8 +2,8 @@ export type DefaultHandler = (...args: any[]) => void;
 
 
 export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandler> {
-  // all the handlers
-  private handlers: T[] = [];
+  // all the handlers by index, removed handlers are empty
+  private handlers: (T | undefined)[] = [];
   // indexes by event names
   private indexes: {[index: string]: number[]} = {};
 
@@ -61,10 +61,25 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     return index;
   }
 
-  getHandlers(eventName: string | number): T[] {
+  getListeners(eventName: string | number): T[] {
     if (!this.indexes[eventName]) return [];
 
     return this.indexes[eventName].map((index: number) => this.handlers[index]);
+  }
+
+  // TODO: add and test
+  hasListeners(): boolean {
+    let hasInstance: boolean = false;
+
+    for (let handler of this.handlers) {
+      if (handler) {
+        hasInstance = true;
+
+        break;
+      }
+    }
+
+    return hasInstance;
   }
 
   /**
@@ -93,7 +108,9 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     for (let eventName of Object.keys(this.indexes)) {
       const found: number | undefined = this.indexes[eventName].find((item) => item === handlerIndex);
 
-      if (typeof found === 'undefined') return;
+      if (typeof found === 'undefined') continue;
+
+      // found
 
       this.indexes[eventName].splice(handlerIndex, 1);
 

@@ -138,7 +138,7 @@ export default class RemoteCall {
     // TODO: прекратить ожидать ответы
 
     await this.remoteCallbacks.destroy();
-    this.methodsResultEvents.removeAll();
+    this.methodsResultEvents.destroy();
   }
 
 

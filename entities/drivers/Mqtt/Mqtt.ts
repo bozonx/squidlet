@@ -83,7 +83,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   destroy = async () => {
-    this.messageEvents.removeAll();
+    this.messageEvents.destroy();
     this.openPromise && this.openPromise.destroy();
 
     delete this.openPromise;

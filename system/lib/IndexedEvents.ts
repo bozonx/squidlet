@@ -1,36 +1,21 @@
-import {lastItem} from './arrays';
-
-
 export type AnyHandler = (...args: any[]) => void;
-
-// TODO: можно формировать сткроковой индекс в виде байтов 16бит - тогда он может быть бесконечной длины
 
 
 export default class IndexedEvents<T extends AnyHandler> {
-  // TODO: если много создавать и удалять листенеров - то индекс может стать очень большим
+  // all the handlers by index, removed handlers are empty
   private handlers: (T | undefined)[] = [];
 
   /**
    * Get all the handlers.
    * Removed handlers will be undefined
    */
-  getHandlers(): (T | undefined)[] {
+  getListeners(): (T | undefined)[] {
     return this.handlers;
   }
 
   hasListeners(): boolean {
-    // TODO: better to check length
-    let hasInstance: boolean = false;
-
-    for (let handler of this.handlers) {
-      if (handler) {
-        hasInstance = true;
-
-        break;
-      }
-    }
-
-    return hasInstance;
+    // TODO: test
+    return !this.handlers.length;
   }
 
   // TODO: не должно же ничего возвращать!!!!
@@ -84,6 +69,11 @@ export default class IndexedEvents<T extends AnyHandler> {
 
   removeAll(): void {
     this.handlers.splice(0, this.handlers.length);
+  }
+
+  // TODO: test
+  destroy() {
+    delete this.handlers;
   }
 
 }

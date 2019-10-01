@@ -109,7 +109,7 @@ export default class RemoteCallbacks {
     //
     // await this.send();
 
-    this.cbsResultEvents.removeAll();
+    this.cbsResultEvents.destroy();
     clearObject(this.callBacks);
     clearObject(this.fakeCallBacks);
   }

@@ -311,7 +311,7 @@ export default class WsClientLogic {
     clearTimeout(this.reconnectTimeout);
     delete this.openPromise;
     delete this.reconnectTimeout;
-    this.messageEvents.removeAll();
+    this.messageEvents.destroy();
   }
 
   private setCookie(data: string | Uint8Array) {

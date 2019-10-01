@@ -33,7 +33,7 @@ export class Serial extends DriverBase<Props> {
 
 
   destroy = async () => {
-    this.messageEvents.removeAll();
+    this.messageEvents.destroy();
     await this.serialIo.destroyPort(this.portNum);
   }
 

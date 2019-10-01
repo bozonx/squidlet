@@ -15,7 +15,7 @@ export default class State {
 
 
   destroy() {
-    this.changeEvents.removeAll();
+    this.changeEvents.destroy();
   }
 
 

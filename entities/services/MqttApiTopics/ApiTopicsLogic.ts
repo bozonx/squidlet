@@ -45,7 +45,7 @@ export default class ApiTopicsLogic {
   }
 
   destroy() {
-    this.outcomeEvents.removeAll();
+    this.outcomeEvents.destroy();
   }
 
 

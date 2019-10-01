@@ -47,7 +47,7 @@ export default class HttpRouterLogic {
   }
 
   destroy() {
-    this.enterEvents.removeAll();
+    this.enterEvents.destroy();
     clearArray(this.registeredRoutes);
   }
 

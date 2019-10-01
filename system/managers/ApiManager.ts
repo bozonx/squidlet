@@ -25,7 +25,7 @@ export default class ApiManager {
   }
 
   async destroy() {
-    this.rcOutcomeEvents.removeAll();
+    this.rcOutcomeEvents.destroy();
 
     for (let sessionId of Object.keys(this.remoteCalls)) {
       await this.remoteCalls[sessionId].destroy();
