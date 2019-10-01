@@ -14,8 +14,7 @@ export default class IndexedEvents<T extends AnyHandler> {
   }
 
   hasListeners(): boolean {
-    // TODO: test
-    return !this.handlers.length;
+    return Boolean(this.handlers.length);
   }
 
   emit: T = ((...args: any[]) => {
@@ -64,14 +63,13 @@ export default class IndexedEvents<T extends AnyHandler> {
   removeListener(handlerIndex: number): void {
     if (!this.handlers[handlerIndex]) return;
 
-    this.handlers[handlerIndex] = undefined;
+    delete this.handlers[handlerIndex];
   }
 
   removeAll(): void {
     this.handlers.splice(0, this.handlers.length);
   }
 
-  // TODO: test
   destroy() {
     delete this.handlers;
   }

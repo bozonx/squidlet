@@ -1,7 +1,7 @@
 Events = require('../../../system/lib/IndexedEvents').default;
 
 
-describe.only 'system.lib.IndexedEvents', ->
+describe 'system.lib.IndexedEvents', ->
   beforeEach ->
     @handler = sinon.spy()
     @events = new Events()
@@ -14,6 +14,20 @@ describe.only 'system.lib.IndexedEvents', ->
     sinon.assert.calledTwice(@handler)
     sinon.assert.calledWith(@handler, 1)
 
+  it "emitSync", ->
+    handler1 = sinon.stub().returns(Promise.resolve())
+    handler2 = sinon.stub().returns(Promise.resolve())
+
+    @events.addListener(handler1)
+    @events.addListener(handler2)
+
+    await @events.emitSync(1);
+
+    sinon.assert.calledOnce(handler1)
+    sinon.assert.calledWith(handler1, 1)
+    sinon.assert.calledOnce(handler2)
+    sinon.assert.calledWith(handler2, 1)
+
   it "once", ->
     @events.once(@handler)
     @events.emit()
@@ -21,11 +35,17 @@ describe.only 'system.lib.IndexedEvents', ->
 
     sinon.assert.calledOnce(@handler)
 
-  it "emitSync", ->
-    @events.addListener(() => Promise.resolve(1))
-    @events.addListener(() => Promise.resolve(2))
+  it "getListeners", ->
+    @events.addListener(@handler)
 
-    assert.deepEqual(await @events.emitSync(), [1, 2])
+    assert.deepEqual(@events.getListeners(), [@handler])
+
+  it "hasListeners", ->
+    assert.isFalse(@events.hasListeners())
+
+    @events.addListener(@handler)
+
+    assert.isTrue(@events.hasListeners())
 
   it "removeListener", ->
     handler2 = sinon.spy()
@@ -47,14 +67,9 @@ describe.only 'system.lib.IndexedEvents', ->
     sinon.assert.notCalled(@handler)
     sinon.assert.notCalled(handler2)
 
-  it "getListeners", ->
+  it "destroy", ->
     @events.addListener(@handler)
 
-    assert.deepEqual(@events.getListeners(), [@handler])
+    @events.destroy()
 
-  it "hasListeners", ->
-    assert.isFalse(@events.hasListeners())
-
-    @events.addListener(@handler)
-
-    assert.isTrue(@events.hasListeners())
+    assert.isUndefined(@events.handlers)
