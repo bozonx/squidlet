@@ -72,16 +72,17 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
    * You can omit eventName, but if you defined it then removing will be faster.
    */
   removeListener(handlerIndex: number, eventName?: string | number): void {
-    // TODO: test
-
     if (eventName) {
       if (!this.indexes[eventName]) return;
 
-      const found: number | undefined = this.indexes[eventName].find((item) => item === handlerIndex);
+      // find index of handler index in list belongs to eventName
+      const foundIndex: number = this.indexes[eventName].findIndex((item) => item === handlerIndex);
 
-      if (typeof found === 'undefined') return;
+      if (foundIndex < 0) return;
 
-      this.indexes[eventName].slice(handlerIndex, 1);
+      this.indexes[eventName].splice(foundIndex, 1);
+
+      if (!this.indexes[eventName].length) delete this.indexes[eventName];
 
       delete this.handlers[handlerIndex];
 
@@ -92,13 +93,15 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     for (let eventName of Object.keys(this.indexes)) {
       const found: number | undefined = this.indexes[eventName].find((item) => item === handlerIndex);
 
-      if (typeof found !== 'undefined') {
-        this.indexes[eventName].slice(handlerIndex, 1);
+      if (typeof found === 'undefined') return;
 
-        delete this.handlers[handlerIndex];
+      this.indexes[eventName].splice(handlerIndex, 1);
 
-        return;
-      }
+      if (!this.indexes[eventName].length) delete this.indexes[eventName];
+
+      delete this.handlers[handlerIndex];
+
+      return;
     }
   }
 
@@ -113,9 +116,8 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   }
 
   destroy() {
-    for (let eventName of Object.keys(this.indexes)) {
-      this.removeAllListeners(eventName);
-    }
+    delete this.handlers;
+    delete this.indexes;
   }
 
 }

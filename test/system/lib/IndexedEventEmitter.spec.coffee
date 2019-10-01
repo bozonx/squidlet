@@ -2,7 +2,7 @@ Events = require('../../../system/lib/IndexedEventEmitter').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.IndexedEventEmitter', ->
+describe 'system.lib.IndexedEventEmitter', ->
   beforeEach ->
     @eventName = 'name'
     @handler = sinon.spy()
@@ -59,7 +59,7 @@ describe.only 'system.lib.IndexedEventEmitter', ->
     assert.equal(handlers[0], handler1)
     assert.equal(handlers[1], handler2)
 
-  it "removeListener", ->
+  it "removeListener with eventName", ->
     handler2 = sinon.spy()
     index = @events.addListener(@eventName, @handler)
     @events.addListener(@eventName, handler2)
@@ -68,6 +68,34 @@ describe.only 'system.lib.IndexedEventEmitter', ->
 
     sinon.assert.notCalled(@handler)
     sinon.assert.calledOnce(handler2)
+    assert.isUndefined(@events.handlers[index])
+    assert.equal(@events.indexes[@eventName], 1)
+
+  it "removeListener without eventName", ->
+    handler2 = sinon.spy()
+    index = @events.addListener(@eventName, @handler)
+    @events.addListener(@eventName, handler2)
+    @events.removeListener(index)
+    @events.emit(@eventName)
+
+    sinon.assert.notCalled(@handler)
+    sinon.assert.calledOnce(handler2)
+    assert.isUndefined(@events.handlers[index])
+    assert.equal(@events.indexes[@eventName], 1)
+
+  it "removeListener with eventName and clean up", ->
+    index = @events.addListener(@eventName, @handler)
+    @events.removeListener(index, @eventName)
+
+    assert.isUndefined(@events.handlers[index])
+    assert.isUndefined(@events.indexes[@eventName])
+
+  it "removeListener without eventName and clean up", ->
+    index = @events.addListener(@eventName, @handler)
+    @events.removeListener(index)
+
+    assert.isUndefined(@events.handlers[index])
+    assert.isUndefined(@events.indexes[@eventName])
 
   it "removeAllListeners", ->
     handler2 = sinon.spy()
@@ -78,11 +106,12 @@ describe.only 'system.lib.IndexedEventEmitter', ->
 
     sinon.assert.notCalled(@handler)
     sinon.assert.notCalled(handler2)
+    assert.isUndefined(@events.indexes[@eventName])
 
   it 'destroy', ->
-    @events.addListener(@eventName, sinon.spy())
     @events.addListener(@eventName, sinon.spy())
 
     @events.destroy()
 
-    assert.deepEqual(@events.indexedEvents, {})
+    assert.isUndefined(@events.handlers)
+    assert.isUndefined(@events.indexes)
