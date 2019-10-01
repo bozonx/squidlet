@@ -16,7 +16,6 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     }
   }
 
-  // TODO: test
   emitSync(eventName: string | number, ...args: any[]): Promise<void> {
     if (!this.indexes[eventName]) return Promise.resolve();
 
@@ -25,10 +24,24 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     for (let index of this.indexes[eventName]) {
       const result: any = this.handlers[index](...args);
 
-      if (result && typeof result === 'object' && result.then) promises.push(result);
+      if (result && typeof result === 'object' && result.then) {
+        promises.push(result);
+      }
     }
 
     return Promise.all(promises).then(() => undefined);
+  }
+
+  once(eventName: string | number, handler: T): number {
+    let wrapperIndex: number;
+    const wrapper = ((...args: any[]) => {
+      this.removeListener(wrapperIndex, eventName);
+      handler(...args);
+    }) as T;
+
+    wrapperIndex = this.addListener(eventName, wrapper);
+
+    return wrapperIndex;
   }
 
   /**
@@ -48,23 +61,10 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     return index;
   }
 
-  // TODO: test
   getHandlers(eventName: string | number): T[] {
     if (!this.indexes[eventName]) return [];
 
     return this.indexes[eventName].map((index: number) => this.handlers[index]);
-  }
-
-  once(eventName: string | number, handler: T): number {
-    let wrapperIndex: number;
-    const wrapper = ((...args: any[]) => {
-      this.removeListener(wrapperIndex, eventName);
-      handler(...args);
-    }) as T;
-
-    wrapperIndex = this.addListener(eventName, wrapper);
-
-    return wrapperIndex;
   }
 
   /**
