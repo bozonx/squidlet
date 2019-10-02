@@ -15,7 +15,7 @@ export class RuleActions {
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
-  readonly actions: ActionItem[];
+  private readonly actions: ActionItem[];
 
 
   constructor(
@@ -32,7 +32,9 @@ export class RuleActions {
   }
 
   destroy() {
-    // TODO: add
+    for (let action of this.actions) {
+      action.destroy();
+    }
   }
 
 

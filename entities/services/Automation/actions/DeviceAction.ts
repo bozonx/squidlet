@@ -26,6 +26,10 @@ export default class DeviceAction implements ActionItem {
     this.definition = definition as DeviceActionDefinition;
   }
 
+  destroy(): void {
+    // TODO: add !!!!!
+  }
+
 
   async execute() {
     const device: DeviceBase = this.manager.context.system.devicesManager.getDevice(this.definition.id);

@@ -6,4 +6,5 @@ export type ActionItemClass = new (manager: RuleActions, definition: ActionDefin
 
 export default interface ActionItem {
   execute(): Promise<void>;
+  destroy(): void;
 }
