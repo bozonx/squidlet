@@ -2,6 +2,7 @@ import DeviceBase from 'system/base/DeviceBase';
 import ActionItem from '../interfaces/ActionItem';
 import {ActionDefinition} from '../interfaces/RuleDefinition';
 import {RuleActions} from '../rule/RuleActions';
+import ConditionDefinition from '../interfaces/ConditionDefinition';
 
 
 interface DeviceActionDefinition extends ActionDefinition {
@@ -9,8 +10,9 @@ interface DeviceActionDefinition extends ActionDefinition {
   id: string;
   // name of action
   action: string;
-  // javascript expression or a list of expressions
-  params?: string | string[];
+  if: ConditionDefinition[];
+  // parameters which will be sent to the action
+  value?: string[];
 }
 
 
