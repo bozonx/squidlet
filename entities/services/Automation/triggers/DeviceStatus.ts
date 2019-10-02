@@ -12,7 +12,7 @@ interface DeviceStateDefinition extends TriggerDefinition {
 }
 
 
-export default class DeviceState implements TriggerItem {
+export default class DeviceStatus implements TriggerItem {
   private readonly manager: RuleTriggers;
   private readonly definition: DeviceStateDefinition;
 

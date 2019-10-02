@@ -6,7 +6,7 @@ import DeviceAction from '../actions/DeviceAction';
 
 
 const actionsClasses: {[index: string]: ActionItemClass} = {
-  deviceAction: DeviceAction,
+  action: DeviceAction,
 };
 
 

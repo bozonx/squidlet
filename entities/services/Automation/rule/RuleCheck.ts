@@ -1,7 +1,7 @@
 import Context from 'system/Context';
 import RuleItem from '../interfaces/RuleItem';
 import RuleDefinition from '../interfaces/RuleDefinition';
-import {RuleActions} from './RuleActions';
+
 
 export default class RuleCheck {
   readonly context: Context;

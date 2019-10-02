@@ -20,7 +20,7 @@ export default class Automation extends ServiceBase<Props> {
 
   protected appDidInit = async () => {
     this.log.debug(`Automation: starting preparing rules`);
-    this.prepareRules();
+    await this.prepareRules();
   }
 
 
@@ -48,7 +48,9 @@ export default class Automation extends ServiceBase<Props> {
   }
 
 
-  private prepareRules() {
+  private async prepareRules() {
+    // TODO: load automation service state file and set turned off that rules that pointed in this file
+
     for (let ruleDefinition of this.props.rules) {
       this.validateRule(ruleDefinition);
 

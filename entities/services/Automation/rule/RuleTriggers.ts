@@ -3,11 +3,11 @@ import RuleDefinition, {TriggerDefinition} from '../interfaces/RuleDefinition';
 import TriggerItem, {TriggerItemClass} from '../interfaces/TriggerItem';
 import {RuleActions} from './RuleActions';
 import RuleItem from '../interfaces/RuleItem';
-import DeviceState from '../triggers/DeviceState';
+import DeviceStatus from '../triggers/DeviceStatus';
 
 
 const triggerClasses: {[index: string]: TriggerItemClass} = {
-  deviceState: DeviceState,
+  status: DeviceStatus,
 };
 
 
@@ -54,6 +54,10 @@ export class RuleTriggers {
    * Start listen
    */
   stopTriggers() {
+    // TODO: add
+  }
+
+  destroy() {
     // TODO: add
   }
 
