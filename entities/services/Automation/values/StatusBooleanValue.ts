@@ -3,20 +3,24 @@ import {JsonTypes} from 'system/interfaces/Types';
 import {Dictionary} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
 import {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import {invertIfNeed} from 'system/lib/helpers';
 
 
-interface StatusDefinition {
+interface StatusBooleanDefinition {
   id: string;
   statusName: string;
+  invert?: boolean;
 }
 
 
-export default function (context: Context, definition: StatusDefinition): JsonTypes | undefined {
+export default function (context: Context, definition: StatusBooleanDefinition): boolean {
   const state: Dictionary | undefined = context.state.getState(StateCategories.devicesStatus, definition.id);
 
-  if (!state) return;
+  if (!state) return false;
 
-  if (!definition.statusName) return state[DEFAULT_STATUS];
+  const value: JsonTypes | undefined = (definition.statusName)
+    ? state[definition.statusName]
+    : state[DEFAULT_STATUS];
 
-  return state[definition.statusName];
+  return invertIfNeed(Boolean(value), definition.invert);
 }
