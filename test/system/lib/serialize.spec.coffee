@@ -1,7 +1,7 @@
 serialize = require('../../../system/lib/serialize')
 
 
-describe.only 'system.lib.serialize', ->
+describe 'system.lib.serialize', ->
   it 'base64ToString', ->
     assert.equal(serialize.base64ToString('str строка'), 'c3RyINGB0YLRgNC+0LrQsA==')
 
