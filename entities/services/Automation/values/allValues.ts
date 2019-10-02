@@ -5,7 +5,7 @@ import OrValue from './OrValue';
 import Context from 'system/Context';
 
 
-type ValueFunction = (context: Context, definition: any) => any;
+export type ValueFunction = (context: Context, definition: any) => any;
 
 const allValues: {[index: string]: ValueFunction} = {
   andValue: AndValue,

@@ -3,6 +3,8 @@ import ActionItem from '../interfaces/ActionItem';
 import {ActionDefinition} from '../interfaces/RuleDefinition';
 import {RuleActions} from '../rule/RuleActions';
 import ValueDefinition from '../interfaces/ValueDefinition';
+import {JsonTypes} from '../../../../system/interfaces/Types';
+import allValues from '../values/allValues';
 
 
 interface DeviceActionDefinition extends ActionDefinition {
@@ -26,18 +28,16 @@ export default class DeviceAction implements ActionItem {
 
     this.manager = manager;
     this.definition = definition as DeviceActionDefinition;
-
-    // TODO: add instances of conditions
-    // TODO: add instances of value getters
-
   }
 
   destroy(): void {
-    // TODO: add !!!!!
   }
 
 
   async execute() {
+    // do nothing if condition is false
+    if (!this.checkCondition()) return;
+
     const device: DeviceBase = this.manager.context.system.devicesManager.getDevice(this.definition.id);
     const args: any[] = await this.makeArgs();
 
@@ -51,23 +51,28 @@ export default class DeviceAction implements ActionItem {
   }
 
 
-  // TODO: review
   private async makeArgs(): Promise<any[]> {
+    if (typeof this.definition.values === 'undefined') return [];
+
     const result: any[] = [];
 
-    if (typeof this.definition.params === 'undefined') {
-      return [];
-    }
-    else if (typeof this.definition.params === 'string') {
-      result.push(await this.manager.expressionManager.execute(this.definition.params));
-    }
-    else {
-      for (let expr of this.definition.params) {
-        result.push(await this.manager.expressionManager.execute(expr));
-      }
+    for (let valueDefinition of this.definition.values) {
+      result.push(await this.makeValue(valueDefinition));
     }
 
     return result;
+  }
+
+  private makeValue(valueDefinition: any): JsonTypes | undefined {
+    if (!allValues[valueDefinition.type]) {
+      throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
+    }
+
+
+  }
+
+  private checkCondition(): boolean {
+    // TODO: add
   }
 
   private validate(definition: ActionDefinition) {

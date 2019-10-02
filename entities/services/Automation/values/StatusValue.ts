@@ -3,9 +3,10 @@ import {JsonTypes} from 'system/interfaces/Types';
 import {Dictionary} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
 import {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import ValueDefinition from '../interfaces/ValueDefinition';
 
 
-interface StatusDefinition {
+interface StatusDefinition extends ValueDefinition {
   id: string;
   statusName: string;
 }

@@ -4,9 +4,10 @@ import {Dictionary} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
 import {DEFAULT_STATUS} from 'system/base/DeviceBase';
 import {invertIfNeed} from 'system/lib/helpers';
+import ValueDefinition from '../interfaces/ValueDefinition';
 
 
-interface StatusBooleanDefinition {
+interface StatusBooleanDefinition extends ValueDefinition {
   id: string;
   statusName: string;
   invert?: boolean;
