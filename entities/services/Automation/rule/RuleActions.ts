@@ -67,9 +67,11 @@ export class RuleActions {
   }
 
   private instantiateActionItem(actionDefinition: ActionDefinition): ActionItem {
-    const action: ActionItem = new actionsClasses[actionDefinition.type](this, actionDefinition);
+    if (!actionsClasses[actionDefinition.type]) {
+      throw new Error(`Unsupported trigger type: ${actionDefinition.type}`);
+    }
 
-    return action;
+    return new actionsClasses[actionDefinition.type](this, actionDefinition);
   }
 
 }
