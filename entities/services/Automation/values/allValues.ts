@@ -16,12 +16,12 @@ const allValues: {[index: string]: ValueFunction} = {
 };
 
 
-export function makeValue(context: Context, valueDefinition: any): JsonTypes | undefined {
+export async function makeValue(context: Context, valueDefinition: any): Promise<JsonTypes | undefined> {
   if (!allValues[valueDefinition.type]) {
     throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
   }
 
-  return allValues[valueDefinition.type](context, valueDefinition);
+  return await allValues[valueDefinition.type](context, valueDefinition);
 }
 
 

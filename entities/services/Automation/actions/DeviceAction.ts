@@ -3,8 +3,8 @@ import ActionItem from '../interfaces/ActionItem';
 import {ActionDefinition} from '../interfaces/RuleDefinition';
 import {RuleActions} from '../rule/RuleActions';
 import ValueDefinition from '../interfaces/ValueDefinition';
+import {makeValue} from '../values/allValues';
 import {JsonTypes} from '../../../../system/interfaces/Types';
-import allValues from '../values/allValues';
 
 
 interface DeviceActionDefinition extends ActionDefinition {
@@ -12,6 +12,7 @@ interface DeviceActionDefinition extends ActionDefinition {
   id: string;
   // name of action
   action: string;
+  // means AND condition
   if: ValueDefinition[];
   // parameters which will be sent to the action
   values?: string[];
@@ -19,14 +20,14 @@ interface DeviceActionDefinition extends ActionDefinition {
 
 
 export default class DeviceAction implements ActionItem {
-  private readonly manager: RuleActions;
+  private readonly actions: RuleActions;
   private readonly definition: DeviceActionDefinition;
 
 
-  constructor(manager: RuleActions, definition: ActionDefinition) {
+  constructor(actions: RuleActions, definition: ActionDefinition) {
     this.validate(definition);
 
-    this.manager = manager;
+    this.actions = actions;
     this.definition = definition as DeviceActionDefinition;
   }
 
@@ -38,41 +39,44 @@ export default class DeviceAction implements ActionItem {
     // do nothing if condition is false
     if (!this.checkCondition()) return;
 
-    const device: DeviceBase = this.manager.context.system.devicesManager.getDevice(this.definition.id);
+    const device: DeviceBase = this.actions.context.system.devicesactions.getDevice(this.definition.id);
     const args: any[] = await this.makeArgs();
 
-    this.manager.context.log.debug(
+    this.actions.context.log.debug(
       `Automation: executing device action: ` +
       `${this.definition.id}.${this.definition.action} with args: ${JSON.stringify(args)}`
     );
 
     device.action(this.definition.action, ...args)
-      .catch(this.manager.context.log.error);
+      .catch(this.actions.context.log.error);
   }
 
 
   private async makeArgs(): Promise<any[]> {
     if (typeof this.definition.values === 'undefined') return [];
 
-    const result: any[] = [];
+    const promises: Promise<any>[] = [];
 
     for (let valueDefinition of this.definition.values) {
-      result.push(makeValue(valueDefinition));
+      promises.push(makeValue(this.actions.context, valueDefinition));
     }
 
-    return result;
+    return Promise.all(promises);
   }
 
-  // private makeValue(valueDefinition: any): JsonTypes | undefined {
-  //   if (!allValues[valueDefinition.type]) {
-  //     throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
-  //   }
-  //
-  //   return allValues[valueDefinition.type](context, valueDefinition);
-  // }
+  private async checkCondition(): Promise<boolean> {
+    if (!this.definition.if) return false;
 
-  private checkCondition(): boolean {
-    // TODO: add
+    for (let valueDefinition of this.definition.if) {
+      // TODO: поидее порядок выполнения не важен поэтому можно все выполнить одновременно
+      //  и кто первый вернет false тогда считаем false
+
+      const result: JsonTypes | undefined = await makeValue(this.actions.context, valueDefinition);
+
+      if (!result) return false;
+    }
+
+    return true;
   }
 
   private validate(definition: ActionDefinition) {

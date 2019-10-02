@@ -9,6 +9,9 @@ interface AndDefinition extends ValueDefinition {
 
 
 export default function (context: Context, definition: AndDefinition): boolean {
+  // TODO: use makeValue
+  // TODO: use promise
+
   for (let valueDefinition of definition.check) {
     if (!allValues[valueDefinition.type]) {
       throw new Error(`Automation AndValue: can't find a value function of "${valueDefinition.type}"`);
