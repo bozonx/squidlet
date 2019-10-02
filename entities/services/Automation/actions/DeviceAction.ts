@@ -26,6 +26,10 @@ export default class DeviceAction implements ActionItem {
 
     this.manager = manager;
     this.definition = definition as DeviceActionDefinition;
+
+    // TODO: add instances of conditions
+    // TODO: add instances of value getters
+
   }
 
   destroy(): void {
