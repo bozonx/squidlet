@@ -11,7 +11,7 @@ const triggerClasses: {[index: string]: TriggerItemClass} = {
 };
 
 
-export class RulsTriggers {
+export class RuleTriggers {
   readonly context: Context;
   readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];

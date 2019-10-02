@@ -71,6 +71,15 @@ export default class Api {
     return result;
   }
 
+  getAutomationRuleState(ruleName: string) {
+    // TODO: pass generic instead of "as any"
+    const automationService: Automation = this.context.system.servicesManager.getService(
+      'Automation'
+    ) as any;
+
+    return automationService.getRuleState(ruleName);
+  }
+
   turnAutomationRule(ruleName: string, turnTo: boolean) {
     // TODO: pass generic instead of "as any"
     const automationService: Automation = this.context.system.servicesManager.getService(

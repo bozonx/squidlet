@@ -21,6 +21,8 @@ const allowedApiMethodsToCall = [
   'getDeviceStatus',
   'getDeviceConfig',
   'getState',
+  'getAutomationRuleState',
+  'turnAutomationRule',
   //'getSessionStore',
   'republishWholeState',
   'switchToIoServer',
