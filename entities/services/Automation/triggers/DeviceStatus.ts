@@ -25,7 +25,7 @@ export default class DeviceStatus implements TriggerItem {
   }
 
 
-  onSwitch(cb: () => void): number {
+  onTrigger(cb: () => void): number {
 
     // TODO: может делать через device
 

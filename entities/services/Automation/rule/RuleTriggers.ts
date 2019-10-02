@@ -84,7 +84,7 @@ export class RuleTriggers {
 
     const trigger: TriggerItem = new triggerClasses[triggerDefinition.type](this, triggerDefinition);
 
-    trigger.onSwitch(this.handleTriggerSwitch);
+    trigger.onTrigger(this.handleTriggerSwitch);
 
     return trigger;
   }
