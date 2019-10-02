@@ -7,6 +7,7 @@ import HostInfo from './interfaces/HostInfo';
 import {calcAllowedLogLevels} from './lib/helpers';
 import {LOGGER_EVENT} from './constants';
 import SysIo from './interfaces/io/SysIo';
+import Automation from '../entities/services/Automation/Automation';
 
 
 export default class Api {
@@ -69,6 +70,15 @@ export default class Api {
 
     return result;
   }
+
+  turnAutomationRule(ruleName: string) {
+    const automationService: Automation = this.context.system.servicesManager.getService(
+      'Automation'
+    ) as any;
+
+    automationService.turnRule(ruleName);
+  }
+
 
   switchToIoServer() {
     if (!this.context.config.ioServer) {

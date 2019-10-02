@@ -23,6 +23,14 @@ export default class Automation extends ServiceBase<Props> {
   }
 
 
+  /**
+   * Turn on or off an automation rule.
+   */
+  turnRule(ruleName: string) {
+    // TODO: add
+  }
+
+
   private prepareRules() {
     for (let ruleDefinition of this.props.rules) {
       this.validateRule(ruleDefinition);
@@ -42,7 +50,7 @@ export default class Automation extends ServiceBase<Props> {
   }
 
   private validateRule(ruleDefinition: RuleDefinition) {
-    // TODO: validate rule definiton
+    // TODO: validate rule definition
   }
 
   private generateUniqName(): string {

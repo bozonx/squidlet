@@ -9,6 +9,7 @@ Every rule consist of:
   the next section.
 * check section - it's full check to allow do actions or not.
 * action section - it's list of actions to to after trigger and check sections are fulfilled.
+* actionAsync - call actions step by step.
 
 
 ## Example
