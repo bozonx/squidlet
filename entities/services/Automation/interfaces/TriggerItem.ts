@@ -6,4 +6,5 @@ export type TriggerItemClass = new (manager: RuleTriggers, definition: TriggerDe
 
 export default interface TriggerItem {
   onSwitch(cb: () => void): number;
+  destroy(): void;
 }

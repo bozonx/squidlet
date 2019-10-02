@@ -17,7 +17,7 @@ export class RuleTriggers {
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
   readonly actionsManager: RuleActions;
-  readonly triggers: TriggerItem[];
+  triggers: TriggerItem[] = [];
 
 
   constructor(
@@ -32,7 +32,8 @@ export class RuleTriggers {
     this.ruleName = ruleName;
     this.ruleDefinition = ruleDefinition;
     this.actionsManager = actionsManager;
-    this.triggers = this.makeTriggers(ruleDefinition.trigger);
+    // make triggers instances
+    this.startTriggers();
   }
 
 
@@ -40,25 +41,30 @@ export class RuleTriggers {
    * Are triggers started and listen.
    */
   isTriggersActive(): boolean {
-    // TODO: add
+    return Boolean(this.triggers);
   }
 
   /**
    * Stop listen
    */
   startTriggers() {
-    // TODO: add
+    this.triggers = this.makeTriggers(this.ruleDefinition.trigger);
   }
 
   /**
    * Start listen
    */
   stopTriggers() {
-    // TODO: add
+    for (let trigger of this.triggers) {
+      trigger.destroy();
+    }
+
+    delete this.triggers;
   }
 
   destroy() {
     // TODO: add
+    this.stopTriggers();
   }
 
 

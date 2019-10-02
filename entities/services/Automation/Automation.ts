@@ -15,12 +15,22 @@ let nameIndex: number = 0;
 
 
 export default class Automation extends ServiceBase<Props> {
-  private readonly rules: RuleItem[] = [];
+  private rules: RuleItem[] = [];
 
 
   protected appDidInit = async () => {
     this.log.debug(`Automation: starting preparing rules`);
     await this.prepareRules();
+  }
+
+  destroy = async () => {
+    for (let rule of this.rules) {
+      rule.triggers.destroy();
+      rule.check.destroy();
+      rule.actions.destroy();
+    }
+
+    delete this.rules;
   }
 
 
