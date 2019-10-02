@@ -29,7 +29,7 @@ Every rule consist of:
             if:
               - type: and
                 check:
-                  - type: status
+                  - type: booleanStatus
                     id: room.binarySensor
                     statusName: default
                     level: high
@@ -37,12 +37,11 @@ Every rule consist of:
               - type: status
                 id: room.button
                 statusName: default
-                invert: false
               - type: and
                 check:
-                  - type: status
+                  - type: booleanStatus
                     id: room.light1
                     invert: true
-                  - type: status
+                  - type: booleanStatus
                     id: room.light2
                     invert: true
