@@ -57,19 +57,19 @@ export default class DeviceAction implements ActionItem {
     const result: any[] = [];
 
     for (let valueDefinition of this.definition.values) {
-      result.push(await this.makeValue(valueDefinition));
+      result.push(makeValue(valueDefinition));
     }
 
     return result;
   }
 
-  private makeValue(valueDefinition: any): JsonTypes | undefined {
-    if (!allValues[valueDefinition.type]) {
-      throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
-    }
-
-
-  }
+  // private makeValue(valueDefinition: any): JsonTypes | undefined {
+  //   if (!allValues[valueDefinition.type]) {
+  //     throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
+  //   }
+  //
+  //   return allValues[valueDefinition.type](context, valueDefinition);
+  // }
 
   private checkCondition(): boolean {
     // TODO: add
