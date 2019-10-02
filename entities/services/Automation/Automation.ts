@@ -2,8 +2,8 @@ import ServiceBase from 'system/base/ServiceBase';
 
 import RuleItem from './interfaces/RuleItem';
 import RuleDefinition from './interfaces/RuleDefinition';
-import {TriggersManager} from './TriggersManager';
-import {ActionsManager} from './ActionsManager';
+import {RulsTriggers} from './RulsTriggers';
+import {RuleActions} from './RuleActions';
 
 
 interface Props {
@@ -26,7 +26,7 @@ export default class Automation extends ServiceBase<Props> {
   /**
    * Turn on or off an automation rule.
    */
-  turnRule(ruleName: string) {
+  turnRule(ruleName: string, turnTo: boolean) {
     // TODO: add
   }
 
@@ -36,12 +36,14 @@ export default class Automation extends ServiceBase<Props> {
       this.validateRule(ruleDefinition);
 
       const name: string = ruleDefinition.name || this.generateUniqName();
-      const actions = new ActionsManager(this.context, this.expressionManager, this.rules,  name, ruleDefinition);
-      const triggers = new TriggersManager(this.context, this.expressionManager, this.rules, name, ruleDefinition, actions);
+      const actions = new RuleActions(this.context, this.expressionManager, this.rules,  name, ruleDefinition);
+      const check = new RuleCheck();
+      const triggers = new RulsTriggers(this.context, this.expressionManager, this.rules, name, ruleDefinition, actions);
 
       const ruleItem: RuleItem = {
         name,
         triggers,
+        check,
         actions,
       };
 

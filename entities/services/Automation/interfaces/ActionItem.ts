@@ -1,8 +1,8 @@
 import {ActionDefinition} from './RuleDefinition';
-import {ActionsManager} from '../ActionsManager';
+import {RuleActions} from '../RuleActions';
 
 
-export type ActionItemClass = new (manager: ActionsManager, definition: ActionDefinition) => ActionItem;
+export type ActionItemClass = new (manager: RuleActions, definition: ActionDefinition) => ActionItem;
 
 export default interface ActionItem {
   execute(): Promise<void>;

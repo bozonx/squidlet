@@ -1,7 +1,7 @@
 import Context from 'system/Context';
 import RuleDefinition, {TriggerDefinition} from './interfaces/RuleDefinition';
 import TriggerItem, {TriggerItemClass} from './interfaces/TriggerItem';
-import {ActionsManager} from './ActionsManager';
+import {RuleActions} from './RuleActions';
 import RuleItem from './interfaces/RuleItem';
 import DeviceState from './triggers/DeviceState';
 
@@ -11,13 +11,13 @@ const triggerClasses: {[index: string]: TriggerItemClass} = {
 };
 
 
-export class TriggersManager {
+export class RulsTriggers {
   readonly context: Context;
   readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
-  readonly actionsManager: ActionsManager;
+  readonly actionsManager: RuleActions;
   readonly triggers: TriggerItem[];
 
 
@@ -27,7 +27,7 @@ export class TriggersManager {
     rules: RuleItem[],
     ruleName: string,
     ruleDefinition: RuleDefinition,
-    actionsManager: ActionsManager
+    actionsManager: RuleActions
   ) {
     this.context = context;
     this.expressionManager = expressionManager;

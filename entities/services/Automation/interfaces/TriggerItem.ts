@@ -1,8 +1,8 @@
 import {TriggerDefinition} from './RuleDefinition';
-import {TriggersManager} from '../TriggersManager';
+import {RulsTriggers} from '../RulsTriggers';
 
 
-export type TriggerItemClass = new (manager: TriggersManager, definition: TriggerDefinition) => TriggerItem;
+export type TriggerItemClass = new (manager: RulsTriggers, definition: TriggerDefinition) => TriggerItem;
 
 export default interface TriggerItem {
   onSwitch(cb: () => void): number;

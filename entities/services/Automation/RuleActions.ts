@@ -10,7 +10,7 @@ const actionsClasses: {[index: string]: ActionItemClass} = {
 };
 
 
-export class ActionsManager {
+export class RuleActions {
   readonly context: Context;
   readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];

@@ -1,7 +1,7 @@
 import {StateCategories} from 'system/interfaces/States';
 import TriggerItem from '../interfaces/TriggerItem';
 import {TriggerDefinition} from '../interfaces/RuleDefinition';
-import {TriggersManager} from '../TriggersManager';
+import {RulsTriggers} from '../RulsTriggers';
 
 
 interface DeviceStateDefinition extends TriggerDefinition {
@@ -13,11 +13,11 @@ interface DeviceStateDefinition extends TriggerDefinition {
 
 
 export default class DeviceState implements TriggerItem {
-  private readonly manager: TriggersManager;
+  private readonly manager: RulsTriggers;
   private readonly definition: DeviceStateDefinition;
 
 
-  constructor(manager: TriggersManager, definition: TriggerDefinition) {
+  constructor(manager: RulsTriggers, definition: TriggerDefinition) {
     this.validate(definition);
 
     this.manager = manager;

@@ -1,7 +1,7 @@
 import DeviceBase from 'system/base/DeviceBase';
 import ActionItem from '../interfaces/ActionItem';
 import {ActionDefinition} from '../interfaces/RuleDefinition';
-import {ActionsManager} from '../ActionsManager';
+import {RuleActions} from '../RuleActions';
 
 
 interface DeviceActionDefinition extends ActionDefinition {
@@ -15,11 +15,11 @@ interface DeviceActionDefinition extends ActionDefinition {
 
 
 export default class DeviceAction implements ActionItem {
-  private readonly manager: ActionsManager;
+  private readonly manager: RuleActions;
   private readonly definition: DeviceActionDefinition;
 
 
-  constructor(manager: ActionsManager, definition: ActionDefinition) {
+  constructor(manager: RuleActions, definition: ActionDefinition) {
     this.validate(definition);
 
     this.manager = manager;
