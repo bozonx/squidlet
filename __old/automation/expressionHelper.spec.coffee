@@ -1,4 +1,4 @@
-runExpr = require('../../../../entities/services/Automation/expressionHelper').default
+runExpr = require('./expressionHelper').default
 
 
 describe.only 'services.Automation.expressionHelper', ->

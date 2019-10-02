@@ -3,7 +3,6 @@ import RuleDefinition, {ActionDefinition} from './interfaces/RuleDefinition';
 import ActionItem, {ActionItemClass} from './interfaces/ActionItem';
 import RuleItem from './interfaces/RuleItem';
 import DeviceAction from './actions/DeviceAction';
-import ExpressionManager from './ExpressionManager';
 
 
 const actionsClasses: {[index: string]: ActionItemClass} = {

@@ -3,7 +3,6 @@ import RuleItem from './interfaces/RuleItem';
 import RuleDefinition from './interfaces/RuleDefinition';
 import {TriggersManager} from './TriggersManager';
 import {ActionsManager} from './ActionsManager';
-import ExpressionManager from './ExpressionManager';
 
 
 interface Props {

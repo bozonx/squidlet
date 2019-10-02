@@ -4,7 +4,6 @@ import TriggerItem, {TriggerItemClass} from './interfaces/TriggerItem';
 import {ActionsManager} from './ActionsManager';
 import RuleItem from './interfaces/RuleItem';
 import DeviceState from './triggers/DeviceState';
-import ExpressionManager from './ExpressionManager';
 
 
 const triggerClasses: {[index: string]: TriggerItemClass} = {

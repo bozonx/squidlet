@@ -1,5 +1,5 @@
-import Context from 'system/Context';
-import DeviceBase from 'system/base/DeviceBase';
+import Context from 'Context';
+import DeviceBase from 'base/DeviceBase';
 import runExpr from './expressionHelper';
 
 
