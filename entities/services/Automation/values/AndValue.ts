@@ -1,6 +1,6 @@
 import Context from 'system/Context';
 import ValueDefinition from '../interfaces/ValueDefinition';
-import allValues from './allValues';
+import {makeValue} from './allValues';
 
 
 interface AndDefinition extends ValueDefinition {
@@ -8,16 +8,12 @@ interface AndDefinition extends ValueDefinition {
 }
 
 
-export default function (context: Context, definition: AndDefinition): boolean {
-  // TODO: use makeValue
-  // TODO: use promise
-
+export default function (context: Context, definition: AndDefinition): boolean | Promise<boolean> {
   for (let valueDefinition of definition.check) {
-    if (!allValues[valueDefinition.type]) {
-      throw new Error(`Automation AndValue: can't find a value function of "${valueDefinition.type}"`);
-    }
+    const result: any = makeValue(context, valueDefinition.type);
 
-    const result: any = allValues[valueDefinition.type](context, valueDefinition);
+    // TODO: если вернулся promise - то все далее проверяем по очереди с промисами
+    // TODO: поидее порядок выполнения не важен поэтому можно все выполнить одновременно
 
     if (!result) return false;
   }

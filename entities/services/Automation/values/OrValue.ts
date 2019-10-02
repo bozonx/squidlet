@@ -1,6 +1,6 @@
 import Context from 'system/Context';
 import ValueDefinition from '../interfaces/ValueDefinition';
-import allValues, {makeValue} from './allValues';
+import {makeValue} from './allValues';
 
 
 interface OrDefinition extends ValueDefinition {
@@ -9,13 +9,10 @@ interface OrDefinition extends ValueDefinition {
 
 
 export default function (context: Context, definition: OrDefinition): boolean {
-  // TODO: use makeValue
   for (let valueDefinition of definition.check) {
-    if (!allValues[valueDefinition.type]) {
-      throw new Error(`Automation OrValue: can't find a value function of "${valueDefinition.type}"`);
-    }
+    const result: any = makeValue(context, valueDefinition.type);
 
-    const result: any = allValues[valueDefinition.type](context, valueDefinition);
+    // TODO: если вернулся promise - то все далее проверяем по очереди с промисами
 
     if (result) return true;
   }

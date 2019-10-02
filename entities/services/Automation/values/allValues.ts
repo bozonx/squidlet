@@ -19,10 +19,10 @@ const allValues: {[index: string]: ValueFunction} = {
 
 export function makeValue(context: Context, valueDefinition: any): ValueFunctionReturnType {
   if (!allValues[valueDefinition.type]) {
-    throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
+    throw new Error(`Automation: can't find a value function of "${valueDefinition.type}"`);
   }
 
-  const result allValues[valueDefinition.type](context, valueDefinition);
+  return allValues[valueDefinition.type](context, valueDefinition);
 }
 
 

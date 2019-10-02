@@ -5,6 +5,7 @@ import {RuleActions} from '../rule/RuleActions';
 import ValueDefinition from '../interfaces/ValueDefinition';
 import {makeValue} from '../values/allValues';
 import {JsonTypes} from '../../../../system/interfaces/Types';
+import AndValue from '../values/AndValue';
 
 
 interface DeviceActionDefinition extends ActionDefinition {
@@ -55,28 +56,33 @@ export default class DeviceAction implements ActionItem {
   private async makeArgs(): Promise<any[]> {
     if (typeof this.definition.values === 'undefined') return [];
 
-    const promises: Promise<any>[] = [];
+    // TODO: support of promises
+
+    const result: any[] = [];
 
     for (let valueDefinition of this.definition.values) {
-      promises.push(makeValue(this.actions.context, valueDefinition));
+      result.push(await makeValue(this.actions.context, valueDefinition));
     }
 
-    return Promise.all(promises);
+    return result;
+
+    // const promises: Promise<any>[] = [];
+    //
+    // for (let valueDefinition of this.definition.values) {
+    //   // TODO: могут быть и не промисы
+    //   promises.push(makeValue(this.actions.context, valueDefinition));
+    // }
+    //
+    // return Promise.all(promises);
   }
 
   private async checkCondition(): Promise<boolean> {
     if (!this.definition.if) return false;
 
-    for (let valueDefinition of this.definition.if) {
-      // TODO: поидее порядок выполнения не важен поэтому можно все выполнить одновременно
-      //  и кто первый вернет false тогда считаем false
-
-      const result: JsonTypes | undefined = await makeValue(this.actions.context, valueDefinition);
-
-      if (!result) return false;
-    }
-
-    return true;
+    return AndValue(this.actions.context, {
+      type: 'and',
+      check: this.definition.if,
+    });
   }
 
   private validate(definition: ActionDefinition) {
