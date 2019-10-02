@@ -13,7 +13,6 @@ const triggerClasses: {[index: string]: TriggerItemClass} = {
 
 export class RuleTriggers {
   readonly context: Context;
-  readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
@@ -23,20 +22,41 @@ export class RuleTriggers {
 
   constructor(
     context: Context,
-    expressionManager: ExpressionManager,
     rules: RuleItem[],
     ruleName: string,
     ruleDefinition: RuleDefinition,
     actionsManager: RuleActions
   ) {
     this.context = context;
-    this.expressionManager = expressionManager;
     this.rules = rules;
     this.ruleName = ruleName;
     this.ruleDefinition = ruleDefinition;
     this.actionsManager = actionsManager;
     this.triggers = this.makeTriggers(ruleDefinition.trigger);
   }
+
+
+  /**
+   * Are triggers started and listen.
+   */
+  isTriggersActive(): boolean {
+    // TODO: add
+  }
+
+  /**
+   * Stop listen
+   */
+  startTriggers() {
+    // TODO: add
+  }
+
+  /**
+   * Start listen
+   */
+  stopTriggers() {
+    // TODO: add
+  }
+
 
   private makeTriggers(trigger: TriggerDefinition[]): TriggerItem[] {
     const result: TriggerItem[] = [];

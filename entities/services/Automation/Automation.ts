@@ -27,15 +27,24 @@ export default class Automation extends ServiceBase<Props> {
   /**
    * Is rule turned on or off
    */
-  getRuleState(ruleName: string): boolean {
-    // TODO: add
+  getRuleActiveState(ruleName: string): boolean {
+    const ruleItem: RuleItem = this.getRuleItem(ruleName);
+
+    return ruleItem.triggers.isTriggersActive();
   }
 
   /**
    * Turn on or off an automation rule.
    */
-  turnRule(ruleName: string, turnTo: boolean) {
-    // TODO: add
+  setRuleActive(ruleName: string, setActive: boolean) {
+    const ruleItem: RuleItem = this.getRuleItem(ruleName);
+
+    if (setActive) {
+      ruleItem.triggers.startTriggers();
+    }
+    else {
+      ruleItem.triggers.stopTriggers();
+    }
   }
 
 
@@ -67,6 +76,14 @@ export default class Automation extends ServiceBase<Props> {
     nameIndex++;
 
     return String(nameIndex);
+  }
+
+  private getRuleItem(ruleName: string): RuleItem {
+    const ruleItem: RuleItem | undefined = this.rules.find((rule) => rule.name === ruleName);
+
+    if (!ruleItem) throw new Error(`Automation rule "${ruleName}" is not found`);
+
+    return ruleItem;
   }
 
 }

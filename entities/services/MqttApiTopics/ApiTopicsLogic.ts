@@ -15,7 +15,7 @@ const topicTypes = ['device', 'api'];
 const allowedApiMethodsToCall = [
   'setDeviceConfig',
   'switchToIoServer',
-  'turnAutomationRule',
+  'setAutomationRuleActive',
   'republishWholeState',
   'reboot',
 ];

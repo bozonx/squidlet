@@ -12,7 +12,6 @@ const actionsClasses: {[index: string]: ActionItemClass} = {
 
 export class RuleActions {
   readonly context: Context;
-  readonly expressionManager: ExpressionManager;
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
@@ -21,13 +20,11 @@ export class RuleActions {
 
   constructor(
     context: Context,
-    expressionManager: ExpressionManager,
     rules: RuleItem[],
     ruleName: string,
     ruleDefinition: RuleDefinition
   ) {
     this.context = context;
-    this.expressionManager = expressionManager;
     this.rules = rules;
     this.ruleName = ruleName;
     this.ruleDefinition = ruleDefinition;
