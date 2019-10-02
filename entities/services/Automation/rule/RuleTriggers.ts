@@ -17,7 +17,7 @@ export class RuleTriggers {
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
   readonly actionsManager: RuleActions;
-  triggers: TriggerItem[] = [];
+  triggers?: TriggerItem[];
 
 
   constructor(
@@ -45,16 +45,25 @@ export class RuleTriggers {
   }
 
   /**
-   * Stop listen
+   * Start listen
    */
   startTriggers() {
-    this.triggers = this.makeTriggers(this.ruleDefinition.trigger);
+    // don't start twice
+    if (this.triggers) return;
+
+    this.triggers = [];
+
+    for (let triggerDefinition of this.ruleDefinition.trigger) {
+      this.triggers.push(this.instantiateTriggerItem(triggerDefinition));
+    }
   }
 
   /**
-   * Start listen
+   * Stop listen
    */
   stopTriggers() {
+    if (!this.triggers) return;
+
     for (let trigger of this.triggers) {
       trigger.destroy();
     }
@@ -67,16 +76,6 @@ export class RuleTriggers {
     this.stopTriggers();
   }
 
-
-  private makeTriggers(trigger: TriggerDefinition[]): TriggerItem[] {
-    const result: TriggerItem[] = [];
-
-    for (let triggerDefinition of trigger) {
-      result.push(this.instantiateTriggerItem(triggerDefinition));
-    }
-
-    return result;
-  }
 
   private instantiateTriggerItem(triggerDefinition: TriggerDefinition): TriggerItem {
     const trigger: TriggerItem = new triggerClasses[triggerDefinition.type](this, triggerDefinition);
