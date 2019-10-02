@@ -1,7 +1,7 @@
 import {StateCategories} from 'system/interfaces/States';
 import TriggerItem from '../interfaces/TriggerItem';
 import {TriggerDefinition} from '../interfaces/RuleDefinition';
-import {RuleTriggers} from '../RuleTriggers';
+import {RuleTriggers} from '../rule/RuleTriggers';
 
 
 interface DeviceStateDefinition extends TriggerDefinition {

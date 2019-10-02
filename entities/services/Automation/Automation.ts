@@ -2,9 +2,9 @@ import ServiceBase from 'system/base/ServiceBase';
 
 import RuleItem from './interfaces/RuleItem';
 import RuleDefinition from './interfaces/RuleDefinition';
-import {RuleTriggers} from './RuleTriggers';
-import {RuleActions} from './RuleActions';
-import RuleCheck from './RuleCheck';
+import {RuleTriggers} from './rule/RuleTriggers';
+import {RuleActions} from './rule/RuleActions';
+import RuleCheck from './rule/RuleCheck';
 
 
 interface Props {
@@ -53,8 +53,8 @@ export default class Automation extends ServiceBase<Props> {
       this.validateRule(ruleDefinition);
 
       const name: string = ruleDefinition.name || this.generateUniqName();
-      const actions = new RuleActions(this.context, this.rules,  name, ruleDefinition);
-      const check = new RuleCheck();
+      const actions = new RuleActions(this.context, this.rules, name, ruleDefinition);
+      const check = new RuleCheck(this.context, this.rules, name, ruleDefinition);
       const triggers = new RuleTriggers(this.context, this.rules, name, ruleDefinition, actions);
 
       const ruleItem: RuleItem = {

@@ -1,9 +1,9 @@
 import Context from 'system/Context';
-import RuleDefinition, {TriggerDefinition} from './interfaces/RuleDefinition';
-import TriggerItem, {TriggerItemClass} from './interfaces/TriggerItem';
+import RuleDefinition, {TriggerDefinition} from '../interfaces/RuleDefinition';
+import TriggerItem, {TriggerItemClass} from '../interfaces/TriggerItem';
 import {RuleActions} from './RuleActions';
-import RuleItem from './interfaces/RuleItem';
-import DeviceState from './triggers/DeviceState';
+import RuleItem from '../interfaces/RuleItem';
+import DeviceState from '../triggers/DeviceState';
 
 
 const triggerClasses: {[index: string]: TriggerItemClass} = {

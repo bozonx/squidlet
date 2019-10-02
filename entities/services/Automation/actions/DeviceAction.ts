@@ -1,7 +1,7 @@
 import DeviceBase from 'system/base/DeviceBase';
 import ActionItem from '../interfaces/ActionItem';
 import {ActionDefinition} from '../interfaces/RuleDefinition';
-import {RuleActions} from '../RuleActions';
+import {RuleActions} from '../rule/RuleActions';
 
 
 interface DeviceActionDefinition extends ActionDefinition {

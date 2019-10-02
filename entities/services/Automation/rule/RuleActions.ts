@@ -1,8 +1,8 @@
 import Context from 'system/Context';
-import RuleDefinition, {ActionDefinition} from './interfaces/RuleDefinition';
-import ActionItem, {ActionItemClass} from './interfaces/ActionItem';
-import RuleItem from './interfaces/RuleItem';
-import DeviceAction from './actions/DeviceAction';
+import RuleDefinition, {ActionDefinition} from '../interfaces/RuleDefinition';
+import ActionItem, {ActionItemClass} from '../interfaces/ActionItem';
+import RuleItem from '../interfaces/RuleItem';
+import DeviceAction from '../actions/DeviceAction';
 
 
 const actionsClasses: {[index: string]: ActionItemClass} = {

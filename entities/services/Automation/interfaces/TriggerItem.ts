@@ -1,5 +1,5 @@
 import {TriggerDefinition} from './RuleDefinition';
-import {RuleTriggers} from '../RuleTriggers';
+import {RuleTriggers} from '../rule/RuleTriggers';
 
 
 export type TriggerItemClass = new (manager: RuleTriggers, definition: TriggerDefinition) => TriggerItem;
