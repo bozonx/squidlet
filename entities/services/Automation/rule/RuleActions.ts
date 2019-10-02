@@ -31,6 +31,10 @@ export class RuleActions {
     this.actions = this.makeActions(ruleDefinition.action);
   }
 
+  destroy() {
+    // TODO: add
+  }
+
 
   /**
    * Execute all the actions synchronously

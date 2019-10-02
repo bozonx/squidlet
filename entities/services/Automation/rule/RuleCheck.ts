@@ -23,5 +23,8 @@ export default class RuleCheck {
   }
 
 
+  destroy() {
+    // TODO: add
+  }
 
 }

@@ -28,18 +28,11 @@ export default class DeviceStatus implements TriggerItem {
 
 
   onTrigger(cb: () => void): number {
-    const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
-      if (
-        category !== StateCategories.devicesStatus
-        || stateName !== this.definition.id
-      ) return;
-
-      if (this.definition.state && !changedParams.includes(this.definition.state)) return;
-
-      cb();
-    };
-
-    const handlerIndex: number = this.triggers.context.state.onChange(handlerWrapper);
+    const handlerIndex: number = this.triggers.context.state.onChange(
+      (category: number, stateName: string, changedParams: string[]) => {
+        this.stateHandler(cb, category, stateName, changedParams);
+      }
+    );
 
     this.handlersIndexes.push(handlerIndex);
 
@@ -54,6 +47,22 @@ export default class DeviceStatus implements TriggerItem {
     delete this.handlersIndexes;
   }
 
+
+  private stateHandler(cb: () => void, category: number, stateName: string, changedParams: string[]): void {
+    if (category !== StateCategories.devicesStatus || stateName !== this.definition.id) {
+      return;
+    }
+
+    // check only specified state name or allow any state change if "state" param isn't defined
+    if (this.definition.state && !changedParams.includes(this.definition.state)) return;
+
+    try {
+      cb();
+    }
+    catch (err) {
+      this.triggers.context.log.error(err);
+    }
+  }
 
   private validate(definition: TriggerDefinition) {
     // TODO: validate
