@@ -1,3 +1,3 @@
-export default class OrValue {
+export default function () {
 
 }

@@ -1,3 +1,3 @@
-export default class StatusValue {
+export default function () {
 
 }

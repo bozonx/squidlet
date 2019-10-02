@@ -1,3 +1,3 @@
-export default class AndValue {
+export default function () {
 
 }

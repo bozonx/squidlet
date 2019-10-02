@@ -12,7 +12,7 @@ interface DeviceActionDefinition extends ActionDefinition {
   action: string;
   if: ValueDefinition[];
   // parameters which will be sent to the action
-  value?: string[];
+  values?: string[];
 }
 
 
@@ -51,6 +51,7 @@ export default class DeviceAction implements ActionItem {
   }
 
 
+  // TODO: review
   private async makeArgs(): Promise<any[]> {
     const result: any[] = [];
 
