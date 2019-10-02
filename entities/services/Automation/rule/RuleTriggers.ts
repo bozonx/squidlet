@@ -1,7 +1,6 @@
 import Context from 'system/Context';
 import RuleDefinition, {TriggerDefinition} from '../interfaces/RuleDefinition';
 import TriggerItem, {TriggerItemClass} from '../interfaces/TriggerItem';
-import {RuleActions} from './RuleActions';
 import RuleItem from '../interfaces/RuleItem';
 import DeviceStatus from '../triggers/DeviceStatus';
 

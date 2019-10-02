@@ -1,4 +1,5 @@
 import {StateCategories} from 'system/interfaces/States';
+
 import TriggerItem from '../interfaces/TriggerItem';
 import {TriggerDefinition} from '../interfaces/RuleDefinition';
 import {RuleTriggers} from '../rule/RuleTriggers';
@@ -13,22 +14,20 @@ interface DeviceStateDefinition extends TriggerDefinition {
 
 
 export default class DeviceStatus implements TriggerItem {
-  private readonly manager: RuleTriggers;
+  private readonly triggers: RuleTriggers;
   private readonly definition: DeviceStateDefinition;
+  private handlersIndexes: number[] = [];
 
 
-  constructor(manager: RuleTriggers, definition: TriggerDefinition) {
+  constructor(triggers: RuleTriggers, definition: TriggerDefinition) {
     this.validate(definition);
 
-    this.manager = manager;
+    this.triggers = triggers;
     this.definition = definition as DeviceStateDefinition;
   }
 
 
   onTrigger(cb: () => void): number {
-
-    // TODO: может делать через device
-
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (
         category !== StateCategories.devicesStatus
@@ -40,7 +39,19 @@ export default class DeviceStatus implements TriggerItem {
       cb();
     };
 
-    return this.manager.context.state.onChange(handlerWrapper);
+    const handlerIndex: number = this.triggers.context.state.onChange(handlerWrapper);
+
+    this.handlersIndexes.push(handlerIndex);
+
+    return handlerIndex;
+  }
+
+  destroy(): void {
+    for (let handlerIndex of this.handlersIndexes) {
+      this.triggers.context.state.removeListener(handlerIndex);
+    }
+
+    delete this.handlersIndexes;
   }
 
 
