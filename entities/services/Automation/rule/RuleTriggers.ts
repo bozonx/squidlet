@@ -16,8 +16,8 @@ export class RuleTriggers {
   readonly rules: RuleItem[];
   readonly ruleName: string;
   readonly ruleDefinition: RuleDefinition;
-  readonly actionsManager: RuleActions;
-  triggers?: TriggerItem[];
+  private readonly triggeredCb: () => void;
+  private triggers?: TriggerItem[];
 
 
   constructor(
@@ -25,15 +25,20 @@ export class RuleTriggers {
     rules: RuleItem[],
     ruleName: string,
     ruleDefinition: RuleDefinition,
-    actionsManager: RuleActions
+    triggeredCb: () => void
   ) {
     this.context = context;
     this.rules = rules;
     this.ruleName = ruleName;
     this.ruleDefinition = ruleDefinition;
-    this.actionsManager = actionsManager;
+    this.triggeredCb = triggeredCb;
     // make triggers instances
     this.startTriggers();
+  }
+
+  destroy() {
+    // TODO: add
+    this.stopTriggers();
   }
 
 
@@ -71,13 +76,12 @@ export class RuleTriggers {
     delete this.triggers;
   }
 
-  destroy() {
-    // TODO: add
-    this.stopTriggers();
-  }
-
 
   private instantiateTriggerItem(triggerDefinition: TriggerDefinition): TriggerItem {
+    if (!triggerClasses[triggerDefinition.type]) {
+      throw new Error(`Unsupported trigger type: ${triggerDefinition.type}`);
+    }
+
     const trigger: TriggerItem = new triggerClasses[triggerDefinition.type](this, triggerDefinition);
 
     trigger.onSwitch(this.handleTriggerSwitch);
@@ -87,7 +91,7 @@ export class RuleTriggers {
 
   private handleTriggerSwitch = () => {
     this.context.log.debug(`Automation: triggered rule "${this.ruleName}"`);
-    this.actionsManager.execute();
+    this.triggeredCb();
   }
 
 }

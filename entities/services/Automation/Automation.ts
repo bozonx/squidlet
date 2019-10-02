@@ -67,7 +67,16 @@ export default class Automation extends ServiceBase<Props> {
       const name: string = ruleDefinition.name || this.generateUniqName();
       const actions = new RuleActions(this.context, this.rules, name, ruleDefinition);
       const check = new RuleCheck(this.context, this.rules, name, ruleDefinition);
-      const triggers = new RuleTriggers(this.context, this.rules, name, ruleDefinition, actions);
+      const triggeredCb = () => {
+        actions.execute();
+      };
+      const triggers = new RuleTriggers(
+        this.context,
+        this.rules,
+        name,
+        ruleDefinition,
+        triggeredCb
+      );
 
       const ruleItem: RuleItem = {
         name,
