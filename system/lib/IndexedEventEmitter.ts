@@ -1,3 +1,5 @@
+import {isPromise} from './common';
+
 export type DefaultHandler = (...args: any[]) => void;
 
 
@@ -32,7 +34,7 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
 
       const result: any = handler(...args);
 
-      if (result && typeof result === 'object' && result.then) {
+      if (isPromise(result)) {
         promises.push(result);
       }
     }

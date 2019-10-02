@@ -115,6 +115,14 @@ describe 'system.lib.common', ->
     assert.isFalse(common.isKindOfNumber([]))
     assert.isFalse(common.isKindOfNumber({}))
 
+  it 'isPromise', ->
+    assert.isFalse(common.isPromise(null))
+    assert.isFalse(common.isPromise(1))
+    assert.isFalse(common.isPromise({}))
+    assert.isFalse(common.isPromise({then: 1}))
+    assert.isTrue(common.isPromise({then: () =>}))
+    assert.isTrue(common.isPromise(Promise.resolve()))
+
 #  it 'isEmpty', ->
 #    assert.equal(common.isEmpty(undefined), true)
 #    assert.equal(common.isEmpty(null), true)

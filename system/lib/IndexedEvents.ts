@@ -1,3 +1,5 @@
+import {isPromise} from './common';
+
 export type AnyHandler = (...args: any[]) => void;
 
 
@@ -31,7 +33,7 @@ export default class IndexedEvents<T extends AnyHandler> {
 
       const result: any = handler(...args);
 
-      if (result && typeof result === 'object' && result.then) {
+      if (isPromise(result)) {
         promises.push(result);
       }
     }

@@ -1,6 +1,6 @@
 import Context from 'system/Context';
 import ValueDefinition from '../interfaces/ValueDefinition';
-import allValues, {ValueFunction} from './allValues';
+import allValues from './allValues';
 
 
 interface AndDefinition extends ValueDefinition {

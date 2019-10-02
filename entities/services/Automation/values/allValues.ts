@@ -3,10 +3,11 @@ import StatusValue from './StatusValue';
 import AndValue from './AndValue';
 import OrValue from './OrValue';
 import Context from 'system/Context';
-import {JsonTypes} from '../../../../system/interfaces/Types';
+import {JsonTypes} from 'system/interfaces/Types';
 
 
-export type ValueFunction = (context: Context, definition: any) => JsonTypes | undefined;
+export type ValueFunctionReturnType = (JsonTypes | undefined) | Promise<JsonTypes | undefined>;
+export type ValueFunction = (context: Context, definition: any) => ValueFunctionReturnType;
 
 const allValues: {[index: string]: ValueFunction} = {
   andValue: AndValue,
@@ -16,12 +17,12 @@ const allValues: {[index: string]: ValueFunction} = {
 };
 
 
-export async function makeValue(context: Context, valueDefinition: any): Promise<JsonTypes | undefined> {
+export function makeValue(context: Context, valueDefinition: any): ValueFunctionReturnType {
   if (!allValues[valueDefinition.type]) {
     throw new Error(`Automation DeviceAction: can't find a value function of "${valueDefinition.type}"`);
   }
 
-  return await allValues[valueDefinition.type](context, valueDefinition);
+  const result allValues[valueDefinition.type](context, valueDefinition);
 }
 
 
