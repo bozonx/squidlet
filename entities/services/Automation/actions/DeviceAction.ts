@@ -1,10 +1,10 @@
 import DeviceBase from 'system/base/DeviceBase';
+
 import ActionItem from '../interfaces/ActionItem';
 import {ActionDefinition} from '../interfaces/RuleDefinition';
 import {RuleActions} from '../rule/RuleActions';
 import ValueDefinition from '../interfaces/ValueDefinition';
 import {makeValue} from '../values/allValues';
-import {JsonTypes} from '../../../../system/interfaces/Types';
 import AndValue from '../values/AndValue';
 
 
@@ -40,7 +40,7 @@ export default class DeviceAction implements ActionItem {
     // do nothing if condition is false
     if (!this.checkCondition()) return;
 
-    const device: DeviceBase = this.actions.context.system.devicesactions.getDevice(this.definition.id);
+    const device: DeviceBase = this.actions.context.system.devicesManager.getDevice(this.definition.id);
     const args: any[] = await this.makeArgs();
 
     this.actions.context.log.debug(
