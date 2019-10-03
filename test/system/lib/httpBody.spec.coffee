@@ -1,7 +1,7 @@
 httpBody = require('../../../system/lib/httpBody')
 
 
-describe.only 'system.lib.httpBody', ->
+describe 'system.lib.httpBody', ->
   it 'parseBody', ->
     uintArr = new Uint8Array([0])
 

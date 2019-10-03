@@ -29,6 +29,8 @@ export function trimCharEnd(src: string, char: string = ' '): string {
     }
   }
 
+  if (!countToCut) return src;
+
   return src.slice(0, countToCut);
 }
 

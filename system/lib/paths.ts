@@ -34,7 +34,9 @@ export function pathJoin (...paths: string[]): string {
     prepared.push(cleared);
   }
 
-  return prepared.join(PATH_SEP);
+  return prepared
+    .filter((item) => Boolean(item))
+    .join(PATH_SEP);
 }
 
 export function pathIsAbsolute(pathToDirOrFile: string): boolean {
