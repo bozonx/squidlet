@@ -10,8 +10,8 @@ export type ValueFunctionReturnType = (JsonTypes | undefined) | Promise<JsonType
 export type ValueFunction = (context: Context, definition: any) => ValueFunctionReturnType;
 
 const allValues: {[index: string]: ValueFunction} = {
-  andValue: AndValue,
-  orValue: OrValue,
+  and: AndValue,
+  or: OrValue,
   statusBoolean: StatusBooleanValue,
   status: StatusValue,
 };
