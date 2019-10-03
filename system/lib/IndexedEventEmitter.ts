@@ -23,7 +23,22 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   }
 
   emitSync = async (eventName: string | number, ...args: any[]): Promise<void> => {
-    if (!this.indexes[eventName]) return Promise.resolve();
+    if (!this.indexes[eventName]) return;
+
+    for (let index of this.indexes[eventName]) {
+      const handler: T | undefined = this.handlers[index];
+
+      if (!handler) continue;
+
+      await handler(...args);
+    }
+  }
+
+  // TODO: можно сделать вариант когда выполняются все, ошибочные пропускаются и выводятся ошибки списокм
+
+  // TODO: test
+  emitAll = async (eventName: string | number, ...args: any[]): Promise<void> => {
+    if (!this.indexes[eventName]) return;
 
     const promises: Promise<any>[] = [];
 
@@ -39,7 +54,7 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
       }
     }
 
-    return Promise.all(promises).then(() => undefined);
+    await Promise.all(promises);
   }
 
   once(eventName: string | number, handler: T): number {

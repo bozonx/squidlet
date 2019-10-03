@@ -35,7 +35,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.configState.isReading() || this.configState.isWriting();
   }
 
-  //protected readonly env: EntityEnv;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
    */
@@ -87,7 +86,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       );
     }
 
-    this.context.onAppInit(async () => {
+    // TODO: ???? why ??? strong review
+    this.context.onDevicesInit(async () => {
       await Promise.all([
         this.statusState && this.statusState.init(),
         this.configState && this.configState.init(),

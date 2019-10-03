@@ -26,6 +26,17 @@ export default class IndexedEvents<T extends AnyHandler> {
   }) as T;
 
   emitSync = async (...args: any[]): Promise<void> => {
+    for (let handler of this.handlers) {
+      if (!handler) continue;
+
+      await handler(...args);
+    }
+  }
+
+  // TODO: можно сделать вариант когда выполняются все, ошибочные пропускаются и выводятся ошибки списокм
+
+  // TODO: test
+  emitAll = async (...args: any[]): Promise<void> => {
     const promises: Promise<any>[] = [];
 
     for (let handler of this.handlers) {
