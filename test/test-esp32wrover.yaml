@@ -16,13 +16,15 @@ automation:
   rules:
     - name: switch_led
       trigger:
-        - type: deviceState
+        - type: status
           id: bedroom.wall-light-toggle
       action:
-        - type: deviceAction
+        - type: action
           id: bedroom.light2
           action: turn
-          params: 'getDeviceStatus("bedroom.wall-light-toggle")'
+          value:
+            - type: statusBoolean
+              id: bedroom.wall-light-toggle
 
 devices:
   bedroom:
