@@ -247,8 +247,18 @@ describe 'system.lib.url', ->
       path: '/api/getState/0,bedroom.light1',
     })
 
+  it 'parseUrl - dot in file name', ->
+    testUrl = '127.0.0.1/path/index.html?param=1'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      host: '127.0.0.1',
+      path: '/path/index.html',
+      search: {
+        param: 1
+      }
+    })
 
-  #it 'parseUrl - bad url', ->
+
+#it 'parseUrl - bad url', ->
     # bad protocol
     #assert.throws(() => url.parseUrl('http:/host.com/path'))
     # bad search
