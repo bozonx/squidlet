@@ -93,7 +93,7 @@ export default class System {
     await this.initTopLayer();
 
     this._isAppInitialized = true;
-    await this.events.emitSync(AppLifeCycleEvents.appInitialized);
+    await this.emitEventSync(AppLifeCycleEvents.appInitialized);
 
     // remove initialization config
     delete this._initializationConfig;
@@ -113,7 +113,16 @@ export default class System {
     console.info(`---> Initializing devices`);
     await this.devicesManager.init();
     this._isDevicesInitialized = true;
-    await this.events.emitSync(AppLifeCycleEvents.devicesInitialized);
+    await this.emitEventSync(AppLifeCycleEvents.devicesInitialized);
+  }
+
+  private async emitEventSync(eventName: number) {
+    try {
+      await this.events.emitSync(eventName);
+    }
+    catch (err) {
+      this.context.log.error(err);
+    }
   }
 
 }

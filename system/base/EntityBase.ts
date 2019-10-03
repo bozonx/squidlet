@@ -82,27 +82,11 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     const getDriverDep: GetDriverDep = this.getDriverDepCb();
 
     if (this.devicesDidInit) {
-      // TODO: будет не синхронно
-      this.context.onDevicesInit(async () => {
-        try {
-          this.devicesDidInit && await this.devicesDidInit();
-        }
-        catch (err) {
-          this.log.error(err);
-        }
-      });
+      this.context.onDevicesInit(this.devicesDidInit);
     }
 
     if (this.appDidInit) {
-      // TODO: будет не синхронно
-      this.context.onAppInit(async () => {
-        try {
-          this.appDidInit && await this.appDidInit();
-        }
-        catch (err) {
-          this.log.error(err);
-        }
-      });
+      this.context.onAppInit(this.appDidInit);
     }
 
     if (this.willInit) await this.willInit(getDriverDep);
