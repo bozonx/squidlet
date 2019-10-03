@@ -78,11 +78,18 @@ export default class Context {
   private addListenerOnce(isFulfilled: boolean, eventName: AppLifeCycleEvents, cb: () => Promise<void>): number {
     // call immediately if devices are initialized
     if (isFulfilled) {
-      const promise: Promise<void> | undefined = cb();
+      try {
+        const promise: Promise<void> | undefined = cb();
 
-      if (promise) promise.catch(this.log.error);
+        if (promise) promise.catch(this.log.error);
 
-      return -1;
+        return -1;
+      }
+      catch (err) {
+        this.log.error(err);
+
+        return -1;
+      }
     }
 
     return this.system.events.once(eventName, cb);
