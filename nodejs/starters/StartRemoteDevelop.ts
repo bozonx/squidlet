@@ -39,11 +39,14 @@ export default class StartRemoteDevelop extends StartDevelopBase {
   }
 
   async init() {
-    this.remoteHostInfo = await this.httpApiClient.callMethod<HostInfo>('info');
+    this.remoteHostInfo = await this.httpApiClient.callMethod('info') as any;
 
     await super.init();
 
     console.info(`Using remote ioset of host "${this.joinHostPort()}".`);
+
+    if (!this.remoteHostInfo) return;
+
     console.info(`Remote machine: ${this.remoteHostInfo.machine}, ${this.remoteHostInfo.platform}`);
   }
 

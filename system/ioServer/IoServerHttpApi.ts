@@ -93,7 +93,7 @@ export default class IoServerHttpApi {
       return this.makeHttpApiErrorResponse(`Unsupported api call: "${preparedPath}"`);
     }
 
-    return { body };
+    return { body: body as {[index: string]: any} };
   }
 
   private apiReboot(): HttpApiBody {
@@ -123,7 +123,7 @@ export default class IoServerHttpApi {
       usedIo: this.ioSet.getNames(),
     };
 
-    return { result: hostInfo };
+    return { result: hostInfo as {[index: string]: any} };
   }
 
   private makeHttpApiErrorResponse(error: string): HttpDriverResponse {
@@ -133,7 +133,7 @@ export default class IoServerHttpApi {
 
     return {
       status: 500,
-      body
+      body: body as {[index: string]: any}
     };
   }
 
