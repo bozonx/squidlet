@@ -24,7 +24,7 @@ export default class Context {
     return this.hostConfig as any;
   }
   get isInitialized() {
-    return this.system.isAppInitialized;
+    return this.system.wasAppInitialized;
   }
 
   private hostConfig?: HostConfig;
@@ -64,11 +64,11 @@ export default class Context {
   // }
 
   onDevicesInit(cb: () => Promise<void>): number {
-    return this.addListenerOnce(this.system.isDevicesInitialized, AppLifeCycleEvents.devicesInitialized, cb);
+    return this.addListenerOnce(this.system.wasDevicesInitialized, AppLifeCycleEvents.devicesInitialized, cb);
   }
 
   onAppInit(cb: () => Promise<void>): number {
-    return this.addListenerOnce(this.system.isAppInitialized, AppLifeCycleEvents.appInitialized, cb);
+    return this.addListenerOnce(this.system.wasAppInitialized, AppLifeCycleEvents.appInitialized, cb);
   }
 
   onBeforeDestroy(cb: () => Promise<void>): number {

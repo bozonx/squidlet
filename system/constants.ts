@@ -5,6 +5,8 @@ export const WAIT_RESPONSE_TIMEOUT_SEC = 60;
 
 // TODO: make full system event enum
 export enum AppLifeCycleEvents {
+  driversInitialized,
+  servicesInitialized,
   devicesInitialized,
   appInitialized,
   beforeDestroy,

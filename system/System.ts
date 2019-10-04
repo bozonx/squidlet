@@ -28,15 +28,23 @@ export default class System {
   readonly apiManager: ApiManager;
   readonly api: Api;
 
-  get isDevicesInitialized(): boolean {
-    return this._isDevicesInitialized;
+  get wasDriversInitialized(): boolean {
+    return this._wasDriversInitialized;
   }
-  get isAppInitialized(): boolean {
-    return this._isAppInitialized;
+  get wasServicesInitialized(): boolean {
+    return this._wasServicesInitialized;
+  }
+  get wasDevicesInitialized(): boolean {
+    return this._wasDevicesInitialized;
+  }
+  get wasAppInitialized(): boolean {
+    return this._wasAppInitialized;
   }
 
-  private _isDevicesInitialized: boolean = false;
-  private _isAppInitialized: boolean = false;
+  private _wasDriversInitialized: boolean = false;
+  private _wasServicesInitialized: boolean = false;
+  private _wasDevicesInitialized: boolean = false;
+  private _wasAppInitialized: boolean = false;
   private readonly logger: Logger;
 
 
@@ -86,17 +94,20 @@ export default class System {
 
     console.info(`---> Initializing drivers`);
     await this.driversManager.initialize();
+    this._wasDriversInitialized = true;
+    await this.emitEventSync(AppLifeCycleEvents.driversInitialized);
 
     console.info(`---> Initializing system services`);
     await this.servicesManager.initialize();
+    this._wasServicesInitialized = true;
+    await this.emitEventSync(AppLifeCycleEvents.servicesInitialized);
 
     console.info(`---> Initializing devices`);
     await this.devicesManager.initialize();
-
-    this._isDevicesInitialized = true;
+    this._wasDevicesInitialized = true;
     await this.emitEventSync(AppLifeCycleEvents.devicesInitialized);
 
-    this._isAppInitialized = true;
+    this._wasAppInitialized = true;
     await this.emitEventSync(AppLifeCycleEvents.appInitialized);
 
     console.info(`===> System initialization has been finished`);
