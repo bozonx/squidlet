@@ -11,6 +11,7 @@ import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import Logger from './interfaces/Logger';
+import LogLevel from './interfaces/LogLevel';
 
 
 export type ShutdownHandler = (reason: ShutdownReason) => void;
@@ -45,7 +46,6 @@ export default class System {
   private _wasServicesInitialized: boolean = false;
   private _wasDevicesInitialized: boolean = false;
   private _wasAppInitialized: boolean = false;
-  private readonly logger: Logger;
 
 
   /**
@@ -54,9 +54,8 @@ export default class System {
    * @param shutdownRequestCb - handler of shutdown request
    * @param logger - external logger
    */
-  constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler, logger: Logger) {
+  constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler, logger?: Logger) {
     this.shutdownRequest = shutdownRequestCb;
-    this.logger = logger;
     this.context = new Context(this);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);
@@ -65,6 +64,13 @@ export default class System {
     this.devicesManager = new DevicesManager(this.context);
     this.apiManager = new ApiManager(this.context);
     this.api = new Api(this.context);
+
+    // send logs to an external logger to catch logs on initialization time
+    if (logger) {
+      this.events.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
+        logger[level](message);
+      });
+    }
   }
 
   destroy = async () => {
@@ -76,33 +82,33 @@ export default class System {
     await this.driversManager.destroy();
     this.context.destroy();
     this.events.destroy();
-    console.info('System has been successfully destroyed');
+    this.context.log.info('System has been successfully destroyed');
   }
 
 
   async start() {
-    console.info(`---> Initializing io`);
+    this.context.log.info(`---> Initializing io`);
     await this.ioManager.init();
 
-    console.info(`---> Initializing context`);
+    this.context.log.info(`---> Initializing context`);
     await this.context.init();
 
-    console.info(`---> Instantiating entities`);
+    this.context.log.info(`---> Instantiating entities`);
     await this.driversManager.instantiate();
     await this.servicesManager.instantiate();
     await this.devicesManager.instantiate();
 
-    console.info(`---> Initializing drivers`);
+    this.context.log.info(`---> Initializing drivers`);
     await this.driversManager.initialize();
     this._wasDriversInitialized = true;
     await this.emitEventSync(SystemEvents.driversInitialized);
 
-    console.info(`---> Initializing system services`);
+    this.context.log.info(`---> Initializing system services`);
     await this.servicesManager.initialize();
     this._wasServicesInitialized = true;
     await this.emitEventSync(SystemEvents.servicesInitialized);
 
-    console.info(`---> Initializing devices`);
+    this.context.log.info(`---> Initializing devices`);
     await this.devicesManager.initialize();
     this._wasDevicesInitialized = true;
     await this.emitEventSync(SystemEvents.devicesInitialized);
@@ -110,7 +116,7 @@ export default class System {
     this._wasAppInitialized = true;
     await this.emitEventSync(SystemEvents.appInitialized);
 
-    console.info(`===> System initialization has been finished`);
+    this.context.log.info(`===> System initialization has been finished`);
   }
 
 

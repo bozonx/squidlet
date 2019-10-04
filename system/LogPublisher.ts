@@ -28,11 +28,12 @@ export default class LogPublisher {
   }
 
 
+  // TODO: review
   private emit(level: LogLevel, message: string) {
-    const eventName = `${SystemEvents.logger}_${level}`;
-
-    this.context.system.events.emit(eventName, message, level);
-    this.context.system.events.emit(SystemEvents.logger, message, level);
+    // const eventName = `${SystemEvents.logger}_${level}`;
+    //
+    // this.context.system.events.emit(eventName, message, level);
+    this.context.system.events.emit(SystemEvents.logger, level, message);
   }
 
 }
