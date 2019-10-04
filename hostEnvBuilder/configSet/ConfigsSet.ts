@@ -20,21 +20,13 @@ export default class ConfigsSet {
 
 
   getConfigSet(): HostConfigSet {
-    const [
-      systemDrivers,
-      regularDrivers,
-    ] = this.sortDrivers();
-    const [
-      systemServices,
-      regularServices,
-    ] = this.sortServices();
+    const driversList: string[] = this.sortDrivers();
+    const servicesList: string[] = this.sortServices();
 
     return {
       config: this.configManager.hostConfig,
-      systemDrivers,
-      regularDrivers,
-      systemServices,
-      regularServices,
+      driversList,
+      servicesList,
       devicesDefinitions: Object.values(this.definitions.getDevicesDefinitions()),
       driversDefinitions: this.definitions.getDriversDefinitions(),
       servicesDefinitions: this.definitions.getServicesDefinitions(),
@@ -46,7 +38,7 @@ export default class ConfigsSet {
    * sort drivers to system and regular
    * @returns [systemDrivers, regularDrivers]
    */
-  private sortDrivers(): [string[], string[]] {
+  private sortDrivers(): string[] {
     const driversClasses: string[] = this.usedEntities.getEntitiesNames().drivers;
     const allSystemDrivers: string[] = [];
 
@@ -63,7 +55,7 @@ export default class ConfigsSet {
    * sort services to system and regular
    * @returns [systemServices, regularServices]
    */
-  private sortServices(): [string[], string[]] {
+  private sortServices(): string[] {
     const servicesClasses: string[] = this.usedEntities.getEntitiesNames().services;
     const allSystemServices: string[] = [];
 

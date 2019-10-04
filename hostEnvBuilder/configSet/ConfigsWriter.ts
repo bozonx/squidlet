@@ -42,10 +42,8 @@ export default class ConfigsWriter {
       this.ownerOptions
     );
     // write host's definitions
-    await this.os.writeJson(path.join(configDir, fileNames.systemDrivers), hostConfigSet.systemDrivers, this.ownerOptions);
-    await this.os.writeJson(path.join(configDir, fileNames.regularDrivers), hostConfigSet.regularDrivers, this.ownerOptions);
-    await this.os.writeJson(path.join(configDir, fileNames.systemServices), hostConfigSet.systemServices, this.ownerOptions);
-    await this.os.writeJson(path.join(configDir, fileNames.regularServices), hostConfigSet.regularServices, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.driversList), hostConfigSet.driversList, this.ownerOptions);
+    await this.os.writeJson(path.join(configDir, fileNames.servicesList), hostConfigSet.servicesList, this.ownerOptions);
     await this.os.writeJson(path.join(configDir, fileNames.devicesDefinitions), hostConfigSet.devicesDefinitions, this.ownerOptions);
     await this.os.writeJson(path.join(configDir, fileNames.driversDefinitions), hostConfigSet.driversDefinitions, this.ownerOptions);
     await this.os.writeJson(path.join(configDir, fileNames.servicesDefinitions), hostConfigSet.servicesDefinitions, this.ownerOptions);

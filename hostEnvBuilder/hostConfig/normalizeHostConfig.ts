@@ -4,6 +4,7 @@ import systemConfig from '../configs/systemConfig';
 import {EntityType} from '../../system/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import {cloneDeepObject, omitObj} from '../../system/lib/objects';
+import {DEVICE_ID_SEPARATOR} from '../constants';
 
 
 /**
@@ -34,7 +35,7 @@ function makeDevicesPlain(preDevices?: {[index: string]: any}): {[index: string]
     // else it's room - go deeper in room
     for (let itemName of Object.keys(preDevicesOrRoom)) {
       const newRoot = (root)
-        ? [ root, itemName ].join(systemConfig.hostSysCfg.deviceIdSeparator)
+        ? [ root, itemName ].join(DEVICE_ID_SEPARATOR)
         : itemName;
       recursively(newRoot, preDevicesOrRoom[itemName]);
     }
