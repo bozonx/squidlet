@@ -70,8 +70,7 @@ export default class Context {
     return this.addListenerOnce(this.system.isAppInitialized, AppLifeCycleEvents.appInitialized, cb);
   }
 
-  // TODO: может тоже сделать асинронный ???
-  onBeforeDestroy(cb: () => void): number {
+  onBeforeDestroy(cb: () => Promise<void>): number {
     return this.system.events.once(AppLifeCycleEvents.beforeDestroy, cb);
   }
 

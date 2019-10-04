@@ -57,7 +57,7 @@ export default class System {
 
   destroy = async () => {
     this.context.log.info('... destroying System');
-    this.events.emit(AppLifeCycleEvents.beforeDestroy);
+    await this.events.emitSync(AppLifeCycleEvents.beforeDestroy);
     await this.apiManager.destroy();
     await this.devicesManager.destroy();
     await this.servicesManager.destroy();
