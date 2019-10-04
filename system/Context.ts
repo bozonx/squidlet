@@ -4,7 +4,7 @@ import State from './lib/State';
 import HostConfig from './interfaces/HostConfig';
 import System from './System';
 import {makeUniqId} from './lib/uniqId';
-import {AppLifeCycleEvents} from './constants';
+import {SystemEvents} from './constants';
 import IoItem from './interfaces/IoItem';
 import DriverBase from './base/DriverBase';
 import ServiceBase from './base/ServiceBase';
@@ -64,19 +64,19 @@ export default class Context {
   // }
 
   onDevicesInit(cb: () => Promise<void>): number {
-    return this.addListenerOnce(this.system.wasDevicesInitialized, AppLifeCycleEvents.devicesInitialized, cb);
+    return this.addListenerOnce(this.system.wasDevicesInitialized, SystemEvents.devicesInitialized, cb);
   }
 
   onAppInit(cb: () => Promise<void>): number {
-    return this.addListenerOnce(this.system.wasAppInitialized, AppLifeCycleEvents.appInitialized, cb);
+    return this.addListenerOnce(this.system.wasAppInitialized, SystemEvents.appInitialized, cb);
   }
 
   onBeforeDestroy(cb: () => Promise<void>): number {
-    return this.system.events.once(AppLifeCycleEvents.beforeDestroy, cb);
+    return this.system.events.once(SystemEvents.beforeDestroy, cb);
   }
 
 
-  private addListenerOnce(isFulfilled: boolean, eventName: AppLifeCycleEvents, cb: () => Promise<void>): number {
+  private addListenerOnce(isFulfilled: boolean, eventName: SystemEvents, cb: () => Promise<void>): number {
     // call immediately if devices are initialized
     if (isFulfilled) {
       try {

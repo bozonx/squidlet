@@ -8,7 +8,7 @@ import ApiManager from './managers/ApiManager';
 import Api from './Api';
 import Context from './Context';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
-import {AppLifeCycleEvents} from './constants';
+import {SystemEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import Logger from './interfaces/Logger';
 
@@ -69,7 +69,7 @@ export default class System {
 
   destroy = async () => {
     this.context.log.info('... destroying System');
-    await this.events.emitSync(AppLifeCycleEvents.beforeDestroy);
+    await this.events.emitSync(SystemEvents.beforeDestroy);
     await this.apiManager.destroy();
     await this.devicesManager.destroy();
     await this.servicesManager.destroy();
@@ -95,20 +95,20 @@ export default class System {
     console.info(`---> Initializing drivers`);
     await this.driversManager.initialize();
     this._wasDriversInitialized = true;
-    await this.emitEventSync(AppLifeCycleEvents.driversInitialized);
+    await this.emitEventSync(SystemEvents.driversInitialized);
 
     console.info(`---> Initializing system services`);
     await this.servicesManager.initialize();
     this._wasServicesInitialized = true;
-    await this.emitEventSync(AppLifeCycleEvents.servicesInitialized);
+    await this.emitEventSync(SystemEvents.servicesInitialized);
 
     console.info(`---> Initializing devices`);
     await this.devicesManager.initialize();
     this._wasDevicesInitialized = true;
-    await this.emitEventSync(AppLifeCycleEvents.devicesInitialized);
+    await this.emitEventSync(SystemEvents.devicesInitialized);
 
     this._wasAppInitialized = true;
-    await this.emitEventSync(AppLifeCycleEvents.appInitialized);
+    await this.emitEventSync(SystemEvents.appInitialized);
 
     console.info(`===> System initialization has been finished`);
   }

@@ -3,12 +3,11 @@ export const SERVER_STARTING_TIMEOUT_SEC = 30;
 // wait for response for http and so on
 export const WAIT_RESPONSE_TIMEOUT_SEC = 60;
 
-// TODO: make full system event enum
-export enum AppLifeCycleEvents {
+export enum SystemEvents {
   driversInitialized,
   servicesInitialized,
   devicesInitialized,
   appInitialized,
   beforeDestroy,
+  logger,
 }
-export const LOGGER_EVENT = 'LOGGER';

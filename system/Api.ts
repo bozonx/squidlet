@@ -5,9 +5,9 @@ import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostInfo from './interfaces/HostInfo';
 import {calcAllowedLogLevels} from './lib/helpers';
-import {LOGGER_EVENT} from './constants';
 import SysIo from './interfaces/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
+import {SystemEvents} from './constants';
 
 
 export default class Api {
@@ -181,7 +181,7 @@ export default class Api {
   listenLog(logLevel: LogLevel = 'info', cb: (msg: string) => void): number {
     const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(logLevel);
 
-    return this.context.system.events.addListener(LOGGER_EVENT, (message: string, level: LogLevel) => {
+    return this.context.system.events.addListener(SystemEvents.logger, (message: string, level: LogLevel) => {
       if (allowedLogLevels.includes(level)) cb(message);
     });
   }
@@ -194,7 +194,7 @@ export default class Api {
   }
 
   removeLogListener(handlerIndex: number) {
-    this.context.system.events.removeListener(handlerIndex, LOGGER_EVENT);
+    this.context.system.events.removeListener(handlerIndex, SystemEvents.logger);
   }
 
 }
