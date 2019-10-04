@@ -2,8 +2,8 @@
 
 id: testHost
 
-consoleLogger:
-  logLevel: debug
+#consoleLogger:
+#  logLevel: debug
 
 #httpApi:
 #  host: 0.0.0.0

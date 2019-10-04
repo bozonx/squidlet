@@ -40,9 +40,9 @@ describe 'envBuilder.normalizeHostConfig', ->
       }
       services: {
         # default service
-        consoleLogger: {
-          className: 'ConsoleLogger'
-        }
+#        consoleLogger: {
+#          className: 'ConsoleLogger'
+#        }
         myService: {
           className: 'ServiceClass'
           param: 1
@@ -67,9 +67,9 @@ describe 'envBuilder.normalizeHostConfig', ->
       mqtt: {
         param: 2
       }
-      consoleLogger: {
-        param: 3
-      }
+#      consoleLogger: {
+#        param: 3
+#      }
     }
 
     assert.deepEqual(normalize(hostConfig), {
@@ -87,10 +87,6 @@ describe 'envBuilder.normalizeHostConfig', ->
         mqtt: {
           className: 'Mqtt'
           param: 2
-        }
-        consoleLogger: {
-          className: 'ConsoleLogger'
-          param: 3
         }
       }
     })

@@ -53,9 +53,9 @@ describe 'envBuilder.ConfigManager', ->
       drivers: {}
       services: {
         # default service
-        consoleLogger: {
-          className: 'ConsoleLogger'
-        }
+#        consoleLogger: {
+#          className: 'ConsoleLogger'
+#        }
       }
     })
     assert.deepEqual(@configManager.iosDefinitions, {
