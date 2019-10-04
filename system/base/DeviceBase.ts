@@ -86,7 +86,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       );
     }
 
-    // TODO: ???? why ??? strong review
+    // TODO: strong review - экспандеры должны инициализироваться до пинов
     this.context.onDevicesInit(async () => {
       await Promise.all([
         this.statusState && this.statusState.init(),

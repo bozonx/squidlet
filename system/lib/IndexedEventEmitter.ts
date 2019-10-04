@@ -61,7 +61,8 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     let wrapperIndex: number;
     const wrapper = ((...args: any[]) => {
       this.removeListener(wrapperIndex, eventName);
-      handler(...args);
+      // return in promise case
+      return handler(...args);
     }) as T;
 
     wrapperIndex = this.addListener(eventName, wrapper);
