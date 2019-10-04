@@ -4,15 +4,15 @@
 
 // TODO: расформировать
 
-import initializationConfig from '../../system/initializationConfig';
-import InitializationConfig from '../../system/interfaces/InitializationConfig';
+//import initializationConfig from '../../system/initializationConfig';
+//import InitializationConfig from '../../system/interfaces/InitializationConfig';
 import systemConfig from '../../system/systemConfig';
 
 
-const hostInitCfg: InitializationConfig = initializationConfig();
+//const hostInitCfg: InitializationConfig = initializationConfig();
 
 export default {
-  hostInitCfg,
+  //hostInitCfg,
   hostSysCfg: systemConfig,
 
   indexManifestFileNames: ['manifest.yaml'],

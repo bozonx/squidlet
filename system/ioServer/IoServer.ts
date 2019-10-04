@@ -1,8 +1,6 @@
 import IoSet from '../interfaces/IoSet';
 import WebSocketServerIo from '../interfaces/io/WebSocketServerIo';
 import HostConfig from '../interfaces/HostConfig';
-import InitializationConfig from '../interfaces/InitializationConfig';
-import initializationConfig from '../initializationConfig';
 import {pathJoin} from '../lib/paths';
 import systemConfig from '../systemConfig';
 import StorageIo from '../interfaces/io/StorageIo';
@@ -13,10 +11,6 @@ import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
 
 import IoServerConnection from './IoServerConnection';
 import IoServerHttpApi from './IoServerHttpApi';
-
-
-
-const initCfg: InitializationConfig = initializationConfig();
 
 
 export default class IoServer {
@@ -55,7 +49,7 @@ export default class IoServer {
   }
 
   async start() {
-    this._hostConfig = await this.loadConfig<HostConfig>(initCfg.fileNames.hostConfig);
+    this._hostConfig = await this.loadConfig<HostConfig>(systemConfig.fileNames.hostConfig);
 
     this.logInfo('--> Configuring Io');
     await this.configureIoSet();
@@ -181,7 +175,7 @@ export default class IoServer {
 
   private async configureIoSet() {
     const ioParams = await this.loadConfig<IoItemDefinition>(
-      initCfg.fileNames.iosDefinitions
+      systemConfig.fileNames.iosDefinitions
     );
 
     for (let ioName of Object.keys(ioParams)) {

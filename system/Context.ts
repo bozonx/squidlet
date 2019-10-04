@@ -8,6 +8,7 @@ import {AppLifeCycleEvents} from './constants';
 import IoItem from './interfaces/IoItem';
 import DriverBase from './base/DriverBase';
 import ServiceBase from './base/ServiceBase';
+import systemConfig from './systemConfig';
 
 
 export default class Context {
@@ -35,7 +36,7 @@ export default class Context {
 
   async init() {
     this.hostConfig = await this.system.envSet.loadConfig<HostConfig>(
-      this.system.initializationConfig.fileNames.hostConfig
+      systemConfig.fileNames.hostConfig
     );
   }
 

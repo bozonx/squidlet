@@ -1,12 +1,13 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
 import ServiceBase from '../base/ServiceBase';
+import systemConfig from '../systemConfig';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceBase> {
   async initSystemServices() {
     const systemServicesList: string[] = await this.context.system.envSet.loadConfig<string[]>(
-      this.context.system.initializationConfig.fileNames.systemServices
+      systemConfig.fileNames.systemServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(systemServicesList);
 
@@ -15,7 +16,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase> {
 
   async initRegularServices() {
     const regularServicesList = await this.context.system.envSet.loadConfig<string[]>(
-      this.context.system.initializationConfig.fileNames.regularServices
+      systemConfig.fileNames.regularServices
     );
     const servicesIds: string[] = await this.generateServiceIdsList(regularServicesList);
 
@@ -36,7 +37,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase> {
 
   private async initServices(servicesIds: string[]) {
     const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.context.system.initializationConfig.fileNames.servicesDefinitions
+      systemConfig.fileNames.servicesDefinitions
     );
 
     for (let serviceId of servicesIds) {
@@ -50,7 +51,7 @@ export default class ServicesManager extends EntityManagerBase<ServiceBase> {
   private async generateServiceIdsList(allowedClassNames: string[]): Promise<string[]> {
     const servicesIds: string[] = [];
     const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.context.system.initializationConfig.fileNames.servicesDefinitions
+      systemConfig.fileNames.servicesDefinitions
     );
 
     for (let serviceId of Object.keys(definitions)) {

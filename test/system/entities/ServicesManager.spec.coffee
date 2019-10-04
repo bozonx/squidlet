@@ -1,5 +1,5 @@
 ServicesManager = require('../../../system/managers/ServicesManager').default
-initializationConfig = require('../../../system/initializationConfig').default
+#initializationConfig = require('../../../system/initializationConfig').default
 
 
 describe 'system.ServicesManager', ->

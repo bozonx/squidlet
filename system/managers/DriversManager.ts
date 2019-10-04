@@ -1,6 +1,7 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
 import DriverBase from '../base/DriverBase';
+import systemConfig from '../systemConfig';
 
 
 /**
@@ -10,7 +11,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
   async initSystemDrivers(): Promise<void> {
     // get list of system drivers from json file
     const systemDriversList = await this.context.system.envSet.loadConfig<string[]>(
-      this.context.system.initializationConfig.fileNames.systemDrivers
+      systemConfig.fileNames.systemDrivers
     );
 
     await this.initDrivers(systemDriversList);
@@ -19,7 +20,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
   async initRegularDrivers(): Promise<void> {
     // get list of regular drivers from json file
     const regularDriversList = await this.context.system.envSet.loadConfig<string[]>(
-      this.context.system.initializationConfig.fileNames.regularDrivers
+      systemConfig.fileNames.regularDrivers
     );
 
     await this.initDrivers(regularDriversList);
@@ -59,7 +60,7 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
    */
   private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
     return this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      this.context.system.initializationConfig.fileNames.driversDefinitions
+      systemConfig.fileNames.driversDefinitions
     );
   }
 

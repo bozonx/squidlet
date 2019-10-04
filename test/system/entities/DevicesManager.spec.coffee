@@ -1,5 +1,5 @@
 DevicesManager = require('../../../system/managers/DevicesManager').default
-initializationConfig = require('../../../system/initializationConfig').default
+#initializationConfig = require('../../../system/initializationConfig').default
 
 
 describe 'app.DevicesManager', ->

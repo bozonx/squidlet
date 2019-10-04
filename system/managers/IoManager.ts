@@ -1,6 +1,7 @@
 import IoSet from '../interfaces/IoSet';
 import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
 import Context from '../Context';
+import systemConfig from '../systemConfig';
 
 
 export default class IoManager {
@@ -31,7 +32,7 @@ export default class IoManager {
   private async configureAllIo() {
     const ioNames: string[] = this.ioSet.getNames();
     const ioParams = await this.context.system.envSet.loadConfig<IoItemDefinition>(
-      this.context.system.initializationConfig.fileNames.iosDefinitions
+      systemConfig.fileNames.iosDefinitions
     );
 
     // configure ios if need

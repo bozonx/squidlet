@@ -32,12 +32,12 @@ export default class ConfigsWriter {
   async write() {
     const hostConfigSet: HostConfigSet = this.configsSet.getConfigSet();
     //const hostsUsedEntitiesNames: EntitiesNames = this.hostClassNames.getEntitiesNames();
-    const fileNames = systemConfig.hostInitCfg.fileNames;
+    const fileNames = systemConfig.hostSysCfg.fileNames;
     const configDir = path.join(this.buildDir, systemConfig.hostSysCfg.envSetDirs.configs);
 
     // write host's config
     await this.os.writeJson(
-      path.join(configDir, systemConfig.hostInitCfg.fileNames.hostConfig),
+      path.join(configDir, systemConfig.hostSysCfg.fileNames.hostConfig),
       hostConfigSet.config,
       this.ownerOptions
     );

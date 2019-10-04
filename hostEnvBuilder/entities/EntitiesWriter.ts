@@ -74,7 +74,7 @@ export default class EntitiesWriter {
 
     // write manifest
     await this.os.writeJson(
-      path.join(entityDstDir, systemConfig.hostInitCfg.fileNames.manifest),
+      path.join(entityDstDir, systemConfig.hostSysCfg.fileNames.manifest),
       entitySet.manifest,
       this.ownerOptions
     );

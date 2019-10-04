@@ -1,5 +1,5 @@
 DriversManager = require('../../../system/managers/DriversManager').default
-initializationConfig = require('../../../system/initializationConfig').default
+#initializationConfig = require('../../../system/initializationConfig').default
 
 
 describe 'app.DriversManager', ->

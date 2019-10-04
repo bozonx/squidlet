@@ -7,8 +7,6 @@ import IoManager from './managers/IoManager';
 import ApiManager from './managers/ApiManager';
 import Api from './Api';
 import Context from './Context';
-import InitializationConfig from './interfaces/InitializationConfig';
-import initializationConfig from './initializationConfig';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
@@ -29,9 +27,6 @@ export default class System {
   readonly apiManager: ApiManager;
   readonly api: Api;
 
-  get initializationConfig(): InitializationConfig {
-    return this._initializationConfig as InitializationConfig;
-  }
   get isDevicesInitialized(): boolean {
     return this._isDevicesInitialized;
   }
@@ -39,8 +34,6 @@ export default class System {
     return this._isAppInitialized;
   }
 
-  // only for initialization time - it will be deleted after it
-  private _initializationConfig?: InitializationConfig;
   private _isDevicesInitialized: boolean = false;
   private _isAppInitialized: boolean = false;
 
@@ -52,8 +45,6 @@ export default class System {
    */
   constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler) {
     this.shutdownRequest = shutdownRequestCb;
-    // config which is used only on initialization time
-    this._initializationConfig = initializationConfig();
     this.context = new Context(this);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);
@@ -84,37 +75,24 @@ export default class System {
     console.info(`---> Initializing context`);
     await this.context.init();
 
-    console.info(`---> Initializing system drivers`);
-    await this.driversManager.initSystemDrivers();
+    console.info(`---> Initializing drivers`);
+    await this.driversManager.init();
 
     console.info(`---> Initializing system services`);
-    await this.servicesManager.initSystemServices();
+    await this.servicesManager.init();
 
-    await this.initTopLayer();
+    console.info(`---> Initializing devices`);
+    await this.devicesManager.init();
+
+    this._isDevicesInitialized = true;
+    await this.emitEventSync(AppLifeCycleEvents.devicesInitialized);
 
     this._isAppInitialized = true;
     await this.emitEventSync(AppLifeCycleEvents.appInitialized);
 
-    // remove initialization config
-    delete this._initializationConfig;
-
     console.info(`===> System initialization has been finished`);
   }
 
-
-  /**
-   * Init top layer - devices, regular drivers and regular services
-   */
-  private async initTopLayer(): Promise<void> {
-    console.info(`---> Initializing regular drivers`);
-    await this.driversManager.initRegularDrivers();
-    console.info(`---> Initializing regular services`);
-    await this.servicesManager.initRegularServices();
-    console.info(`---> Initializing devices`);
-    await this.devicesManager.init();
-    this._isDevicesInitialized = true;
-    await this.emitEventSync(AppLifeCycleEvents.devicesInitialized);
-  }
 
   private async emitEventSync(eventName: number) {
     try {

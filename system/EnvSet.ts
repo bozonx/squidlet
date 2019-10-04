@@ -51,7 +51,7 @@ export default class EnvSet {
       systemConfig.envSetDirs.entities,
       convertEntityTypeToPlural(entityType),
       entityName,
-      this.context.system.initializationConfig.fileNames.manifest
+      systemConfig.fileNames.manifest
     );
 
     return this.readJsonObjectFile(pathToFile) as Promise<T>;

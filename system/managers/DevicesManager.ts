@@ -1,6 +1,7 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
 import DeviceBase from '../base/DeviceBase';
+import systemConfig from '../systemConfig';
 
 
 /**
@@ -12,7 +13,7 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase> {
    */
   async init() {
     const definitions = await this.context.system.envSet.loadConfig<EntityDefinition[]>(
-      this.context.system.initializationConfig.fileNames.devicesDefinitions
+      systemConfig.fileNames.devicesDefinitions
     );
 
     for (let definition of definitions) {
