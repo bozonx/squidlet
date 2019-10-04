@@ -10,6 +10,7 @@ import Context from './Context';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {AppLifeCycleEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
+import Logger from './interfaces/Logger';
 
 
 export type ShutdownHandler = (reason: ShutdownReason) => void;
@@ -36,6 +37,7 @@ export default class System {
 
   private _isDevicesInitialized: boolean = false;
   private _isAppInitialized: boolean = false;
+  private readonly logger: Logger;
 
 
   /**
@@ -43,8 +45,9 @@ export default class System {
    * @param ioSet - has to be initialized before
    * @param shutdownRequestCb - handler of shutdown request
    */
-  constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler) {
+  constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler, logger: Logger) {
     this.shutdownRequest = shutdownRequestCb;
+    this.logger = logger;
     this.context = new Context(this);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);

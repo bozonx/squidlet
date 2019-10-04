@@ -9,6 +9,7 @@ import IoItem from './interfaces/IoItem';
 import DriverBase from './base/DriverBase';
 import ServiceBase from './base/ServiceBase';
 import systemConfig from './systemConfig';
+import Logger from './interfaces/Logger';
 
 
 export default class Context {

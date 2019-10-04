@@ -3,7 +3,7 @@ import * as path from 'path';
 import systemConfig from '../configs/systemConfig';
 import {EntityType, EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import Os from '../../shared/Os';
-import Logger from '../interfaces/Logger';
+import Logger from '../../system/interfaces/Logger';
 import buildEntity from './buildEntity';
 import UsedEntities, {EntitiesNames} from './UsedEntities';
 import HostEntitySet from '../interfaces/HostEntitySet';

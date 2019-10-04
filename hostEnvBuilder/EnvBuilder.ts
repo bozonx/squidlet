@@ -5,7 +5,7 @@ import ConfigsSet from './configSet/ConfigsSet';
 import ConfigsWriter from './configSet/ConfigsWriter';
 import Os from '../shared/Os';
 import * as defaultLogger from './defaultLogger';
-import Logger from './interfaces/Logger';
+import Logger from '../system/interfaces/Logger';
 import HostEnvSet from './interfaces/HostEnvSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 import PreHostConfig from './interfaces/PreHostConfig';
