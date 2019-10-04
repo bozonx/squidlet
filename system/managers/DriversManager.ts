@@ -2,12 +2,16 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
 import DriverBase from '../base/DriverBase';
 import systemConfig from '../systemConfig';
+import {EntityType} from '../interfaces/EntityTypes';
 
 
 /**
  * Driver manager
  */
 export default class DriversManager extends EntityManagerBase<DriverBase> {
+  protected entityType: EntityType = 'driver';
+
+
   /**
    * Instantiate all the drivers
    */
@@ -22,30 +26,18 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
     );
 
     for (let driverName of orderedDriversList) {
-      this.instances[driverName] = await this.makeInstance('driver', definitions[driverName]);
+      this.instances[driverName] = await this.makeInstance(definitions[driverName]);
     }
   }
-
-  /**
-   * Call init() method of all the drivers
-   */
-  async initialize() {
-    // TODO: use order
-    // TODO: add initializeAll
-    this.context.log.debug(`DriversManager: instantiating driver "${driverName}"`);
-  }
-
 
   /**
    * Get driver instance.
    * It rises an error if driver hasn't found.
    */
   getDriver<T extends DriverBase>(driverName: string): T {
-    const driver: DriverBase | undefined = this.instances[driverName];
+    if (!this.instances[driverName]) throw new Error(`Can't find the driver "${driverName}"`);
 
-    if (!driver) throw new Error(`Can't find the driver "${driverName}"`);
-
-    return driver as T;
+    return this.instances[driverName] as T;
   }
 
 }

@@ -7,7 +7,9 @@ import Context from '../Context';
 export type EntityClassType = new (context: Context, definition: EntityDefinition) => EntityBase;
 
 
-export default class EntityManagerBase<EntityInstance extends EntityBase> {
+export default abstract class EntityManagerBase<EntityInstance extends EntityBase> {
+  protected readonly abstract entityType: EntityType;
+
   protected readonly context: Context;
   protected readonly instances: {[index: string]: EntityInstance} = {};
 
@@ -25,28 +27,31 @@ export default class EntityManagerBase<EntityInstance extends EntityBase> {
   }
 
 
-  protected async makeInstance(entityType: EntityType, definition: EntityDefinition): Promise<EntityInstance> {
+  /**
+   * Call init function of all the instances.
+   */
+  async initialize() {
+    for (let entityId of Object.keys(this.instances)) {
+      const entity: EntityInstance = this.instances[entityId];
+
+      this.context.log.debug(`EntityManager: initializing ${this.entityType} "${entityId}"`);
+
+      if (entity.init) await entity.init();
+    }
+  }
+
+  getIds(): string[] {
+    return Object.keys(this.instances);
+  }
+
+
+  protected async makeInstance(definition: EntityDefinition): Promise<EntityInstance> {
     const EntityClass = await this.context.system.envSet.loadMain<EntityClassType>(
-      entityType,
+      this.entityType,
       definition.className
     );
 
     return new EntityClass(this.context, definition) as EntityInstance;
-  }
-
-  /**
-   * Call init function of all the instances.
-   */
-  protected async initializeAll(entitiesIds: string[]) {
-    for (let entityId of entitiesIds) {
-      if (typeof this.instances[entityId] === 'undefined') {
-        throw new Error(`Can't find an entity to init`);
-      }
-
-      const entity: EntityInstance = this.instances[entityId];
-
-      if (entity.init) await entity.init();
-    }
   }
 
 }

@@ -85,7 +85,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    */
   private getDevicesActionTopics(): string[] {
     const topics: string[] = [];
-    const devicesIds: string[] = this.context.system.devicesManager.getInstantiatedDevicesIds();
+    const devicesIds: string[] = this.context.system.devicesManager.getIds();
 
     for (let deviceId of devicesIds) {
       const device = this.context.system.devicesManager.getDevice(deviceId);

@@ -2,12 +2,16 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
 import DeviceBase from '../base/DeviceBase';
 import systemConfig from '../systemConfig';
+import {EntityType} from '../interfaces/EntityTypes';
 
 
 /**
  * Creates instances of local devices and prepare config for them.
  */
 export default class DevicesManager extends EntityManagerBase<DeviceBase> {
+  protected entityType: EntityType = 'device';
+
+
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */
@@ -17,20 +21,8 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase> {
     );
 
     for (let definition of definitions) {
-      this.instances[definition.id] = await this.makeInstance('device', definition);
+      this.instances[definition.id] = await this.makeInstance(definition);
     }
-  }
-
-  /**
-   * Call init() method of all the devices
-   */
-  async initialize() {
-    this.context.log.debug(`DevicesManager: instantiating device "${definition.id}"`);
-    // TODO: add initializeAll
-  }
-
-  getInstantiatedDevicesIds(): string[] {
-    return Object.keys(this.instances);
   }
 
   /**
@@ -38,15 +30,9 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase> {
    * It rises an error if device hasn't found.
    */
   getDevice<T extends DeviceBase>(deviceId: string): T {
-    const device: DeviceBase | undefined = this.instances[deviceId];
+    if (!this.instances[deviceId]) throw new Error(`Can't find the device "${deviceId}"`);
 
-    if (!device) {
-      this.context.log.error(`DevicesManager.getDevice: Can't find the device "${deviceId}"`);
-
-      throw new Error(`Can't find the device "${deviceId}"`);
-    }
-
-    return device as T;
+    return this.instances[deviceId] as T;
   }
 
 }
