@@ -44,6 +44,7 @@ export default class System {
    * The main app.
    * @param ioSet - has to be initialized before
    * @param shutdownRequestCb - handler of shutdown request
+   * @param logger - external logger
    */
   constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler, logger: Logger) {
     this.shutdownRequest = shutdownRequestCb;
@@ -78,14 +79,19 @@ export default class System {
     console.info(`---> Initializing context`);
     await this.context.init();
 
+    console.info(`---> Instantiating entities`);
+    await this.driversManager.instantiate();
+    await this.servicesManager.instantiate();
+    await this.devicesManager.instantiate();
+
     console.info(`---> Initializing drivers`);
-    await this.driversManager.init();
+    await this.driversManager.initialize();
 
     console.info(`---> Initializing system services`);
-    await this.servicesManager.init();
+    await this.servicesManager.initialize();
 
     console.info(`---> Initializing devices`);
-    await this.devicesManager.init();
+    await this.devicesManager.initialize();
 
     this._isDevicesInitialized = true;
     await this.emitEventSync(AppLifeCycleEvents.devicesInitialized);

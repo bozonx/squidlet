@@ -8,23 +8,33 @@ import systemConfig from '../systemConfig';
  * Driver manager
  */
 export default class DriversManager extends EntityManagerBase<DriverBase> {
-  async initSystemDrivers(): Promise<void> {
-    // get list of system drivers from json file
-    const systemDriversList = await this.context.system.envSet.loadConfig<string[]>(
-      systemConfig.fileNames.systemDrivers
+  /**
+   * Instantiate all the drivers
+   */
+  async instantiate() {
+    // load list of drivers in order
+    const orderedDriversList: string[] = await this.context.system.envSet.loadConfig<string[]>(
+      systemConfig.fileNames.driversList
+    );
+    // load list of definitions of drivers
+    const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
+      systemConfig.fileNames.driversDefinitions
     );
 
-    await this.initDrivers(systemDriversList);
+    for (let driverName of orderedDriversList) {
+      this.instances[driverName] = await this.makeInstance('driver', definitions[driverName]);
+    }
   }
 
-  async initRegularDrivers(): Promise<void> {
-    // get list of regular drivers from json file
-    const regularDriversList = await this.context.system.envSet.loadConfig<string[]>(
-      systemConfig.fileNames.regularDrivers
-    );
-
-    await this.initDrivers(regularDriversList);
+  /**
+   * Call init() method of all the drivers
+   */
+  async initialize() {
+    // TODO: use order
+    // TODO: add initializeAll
+    this.context.log.debug(`DriversManager: instantiating driver "${driverName}"`);
   }
+
 
   /**
    * Get driver instance.
@@ -33,35 +43,9 @@ export default class DriversManager extends EntityManagerBase<DriverBase> {
   getDriver<T extends DriverBase>(driverName: string): T {
     const driver: DriverBase | undefined = this.instances[driverName];
 
-    if (!driver) {
-      this.context.log.error(`DriversManager.getDriver: Can't find the driver "${driverName}"`);
-
-      throw new Error(`Can't find the driver "${driverName}"`);
-    }
+    if (!driver) throw new Error(`Can't find the driver "${driverName}"`);
 
     return driver as T;
-  }
-
-  private async initDrivers(driverNames: string[]) {
-    // load list of definitions of drivers
-    const definitions = await this.loadDriversDefinitions();
-
-    for (let driverName of driverNames) {
-      //this.context.log.debug(`DriversManager: initializing driver "${driverName}"`);
-      this.instances[driverName] = await this.makeInstance('driver', definitions[driverName]);
-    }
-
-    await this.initializeAll(driverNames);
-  }
-
-  /**
-   * load list of definitions of drivers
-   * requires config file driversDefinitions.json
-   */
-  private async loadDriversDefinitions(): Promise<{[index: string]: EntityDefinition}> {
-    return this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      systemConfig.fileNames.driversDefinitions
-    );
   }
 
 }

@@ -11,17 +11,22 @@ export default class DevicesManager extends EntityManagerBase<DeviceBase> {
   /**
    * Initialize all the devices on current host specified by its definitions in config
    */
-  async init() {
+  async instantiate() {
     const definitions = await this.context.system.envSet.loadConfig<EntityDefinition[]>(
       systemConfig.fileNames.devicesDefinitions
     );
 
     for (let definition of definitions) {
-      this.context.log.debug(`DevicesManager: initializing device "${definition.id}"`);
       this.instances[definition.id] = await this.makeInstance('device', definition);
     }
+  }
 
-    await this.initializeAll(Object.keys(this.instances));
+  /**
+   * Call init() method of all the devices
+   */
+  async initialize() {
+    this.context.log.debug(`DevicesManager: instantiating device "${definition.id}"`);
+    // TODO: add initializeAll
   }
 
   getInstantiatedDevicesIds(): string[] {

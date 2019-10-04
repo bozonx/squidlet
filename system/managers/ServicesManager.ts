@@ -5,57 +5,48 @@ import systemConfig from '../systemConfig';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceBase> {
-  async initSystemServices() {
-    const systemServicesList: string[] = await this.context.system.envSet.loadConfig<string[]>(
-      systemConfig.fileNames.systemServices
+  /**
+   * Instantiate all the services
+   */
+  async instantiate() {
+    const orderedServicesList: string[] = await this.context.system.envSet.loadConfig<string[]>(
+      systemConfig.fileNames.servicesList
     );
-    const servicesIds: string[] = await this.generateServiceIdsList(systemServicesList);
+    const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
+      systemConfig.fileNames.servicesDefinitions
+    );
+    const servicesIds: string[] = await this.generateServiceIdsList(orderedServicesList, definitions);
 
-    await this.initServices(servicesIds);
+    for (let serviceId of servicesIds) {
+      this.instances[serviceId] = await this.makeInstance('service', definitions[serviceId]);
+    }
   }
 
-  async initRegularServices() {
-    const regularServicesList = await this.context.system.envSet.loadConfig<string[]>(
-      systemConfig.fileNames.regularServices
-    );
-    const servicesIds: string[] = await this.generateServiceIdsList(regularServicesList);
-
-    await this.initServices(servicesIds);
+  /**
+   * Call init() method of all the services
+   */
+  async initialize() {
+    this.context.log.debug(`ServicesManager: instantiating service "${serviceId}"`);
+    // TODO: add initializeAll
   }
 
   getService<T extends ServiceBase>(serviceId: string): T {
     const service: ServiceBase | undefined = this.instances[serviceId];
 
-    if (!service) {
-      this.context.log.error(`ServicesManager.getService: Can't find the service "${serviceId}"`);
-      throw new Error(`Can't find the service "${serviceId}"`);
-    }
+    if (!service) throw new Error(`Can't find the service "${serviceId}"`);
 
     return service as T;
   }
 
-
-  private async initServices(servicesIds: string[]) {
-    const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      systemConfig.fileNames.servicesDefinitions
-    );
-
-    for (let serviceId of servicesIds) {
-      //this.context.log.debug(`ServicesManager: initializing service "${serviceId}"`);
-      this.instances[serviceId] = await this.makeInstance('service', definitions[serviceId]);
-    }
-
-    await this.initializeAll(servicesIds);
-  }
-
-  private async generateServiceIdsList(allowedClassNames: string[]): Promise<string[]> {
+  // TODO: похоже здесь переводятся id в classNames
+  private generateServiceIdsList(
+    orderedServicesList: string[],
+    definitions: {[index: string]: EntityDefinition}
+  ): string[] {
     const servicesIds: string[] = [];
-    const definitions = await this.context.system.envSet.loadConfig<{[index: string]: EntityDefinition}>(
-      systemConfig.fileNames.servicesDefinitions
-    );
 
     for (let serviceId of Object.keys(definitions)) {
-      if (allowedClassNames.includes(definitions[serviceId].className)) {
+      if (orderedServicesList.includes(definitions[serviceId].className)) {
         servicesIds.push(serviceId);
       }
     }
