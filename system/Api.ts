@@ -181,7 +181,7 @@ export default class Api {
   listenLog(logLevel: LogLevel = 'info', cb: (msg: string) => void): number {
     const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(logLevel);
 
-    return this.context.system.events.addListener(SystemEvents.logger, (message: string, level: LogLevel) => {
+    return this.context.system.events.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
       if (allowedLogLevels.includes(level)) cb(message);
     });
   }

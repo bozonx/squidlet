@@ -28,7 +28,6 @@ export default class LogPublisher {
   }
 
 
-  // TODO: review
   private emit(level: LogLevel, message: string) {
     // const eventName = `${SystemEvents.logger}_${level}`;
     //

@@ -1,7 +1,7 @@
-import ServiceBase from 'system/base/ServiceBase';
-import LogLevel, {LOG_LEVELS} from 'system/interfaces/LogLevel';
-import {calcAllowedLogLevels} from 'system/lib/helpers';
-import {SystemEvents} from 'system/constants';
+import ServiceBase from 'base/ServiceBase';
+import LogLevel, {LOG_LEVELS} from 'interfaces/LogLevel';
+import {calcAllowedLogLevels} from 'lib/helpers';
+import {SystemEvents} from 'constants';
 
 
 const consoleLog = {
