@@ -31,12 +31,14 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.binaryInput = await getDriverDep('BinaryInput')
-      .getInstance({
+  protected willInit = async () => {
+    this.depsInstances.binaryInput = await this.context.getSubDriver(
+      'BinaryInput',
+      {
         ...omitObj(this.props, 'releaseTimeoutMs'),
         blockTime: 0,
-      });
+      }
+    );
   }
 
   protected didInit = async () => {

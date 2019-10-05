@@ -23,9 +23,8 @@ export class Channels extends DriverBase<ChannelsProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.driver = await getDriverDep(this.props.driver)
-      .getInstance(omit(this.props, 'drvier'));
+  protected willInit = async () => {
+    this.depsInstances.driver = await this.context.getSubDriver(this.props.driver, omit(this.props, 'drvier'));
   }
 
 

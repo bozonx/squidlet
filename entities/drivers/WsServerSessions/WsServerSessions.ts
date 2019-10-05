@@ -37,9 +37,8 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private sessionConnections: {[index: string]: string} = {};
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.server = await getDriverDep('WsServer')
-      .getInstance(omitObj(this.props, 'expiredSec'));
+  protected willInit = async () => {
+    this.depsInstances.server = await this.context.getSubDriver('WsServer', omitObj(this.props, 'expiredSec'));
 
     this.server.onConnection(this.handleNewConnection);
     this.server.onMessage((connectionId: string, data: string | Uint8Array) => {

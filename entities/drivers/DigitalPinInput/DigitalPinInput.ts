@@ -38,21 +38,23 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
+  protected willInit = async () => {
     // the second check is half of a debounce time
     this.secondCheckTimeout = Math.ceil((this.props.debounce || 0) / 2);
 
     const driverName = `Digital_${this.props.source}`;
 
-    this.depsInstances.source = await getDriverDep(driverName)
-      .getInstance(omitObj(
+    this.depsInstances.source = await this.context.getSubDriver(
+      driverName,
+      omitObj(
         this.props,
         'doubleCheck',
         'pullup',
         'pulldown',
         'pin',
         'source'
-      ));
+      )
+    );
   }
 
   protected didInit = async () => {

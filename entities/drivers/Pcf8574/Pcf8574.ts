@@ -49,14 +49,16 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave')
-      .getInstance({
+  protected willInit = async () => {
+    this.depsInstances.i2cDriver = await this.context.getSubDriver(
+      'I2cToSlave',
+      {
         ...this.props,
         poll: [
           {length: DATA_LENGTH}
         ],
-      });
+      }
+    );
   }
 
   protected didInit = async () => {

@@ -50,9 +50,10 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput')
-      .getInstance({
+  protected willInit = async () => {
+    this.depsInstances.digitalOutput = await this.context.getSubDriver(
+      'DigitalPinOutput',
+      {
         ...omitObj(
           this.props,
           'impulseLength',
@@ -61,7 +62,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
           'invert',
         ),
         initialLevel: invertIfNeed(false, this.props.invert),
-      });
+      }
+    );
   }
 
 

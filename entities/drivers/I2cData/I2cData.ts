@@ -54,9 +54,8 @@ export class I2cData extends DriverBase<I2cDataProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.i2cDriver = await getDriverDep(this.props.i2cDriverName)
-      .getInstance(this.props);
+  protected willInit = async () => {
+    this.depsInstances.i2cDriver = await this.context.getSubDriver(this.props.i2cDriverName, this.props);
   }
 
   async send(i2cAddress: string | number | undefined, dataMark: number | undefined, data: Uint8Array): Promise<void> {

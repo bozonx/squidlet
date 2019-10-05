@@ -22,11 +22,18 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
+  protected willInit = async () => {
     const driverName = `Digital_${this.props.source}`;
 
-    this.depsInstances.source = await getDriverDep(driverName)
-      .getInstance(omitObj(this.props, 'initialLevel', 'pin', 'source'));
+    this.depsInstances.source = await this.context.getSubDriver(
+      driverName,
+      omitObj(
+        this.props,
+        'initialLevel',
+        'pin',
+        'source'
+      )
+    );
   }
 
   // setup pin after drivers and devices have been initialized

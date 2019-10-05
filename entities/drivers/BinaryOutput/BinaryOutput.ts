@@ -33,12 +33,14 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.digitalOutput = await getDriverDep('DigitalPinOutput')
-      .getInstance({
+  protected willInit = async () => {
+    this.depsInstances.digitalOutput = await this.context.getSubDriver(
+      'DigitalPinOutput',
+      {
         ...omitObj(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
         initialLevel: this.resolveInitialLevel(),
-      });
+      }
+    );
   }
 
 

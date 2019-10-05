@@ -29,11 +29,12 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
+  protected willInit = async () => {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
-    this.depsInstances.digitalInput = await getDriverDep('DigitalPinInput')
-      .getInstance({
+    this.depsInstances.digitalInput = this.context.getSubDriver(
+      'DigitalPinInput',
+      {
         ...omitObj(
           this.props,
           'blockTime',
@@ -41,7 +42,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
           'invert'
         ),
         edge: resolveEdge(this.props.edge, this._isInverted),
-      });
+      }
+    );
   }
 
   protected didInit = async () => {

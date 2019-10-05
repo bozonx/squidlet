@@ -37,9 +37,8 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.router = await getDriverDep('HttpServerRouter')
-      .getInstance(this.props);
+  protected willInit = async () => {
+    this.depsInstances.router = await this.context.getSubDriver('HttpServerRouter', this.props);
 
     this.router.addRoute('get', '/api/:apiMethodName/:args', this.handleRoute);
     this.router.addRoute('get', '/api/:apiMethodName', this.handleRoute);

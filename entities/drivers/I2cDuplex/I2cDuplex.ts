@@ -19,14 +19,12 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
     return this.depsInstances.i2cDriver;
   }
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
+  protected willInit = async () => {
     if (this.isToSlave()) {
-      this.depsInstances.i2cDriver = await getDriverDep('I2cToSlave')
-        .getInstance(this.props);
+      this.depsInstances.i2cDriver = await this.context.getSubDriver('I2cToSlave', this.props);
     }
     else {
-      this.depsInstances.i2cDriver = await getDriverDep('I2cToMaster')
-        .getInstance(this.props);
+      this.depsInstances.i2cDriver = await this.context.getSubDriver('I2cToMaster', this.props);
     }
   }
 

@@ -6,14 +6,6 @@ import HostConfig from '../interfaces/HostConfig';
 import {EntityType} from '../interfaces/EntityTypes';
 
 
-interface KindOfDriver {
-  getInstance(instanceProps?: {[index: string]: any}): Promise<any>;
-  [index: string]: any;
-}
-
-export type GetDriverDep = (driverName: string) => KindOfDriver;
-
-
 export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
   abstract readonly entityType: EntityType;
   readonly context: Context;
@@ -45,11 +37,11 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   protected doInit?: () => Promise<void>;
   // TODO: maybe remove ????
   // it calls after init. Better place to setup listeners
-  //protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  //protected didInit?: () => Promise<void>;
 
   // TODO: maybe make separate did drivers and services init????
   // it will be called after all the entities of entityType have been inited
-  protected didGroupInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  protected didGroupInit?: () => Promise<void>;
   // it will be risen after devices init or immediately if devices were inited
   protected devicesDidInit?: () => Promise<void>;
   // it will be risen after app init or immediately if app was inited
@@ -113,7 +105,7 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     // // not critical error
     // if (this.didInit) {
     //   try {
-    //     await this.didInit(getDriverDep);
+    //     await this.didInit();
     //   }
     //   catch (err) {
     //     this.log.error(err);

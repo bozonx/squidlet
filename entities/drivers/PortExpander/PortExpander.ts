@@ -109,7 +109,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   private initingIcInProgress: boolean = false;
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
+  protected willInit = async () => {
     const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex`;
 
     const props = {
@@ -124,7 +124,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
       props.poll.push({dataAddress: INCOME_COMMANDS.newAnalogPinState,  dataLength: 3});
     }
 
-    this.depsInstances.node = await getDriverDep(driverName).getInstance(props);
+    this.depsInstances.node = await this.context.getSubDriver(driverName, props);
   }
 
   protected didInit = async () => {

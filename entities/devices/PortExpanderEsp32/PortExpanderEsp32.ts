@@ -18,9 +18,8 @@ export default class PortExpanderEsp32 extends DeviceBase<Props> {
     return this.depsInstances.expander;
   }
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.expander = await getDriverDep('PortExpander')
-      .getInstance(this.props);
+  protected willInit = async () => {
+    this.depsInstances.expander = await this.context.getSubDriver('PortExpander', this.props);
   }
 
 }
