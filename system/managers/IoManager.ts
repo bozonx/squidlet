@@ -1,5 +1,5 @@
 import IoSet from '../interfaces/IoSet';
-import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
+import IoItem, {IoDefinitions} from '../interfaces/IoItem';
 import Context from '../Context';
 import systemConfig from '../systemConfig';
 
@@ -30,27 +30,20 @@ export default class IoManager {
 
 
   private async configureAllIo() {
-    const ioNames: string[] = this.ioSet.getNames();
-    const ioParams = await this.context.system.envSet.loadConfig<IoItemDefinition>(
+    const ioDefinitions = await this.context.system.envSet.loadConfig<IoDefinitions>(
       systemConfig.fileNames.iosDefinitions
     );
 
-    // configure ios if need
-    for (let ioName of ioNames) {
+    // configure ios that have a definition
+    for (let ioName of Object.keys(ioDefinitions)) {
+      // get io or throw an error
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      if (!ioItem) {
-        //this.context.log.warn(`ioDefinitions config has definition of io item which doesn't exist in ioSet`);
-        console.warn(`WARNING: ioDefinitions config has definition of io item which doesn't exist in ioSet`);
+      // do nothing if it doesn't have a configure() method
+      if (!ioItem.configure) continue;
 
-        continue;
-      }
-      else if (!ioParams[ioName] || !ioItem || !ioItem.configure) {
-        continue;
-      }
-
-      //this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioParams[ioName])}`);
-      await ioItem.configure(ioParams[ioName]);
+      this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
+      await ioItem.configure(ioDefinitions[ioName]);
     }
   }
 

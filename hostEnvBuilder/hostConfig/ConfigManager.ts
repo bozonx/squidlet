@@ -12,7 +12,7 @@ import {
   makeListOfNamesFromPaths,
   resolvePlatformDir
 } from '../../shared/helpers';
-import {IoItemDefinition} from '../../system/interfaces/IoItem';
+import {IoDefinitions} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import Platforms from '../../system/interfaces/Platforms';
@@ -27,7 +27,7 @@ export default class ConfigManager {
     drivers: {},
     services: {},
   };
-  iosDefinitions: IoItemDefinition = {};
+  iosDefinitions: IoDefinitions = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
   dependencies?: {[index: string]: any};

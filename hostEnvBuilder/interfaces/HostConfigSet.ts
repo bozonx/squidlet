@@ -1,6 +1,6 @@
 import HostConfig from '../../system/interfaces/HostConfig';
 import EntityDefinition from '../../system/interfaces/EntityDefinition';
-import {IoItemDefinition} from '../../system/interfaces/IoItem';
+import {IoDefinitions} from '../../system/interfaces/IoItem';
 
 
 export default interface HostConfigSet {
@@ -17,5 +17,5 @@ export default interface HostConfigSet {
   // list of services definitions
   servicesDefinitions: {[index: string]: EntityDefinition};
   // list of services definitions
-  iosDefinitions: IoItemDefinition;
+  iosDefinitions: IoDefinitions;
 }

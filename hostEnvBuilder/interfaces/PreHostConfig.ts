@@ -1,4 +1,4 @@
-import {IoItemDefinition} from '../../system/interfaces/IoItem';
+import {IoDefinitions} from '../../system/interfaces/IoItem';
 
 
 // export interface IoSetConfig {
@@ -54,7 +54,7 @@ export default interface PreHostConfig {
   // services definitions by service id
   services?: {[index: string]: any};
   // params which will be passed to dev's configure method. By dev name
-  ios?: IoItemDefinition;
+  ios?: IoDefinitions;
 
   //ioSet?: IoSetConfig;
 

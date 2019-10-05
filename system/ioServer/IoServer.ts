@@ -5,7 +5,7 @@ import {pathJoin} from '../lib/paths';
 import systemConfig from '../systemConfig';
 import StorageIo from '../interfaces/io/StorageIo';
 import {ShutdownHandler} from '../System';
-import IoItem, {IoItemDefinition} from '../interfaces/IoItem';
+import IoItem, {IoDefinitions} from '../interfaces/IoItem';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
 
@@ -174,7 +174,7 @@ export default class IoServer {
   }
 
   private async configureIoSet() {
-    const ioParams = await this.loadConfig<IoItemDefinition>(
+    const ioParams = await this.loadConfig<IoDefinitions>(
       systemConfig.fileNames.iosDefinitions
     );
 

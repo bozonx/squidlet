@@ -1,7 +1,7 @@
 /**
  * It's params which will pass to configure method on init time
  */
-export interface IoItemDefinition {
+export interface IoDefinitions {
   [index: string]: {[index: string]: any};
 }
 
