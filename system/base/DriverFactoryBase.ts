@@ -16,7 +16,7 @@ import Context from '../Context';
  *   "1" is unique id for instances
  * * if instanceIdCalc is set method getInstance will call this function to get unique id
  */
-export default abstract class DriverFactoryBase<Instance extends DriverBase> {
+export default abstract class DriverFactoryBase<Instance extends DriverBase = DriverBase> {
   protected instances: {[index: string]: Instance} = {};
   protected abstract DriverClass: new (context: Context, definition: EntityDefinition) => Instance;
   protected instanceAlwaysNew: boolean = false;

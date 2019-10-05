@@ -3,7 +3,6 @@ import DriverBase from 'system/base/DriverBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from 'system/lib/HttpRouterLogic';
 import {JsonTypes} from 'system/interfaces/Types';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {HttpMethods} from 'system/interfaces/Http';
 import {URL_DELIMITER} from 'system/lib/url';
 
@@ -35,9 +34,8 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   }
 
 
-  protected willInit = async (getDriverDep: GetDriverDep) => {
-    this.depsInstances.server = await getDriverDep('HttpServer')
-      .getInstance(this.props);
+  protected willInit = async () => {
+    this.depsInstances.server = await this.context.getSubDriver('HttpServer', this.props);
     this._router = new HttpRouterLogic(this.log.debug);
 
     this.server.onRequest(this.handleIncomeRequest);

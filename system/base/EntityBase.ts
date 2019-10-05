@@ -40,9 +40,9 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: any} = {};
   // better place to instantiate dependencies if need
-  protected willInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  protected willInit?: () => Promise<void>;
   // init process
-  protected doInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  protected doInit?: () => Promise<void>;
   // TODO: maybe remove ????
   // it calls after init. Better place to setup listeners
   //protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
@@ -102,21 +102,13 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   }
 
 
-  private getDriverDepCb(): GetDriverDep {
-    return (driverName: string): KindOfDriver => {
-      return this.context.getDriver(driverName) as any;
-    };
-  }
-
   private async addLifeCycleListeners() {
-    const getDriverDep: GetDriverDep = this.getDriverDepCb();
-
     // TODO: add on drivers and on services init
     if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
     if (this.appDidInit) this.context.onAppInit(this.appDidInit);
-    if (this.willInit) await this.willInit(getDriverDep);
+    if (this.willInit) await this.willInit();
     // TODO: может тогда переименовать в didInit ??? или вообще зачем он нужен ???
-    if (this.doInit) await this.doInit(getDriverDep);
+    if (this.doInit) await this.doInit();
 
     // // not critical error
     // if (this.didInit) {

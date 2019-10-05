@@ -1,3 +1,4 @@
+import DriverFactoryBase from './base/DriverFactoryBase';
 import LogPublisher from './LogPublisher';
 import Sessions from './lib/Sessions';
 import State from './lib/State';
@@ -50,11 +51,27 @@ export default class Context {
     return this.system.ioManager.getIo<T>(ioName);
   }
 
-  getDriver<T extends DriverBase>(driverName: string): T {
+  /**
+   * Get driver itself.
+   */
+  getDriver<T extends DriverBase = DriverBase>(driverName: string): T {
     return this.system.driversManager.getDriver<T>(driverName);
   }
 
-  getService<T extends ServiceBase>(serviceId: string): T {
+  /**
+   * Ask the driver which is factory to create or get an instance of sub driver e.g. http server.
+   * It will return an instance according to props.
+   */
+  async getSubDriver<T extends DriverBase = DriverBase>(
+    driverName: string,
+    props: {[index: string]: any}
+  ): Promise<T> {
+    const driver: DriverFactoryBase = this.getDriver<any>(driverName);
+
+    return await driver.getInstance(props) as T;
+  }
+
+  getService<T extends ServiceBase = ServiceBase>(serviceId: string): T {
     return this.system.servicesManager.getService<T>(serviceId);
   }
 
