@@ -59,9 +59,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
         ],
       }
     );
-  }
 
-  protected didInit = async () => {
     this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
       this.log.error(String(err));
     });
@@ -69,6 +67,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
+  // TODO: review
   protected appDidInit = async () => {
     // init IC state after app is initialized if it isn't at this moment
     try {
@@ -115,7 +114,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   /**
    * Listen to changes of pin after edge and debounce were processed.
-   * Call this method inside a didInit() callback of your driver or device or after.
+   * Call this method inside a willInit() callback of your driver or device or after.
    */
   addListener(handler: ChangeStateHandler): number {
     return this.events.addListener(handler);

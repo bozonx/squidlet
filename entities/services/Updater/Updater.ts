@@ -33,7 +33,7 @@ interface Props {
 }
 
 export default class Updater extends ServiceBase<Props> {
-  protected didInit = async () => {
+  protected willInit = async () => {
     this.listen();
   }
 

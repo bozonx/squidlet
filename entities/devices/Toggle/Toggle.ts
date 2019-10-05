@@ -30,9 +30,7 @@ export default class Toggle extends DeviceBase<Props> {
         blockTime: 0,
       }
     );
-  }
 
-  protected didInit = async () => {
     // listen only keyUp events
     this.binaryClick.addUpListener(this.onUp);
   }

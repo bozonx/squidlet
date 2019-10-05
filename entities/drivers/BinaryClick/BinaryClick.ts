@@ -39,9 +39,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
         blockTime: 0,
       }
     );
-  }
 
-  protected didInit = async () => {
     await this.binaryInput.addListener(this.handleInputChange);
   }
 

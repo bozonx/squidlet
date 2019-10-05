@@ -23,9 +23,7 @@ export default class ClickSensor extends DeviceBase<Props> {
       'BinaryClick',
       omitObj(this.props, 'publish')
     );
-  }
 
-  protected didInit = async () => {
     if (this.props.publish === 'down') {
       // change status silently
       this.binaryClick.addStateListener(this.onSilentStatusChange);
@@ -42,6 +40,7 @@ export default class ClickSensor extends DeviceBase<Props> {
       this.binaryClick.addStateListener(this.onClickStateChange);
     }
   }
+
 
   protected statusGetter = async (): Promise<Dictionary> => {
     return { [DEFAULT_STATUS]: this.binaryClick.isDown() };

@@ -35,10 +35,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   protected willInit?: () => Promise<void>;
   // init process
   protected doInit?: () => Promise<void>;
-  // TODO: maybe remove ????
-  // it calls after init. Better place to setup listeners
-  //protected didInit?: () => Promise<void>;
-
   // it will be called after all the entities of entityType have been inited
   protected driversDidInit?: () => Promise<void>;
   protected servicesDidInit?: () => Promise<void>;
@@ -100,18 +96,8 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
     if (this.appDidInit) this.context.onAppInit(this.appDidInit);
     if (this.willInit) await this.willInit();
-    // TODO: может тогда переименовать в didInit ??? или вообще зачем он нужен ???
+    // TODO: review
     if (this.doInit) await this.doInit();
-
-    // // not critical error
-    // if (this.didInit) {
-    //   try {
-    //     await this.didInit();
-    //   }
-    //   catch (err) {
-    //     this.log.error(err);
-    //   }
-    // }
   }
 
 }

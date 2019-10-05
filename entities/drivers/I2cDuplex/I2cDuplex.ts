@@ -26,9 +26,6 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
     else {
       this.depsInstances.i2cDriver = await this.context.getSubDriver('I2cToMaster', this.props);
     }
-  }
-
-  protected didInit = async () => {
     // listen to poll errors and print it to logger
     this.i2cDriver.addPollErrorListener((dataAddressStr: string | number | undefined, err: Error) => {
       this.log.error(String(err));

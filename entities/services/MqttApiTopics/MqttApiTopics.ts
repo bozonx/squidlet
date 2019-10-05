@@ -22,9 +22,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
     this._apiTopicsLogic = new ApiTopicsLogic(this.context);
     this.apiTopicsLogic.init();
     this.depsInstances.mqtt = await this.context.getSubDriver('Mqtt', this.props);
-  }
 
-  protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
     // listen to outcome messages and pass them to mqtt
@@ -32,7 +30,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
   }
 
   protected devicesDidInit = async () => {
-    // TODO: должно ожидать соединения
+    // TODO: должно ожидать соединения ????
     await this.mqtt.connectedPromise;
     await this.subscribeToDevices();
   }

@@ -20,9 +20,7 @@ export default class MqttApi extends ServiceBase<MqttProps> {
     this.depsInstances.mqtt = await this.context.getSubDriver('Mqtt', this.props);
 
     this.sessionId = this.context.sessions.newSession(0);
-  }
 
-  protected didInit = async () => {
     // listen to income messages from mqtt broker
     await this.mqtt.onMessage(this.handleIncomeMessages);
     // listen outcome api requests

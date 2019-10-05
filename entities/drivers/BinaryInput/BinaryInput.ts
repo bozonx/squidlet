@@ -44,9 +44,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
         edge: resolveEdge(this.props.edge, this._isInverted),
       }
     );
-  }
 
-  protected didInit = async () => {
     await this.digitalInput.addListener(this.handleInputChange);
   }
 

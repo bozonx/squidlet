@@ -57,9 +57,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
         edge: resolveEdge('rising', this._isInverted),
       }
     );
-  }
 
-  protected didInit = async () => {
     await this.digitalInput.addListener(this.handleInputChange);
   }
 

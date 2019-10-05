@@ -127,6 +127,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
     this.depsInstances.node = await this.context.getSubDriver(driverName, props);
   }
 
+  // TODO: reivew
   protected didInit = async () => {
     // Listen to received data
     this.node.onReceive((dataAddressStr: number | string, data: Uint8Array) => {
