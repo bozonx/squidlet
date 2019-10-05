@@ -15,7 +15,7 @@ export class SharedStorage extends DriverBase {
 
 
   protected willInit = async () => {
-    this.depsInstances.storageDev = this.getIo('Storage');
+    this.depsInstances.storageDev = this.context.getIo('Storage');
     this.rootDir = pathJoin(
       systemConfig.rootDirs.varData,
       systemConfig.storageDirs.common,

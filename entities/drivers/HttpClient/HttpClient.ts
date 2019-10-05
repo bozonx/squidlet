@@ -8,7 +8,7 @@ import {HttpDriverRequest} from '../HttpServer/HttpServerLogic';
 
 export class HttpClient extends DriverBase<HttpClientProps> {
   private get httpClientIo(): HttpClientIo {
-    return this.getIo('HttpClient') as any;
+    return this.context.getIo('HttpClient') as any;
   }
   private client?: HttpClientLogic;
 

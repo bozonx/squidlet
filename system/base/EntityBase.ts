@@ -3,8 +3,6 @@ import ManifestBase from '../interfaces/ManifestBase';
 import Context from '../Context';
 import LogPublisher from '../LogPublisher';
 import HostConfig from '../interfaces/HostConfig';
-import IoItem from '../interfaces/IoItem';
-import DriverBase from './DriverBase';
 import {EntityType} from '../interfaces/EntityTypes';
 
 
@@ -59,17 +57,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
 
-  // TODO: does it really need???
-  // protected get definition(): EntityDefinition {
-  //   const {id, className, props} = this;
-  //
-  //   return {
-  //     id,
-  //     className,
-  //     props,
-  //   };
-  // }
-
 
   constructor(context: Context, definition: EntityDefinition) {
     this.context = context;
@@ -86,18 +73,11 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     await this.addLifeCycleListeners();
   }
 
+  // TODO: review - ??? why doDestroy ???
   async doDestroy() {
     if (this.destroy) await this.destroy();
   }
 
-
-  getIo<T extends IoItem>(shortDevName: string): T {
-    return this.context.system.ioManager.getIo<T>(shortDevName);
-  }
-
-  getDriver<T extends DriverBase>(driverName: string): T {
-    return this.context.system.driversManager.getDriver<T>(driverName);
-  }
 
   /**
    * Load manifest of this entity
@@ -124,7 +104,7 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
 
   private getDriverDepCb(): GetDriverDep {
     return (driverName: string): KindOfDriver => {
-      return this.getDriver(driverName) as any;
+      return this.context.getDriver(driverName) as any;
     };
   }
 
@@ -135,6 +115,7 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
     if (this.appDidInit) this.context.onAppInit(this.appDidInit);
     if (this.willInit) await this.willInit(getDriverDep);
+    // TODO: может тогда переименовать в didInit ??? или вообще зачем он нужен ???
     if (this.doInit) await this.doInit(getDriverDep);
 
     // // not critical error

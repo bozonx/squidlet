@@ -15,7 +15,7 @@ export class HttpServer extends DriverBase<HttpServerProps> {
   }
 
   private get httpServerIo(): HttpServerIo {
-    return this.getIo('HttpServer') as any;
+    return this.context.getIo('HttpServer') as any;
   }
   private server?: HttpServerLogic;
   private get closedMsg() {

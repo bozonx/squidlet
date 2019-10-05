@@ -29,7 +29,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   //private wasPrevOpenFulfilled: boolean = false;
   private connectionId?: string;
   private get mqttIo(): MqttIo {
-    return this.getIo('Mqtt') as any;
+    return this.context.getIo('Mqtt') as any;
   }
   private get closedMsg() {
     return `Connection "${this.props.url}" has been closed`;

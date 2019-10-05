@@ -14,7 +14,7 @@ interface Props extends SerialParams {
 export class Serial extends DriverBase<Props> {
   private readonly messageEvents = new IndexedEvents<MessageHandler>();
   private get serialIo(): SerialIo {
-    return this.getIo('Serial') as any;
+    return this.context.getIo('Serial') as any;
   }
   private portNum: number = -1;
 

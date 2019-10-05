@@ -16,7 +16,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
   private get wsServerIo(): WebSocketServerIo {
-    return this.getIo('WebSocketServer') as any;
+    return this.context.getIo('WebSocketServer') as any;
   }
   private server?: WsServerLogic;
   private get closedMsg() {

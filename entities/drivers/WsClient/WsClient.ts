@@ -21,7 +21,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
   private readonly closeEvents = new IndexedEvents<() => void>();
   private get wsClientIo(): WebSocketClientIo {
-    return this.getIo('WebSocketClient') as any;
+    return this.context.getIo('WebSocketClient') as any;
   }
   private client?: WsClientLogic;
   private get closedMsg() {
