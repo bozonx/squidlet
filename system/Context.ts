@@ -62,6 +62,14 @@ export default class Context {
   //   return this.system.devicesManager.getDevice<T>(deviceId);
   // }
 
+  onDriversInit(cb: () => Promise<void>): number {
+    return this.addListenerOnce(this.system.wasDriversInitialized, SystemEvents.driversInitialized, cb);
+  }
+
+  onServicesInit(cb: () => Promise<void>): number {
+    return this.addListenerOnce(this.system.wasServicesInitialized, SystemEvents.servicesInitialized, cb);
+  }
+
   onDevicesInit(cb: () => Promise<void>): number {
     return this.addListenerOnce(this.system.wasDevicesInitialized, SystemEvents.devicesInitialized, cb);
   }
