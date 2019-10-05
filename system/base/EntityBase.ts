@@ -39,9 +39,9 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   // it calls after init. Better place to setup listeners
   //protected didInit?: () => Promise<void>;
 
-  // TODO: maybe make separate did drivers and services init????
   // it will be called after all the entities of entityType have been inited
-  protected didGroupInit?: () => Promise<void>;
+  protected driversDidInit?: () => Promise<void>;
+  protected servicesDidInit?: () => Promise<void>;
   // it will be risen after devices init or immediately if devices were inited
   protected devicesDidInit?: () => Promise<void>;
   // it will be risen after app init or immediately if app was inited
@@ -95,7 +95,8 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
 
 
   private async addLifeCycleListeners() {
-    // TODO: add on drivers and on services init
+    if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit);
+    if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit);
     if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
     if (this.appDidInit) this.context.onAppInit(this.appDidInit);
     if (this.willInit) await this.willInit();
