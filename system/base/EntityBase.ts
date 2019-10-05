@@ -19,18 +19,19 @@ export type GetDriverDep = (driverName: string) => KindOfDriver;
 export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
   abstract readonly entityType: EntityType;
   readonly context: Context;
-  readonly id: string;
-  readonly className: string;
-  readonly props: Props;
+  readonly definition: EntityDefinition;
   // destroy method for entity
   destroy?: () => Promise<void>;
 
-  // get api(): Api {
-  //   return this.system.api;
-  // }
-  // get events(): IndexedEventEmitter {
-  //   return this.system.events;
-  // }
+  get id(): string {
+    return this.definition.id;
+  }
+  get className(): string {
+    return this.definition.className;
+  }
+  get props(): Props {
+    return this.definition.props as Props;
+  }
   get log(): LogPublisher {
     return this.context.log;
   }
@@ -44,32 +45,35 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   protected willInit?: (getDriverDep: GetDriverDep) => Promise<void>;
   // init process
   protected doInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  // TODO: maybe remove ????
   // it calls after init. Better place to setup listeners
-  protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
-  // it will be risen after devices init
+  //protected didInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+
+  // TODO: maybe make separate did drivers and services init????
+  // it will be called after all the entities of entityType have been inited
+  protected didGroupInit?: (getDriverDep: GetDriverDep) => Promise<void>;
+  // it will be risen after devices init or immediately if devices were inited
   protected devicesDidInit?: () => Promise<void>;
-  // it will be risen after app init
+  // it will be risen after app init or immediately if app was inited
   protected appDidInit?: () => Promise<void>;
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
 
-
-  protected get definition(): EntityDefinition {
-    const {id, className, props} = this;
-
-    return {
-      id,
-      className,
-      props,
-    };
-  }
+  // TODO: does it really need???
+  // protected get definition(): EntityDefinition {
+  //   const {id, className, props} = this;
+  //
+  //   return {
+  //     id,
+  //     className,
+  //     props,
+  //   };
+  // }
 
 
   constructor(context: Context, definition: EntityDefinition) {
     this.context = context;
-    this.id = definition.id;
-    this.className = definition.className;
-    this.props = definition.props as Props;
+    this.definition = definition;
   }
 
   async init() {
@@ -79,30 +83,7 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
       if (errorMsg) throw new Error(errorMsg);
     }
 
-    const getDriverDep: GetDriverDep = this.getDriverDepCb();
-
-    if (this.devicesDidInit) {
-      this.context.onDevicesInit(this.devicesDidInit);
-    }
-
-    if (this.appDidInit) {
-      this.context.onAppInit(this.appDidInit);
-    }
-
-    if (this.willInit) await this.willInit(getDriverDep);
-    if (this.doInit) await this.doInit(getDriverDep);
-
-    // TODO: call on event which is risen after entities of the same type are inited
-    // not critical error
-    if (this.didInit) {
-      //this.env.system.afterEntitiesInit()
-      try {
-        await this.didInit(getDriverDep);
-      }
-      catch (err) {
-        this.log.error(err);
-      }
-    }
+    await this.addLifeCycleListeners();
   }
 
   async doDestroy() {
@@ -145,6 +126,26 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     return (driverName: string): KindOfDriver => {
       return this.getDriver(driverName) as any;
     };
+  }
+
+  private async addLifeCycleListeners() {
+    const getDriverDep: GetDriverDep = this.getDriverDepCb();
+
+    // TODO: add on drivers and on services init
+    if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
+    if (this.appDidInit) this.context.onAppInit(this.appDidInit);
+    if (this.willInit) await this.willInit(getDriverDep);
+    if (this.doInit) await this.doInit(getDriverDep);
+
+    // // not critical error
+    // if (this.didInit) {
+    //   try {
+    //     await this.didInit(getDriverDep);
+    //   }
+    //   catch (err) {
+    //     this.log.error(err);
+    //   }
+    // }
   }
 
 }
