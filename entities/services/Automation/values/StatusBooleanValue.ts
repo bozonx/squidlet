@@ -2,7 +2,7 @@ import Context from 'system/Context';
 import {JsonTypes} from 'system/interfaces/Types';
 import {Dictionary} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
-import {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 import {invertIfNeed} from 'system/lib/helpers';
 import ValueDefinition from '../interfaces/ValueDefinition';
 
@@ -21,7 +21,7 @@ export default function (context: Context, definition: StatusBooleanDefinition):
 
   const value: JsonTypes | undefined = (definition.statusName)
     ? state[definition.statusName]
-    : state[DEFAULT_STATUS];
+    : state[DEFAULT_DEVICE_STATUS];
 
   return invertIfNeed(Boolean(value), definition.invert);
 }

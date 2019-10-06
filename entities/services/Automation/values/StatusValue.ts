@@ -2,7 +2,7 @@ import Context from 'system/Context';
 import {JsonTypes} from 'system/interfaces/Types';
 import {Dictionary} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
-import {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 import ValueDefinition from '../interfaces/ValueDefinition';
 
 
@@ -17,7 +17,7 @@ export default function (context: Context, definition: StatusDefinition): JsonTy
 
   if (!state) return;
 
-  if (!definition.statusName) return state[DEFAULT_STATUS];
+  if (!definition.statusName) return state[DEFAULT_DEVICE_STATUS];
 
   return state[definition.statusName];
 }

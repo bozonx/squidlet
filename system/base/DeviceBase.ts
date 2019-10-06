@@ -4,10 +4,8 @@ import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../lib/ConsistentState';
 import DeviceState from '../DeviceState';
 import {StateCategories} from '../interfaces/States';
+import {DEFAULT_DEVICE_STATUS} from '../constants';
 
-
-// TODO: move to constants
-export const DEFAULT_STATUS = 'default';
 
 export type StatusChangeHandler = (paramName: string, value?: JsonTypes) => void;
 export type ConfigChangeHandler = () => void;
@@ -139,7 +137,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   /**
    * Get specified status or default status.
    */
-  getStatus = (statusName: string = DEFAULT_STATUS): JsonTypes | undefined => {
+  getStatus = (statusName: string = DEFAULT_DEVICE_STATUS): JsonTypes | undefined => {
     if (!this.statusState) return;
 
     const state = this.statusState.getState();
@@ -161,7 +159,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
   }
 
-  setStatus = async (newValue: any, statusName: string = DEFAULT_STATUS): Promise<void> => {
+  setStatus = async (newValue: any, statusName: string = DEFAULT_DEVICE_STATUS): Promise<void> => {
     if (!this.statusState) {
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
     }

@@ -1,6 +1,7 @@
-import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import DeviceBase from 'system/base/DeviceBase';
 import {omitObj} from 'system/lib/objects';
 import {Dictionary} from 'system/interfaces/Types';
+import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
 
@@ -42,7 +43,7 @@ export default class ClickSensor extends DeviceBase<Props> {
 
 
   protected statusGetter = async (): Promise<Dictionary> => {
-    return { [DEFAULT_STATUS]: this.binaryClick.isDown() };
+    return { [DEFAULT_DEVICE_STATUS]: this.binaryClick.isDown() };
   }
 
   // protected transformPublishValue = (value: boolean): number => {
@@ -55,7 +56,7 @@ export default class ClickSensor extends DeviceBase<Props> {
 
     // TODO: почему тут silent write был ????
 
-    await this.statusState.write({[DEFAULT_STATUS]: true});
+    await this.statusState.write({[DEFAULT_DEVICE_STATUS]: true});
   });
 
   private onDown = this.wrapErrors(async () => {

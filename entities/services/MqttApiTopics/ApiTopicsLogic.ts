@@ -3,7 +3,7 @@ import {combineTopic, parseArgs} from 'system/lib/helpers';
 import {Dictionary, JsonTypes} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 import Context from 'system/Context';
 
 
@@ -157,7 +157,7 @@ export default class ApiTopicsLogic {
     if (!state) return;
 
     for (let paramName of changedParams) {
-      const resolvedParamName: string | undefined = (paramName === DEFAULT_STATUS) ? undefined : paramName;
+      const resolvedParamName: string | undefined = (paramName === DEFAULT_DEVICE_STATUS) ? undefined : paramName;
       const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, stateType, resolvedParamName);
       const data: string = JSON.stringify(state[paramName]);
 

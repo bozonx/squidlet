@@ -1,6 +1,7 @@
-import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
+import DeviceBase from 'system/base/DeviceBase';
 import {resolveLevel} from 'system/lib/helpers';
 import {Dictionary} from 'system/interfaces/Types';
+import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';
 
@@ -21,17 +22,17 @@ export default class Switch extends DeviceBase<Props> {
     this.depsInstances.binaryOutput.onIncomeChange((newLevel: boolean) => {
       if (!this.statusState) throw new Error(`No status`);
 
-      this.statusState.setIncomeState({ [DEFAULT_STATUS]: newLevel });
+      this.statusState.setIncomeState({ [DEFAULT_DEVICE_STATUS]: newLevel });
     });
   }
 
 
   protected statusGetter = async (): Promise<Dictionary> => {
-    return { [DEFAULT_STATUS]: await this.binaryOutput.read() };
+    return { [DEFAULT_DEVICE_STATUS]: await this.binaryOutput.read() };
   }
 
   protected statusSetter = async (partialData: Dictionary) => {
-    await this.binaryOutput.write(partialData[DEFAULT_STATUS] as boolean);
+    await this.binaryOutput.write(partialData[DEFAULT_DEVICE_STATUS] as boolean);
   }
 
   protected actions = {
