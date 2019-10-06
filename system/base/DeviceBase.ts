@@ -49,7 +49,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   private _configState?: DeviceState;
 
 
-  protected doInit = async () => {
+  init = async () => {
+    await this.doPreInit();
+
     const manifest: DeviceManifest = await this.getManifest();
 
     if (manifest.status) {

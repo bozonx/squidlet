@@ -33,8 +33,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   protected depsInstances: {[index: string]: any} = {};
   // better place to instantiate dependencies if need
   protected willInit?: () => Promise<void>;
-  // init process
-  protected doInit?: () => Promise<void>;
   // it will be called after all the entities of entityType have been inited
   protected driversDidInit?: () => Promise<void>;
   protected servicesDidInit?: () => Promise<void>;
@@ -52,13 +50,7 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   }
 
   async init() {
-    if (this.validateProps) {
-      const errorMsg: string | undefined = this.validateProps(this.props);
-
-      if (errorMsg) throw new Error(errorMsg);
-    }
-
-    await this.addLifeCycleListeners();
+    await this.doPreInit();
   }
 
   // TODO: review - ??? why doDestroy ???
@@ -89,15 +81,27 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     };
   }
 
+  protected async doPreInit() {
+    this.doPropsValidation();
+    await this.addLifeCycleListeners();
+    // TODO: review
+    if (this.willInit) await this.willInit();
+  }
+
+
+  private doPropsValidation() {
+    if (this.validateProps) {
+      const errorMsg: string | undefined = this.validateProps(this.props);
+
+      if (errorMsg) throw new Error(errorMsg);
+    }
+  }
 
   private async addLifeCycleListeners() {
     if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit);
     if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit);
     if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
     if (this.appDidInit) this.context.onAppInit(this.appDidInit);
-    if (this.willInit) await this.willInit();
-    // TODO: review
-    if (this.doInit) await this.doInit();
   }
 
 }
