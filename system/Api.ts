@@ -8,7 +8,6 @@ import {calcAllowedLogLevels} from './lib/helpers';
 import SysIo from './interfaces/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
 import {SystemEvents} from './constants';
-import {StatusChangeHandler} from './base/DeviceBase';
 
 
 export default class Api {
@@ -122,7 +121,7 @@ export default class Api {
   /**
    * Listen device status and make object with changed params
    */
-  listenDeviceStatus(deviceId: string, cb: StatusChangeHandler): number {
+  listenDeviceStatus(deviceId: string, cb: (changedParams: Dictionary) => void): number {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
