@@ -7,11 +7,14 @@ import {StateCategories} from '../interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '../constants';
 
 
+export type DeviceAction = (...param: any[]) => JsonTypes | Promise<JsonTypes>;
 export type StatusChangeHandler = (paramName: string, value?: JsonTypes) => void;
 export type ConfigChangeHandler = () => void;
 
 
-export default class DeviceBase<Props extends {[index: string]: any} = {}> extends EntityBase<Props, DeviceManifest> {
+export default class DeviceBase<
+  Props extends {[index: string]: any} = {}
+> extends EntityBase<Props, DeviceManifest> {
   readonly entityType = 'device';
 
   get statusState(): DeviceState | undefined {
@@ -45,7 +48,8 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected initialConfig?: Initialize;
   protected configGetter?: Getter;
   protected configSetter?: Setter;
-  protected actions: {[index: string]: Function} = {};
+
+  protected actions: {[index: string]: DeviceAction} = {};
 
   private _statusState?: DeviceState;
   private _configState?: DeviceState;
@@ -96,6 +100,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       ]);
     });
 
+    // call didInit handler of device if set
     if (this.didInit) await this.didInit();
   }
 
@@ -120,18 +125,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
     }
 
-    let result: JsonTypes | undefined;
-
-    try {
-      result = await this.actions[actionName](...params);
-    }
-    catch (err) {
-      this.log.error(`Action "${actionName}" returns an error: ${err.toString()}`);
-
-      return;
-    }
-
-    return result;
+    return this.actions[actionName](...params);
   }
 
   /**
@@ -146,7 +140,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
   /**
-   * Force load status
+   * Force load status whole status.
    */
   loadStatus = async (): Promise<void> => {
     if (!this.statusState) return;
@@ -159,6 +153,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
   }
 
+  /**
+   * Set status params value
+   */
   setStatus = async (newValue: any, statusName: string = DEFAULT_DEVICE_STATUS): Promise<void> => {
     if (!this.statusState) {
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
@@ -168,7 +165,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
       await this.statusState.write({[statusName]: newValue});
     }
     catch (err) {
-      throw new Error(`Device "${this.id}" setStatus: ${err}`);
+      throw new Error(`DeviceBase.setStatus: device "${this.id}", ${err}`);
     }
   }
 
@@ -197,6 +194,9 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.context.state.onChange(wrapper);
   }
 
+  /**
+   * Get while config
+   */
   getConfig(): Dictionary {
     if (!this.configState) return {};
 
@@ -204,7 +204,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   }
 
   /**
-   * Force load config
+   * Force load whole config.
    */
   loadConfig = async (): Promise<void> => {
     if (!this.configState) return;
@@ -217,6 +217,10 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     }
   }
 
+  /**
+   * Set whole config
+   * @param partialData
+   */
   setConfig = async (partialData: Dictionary): Promise<void> => {
     if (!this.configState) {
       throw new Error(`DeviceBase.getConfig: device "${this.id}", config hasn't been set.`);
