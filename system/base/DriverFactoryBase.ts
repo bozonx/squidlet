@@ -6,36 +6,26 @@ import {mergeDeepObjects} from '../lib/objects';
 import Context from '../Context';
 
 
-// TODO: наследовать от DriverBase???
 /**
- * This factory creates instances and keeps them in memory if they will be reused.
+ * This factory creates instances of sub drivers and keeps them in the memory.
  * After the next request of instance it returns previously created one.
- * Getting/setting instance politics has the next types:
- * * if instanceAlwaysSame is set method getInstance will return the same instance all the time
- * * if instanceByPropName is set method getInstance will return instances by unique id which
- *   gets from props. E.g instanceByPropName = 'pin' and props is {pin: 1} then
- *   "1" is unique id for instances
- * * if instanceIdCalc is set method getInstance will call this function to get unique id
+ * If the "instanceId" method is set then id of instances of subDriver will be calculated there.
+ * If there no "instanceId" method then a new instance will be created each call of "subDriver"
+ * and never be saved.
  */
 export default abstract class DriverFactoryBase<
   Instance extends DriverBase = DriverBase,
   Props = {[index: string]: any}
-> {
-  protected readonly context: Context;
-  protected readonly definition: EntityDefinition;
+> extends DriverBase {
+  // there instances are kept
   protected instances: {[index: string]: Instance} = {};
-  protected abstract DriverClass: new (context: Context, definition: EntityDefinition) => Instance;
-  // calculate instance id by calling a function. If it doesn't set
-  // then it will generate a new instance on calling getInstance() function.
+  // Specify your sub driver class. It's required.
+  protected abstract SubDriverClass: new (context: Context, definition: EntityDefinition) => Instance;
+  // Specify it to calculate an id of the new instance of sub driver
   protected instanceId?: (props: Props) => string;
 
 
-  constructor(context: Context, definition: EntityDefinition) {
-    this.definition = definition;
-    this.context = context;
-  }
-
-  async destroy() {
+  destroy = async () => {
     for (let name of Object.keys(this.instances)) {
       const instance: Instance = this.instances[name];
 

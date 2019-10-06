@@ -25,10 +25,11 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   get props(): Props {
     return this.definition.props as Props;
   }
-  get log(): LogPublisher {
+
+  protected get log(): LogPublisher {
     return this.context.log;
   }
-  get config(): HostConfig {
+  protected get config(): HostConfig {
     return this.context.config;
   }
 
