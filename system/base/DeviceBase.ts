@@ -92,7 +92,7 @@ export default class DeviceBase<
       );
     }
 
-    // TODO: strong review - экспандеры должны инициализироваться до пинов
+    // initialize status and config after all the devices has been initialized
     this.context.onDevicesInit(async () => {
       await Promise.all([
         this.statusState && this.statusState.init(),
@@ -140,20 +140,6 @@ export default class DeviceBase<
   }
 
   /**
-   * Force load status whole status.
-   */
-  loadStatus = async (): Promise<void> => {
-    if (!this.statusState) return;
-
-    try {
-      await this.statusState.load();
-    }
-    catch (err) {
-      throw new Error(`Device "${this.id}" loadStatus: ${err}`);
-    }
-  }
-
-  /**
    * Set status params value
    */
   setStatus = async (newValue: any, statusName: string = DEFAULT_DEVICE_STATUS): Promise<void> => {
@@ -169,31 +155,6 @@ export default class DeviceBase<
     }
   }
 
-  // TODO: review - похоже не используется
-  // TODO: почему бы не передать просто changedParams или не собрать partialState
-  /**
-   * Listen status change
-   */
-  onChange(cb: StatusChangeHandler): number {
-    const wrapper = (category: number, stateName: string, changedParams: string[]): void => {
-      if (category !== StateCategories.devicesStatus || stateName !== this.id) return;
-
-      if (!this.statusState) {
-        return this.log.error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
-      }
-
-      const currentState: Dictionary = this.statusState.getState();
-
-      for (let paramName of changedParams) {
-        cb(paramName, currentState[paramName]);
-      }
-    };
-
-    // TODO: почему не используется statusState???
-
-    return this.context.state.onChange(wrapper);
-  }
-
   /**
    * Get while config
    */
@@ -201,20 +162,6 @@ export default class DeviceBase<
     if (!this.configState) return {};
 
     return  this.configState.getState();
-  }
-
-  /**
-   * Force load whole config.
-   */
-  loadConfig = async (): Promise<void> => {
-    if (!this.configState) return;
-
-    try {
-      await this.configState.load();
-    }
-    catch (err) {
-      throw new Error(`Device "${this.id}" loadConfig: ${err}`);
-    }
   }
 
   /**
@@ -234,23 +181,76 @@ export default class DeviceBase<
     }
   }
 
-  // TODO: review - похоже не используется
-  /**
-   * Listen status change
-   */
-  onConfigChange(cb: ConfigChangeHandler): number {
-    if (!this.configState) {
-      throw new Error(`DeviceBase.onConfigChange: device "${this.id}", config hasn't been set.`);
-    }
-
-    const wrapper = (category: number, stateName: string): void => {
-      if (category !== StateCategories.devicesConfig || stateName !== this.id) return;
-
-      cb();
-    };
-
-    // TODO: почему не используется statusState???
-    return this.context.state.onChange(wrapper);
-  }
-
 }
+
+
+// /**
+//  * Force load status whole status.
+//  */
+// loadStatus = async (): Promise<void> => {
+//   if (!this.statusState) return;
+//
+//   try {
+//     await this.statusState.load();
+//   }
+//   catch (err) {
+//     throw new Error(`Device "${this.id}" loadStatus: ${err}`);
+//   }
+// }
+
+// /**
+//  * Force load whole config.
+//  */
+// loadConfig = async (): Promise<void> => {
+//   if (!this.configState) return;
+//
+//   try {
+//     await this.configState.load();
+//   }
+//   catch (err) {
+//     throw new Error(`Device "${this.id}" loadConfig: ${err}`);
+//   }
+// }
+
+// T-O-D-O: review - похоже не используется
+// T-O-D-O: почему бы не передать просто changedParams или не собрать partialState
+// /**
+//  * Listen status change
+//  */
+// onChange(cb: StatusChangeHandler): number {
+//   const wrapper = (category: number, stateName: string, changedParams: string[]): void => {
+//     if (category !== StateCategories.devicesStatus || stateName !== this.id) return;
+//
+//     if (!this.statusState) {
+//       return this.log.error(`DeviceBase.onChange: device "${this.id}", status hasn't been set.`);
+//     }
+//
+//     const currentState: Dictionary = this.statusState.getState();
+//
+//     for (let paramName of changedParams) {
+//       cb(paramName, currentState[paramName]);
+//     }
+//   };
+//
+//   // T-O-D-O: почему не используется statusState???
+//
+//   return this.context.state.onChange(wrapper);
+// }
+
+// /**
+//  * Listen status change
+//  */
+// onConfigChange(cb: ConfigChangeHandler): number {
+//   if (!this.configState) {
+//     throw new Error(`DeviceBase.onConfigChange: device "${this.id}", config hasn't been set.`);
+//   }
+//
+//   const wrapper = (category: number, stateName: string): void => {
+//     if (category !== StateCategories.devicesConfig || stateName !== this.id) return;
+//
+//     cb();
+//   };
+//
+//   // T-O-D-O: почему не используется statusState???
+//   return this.context.state.onChange(wrapper);
+// }

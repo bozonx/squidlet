@@ -50,12 +50,10 @@ export default class Api {
     return device.action(actionName, ...args);
   }
 
-  // TODO: rename to deviceStatus ???
   getDeviceStatus(deviceId: string): Dictionary | undefined {
     return this.context.state.getState(StateCategories.devicesStatus, deviceId);
   }
 
-  // TODO: rename to deviceConfig ???
   getDeviceConfig(deviceId: string): Dictionary | undefined {
     return this.context.state.getState(StateCategories.devicesConfig, deviceId);
   }
