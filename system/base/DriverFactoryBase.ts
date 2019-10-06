@@ -6,6 +6,7 @@ import {mergeDeepObjects} from '../lib/objects';
 import Context from '../Context';
 
 
+// TODO: наследовать от DriverBase???
 /**
  * This factory creates instances and keeps them in memory if they will be reused.
  * After the next request of instance it returns previously created one.
@@ -16,17 +17,17 @@ import Context from '../Context';
  *   "1" is unique id for instances
  * * if instanceIdCalc is set method getInstance will call this function to get unique id
  */
-export default abstract class DriverFactoryBase<Instance extends DriverBase = DriverBase> {
-  protected instances: {[index: string]: Instance} = {};
-  protected abstract DriverClass: new (context: Context, definition: EntityDefinition) => Instance;
-  protected instanceAlwaysNew: boolean = false;
-  protected instanceAlwaysSame: boolean = false;
-  // name of instance id in props
-  protected instanceByPropName?: string;
-  // calculate instance id by calling a function
-  protected instanceIdCalc?: (props: {[index: string]: any}) => string;
+export default abstract class DriverFactoryBase<
+  Instance extends DriverBase = DriverBase,
+  Props = {[index: string]: any}
+> {
   protected readonly context: Context;
   protected readonly definition: EntityDefinition;
+  protected instances: {[index: string]: Instance} = {};
+  protected abstract DriverClass: new (context: Context, definition: EntityDefinition) => Instance;
+  // calculate instance id by calling a function. If it doesn't set
+  // then it will generate a new instance on calling getInstance() function.
+  protected instanceId?: (props: Props) => string;
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -43,19 +44,23 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase = Dr
   }
 
 
-  async getInstance(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
+  /**
+   * Get existent or create a new sub driver instance
+   */
+  async subDriver(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     // combined instance and definition props
-    const props: {[index: string]: any} = mergeDeepObjects(instanceProps, this.definition.props);
+    const props = mergeDeepObjects(instanceProps, this.definition.props) as Props;
     const instanceId: string | undefined = this.getInstanceId(props);
 
     // TODO: лучше не ждать до создания инстанса
     await this.validateInstanceProps(instanceProps, props);
 
     if (typeof instanceId === 'undefined') {
-      // just create always new instance and don't save
+      // just create a new instance and don't save it
       return this.makeInstance(props);
     }
 
+    // else in case if specified any id includes the same id each time
     // return previously instantiated instance if it is
     if (this.instances[instanceId]) {
       return this.instances[instanceId];
@@ -68,30 +73,17 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase = Dr
   }
 
 
-  private getInstanceId(props: {[index: string]: any}): string | undefined {
-    if (this.instanceAlwaysNew) {
-      return;
-    }
-    else if (this.instanceAlwaysSame) {
-      return 'same';
-    }
-    else if (this.instanceByPropName) {
-      if (typeof this.instanceByPropName === 'undefined') throw new Error(`You have to specify "instanceByPropName"`);
+  private getInstanceId(props: Props): string | undefined {
+    if (!this.instanceId) return;
 
-      return props[this.instanceByPropName];
-    }
-    else if (this.instanceIdCalc) {
-      if (typeof this.instanceIdCalc !== 'function') {
-        throw new Error(`You have to specify "instanceIdCalc"`);
-      }
-
-      return this.instanceIdCalc(props);
+    if (typeof this.instanceId !== 'function') {
+      throw new Error(`You have to specify "instanceIdCalc"`);
     }
 
-    throw new Error(`DriverFactoryBase: cant resolve getting instance method! $`);
+    return this.instanceId(props);
   }
 
-  private async makeInstance(props: {[index: string]: any}): Promise<Instance> {
+  private async makeInstance(props: Props): Promise<Instance> {
     // replace merged props
     const definition = {
       ...this.definition,
@@ -100,12 +92,14 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase = Dr
 
     const instance: Instance = new this.DriverClass(this.context, definition);
 
-    // init it
+    // TODO: нужно ли сразу инициализировать ???
+    // init it right now
     if (instance.init) await instance.init();
 
     return instance;
   }
 
+  // TODO: review
   private async validateInstanceProps(
     instanceProps: {[index: string]: any},
     mergedProps: {[index: string]: any}
