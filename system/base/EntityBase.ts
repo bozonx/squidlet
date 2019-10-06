@@ -9,8 +9,11 @@ import {EntityType} from '../interfaces/EntityTypes';
 export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
   abstract readonly entityType: EntityType;
   readonly context: Context;
+  // define this method and it will be called on system init
+  init?: () => Promise<void>;
   readonly definition: EntityDefinition;
-  // destroy method for entity
+  // define this method to destroy entity when system is destroying.
+  // Don't call this method in other cases.
   destroy?: () => Promise<void>;
 
   get id(): string {
@@ -52,12 +55,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit);
     if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
     if (this.appDidInit) this.context.onAppInit(this.appDidInit);
-  }
-
-
-  // TODO: review - ??? why doDestroy ???
-  async doDestroy() {
-    if (this.destroy) await this.destroy();
   }
 
 

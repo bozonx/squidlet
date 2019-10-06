@@ -22,7 +22,7 @@ export default abstract class EntityManagerBase<EntityInstance extends EntityBas
     for (let name of Object.keys(this.instances)) {
       const instance: EntityInstance = this.instances[name];
 
-      if (instance.doDestroy) await instance.doDestroy();
+      if (instance.destroy) await instance.destroy();
     }
   }
 

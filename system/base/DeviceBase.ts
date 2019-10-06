@@ -6,6 +6,7 @@ import DeviceState from '../DeviceState';
 import {StateCategories} from '../interfaces/States';
 
 
+// TODO: move to constants
 export const DEFAULT_STATUS = 'default';
 
 export type StatusChangeHandler = (paramName: string, value?: JsonTypes) => void;
@@ -35,6 +36,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.configState.isReading() || this.configState.isWriting();
   }
 
+  // define it to do initialization after states have inited.
   protected didInit?: () => Promise<void>;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
@@ -46,6 +48,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
   protected configGetter?: Getter;
   protected configSetter?: Setter;
   protected actions: {[index: string]: Function} = {};
+
   private _statusState?: DeviceState;
   private _configState?: DeviceState;
 
@@ -94,18 +97,18 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
         this.configState && this.configState.init(),
       ]);
     });
+
+    if (this.didInit) await this.didInit();
   }
 
-
-  // TODO: review - why doDestroy instead of just destroy ???
-  async doDestroy() {
-    await super.doDestroy();
+  destroy = async () => {
     this._statusState && this._statusState.destroy();
     this._configState && this._configState.destroy();
 
     delete this._statusState;
     delete this._configState;
   }
+
 
   getActionsList(): string[] {
     return Object.keys(this.actions);
