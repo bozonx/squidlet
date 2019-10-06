@@ -35,6 +35,7 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     return this.configState.isReading() || this.configState.isWriting();
   }
 
+  protected didInit?: () => Promise<void>;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
    */

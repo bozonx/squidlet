@@ -21,7 +21,7 @@ export default class Toggle extends DeviceBase<Props> {
   }
 
 
-  protected willInit = async () => {
+  protected didInit = async () => {
     this.depsInstances.binaryClick = await this.context.getSubDriver(
       'BinaryClick',
       {
