@@ -2,7 +2,6 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {omitObj} from 'system/lib/objects';
 
 import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
@@ -31,7 +30,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.binaryInput = await this.context.getSubDriver(
       'BinaryInput',
       {

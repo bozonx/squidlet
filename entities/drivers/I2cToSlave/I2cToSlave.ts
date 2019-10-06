@@ -1,6 +1,5 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {omitObj} from 'system/lib/objects';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/base/MasterSlaveBaseNodeDriver';
 
@@ -25,7 +24,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     if (this.props.int) {
       this.impulseInput = await this.context.getSubDriver('ImpulseInput', this.props.int || {});
     }

@@ -13,7 +13,7 @@ export class HttpClient extends DriverBase<HttpClientProps> {
   private client?: HttpClientLogic;
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.client = new HttpClientLogic(
       this.httpClientIo,
       this.props,

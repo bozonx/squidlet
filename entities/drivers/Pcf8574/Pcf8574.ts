@@ -4,7 +4,6 @@
  */
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {Edge} from 'system/interfaces/io/DigitalIo';
@@ -49,7 +48,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.i2cDriver = await this.context.getSubDriver(
       'I2cToSlave',
       {
@@ -114,7 +113,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   /**
    * Listen to changes of pin after edge and debounce were processed.
-   * Call this method inside a willInit() callback of your driver or device or after.
+   * Call this method inside a init() callback of your driver or device or after.
    */
   addListener(handler: ChangeStateHandler): number {
     return this.events.addListener(handler);

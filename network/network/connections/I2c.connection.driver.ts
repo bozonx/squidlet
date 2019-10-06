@@ -3,7 +3,6 @@ import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData';
 import { uint8ArrayToText, textToUint8Array} from '../../../system/lib/serialize';
 import DriverBase from '../../../system/base/DriverBase';
-import {GetDriverDep} from '../../../system/base/EntityBase';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
@@ -29,7 +28,7 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     const isMaster = typeof this.props.myAddress.address === 'undefined';
     const i2cDriverName = (isMaster) ? 'I2cMaster' : 'I2cSlave';
 

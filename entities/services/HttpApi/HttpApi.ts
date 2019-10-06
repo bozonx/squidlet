@@ -1,4 +1,3 @@
-import {GetDriverDep} from 'system/base/EntityBase';
 import ServiceBase from 'system/base/ServiceBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
 import {Route} from 'system/lib/HttpRouterLogic';
@@ -37,7 +36,7 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.router = await this.context.getSubDriver('HttpServerRouter', this.props);
 
     this.router.addRoute('get', '/api/:apiMethodName/:args', this.handleRoute);

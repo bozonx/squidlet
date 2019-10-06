@@ -1,5 +1,4 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {omitObj} from 'system/lib/objects';
 import {Dictionary} from 'system/interfaces/Types';
 

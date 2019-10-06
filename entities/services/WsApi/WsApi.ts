@@ -1,4 +1,3 @@
-import {GetDriverDep} from 'system/base/EntityBase';
 import ServiceBase from 'system/base/ServiceBase';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import {deserializeJson, serializeJson} from 'system/lib/serialize';
@@ -16,7 +15,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.wsServer = await this.context.getSubDriver('WsServerSessions', this.props);
 
     this.wsServerSessions.onNewSession((sessionId: string) => {

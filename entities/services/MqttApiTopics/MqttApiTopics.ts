@@ -1,6 +1,5 @@
 import ServiceBase from 'system/base/ServiceBase';
 import {combineTopic} from 'system/lib/helpers';
-import {GetDriverDep} from 'system/base/EntityBase';
 
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
 import ApiTopicsLogic, {TOPIC_SEPARATOR, TOPIC_TYPE_SEPARATOR, TopicType} from './ApiTopicsLogic';
@@ -18,7 +17,7 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this._apiTopicsLogic = new ApiTopicsLogic(this.context);
     this.apiTopicsLogic.init();
     this.depsInstances.mqtt = await this.context.getSubDriver('Mqtt', this.props);

@@ -1,6 +1,5 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {omitObj} from 'system/lib/objects';
 import {DigitalSubDriver} from 'system/interfaces/io/DigitalIo';
 
@@ -22,7 +21,7 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     const driverName = `Digital_${this.props.source}`;
 
     this.depsInstances.source = await this.context.getSubDriver(

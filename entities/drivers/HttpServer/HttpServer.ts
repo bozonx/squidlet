@@ -23,7 +23,7 @@ export class HttpServer extends DriverBase<HttpServerProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.server = new HttpServerLogic(
       this.httpServerIo,
       this.props,

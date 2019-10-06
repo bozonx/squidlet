@@ -1,7 +1,6 @@
 import DriverBase from 'system/base/DriverBase';
 import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/base/MasterSlaveBaseNodeDriver';
 
 
@@ -19,7 +18,7 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
     return this.depsInstances.i2cDriver;
   }
 
-  protected willInit = async () => {
+  protected init = async () => {
     if (this.isToSlave()) {
       this.depsInstances.i2cDriver = await this.context.getSubDriver('I2cToSlave', this.props);
     }

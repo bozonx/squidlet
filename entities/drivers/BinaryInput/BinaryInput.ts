@@ -2,7 +2,6 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
 
@@ -29,7 +28,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = this.context.getSubDriver(

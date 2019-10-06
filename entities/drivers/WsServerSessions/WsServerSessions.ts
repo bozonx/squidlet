@@ -3,7 +3,6 @@ import DriverBase from 'system/base/DriverBase';
 import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import {WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 import {parseCookie} from 'system/lib/cookies';
-import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {getKeyOfObject} from 'system/lib/objects';
 import {omitObj} from 'system/lib/objects';
@@ -37,7 +36,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   private sessionConnections: {[index: string]: string} = {};
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.server = await this.context.getSubDriver('WsServer', omitObj(this.props, 'expiredSec'));
 
     this.server.onConnection(this.handleNewConnection);

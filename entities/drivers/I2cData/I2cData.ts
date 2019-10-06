@@ -7,7 +7,6 @@ import {
 } from 'system/lib/binaryHelpers';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 
 
 const MAX_BLOCK_LENGTH = 65535;
@@ -54,7 +53,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.i2cDriver = await this.context.getSubDriver(this.props.i2cDriverName, this.props);
   }
 

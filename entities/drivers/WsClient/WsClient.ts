@@ -29,7 +29,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.client = new WsClientLogic(
       this.wsClientIo,
       this.props,

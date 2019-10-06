@@ -1,5 +1,4 @@
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
 import {invertIfNeed} from 'system/lib/helpers';
@@ -50,7 +49,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.digitalOutput = await this.context.getSubDriver(
       'DigitalPinOutput',
       {

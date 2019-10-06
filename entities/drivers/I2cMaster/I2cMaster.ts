@@ -17,7 +17,7 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.i2cMaster = this.context.getIo('I2cMaster');
 
     await this.i2cMasterIo.newBus(this.props.busNum, omitObj(this.props, 'busNum') as any);

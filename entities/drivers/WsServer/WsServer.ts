@@ -24,7 +24,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.server = new WsServerLogic(
       this.wsServerIo,
       this.props,

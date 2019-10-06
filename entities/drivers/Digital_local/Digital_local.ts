@@ -14,7 +14,7 @@ export class DigitalLocal extends DriverBase implements DigitalSubDriver {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.digitalDev = this.context.getIo('Digital');
   }
 

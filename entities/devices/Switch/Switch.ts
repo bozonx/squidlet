@@ -1,6 +1,5 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
 import {resolveLevel} from 'system/lib/helpers';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';

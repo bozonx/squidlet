@@ -9,7 +9,6 @@
  */
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {firstLetterToUpperCase} from 'system/lib/strings';
 import DriverBase from 'system/base/DriverBase';
 import DuplexDriver from 'system/interfaces/DuplexDriver';
@@ -109,7 +108,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   private initingIcInProgress: boolean = false;
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex`;
 
     const props = {

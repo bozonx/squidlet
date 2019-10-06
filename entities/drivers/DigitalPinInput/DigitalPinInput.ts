@@ -1,7 +1,6 @@
 import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
@@ -38,7 +37,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     // the second check is half of a debounce time
     this.secondCheckTimeout = Math.ceil((this.props.debounce || 0) / 2);
 

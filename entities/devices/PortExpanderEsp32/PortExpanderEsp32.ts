@@ -1,5 +1,4 @@
 import DeviceBase from 'system/base/DeviceBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 
 import {
   PortExpanderProps,

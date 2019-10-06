@@ -34,7 +34,7 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.server = await this.context.getSubDriver('HttpServer', this.props);
     this._router = new HttpRouterLogic(this.log.debug);
 

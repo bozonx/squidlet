@@ -18,6 +18,7 @@ export default class Automation extends ServiceBase<Props> {
   private rules: RuleItem[] = [];
 
 
+  // TODO: нужно чтобы выполнилось вообще в самом конце
   protected appDidInit = async () => {
     this.log.debug(`Automation: starting preparing rules`);
     await this.prepareRules();

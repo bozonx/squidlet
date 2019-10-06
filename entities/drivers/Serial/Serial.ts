@@ -19,7 +19,7 @@ export class Serial extends DriverBase<Props> {
   private portNum: number = -1;
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.portNum = await this.serialIo.newPort(
       this.props.portNum,
       omitObj(this.props, 'portNum')

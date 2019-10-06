@@ -1,6 +1,5 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
@@ -33,7 +32,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.digitalOutput = await this.context.getSubDriver(
       'DigitalPinOutput',
       {

@@ -1,5 +1,4 @@
 import DeviceBase, {DEFAULT_STATUS} from 'system/base/DeviceBase';
-import {GetDriverDep} from 'system/base/EntityBase';
 import {Dictionary} from 'system/interfaces/Types';
 
 import {BinaryInput, BinaryInputProps} from '../../drivers/BinaryInput/BinaryInput';

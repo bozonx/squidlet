@@ -1,7 +1,6 @@
 import DriverBase from '../../../system/base/DriverBase';
 import DuplexDriver from '../../../system/interfaces/DuplexDriver';
 import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
-import {GetDriverDep} from '../../../system/base/EntityBase';
 import {omitObj} from '../../../system/lib/objects';
 import {addFirstItemUint8Arr} from '../../../system/lib/binaryHelpers';
 
@@ -23,7 +22,7 @@ export class Channels extends DriverBase<ChannelsProps> {
   }
 
 
-  protected willInit = async () => {
+  protected init = async () => {
     this.depsInstances.driver = await this.context.getSubDriver(this.props.driver, omit(this.props, 'drvier'));
   }
 
