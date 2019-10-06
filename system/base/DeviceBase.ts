@@ -96,16 +96,14 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
     });
   }
 
-
-  // TODO: review - why doDestroy instead of just destroy ???
-  async doDestroy() {
-    await super.doDestroy();
+  destroy = async () => {
     this._statusState && this._statusState.destroy();
     this._configState && this._configState.destroy();
 
     delete this._statusState;
     delete this._configState;
   }
+
 
   getActionsList(): string[] {
     return Object.keys(this.actions);

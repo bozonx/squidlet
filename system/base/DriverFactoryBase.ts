@@ -34,9 +34,11 @@ export default abstract class DriverFactoryBase<Instance extends DriverBase = Dr
     this.context = context;
   }
 
-  async doDestroy() {
+  async destroy() {
     for (let name of Object.keys(this.instances)) {
-      if (this.instances[name].doDestroy) await this.instances[name].doDestroy();
+      const instance: Instance = this.instances[name];
+
+      if (instance.destroy) await instance.destroy();
     }
   }
 
