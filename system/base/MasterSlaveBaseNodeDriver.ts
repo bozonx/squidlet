@@ -59,8 +59,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   // TODO: reivew
   init = async () => {
-    await this.doPreInit();
-
     // listen to errors which happen on polling
     for (let pollProps of this.props.poll) {
       const resolvedDataAddr: string = this.resolvefunctionStr(pollProps.function);

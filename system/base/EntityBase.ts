@@ -31,8 +31,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
 
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: any} = {};
-  // better place to instantiate dependencies if need
-  protected willInit?: () => Promise<void>;
   // it will be called after all the entities of entityType have been inited
   protected driversDidInit?: () => Promise<void>;
   protected servicesDidInit?: () => Promise<void>;
@@ -47,11 +45,15 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   constructor(context: Context, definition: EntityDefinition) {
     this.context = context;
     this.definition = definition;
+
+    this.doPropsValidation();
+
+    if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit);
+    if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit);
+    if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
+    if (this.appDidInit) this.context.onAppInit(this.appDidInit);
   }
 
-  async init() {
-    await this.doPreInit();
-  }
 
   // TODO: review - ??? why doDestroy ???
   async doDestroy() {
@@ -81,13 +83,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     };
   }
 
-  protected async doPreInit() {
-    this.doPropsValidation();
-    await this.addLifeCycleListeners();
-    // TODO: review
-    if (this.willInit) await this.willInit();
-  }
-
 
   private doPropsValidation() {
     if (this.validateProps) {
@@ -95,13 +90,6 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
 
       if (errorMsg) throw new Error(errorMsg);
     }
-  }
-
-  private async addLifeCycleListeners() {
-    if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit);
-    if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit);
-    if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
-    if (this.appDidInit) this.context.onAppInit(this.appDidInit);
   }
 
 }

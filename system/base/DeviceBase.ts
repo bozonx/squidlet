@@ -50,8 +50,6 @@ export default class DeviceBase<Props extends {[index: string]: any} = {}> exten
 
 
   init = async () => {
-    await this.doPreInit();
-
     const manifest: DeviceManifest = await this.getManifest();
 
     if (manifest.status) {
