@@ -62,7 +62,6 @@ export default class WsApiCall {
       const handlerIndex = await apiClient.callMethod(
         'listenDeviceStatus',
         deviceId,
-        undefined,
         (changedValues: Dictionary) => {
           console.info(JSON.stringify(changedValues));
         }

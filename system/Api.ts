@@ -8,6 +8,7 @@ import {calcAllowedLogLevels} from './lib/helpers';
 import SysIo from './interfaces/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
 import {SystemEvents} from './constants';
+import {StatusChangeHandler} from './base/DeviceBase';
 
 
 export default class Api {
@@ -50,15 +51,16 @@ export default class Api {
     return device.action(actionName, ...args);
   }
 
+  // Get whole device status or undefined if there no such device or device doesn't have a status
   getDeviceStatus(deviceId: string): Dictionary | undefined {
     return this.context.state.getState(StateCategories.devicesStatus, deviceId);
   }
 
+  // get while device config or undefined if there no such device or device doesn't have a config
   getDeviceConfig(deviceId: string): Dictionary | undefined {
     return this.context.state.getState(StateCategories.devicesConfig, deviceId);
   }
 
-  // TODO: rename to state ???
   getState(category: StateCategories, stateName: string): Dictionary | undefined {
     const result: Dictionary | undefined = this.context.state.getState(category, stateName);
 
@@ -117,11 +119,10 @@ export default class Api {
   }
 
 
-  listenDeviceStatus(
-    deviceId: string,
-    statusName: string | undefined,
-    cb: (changedValues: Dictionary) => void
-  ): number {
+  /**
+   * Listen device status and make object with changed params
+   */
+  listenDeviceStatus(deviceId: string, cb: StatusChangeHandler): number {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesStatus || stateName !== deviceId) return;
 
@@ -136,7 +137,10 @@ export default class Api {
     return this.context.state.onChange(handlerWrapper);
   }
 
-  listenDeviceConfig(deviceId: string, cb: (changedValues: Dictionary) => void): number {
+  /**
+   * Listen device config and make object with changed params
+   */
+  listenDeviceConfig(deviceId: string, cb: (changedParams: Dictionary) => void): number {
     const handlerWrapper = (category: number, stateName: string, changedParams: string[]) => {
       if (category !== StateCategories.devicesConfig || stateName !== deviceId) return;
 
