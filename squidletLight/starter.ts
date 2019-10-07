@@ -5,6 +5,7 @@ import AppBuilder from './builders/AppBuilder';
 import Platforms from '../system/interfaces/Platforms';
 import {REPO_ROOT} from '../shared/helpers';
 import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
+import LogLevel from '../system/interfaces/LogLevel';
 
 
 const SQUIDLET_LIGHT_WORKDIR = 'light';
@@ -17,6 +18,7 @@ const SQUIDLET_LIGHT_WORKDIR = 'light';
  * * --machine - required
  * * --minimize - default is true
  * * --io-server - build IO server standalone instead of full app.
+ * * --log-level - Optional. Set log level for logger.
  * * config path
  */
 export function resolveWorkDir(argWorkDir?: string): string {
@@ -35,6 +37,7 @@ export default async function(): Promise<void> {
   const machine: string | undefined = yargs.argv.machine as any;
   const hostConfigPath: string | undefined = yargs.argv._[0] as any;
   const minimize: boolean = yargs.argv.minimize !== 'false';
+  const logLevel: LogLevel | undefined = yargs.argv.logLevel as any;
 
   if (!platform) {
     console.error(`--platform is required`);
@@ -56,7 +59,8 @@ export default async function(): Promise<void> {
       platform,
       machine,
       hostConfigPath,
-      minimize
+      minimize,
+      logLevel
     );
 
     return await builder.build();
@@ -68,7 +72,8 @@ export default async function(): Promise<void> {
     platform,
     machine,
     hostConfigPath,
-    minimize
+    minimize,
+    logLevel
   );
 
   await builder.build();

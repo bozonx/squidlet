@@ -9,6 +9,7 @@ import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
+import LogLevel from '../../system/interfaces/LogLevel';
 
 
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
@@ -22,6 +23,7 @@ export default class AppBuilder {
   private readonly machine: string;
   private readonly tmpDir: string;
   private readonly minimize: boolean;
+  private readonly logLevel?: LogLevel;
   private readonly os: Os = new Os();
   private readonly envBuilder: EnvBuilder;
 
@@ -31,13 +33,15 @@ export default class AppBuilder {
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
-    minimize: boolean = true
+    minimize: boolean = true,
+    logLevel?: LogLevel
   ) {
     this.workDir = workDir;
     this.platform = platform;
     this.machine = machine;
     this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
     this.minimize = minimize;
+    this.logLevel = logLevel;
 
     this.envBuilder = new EnvBuilder(
       hostConfigPath,
@@ -103,6 +107,8 @@ export default class AppBuilder {
       + `import AppSwitcher from '${appSwitcherPath}';\n`
       + `import IoSetBuiltin from '${ioSetPath}';\n`
       + `import ConsoleLogger from '${ConsoleLoggerPath}';\n`
+      + '\n\n'
+      + `const consoleLogger = new ConsoleLogger(${this.logLevel})`
       + '\n\n'
       + `async function start() {\n`
       + `  const ioSet: any = new IoSetBuiltin(envSet, ios, ${DEVICES_MAIN_FILES}, ${DRIVERS_MAIN_FILES}, ${SERViCES_MAIN_FILES});\n`

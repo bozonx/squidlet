@@ -9,7 +9,7 @@ export default class ConsoleLogger implements Logger {
   private readonly allowWarn: boolean;
 
 
-  constructor(level: LogLevel) {
+  constructor(level: LogLevel = 'info') {
     const allowedLogLevels: LogLevel[] = calcAllowedLogLevels(level);
 
     this.allowDebug = allowedLogLevels.includes('debug');
@@ -18,25 +18,25 @@ export default class ConsoleLogger implements Logger {
   }
 
 
-  debug(message: string) {
+  debug = (message: string) => {
     if (!this.allowDebug) return;
 
     console.info(`DEBUG: ${message}`);
   }
 
-  info(message: string) {
+  info = (message: string) => {
     if (!this.allowInfo) return;
 
     console.info(message);
   }
 
-  warn(message: string) {
+  warn = (message: string) => {
     if (!this.allowWarn) return;
 
     console.warn(`WARNING: ${message}`);
   }
 
-  error(message: string) {
+  error = (message: string) => {
     console.error(`ERROR: ${message}`);
   }
 
