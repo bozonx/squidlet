@@ -129,6 +129,8 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574, DigitalPcf8574Props> {
   protected SubDriverClass = DigitalPcf8574;
+  // one instance to one expander
+  protected instanceId = (props: DigitalPcf8574Props) => props.expander;
 
   /**
    * It generates unique id for DigitalPin input and output driver
