@@ -35,26 +35,25 @@ export default abstract class DriverFactoryBase<
 
 
   /**
-   * Get existent or create a new sub driver instance
+   * Get existent or create a new sub driver instance.
+   * It subDriver has an id you shouldn't destroy the subDriver.
    */
   async subDriver(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
     // combined instance and definition props
     const props = mergeDeepObjects(instanceProps, this.definition.props) as Props;
-    const instanceId: string | undefined = this.getInstanceId(props);
 
-    // TODO: лучше не ждать до создания инстанса
     await this.validateInstanceProps(instanceProps, props);
 
-    if (typeof instanceId === 'undefined') {
-      // just create a new instance and don't save it
-      return this.makeInstance(props);
-    }
+    // just create a new instance and don't save it
+    if (!this.instanceId) return this.makeInstance(props);
+
+    const instanceId: string | undefined = this.instanceId(props);
+
+    if (typeof instanceId !== 'string') throw new Error(`instanceId() method has to return a string`);
 
     // else in case if specified any id includes the same id each time
     // return previously instantiated instance if it is
-    if (this.instances[instanceId]) {
-      return this.instances[instanceId];
-    }
+    if (this.instances[instanceId]) return this.instances[instanceId];
 
     // create and save instance
     this.instances[instanceId] = await this.makeInstance(props);
@@ -63,33 +62,21 @@ export default abstract class DriverFactoryBase<
   }
 
 
-  private getInstanceId(props: Props): string | undefined {
-    if (!this.instanceId) return;
-
-    if (typeof this.instanceId !== 'function') {
-      throw new Error(`You have to specify "instanceIdCalc"`);
-    }
-
-    return this.instanceId(props);
-  }
-
   private async makeInstance(props: Props): Promise<Instance> {
-    // replace merged props
+    // make a definition where preps are merged props of definition's and instance's
     const definition = {
       ...this.definition,
       props,
     };
 
-    const instance: Instance = new this.DriverClass(this.context, definition);
+    const instance: Instance = new this.SubDriverClass(this.context, definition);
 
-    // TODO: нужно ли сразу инициализировать ???
     // init it right now
     if (instance.init) await instance.init();
 
     return instance;
   }
 
-  // TODO: review
   private async validateInstanceProps(
     instanceProps: {[index: string]: any},
     mergedProps: {[index: string]: any}
@@ -105,7 +92,7 @@ export default abstract class DriverFactoryBase<
       || validateRequiredProps(mergedProps, manifest.props);
 
     if (validationErr) {
-      throw new Error(`Can't make instance of driver "${this.definition.id}": ${validationErr}`);
+      throw new Error(`Props of sub driver "${this.definition.id}" are invalid: ${validationErr}`);
     }
   }
 
