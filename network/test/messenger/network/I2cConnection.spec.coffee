@@ -29,7 +29,7 @@ describe 'connections.I2cConnection', ->
       address: undefined
     }
 
-    @connection = new I2cConnection(@drivers, {}).getInstance(@myAddress)
+    @connection = new I2cConnection(@drivers, {}).subDriver(@myAddress)
 
   it 'send', ->
     await @connection.send(@remoteAddress, @message)

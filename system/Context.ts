@@ -68,7 +68,7 @@ export default class Context {
   ): Promise<T> {
     const driver: DriverFactoryBase = this.getDriver<any>(driverName);
 
-    return await driver.getInstance(props) as T;
+    return await driver.subDriver(props) as T;
   }
 
   getService<T extends ServiceBase = ServiceBase>(serviceId: string): T {

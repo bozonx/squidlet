@@ -88,7 +88,7 @@ export default class Destinations {
 
     // TODO: сделать по нормальному
     // TODO: использовать await
-    this.connections[connectionId] = (connectionDriver as any).getInstance(myAddress);
+    this.connections[connectionId] = (connectionDriver as any).subDriver(myAddress);
   }
 
   private listenToAllDestinations(): void {
