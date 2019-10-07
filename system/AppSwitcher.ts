@@ -4,11 +4,14 @@ import IoServer from './ioServer/IoServer';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import IoItem from './interfaces/IoItem';
 import {consoleError} from './lib/helpers';
+import Logger from './interfaces/Logger';
+import ConsoleLogger from '../shared/ConsoleLogger';
 
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
   private readonly restartRequest: () => void;
+  private readonly logger: Logger;
   private system?: System;
   private ioServer?: IoServer;
 
@@ -16,9 +19,11 @@ export default class AppSwitcher {
   constructor(
     ioSet: IoSet,
     restartRequest: () => void,
+    logger?: Logger
   ) {
     this.ioSet = ioSet;
     this.restartRequest = restartRequest;
+    this.logger = logger || new ConsoleLogger();
   }
 
 
@@ -50,7 +55,7 @@ export default class AppSwitcher {
 
 
   private startSystem = async () => {
-    this.system = new System(this.ioSet, this.handleShutdownRequest);
+    this.system = new System(this.ioSet, this.handleShutdownRequest, this.logger);
 
     await this.system.start();
   }
@@ -59,9 +64,9 @@ export default class AppSwitcher {
     this.ioServer = new IoServer(
       this.ioSet,
       this.handleShutdownRequest,
-      console.log,
-      console.info,
-      consoleError
+      this.logger.debug,
+      this.logger.info,
+      this.logger.error
     );
 
     await this.ioServer.start();

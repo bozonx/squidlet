@@ -18,7 +18,7 @@ const SQUIDLET_LIGHT_WORKDIR = 'light';
  * * --machine - required
  * * --minimize - default is true
  * * --io-server - build IO server standalone instead of full app.
- * * --log-level - Optional. Set log level for logger.
+ * * --log-level - Optional. Set log level for logger. debug|info|warn|error
  * * config path
  */
 export function resolveWorkDir(argWorkDir?: string): string {

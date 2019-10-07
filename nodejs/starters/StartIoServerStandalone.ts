@@ -2,11 +2,11 @@ import IoServer from '../../system/ioServer/IoServer';
 import IoSet from '../../system/interfaces/IoSet';
 import IoItem from '../../system/interfaces/IoItem';
 import StorageIo from '../../system/interfaces/io/StorageIo';
-import {consoleError} from '../../system/lib/helpers';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
 import StartDevelopBase from './StartDevelopBase';
+import ConsoleLogger from '../../shared/ConsoleLogger';
 
 
 export default class StartIoServerStandalone extends StartDevelopBase {
@@ -48,12 +48,13 @@ export default class StartIoServerStandalone extends StartDevelopBase {
     // TODO: install like in dev mode
     //await this.installModules();
 
+    const consoleLogger = new ConsoleLogger(this.props.argLogLevel);
     const ioServer = new IoServer(
       this.ioSet,
       this.shutdownRequestCb,
-      console.log,
-      console.info,
-      consoleError
+      consoleLogger.debug,
+      consoleLogger.info,
+      consoleLogger.error
     );
 
     await ioServer.start();

@@ -6,6 +6,8 @@ import Props from './Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
 import StorageIo from '../../system/interfaces/io/StorageIo';
+import ConsoleLogger from '../../shared/ConsoleLogger';
+import Logger from '../../system/interfaces/Logger';
 
 
 interface SystemKind {
@@ -16,6 +18,7 @@ interface SystemKind {
 type SystemKindClass = new (
   ioSet: IoSet,
   restartRequest: () => void,
+  logger?: Logger
 ) => SystemKind;
 
 
@@ -44,9 +47,11 @@ export default class SystemStarter {
     ioSet.init && await ioSet.init();
     await this.configureStorage(ioSet);
 
+    const consoleLogger = new ConsoleLogger(this.props.argLogLevel);
     const systemKind: SystemKind = new systemKindClass(
       ioSet,
-      this.handleRestartRequest
+      this.handleRestartRequest,
+      consoleLogger
     );
 
     this.listenDestroySignals(systemKind.destroy);
