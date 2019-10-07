@@ -124,11 +124,10 @@ export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> im
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPortExpander> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<DigitalPortExpander, DigitalPortExpanderProps> {
   protected SubDriverClass = DigitalPortExpander;
 
-  // TODO: почему так канзывается???
+  // TODO: review
   /**
    * It generates unique id for DigitalPin input and output driver
    */

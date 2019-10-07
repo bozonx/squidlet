@@ -30,7 +30,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.binaryInput = await this.context.getSubDriver(
       'BinaryInput',
       {
@@ -153,7 +153,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<BinaryClick> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<BinaryClick, BinaryClickProps> {
   protected SubDriverClass = BinaryClick;
 }

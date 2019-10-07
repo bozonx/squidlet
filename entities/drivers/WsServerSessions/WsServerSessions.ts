@@ -185,7 +185,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
 export default class Factory extends DriverFactoryBase<WsServerSessions> {
   protected SubDriverClass = WsServerSessions;
 
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;
   }
 }

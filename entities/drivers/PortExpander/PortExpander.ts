@@ -362,7 +362,7 @@ export default class Factory extends DriverFactoryBase<PortExpander> {
   protected instanceAlwaysNew = true;
   // TODO: review - может быть и wifi и ble и их адреса
 
-  // protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  // protected instanceId = (props: {[index: string]: any}): string => {
   //   const bus: string = (props.bus) ? String(props.bus) : 'default';
   //
   //   return `${bus}-${props.address}`;

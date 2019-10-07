@@ -32,7 +32,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.digitalOutput = await this.context.getSubDriver(
       'DigitalPinOutput',
       {
@@ -179,7 +179,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<BinaryOutput> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<BinaryOutput, BinaryOutputProps> {
   protected SubDriverClass = BinaryOutput;
 }

@@ -5,9 +5,6 @@ import {omitObj} from '../../../system/lib/objects';
 import {addFirstItemUint8Arr} from '../../../system/lib/binaryHelpers';
 
 
-
-
-
 export interface ChannelsProps {
   // duplex driver name
   duplex: string;
@@ -59,7 +56,7 @@ export class Channels extends DriverBase<ChannelsProps> {
 }
 
 export default class Factory extends DriverFactoryBase<Channels> {
-  // protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  // protected instanceId = (props: {[index: string]: any}): string => {
   //   return `${props.bus || 'default'}-${props.address}`;
   // }
   protected SubDriverClass = Channels;

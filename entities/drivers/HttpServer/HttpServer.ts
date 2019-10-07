@@ -23,7 +23,7 @@ export class HttpServer extends DriverBase<HttpServerProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.server = new HttpServerLogic(
       this.httpServerIo,
       this.props,
@@ -73,10 +73,10 @@ export class HttpServer extends DriverBase<HttpServerProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<HttpServer> {
+export default class Factory extends DriverFactoryBase<HttpServer, HttpServerProps> {
   protected SubDriverClass = HttpServer;
 
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;
   }
 }

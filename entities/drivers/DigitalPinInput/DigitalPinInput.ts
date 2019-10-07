@@ -37,7 +37,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     // the second check is half of a debounce time
     this.secondCheckTimeout = Math.ceil((this.props.debounce || 0) / 2);
 
@@ -164,8 +164,7 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPinInput> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<DigitalPinInput, DigitalPinInputProps> {
   protected SubDriverClass = DigitalPinInput;
   // TODO: source + pin + спросить адрес у нижележащего драйвера
 }

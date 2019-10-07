@@ -28,7 +28,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = this.context.getSubDriver(
@@ -109,7 +109,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<BinaryInput> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<BinaryInput, BinaryInputProps> {
   protected SubDriverClass = BinaryInput;
 }

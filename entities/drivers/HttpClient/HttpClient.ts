@@ -13,7 +13,7 @@ export class HttpClient extends DriverBase<HttpClientProps> {
   private client?: HttpClientLogic;
 
 
-  protected init = async () => {
+  init = async () => {
     this.client = new HttpClientLogic(
       this.httpClientIo,
       this.props,
@@ -33,7 +33,6 @@ export class HttpClient extends DriverBase<HttpClientProps> {
   }
 }
 
-export default class Factory extends DriverFactoryBase<HttpClient> {
+export default class Factory extends DriverFactoryBase<HttpClient, HttpClientProps> {
   protected SubDriverClass = HttpClient;
-  protected instanceAlwaysNew: boolean = true;
 }

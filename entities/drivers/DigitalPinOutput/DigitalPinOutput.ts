@@ -21,7 +21,7 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     const driverName = `Digital_${this.props.source}`;
 
     this.depsInstances.source = await this.context.getSubDriver(
@@ -72,8 +72,7 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPinOutput> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<DigitalPinOutput, DigitalPinOutputProps> {
   protected SubDriverClass = DigitalPinOutput;
   // TODO: source + pin + спросить адрес у нижележащего драйвера
 }

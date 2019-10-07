@@ -69,7 +69,7 @@ export class Serial extends DriverBase<Props> {
 export default class Factory extends DriverFactoryBase<Serial> {
   protected SubDriverClass = Serial;
 
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: {[index: string]: any}): string => {
     return String(props.portNum);
   }
 }

@@ -73,7 +73,7 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
 
 
 export default class Factory extends DriverFactoryBase<I2cDuplex> {
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: {[index: string]: any}): string => {
     return `${props.bus || 'default'}-${props.address}`;
   }
   protected SubDriverClass = I2cDuplex;

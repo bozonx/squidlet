@@ -118,7 +118,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 export default class Factory extends DriverFactoryBase<WsServer> {
   protected SubDriverClass = WsServer;
 
-  protected instanceIdCalc = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;
   }
 }

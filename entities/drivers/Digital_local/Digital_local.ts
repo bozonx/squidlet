@@ -14,7 +14,7 @@ export class DigitalLocal extends DriverBase implements DigitalSubDriver {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.digitalDev = this.context.getIo('Digital');
   }
 
@@ -62,6 +62,5 @@ export class DigitalLocal extends DriverBase implements DigitalSubDriver {
 
 
 export default class Factory extends DriverFactoryBase<DigitalLocal> {
-  protected instanceAlwaysNew = true;
   protected SubDriverClass = DigitalLocal;
 }
