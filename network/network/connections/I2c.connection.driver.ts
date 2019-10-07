@@ -28,7 +28,7 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     const isMaster = typeof this.props.myAddress.address === 'undefined';
     const i2cDriverName = (isMaster) ? 'I2cMaster' : 'I2cSlave';
 

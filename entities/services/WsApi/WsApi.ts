@@ -15,7 +15,7 @@ export default class WsApi extends ServiceBase<WsServerSessionsProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.wsServer = await this.context.getSubDriver('WsServerSessions', this.props);
 
     this.wsServerSessions.onNewSession((sessionId: string) => {
