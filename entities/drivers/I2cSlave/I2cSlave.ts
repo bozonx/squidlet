@@ -143,5 +143,5 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
 
 export default class Factory extends DriverFactoryBase<I2cSlave> {
   protected instanceByPropName = 'bus';
-  protected DriverClass = I2cSlave;
+  protected SubDriverClass = I2cSlave;
 }

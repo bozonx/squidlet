@@ -126,7 +126,7 @@ export class DigitalPortExpander extends DriverBase<DigitalPortExpanderProps> im
 
 export default class Factory extends DriverFactoryBase<DigitalPortExpander> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = DigitalPortExpander;
+  protected SubDriverClass = DigitalPortExpander;
 
   // TODO: почему так канзывается???
   /**

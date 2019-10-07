@@ -111,5 +111,5 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryInput> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = BinaryInput;
+  protected SubDriverClass = BinaryInput;
 }

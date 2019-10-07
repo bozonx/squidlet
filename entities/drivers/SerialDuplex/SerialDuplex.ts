@@ -121,7 +121,7 @@ export class SerialDuplex extends DriverBase<SerialDuplexProps> implements Duple
 
 
 export default class Factory extends DriverFactoryBase<SerialDuplex> {
-  protected DriverClass = SerialDuplex;
+  protected SubDriverClass = SerialDuplex;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return String(props.uartNum);

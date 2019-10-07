@@ -166,6 +166,6 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
 
 export default class Factory extends DriverFactoryBase<DigitalPinInput> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = DigitalPinInput;
+  protected SubDriverClass = DigitalPinInput;
   // TODO: source + pin + спросить адрес у нижележащего драйвера
 }

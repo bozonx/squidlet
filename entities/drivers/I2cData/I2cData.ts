@@ -166,5 +166,5 @@ export class I2cData extends DriverBase<I2cDataProps> {
 export default class Factory extends DriverFactoryBase<I2cData> {
   // TODO: review - может компоновать driverName and bus >
   protected instanceAlwaysNew = true;
-  protected DriverClass = I2cData;
+  protected SubDriverClass = I2cData;
 }

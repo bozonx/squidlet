@@ -367,5 +367,5 @@ export default class Factory extends DriverFactoryBase<PortExpander> {
   //
   //   return `${bus}-${props.address}`;
   // }
-  protected DriverClass = PortExpander;
+  protected SubDriverClass = PortExpander;
 }

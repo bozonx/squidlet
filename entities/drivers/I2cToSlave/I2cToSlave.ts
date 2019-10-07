@@ -173,5 +173,5 @@ export default class Factory extends DriverFactoryBase<I2cToSlave> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.busNum}-${props.address}`;
   }
-  protected DriverClass = I2cToSlave;
+  protected SubDriverClass = I2cToSlave;
 }

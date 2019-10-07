@@ -155,5 +155,5 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryClick> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = BinaryClick;
+  protected SubDriverClass = BinaryClick;
 }

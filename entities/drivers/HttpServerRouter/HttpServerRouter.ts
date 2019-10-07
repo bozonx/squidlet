@@ -84,7 +84,7 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
 }
 
 export default class Factory extends DriverFactoryBase<HttpServerRouter> {
-  protected DriverClass = HttpServerRouter;
+  protected SubDriverClass = HttpServerRouter;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;

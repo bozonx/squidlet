@@ -34,6 +34,6 @@ export class HttpClient extends DriverBase<HttpClientProps> {
 }
 
 export default class Factory extends DriverFactoryBase<HttpClient> {
-  protected DriverClass = HttpClient;
+  protected SubDriverClass = HttpClient;
   protected instanceAlwaysNew: boolean = true;
 }

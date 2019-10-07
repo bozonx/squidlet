@@ -74,7 +74,7 @@ export class HttpServer extends DriverBase<HttpServerProps> {
 }
 
 export default class Factory extends DriverFactoryBase<HttpServer> {
-  protected DriverClass = HttpServer;
+  protected SubDriverClass = HttpServer;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;

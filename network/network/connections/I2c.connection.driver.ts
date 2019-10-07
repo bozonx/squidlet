@@ -69,5 +69,5 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
 
 export default class Factory extends DriverFactoryBase<I2cConnectionDriver> {
   protected instanceByPropName = 'bus';
-  protected DriverClass = I2cConnectionDriver;
+  protected SubDriverClass = I2cConnectionDriver;
 }

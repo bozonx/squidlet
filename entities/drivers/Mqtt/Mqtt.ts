@@ -138,6 +138,6 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
 export default class Factory extends DriverFactoryBase<Mqtt> {
-  protected DriverClass = Mqtt;
+  protected SubDriverClass = Mqtt;
   protected instanceByPropName = 'url';
 }

@@ -76,5 +76,5 @@ export default class Factory extends DriverFactoryBase<I2cDuplex> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.bus || 'default'}-${props.address}`;
   }
-  protected DriverClass = I2cDuplex;
+  protected SubDriverClass = I2cDuplex;
 }

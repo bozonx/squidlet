@@ -126,7 +126,7 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
 
 export default class Factory extends DriverFactoryBase<DigitalPcf8574> {
   protected instanceAlwaysNew = true;
-  protected DriverClass = DigitalPcf8574;
+  protected SubDriverClass = DigitalPcf8574;
 
   // TODO: почему так канзывается???
   /**

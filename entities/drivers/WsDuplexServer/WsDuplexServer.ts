@@ -29,7 +29,7 @@ export class WebSocketServerDuplex extends DriverBase<WebSocketServerRouterProps
 
 
 export default class Factory extends DriverFactoryBase<WebSocketServerDuplex> {
-  protected DriverClass = WebSocketServerDuplex;
+  protected SubDriverClass = WebSocketServerDuplex;
 
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.host}:${props.port}`;

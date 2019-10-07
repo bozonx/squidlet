@@ -394,5 +394,5 @@ export default class Factory extends DriverFactoryBase<Pcf8574> {
   protected instanceIdCalc = (props: {[index: string]: any}): string => {
     return `${props.busNum}-${props.address}`;
   }
-  protected DriverClass = Pcf8574;
+  protected SubDriverClass = Pcf8574;
 }

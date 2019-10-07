@@ -62,7 +62,7 @@ export default class Factory extends DriverFactoryBase<Channels> {
   // protected instanceIdCalc = (props: {[index: string]: any}): string => {
   //   return `${props.bus || 'default'}-${props.address}`;
   // }
-  protected DriverClass = Channels;
+  protected SubDriverClass = Channels;
 
   // TODO: инстансы по типу соединения (имени драйвера)
 }
