@@ -53,7 +53,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.i2cDriver = await this.context.getSubDriver(this.props.i2cDriverName, this.props);
   }
 
@@ -163,8 +163,7 @@ export class I2cData extends DriverBase<I2cDataProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cData> {
+export default class Factory extends DriverFactoryBase<I2cData, I2cDataProps> {
   // TODO: review - может компоновать driverName and bus >
-  protected instanceAlwaysNew = true;
   protected SubDriverClass = I2cData;
 }

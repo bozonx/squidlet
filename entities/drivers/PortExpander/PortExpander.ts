@@ -108,7 +108,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   private initingIcInProgress: boolean = false;
 
 
-  protected init = async () => {
+  init = async () => {
     const driverName = `${firstLetterToUpperCase(this.props.connection)}Duplex`;
 
     const props = {
@@ -357,9 +357,8 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<PortExpander> {
+export default class Factory extends DriverFactoryBase<PortExpander, PortExpanderProps> {
 
-  protected instanceAlwaysNew = true;
   // TODO: review - может быть и wifi и ble и их адреса
 
   // protected instanceId = (props: {[index: string]: any}): string => {

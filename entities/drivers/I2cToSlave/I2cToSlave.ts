@@ -24,7 +24,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
 
-  protected init = async () => {
+  init = async () => {
     if (this.props.int) {
       this.impulseInput = await this.context.getSubDriver('ImpulseInput', this.props.int || {});
     }
@@ -169,9 +169,9 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cToSlave> {
-  protected instanceId = (props: {[index: string]: any}): string => {
+export default class Factory extends DriverFactoryBase<I2cToSlave, I2cToSlaveDriverProps> {
+  protected SubDriverClass = I2cToSlave;
+  protected instanceId = (props: I2cToSlaveDriverProps): string => {
     return `${props.busNum}-${props.address}`;
   }
-  protected SubDriverClass = I2cToSlave;
 }

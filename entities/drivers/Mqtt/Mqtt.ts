@@ -36,7 +36,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.openPromise = new Promised<void>();
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
@@ -137,7 +137,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<Mqtt> {
+export default class Factory extends DriverFactoryBase<Mqtt, MqttProps> {
   protected SubDriverClass = Mqtt;
-  protected instanceByPropName = 'url';
+  protected instanceId = (props: MqttProps) => props.url;
 }

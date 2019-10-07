@@ -20,7 +20,7 @@ export class SerialDuplex extends DriverBase<SerialDuplexProps> implements Duple
     return this.depsInstances.serialDev as any;
   }
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.serialDev = this.env.getIo('Serial');
   }
 
@@ -120,10 +120,10 @@ export class SerialDuplex extends DriverBase<SerialDuplexProps> implements Duple
 }
 
 
-export default class Factory extends DriverFactoryBase<SerialDuplex> {
+export default class Factory extends DriverFactoryBase<SerialDuplex, SerialDuplexProps> {
   protected SubDriverClass = SerialDuplex;
 
-  protected instanceId = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: SerialDuplexProps): string => {
     return String(props.uartNum);
   }
 }

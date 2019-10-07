@@ -39,7 +39,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = await this.context.getSubDriver(
@@ -170,7 +170,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<ImpulseInput> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<ImpulseInput, ImpulseInputProps> {
   protected SubDriverClass = ImpulseInput;
 }

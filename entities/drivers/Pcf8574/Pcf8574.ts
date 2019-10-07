@@ -48,7 +48,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.i2cDriver = await this.context.getSubDriver(
       'I2cToSlave',
       {
@@ -390,9 +390,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<Pcf8574> {
-  protected instanceId = (props: {[index: string]: any}): string => {
+export default class Factory extends DriverFactoryBase<Pcf8574, Pcf8574ExpanderProps> {
+  protected SubDriverClass = Pcf8574;
+  protected instanceId = (props: Pcf8574ExpanderProps): string => {
     return `${props.busNum}-${props.address}`;
   }
-  protected SubDriverClass = Pcf8574;
 }

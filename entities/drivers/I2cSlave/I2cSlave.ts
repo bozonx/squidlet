@@ -25,7 +25,7 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.i2cSlave = this.context.getIo('I2cSlave');
   }
 
@@ -141,7 +141,7 @@ export class I2cSlave extends DriverBase<I2cSlaveProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cSlave> {
-  protected instanceByPropName = 'bus';
+export default class Factory extends DriverFactoryBase<I2cSlave, I2cSlaveProps> {
   protected SubDriverClass = I2cSlave;
+  protected instanceId = (props: I2cSlaveProps) => String(props.bus);
 }

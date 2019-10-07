@@ -24,7 +24,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.server = new WsServerLogic(
       this.wsServerIo,
       this.props,
@@ -115,10 +115,9 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<WsServer> {
+export default class Factory extends DriverFactoryBase<WsServer, WebSocketServerProps> {
   protected SubDriverClass = WsServer;
-
-  protected instanceId = (props: {[index: string]: any}): string => {
+  protected instanceId = (props: WebSocketServerProps): string => {
     return `${props.host}:${props.port}`;
   }
 }

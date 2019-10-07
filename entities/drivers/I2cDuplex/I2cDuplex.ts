@@ -18,7 +18,7 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
     return this.depsInstances.i2cDriver;
   }
 
-  protected init = async () => {
+  init = async () => {
     if (this.isToSlave()) {
       this.depsInstances.i2cDriver = await this.context.getSubDriver('I2cToSlave', this.props);
     }
@@ -72,9 +72,9 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cDuplex> {
-  protected instanceId = (props: {[index: string]: any}): string => {
+export default class Factory extends DriverFactoryBase<I2cDuplex, I2cDuplexProps> {
+  protected SubDriverClass = I2cDuplex;
+  protected instanceId = (props: I2cDuplexProps): string => {
     return `${props.bus || 'default'}-${props.address}`;
   }
-  protected SubDriverClass = I2cDuplex;
 }

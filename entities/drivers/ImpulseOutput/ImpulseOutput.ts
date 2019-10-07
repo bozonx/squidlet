@@ -49,7 +49,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.depsInstances.digitalOutput = await this.context.getSubDriver(
       'DigitalPinOutput',
       {
@@ -141,7 +141,6 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<ImpulseOutput> {
-  protected instanceAlwaysNew = true;
+export default class Factory extends DriverFactoryBase<ImpulseOutput, ImpulseOutputProps> {
   protected SubDriverClass = ImpulseOutput;
 }

@@ -29,7 +29,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
   }
 
 
-  protected init = async () => {
+  init = async () => {
     this.client = new WsClientLogic(
       this.wsClientIo,
       this.props,
@@ -94,7 +94,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<WsClient> {
+export default class Factory extends DriverFactoryBase<WsClient, WsClientLogicProps> {
   protected SubDriverClass = WsClient;
-  protected instanceByPropName = 'url';
+  protected instanceId = (props: WsClientLogicProps) => props.url;
 }
