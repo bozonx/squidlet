@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import {omitObj} from 'system/lib/objects';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/base/MasterSlaveBaseNodeDriver';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
 
 import {I2cMaster} from '../I2cMaster/I2cMaster';
 import {ImpulseInput} from '../ImpulseInput/ImpulseInput';

@@ -15,7 +15,7 @@ import DuplexDriver from 'system/interfaces/DuplexDriver';
 import {ASCII_NUMERIC_OFFSET, BITS_IN_BYTE} from 'system/lib/constants';
 import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
-import {PollProps} from 'system/base/MasterSlaveBaseNodeDriver';
+import {PollProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
 import {uint8ToNum} from 'system/lib/binaryHelpers';
 
 import DigitalPins, {DigitalPinHandler} from './DigitalPins';

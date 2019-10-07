@@ -4,10 +4,10 @@ import {
   SerialEvents,
   SerialParams,
   SerialPortLike
-} from '../interfaces/io/SerialIo';
-import {ENCODE} from '../lib/constants';
-import {callPromised} from '../lib/common';
-import IndexedEventEmitter, {DefaultHandler} from '../lib/IndexedEventEmitter';
+} from '../../interfaces/io/SerialIo';
+import {ENCODE} from '../constants';
+import {callPromised} from '../common';
+import IndexedEventEmitter, {DefaultHandler} from '../IndexedEventEmitter';
 
 
 export type SerialItem = [

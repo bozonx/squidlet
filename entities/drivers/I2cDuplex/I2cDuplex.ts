@@ -1,7 +1,7 @@
 import DriverBase from 'system/base/DriverBase';
 import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/base/MasterSlaveBaseNodeDriver';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
 
 
 export interface I2cDuplexProps extends MasterSlaveBaseProps {

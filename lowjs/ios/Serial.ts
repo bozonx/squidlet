@@ -1,7 +1,7 @@
 const uart = require('uart');
 
 import SerialIo, {SerialParams, SerialPortLike} from 'system/interfaces/io/SerialIo';
-import SerialIoBase from 'system/base/SerialIoBase';
+import SerialIoBase from 'system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 

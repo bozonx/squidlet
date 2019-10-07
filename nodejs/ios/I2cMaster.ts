@@ -2,7 +2,7 @@ import {I2cBus, openSync} from 'i2c-bus';
 
 import I2cMasterIo, {I2cMasterBusLike, I2cParams} from 'system/interfaces/io/I2cMasterIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
-import I2cMasterIoBase from 'system/base/I2cMasterIoBase';
+import I2cMasterIoBase from 'system/lib/base/I2cMasterIoBase';
 import {callPromised} from 'system/lib/common';
 
 
