@@ -90,6 +90,10 @@ export default class AppBuilder {
       this.tmpDir,
       path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
     );
+    const ConsoleLoggerPath = path.relative(
+      this.tmpDir,
+      path.join(REPO_ROOT, 'shared', 'ConsoleLogger')
+    );
 
     return `import envSet from './envSet';\n`
       + `import * as ios from './ios';\n`
@@ -98,6 +102,7 @@ export default class AppBuilder {
       + `import * as ${SERViCES_MAIN_FILES} from './${SERViCES_MAIN_FILES}';\n`
       + `import AppSwitcher from '${appSwitcherPath}';\n`
       + `import IoSetBuiltin from '${ioSetPath}';\n`
+      + `import ConsoleLogger from '${ConsoleLoggerPath}';\n`
       + '\n\n'
       + `async function start() {\n`
       + `  const ioSet: any = new IoSetBuiltin(envSet, ios, ${DEVICES_MAIN_FILES}, ${DRIVERS_MAIN_FILES}, ${SERViCES_MAIN_FILES});\n`
@@ -106,7 +111,7 @@ export default class AppBuilder {
       + `\n`
       // TODO: make real restart
       + `  const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);\n`
-      + `  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler);\n`
+      + `  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, consoleLogger);\n`
       + '\n'
       + `  await app.start();\n`
       + '}\n'
