@@ -8,6 +8,7 @@ import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryCli
 
 
 interface Props extends BinaryClickProps {
+  // TODO: review
   publish: 'down' | 'up' | 'both';
 }
 

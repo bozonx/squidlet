@@ -34,11 +34,16 @@ interface DigitalBase {
   clearAllWatches(): Promise<void>;
 }
 
+// TODO: move to separate file ???
 export interface DigitalSubDriver extends DigitalBase {
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
   setupOutput(pin: number, initialValue: boolean): Promise<void>;
   // getPinMode isn't used
 }
+
+// export interface DigitalDriverFactory {
+//   generateUniqId?(props: any): string;
+// }
 
 // Digital.dev
 export default interface DigitalIo extends DigitalBase, IoItem {

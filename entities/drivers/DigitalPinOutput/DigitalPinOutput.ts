@@ -10,6 +10,10 @@ export interface DigitalPinOutputProps extends DigitalBaseProps {
   initialLevel: boolean;
 }
 
+export function combineDriverName(source: string) {
+  return `Digital_${source}`;
+}
+
 
 /**
  * This is middleware driver which allows acting with low level drivers as an output pin.
@@ -22,7 +26,9 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
 
 
   init = async () => {
-    const driverName = `Digital_${this.props.source}`;
+    if (!this.props.source) throw new Error(`DigitalPinOutput: No source: ${JSON.stringify(this.props)}`);
+
+    const driverName = combineDriverName(this.props.source);
 
     this.depsInstances.source = await this.context.getSubDriver(
       driverName,
@@ -74,5 +80,18 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
 
 export default class Factory extends DriverFactoryBase<DigitalPinOutput, DigitalPinOutputProps> {
   protected SubDriverClass = DigitalPinOutput;
-  // TODO: source + pin + спросить адрес у нижележащего драйвера
+  protected instanceId = (props: DigitalPinOutputProps): string => {
+    const baseId = `${props.source}-${props.pin}`;
+
+    if (!props.source) return baseId;
+
+    const driver: any = this.context.getDriver(combineDriverName(props.source));
+
+    if (driver.generateUniqId) {
+      return `${baseId}-${driver.generateUniqId(props)}`;
+    }
+    else {
+      return baseId;
+    }
+  }
 }

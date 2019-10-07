@@ -11,6 +11,9 @@ interface DigitalPcf8574Props extends Pcf8574ExpanderProps {
 }
 
 
+// TODO: review
+
+
 export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements DigitalSubDriver {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
@@ -127,7 +130,6 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
 export default class Factory extends DriverFactoryBase<DigitalPcf8574, DigitalPcf8574Props> {
   protected SubDriverClass = DigitalPcf8574;
 
-  // TODO: review
   /**
    * It generates unique id for DigitalPin input and output driver
    */

@@ -2,7 +2,8 @@ import DigitalIo, {
   DigitalSubDriver,
   Edge,
   WatchHandler,
-  DigitalInputMode
+  DigitalInputMode,
+  DigitalDriverFactory,
 } from 'system/interfaces/io/DigitalIo';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
@@ -45,16 +46,16 @@ export class DigitalLocal extends DriverBase implements DigitalSubDriver {
   /**
    * Listen to interruption of input pin
    */
-  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+  setWatch(pin: number, handler: WatchHandler): Promise<number> {
     // TODO: review
     return this.digitalDev.setWatch(pin, handler);
   }
 
-  async clearWatch(id: number): Promise<void> {
+  clearWatch(id: number): Promise<void> {
     return this.digitalDev.clearWatch(id);
   }
 
-  async clearAllWatches(): Promise<void> {
+  clearAllWatches(): Promise<void> {
     return this.digitalDev.clearAllWatches();
   }
 

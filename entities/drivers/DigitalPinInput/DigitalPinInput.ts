@@ -5,6 +5,7 @@ import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
 import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
+import {combineDriverName} from '../DigitalPinOutput/DigitalPinOutput';
 
 
 export interface DigitalPinInputProps extends DigitalBaseProps {
@@ -41,7 +42,9 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
     // the second check is half of a debounce time
     this.secondCheckTimeout = Math.ceil((this.props.debounce || 0) / 2);
 
-    const driverName = `Digital_${this.props.source}`;
+    if (!this.props.source) throw new Error(`DigitalPinInput: No source: ${JSON.stringify(this.props)}`);
+
+    const driverName = combineDriverName(this.props.source);
 
     this.depsInstances.source = await this.context.getSubDriver(
       driverName,
@@ -166,5 +169,18 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
 
 export default class Factory extends DriverFactoryBase<DigitalPinInput, DigitalPinInputProps> {
   protected SubDriverClass = DigitalPinInput;
-  // TODO: source + pin + спросить адрес у нижележащего драйвера
+  protected instanceId = (props: DigitalPinInputProps): string => {
+    const baseId = `${props.source}-${props.pin}`;
+
+    if (!props.source) return baseId;
+
+    const driver: any = this.context.getDriver(combineDriverName(props.source));
+
+    if (driver.generateUniqId) {
+      return `${baseId}-${driver.generateUniqId(props)}`;
+    }
+    else {
+      return baseId;
+    }
+  }
 }
