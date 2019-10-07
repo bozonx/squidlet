@@ -6,6 +6,24 @@ import {DigitalSubDriver} from 'system/interfaces/io/DigitalIo';
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
 
 
+/*
+initialLevel:
+  type: boolean
+  default: false
+
+### DigitalPin base props
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'
+expander:
+  type: string
+
+ */
+
+
 export interface DigitalPinOutputProps extends DigitalBaseProps {
   initialLevel: boolean;
 }

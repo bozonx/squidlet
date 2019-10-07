@@ -5,7 +5,7 @@ import DriverBase from 'system/base/DriverBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
 
-import {DigitalPinInput, DigitalPinInputProps} from '../DigitalPinInput/DigitalPinInput';
+import {DigitalPinInput, DigitalPinInputProps} from '../../../system/lib/base/digital/DigitalPinInput';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {

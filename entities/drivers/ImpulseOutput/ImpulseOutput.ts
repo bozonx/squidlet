@@ -4,7 +4,7 @@ import {omitObj} from 'system/lib/objects';
 import {invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';
 
-import {DigitalPinOutput, DigitalPinOutputProps} from '../DigitalPinOutput/DigitalPinOutput';
+import {DigitalPinOutput, DigitalPinOutputProps} from '../../../system/lib/base/digital/DigitalPinOutput';
 
 
 export interface ImpulseOutputProps extends DigitalPinOutputProps {

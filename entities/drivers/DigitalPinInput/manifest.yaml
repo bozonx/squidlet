@@ -1,9 +1,0 @@
-name: DigitalPinInput
-main: DigitalPinInput.ts
-system: true
-
-drivers:
-  # it needs to access to shared helper and interface
-  - DigitalPinOutput
-
-props: props.yaml

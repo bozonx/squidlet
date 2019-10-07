@@ -4,8 +4,38 @@ import DriverBase from 'system/base/DriverBase';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
-import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
-import {combineDriverName} from '../DigitalPinOutput/DigitalPinOutput';
+import DigitalBaseProps from './interfaces/DigitalBaseProps';
+import {combineDriverName} from './DigitalPinOutput';
+
+
+/*
+edge:
+  type: '"rising" | "falling" | "both"'
+  default: both
+debounce:
+  type: number
+  default: 0
+doubleCheck:
+  type: boolean
+  default: false
+pullup:
+  type: boolean
+  default: false
+pulldown:
+  type: boolean
+  default: false
+
+### DigitalPin base props
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'
+expander:
+  type: string
+
+ */
 
 
 export interface DigitalPinInputProps extends DigitalBaseProps {

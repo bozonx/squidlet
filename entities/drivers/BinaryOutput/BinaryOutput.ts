@@ -5,8 +5,8 @@ import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
-import DigitalBaseProps from '../DigitalPinOutput/interfaces/DigitalBaseProps';
-import {DigitalPinOutput} from '../DigitalPinOutput/DigitalPinOutput';
+import DigitalBaseProps from '../../../system/lib/base/digital/interfaces/DigitalBaseProps';
+import {DigitalPinOutput} from '../../../system/lib/base/digital/DigitalPinOutput';
 
 
 type DelayedResultHandler = (err?: Error) => void;
