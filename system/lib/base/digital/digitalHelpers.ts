@@ -11,7 +11,7 @@ export function combineDriverName(source: string) {
   return `Digital_${source}`;
 }
 
-export function resolvePinMode(pullup: boolean, pulldown: boolean): DigitalInputMode {
+export function resolvePinMode(pullup?: boolean, pulldown?: boolean): DigitalInputMode {
   if (pullup) return 'input_pullup';
   else if (pulldown) return 'input_pulldown';
   else return 'input';

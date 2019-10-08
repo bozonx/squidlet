@@ -35,6 +35,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     return resolvePinMode(this.props.pullup, this.props.pulldown);
   }
 
+  // TODO: добавить возможность сбросить block time
 
   init = async () => {
     //if (!this.props.source) throw new Error(`BinaryInput: No source: ${this.id}`);
@@ -61,6 +62,9 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       }
     );
 
+    // TODO: review
+    // TODO: почему не ждем ???
+    // TODO: может надо делат сетап после того как все драйверы инициализируются или все девайсы ???
     // setup pin as an input with resistor if specified
     await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
       .catch((err) => {
@@ -71,9 +75,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       });
 
     await this.source.setWatch(this.props.pin, this.handleChange);
-
-    // TODO: remake
-    await this.digitalInput.addListener(this.handleInputChange);
   }
 
 
@@ -89,7 +90,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     return invertIfNeed(await this.source.read(this.props.pin), this.isInverted());
   }
 
-  // TODO: review
+  // TODO: review - зачем здесь инвертировать можно же  в handleChange ???
   /**
    * Listen to rising and falling of impulse (1 and 0 levels)
    */
@@ -101,6 +102,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     return this.changeEvents.addListener(wrapper);
   }
 
+  // TODO: review - зачем здесь инвертировать можно же  в handleChange ???
   listenOnce(handler: WatchHandler): number {
     const wrapper: WatchHandler = (level: boolean) => {
       handler(invertIfNeed(level, this.isInverted()));
@@ -114,10 +116,11 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
 
-  private handleInputChange = async (level: boolean) => {
+  private handleChange = async (level: boolean) => {
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
+    // TODO: может инвертировать здесь ????
     this.changeEvents.emit(level);
 
     if (!this.props.blockTime) return;
@@ -128,12 +131,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     setTimeout(() => {
       this.blockTimeInProgress = false;
     }, this.props.blockTime);
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 }
