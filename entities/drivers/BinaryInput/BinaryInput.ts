@@ -87,7 +87,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     }
 
     // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался
-    await this.source.setWatch(this.props.pin, this.handleChange);
+    await this.source.addListener(this.props.pin, this.handleChange);
   }
 
 

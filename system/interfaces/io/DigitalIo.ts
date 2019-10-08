@@ -1,7 +1,4 @@
-import IoItem from '../IoItem';
-
-
-export type WatchHandler = (state: boolean) => void;
+export type ChangeHandler = (state: boolean) => void;
 export type DigitalInputMode = 'input'
   | 'input_pullup'
   | 'input_pulldown';
@@ -13,9 +10,9 @@ export const Methods = [
   'read',
   'write',
   'getPinMode',
-  'setWatch',
-  'clearWatch',
-  'clearAllWatches',
+  'addListener',
+  'removeListener',
+  'removeAllListeners',
   'setupInput',
   'setupOutput',
   'getPinMode',
@@ -23,36 +20,29 @@ export const Methods = [
 
 
 export default interface DigitalIo {
-  read(pin: number): Promise<boolean>;
+  /**
+   * Setup pin as input
+   * @param pin - pin number
+   * @param inputMode - one of modes: input | input_pullup | input_pulldown | output
+   * @param debounce - debounce time in ms. 0 or less = no debounce.
+   * @param edge - Which value (0 or 1 or both) will rise an event. One of modes: rising | falling | both
+   */
+  setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
+  setupOutput(pin: number, initialValue: boolean): Promise<void>;
 
+  // output and input pins can be read
+  read(pin: number): Promise<boolean>;
   // only for output pins
   write(pin: number, value: boolean): Promise<void>;
-
   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
 
   // only for input pins
-  //setWatch(pin: number, handler: WatchHandler, debounce?: number, edge?: Edge): Promise<number>;
-  setWatch(pin: number, handler: WatchHandler): Promise<number>;
-  clearWatch(id: number): Promise<void>;
-  clearAllWatches(): Promise<void>;
-  setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
-  setupOutput(pin: number, initialValue: boolean): Promise<void>;
+  // Listen to change events
+  addListener(pin: number, handler: ChangeHandler): Promise<number>;
+  removeListener(id: number): Promise<void>;
+  removeAllListeners(): Promise<void>;
 }
 
-// // TODO: move to separate file ???
-// export interface DigitalSubDriver extends DigitalBase {
-//   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
-//   setupOutput(pin: number, initialValue: boolean): Promise<void>;
-//   // getPinMode isn't used
-// }
-//
-// // export interface DigitalDriverFactory {
-// //   generateUniqId?(props: any): string;
-// // }
-//
-// // Digital.dev
-// export default interface DigitalIo extends DigitalBase, IoItem {
-//   setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void>;
-//   setupOutput(pin: number, initialValue?: boolean): Promise<void>;
-//   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
+// export interface DigitalDriverFactory {
+//   generateUniqId?(props: any): string;
 // }

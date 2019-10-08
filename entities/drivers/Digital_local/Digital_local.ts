@@ -18,6 +18,8 @@ export class DigitalLocal extends DriverBase implements DigitalIo {
     this.depsInstances.digitalDev = this.context.getIo('Digital');
   }
 
+  // TODO: после дестроя всех digital драйверов надо поидее сделать removeAllListeners()
+
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
     return this.digitalDev.setupInput(pin, inputMode, debounce, edge);

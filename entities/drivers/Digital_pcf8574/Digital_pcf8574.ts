@@ -34,6 +34,7 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
     return device.expander;
   }
 
+  // TODO: после дестроя всех digital драйверов надо поидее сделать removeAllListeners()
 
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
     return this.callOnDevicesInit<void>(async () => {
