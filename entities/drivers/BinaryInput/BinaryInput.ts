@@ -1,11 +1,12 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {DigitalInputMode, DigitalSubDriver, WatchHandler} from 'system/interfaces/io/DigitalIo';
+import {DigitalInputMode, DigitalIo, Edge, WatchHandler} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
-import {combineDriverName, generateSubDriverId, resolvePinMode} from 'system/lib/base/digital/digitalHelpers';
+import {makeDigitalSourceDriverName, generateSubDriverId, resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';
+import {JsonTypes} from 'system/interfaces/Types';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -22,58 +23,70 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<WatchHandler>();
   private blockTimeInProgress: boolean = false;
   private lastValue?: boolean;
+  // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
 
-  // TODO: review interface DigitalSubDriver
-  private get source(): DigitalSubDriver {
+  private get source(): DigitalIo {
     return this.depsInstances.source;
   }
 
 
   // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
-  async getPinMode(): Promise<DigitalInputMode> {
-    return resolvePinMode(this.props.pullup, this.props.pulldown);
+  getPinMode(): DigitalInputMode {
+    return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
 
   // TODO: добавить возможность сбросить block time
 
   init = async () => {
-    //if (!this.props.source) throw new Error(`BinaryInput: No source: ${this.id}`);
-
-    // TODO: review
-    this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
-
-    this.depsInstances.digitalInput = this.context.getSubDriver(
-      combineDriverName(this.props.source),
-      {
-        ...omitObj(
-          this.props,
-          'blockTime',
-          'invertOnPullup',
-          'invert',
-          'edge',
-          'debounce',
-          'pullup',
-          'pulldown',
-          'pin',
-          'source'
-        ),
-        edge: resolveEdge(this.props.edge, this._isInverted),
-      }
+    // TODO: isDigitalInputInverted перенести в digital helpers
+    this._isInverted = isDigitalInputInverted(
+      this.props.invert,
+      this.props.invertOnPullup,
+      this.props.pullup
     );
 
-    // TODO: review
-    // TODO: почему не ждем ???
-    // TODO: может надо делат сетап после того как все драйверы инициализируются или все девайсы ???
-    // setup pin as an input with resistor if specified
-    await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
-      .catch((err) => {
-        this.log.error(
-          `DigitalPinInputDriver: Can't setup pin. ` +
-          `"${JSON.stringify(this.props)}": ${err.toString()}`
-        );
-      });
+    // make rest of props to pass them to the sub driver
+    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
+      this.props,
+      'blockTime',
+      'invertOnPullup',
+      'invert',
+      'edge',
+      'debounce',
+      'pullup',
+      'pulldown',
+      'pin',
+      'source'
+    );
 
+    this.depsInstances.source = this.context.getSubDriver(
+      makeDigitalSourceDriverName(this.props.source),
+      subDriverProps
+    );
+  }
+
+  // setup pin after all the drivers has been initialized
+  driversDidInit = async () => {
+    const edge: Edge = resolveEdge(this.props.edge, this._isInverted);
+
+    // TODO: print unique id of sub driver
+    this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.source}`);
+
+    // TODO: перезапускать setup время от времени
+    // setup pin as an input with resistor if specified
+    // wait for pin has initialized but don't break initialization on error
+    try {
+      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
+    }
+    catch (err) {
+      this.log.error(
+        `BinaryInput: Can't setup pin. ` +
+        `"${JSON.stringify(this.props)}": ${err.toString()}`
+      );
+    }
+
+    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался
     await this.source.setWatch(this.props.pin, this.handleChange);
   }
 
@@ -142,7 +155,7 @@ export default class Factory extends DriverFactoryBase<BinaryInput, BinaryInputP
     if (!props.source) throw new Error(`no source. ${this.id}`);
 
     // TODO: add type
-    const driver: any = this.context.getDriver(combineDriverName(props.source));
+    const driver: any = this.context.getDriver(makeDigitalSourceDriverName(props.source));
 
     return generateSubDriverId(props.source, props.pin, driver.generateUniqId());
   }

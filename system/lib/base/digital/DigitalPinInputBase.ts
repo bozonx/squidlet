@@ -1,3 +1,6 @@
+// TODO: remove
+
+
 import {Edge, WatchHandler, DigitalSubDriver, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
@@ -54,7 +57,7 @@ export default class DigitalPinInputBase<Props extends DigitalPinInputProps> ext
 
     // if (!this.props.source) throw new Error(`DigitalPinInput: No source: ${JSON.stringify(this.props)}`);
     //
-    // const driverName = combineDriverName(this.props.source);
+    // const driverName = makeDigitalSourceDriverName(this.props.source);
     //
     // this.depsInstances.source = await this.context.getSubDriver(
     //   driverName,

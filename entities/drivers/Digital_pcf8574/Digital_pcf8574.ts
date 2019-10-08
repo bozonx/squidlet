@@ -1,6 +1,6 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import {DigitalIo, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import {lastItem} from 'system/lib/arrays';
 
 import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';
@@ -14,7 +14,7 @@ interface DigitalPcf8574Props extends Pcf8574ExpanderProps {
 // TODO: review
 
 
-export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements DigitalSubDriver {
+export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements DigitalIo {
   // saved handlerId. Keys are handlerIndexes
   // it needs to do clearAllWatches()
   private handlerIds: number[] = [];

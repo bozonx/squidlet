@@ -44,7 +44,7 @@ export default class DigitalPinOutputBase extends DriverBase<DigitalPinOutputPro
   init = async () => {
     if (!this.props.source) throw new Error(`DigitalPinOutput: No source: ${JSON.stringify(this.props)}`);
 
-    const driverName = combineDriverName(this.props.source);
+    const driverName = makeDigitalSourceDriverName(this.props.source);
 
     this.depsInstances.source = await this.context.getSubDriver(
       driverName,
