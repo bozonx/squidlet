@@ -24,6 +24,7 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 
 export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  // TODO: remove
   // is block time in progress
   private blocked: boolean = false;
   private lastLevel?: boolean;

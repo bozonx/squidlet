@@ -3,8 +3,10 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
 import {invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';
-
-import {DigitalPinOutputBase, DigitalPinOutputProps} from '../../../system/lib/base/digital/DigitalPinOutputBase';
+import {DigitalPinOutputBase, DigitalPinOutputProps} from 'system/lib/base/digital/DigitalPinOutputBase';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
+import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
+import {ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
 
 
 export interface ImpulseOutputProps extends DigitalPinOutputProps {
@@ -143,5 +145,9 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
 export default class Factory extends DriverFactoryBase<ImpulseOutput, ImpulseOutputProps> {
   protected SubDriverClass = ImpulseOutput;
-  // TODO: add instanceId
+  protected instanceId = (props: ImpulseOutputProps): string => {
+    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
+
+    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+  }
 }

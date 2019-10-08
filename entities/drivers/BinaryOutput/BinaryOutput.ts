@@ -7,6 +7,9 @@ import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
 import DigitalBaseProps from '../../../system/lib/base/digital/interfaces/DigitalBaseProps';
 import {DigitalPinOutputBase} from '../../../system/lib/base/digital/DigitalPinOutputBase';
+import {BinaryClickProps} from '../BinaryClick/BinaryClick';
+import SourceDriverFactoryBase from '../../../system/lib/base/digital/SourceDriverFactoryBase';
+import {generateSubDriverId, makeDigitalSourceDriverName} from '../../../system/lib/base/digital/digitalHelpers';
 
 
 type DelayedResultHandler = (err?: Error) => void;
@@ -181,5 +184,9 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryOutput, BinaryOutputProps> {
   protected SubDriverClass = BinaryOutput;
-  // TODO: add instanceId
+  protected instanceId = (props: BinaryOutputProps): string => {
+    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
+
+    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+  }
 }

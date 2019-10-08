@@ -1,23 +1,37 @@
-import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {WatchHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import {omitObj} from 'system/lib/objects';
-
-import {BinaryInput, BinaryInputProps} from '../BinaryInput/BinaryInput';
+import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
+import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
+import {isDigitalInputInverted} from 'system/lib/helpers';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 
 type Handler = () => void;
 
-export interface BinaryClickProps extends BinaryInputProps {
+enum BinaryClickEvents {
+  up,
+  down,
+  change,
+}
+
+// TODO: add props to manifest
+export interface BinaryClickProps extends DigitalPinInputProps {
   releaseTimeoutMs: number;
+  // TODO: review
+  // auto invert if pullup resistor is set. Default is true
+  invertOnPullup: boolean;
+  // when receives 1 actually returned 0 and otherwise
+  invert: boolean;
 }
 
 
 export class BinaryClick extends DriverBase<BinaryClickProps> {
-  private readonly stateEvents = new IndexedEvents<WatchHandler>();
-  private readonly downEvents = new IndexedEvents<Handler>();
-  private readonly upEvents = new IndexedEvents<Handler>();
+  private readonly events = new IndexedEventEmitter();
+  // should invert value which is received from IO
+  private _isInverted: boolean = false;
   private keyDown: boolean = false;
   //private debounceInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
@@ -25,12 +39,18 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   //private secondDebounceTimeout: any;
   private blockTimeTimeout: any;
 
-  private get binaryInput(): BinaryInput {
-    return this.depsInstances.binaryInput;
+  private get source(): DigitalIo {
+    return this.depsInstances.source;
   }
 
 
   init = async () => {
+    this._isInverted = isDigitalInputInverted(
+      this.props.invert,
+      this.props.invertOnPullup,
+      this.props.pullup
+    );
+
     this.depsInstances.binaryInput = await this.context.getSubDriver(
       'BinaryInput',
       {
@@ -47,28 +67,25 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     return this.keyDown;
   }
 
-  addStateListener(handler: WatchHandler): number {
-    return this.stateEvents.addListener(handler);
+  isBlocked(): boolean {
+    // TODO: use block timeout
+    return this.blocked;
   }
 
-  removeStateListener(handlerIndex: number): void {
-    this.stateEvents.removeListener(handlerIndex);
+  addChangeListener(handler: ChangeHandler): number {
+    return this.events.addListener(BinaryClickEvents.change, handler);
   }
 
   addDownListener(handler: Handler): number {
-    return this.downEvents.addListener(handler);
-  }
-
-  removeDownListener(handlerIndex: number): void {
-    this.downEvents.removeListener(handlerIndex);
+    return this.events.addListener(BinaryClickEvents.down, handler);
   }
 
   addUpListener(handler: Handler): number {
-    return this.upEvents.addListener(handler);
+    return this.events.addListener(BinaryClickEvents.up, handler);
   }
 
-  removeUpListener(handlerIndex: number): void {
-    this.upEvents.removeListener(handlerIndex);
+  removeListener(handlerIndex: number): void {
+    this.events.removeListener(handlerIndex);
   }
 
 
@@ -155,5 +172,9 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryClick, BinaryClickProps> {
   protected SubDriverClass = BinaryClick;
-  // TODO: add instanceId
+  protected instanceId = (props: BinaryClickProps): string => {
+    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
+
+    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+  }
 }

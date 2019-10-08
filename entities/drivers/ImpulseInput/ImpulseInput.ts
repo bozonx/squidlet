@@ -4,8 +4,10 @@ import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
 import {isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
-
-import {DigitalPinInputBase, DigitalPinInputProps} from '../../../system/lib/base/digital/DigitalPinInputBase';
+import {DigitalPinInputBase, DigitalPinInputProps} from 'system/lib/base/digital/DigitalPinInputBase';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
+import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
+import {BinaryOutputProps} from '../BinaryOutput/BinaryOutput';
 
 
 type RisingHandler = () => void;
@@ -172,5 +174,9 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
 export default class Factory extends DriverFactoryBase<ImpulseInput, ImpulseInputProps> {
   protected SubDriverClass = ImpulseInput;
-  // TODO: add instanceId
+  protected instanceId = (props: ImpulseInputProps): string => {
+    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
+
+    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+  }
 }
