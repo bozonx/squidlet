@@ -1,10 +1,11 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {DigitalSubDriver, WatchHandler} from 'system/interfaces/io/DigitalIo';
+import {DigitalInputMode, DigitalSubDriver, WatchHandler} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
-import {combineDriverName, generateSubDriverId} from 'system/lib/base/digital/digitalHelpers';
-import DigitalPinInputBase, {DigitalPinInputProps} from 'system/lib/base/digital/DigitalPinInputBase';
+import {combineDriverName, generateSubDriverId, resolvePinMode} from 'system/lib/base/digital/digitalHelpers';
+import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
+import DriverBase from 'system/base/DriverBase';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -17,29 +18,59 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 }
 
 
-export class BinaryInput extends DigitalPinInputBase<BinaryInputProps> {
-  //private readonly changeEvents = new IndexedEvents<WatchHandler>();
+export class BinaryInput extends DriverBase<BinaryInputProps> {
+  private readonly changeEvents = new IndexedEvents<WatchHandler>();
   private blockTimeInProgress: boolean = false;
+  private lastValue?: boolean;
   private _isInverted: boolean = false;
+
+  // TODO: review interface DigitalSubDriver
+  private get source(): DigitalSubDriver {
+    return this.depsInstances.source;
+  }
+
+
+  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
+  async getPinMode(): Promise<DigitalInputMode> {
+    return resolvePinMode(this.props.pullup, this.props.pulldown);
+  }
 
 
   init = async () => {
-    await super.init();
+    //if (!this.props.source) throw new Error(`BinaryInput: No source: ${this.id}`);
 
+    // TODO: review
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = this.context.getSubDriver(
-      'DigitalPinInput',
+      combineDriverName(this.props.source),
       {
         ...omitObj(
           this.props,
           'blockTime',
           'invertOnPullup',
-          'invert'
+          'invert',
+          'edge',
+          'debounce',
+          'pullup',
+          'pulldown',
+          'pin',
+          'source'
         ),
         edge: resolveEdge(this.props.edge, this._isInverted),
       }
     );
+
+    // setup pin as an input with resistor if specified
+    await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
+      .catch((err) => {
+        this.log.error(
+          `DigitalPinInputDriver: Can't setup pin. ` +
+          `"${JSON.stringify(this.props)}": ${err.toString()}`
+        );
+      });
+
+    await this.source.setWatch(this.props.pin, this.handleChange);
 
     // TODO: remake
     await this.digitalInput.addListener(this.handleInputChange);

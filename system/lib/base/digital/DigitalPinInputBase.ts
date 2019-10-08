@@ -52,32 +52,32 @@ export default class DigitalPinInputBase<Props extends DigitalPinInputProps> ext
     // the second check is half of a debounce time
     //this.secondCheckTimeout = Math.ceil((this.props.debounce || 0) / 2);
 
-    if (!this.props.source) throw new Error(`DigitalPinInput: No source: ${JSON.stringify(this.props)}`);
+    // if (!this.props.source) throw new Error(`DigitalPinInput: No source: ${JSON.stringify(this.props)}`);
+    //
+    // const driverName = combineDriverName(this.props.source);
+    //
+    // this.depsInstances.source = await this.context.getSubDriver(
+    //   driverName,
+    //   omitObj(
+    //     this.props,
+    //     'doubleCheck',
+    //     'pullup',
+    //     'pulldown',
+    //     'pin',
+    //     'source'
+    //   )
+    // );
 
-    const driverName = combineDriverName(this.props.source);
-
-    this.depsInstances.source = await this.context.getSubDriver(
-      driverName,
-      omitObj(
-        this.props,
-        'doubleCheck',
-        'pullup',
-        'pulldown',
-        'pin',
-        'source'
-      )
-    );
-
-    // setup pin as an input with resistor if specified
-    await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
-      .catch((err) => {
-        this.log.error(
-          `DigitalPinInputDriver: Can't setup pin. ` +
-          `"${JSON.stringify(this.props)}": ${err.toString()}`
-        );
-      });
-
-    await this.source.setWatch(this.props.pin, this.handleChange);
+    // // setup pin as an input with resistor if specified
+    // await this.source.setupInput(this.props.pin, this.resolvePinMode(), this.props.debounce, this.props.edge)
+    //   .catch((err) => {
+    //     this.log.error(
+    //       `DigitalPinInputDriver: Can't setup pin. ` +
+    //       `"${JSON.stringify(this.props)}": ${err.toString()}`
+    //     );
+    //   });
+    //
+    // await this.source.setWatch(this.props.pin, this.handleChange);
   }
 
 
@@ -92,16 +92,16 @@ export default class DigitalPinInputBase<Props extends DigitalPinInputProps> ext
     // // if doubleCheck isn't set up - just rise an event
     // else if (!this.props.doubleCheck) return this.changeEvents.emit(state);
     // if new state isn't changed - just emit event and do not do a check
-    else if (this.lastValue === state) return this.changeEvents.emit(state);
+    if (this.lastValue === state) return this.changeEvents.emit(state);
 
-    this.doSecondCheck(state);
+    //this.doSecondCheck(state);
   }
 
-  private resolvePinMode(): DigitalInputMode {
-    if (this.props.pullup) return 'input_pullup';
-    else if (this.props.pulldown) return 'input_pulldown';
-    else return 'input';
-  }
+  // private resolvePinMode(): DigitalInputMode {
+  //   if (this.props.pullup) return 'input_pullup';
+  //   else if (this.props.pulldown) return 'input_pulldown';
+  //   else return 'input';
+  // }
 
   // /**
   //  * Get current binary value of pin.
