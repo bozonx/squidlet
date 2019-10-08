@@ -202,6 +202,7 @@ export default class Factory extends DriverFactoryBase<DigitalPinInput, DigitalP
   protected instanceId = (props: DigitalPinInputProps): string => {
     const baseId = `${props.source}-${props.pin}`;
 
+    // TODO: такого быть не должно
     if (!props.source) return baseId;
 
     const driver: any = this.context.getDriver(combineDriverName(props.source));
@@ -212,5 +213,7 @@ export default class Factory extends DriverFactoryBase<DigitalPinInput, DigitalP
     else {
       return baseId;
     }
+
+
   }
 }

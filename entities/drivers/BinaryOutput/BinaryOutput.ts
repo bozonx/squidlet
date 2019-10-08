@@ -181,4 +181,5 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryOutput, BinaryOutputProps> {
   protected SubDriverClass = BinaryOutput;
+  // TODO: add instanceId
 }

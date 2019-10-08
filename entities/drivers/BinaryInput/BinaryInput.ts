@@ -4,7 +4,9 @@ import {WatchHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
+import {combineDriverName, generateSubDriverId} from 'system/lib/base/digital/digitalHelpers';
 
+// TODO: review
 import {DigitalPinInput, DigitalPinInputProps} from '../../../system/lib/base/digital/DigitalPinInput';
 
 
@@ -111,4 +113,12 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
 export default class Factory extends DriverFactoryBase<BinaryInput, BinaryInputProps> {
   protected SubDriverClass = BinaryInput;
+  protected instanceId = (props: BinaryInputProps): string => {
+    if (!props.source) throw new Error(`no source. ${this.id}`);
+
+    // TODO: add type
+    const driver: any = this.context.getDriver(combineDriverName(props.source));
+
+    return generateSubDriverId(props.source, props.pin, driver.generateUniqId());
+  }
 }

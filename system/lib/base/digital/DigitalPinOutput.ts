@@ -28,9 +28,7 @@ export interface DigitalPinOutputProps extends DigitalBaseProps {
   initialLevel: boolean;
 }
 
-export function combineDriverName(source: string) {
-  return `Digital_${source}`;
-}
+
 
 
 /**
