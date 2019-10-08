@@ -1,12 +1,17 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import {omitObj} from 'system/lib/objects';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
-import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
+import {
+  generateSubDriverId,
+  makeDigitalSourceDriverName,
+  resolveInputPinMode,
+} from 'system/lib/base/digital/digitalHelpers';
 import {isDigitalInputInverted} from 'system/lib/helpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {JsonTypes} from 'system/interfaces/Types';
 
 
 type Handler = () => void;
@@ -18,8 +23,12 @@ enum BinaryClickEvents {
 }
 
 // TODO: add props to manifest
+// TODO: no edge
+// TODO: add debounce
+// TODO: review
 export interface BinaryClickProps extends DigitalPinInputProps {
   releaseTimeoutMs: number;
+  blockTime?: number;
   // TODO: review
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
@@ -28,6 +37,13 @@ export interface BinaryClickProps extends DigitalPinInputProps {
 }
 
 
+/**
+ * Click logic. It has steps:
+ * * 0 - nothing happening
+ * * 1 - keyDown state, down event emits
+ * * 0 - key is up, up event emits
+ * * 0 - blocking. Skip any inputs during this time.
+ */
 export class BinaryClick extends DriverBase<BinaryClickProps> {
   private readonly events = new IndexedEventEmitter();
   // should invert value which is received from IO
@@ -51,17 +67,54 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
       this.props.pullup
     );
 
-    this.depsInstances.binaryInput = await this.context.getSubDriver(
-      'BinaryInput',
-      {
-        ...omitObj(this.props, 'releaseTimeoutMs'),
-        blockTime: 0,
-      }
+    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
+      this.props,
+      // TODO: review props to omit
+      'releaseTimeoutMs',
+      'blockTime',
+      'invertOnPullup',
+      'invert',
+      'edge',
+      'debounce',
+      'pullup',
+      'pulldown',
+      'pin',
+      'source'
     );
 
-    await this.binaryInput.addListener(this.handleInputChange);
+    this.depsInstances.source = this.context.getSubDriver(
+      makeDigitalSourceDriverName(this.props.source),
+      subDriverProps
+    );
   }
 
+  // setup pin after all the drivers has been initialized
+  driversDidInit = async () => {
+    // TODO: print unique id of sub driver
+    this.log.debug(`BinaryClick: Setup pin ${this.props.pin} of ${this.props.source}`);
+
+    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
+    // setup pin as an input with resistor if specified
+    // wait for pin has initialized but don't break initialization on error
+    try {
+      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, 'both');
+    }
+    catch (err) {
+      this.log.error(
+        `BinaryInput: Can't setup pin. ` +
+        `"${JSON.stringify(this.props)}": ${err.toString()}`
+      );
+    }
+
+    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
+    await this.source.addListener(this.props.pin, this.handleChange);
+  }
+
+
+  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
+  getPinMode(): DigitalInputMode {
+    return resolveInputPinMode(this.props.pullup, this.props.pulldown);
+  }
 
   isDown(): boolean {
     return this.keyDown;
@@ -69,7 +122,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
   isBlocked(): boolean {
     // TODO: use block timeout
-    return this.blocked;
+    return this.blockTimeInProgress;
   }
 
   addChangeListener(handler: ChangeHandler): number {
@@ -89,29 +142,32 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
 
-  private handleInputChange = async (level: boolean) => {
-    if (this.blockTimeInProgress) return;
+  private handleChange = async (level: boolean) => {
+    if (this.isBlocked()) return;
 
     if (level) {
+      // if level is high and current state is keyDown and isn't blocked
+      // then do nothing - state hasn't been changed
       if (this.keyDown) return;
-
-      await this.startDownLogic();
+      // else start a new cycle
+      await this.startCycle();
     }
     else {
+      // if level is low and current state isn't blocked and isn't keyDown (cycle not started)
+      // then do nothing - nothing happened
       if (!this.keyDown) return;
-
-      //await this.startUpLogic();
-
+      // else if state is keyDown then finish cycle and start blocking
       // logical 0 = finish
       await this.finishLogic();
     }
   }
 
-  private async startDownLogic() {
+  // TODO: review
+  private async startCycle() {
     clearTimeout(this.releaseTimeout);
     this.keyDown = true;
-    this.stateEvents.emit(true);
-    this.downEvents.emit();
+    this.events.emit(BinaryClickEvents.change, true);
+    this.events.emit(BinaryClickEvents.down);
 
     // release if timeout is reached
     this.releaseTimeout = setTimeout(() => {
@@ -121,6 +177,21 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
       //this.debounceInProgress = false;
       this.blockTimeInProgress = false;
     }, this.props.releaseTimeoutMs);
+  }
+
+  private async finishLogic() {
+    this.keyDown = false;
+    this.blockTimeInProgress = true;
+
+    this.events.emit(BinaryClickEvents.change, false);
+    this.events.emit(BinaryClickEvents.up);
+
+    this.blockTimeTimeout = setTimeout(() => {
+      this.blockTimeInProgress = false;
+      this.blockTimeTimeout = undefined;
+
+      clearTimeout(this.releaseTimeout);
+    }, this.props.blockTime || 0);
   }
 
   // private async startUpLogic() {
@@ -145,27 +216,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   //     }
   //   }, this.props.debounce);
   // }
-
-  private async finishLogic() {
-    this.keyDown = false;
-    this.blockTimeInProgress = true;
-
-    this.stateEvents.emit(false);
-    this.upEvents.emit();
-
-    this.blockTimeTimeout = setTimeout(() => {
-      this.blockTimeInProgress = false;
-      this.blockTimeTimeout = undefined;
-
-      clearTimeout(this.releaseTimeout);
-    }, this.props.blockTime || 0);
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
-  }
 
 }
 

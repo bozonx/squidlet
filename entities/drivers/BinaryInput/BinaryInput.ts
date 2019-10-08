@@ -22,11 +22,14 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 }
 
 
+/**
+ * Simple binary logic. Steps:
+ * * 0 - nothing happening
+ * * 1 - level is high
+ * * 0 - blocking. Skip any inputs during this time.
+ */
 export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  // TODO: remove
-  // is block time in progress
-  private blocked: boolean = false;
   private lastLevel?: boolean;
   // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
@@ -100,11 +103,12 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
    */
   cancelBlock() {
     clearTimeout(this.blockTimeout);
-    this.blocked = false;
+
+    delete this.blockTimeout;
   }
 
   isBlocked(): boolean {
-    return this.blocked;
+    return Boolean(this.blockTimeout);
   }
 
   isInverted(): boolean {
@@ -133,7 +137,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
   private handleChange = async (level: boolean) => {
     // do nothing if there is block time in progress
-    if (this.blocked) return;
+    if (this.isBlocked()) return;
 
     // don't rise any events if value hasn't changed
     if (level === this.lastLevel) return;
@@ -147,9 +151,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     if (!this.props.blockTime) return;
 
     // start block time
-    this.blocked = true;
     // unblock after timeout
-    this.blockTimeout = setTimeout(() => this.blocked = false, this.props.blockTime);
+    this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
   }
 
 }
