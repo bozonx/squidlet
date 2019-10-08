@@ -29,18 +29,12 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   private lastLevel?: boolean;
   // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
+  private blockTimeout: any;
 
   private get source(): DigitalIo {
     return this.depsInstances.source;
   }
 
-
-  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
-  getPinMode(): DigitalInputMode {
-    return resolveInputPinMode(this.props.pullup, this.props.pulldown);
-  }
-
-  // TODO: добавить возможность сбросить block time
 
   init = async () => {
     // TODO: isDigitalInputInverted перенести в digital helpers
@@ -77,7 +71,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     // TODO: print unique id of sub driver
     this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
-    // TODO: перезапускать setup время от времени
+    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
@@ -94,6 +88,19 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     await this.source.addListener(this.props.pin, this.handleChange);
   }
 
+
+  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
+  getPinMode(): DigitalInputMode {
+    return resolveInputPinMode(this.props.pullup, this.props.pulldown);
+  }
+
+  /**
+   * Cancel blocking of input.
+   */
+  cancelBlock() {
+    clearTimeout(this.blockTimeout);
+    this.blocked = false;
+  }
 
   isBlocked(): boolean {
     return this.blocked;
@@ -141,7 +148,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     // start block time
     this.blocked = true;
     // unblock after timeout
-    setTimeout(() => this.blocked = false, this.props.blockTime);
+    this.blockTimeout = setTimeout(() => this.blocked = false, this.props.blockTime);
   }
 
 }
