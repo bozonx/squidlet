@@ -35,7 +35,7 @@ export interface DigitalPinOutputProps extends DigitalBaseProps {
  * This is middleware driver which allows acting with low level drivers as an output pin.
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
-export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
+export class DigitalPinOutputBase extends DriverBase<DigitalPinOutputProps> {
   private get source(): DigitalSubDriver {
     return this.depsInstances.source;
   }
@@ -94,8 +94,8 @@ export class DigitalPinOutput extends DriverBase<DigitalPinOutputProps> {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPinOutput, DigitalPinOutputProps> {
-  protected SubDriverClass = DigitalPinOutput;
+export default class Factory extends DriverFactoryBase<DigitalPinOutputBase, DigitalPinOutputProps> {
+  protected SubDriverClass = DigitalPinOutputBase;
   protected instanceId = (props: DigitalPinOutputProps): string => {
     const baseId = `${props.source}-${props.pin}`;
 

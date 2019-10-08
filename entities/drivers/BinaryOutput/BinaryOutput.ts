@@ -6,7 +6,7 @@ import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel} from 'system/interfaces/Types';
 
 import DigitalBaseProps from '../../../system/lib/base/digital/interfaces/DigitalBaseProps';
-import {DigitalPinOutput} from '../../../system/lib/base/digital/DigitalPinOutput';
+import {DigitalPinOutputBase} from '../../../system/lib/base/digital/DigitalPinOutputBase';
 
 
 type DelayedResultHandler = (err?: Error) => void;
@@ -27,7 +27,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private blockTimeInProgress: boolean = false;
   private lastDeferredValue?: boolean;
 
-  private get digitalOutput(): DigitalPinOutput {
+  private get digitalOutput(): DigitalPinOutputBase {
     return this.depsInstances.digitalOutput;
   }
 

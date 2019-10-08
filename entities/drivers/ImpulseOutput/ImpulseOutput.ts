@@ -4,7 +4,7 @@ import {omitObj} from 'system/lib/objects';
 import {invertIfNeed} from 'system/lib/helpers';
 import {BlockMode} from 'system/interfaces/Types';
 
-import {DigitalPinOutput, DigitalPinOutputProps} from '../../../system/lib/base/digital/DigitalPinOutput';
+import {DigitalPinOutputBase, DigitalPinOutputProps} from '../../../system/lib/base/digital/DigitalPinOutputBase';
 
 
 export interface ImpulseOutputProps extends DigitalPinOutputProps {
@@ -44,7 +44,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
 
-  private get digitalOutput(): DigitalPinOutput {
+  private get digitalOutput(): DigitalPinOutputBase {
     return this.depsInstances.digitalOutput;
   }
 

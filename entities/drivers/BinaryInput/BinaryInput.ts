@@ -1,13 +1,10 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {WatchHandler} from 'system/interfaces/io/DigitalIo';
-import DriverBase from 'system/base/DriverBase';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
 import {combineDriverName, generateSubDriverId} from 'system/lib/base/digital/digitalHelpers';
-
-// TODO: review
-import {DigitalPinInput, DigitalPinInputProps} from '../../../system/lib/base/digital/DigitalPinInput';
+import DigitalPinInputBase, {DigitalPinInputProps} from 'system/lib/base/digital/DigitalPinInputBase';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -20,7 +17,7 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 }
 
 
-export class BinaryInput extends DriverBase<BinaryInputProps> {
+export class BinaryInput extends DigitalPinInputBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<WatchHandler>();
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;

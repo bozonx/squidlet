@@ -5,7 +5,6 @@ import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 
 import DigitalBaseProps from './interfaces/DigitalBaseProps';
-import {combineDriverName} from './DigitalPinOutput';
 
 
 /*
@@ -57,7 +56,7 @@ export interface DigitalPinInputProps extends DigitalBaseProps {
  * This is middleware driver which allows acting with low level drivers as an input pin.
  * This driver works with specified low level drivers like Digital_local, Digital_pcf8574 etc.
  */
-export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
+export default class DigitalPinInputBase extends DriverBase<DigitalPinInputProps> {
   private changeEvents = new IndexedEvents<WatchHandler>();
   private doubleCheckInProgress: boolean = false;
   private lastValue?: boolean;
@@ -194,26 +193,4 @@ export class DigitalPinInput extends DriverBase<DigitalPinInputProps> {
     return;
   }
 
-}
-
-
-export default class Factory extends DriverFactoryBase<DigitalPinInput, DigitalPinInputProps> {
-  protected SubDriverClass = DigitalPinInput;
-  protected instanceId = (props: DigitalPinInputProps): string => {
-    const baseId = `${props.source}-${props.pin}`;
-
-    // TODO: такого быть не должно
-    if (!props.source) return baseId;
-
-    const driver: any = this.context.getDriver(combineDriverName(props.source));
-
-    if (driver.generateUniqId) {
-      return `${baseId}-${driver.generateUniqId(props)}`;
-    }
-    else {
-      return baseId;
-    }
-
-
-  }
 }
