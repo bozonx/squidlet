@@ -1,6 +1,6 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {WatchHandler} from 'system/interfaces/io/DigitalIo';
+import {DigitalSubDriver, WatchHandler} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
 import {combineDriverName, generateSubDriverId} from 'system/lib/base/digital/digitalHelpers';
@@ -18,16 +18,14 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 
 
 export class BinaryInput extends DigitalPinInputBase<BinaryInputProps> {
-  private readonly changeEvents = new IndexedEvents<WatchHandler>();
+  //private readonly changeEvents = new IndexedEvents<WatchHandler>();
   private blockTimeInProgress: boolean = false;
   private _isInverted: boolean = false;
 
-  private get digitalInput(): DigitalPinInput {
-    return this.depsInstances.digitalInput;
-  }
-
 
   init = async () => {
+    await super.init();
+
     this._isInverted = isDigitalInputInverted(this.props.invert, this.props.invertOnPullup, this.props.pullup);
 
     this.depsInstances.digitalInput = this.context.getSubDriver(
@@ -43,6 +41,7 @@ export class BinaryInput extends DigitalPinInputBase<BinaryInputProps> {
       }
     );
 
+    // TODO: remake
     await this.digitalInput.addListener(this.handleInputChange);
   }
 
@@ -56,9 +55,10 @@ export class BinaryInput extends DigitalPinInputBase<BinaryInputProps> {
   }
 
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.digitalInput.read(), this.isInverted());
+    return invertIfNeed(await this.source.read(this.props.pin), this.isInverted());
   }
 
+  // TODO: review
   /**
    * Listen to rising and falling of impulse (1 and 0 levels)
    */
