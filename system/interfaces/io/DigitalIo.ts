@@ -21,13 +21,19 @@ export const Methods = [
 
 export default interface DigitalIo {
   /**
-   * Setup pin as input
+   * Setup pin as an input
    * @param pin - pin number
    * @param inputMode - one of modes: input | input_pullup | input_pulldown | output
    * @param debounce - debounce time in ms. 0 or less = no debounce.
    * @param edge - Which value (0 or 1 or both) will rise an event. One of modes: rising | falling | both
    */
   setupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
+
+  /**
+   * Setup pin as an output
+   * @param pin - pin number
+   * @param initialValue - value which will be set on default. Be careful with inverting and pullup mode.
+   */
   setupOutput(pin: number, initialValue: boolean): Promise<void>;
 
   // output and input pins can be read
@@ -39,7 +45,7 @@ export default interface DigitalIo {
   // only for input pins
   // Listen to change events
   addListener(pin: number, handler: ChangeHandler): Promise<number>;
-  removeListener(id: number): Promise<void>;
+  removeListener(handlerIndex: number): Promise<void>;
   removeAllListeners(): Promise<void>;
 }
 

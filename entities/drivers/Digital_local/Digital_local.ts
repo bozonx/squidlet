@@ -1,5 +1,4 @@
 import DigitalIo, {
-  DigitalIo,
   Edge,
   WatchHandler,
   DigitalInputMode,

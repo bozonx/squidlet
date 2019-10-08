@@ -1,6 +1,6 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {DigitalIo, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import {lastItem} from 'system/lib/arrays';
 
 import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';

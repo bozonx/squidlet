@@ -1,6 +1,6 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {DigitalInputMode, DigitalIo, Edge, WatchHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {DigitalInputMode, Edge, ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
 import {makeDigitalSourceDriverName, generateSubDriverId, resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
@@ -20,7 +20,7 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 
 
 export class BinaryInput extends DriverBase<BinaryInputProps> {
-  private readonly changeEvents = new IndexedEvents<WatchHandler>();
+  private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private blockTimeInProgress: boolean = false;
   private lastValue?: boolean;
   // has value to be inverted when change event is rising
@@ -86,7 +86,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       );
     }
 
-    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался
+    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
     await this.source.addListener(this.props.pin, this.handleChange);
   }
 
@@ -103,38 +103,29 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     return invertIfNeed(await this.source.read(this.props.pin), this.isInverted());
   }
 
-  // TODO: review - зачем здесь инвертировать можно же  в handleChange ???
   /**
    * Listen to rising and falling of impulse (1 and 0 levels)
    */
-  addListener(handler: WatchHandler): number {
-    const wrapper: WatchHandler = (level: boolean) => {
-      handler(invertIfNeed(level, this.isInverted()));
-    };
-
-    return this.changeEvents.addListener(wrapper);
+  addListener(handler: ChangeHandler): number {
+    return this.changeEvents.addListener(handler);
   }
 
-  // TODO: review - зачем здесь инвертировать можно же  в handleChange ???
-  listenOnce(handler: WatchHandler): number {
-    const wrapper: WatchHandler = (level: boolean) => {
-      handler(invertIfNeed(level, this.isInverted()));
-    };
-
-    return this.changeEvents.once(wrapper);
+  once(handler: ChangeHandler): number {
+    return this.changeEvents.once(handler);
   }
 
   removeListener(handlerIndex: number): void {
     this.changeEvents.removeListener(handlerIndex);
   }
 
-
+  // TODO: review
   private handleChange = async (level: boolean) => {
+    // TODO: если значение не изменилось - ничего не делаем
+
     // do nothing if there is block time
     if (this.blockTimeInProgress) return;
 
-    // TODO: может инвертировать здесь ????
-    this.changeEvents.emit(level);
+    this.changeEvents.emit(invertIfNeed(level, this.isInverted()));
 
     if (!this.props.blockTime) return;
 
