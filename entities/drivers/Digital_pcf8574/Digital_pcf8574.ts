@@ -1,7 +1,7 @@
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import DigitalIo, {Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {Edge, ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import {lastItem} from 'system/lib/arrays';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 
 import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';
 
@@ -74,7 +74,7 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
   /**
    * Listen to interruption of input pin
    */
-  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+  async setWatch(pin: number, handler: ChangeHandler): Promise<number> {
     return this.callOnDevicesInit<number>(async () => {
       if (this.expanderDriver) {
         const wrapper = (targetPin: number, value: boolean) => {
@@ -128,7 +128,7 @@ export class DigitalPcf8574 extends DriverBase<DigitalPcf8574Props> implements D
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalPcf8574, DigitalPcf8574Props> {
+export default class Factory extends SourceDriverFactoryBase<DigitalPcf8574, DigitalPcf8574Props> {
   protected SubDriverClass = DigitalPcf8574;
   // one instance to one expander
   protected instanceId = (props: DigitalPcf8574Props) => props.expander;

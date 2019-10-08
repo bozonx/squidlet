@@ -1,10 +1,10 @@
 import DigitalIo, {
   Edge,
-  WatchHandler,
+  ChangeHandler,
   DigitalInputMode,
 } from 'system/interfaces/io/DigitalIo';
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 
 
 export class DigitalLocal extends DriverBase implements DigitalIo {
@@ -46,7 +46,7 @@ export class DigitalLocal extends DriverBase implements DigitalIo {
   /**
    * Listen to interruption of input pin
    */
-  setWatch(pin: number, handler: WatchHandler): Promise<number> {
+  setWatch(pin: number, handler: ChangeHandler): Promise<number> {
     // TODO: review
     return this.digitalDev.setWatch(pin, handler);
   }
@@ -62,8 +62,12 @@ export class DigitalLocal extends DriverBase implements DigitalIo {
 }
 
 
-export default class Factory extends DriverFactoryBase<DigitalLocal> {
+export default class Factory extends SourceDriverFactoryBase<DigitalLocal> {
   protected SubDriverClass = DigitalLocal;
   // always return the same instance
   protected instanceId = () => 'same';
+
+  generateUniqId(): string {
+    return 'local';
+  }
 }

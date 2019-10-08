@@ -7,6 +7,7 @@ import {makeDigitalSourceDriverName, generateSubDriverId, resolveInputPinMode} f
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';
 import {JsonTypes} from 'system/interfaces/Types';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -107,7 +108,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
   /**
-   * Listen to rising and falling of impulse (1 and 0 levels)
+   * Listen to rising and falling of impulse (1 and 0 levels).
+   * The value will be inverted if it required.
    */
   addListener(handler: ChangeHandler): number {
     return this.changeEvents.addListener(handler);
@@ -148,11 +150,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 export default class Factory extends DriverFactoryBase<BinaryInput, BinaryInputProps> {
   protected SubDriverClass = BinaryInput;
   protected instanceId = (props: BinaryInputProps): string => {
-    if (!props.source) throw new Error(`no source. ${this.id}`);
+    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
 
-    // TODO: add type
-    const driver: any = this.context.getDriver(makeDigitalSourceDriverName(props.source));
-
-    return generateSubDriverId(props.source, props.pin, driver.generateUniqId());
+    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
   }
 }

@@ -48,7 +48,3 @@ export default interface DigitalIo {
   removeListener(handlerIndex: number): Promise<void>;
   removeAllListeners(): Promise<void>;
 }
-
-// export interface DigitalDriverFactory {
-//   generateUniqId?(props: any): string;
-// }
