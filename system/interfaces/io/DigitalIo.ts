@@ -1,4 +1,4 @@
-export type ChangeHandler = (state: boolean) => void;
+export type ChangeHandler = (level: boolean) => void;
 export type DigitalInputMode = 'input'
   | 'input_pullup'
   | 'input_pulldown';

@@ -10,7 +10,9 @@ import {JsonTypes} from 'system/interfaces/Types';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
-  // in this time driver doesn't receive any data
+  // in this time driver doesn't receive any data.
+  // it is optional. If doesn't set then the change event will be emit as soon as value is changed
+  // but if value actually not equals the last one.
   blockTime?: number;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
@@ -21,8 +23,9 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 
 export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  private blockTimeInProgress: boolean = false;
-  private lastValue?: boolean;
+  // is block time in progress
+  private blocked: boolean = false;
+  private lastLevel?: boolean;
   // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
 
@@ -92,7 +95,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
 
   isBlocked(): boolean {
-    return this.blockTimeInProgress;
+    return this.blocked;
   }
 
   isInverted(): boolean {
@@ -118,23 +121,25 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     this.changeEvents.removeListener(handlerIndex);
   }
 
-  // TODO: review
   private handleChange = async (level: boolean) => {
-    // TODO: если значение не изменилось - ничего не делаем
+    // do nothing if there is block time in progress
+    if (this.blocked) return;
 
-    // do nothing if there is block time
-    if (this.blockTimeInProgress) return;
+    // don't rise any events if value hasn't changed
+    if (level === this.lastLevel) return;
+    // save last level to compare next time
+    this.lastLevel = level;
 
+    // emit event and invert the value if need
     this.changeEvents.emit(invertIfNeed(level, this.isInverted()));
 
+    // don't use blocking logic if blockTime is 0 or less
     if (!this.props.blockTime) return;
 
     // start block time
-    this.blockTimeInProgress = true;
-
-    setTimeout(() => {
-      this.blockTimeInProgress = false;
-    }, this.props.blockTime);
+    this.blocked = true;
+    // unblock after timeout
+    setTimeout(() => this.blocked = false, this.props.blockTime);
   }
 
 }

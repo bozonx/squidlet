@@ -11,14 +11,23 @@ invertOnPullup:
   type: boolean
   default: true
 
-###### Other props
-### DigitalPinInput driver
-# debounce: {}
-# doubleCheck: {}
-# edge: {}
-# pullup: {}
-# pulldown: {}
-#
-#### DigitalPin base
-# pin: {}
-# source: {}
+edge:
+  type: '"rising" | "falling" | "both"'
+  default: both
+debounce:
+  type: number
+  default: 0
+pullup:
+  type: boolean
+  default: false
+pulldown:
+  type: boolean
+  default: false
+
+### DigitalPin base props
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'

@@ -11,30 +11,6 @@ import DigitalBaseProps from './interfaces/DigitalBaseProps';
 import DigitalPinInputProps from './interfaces/DigitalPinInputProps';
 
 
-/*
-edge:
-  type: '"rising" | "falling" | "both"'
-  default: both
-debounce:
-  type: number
-  default: 0
-pullup:
-  type: boolean
-  default: false
-pulldown:
-  type: boolean
-  default: false
-
-### DigitalPin base props
-pin:
-  type: number
-  required: true
-source:
-  type: string
-  default: 'local'
- */
-
-
 
 /**
  * This is middleware driver which allows acting with low level drivers as an input pin.
