@@ -105,6 +105,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     await this.source.addListener(this.props.pin, this.handleChange);
   }
 
+  // TODO: add cancel blocking
 
   // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
   getPinMode(): DigitalInputMode {

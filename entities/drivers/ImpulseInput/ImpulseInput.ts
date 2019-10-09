@@ -24,8 +24,7 @@ export interface ImpulseInputProps extends DigitalPinInputProps {
   impulseLength: number;
   // in this time driver doesn't receive any data
   blockTime: number;
-  // if specified - it will wait for specified time
-  //   and after that read level and start impulse if level is 1
+
   mode: ImpulseInputMode;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
@@ -43,9 +42,12 @@ enum ImpulseInputEvents {
 // TODO: add doc
 export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private readonly events = new IndexedEventEmitter();
-  //private throttleInProgress: boolean = false;
+  // TODO: remove
   private impulseInProgress: boolean = false;
+  // TODO: remove
   private blockTimeInProgress: boolean = false;
+  private blockTimeout: any;
+  private impulseTimeout: any;
   // TODO: review
   private _isInverted: boolean = false;
 
@@ -65,6 +67,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
       this.props,
       'impulseLength',
       'blockTime',
+      'mode',
       'invert',
       'invertOnPullup',
       // TODO: review edge
@@ -124,9 +127,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     return this._isInverted;
   }
 
+  // TODO: add cancel blocking
+  // TODO: add cancel impulse
 
-  // TODO: review
-  async read(): Promise<boolean> {
+
+
+  async isImpulseInProgress(): Promise<boolean> {
+    // TODO: use timeout
     return this.impulseInProgress;
   }
 
@@ -154,32 +161,39 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
 
   private handleChange = () => {
-    // don't process new impulse while current is in progress
-    if (this.impulseInProgress || this.blockTimeInProgress) return;
+    // skip other changes while current is in progress
+    if (this.impulseInProgress || this.isBlocked()) return;
 
-    this.startImpulse();
-
-    // if (typeof this.props.throttle === 'undefined') {
-    //   this.startImpulse();
-    // }
-    // else {
-    //   this.throttle();
-    // }
+    if (this.props.mode === 'fixed') {
+      this.startFixedImpulse();
+    }
+    else {
+      this.startIncreasingImpulse();
+    }
   }
 
-  private startImpulse(): void {
+  private startFixedImpulse() {
     this.impulseInProgress = true;
 
-    this.risingEvents.emit();
-    this.bothEvents.emit(true);
+    this.events.emit(ImpulseInputEvents.rising);
+    this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
 
-    setTimeout(() => {
+    this.impulseTimeout = setTimeout(() => {
       this.impulseInProgress = false;
-      this.bothEvents.emit(false);
+      this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
 
       // start block time if need
       this.startBlockTime();
     }, this.props.impulseLength);
+  }
+
+  private startIncreasingImpulse() {
+    this.impulseInProgress = true;
+
+    this.events.emit(ImpulseInputEvents.rising);
+    this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
+
+    // TODO: add
   }
 
   // private throttle(): void {
@@ -204,7 +218,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
     this.blockTimeInProgress = true;
 
-    setTimeout(() => {
+    this.blockTimeout = setTimeout(() => {
       this.blockTimeInProgress = false;
     }, this.props.blockTime);
   }

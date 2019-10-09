@@ -4,10 +4,13 @@ $base: 'drivers.DigitalPinInput'
 impulseLength:
   type: number
   default: 100
+  # TODO: не может быть 0 или меньше
 blockTime:
   type: number
   default: 0
 # Fixed mode is just impulse which longs for impulseLength time
+# Increasing works like motion detect sensor - each change increase the impulse length.
+# In this mode impulse increases by "impulseLength" time.
 mode:
   type: fixed | increasing
   default: fixed
