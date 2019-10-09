@@ -15,10 +15,10 @@ export interface BinaryInputProps extends DigitalPinInputProps {
   // it is optional. If doesn't set then the change event will be emit as soon as value is changed
   // but if value actually not equals the last one.
   blockTime?: number;
-  // auto invert if pullup resistor is set. Default is true
-  invertOnPullup: boolean;
   // when receives 1 actually returned 0 and otherwise
   invert: boolean;
+  // auto invert if pullup resistor is set. Default is true
+  invertOnPullup: boolean;
 }
 
 
@@ -52,8 +52,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     const subDriverProps: {[index: string]: JsonTypes} = omitObj(
       this.props,
       'blockTime',
-      'invertOnPullup',
       'invert',
+      'invertOnPullup',
       'edge',
       'debounce',
       'pullup',

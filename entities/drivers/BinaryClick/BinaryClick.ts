@@ -16,24 +16,22 @@ import {JsonTypes} from 'system/interfaces/Types';
 
 type Handler = () => void;
 
+export interface BinaryClickProps extends DigitalPinInputProps {
+  // Maximum time of pressed button
+  releaseTimeoutMs?: number;
+  // the last step of cycle. At this time it doesn't receive any events
+  blockTime?: number;
+  // auto invert if pullup resistor is set. Default is true
+  invert: boolean;
+  // edge actually isn't supported
+  invertOnPullup: boolean;
+  // when receives 1 actually returned 0 and otherwise
+}
+
 enum BinaryClickEvents {
   up,
   down,
   change,
-}
-
-// TODO: add props to manifest
-// TODO: no edge
-// TODO: add debounce
-// TODO: review
-export interface BinaryClickProps extends DigitalPinInputProps {
-  releaseTimeoutMs?: number;
-  blockTime?: number;
-  // TODO: review
-  // auto invert if pullup resistor is set. Default is true
-  invertOnPullup: boolean;
-  // when receives 1 actually returned 0 and otherwise
-  invert: boolean;
 }
 
 
@@ -66,12 +64,12 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
     const subDriverProps: {[index: string]: JsonTypes} = omitObj(
       this.props,
-      // TODO: review props to omit
       'releaseTimeoutMs',
       'blockTime',
-      'invertOnPullup',
       'invert',
-      'edge',
+      'invertOnPullup',
+      // it doesn't supported in props
+      //'edge',
       'debounce',
       'pullup',
       'pulldown',
@@ -119,6 +117,13 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
   isBlocked(): boolean {
     return Boolean(this.blockTimeout);
+  }
+
+  /**
+   * If changes from IO comes inverted
+   */
+  isInverted(): boolean {
+    return this._isInverted;
   }
 
   addChangeListener(handler: ChangeHandler): number {
