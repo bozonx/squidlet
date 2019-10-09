@@ -96,7 +96,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     }
     catch (err) {
       this.log.error(
-        `BinaryInput: Can't setup pin. ` +
+        `BinaryClick: Can't setup pin. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }

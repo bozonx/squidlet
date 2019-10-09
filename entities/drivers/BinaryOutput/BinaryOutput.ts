@@ -2,16 +2,17 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
-import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
-import {BlockMode, InitialLevel} from 'system/interfaces/Types';
+import {resolveLevel, invertIfNeed, resolveEdge} from 'system/lib/helpers';
+import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
 import DigitalBaseProps from 'system/lib/base/digital/interfaces/DigitalBaseProps';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {Edge} from 'system/interfaces/io/DigitalIo';
 
 
 type DelayedResultHandler = (err?: Error) => void;
 
+// TODO: review props in manifest
 export interface BinaryOutputProps extends DigitalBaseProps {
   blockTime?: number;
   // TODO: review
@@ -40,17 +41,58 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
     // TODO: what about inverted????
 
-    this.depsInstances.digitalOutput = await this.context.getSubDriver(
-      'DigitalPinOutput',
-      {
-        ...omitObj(this.props, 'blockTime', 'blockMode', 'invert', 'initial'),
-        initialLevel: this.resolveInitialLevel(),
-      }
+    // make rest of props to pass them to the sub driver
+    const subDriverProps: {[index: string]: JsonTypes} = {
+      ...omitObj(
+        this.props,
+        // TODO: review props
+        'blockTime',
+        'blockMode',
+        'initial',
+        'invert',
+        'edge',
+        'debounce',
+        'pullup',
+        'pulldown',
+        'pin',
+        'source'
+      ),
+      //initialLevel: this.resolveInitialLevel(),
+    };
+
+    this.depsInstances.source = this.context.getSubDriver(
+      makeDigitalSourceDriverName(this.props.source),
+      subDriverProps
     );
   }
 
+  // setup pin after all the drivers has been initialized
+  driversDidInit = async () => {
+    // TODO: print unique id of sub driver
+    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
+
+    const initialValue: boolean = this.resolveInitialLevel();
+
+    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
+    // setup pin as an input with resistor if specified
+    // wait for pin has initialized but don't break initialization on error
+    try {
+      await this.source.setupOutput(this.props.pin, initialValue);
+    }
+    catch (err) {
+      this.log.error(
+        `BinaryOutput: Can't setup pin. ` +
+        `"${JSON.stringify(this.props)}": ${err.toString()}`
+      );
+    }
+  }
+
+
+  // TODO: добавить прослойку событий чтобы слушать изменения пинов.
+  //  Выяснить будут ли подниматься события в IO если пин output
 
   isBlocked(): boolean {
+    // TODO: use timeout
     return this.blockTimeInProgress;
   }
 
