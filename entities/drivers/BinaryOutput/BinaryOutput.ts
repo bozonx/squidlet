@@ -4,18 +4,17 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel} from 'system/interfaces/Types';
-
-import DigitalBaseProps from '../../../system/lib/base/digital/interfaces/DigitalBaseProps';
-import {DigitalPinOutputBase} from '../../../system/lib/base/digital/DigitalPinOutputBase';
-import {BinaryClickProps} from '../BinaryClick/BinaryClick';
-import SourceDriverFactoryBase from '../../../system/lib/base/digital/SourceDriverFactoryBase';
-import {generateSubDriverId, makeDigitalSourceDriverName} from '../../../system/lib/base/digital/digitalHelpers';
+import DigitalBaseProps from 'system/lib/base/digital/interfaces/DigitalBaseProps';
+import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
+import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
+import DigitalIo from 'system/interfaces/io/DigitalIo';
 
 
 type DelayedResultHandler = (err?: Error) => void;
 
 export interface BinaryOutputProps extends DigitalBaseProps {
   blockTime?: number;
+  // TODO: review
   // if "refuse" - it doesn't write while block time is in progress. It is on default.
   // If "defer" it waits for block time finished and write last value which was tried to set
   blockMode: BlockMode;
@@ -27,15 +26,20 @@ export interface BinaryOutputProps extends DigitalBaseProps {
 
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
+  // TODO: use timeout
   private blockTimeInProgress: boolean = false;
+  // TODO: reivew
   private lastDeferredValue?: boolean;
 
-  private get digitalOutput(): DigitalPinOutputBase {
-    return this.depsInstances.digitalOutput;
+  private get source(): DigitalIo {
+    return this.depsInstances.source;
   }
 
 
   init = async () => {
+
+    // TODO: what about inverted????
+
     this.depsInstances.digitalOutput = await this.context.getSubDriver(
       'DigitalPinOutput',
       {
@@ -171,12 +175,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
     // not inverted
     return resolvedLevel;
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 }
