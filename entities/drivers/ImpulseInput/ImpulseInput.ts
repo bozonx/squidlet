@@ -19,6 +19,7 @@ type ImpulseInputMode = 'fixed' | 'increasing';
 
 // TODO: reivew
 // TODO: reivew in manifest
+// TODO: debounce минимальный или вообще не нужен
 export interface ImpulseInputProps extends DigitalPinInputProps {
   // duration of impulse in ms
   impulseLength: number;
@@ -122,11 +123,19 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     return this._isInverted;
   }
 
-  // TODO: add cancel blocking
-  // TODO: add cancel impulse
+  /**
+   * Cancel impulse or block
+   */
+  cancel() {
+    clearTimeout(this.impulseTimeout);
+    clearTimeout(this.blockTimeout);
+
+    delete this.impulseTimeout;
+    delete this.blockTimeout;
+  }
 
 
-  async isImpulseInProgress(): Promise<boolean> {
+  isImpulseInProgress(): boolean {
     return Boolean(this.impulseTimeout);
   }
 
@@ -154,10 +163,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
 
   private handleChange = () => {
-    // skip other changes while current is in progress
-    if (this.impulseInProgress || this.isBlocked()) return;
+    // skip other changes while block time
+    if (this.isBlocked()) return;
 
     if (this.props.mode === 'fixed') {
+      // skip other changes while current is in progress
+      if (this.isImpulseInProgress()) return;
+
       this.startFixedImpulse();
     }
     else {
@@ -166,51 +178,41 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
   private startFixedImpulse() {
-    // TODO: наверное события запустить после таймаута чтобы на момент события правилно определился стейт
+    this.setImpulseTimeout();
     this.events.emit(ImpulseInputEvents.rising);
     this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
+  }
 
+  private startIncreasingImpulse() {
+    if (this.isImpulseInProgress()) {
+      // increase current impulse
+      // clear current impulse timeout
+      clearTimeout(this.impulseTimeout);
+      // set a new impulse timeout
+      this.setImpulseTimeout();
+    }
+    else {
+      // start a new one
+      this.startFixedImpulse();
+    }
+  }
+
+  private setImpulseTimeout() {
     this.impulseTimeout = setTimeout(() => {
       delete this.impulseTimeout;
 
       this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
-
       // start block time if need
       this.startBlockTime();
     }, this.props.impulseLength);
   }
 
-  private startIncreasingImpulse() {
-    this.events.emit(ImpulseInputEvents.rising);
-    this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
-
-    // TODO: add
-  }
-
-  // private throttle(): void {
-  //   this.throttleInProgress = true;
-  //
-  //   // waiting and then read level
-  //   setTimeout(async () => {
-  //     const currentValue: boolean = await this.digitalInput.read();
-  //
-  //     this.throttleInProgress = false;
-  //
-  //     // if level is 0 - it isn't an impulse - do nothing
-  //     if (!currentValue) return;
-  //
-  //     this.startImpulse();
-  //   }, Number(this.props.throttle));
-  // }
-
   private startBlockTime(): void {
     // if block time isn't set = do nothing
     if (!this.props.blockTime) return;
 
-    this.blockTimeInProgress = true;
-
     this.blockTimeout = setTimeout(() => {
-      this.blockTimeInProgress = false;
+      delete this.blockTimeout;
     }, this.props.blockTime);
   }
 

@@ -101,7 +101,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   /**
    * Cancel blocking of input.
    */
-  cancelBlock() {
+  cancel() {
     clearTimeout(this.blockTimeout);
 
     delete this.blockTimeout;
