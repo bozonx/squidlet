@@ -144,6 +144,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     // save last level to compare next time
     this.lastLevel = level;
 
+    // TODO: наверное события запустить после таймаута чтобы на момент правильно пределилися isBlocked
     // emit event and invert the value if need
     this.changeEvents.emit(invertIfNeed(level, this.isInverted()));
 

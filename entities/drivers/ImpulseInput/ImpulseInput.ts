@@ -42,10 +42,6 @@ enum ImpulseInputEvents {
 // TODO: add doc
 export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private readonly events = new IndexedEventEmitter();
-  // TODO: remove
-  private impulseInProgress: boolean = false;
-  // TODO: remove
-  private blockTimeInProgress: boolean = false;
   private blockTimeout: any;
   private impulseTimeout: any;
   // TODO: review
@@ -116,8 +112,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
   isBlocked(): boolean {
-    // TODO: use timeout
-    return this.blockTimeInProgress;
+    return Boolean(this.blockTimeout);
   }
 
   /**
@@ -131,10 +126,8 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   // TODO: add cancel impulse
 
 
-
   async isImpulseInProgress(): Promise<boolean> {
-    // TODO: use timeout
-    return this.impulseInProgress;
+    return Boolean(this.impulseTimeout);
   }
 
   /**
@@ -173,13 +166,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
   private startFixedImpulse() {
-    this.impulseInProgress = true;
-
+    // TODO: наверное события запустить после таймаута чтобы на момент события правилно определился стейт
     this.events.emit(ImpulseInputEvents.rising);
     this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
 
     this.impulseTimeout = setTimeout(() => {
-      this.impulseInProgress = false;
+      delete this.impulseTimeout;
+
       this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
 
       // start block time if need
@@ -188,8 +181,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
   private startIncreasingImpulse() {
-    this.impulseInProgress = true;
-
     this.events.emit(ImpulseInputEvents.rising);
     this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
 

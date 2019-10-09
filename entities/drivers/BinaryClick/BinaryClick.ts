@@ -168,6 +168,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     // set keyDown state
     this.keyDown = true;
 
+    // TODO: наверное события запустить после таймаута чтобы на момент события был isKeyDown true
     this.events.emit(BinaryClickEvents.change, this.keyDown);
     this.events.emit(BinaryClickEvents.down);
 
