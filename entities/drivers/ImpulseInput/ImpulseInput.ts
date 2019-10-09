@@ -1,4 +1,3 @@
-import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalIo, {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
@@ -12,20 +11,22 @@ import {
 } from 'system/lib/base/digital/digitalHelpers';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
 import {JsonTypes} from 'system/interfaces/Types';
+import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
 
 
 type RisingHandler = () => void;
+type ImpulseInputMode = 'fixed' | 'increasing';
 
 // TODO: reivew
 // TODO: reivew in manifest
 export interface ImpulseInputProps extends DigitalPinInputProps {
-  // time between 1 and 0
+  // duration of impulse in ms
   impulseLength: number;
   // in this time driver doesn't receive any data
   blockTime: number;
   // if specified - it will wait for specified time
   //   and after that read level and start impulse if level is 1
-  //throttle?: number;
+  mode: ImpulseInputMode;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
   // for input: when receives 1 actually returned 0 and otherwise
@@ -33,11 +34,15 @@ export interface ImpulseInputProps extends DigitalPinInputProps {
   invert: boolean;
 }
 
+enum ImpulseInputEvents {
+  rising,
+  both
+}
+
 
 // TODO: add doc
 export class ImpulseInput extends DriverBase<ImpulseInputProps> {
-  private readonly risingEvents = new IndexedEvents<RisingHandler>();
-  private readonly bothEvents = new IndexedEvents<ChangeHandler>();
+  private readonly events = new IndexedEventEmitter();
   //private throttleInProgress: boolean = false;
   private impulseInProgress: boolean = false;
   private blockTimeInProgress: boolean = false;
@@ -120,12 +125,8 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
 
-  // TODO: review below
-
-
+  // TODO: review
   async read(): Promise<boolean> {
-    //return this.digitalInput.read();
-    //return this.throttleInProgress || this.impulseInProgress;
     return this.impulseInProgress;
   }
 
@@ -133,32 +134,27 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
    * Listen only to rising of impulse, not falling.
    */
   addRisingListener(handler: RisingHandler): number {
-    return this.risingEvents.addListener(handler);
+    return this.events.addListener(ImpulseInputEvents.rising, handler);
   }
 
   listenRisingOnce(handler: RisingHandler): number {
-    return this.risingEvents.once(handler);
+    return this.events.once(ImpulseInputEvents.rising, handler);
   }
 
   /**
-   * Listen to rising and faling of impulse (1 and 0 levels)
+   * Listen to rising and falling of impulse (1 and 0 levels)
    */
   addListener(handler: ChangeHandler): number {
-    return this.bothEvents.addListener(handler);
-  }
-
-  removeRisingListener(handlerIndex: number) {
-    this.risingEvents.removeListener(handlerIndex);
+    return this.events.addListener(ImpulseInputEvents.both, handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.bothEvents.removeListener(handlerIndex);
+    this.events.removeListener(handlerIndex);
   }
 
 
   private handleChange = () => {
     // don't process new impulse while current is in progress
-    //if (this.throttleInProgress || this.impulseInProgress || this.blockTimeInProgress) return;
     if (this.impulseInProgress || this.blockTimeInProgress) return;
 
     this.startImpulse();
