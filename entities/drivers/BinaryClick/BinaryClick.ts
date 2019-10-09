@@ -9,7 +9,7 @@ import {
   makeDigitalSourceDriverName,
   resolveInputPinMode,
 } from 'system/lib/base/digital/digitalHelpers';
-import {isDigitalInputInverted} from 'system/lib/helpers';
+import {invertIfNeed, isDigitalInputInverted} from 'system/lib/helpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {JsonTypes} from 'system/interfaces/Types';
 
@@ -147,7 +147,9 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   private handleChange = async (level: boolean) => {
     if (this.isBlocked()) return;
 
-    if (level) {
+    const resolvedLevel: boolean = invertIfNeed(level, this.isInverted());
+
+    if (resolvedLevel) {
       // if level is high and current state is keyDown and isn't blocked
       // then do nothing - state hasn't been changed
       if (this.keyDown) return;

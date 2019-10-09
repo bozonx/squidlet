@@ -1,8 +1,8 @@
-import DigitalIo, {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler, DigitalInputMode, Edge} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
-import {isDigitalInputInverted} from 'system/lib/helpers';
+import {isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {
   generateSubDriverId,
@@ -51,7 +51,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private readonly events = new IndexedEventEmitter();
   private blockTimeout: any;
   private impulseTimeout: any;
-  // TODO: review
   private _isInverted: boolean = false;
 
   private get source(): DigitalIo {
@@ -91,12 +90,14 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     // TODO: print unique id of sub driver
     this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
+    const edge: Edge = resolveEdge('rising', this.isInverted());
+
     // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
       // listen to only high levels
-      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, 'rising');
+      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
     }
     catch (err) {
       this.log.error(
