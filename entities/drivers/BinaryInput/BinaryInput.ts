@@ -24,7 +24,7 @@ export interface BinaryInputProps extends DigitalPinInputProps {
 
 /**
  * Simple binary logic. Steps:
- * * 0 - nothing happening
+ * * 0 - nothing is happening
  * * 1 - level is high
  * * 0 - blocking. Skip any inputs during this time.
  */

@@ -1,5 +1,3 @@
-$base: 'drivers.DigitalPinInput'
-
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   type: number
@@ -16,7 +14,7 @@ edge:
   default: both
 debounce:
   type: number
-  default: 0
+  default: 10
 pullup:
   type: boolean
   default: false

@@ -17,9 +17,8 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 type RisingHandler = () => void;
 type ImpulseInputMode = 'fixed' | 'increasing';
 
-// TODO: reivew
-// TODO: reivew in manifest
-// TODO: debounce минимальный или вообще не нужен
+
+// TODO: edge doesn't supported but it in DigitalPinInputProps
 export interface ImpulseInputProps extends DigitalPinInputProps {
   // duration of impulse in ms
   impulseLength: number;
@@ -40,7 +39,14 @@ enum ImpulseInputEvents {
 }
 
 
-// TODO: add doc
+/**
+ * Impulse logic steps:
+ * * 0 - nothing is happening
+ * * 1 - started impulse
+ * * 0 - impulse ended
+ * * 0 - blocking. Skip any inputs during this time.
+ * In "increasing" mode impulse will increase by new income changes
+ */
 export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private readonly events = new IndexedEventEmitter();
   private blockTimeout: any;
@@ -67,9 +73,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
       'mode',
       'invert',
       'invertOnPullup',
-      // TODO: review edge
-      // it doesn't supported in props
-      //'edge',
       'debounce',
       'pullup',
       'pulldown',
@@ -92,8 +95,8 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      // TODO: review edge
-      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, 'both');
+      // listen to only high levels
+      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, 'rising');
     }
     catch (err) {
       this.log.error(

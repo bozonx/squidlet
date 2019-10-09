@@ -37,7 +37,7 @@ enum BinaryClickEvents {
 
 /**
  * Click logic. It has steps:
- * * 0 - nothing happening
+ * * 0 - nothing is happening
  * * 1 - keyDown state, down event emits
  * * 0 - key is up, up event emits
  * * 0 - blocking. Skip any inputs during this time.

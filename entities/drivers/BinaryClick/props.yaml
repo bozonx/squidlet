@@ -1,5 +1,3 @@
-$base: 'drivers.BinaryInput'
-
 # Maximum time of pressed button. It releases after reaching this timeout. Default is unlimited.
 releaseTimeoutMs:
   type: number
@@ -16,7 +14,7 @@ invertOnPullup:
 
 debounce:
   type: number
-  default: 0
+  default: 10
 pullup:
   type: boolean
   default: false

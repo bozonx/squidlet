@@ -1,5 +1,3 @@
-$base: 'drivers.DigitalPinInput'
-
 # duration of impulse in ms
 impulseLength:
   type: number
@@ -21,17 +19,20 @@ invertOnPullup:
   type: boolean
   default: true
 
-# see DigitalPinInput driver
 debounce:
+  type: number
   default: 0
+pullup:
+  type: boolean
+  default: false
+pulldown:
+  type: boolean
+  default: false
 
-###### Other props
-### DigitalPinInput driver
-# doubleCheck: {}
-# edge: {}
-# pullup: {}
-# pulldown: {}
-#
-#### DigitalPin base
-# pin: {}
-# source: {}
+### DigitalPin base props
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'
