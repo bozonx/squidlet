@@ -27,7 +27,7 @@ enum BinaryClickEvents {
 // TODO: add debounce
 // TODO: review
 export interface BinaryClickProps extends DigitalPinInputProps {
-  releaseTimeoutMs: number;
+  releaseTimeoutMs?: number;
   blockTime?: number;
   // TODO: review
   // auto invert if pullup resistor is set. Default is true
@@ -49,11 +49,8 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   // should invert value which is received from IO
   private _isInverted: boolean = false;
   private keyDown: boolean = false;
-  //private debounceInProgress: boolean = false;
-  private blockTimeInProgress: boolean = false;
   private releaseTimeout: any;
-  //private secondDebounceTimeout: any;
-  private blockTimeTimeout: any;
+  private blockTimeout: any;
 
   private get source(): DigitalIo {
     return this.depsInstances.source;
@@ -121,8 +118,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
   isBlocked(): boolean {
-    // TODO: use block timeout
-    return this.blockTimeInProgress;
+    return Boolean(this.blockTimeout);
   }
 
   addChangeListener(handler: ChangeHandler): number {
@@ -150,7 +146,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
       // then do nothing - state hasn't been changed
       if (this.keyDown) return;
       // else start a new cycle
-      await this.startCycle();
+      await this.startDownState();
     }
     else {
       // if level is low and current state isn't blocked and isn't keyDown (cycle not started)
@@ -158,64 +154,46 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
       if (!this.keyDown) return;
       // else if state is keyDown then finish cycle and start blocking
       // logical 0 = finish
-      await this.finishLogic();
+      await this.finishDownState();
     }
   }
 
-  // TODO: review
-  private async startCycle() {
-    clearTimeout(this.releaseTimeout);
+  private async startDownState() {
+    // set keyDown state
     this.keyDown = true;
-    this.events.emit(BinaryClickEvents.change, true);
+
+    this.events.emit(BinaryClickEvents.change, this.keyDown);
     this.events.emit(BinaryClickEvents.down);
 
-    // release if timeout is reached
-    this.releaseTimeout = setTimeout(() => {
-      this.releaseTimeout = undefined;
-      //clearTimeout(this.secondDebounceTimeout);
-      clearTimeout(this.blockTimeTimeout);
-      //this.debounceInProgress = false;
-      this.blockTimeInProgress = false;
-    }, this.props.releaseTimeoutMs);
+    if (this.props.releaseTimeoutMs) {
+      // release if timeout is reached
+      this.releaseTimeout = setTimeout(() => {
+        // At this point finishDownState isn't called.
+        // Just clear keyDown state and allow receive new level event.
+        this.keyDown = false;
+
+        delete this.releaseTimeout;
+      }, this.props.releaseTimeoutMs);
+    }
   }
 
-  private async finishLogic() {
+  private async finishDownState() {
     this.keyDown = false;
-    this.blockTimeInProgress = true;
 
-    this.events.emit(BinaryClickEvents.change, false);
+    clearTimeout(this.releaseTimeout);
+
+    delete this.releaseTimeout;
+
+    this.events.emit(BinaryClickEvents.change, this.keyDown);
     this.events.emit(BinaryClickEvents.up);
 
-    this.blockTimeTimeout = setTimeout(() => {
-      this.blockTimeInProgress = false;
-      this.blockTimeTimeout = undefined;
+    // don't use blocking logic if blockTime is 0 or less
+    if (!this.props.blockTime) return;
 
-      clearTimeout(this.releaseTimeout);
-    }, this.props.blockTime || 0);
+    this.blockTimeout = setTimeout(() => {
+      delete this.blockTimeout;
+    }, this.props.blockTime);
   }
-
-  // private async startUpLogic() {
-  //   if (this.debounceInProgress) return;
-  //
-  //   this.debounceInProgress = true;
-  //
-  //   // TODO: does it need second debounce???
-  //   // start second debounce timeout
-  //   this.secondDebounceTimeout = setTimeout(async () => {
-  //     this.secondDebounceTimeout = undefined;
-  //
-  //     const currentLevel: boolean = await this.binaryInput.read();
-  //
-  //     this.debounceInProgress = false;
-  //
-  //     // if logical 1 = do nothing
-  //
-  //     if (!currentLevel) {
-  //       // logical 0 = finish
-  //       await this.finishLogic();
-  //     }
-  //   }, this.props.debounce);
-  // }
 
 }
 

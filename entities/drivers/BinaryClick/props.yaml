@@ -1,9 +1,8 @@
 $base: 'drivers.BinaryInput'
 
-# Maximum time of pressed button. It releases after reaching this timeout.
+# Maximum time of pressed button. It releases after reaching this timeout. Default is unlimited.
 releaseTimeoutMs:
   type: number
-  default: 10000
 
 # Block time after keyUp
 blockTime:
