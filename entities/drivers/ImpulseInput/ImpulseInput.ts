@@ -11,7 +11,7 @@ import {
 } from 'system/lib/base/digital/digitalHelpers';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
 import {JsonTypes} from 'system/interfaces/Types';
-import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 
 type RisingHandler = () => void;
@@ -203,17 +203,11 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
       this.events.emit(ImpulseInputEvents.both, this.isImpulseInProgress());
       // start block time if need
-      this.startBlockTime();
+      // if block time isn't set = do nothing
+      if (!this.props.blockTime) return;
+
+      this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
     }, this.props.impulseLength);
-  }
-
-  private startBlockTime(): void {
-    // if block time isn't set = do nothing
-    if (!this.props.blockTime) return;
-
-    this.blockTimeout = setTimeout(() => {
-      delete this.blockTimeout;
-    }, this.props.blockTime);
   }
 
 }
