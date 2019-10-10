@@ -41,11 +41,15 @@ export interface BinaryOutputProps extends DigitalPinOutputProps {
  * defer mode:
  * * 0 - nothing is happening
  * * 1 - level is set high. writing. The value of the last request is stored to write it later.
- * * writing sroted value
+ * * writing value deferred value if it was set
  * * blocking. Skip any requests during this time
+ *
+ * If there was error while writing in deferred mode then cycle will be cancelled
+ * but blocking will be started.
  */
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  // TODO: зачем сохранять промис может тогда лучше просто boolean
   private writingPromise?: Promise<void>;
   private deferredWritePromise?: Promised<void>;
   private lastDeferredValue?: boolean;
@@ -191,34 +195,66 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       this.changeEvents.emit(ioValue);
     }
 
-    // use blocking if there is set blockTime prop
+    // save writing promise
+    this.writingPromise = this.source.write(this.props.pin, ioValue);
+
+    // wait for it
+    try {
+      await this.writingPromise;
+    }
+    catch (err) {
+      // on error cancel deferred queue and start blocking
+      const errorMsg = `BinaryOutput driver: Can't write "${level}",
+        props: "${JSON.stringify(this.props)}". ${String(err)}`;
+
+      this.handleError(errorMsg);
+
+      throw new Error(errorMsg);
+    }
+
+    // if deferred mode and there is deferred value then write it
+    if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
+      return this.startDeferredWrite();
+    }
+    // else start just blocking and after that cycle has been ended
+    this.startBlocking();
+  }
+
+  private handleError(errorMsg: string) {
+    // removing deferred and make deferred promise rejected
+    delete this.lastDeferredValue;
+
+    if (this.deferredWritePromise) {
+      this.deferredWritePromise.reject(new Error(errorMsg));
+
+      delete this.deferredWritePromise;
+    }
+
+    // start blocking
+    this.startBlocking();
+  }
+
+  private startBlocking() {
+    // use blocking if there is blockTime prop
     if (this.props.blockTime) {
       // starting blocking
       this.blockTimeout = setTimeout(this.blockTimeFinished, this.props.blockTime);
     }
+  }
 
-    // TODO: сохранить индикатор что идет запись
-
-    try {
-      await this.source.write(this.props.pin, ioValue);
-    }
-    catch (err) {
-
-      // TODO: что делать с отложенным значением? - наверное очистить
-
-      // TODO: блокировка всеравно будет даже если не удалось записать ???
-      clearTimeout(this.blockTimeout);
-
-      delete this.blockTimeout;
-
-      const errorMsg = `BinaryOutputDriver: Can't write "${level}",
-        props: "${JSON.stringify(this.props)}". ${String(err)}`;
-
-      // TODO: review
-      if (this.deferredWritePromise) this.deferredWritePromise.reject(new Error(errorMsg));
-
-      throw new Error(errorMsg);
-    }
+  private startDeferredWrite() {
+    const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.isInverted());
+    // clear deferred value
+    delete this.lastDeferredValue;
+    // write deferred value
+    // don't wait in normal way
+    this.doWrite(resolvedValue)
+      .then(() => {
+        if (this.deferredWritePromise) this.deferredWritePromise.resolve();
+      })
+      .catch((err) => {
+        if (this.deferredWritePromise) this.deferredWritePromise.reject(err);
+      });
   }
 
   private blockTimeFinished = () => {
@@ -229,18 +265,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
     // writing last delayed value if set
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
-      const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.isInverted());
-      // clear deferred value
-      this.lastDeferredValue = undefined;
-      // write deferred value
-      // don't wait in normal way
-      this.doWrite(resolvedValue)
-        .then(() => {
-          if (this.deferredWritePromise) this.deferredWritePromise.resolve();
-        })
-        .catch((err) => {
-          if (this.deferredWritePromise) this.deferredWritePromise.reject(err);
-      });
+
     }
   }
 
