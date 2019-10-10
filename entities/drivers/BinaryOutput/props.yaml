@@ -10,11 +10,17 @@ initial:
   default: 0
 invert:
   type: boolean
-  default: false
-
+# In true case it inverts value if pullup resistor is on
+invertOnOpenDrain:
+  type: boolean
+  default: true
 initialLevel:
   type: boolean
-  default: false
+  default: low
+
+# DigitalPinOutputProps props
+openDrain:
+  type: boolean
 
 ### DigitalPin base props
 pin:
@@ -23,5 +29,3 @@ pin:
 source:
   type: string
   default: 'local'
-expander:
-  type: string

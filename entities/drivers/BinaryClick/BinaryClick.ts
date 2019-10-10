@@ -22,7 +22,7 @@ export interface BinaryClickProps extends DigitalPinInputProps {
   // the last step of cycle. At this time it doesn't receive any events
   blockTime?: number;
   // auto invert if pullup resistor is set. Default is true
-  invert: boolean;
+  invert?: boolean;
   // edge actually isn't supported
   invertOnPullup: boolean;
   // when receives 1 actually returned 0 and otherwise

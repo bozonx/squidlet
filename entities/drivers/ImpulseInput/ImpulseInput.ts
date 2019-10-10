@@ -30,7 +30,7 @@ export interface ImpulseInputProps extends DigitalPinInputProps {
   invertOnPullup: boolean;
   // for input: when receives 1 actually returned 0 and otherwise
   // for output: when sends 1 actually sends 0 and otherwise
-  invert: boolean;
+  invert?: boolean;
 }
 
 enum ImpulseInputEvents {

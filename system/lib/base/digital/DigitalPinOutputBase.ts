@@ -11,10 +11,6 @@ import DigitalBaseProps from './interfaces/DigitalBaseProps';
  */
 
 
-export interface DigitalPinOutputProps extends DigitalBaseProps {
-  initialLevel: boolean;
-}
-
 
 
 

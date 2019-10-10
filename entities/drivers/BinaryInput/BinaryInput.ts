@@ -16,7 +16,7 @@ export interface BinaryInputProps extends DigitalPinInputProps {
   // but if value actually not equals the last one.
   blockTime?: number;
   // when receives 1 actually returned 0 and otherwise
-  invert: boolean;
+  invert?: boolean;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
 }

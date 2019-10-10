@@ -4,23 +4,23 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
-import DigitalBaseProps from 'system/lib/base/digital/interfaces/DigitalBaseProps';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 
 
 type DelayedResultHandler = (err?: Error) => void;
 
-// TODO: review props in manifest
-export interface BinaryOutputProps extends DigitalBaseProps {
+export interface BinaryOutputProps extends DigitalPinOutputProps {
   blockTime?: number;
-  // TODO: review
   // if "refuse" - it doesn't write while block time is in progress. It is on default.
   // If "defer" it waits for block time finished and write last value which was tried to set
   blockMode: BlockMode;
   // when sends 1 actually sends 0 and otherwise
-  invert: boolean;
+  invert?: boolean;
+  // turn value invert if open drain mode is used
+  invertOnOpenDrain: boolean;
   initial: InitialLevel;
 }
 
@@ -51,27 +51,16 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 
   init = async () => {
-
-    // TODO: what about inverted????
-
     // make rest of props to pass them to the sub driver
-    const subDriverProps: {[index: string]: JsonTypes} = {
-      ...omitObj(
-        this.props,
-        // TODO: review props
-        'blockTime',
-        'blockMode',
-        'initial',
-        'invert',
-        'edge',
-        'debounce',
-        'pullup',
-        'pulldown',
-        'pin',
-        'source'
-      ),
-      //initialLevel: this.resolveInitialLevel(),
-    };
+    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
+      this.props,
+      'blockTime',
+      'blockMode',
+      'initial',
+      'invert',
+      'pin',
+      'source'
+    );
 
     this.depsInstances.source = this.context.getSubDriver(
       makeDigitalSourceDriverName(this.props.source),

@@ -6,7 +6,6 @@ blockTime:
   type: number
 invert:
   type: boolean
-  default: false
 # In true case it inverts value if pullup resistor is on
 invertOnPullup:
   type: boolean
@@ -17,10 +16,8 @@ debounce:
   default: 10
 pullup:
   type: boolean
-  default: false
 pulldown:
   type: boolean
-  default: false
 
 ### DigitalPin base props
 pin:
