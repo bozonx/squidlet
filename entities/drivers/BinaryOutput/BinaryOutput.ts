@@ -2,12 +2,12 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
-import {resolveLevel, invertIfNeed, resolveEdge} from 'system/lib/helpers';
+import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
 import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
 import DigitalBaseProps from 'system/lib/base/digital/interfaces/DigitalBaseProps';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {ChangeHandler, Edge} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 
 
 type DelayedResultHandler = (err?: Error) => void;
@@ -107,6 +107,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   async write(level: boolean): Promise<void> {
     // TODO: поднимать событие если значение изменилось
 
+    // TODO: проверитьчто не только заблокировнно, но и идет запись
+
     if (this.isBlocked()) {
       // try to write while another write is in progress
       if (this.props.blockMode === 'refuse') {
@@ -159,6 +161,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       this.blockTimeout = setTimeout(this.blockTimeFinished, this.props.blockTime);
     }
 
+    // TODO: сохранить индикатор что идет запись
+
     try {
       await this.source.write(this.props.pin, resolvedValue);
     }
@@ -181,24 +185,23 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     }
   }
 
-  // TODO: review
   private blockTimeFinished = () => {
-    this.blockTimeInProgress = false;
+    delete this.blockTimeout;
 
-    // setting last delayed value
+    // writing last delayed value if set
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
       const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.props.invert);
       // clear deferred value
       this.lastDeferredValue = undefined;
       // write deferred value
       // don't wait in normal way
-      this.write(resolvedValue)
+      this.doWrite(resolvedValue)
         .then(() => {
-          this.blockTimeInProgress = false;
+          // TODO: reivew
           this.delayedResultEvents.emit();
         })
         .catch((err) => {
-          this.blockTimeInProgress = false;
+          // TODO: reivew
           this.delayedResultEvents.emit(err);
       });
     }
