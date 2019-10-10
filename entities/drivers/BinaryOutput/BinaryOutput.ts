@@ -25,6 +25,19 @@ export interface BinaryOutputProps extends DigitalBaseProps {
 }
 
 
+/**
+ * Binary output logic steps:
+ * refuse mode:
+ * * 0 - nothing is happening
+ * * 1 - level is set high. writing. Other requests are refused
+ * * 1 - blocking. Skip any requests during this time too
+ *
+ * defer mode:
+ * * 0 - nothing is happening
+ * * 1 - level is set high. writing. The value of the last request is stored to write it later.
+ * * writing sroted value
+ * * blocking. Skip any requests during this time
+ */
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
@@ -222,6 +235,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
         resolve();
       };
 
+      // TODO: why not once ???
       listenIndex = this.delayedResultEvents.addListener(listenHandler);
     });
   }

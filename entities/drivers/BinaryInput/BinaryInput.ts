@@ -26,7 +26,7 @@ export interface BinaryInputProps extends DigitalPinInputProps {
  * Simple binary logic. Steps:
  * * 0 - nothing is happening
  * * 1 - level is high
- * * 0 - blocking. Skip any inputs during this time.
+ * * 1 - blocking. Skip any inputs during this time.
  */
 export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
