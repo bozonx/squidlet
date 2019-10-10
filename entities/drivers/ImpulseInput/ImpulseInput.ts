@@ -2,7 +2,7 @@ import DigitalIo, {ChangeHandler, DigitalInputMode, Edge} from 'system/interface
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
-import {isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
+import {isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {
   generateSubDriverId,
@@ -59,7 +59,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
 
   init = async () => {
-    this._isInverted = isDigitalInputInverted(
+    this._isInverted = isDigitalPinInverted(
       this.props.invert,
       this.props.invertOnPullup,
       this.props.pullup

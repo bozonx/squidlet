@@ -9,7 +9,7 @@ import {
   makeDigitalSourceDriverName,
   resolveInputPinMode,
 } from 'system/lib/base/digital/digitalHelpers';
-import {invertIfNeed, isDigitalInputInverted} from 'system/lib/helpers';
+import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {JsonTypes} from 'system/interfaces/Types';
 
@@ -56,7 +56,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
 
   init = async () => {
-    this._isInverted = isDigitalInputInverted(
+    this._isInverted = isDigitalPinInverted(
       this.props.invert,
       this.props.invertOnPullup,
       this.props.pullup

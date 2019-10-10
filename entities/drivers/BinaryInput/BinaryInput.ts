@@ -1,7 +1,7 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DigitalIo, {DigitalInputMode, Edge, ChangeHandler} from 'system/interfaces/io/DigitalIo';
-import {invertIfNeed, isDigitalInputInverted, resolveEdge} from 'system/lib/helpers';
+import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
 import {omitObj} from 'system/lib/objects';
 import {makeDigitalSourceDriverName, generateSubDriverId, resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
@@ -41,8 +41,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
 
   init = async () => {
-    // TODO: isDigitalInputInverted перенести в digital helpers
-    this._isInverted = isDigitalInputInverted(
+    // TODO: isDigitalPinInverted перенести в digital helpers
+    this._isInverted = isDigitalPinInverted(
       this.props.invert,
       this.props.invertOnPullup,
       this.props.pullup

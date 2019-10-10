@@ -16,16 +16,16 @@ describe 'system.lib.helpers', ->
     assert.isFalse(helpers.resolveLevel(5))
     assert.isFalse(helpers.resolveLevel('low, off and other...'))
 
-  it 'isDigitalInputInverted', ->
-    assert.isFalse(helpers.isDigitalInputInverted(false, false, false))
-    assert.isFalse(helpers.isDigitalInputInverted(false, true, false))
+  it 'isDigitalPinInverted', ->
+    assert.isFalse(helpers.isDigitalPinInverted(false, false, false))
+    assert.isFalse(helpers.isDigitalPinInverted(false, true, false))
     # double invert
-    assert.isFalse(helpers.isDigitalInputInverted(true, true, true))
+    assert.isFalse(helpers.isDigitalPinInverted(true, true, true))
 
-    assert.isTrue(helpers.isDigitalInputInverted(true, false, false))
-    assert.isTrue(helpers.isDigitalInputInverted(false, true, true))
+    assert.isTrue(helpers.isDigitalPinInverted(true, false, false))
+    assert.isTrue(helpers.isDigitalPinInverted(false, true, true))
     # don't use pullup
-    assert.isTrue(helpers.isDigitalInputInverted(true, false, true))
+    assert.isTrue(helpers.isDigitalPinInverted(true, false, true))
 
   it 'invertIfNeed', ->
     assert.isTrue(helpers.invertIfNeed(true, false))

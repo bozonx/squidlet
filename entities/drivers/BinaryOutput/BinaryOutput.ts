@@ -2,7 +2,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
-import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
+import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
@@ -40,10 +40,11 @@ export interface BinaryOutputProps extends DigitalPinOutputProps {
  */
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  // TODO: reivew - используется только в defer - может лучше Promised
   private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
-  // TODO: reivew
   private lastDeferredValue?: boolean;
   private blockTimeout: any;
+  private _isInverted: boolean = false;
 
   private get source(): DigitalIo {
     return this.depsInstances.source;
@@ -51,13 +52,21 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 
   init = async () => {
+    this._isInverted = isDigitalPinInverted(
+      this.props.invert,
+      this.props.invertOnOpenDrain,
+      this.props.openDrain
+    );
+
     // make rest of props to pass them to the sub driver
     const subDriverProps: {[index: string]: JsonTypes} = omitObj(
       this.props,
       'blockTime',
       'blockMode',
-      'initial',
       'invert',
+      'invertOnOpenDrain',
+      'initial',
+      'openDrain',
       'pin',
       'source'
     );
@@ -98,12 +107,16 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return Boolean(this.blockTimeout);
   }
 
+  isInverted(): boolean {
+    return this._isInverted;
+  }
+
   async read(): Promise<boolean> {
     const realValue: boolean = await this.source.read(this.props.pin);
 
-    // TODO: поднимать событие если значение изменилось???
+    // TODO: поднимать событие если значение изменилось
 
-    return invertIfNeed(realValue, this.props.invert);
+    return invertIfNeed(realValue, this.isInverted());
   }
 
   async write(level: boolean): Promise<void> {
@@ -155,7 +168,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 
   private async doWrite(level: boolean) {
-    const resolvedValue: boolean = invertIfNeed(level, this.props.invert);
+    const resolvedValue: boolean = invertIfNeed(level, this.isInverted());
 
     // use blocking if there is set blockTime prop
     if (this.props.blockTime) {
@@ -190,9 +203,11 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private blockTimeFinished = () => {
     delete this.blockTimeout;
 
+    // TODO: убедиться что lastDeferredValue гарантированно очищается
+
     // writing last delayed value if set
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
-      const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.props.invert);
+      const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.isInverted());
       // clear deferred value
       this.lastDeferredValue = undefined;
       // write deferred value
@@ -209,7 +224,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     }
   }
 
-  // TODO: review
+  // TODO: review - может лучше промис
   /**
    * Wait for deferred value has been written.
    */
@@ -232,7 +247,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private resolveInitialLevel(): boolean {
     const resolvedLevel: boolean = resolveLevel(this.props.initial);
 
-    return invertIfNeed(resolvedLevel, this.props.invert);
+    return invertIfNeed(resolvedLevel, this.isInverted());
   }
 
 }

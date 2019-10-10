@@ -20,16 +20,20 @@ export function resolveLevel(value: any): boolean {
 
 /**
  * Is actually inverted.
- * Pullup inverts only if invertOnPullup is set.
+ * Pullup and open drain modes invert only if invertOnPullupOrOpenDrain is set.
  */
-export function isDigitalInputInverted(invert: boolean, invertOnPullup: boolean, pullup?: boolean): boolean {
+export function isDigitalPinInverted(
+  invert?: boolean,
+  invertOnPullupOrOpenDrain?: boolean,
+  pullupOrOpenDrain?: boolean
+): boolean {
   // twice inverting on pullup if allowed
-  if (pullup && invertOnPullup) {
+  if (pullupOrOpenDrain && invertOnPullupOrOpenDrain) {
     return !invert;
   }
 
   // in other cases - use invert prop
-  return invert;
+  return Boolean(invert);
 }
 
 /**
