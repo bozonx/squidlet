@@ -10,7 +10,7 @@ import {
   makeDigitalSourceDriverName,
   resolveOutputPinMode,
 } from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler, DigitalInputMode, DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 
@@ -48,6 +48,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private writingPromise?: Promise<void>;
   private deferredWritePromise?: Promised<void>;
   private lastDeferredValue?: boolean;
+  private currentValue?: boolean;
   private blockTimeout: any;
   private _isInverted: boolean = false;
 
@@ -87,13 +88,14 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // TODO: print unique id of sub driver
     this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
-    const initialValue: boolean = this.resolveInitialLevel();
+    // set initial value
+    this.currentValue = this.resolveInitialLevel();
 
     // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.source.setupOutput(this.props.pin, initialValue);
+      await this.source.setupOutput(this.props.pin, this.getPinMode(), this.currentValue);
     }
     catch (err) {
       this.log.error(
@@ -104,10 +106,9 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
 
-  // TODO: Выяснить будут ли подниматься события в IO если пин output
   // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
 
-  getPinMode(): DigitalInputMode {
+  getPinMode(): DigitalOutputMode {
     return resolveOutputPinMode(this.props.openDrain);
   }
 
@@ -130,29 +131,26 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   async read(): Promise<boolean> {
     const realValue: boolean = await this.source.read(this.props.pin);
 
-    // TODO: поднимать событие если значение изменилось
+    // update current value and emit change event if need
+    if (this.currentValue !== realValue) {
+      this.currentValue = realValue;
+
+      this.changeEvents.emit(realValue);
+    }
 
     return invertIfNeed(realValue, this.isInverted());
   }
 
   async write(level: boolean): Promise<void> {
-    // TODO: поднимать событие если значение изменилось
-
-    // TODO: проверитьчто не только заблокировнно, но и идет запись
-
-    if (this.isBlocked()) {
-      // TODO: проверять ещё и в режиме записи
-      // try to write while another write is in progress
-      if (this.props.blockMode === 'refuse') {
-        // don't allow writing while block time is in progress in "refuse" mode
-        return;
-      }
-
-      // else defer mode - store value to write after current writing and make promise
+    // if is writing or is blocking - check block modes
+    if (this.isInProgress()) {
+      // don't allow writing while another writing or block time is in progress in "refuse" mode
+      if (this.props.blockMode === 'refuse') return;
+      // else defer mode - store value to write after current writing has been completed
+      // and wait for defer write has been completed.
       return this.setDeferredValue(level);
     }
-
-    // normal write only if there isn't blocking
+    // normally write only if there isn't writing or blocking in progress
     return this.doWrite(level);
   }
 
@@ -179,6 +177,13 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 
   private async doWrite(level: boolean) {
+    // update current value and emit change event if need
+    if (this.currentValue !== level) {
+      this.currentValue = level;
+
+      this.changeEvents.emit(level);
+    }
+
     const resolvedValue: boolean = invertIfNeed(level, this.isInverted());
 
     // use blocking if there is set blockTime prop

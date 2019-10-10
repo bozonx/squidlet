@@ -4,7 +4,7 @@ import {Gpio} from 'pigpio';
 import DigitalIo, {
   Edge,
   DigitalPinMode,
-  WatchHandler,
+  ChangeHandler,
   DigitalInputMode
 } from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/DebounceCall';
@@ -90,7 +90,11 @@ export default class Digital implements DigitalIo {
     pinInstance.digitalWrite(numValue);
   }
 
-  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+  // TODO: remake to onChange
+  // TODO: должен работать даже если пин не сконфигурирован - это просто слушатель событий
+  // TODO: навешивание на interrupt должно происходить при setup
+  // TODO: но если пин output - то не навешиваться
+  async setWatch(pin: number, handler: ChangeHandler): Promise<number> {
     const pinInstance = this.getPinInstance('setWatch', pin);
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);

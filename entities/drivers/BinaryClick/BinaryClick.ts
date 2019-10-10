@@ -105,8 +105,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     await this.source.addListener(this.props.pin, this.handleChange);
   }
 
-  // TODO: add cancel blocking and down
-
   getPinMode(): DigitalInputMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
@@ -147,6 +145,8 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   removeListener(handlerIndex: number): void {
     this.events.removeListener(handlerIndex);
   }
+
+  // TODO: add cancel blocking and down
 
 
   private handleChange = async (level: boolean) => {
