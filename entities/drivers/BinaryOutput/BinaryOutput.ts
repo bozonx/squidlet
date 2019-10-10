@@ -7,7 +7,7 @@ import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
 import DigitalBaseProps from 'system/lib/base/digital/interfaces/DigitalBaseProps';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {Edge} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler, Edge} from 'system/interfaces/io/DigitalIo';
 
 
 type DelayedResultHandler = (err?: Error) => void;
@@ -26,6 +26,7 @@ export interface BinaryOutputProps extends DigitalBaseProps {
 
 
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
+  private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
   // TODO: use timeout
   private blockTimeInProgress: boolean = false;
@@ -90,6 +91,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
   // TODO: добавить прослойку событий чтобы слушать изменения пинов.
   //  Выяснить будут ли подниматься события в IO если пин output
+  // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
+
 
   isBlocked(): boolean {
     // TODO: use timeout
@@ -97,7 +100,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   async read(): Promise<boolean> {
-    const realValue: boolean = await this.digitalOutput.read();
+    const realValue: boolean = await this.source.read(this.props.pin);
 
     return invertIfNeed(realValue, this.props.invert);
   }
@@ -127,14 +130,16 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return this.doWrite(level);
   }
 
-  onIncomeChange(cb: (newLevel: boolean) => void): number {
-    // TODO: !!!
-    // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
-    return 0;
+  onChange(cb: ChangeHandler): number {
+    return this.changeEvents.addListener(cb);
   }
 
-  removeIncomeChangeListener(handlerIndex: number) {
-    // TODO: !!!
+  onChangeOnce(cb: ChangeHandler): number {
+    return this.changeEvents.once(cb);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.changeEvents.removeListener(handlerIndex);
   }
 
 

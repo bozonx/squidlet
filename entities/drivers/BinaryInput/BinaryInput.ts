@@ -123,11 +123,11 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
    * Listen to rising and falling of impulse (1 and 0 levels).
    * The value will be inverted if it required.
    */
-  addListener(handler: ChangeHandler): number {
+  onChange(handler: ChangeHandler): number {
     return this.changeEvents.addListener(handler);
   }
 
-  once(handler: ChangeHandler): number {
+  onChangeOnce(handler: ChangeHandler): number {
     return this.changeEvents.once(handler);
   }
 

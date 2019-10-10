@@ -146,18 +146,18 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   /**
    * Listen only to rising of impulse, not falling.
    */
-  addRisingListener(handler: RisingHandler): number {
+  onRising(handler: RisingHandler): number {
     return this.events.addListener(ImpulseInputEvents.rising, handler);
   }
 
-  listenRisingOnce(handler: RisingHandler): number {
+  onRisingOnce(handler: RisingHandler): number {
     return this.events.once(ImpulseInputEvents.rising, handler);
   }
 
   /**
    * Listen to rising and falling of impulse (1 and 0 levels)
    */
-  addListener(handler: ChangeHandler): number {
+  onChange(handler: ChangeHandler): number {
     return this.events.addListener(ImpulseInputEvents.both, handler);
   }
 

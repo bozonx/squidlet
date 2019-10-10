@@ -127,15 +127,19 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     return this._isInverted;
   }
 
-  addChangeListener(handler: ChangeHandler): number {
+  onChange(handler: ChangeHandler): number {
     return this.events.addListener(BinaryClickEvents.change, handler);
   }
 
-  addDownListener(handler: Handler): number {
+  onDown(handler: Handler): number {
     return this.events.addListener(BinaryClickEvents.down, handler);
   }
 
-  addUpListener(handler: Handler): number {
+  onDownOnce(handler: Handler): number {
+    return this.events.once(BinaryClickEvents.down, handler);
+  }
+
+  onUp(handler: Handler): number {
     return this.events.addListener(BinaryClickEvents.up, handler);
   }
 
