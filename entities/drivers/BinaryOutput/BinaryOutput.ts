@@ -234,15 +234,11 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     this.startBlocking();
   }
 
-  private startBlocking() {
-    // use blocking if there is blockTime prop
-    if (this.props.blockTime) {
-      // starting blocking
-      this.blockTimeout = setTimeout(this.blockTimeFinished, this.props.blockTime);
-    }
-  }
-
   private startDeferredWrite() {
+
+    // TODO: убедиться что lastDeferredValue и deferredWritePromise гарантированно очищается
+    // TODO: проверить что должно идти по кругу если каждый раз задаются deferred value
+
     const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.isInverted());
     // clear deferred value
     delete this.lastDeferredValue;
@@ -257,16 +253,10 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       });
   }
 
-  private blockTimeFinished = () => {
-    delete this.blockTimeout;
+  private startBlocking() {
+    if (!this.props.blockTime) return;
 
-    // TODO: убедиться что lastDeferredValue и deferredWritePromise гарантированно очищается
-    // TODO: проверить что должно идти по кругу если каждый раз задаются deferred value
-
-    // writing last delayed value if set
-    if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
-
-    }
+    this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
   }
 
   /**
