@@ -26,6 +26,7 @@ export interface BinaryOutputProps extends DigitalPinOutputProps {
   invert?: boolean;
   // turn value invert if open drain mode is used
   invertOnOpenDrain: boolean;
+  // driver's initial, will be resolved to be sent to IO
   initial: InitialLevel;
 }
 
@@ -48,7 +49,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private writingPromise?: Promise<void>;
   private deferredWritePromise?: Promised<void>;
   private lastDeferredValue?: boolean;
-  private currentValue?: boolean;
+  // last not inverted value which is represent value of IO
+  private currentIoValue?: boolean;
   private blockTimeout: any;
   private _isInverted: boolean = false;
 
@@ -89,13 +91,13 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
     // set initial value
-    this.currentValue = this.resolveInitialLevel();
+    this.currentIoValue = this.resolveInitialLevel();
 
     // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.source.setupOutput(this.props.pin, this.getPinMode(), this.currentValue);
+      await this.source.setupOutput(this.props.pin, this.getPinMode(), this.currentIoValue);
     }
     catch (err) {
       this.log.error(
@@ -129,20 +131,20 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   async read(): Promise<boolean> {
-    const realValue: boolean = await this.source.read(this.props.pin);
+    const ioValue: boolean = await this.source.read(this.props.pin);
 
     // update current value and emit change event if need
-    if (this.currentValue !== realValue) {
-      this.currentValue = realValue;
+    if (this.currentIoValue !== ioValue) {
+      this.currentIoValue = ioValue;
 
-      this.changeEvents.emit(realValue);
+      this.changeEvents.emit(ioValue);
     }
 
-    return invertIfNeed(realValue, this.isInverted());
+    return invertIfNeed(ioValue, this.isInverted());
   }
 
   async write(level: boolean): Promise<void> {
-    // if is writing or is blocking - check block modes
+    // if there is writing or blocking check block modes
     if (this.isInProgress()) {
       // don't allow writing while another writing or block time is in progress in "refuse" mode
       if (this.props.blockMode === 'refuse') return;
@@ -154,6 +156,9 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return this.doWrite(level);
   }
 
+  /**
+   * Listen to changes which are made in this driver
+   */
   onChange(cb: ChangeHandler): number {
     return this.changeEvents.addListener(cb);
   }
@@ -177,14 +182,14 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
 
   private async doWrite(level: boolean) {
+    const ioValue: boolean = invertIfNeed(level, this.isInverted());
+
     // update current value and emit change event if need
-    if (this.currentValue !== level) {
-      this.currentValue = level;
+    if (this.currentIoValue !== ioValue) {
+      this.currentIoValue = ioValue;
 
-      this.changeEvents.emit(level);
+      this.changeEvents.emit(ioValue);
     }
-
-    const resolvedValue: boolean = invertIfNeed(level, this.isInverted());
 
     // use blocking if there is set blockTime prop
     if (this.props.blockTime) {
@@ -195,7 +200,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // TODO: сохранить индикатор что идет запись
 
     try {
-      await this.source.write(this.props.pin, resolvedValue);
+      await this.source.write(this.props.pin, ioValue);
     }
     catch (err) {
 
@@ -240,7 +245,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   /**
-   * Wait for deferred value has been written.
+   * Set deferred value ans wait for it has been written.
    */
   private setDeferredValue(level: boolean): Promise<void> {
     // store level which will be written after current has finished
