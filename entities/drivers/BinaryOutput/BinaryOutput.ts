@@ -28,10 +28,9 @@ export interface BinaryOutputProps extends DigitalBaseProps {
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
-  // TODO: use timeout
-  private blockTimeInProgress: boolean = false;
   // TODO: reivew
   private lastDeferredValue?: boolean;
+  private blockTimeout: any;
 
   private get source(): DigitalIo {
     return this.depsInstances.source;
@@ -89,41 +88,40 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
 
-  // TODO: добавить прослойку событий чтобы слушать изменения пинов.
-  //  Выяснить будут ли подниматься события в IO если пин output
+  // TODO: Выяснить будут ли подниматься события в IO если пин output
   // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
 
 
   isBlocked(): boolean {
-    // TODO: use timeout
-    return this.blockTimeInProgress;
+    return Boolean(this.blockTimeout);
   }
 
   async read(): Promise<boolean> {
     const realValue: boolean = await this.source.read(this.props.pin);
 
+    // TODO: поднимать событие если значение изменилось???
+
     return invertIfNeed(realValue, this.props.invert);
   }
 
   async write(level: boolean): Promise<void> {
-    if (this.blockTimeInProgress) {
+    // TODO: поднимать событие если значение изменилось
+
+    if (this.isBlocked()) {
       // try to write while another write is in progress
       if (this.props.blockMode === 'refuse') {
-        // don't write while block time is in progress
+        // don't allow writing while block time is in progress in "refuse" mode
         return;
       }
-      else {
-        // defer mode:
-        // store level which is delayed
-        this.lastDeferredValue = level;
 
-        // TODO: review
+      // else defer mode:
+      // store level which is delayed
+      this.lastDeferredValue = level;
 
-        // wait while delayed value is set
-        return this.waitDeferredValueWritten();
-      }
+      // TODO: review
 
-      return;
+      // wait while delayed value is set
+      return this.waitDeferredValueWritten();
     }
 
     // normal write only if there isn't blocking
@@ -142,36 +140,48 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     this.changeEvents.removeListener(handlerIndex);
   }
 
+  /**
+   * Cancel block time but not cancel writing.
+   */
+  cancel() {
+    clearTimeout(this.blockTimeout);
 
-  private async doWrite(level: boolean): Promise<void> {
+    delete this.blockTimeout;
+  }
+
+
+  private async doWrite(level: boolean) {
     const resolvedValue: boolean = invertIfNeed(level, this.props.invert);
 
     // use blocking if there is set blockTime prop
-    if (this.props.blockTime) this.blockTimeInProgress = true;
+    if (this.props.blockTime) {
+      // starting blocking
+      this.blockTimeout = setTimeout(this.blockTimeFinished, this.props.blockTime);
+    }
 
     try {
-      await this.digitalOutput.write(resolvedValue);
+      await this.source.write(this.props.pin, resolvedValue);
     }
     catch (err) {
-      this.blockTimeInProgress = false;
-      // TODO: review
+
       // TODO: что делать с отложенным значением? - наверное очистить
+
+      // TODO: блокировка всеравно будет даже если не удалось записать ???
+      clearTimeout(this.blockTimeout);
+
+      delete this.blockTimeout;
 
       const errorMsg = `BinaryOutputDriver: Can't write "${level}",
         props: "${JSON.stringify(this.props)}". ${String(err)}`;
 
+      // TODO: review
       this.delayedResultEvents.emit(new Error(errorMsg));
 
       throw new Error(errorMsg);
     }
-
-    // if blockTime prop isn't set - don't do blocking.
-    if (!this.props.blockTime) return;
-
-    // starting blocking
-    setTimeout(this.blockTimeFinished, this.props.blockTime);
   }
 
+  // TODO: review
   private blockTimeFinished = () => {
     this.blockTimeInProgress = false;
 
@@ -194,6 +204,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     }
   }
 
+  // TODO: review
   /**
    * Wait for deferred value has been written.
    */
@@ -215,13 +226,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private resolveInitialLevel(): boolean {
     const resolvedLevel: boolean = resolveLevel(this.props.initial);
 
-    // inverting the initial level
-    if (this.props.invert) {
-      return !resolvedLevel;
-    }
-
-    // not inverted
-    return resolvedLevel;
+    return invertIfNeed(resolvedLevel, this.props.invert);
   }
 
 }

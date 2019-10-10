@@ -6,15 +6,22 @@ blockMode:
   type: '"refuse" | "defer"'
   default: refuse
 initial:
-  type: '1 | 0 | "low" | "high"'
+  type: '1 | 0 | "1" | "0" | "on" | "off" | "low" | "high" | "true" | "false" | true | false'
   default: 0
 invert:
   type: boolean
   default: false
 
-### DigitalPinOutput driver props
-# initialLevel - don't use it, it will be calculated and reassigned
-#
+initialLevel:
+  type: boolean
+  default: false
+
 ### DigitalPin base props
-# pin: {}
-# source: {}
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'
+expander:
+  type: string

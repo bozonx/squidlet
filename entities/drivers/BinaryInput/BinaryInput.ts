@@ -117,6 +117,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
   async read(): Promise<boolean> {
     return invertIfNeed(await this.source.read(this.props.pin), this.isInverted());
+
+    // TODO: может поднять событие если значение изменилось
   }
 
   /**
