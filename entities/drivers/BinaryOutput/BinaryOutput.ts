@@ -10,7 +10,7 @@ import {
   makeDigitalSourceDriverName,
   resolveOutputPinMode,
 } from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {ChangeHandler, DigitalInputMode, DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler, DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 
@@ -235,8 +235,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   private startDeferredWrite() {
-
-    // TODO: убедиться что lastDeferredValue и deferredWritePromise гарантированно очищается
     // TODO: проверить что должно идти по кругу если каждый раз задаются deferred value
 
     const resolvedValue: boolean = invertIfNeed(this.lastDeferredValue, this.isInverted());
@@ -245,6 +243,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // write deferred value
     // don't wait in normal way
     this.doWrite(resolvedValue)
+    // TODO: review может в этот момент уже не будет этих промисов
+    // TODO: удалить промис
       .then(() => {
         if (this.deferredWritePromise) this.deferredWritePromise.resolve();
       })

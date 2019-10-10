@@ -39,10 +39,10 @@ export function isDigitalPinInverted(
 /**
  * It it needs to invert
  */
-export function invertIfNeed(value: boolean, invert?: boolean): boolean {
+export function invertIfNeed(value?: boolean, invert?: boolean): boolean {
   if (invert) return !value;
 
-  return value;
+  return Boolean(value);
 }
 
 /**
