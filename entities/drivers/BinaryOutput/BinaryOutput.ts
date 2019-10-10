@@ -8,6 +8,7 @@ import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactory
 import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
+import Promised from 'system/lib/Promised';
 
 
 type DelayedResultHandler = (err?: Error) => void;
@@ -40,8 +41,7 @@ export interface BinaryOutputProps extends DigitalPinOutputProps {
  */
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  // TODO: reivew - используется только в defer - может лучше Promised
-  private readonly delayedResultEvents = new IndexedEvents<DelayedResultHandler>();
+  private deferredWritePromise?: Promised<void>;
   private lastDeferredValue?: boolean;
   private blockTimeout: any;
   private _isInverted: boolean = false;
@@ -125,20 +125,15 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // TODO: проверитьчто не только заблокировнно, но и идет запись
 
     if (this.isBlocked()) {
+      // TODO: проверять ещё и в режиме записи
       // try to write while another write is in progress
       if (this.props.blockMode === 'refuse') {
         // don't allow writing while block time is in progress in "refuse" mode
         return;
       }
 
-      // else defer mode:
-      // store level which is delayed
-      this.lastDeferredValue = level;
-
-      // TODO: review
-
-      // wait while delayed value is set
-      return this.waitDeferredValueWritten();
+      // else defer mode - store value to write after current writing and make promise
+      return this.setDeferredValue(level);
     }
 
     // normal write only if there isn't blocking
@@ -194,7 +189,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
         props: "${JSON.stringify(this.props)}". ${String(err)}`;
 
       // TODO: review
-      this.delayedResultEvents.emit(new Error(errorMsg));
+      if (this.deferredWritePromise) this.deferredWritePromise.reject(new Error(errorMsg));
 
       throw new Error(errorMsg);
     }
@@ -203,7 +198,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private blockTimeFinished = () => {
     delete this.blockTimeout;
 
-    // TODO: убедиться что lastDeferredValue гарантированно очищается
+    // TODO: убедиться что lastDeferredValue и deferredWritePromise гарантированно очищается
+    // TODO: проверить что должно идти по кругу если каждый раз задаются deferred value
 
     // writing last delayed value if set
     if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
@@ -214,34 +210,27 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       // don't wait in normal way
       this.doWrite(resolvedValue)
         .then(() => {
-          // TODO: reivew
-          this.delayedResultEvents.emit();
+          if (this.deferredWritePromise) this.deferredWritePromise.resolve();
         })
         .catch((err) => {
-          // TODO: reivew
-          this.delayedResultEvents.emit(err);
+          if (this.deferredWritePromise) this.deferredWritePromise.reject(err);
       });
     }
   }
 
-  // TODO: review - может лучше промис
   /**
    * Wait for deferred value has been written.
    */
-  private waitDeferredValueWritten(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      let listenIndex: number;
-      const listenHandler = (err?: Error): void => {
-        this.delayedResultEvents.removeListener(listenIndex);
+  private setDeferredValue(level: boolean): Promise<void> {
+    // store level which will be written after current has finished
+    this.lastDeferredValue = level;
 
-        if (err) return reject(err);
+    // make defer promise
+    if (!this.deferredWritePromise) {
+      this.deferredWritePromise = new Promised<void>();
+    }
 
-        resolve();
-      };
-
-      // TODO: why not once ???
-      listenIndex = this.delayedResultEvents.addListener(listenHandler);
-    });
+    return this.deferredWritePromise.promise;
   }
 
   private resolveInitialLevel(): boolean {
