@@ -111,7 +111,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
 
-  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
   getPinMode(): DigitalInputMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
@@ -126,6 +125,8 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   isInverted(): boolean {
     return this._isInverted;
   }
+
+  // TODO: add isInProgress()
 
   /**
    * Cancel impulse or block

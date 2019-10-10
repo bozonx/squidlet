@@ -2,7 +2,9 @@ export type ChangeHandler = (level: boolean) => void;
 export type DigitalInputMode = 'input'
   | 'input_pullup'
   | 'input_pulldown';
-export type DigitalPinMode = DigitalInputMode | 'output';
+export type DigitalOutputMode = 'output'
+  | 'output_opendrain';
+export type DigitalPinMode = DigitalInputMode | DigitalOutputMode;
 export type Edge = 'rising' | 'falling' | 'both';
 
 
@@ -32,9 +34,10 @@ export default interface DigitalIo {
   /**
    * Setup pin as an output
    * @param pin - pin number
+   * @param outputMode - one of modes: output | output_opendrain
    * @param initialValue - value which will be set on default. Be careful with inverting and pullup mode.
    */
-  setupOutput(pin: number, initialValue: boolean): Promise<void>;
+  setupOutput(pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void>;
 
   // output and input pins can be read
   read(pin: number): Promise<boolean>;

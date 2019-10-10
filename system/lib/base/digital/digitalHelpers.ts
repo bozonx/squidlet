@@ -1,4 +1,4 @@
-import {DigitalInputMode} from '../../../interfaces/io/DigitalIo';
+import {DigitalInputMode, DigitalOutputMode} from '../../../interfaces/io/DigitalIo';
 
 
 export function generateSubDriverId(source: string, pin: number, address?: string) {
@@ -14,5 +14,12 @@ export function makeDigitalSourceDriverName(source: string) {
 export function resolveInputPinMode(pullup?: boolean, pulldown?: boolean): DigitalInputMode {
   if (pullup) return 'input_pullup';
   else if (pulldown) return 'input_pulldown';
-  else return 'input';
+
+  return 'input';
+}
+
+export function resolveOutputPinMode(openDrain?: boolean): DigitalOutputMode {
+  if (openDrain) return 'output_opendrain';
+
+  return 'output';
 }

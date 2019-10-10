@@ -93,18 +93,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
 
-  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
   getPinMode(): DigitalInputMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
-  }
-
-  /**
-   * Cancel blocking of input.
-   */
-  cancel() {
-    clearTimeout(this.blockTimeout);
-
-    delete this.blockTimeout;
   }
 
   isBlocked(): boolean {
@@ -135,6 +125,15 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
   removeListener(handlerIndex: number): void {
     this.changeEvents.removeListener(handlerIndex);
+  }
+
+  /**
+   * Cancel blocking of input.
+   */
+  cancel() {
+    clearTimeout(this.blockTimeout);
+
+    delete this.blockTimeout;
   }
 
   private handleChange = async (level: boolean) => {

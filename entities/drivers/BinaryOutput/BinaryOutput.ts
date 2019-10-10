@@ -5,8 +5,12 @@ import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
-import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {
+  generateSubDriverId,
+  makeDigitalSourceDriverName,
+  resolveOutputPinMode,
+} from 'system/lib/base/digital/digitalHelpers';
+import DigitalIo, {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 
@@ -41,6 +45,7 @@ export interface BinaryOutputProps extends DigitalPinOutputProps {
  */
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  private writingPromise?: Promise<void>;
   private deferredWritePromise?: Promised<void>;
   private lastDeferredValue?: boolean;
   private blockTimeout: any;
@@ -102,9 +107,20 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   // TODO: Выяснить будут ли подниматься события в IO если пин output
   // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
 
+  getPinMode(): DigitalInputMode {
+    return resolveOutputPinMode(this.props.openDrain);
+  }
 
   isBlocked(): boolean {
     return Boolean(this.blockTimeout);
+  }
+
+  isWriting(): boolean {
+    return Boolean(this.writingPromise);
+  }
+
+  isInProgress(): boolean {
+    return this.isWriting() || this.isBlocked();
   }
 
   isInverted(): boolean {

@@ -105,9 +105,8 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     await this.source.addListener(this.props.pin, this.handleChange);
   }
 
-  // TODO: add cancel blocking
+  // TODO: add cancel blocking and down
 
-  // TODO: лучше отдавать режим резистора, так как режим пина и так понятен
   getPinMode(): DigitalInputMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
@@ -119,6 +118,8 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   isBlocked(): boolean {
     return Boolean(this.blockTimeout);
   }
+
+  // TODO: add isInProgress()
 
   /**
    * If changes from IO comes inverted
