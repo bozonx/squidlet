@@ -20,7 +20,8 @@ type DelayedResultHandler = (err?: Error) => void;
 export interface BinaryOutputProps extends DigitalPinOutputProps {
   blockTime?: number;
   // if "refuse" - it doesn't write while block time is in progress. It is on default.
-  // If "defer" it waits for block time finished and write last value which was tried to set
+  // If "defer" it waits for block time finished and write last value which was tried to set.
+  //   It's a simple queue
   blockMode: BlockMode;
   // when sends 1 actually sends 0 and otherwise
   invert?: boolean;
@@ -49,8 +50,7 @@ export interface BinaryOutputProps extends DigitalPinOutputProps {
  */
 export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  // TODO: зачем сохранять промис может тогда лучше просто boolean
-  private writingPromise?: Promise<void>;
+  private writing: boolean = false;
   private deferredWritePromise?: Promised<void>;
   // last value witch will be written after current writing in deferred mode.
   // It represent a top level driver's value (not IO's).
@@ -126,7 +126,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   isWriting(): boolean {
-    return Boolean(this.writingPromise);
+    return this.writing;
   }
 
   isInProgress(): boolean {
@@ -139,15 +139,16 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
   async read(): Promise<boolean> {
     const ioValue: boolean = await this.source.read(this.props.pin);
+    const resolvedValue: boolean = invertIfNeed(ioValue, this.isInverted());
 
     // update current value and emit change event if need
     if (this.currentIoValue !== ioValue) {
       this.currentIoValue = ioValue;
 
-      this.changeEvents.emit(ioValue);
+      this.changeEvents.emit(resolvedValue);
     }
 
-    return invertIfNeed(ioValue, this.isInverted());
+    return resolvedValue;
   }
 
   async write(level: boolean): Promise<void> {
@@ -160,7 +161,9 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       return this.setDeferredValue(level);
     }
     // normally write only if there isn't writing or blocking in progress
-    return this.doWrite(level);
+    await this.doWrite(level);
+
+    this.handleSuccessWriting();
   }
 
   /**
@@ -194,19 +197,18 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // update current value and emit change event if need
     if (this.currentIoValue !== ioValue) {
       this.currentIoValue = ioValue;
-
-      this.changeEvents.emit(ioValue);
+      // emit top level value
+      this.changeEvents.emit(level);
     }
 
-    // save writing promise
-    this.writingPromise = this.source.write(this.props.pin, ioValue);
+    this.writing = true;
 
-    // wait for it
+    // wait for writing
     try {
-      await this.writingPromise;
+      await this.source.write(this.props.pin, ioValue);
     }
     catch (err) {
-      delete this.writingPromise;
+      this.writing = false;
       // on error cancel deferred queue and start blocking
       const errorMsg = `BinaryOutput driver: Can't write "${level}",
         props: "${JSON.stringify(this.props)}". ${String(err)}`;
@@ -216,10 +218,16 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       throw new Error(errorMsg);
     }
 
-    delete this.writingPromise;
+    this.writing = false;
+  }
 
-    // if deferred mode and there is deferred value then write it
-    if (this.props.blockMode === 'defer' && typeof this.lastDeferredValue !== 'undefined') {
+  private handleSuccessWriting() {
+    // if deferred mode and there is deferred value and it different than current value then write it
+    if (
+      this.props.blockMode === 'defer'
+      && typeof this.lastDeferredValue !== 'undefined'
+      && invertIfNeed(this.lastDeferredValue, this.isInverted()) !== this.currentIoValue
+    ) {
       this.startDeferredWrite();
 
       return;
@@ -243,19 +251,19 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   private startDeferredWrite() {
-    // TODO: проверить что должно происходить на 2м круге - какой будет в это время промис
     const level: boolean = Boolean(this.lastDeferredValue);
     // clear deferred value
     delete this.lastDeferredValue;
     // write deferred value, don't wait for it has been finished
     this.doWrite(level)
-    // TODO: review может в этот момент уже не будет этих промисов
       .then(() => {
         if (this.deferredWritePromise) {
           this.deferredWritePromise.resolve();
 
           delete this.deferredWritePromise;
         }
+
+        this.handleSuccessWriting();
       })
       .catch((err) => {
         if (this.deferredWritePromise) {
