@@ -3,7 +3,7 @@ import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
-import {BlockMode, InitialLevel, JsonTypes} from 'system/interfaces/Types';
+import {InitialLevel, JsonTypes} from 'system/interfaces/Types';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {
   generateSubDriverId,
@@ -14,6 +14,8 @@ import DigitalIo, {ChangeHandler, DigitalOutputMode} from 'system/interfaces/io/
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 
+
+export type BlockMode = 'refuse' | 'defer';
 
 export interface BinaryOutputProps extends DigitalPinOutputProps {
   blockTime?: number;
@@ -132,6 +134,30 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   /**
+   * Listen to changes which are made in this driver
+   */
+  onChange(cb: ChangeHandler): number {
+    return this.changeEvents.addListener(cb);
+  }
+
+  onChangeOnce(cb: ChangeHandler): number {
+    return this.changeEvents.once(cb);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.changeEvents.removeListener(handlerIndex);
+  }
+
+  /**
+   * Cancel block time but not cancel writing.
+   */
+  cancel() {
+    clearTimeout(this.blockTimeout);
+
+    delete this.blockTimeout;
+  }
+
+  /**
    * Read value from IO
    */
   async read(): Promise<boolean> {
@@ -165,30 +191,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     await this.doWrite(level);
 
     this.handleSuccessWriting();
-  }
-
-  /**
-   * Listen to changes which are made in this driver
-   */
-  onChange(cb: ChangeHandler): number {
-    return this.changeEvents.addListener(cb);
-  }
-
-  onChangeOnce(cb: ChangeHandler): number {
-    return this.changeEvents.once(cb);
-  }
-
-  removeListener(handlerIndex: number) {
-    this.changeEvents.removeListener(handlerIndex);
-  }
-
-  /**
-   * Cancel block time but not cancel writing.
-   */
-  cancel() {
-    clearTimeout(this.blockTimeout);
-
-    delete this.blockTimeout;
   }
 
 

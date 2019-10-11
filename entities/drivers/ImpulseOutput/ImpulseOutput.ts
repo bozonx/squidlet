@@ -2,7 +2,7 @@ import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
-import {BlockMode, JsonTypes} from 'system/interfaces/Types';
+import {JsonTypes} from 'system/interfaces/Types';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 import {
   generateSubDriverId,
@@ -15,48 +15,44 @@ import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPin
 import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 
 
+type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';
+
 export interface ImpulseOutputProps extends DigitalPinOutputProps {
   // duration of impulse in ms
   impulseLength: number;
   // in this time driver doesn't receive any data
   blockTime: number;
-  // TODO: reivew
-  // if "refuse" - it doesn't write while block time.
+  // if "fixed" - Make fixed impulse and refuse other calls while impulse or block time are in progress.
   // If "defer" it waits for block time finished and write last write request
-  // TODO: add increase
-  blockMode: BlockMode;
-  // when sends 1 actually sends 0 and otherwise
+  blockMode: ImpulseOutputMode;
+  // invert value which is sent to IO
   invert?: boolean;
-  // turn value invert if open drain mode is used
+  // turn value inverted if open drain mode is used
   invertOnOpenDrain: boolean;
 }
 
 
 // TODO: review
-export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-  // TODO: rerutn an object and add method - cancel
-  return new Promise<T>((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        resolve(await cb());
-      }
-      catch(err) {
-        reject(err);
-      }
-    }, delayMs);
-  });
-}
+// export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
+//   // TODO: rerutn an object and add method - cancel
+//   return new Promise<T>((resolve, reject) => {
+//     setTimeout(async () => {
+//       try {
+//         resolve(await cb());
+//       }
+//       catch(err) {
+//         reject(err);
+//       }
+//     }, delayMs);
+//   });
+// }
 
 
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  // TODO: review
   private deferredImpulse: boolean = false;
-  // TODO: review
-  private impulseInProgress: boolean = false;
-  // TODO: use timeout
-  private blockTimeInProgress: boolean = false;
   private blockTimeout: any;
+  private impulseTimeout: any;
   private _isInverted: boolean = false;
 
   private get source(): DigitalIo {
@@ -120,18 +116,12 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     return Boolean(this.blockTimeout);
   }
 
-  isWriting(): boolean {
-    // TODO: add
-    return this.writing;
-  }
-
   isImpulseInProgress(): boolean {
-    // TODO: add
     return Boolean(this.impulseTimeout);
   }
 
   isInProgress(): boolean {
-    return this.isWriting() || this.isBlocked();
+    return this.isImpulseInProgress() || this.isBlocked();
   }
 
   isInverted(): boolean {
@@ -139,30 +129,74 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
   /**
+   * Listen to changes which are made in this driver
+   */
+  onChange(cb: ChangeHandler): number {
+    return this.changeEvents.addListener(cb);
+  }
+
+  onChangeOnce(cb: ChangeHandler): number {
+    return this.changeEvents.once(cb);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.changeEvents.removeListener(handlerIndex);
+  }
+
+  /**
+   * Cancel block time but not cancel writing.
+   */
+  cancel() {
+    clearTimeout(this.impulseTimeout);
+    clearTimeout(this.blockTimeout);
+
+    delete this.impulseTimeout;
+    delete this.blockTimeout;
+
+    this.deferredImpulse = false;
+  }
+
+  /**
    * Start impulse
    */
   async impulse(): Promise<void> {
-    // TODO: review
-    // skip while switch at block time or impulse is in progress
-    if (this.impulseInProgress || this.blockTimeInProgress) {
-      if (this.props.blockMode === 'defer') {
-        // mark that there is a deferred impulse and exit
-        this.deferredImpulse = true;
+    // skip other changes while block time
+    if (this.isBlocked()) return;
+
+    if (this.props.blockMode === 'fixed') {
+      // if is "refuse": skip while block time if impulse is in progress
+      if (this.isImpulseInProgress()) {
+        return;
       }
-      // else if is "refuse": don't write while block time if impulse is in progress
+    }
+    else if (this.props.blockMode === 'defer') {
+      // mark that there is a deferred impulse and exit
+      this.deferredImpulse = true;
+
+      // TODO: return deferred promise
       return;
     }
+    else {
+      // increase mode
+      // TODO: remove current impulse timeout, make new and return promise of it
+      return;
+    }
+    // start the new impulse in case cycle isn't started
+    await this.doStartImpulse();
+  }
 
-    // start the new impulse
 
-    this.impulseInProgress = true;
+  private async doStartImpulse() {
+    const ioValue: boolean = invertIfNeed(true, this.isInverted());
+
+    this.changeEvents.emit(true);
 
     await this.source.write(invertIfNeed(true, this.props.invert));
 
     return deferCall<void>(this.impulseFinished, this.props.impulseLength);
   }
 
-
+  // TODO: review
   private impulseFinished = async () => {
     await this.source.write(invertIfNeed(false, this.props.invert));
     this.impulseInProgress = false;
@@ -170,6 +204,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     this.startBlockTime();
   }
 
+  // TODO: review
   private startBlockTime(): void {
     // if block time isn't set = try to write deferred value if is set
     if (!this.props.blockTime) return this.writeDeferred();
@@ -182,6 +217,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     }, this.props.blockTime);
   }
 
+  // TODO: review
   private writeDeferred(): void {
     // do nothing if blockMode isn't defer or deffered impulse isn't in a queue
     if (this.props.blockMode !== 'defer' || !this.deferredImpulse) return;
@@ -193,12 +229,6 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       .catch((err) => {
         this.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
       });
-  }
-
-
-  protected validateProps = (): string | undefined => {
-    // TODO: ???!!!!
-    return;
   }
 
 }

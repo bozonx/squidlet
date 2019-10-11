@@ -28,8 +28,7 @@ export interface ImpulseInputProps extends DigitalPinInputProps {
   mode: ImpulseInputMode;
   // auto invert if pullup resistor is set. Default is true
   invertOnPullup: boolean;
-  // for input: when receives 1 actually returned 0 and otherwise
-  // for output: when sends 1 actually sends 0 and otherwise
+  // invert value which is sent to IO
   invert?: boolean;
 }
 
@@ -118,6 +117,10 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     return Boolean(this.blockTimeout);
   }
 
+  isImpulseInProgress(): boolean {
+    return Boolean(this.impulseTimeout);
+  }
+
   /**
    * If changes from IO comes inverted
    */
@@ -125,7 +128,9 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     return this._isInverted;
   }
 
-  // TODO: add isInProgress()
+  isInProgress(): boolean {
+    return this.isImpulseInProgress() || this.isBlocked();
+  }
 
   /**
    * Cancel impulse or block
@@ -136,11 +141,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
     delete this.impulseTimeout;
     delete this.blockTimeout;
-  }
-
-
-  isImpulseInProgress(): boolean {
-    return Boolean(this.impulseTimeout);
   }
 
   /**
