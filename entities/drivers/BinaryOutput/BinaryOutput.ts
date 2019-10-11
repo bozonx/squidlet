@@ -154,7 +154,15 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   cancel() {
     clearTimeout(this.blockTimeout);
 
+    if (this.deferredWritePromise) this.deferredWritePromise.cancel();
+
     delete this.blockTimeout;
+    delete this.deferredWritePromise;
+    delete this.lastDeferredValue;
+
+    this.writing = false;
+
+    // TODO: что должно быть с currentIoValue - не трогать или вернуть к предыдущему значению ??
   }
 
   /**

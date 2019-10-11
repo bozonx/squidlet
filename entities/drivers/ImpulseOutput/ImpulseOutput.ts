@@ -154,6 +154,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     delete this.blockTimeout;
 
     this.deferredImpulse = false;
+
+    // TODO: проверить как отменится если идет запись
   }
 
   /**
