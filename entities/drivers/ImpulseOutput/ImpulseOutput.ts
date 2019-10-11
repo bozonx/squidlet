@@ -1,23 +1,34 @@
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {omitObj} from 'system/lib/objects';
-import {invertIfNeed} from 'system/lib/helpers';
-import {BlockMode} from 'system/interfaces/Types';
-import {DigitalPinOutputBase, DigitalPinOutputProps} from 'system/lib/base/digital/DigitalPinOutputBase';
+import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
+import {BlockMode, JsonTypes} from 'system/interfaces/Types';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
-import {generateSubDriverId, makeDigitalSourceDriverName} from 'system/lib/base/digital/digitalHelpers';
-import {ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
+import {
+  generateSubDriverId,
+  makeDigitalSourceDriverName,
+  resolveOutputPinMode,
+} from 'system/lib/base/digital/digitalHelpers';
+import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import IndexedEvents from 'system/lib/IndexedEvents';
+import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
+import {DigitalOutputMode} from '../../../system/interfaces/io/DigitalIo';
 
 
+// TODO: review prop in manifest
 export interface ImpulseOutputProps extends DigitalPinOutputProps {
-  // time or rising state
+  // duration of impulse in ms
   impulseLength: number;
+  // in this time driver doesn't receive any data
   blockTime: number;
+  // TODO: reivew
   // if "refuse" - it doesn't write while block time.
   // If "defer" it waits for block time finished and write last write request
   blockMode: BlockMode;
-  // if true when sends 1 actually sends 0
-  invert: boolean;
+  // when sends 1 actually sends 0 and otherwise
+  invert?: boolean;
+  // turn value invert if open drain mode is used
+  invertOnOpenDrain: boolean;
 }
 
 
@@ -42,31 +53,72 @@ export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
 
 
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
+  private readonly changeEvents = new IndexedEvents<ChangeHandler>();
+  // TODO: review
   private deferredImpulse: boolean = false;
+  // TODO: review
   private impulseInProgress: boolean = false;
+  // TODO: use timeout
   private blockTimeInProgress: boolean = false;
+  private blockTimeout: any;
+  private _isInverted: boolean = false;
 
-  private get digitalOutput(): DigitalPinOutputBase {
-    return this.depsInstances.digitalOutput;
+  private get source(): DigitalIo {
+    return this.depsInstances.source;
   }
 
 
   init = async () => {
-    this.depsInstances.digitalOutput = await this.context.getSubDriver(
-      'DigitalPinOutput',
-      {
-        ...omitObj(
-          this.props,
-          'impulseLength',
-          'blockTime',
-          'blockMode',
-          'invert',
-        ),
-        initialLevel: invertIfNeed(false, this.props.invert),
-      }
+    this._isInverted = isDigitalPinInverted(
+      this.props.invert,
+      this.props.invertOnOpenDrain,
+      this.props.openDrain
+    );
+
+    // make rest of props to pass them to the sub driver
+    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
+      this.props,
+      'impulseLength',
+      'blockTime',
+      'blockMode',
+      'invert',
+      'invertOnOpenDrain',
+      'openDrain',
+      'pin',
+      'source'
+    );
+
+    this.depsInstances.source = this.context.getSubDriver(
+      makeDigitalSourceDriverName(this.props.source),
+      subDriverProps
     );
   }
 
+  // setup pin after all the drivers has been initialized
+  driversDidInit = async () => {
+    // TODO: print unique id of sub driver
+    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
+
+    // set initial value
+    const initialIoValue = invertIfNeed(false, this.isInverted());
+
+    // setup pin as an input with resistor if specified
+    // wait for pin has initialized but don't break initialization on error
+    try {
+      await this.source.setupOutput(this.props.pin, this.getPinMode(), initialIoValue);
+    }
+    catch (err) {
+      this.log.error(
+        `BinaryOutput: Can't setup pin. ` +
+        `"${JSON.stringify(this.props)}": ${err.toString()}`
+      );
+    }
+  }
+
+
+  getPinMode(): DigitalOutputMode {
+    return resolveOutputPinMode(this.props.openDrain);
+  }
 
   isBlocked(): boolean {
     return this.blockTimeInProgress;

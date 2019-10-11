@@ -88,7 +88,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     // TODO: print unique id of sub driver
     this.log.debug(`BinaryClick: Setup pin ${this.props.pin} of ${this.props.source}`);
 
-    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {

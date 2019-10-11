@@ -15,8 +15,6 @@ import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPin
 import Promised from 'system/lib/Promised';
 
 
-type DelayedResultHandler = (err?: Error) => void;
-
 export interface BinaryOutputProps extends DigitalPinOutputProps {
   blockTime?: number;
   // if "refuse" - it doesn't write while block time is in progress. It is on default.
@@ -100,7 +98,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // set initial value
     this.currentIoValue = this.resolveInitialLevel();
 
-    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
@@ -113,9 +110,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       );
     }
   }
-
-
-  // TODO: !!! если пропала связь то сделать дополнительный запрос текущего состояния
 
   getPinMode(): DigitalOutputMode {
     return resolveOutputPinMode(this.props.openDrain);

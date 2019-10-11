@@ -92,7 +92,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
     const edge: Edge = resolveEdge('rising', this.isInverted());
 
-    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
