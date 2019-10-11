@@ -105,7 +105,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     }
     catch (err) {
       this.log.error(
-        `BinaryOutput: Can't setup pin. ` +
+        `BinaryOutput: Can't setup pin ${this.props.pin} of ${this.props.source}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
@@ -131,6 +131,9 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return this._isInverted;
   }
 
+  /**
+   * Read value from IO
+   */
   async read(): Promise<boolean> {
     const ioValue: boolean = await this.source.read(this.props.pin);
     const resolvedValue: boolean = invertIfNeed(ioValue, this.isInverted());
@@ -145,6 +148,10 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return resolvedValue;
   }
 
+  /**
+   * Write value to IO
+   * @param level - top level value
+   */
   async write(level: boolean): Promise<void> {
     // if there is writing or blocking check block modes
     if (this.isInProgress()) {

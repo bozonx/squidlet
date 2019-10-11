@@ -100,7 +100,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     }
     catch (err) {
       this.log.error(
-        `ImpulseInput: Can't setup pin. ` +
+        `ImpulseInput: Can't setup pin ${this.props.pin} of ${this.props.source}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }

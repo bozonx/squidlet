@@ -2,20 +2,28 @@ $base: 'drivers.DigitalPinOutput'
 
 impulseLength:
   type: number
+  # TODO: не может быть 0 или меньше
   default: 20
 blockTime:
   type: number
-  default: 0
 blockMode:
   type: '"refuse" | "defer"'
   default: refuse
 invert:
   type: boolean
-  default: false
+# In true case it inverts value if pullup resistor is on
+invertOnOpenDrain:
+  type: boolean
+  default: true
 
-### DigitalPinOutput driver props
-# initialLevel - don't use it, it will be calculated and reassigned
-#
-#### DigitalPin base props
-#pin: {}
-#source: {}
+# DigitalPinOutputProps props
+openDrain:
+  type: boolean
+
+### DigitalPin base props
+pin:
+  type: number
+  required: true
+source:
+  type: string
+  default: 'local'

@@ -75,7 +75,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     // TODO: print unique id of sub driver
     this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
-    // TODO: перезапускать setup время от времени если не удалось инициализировать пин
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
@@ -83,7 +82,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     }
     catch (err) {
       this.log.error(
-        `BinaryInput: Can't setup pin. ` +
+        `BinaryInput ${this.props.pin} of ${this.props.source}: Can't setup pin. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }

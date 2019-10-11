@@ -12,10 +12,9 @@ import {
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
-import {DigitalOutputMode} from '../../../system/interfaces/io/DigitalIo';
+import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 
 
-// TODO: review prop in manifest
 export interface ImpulseOutputProps extends DigitalPinOutputProps {
   // duration of impulse in ms
   impulseLength: number;
@@ -24,6 +23,7 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
   // TODO: reivew
   // if "refuse" - it doesn't write while block time.
   // If "defer" it waits for block time finished and write last write request
+  // TODO: add increase
   blockMode: BlockMode;
   // when sends 1 actually sends 0 and otherwise
   invert?: boolean;
@@ -32,10 +32,7 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
 }
 
 
-
-
 // TODO: review
-// TODO: test
 export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
   // TODO: rerutn an object and add method - cancel
   return new Promise<T>((resolve, reject) => {
@@ -49,7 +46,6 @@ export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
     }, delayMs);
   });
 }
-
 
 
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
@@ -97,9 +93,9 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   // setup pin after all the drivers has been initialized
   driversDidInit = async () => {
     // TODO: print unique id of sub driver
-    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
+    this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
-    // set initial value
+    // resolve initial value
     const initialIoValue = invertIfNeed(false, this.isInverted());
 
     // setup pin as an input with resistor if specified
@@ -109,7 +105,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     }
     catch (err) {
       this.log.error(
-        `BinaryOutput: Can't setup pin. ` +
+        `ImpulseOutput: Can't setup pin ${this.props.pin} of ${this.props.source}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
@@ -121,19 +117,32 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
   isBlocked(): boolean {
-    return this.blockTimeInProgress;
+    return Boolean(this.blockTimeout);
   }
 
-  async read(): Promise<boolean> {
-    //return this.digitalOutput.read();
+  isWriting(): boolean {
+    // TODO: add
+    return this.writing;
+  }
 
-    return this.impulseInProgress;
+  isImpulseInProgress(): boolean {
+    // TODO: add
+    return Boolean(this.impulseTimeout);
+  }
+
+  isInProgress(): boolean {
+    return this.isWriting() || this.isBlocked();
+  }
+
+  isInverted(): boolean {
+    return this._isInverted;
   }
 
   /**
    * Start impulse
    */
   async impulse(): Promise<void> {
+    // TODO: review
     // skip while switch at block time or impulse is in progress
     if (this.impulseInProgress || this.blockTimeInProgress) {
       if (this.props.blockMode === 'defer') {
@@ -148,14 +157,14 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
     this.impulseInProgress = true;
 
-    await this.digitalOutput.write(invertIfNeed(true, this.props.invert));
+    await this.source.write(invertIfNeed(true, this.props.invert));
 
     return deferCall<void>(this.impulseFinished, this.props.impulseLength);
   }
 
 
   private impulseFinished = async () => {
-    await this.digitalOutput.write(invertIfNeed(false, this.props.invert));
+    await this.source.write(invertIfNeed(false, this.props.invert));
     this.impulseInProgress = false;
 
     this.startBlockTime();

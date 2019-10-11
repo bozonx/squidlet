@@ -2,7 +2,7 @@
 impulseLength:
   type: number
   # TODO: не может быть 0 или меньше
-  default: 100
+  default: 20
 blockTime:
   type: number
 # Fixed mode is just impulse which longs for impulseLength time
