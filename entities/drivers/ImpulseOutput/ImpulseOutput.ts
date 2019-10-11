@@ -32,27 +32,12 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
 }
 
 
-// TODO: review
-// export function deferCall<T>(cb: () => any, delayMs: number): Promise<T> {
-//   // TODO: rerutn an object and add method - cancel
-//   return new Promise<T>((resolve, reject) => {
-//     setTimeout(async () => {
-//       try {
-//         resolve(await cb());
-//       }
-//       catch(err) {
-//         reject(err);
-//       }
-//     }, delayMs);
-//   });
-// }
-
-
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private deferredImpulse: boolean = false;
   private blockTimeout: any;
   private impulseTimeout: any;
+  private writingPromise?: Promise<any>;
   private _isInverted: boolean = false;
 
   private get source(): DigitalIo {
@@ -181,6 +166,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     else {
       // increase mode
       // TODO: remove current impulse timeout, make new and return promise of it
+      // TODO: если идет финальная запись 0 то отклонять increase
       return;
     }
     // start the new impulse in case cycle isn't started
@@ -193,42 +179,77 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
     this.changeEvents.emit(true);
 
-    await this.source.write(invertIfNeed(true, this.props.invert));
+    this.impulseTimeout = setTimeout(() => {
+      this.impulseFinished()
+        .catch(this.log.error);
+    }, this.props.impulseLength);
+    this.writingPromise = this.source.write(this.props.pin, ioValue);
 
-    return deferCall<void>(this.impulseFinished, this.props.impulseLength);
+    try {
+      await this.writingPromise;
+    }
+    catch (err) {
+      delete this.writingPromise;
+      // TODO: !!!! поидее нужно все отменить
+    }
+
+    delete this.writingPromise;
   }
 
-  // TODO: review
-  private impulseFinished = async () => {
-    await this.source.write(invertIfNeed(false, this.props.invert));
-    this.impulseInProgress = false;
+  private async impulseFinished() {
+    // TODO: отменить возможность продления импульса ????
 
-    this.startBlockTime();
+    // if impulse finished faster than writing of beginning of impulse
+    // then wait for writing has been finished
+    if (this.writingPromise) {
+      try {
+        await this.writingPromise;
+      }
+      catch (e) {
+        // TODO: что делать в случае ошибки?? наверное ничего
+        return;
+      }
+    }
+
+    delete this.impulseTimeout;
+
+    const ioValue: boolean = invertIfNeed(false, this.isInverted());
+
+    // TODO: неопределенное состояние пока идет запись
+    //  * либо добавить новое состояние
+    //  * либо продлить импульс
+    //  * либо запустить blockTime
+
+    try {
+      await this.source.write(this.props.pin, ioValue);
+    }
+    catch (err) {
+      // TODO: завершить импульс и запустить block time. Отменить defer
+    }
+
+    this.startBlocking();
   }
 
-  // TODO: review
-  private startBlockTime(): void {
-    // if block time isn't set = try to write deferred value if is set
-    if (!this.props.blockTime) return this.writeDeferred();
-
-    this.blockTimeInProgress = true;
+  private startBlocking(): void {
+    if (!this.props.blockTime) return this.startDeferred();
 
     setTimeout(() => {
-      this.blockTimeInProgress = false;
-      this.writeDeferred();
+      delete this.blockTimeout;
+      this.startDeferred();
     }, this.props.blockTime);
   }
 
-  // TODO: review
-  private writeDeferred(): void {
-    // do nothing if blockMode isn't defer or deffered impulse isn't in a queue
+  private startDeferred(): void {
     if (this.props.blockMode !== 'defer' || !this.deferredImpulse) return;
+    // start a new impulse if mode is defer and deferred impulse is in the queue
 
     // clear deferred value
     this.deferredImpulse = false;
     // make deferred impulse
     this.impulse()
+    // TODO: what on success?
       .catch((err) => {
+        // TODO: review
         this.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
       });
   }

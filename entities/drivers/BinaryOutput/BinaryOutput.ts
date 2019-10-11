@@ -163,6 +163,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     this.writing = false;
 
     // TODO: что должно быть с currentIoValue - не трогать или вернуть к предыдущему значению ??
+    // TODO: проверить как отменится если идет запись
   }
 
   /**
@@ -239,7 +240,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       && typeof this.lastDeferredValue !== 'undefined'
       && invertIfNeed(this.lastDeferredValue, this.isInverted()) !== this.currentIoValue
     ) {
-      this.startDeferredWrite();
+      this.startDeferred();
 
       return;
     }
@@ -261,7 +262,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     this.startBlocking();
   }
 
-  private startDeferredWrite() {
+  private startDeferred() {
     const level: boolean = Boolean(this.lastDeferredValue);
     // clear deferred value
     delete this.lastDeferredValue;

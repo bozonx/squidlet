@@ -7,7 +7,7 @@ impulseLength:
 blockTime:
   type: number
 blockMode:
-  type: '"refuse" | "defer"'
+  type: '"fixed" | "defer" | "increasing"'
   default: refuse
 invert:
   type: boolean
