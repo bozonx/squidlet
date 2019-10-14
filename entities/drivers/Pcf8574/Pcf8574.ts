@@ -8,12 +8,12 @@ import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {Edge} from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/DebounceCall';
-import IndexedEvents from 'system/lib/IndexedEvents';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
 
-export type ChangeStateHandler = (targetPin: number, value: boolean) => void;
+export type ChangeStateHandler = (level: boolean) => void;
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
 }
@@ -41,7 +41,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly pinDebounces: {[index: string]: number | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private readonly changeEvents = new IndexedEvents<ChangeStateHandler>();
+  private readonly changeEvents = new IndexedEventEmitter<ChangeStateHandler>();
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
@@ -66,7 +66,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
-  // TODO: review
+  // TODO: review - лучше наверное вручную дергать когда инициализировать IC
   protected appDidInit = async () => {
     // init IC state after app is initialized if it isn't at this moment
     try {
@@ -115,8 +115,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Listen to changes of pin after edge and debounce were processed.
    * Call this method inside a init() callback of your driver or device or after.
    */
-  addListener(handler: ChangeStateHandler): number {
-    return this.changeEvents.addListener(handler);
+  onChange(pin: number, handler: ChangeStateHandler): number {
+    return this.changeEvents.addListener(pin, handler);
   }
 
   removeListener(handlerIndex: number) {
