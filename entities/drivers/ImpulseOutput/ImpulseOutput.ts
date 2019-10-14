@@ -53,10 +53,12 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
  * * 0 - stop impulse
  * blocking. Skip any requests during this time
  * * Start one deferred impulse
+ *
+ * On error while writing the state of impulse the cycle will be cancelled and a block time will be started.
  */
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  private deferredImpulse: boolean = false;
+  private deferredImpulse?: boolean;
   private blockTimeout: any;
   private impulseTimeout: any;
   // promise of writing of the beginning of impulse
@@ -174,8 +176,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     delete this.deferredWritePromise;
     delete this.impulseTimeout;
     delete this.blockTimeout;
-
-    this.deferredImpulse = false;
+    delete this.deferredImpulse;
 
     // TODO: проверить как отменится если идет запись
   }
@@ -233,7 +234,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       delete this.writingStartPromise;
 
       // on error cancel deferred queue and start blocking
-      const errorMsg = `BinaryOutput driver: Can't write start of impulse,
+      const errorMsg = `ImpulseOutput driver: Can't write start of impulse,
         props: "${JSON.stringify(this.props)}". ${String(err)}`;
 
       this.handleError(errorMsg);
@@ -275,27 +276,16 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     }
     catch (err) {
       delete this.writingEndPromise;
-      // TODO: завершить импульс и запустить block time. Отменить defer
+
+      const errorMsg = `ImpulseOutput driver: Can't write end of impulse,
+        props: "${JSON.stringify(this.props)}". ${String(err)}`;
+
+      this.handleError(errorMsg);
     }
 
     delete this.writingEndPromise;
 
     this.startBlocking();
-  }
-
-  private startDeferred(): void {
-    if (this.props.blockMode !== 'defer' || !this.deferredImpulse) return;
-    // start a new impulse if mode is defer and deferred impulse is in the queue
-
-    // clear deferred value
-    this.deferredImpulse = false;
-    // make deferred impulse
-    this.impulse()
-    // TODO: what on success?
-      .catch((err) => {
-        // TODO: review
-        this.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
-      });
   }
 
   private startBlocking(): void {
@@ -305,6 +295,30 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       delete this.blockTimeout;
       this.startDeferred();
     }, this.props.blockTime);
+  }
+
+  private startDeferred(): void {
+    if (this.props.blockMode !== 'defer' || !this.deferredImpulse) return;
+    // start a new impulse if mode is defer and deferred impulse is in the queue
+    // clear deferred value
+    delete this.deferredImpulse;
+    // make deferred impulse
+
+    let deferredWritePromise: Promised<void> | undefined;
+
+    if (this.deferredWritePromise) {
+      deferredWritePromise = this.deferredWritePromise;
+
+      delete this.deferredWritePromise;
+    }
+
+    this.impulse()
+      .then(() => {
+        if (deferredWritePromise) deferredWritePromise.resolve();
+      })
+      .catch((err) => {
+        if (deferredWritePromise) deferredWritePromise.reject(err);
+      });
   }
 
   private handleError(errorMsg: string) {

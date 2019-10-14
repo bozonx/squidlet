@@ -264,23 +264,24 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     const level: boolean = Boolean(this.lastDeferredValue);
     // clear deferred value
     delete this.lastDeferredValue;
+
+    let deferredWritePromise: Promised<void> | undefined;
+
+    if (this.deferredWritePromise) {
+      deferredWritePromise = this.deferredWritePromise;
+
+      delete this.deferredWritePromise;
+    }
+
     // write deferred value, don't wait for it has been finished
     this.doWrite(level)
       .then(() => {
-        if (this.deferredWritePromise) {
-          this.deferredWritePromise.resolve();
-
-          delete this.deferredWritePromise;
-        }
+        if (deferredWritePromise) deferredWritePromise.resolve();
 
         this.handleSuccessWriting();
       })
       .catch((err) => {
-        if (this.deferredWritePromise) {
-          this.deferredWritePromise.reject(err);
-
-          delete this.deferredWritePromise;
-        }
+        if (deferredWritePromise) deferredWritePromise.reject(err);
       });
   }
 
