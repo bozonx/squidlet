@@ -3,7 +3,7 @@ import DigitalIo, {Edge, ChangeHandler, DigitalInputMode} from 'system/interface
 import {lastItem} from 'system/lib/arrays';
 import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
 
-import {Pcf8574ExpanderProps, Pcf8574} from '../Pcf8574/Pcf8574';
+import {Pcf8574ExpanderProps, Pcf8574} from '../../drivers/Pcf8574/Pcf8574';
 
 
 interface DigitalPcf8574Props extends Pcf8574ExpanderProps {

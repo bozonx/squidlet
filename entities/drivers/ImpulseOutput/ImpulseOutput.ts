@@ -86,6 +86,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       'source'
     );
 
+    // TODO: get device specified in gpio param
     this.depsInstances.source = this.context.getSubDriver(
       makeDigitalSourceDriverName(this.props.source),
       subDriverProps
