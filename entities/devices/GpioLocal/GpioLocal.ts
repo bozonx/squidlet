@@ -1,6 +1,6 @@
 import DeviceBase from 'system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
-import {
+import DigitalIo, {
   ChangeHandler,
   DigitalInputMode,
   DigitalOutputMode,
@@ -15,41 +15,52 @@ interface GpioLocalProps {
 
 
 export default class GpioLocal extends DeviceBase<GpioLocalProps> {
-  protected didInit = async () => {
-
+  private get digitalIo(): DigitalIo {
+    return this.depsInstances.digitalIo as DigitalIo;
   }
 
-  protected actions: Gpio = {
-    digitalSetupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> {
 
+  protected didInit = async () => {
+    this.depsInstances.digitalIo = this.context.getIo('Digital');
+  }
+
+  destroy = async () => {
+    await this.digitalIo.removeAllListeners();
+  }
+
+
+  private gpio: Gpio = {
+    digitalSetupInput: (pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> => {
+      return this.digitalIo.setupInput(pin, inputMode, debounce, edge);
     },
 
-    digitalSetupOutput(pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void> {
-
+    digitalSetupOutput: (pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void> => {
+      return this.digitalIo.setupOutput(pin, outputMode, initialValue);
     },
 
-    digitalRead(pin: number): Promise<boolean> {
-
+    digitalRead: (pin: number): Promise<boolean> => {
+      return this.digitalIo.read(pin);
     },
 
     // only for output pins
-    digitalWrite(pin: number, value: boolean): Promise<void> {
-
+    digitalWrite: (pin: number, level: boolean): Promise<void> => {
+      return this.digitalIo.write(pin, level);
     },
 
-    digitalGetPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-
+    digitalGetPinMode: (pin: number): Promise<DigitalPinMode | undefined> => {
+      return this.digitalIo.getPinMode(pin);
     },
 
     // only for input pins
     // Listen to change events
-    digitalAddListener(pin: number, handler: ChangeHandler): Promise<number> {
-
+    digitalOnChange: (pin: number, handler: ChangeHandler): Promise<number> => {
+      return this.digitalIo.onChange(pin, handler);
     },
 
-    removeListener(handlerIndex: number): Promise<void> {
-
+    removeListener: (handlerIndex: number): Promise<void> => {
+      return this.digitalIo.removeListener(handlerIndex);
     },
   };
 
+  protected actions = this.gpio as any;
 }

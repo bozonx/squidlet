@@ -2,9 +2,9 @@ import DigitalIo, {
   Edge,
   ChangeHandler,
   DigitalInputMode,
-} from 'system/interfaces/io/DigitalIo';
-import DriverBase from 'system/base/DriverBase';
-import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
+} from 'interfaces/io/DigitalIo';
+import DriverBase from 'base/DriverBase';
+import SourceDriverFactoryBase from 'lib/base/digital/SourceDriverFactoryBase';
 
 
 export class DigitalLocal extends DriverBase implements DigitalIo {

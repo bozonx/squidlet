@@ -46,8 +46,8 @@ export default interface DigitalIo {
   getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
 
   // only for input pins
-  // Listen to change events
-  addListener(pin: number, handler: ChangeHandler): Promise<number>;
+  // Listen to changes
+  onChange(pin: number, handler: ChangeHandler): Promise<number>;
   removeListener(handlerIndex: number): Promise<void>;
   removeAllListeners(): Promise<void>;
 }

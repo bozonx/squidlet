@@ -6,12 +6,12 @@ export default interface Gpio {
   digitalSetupOutput(pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void>;
   digitalRead(pin: number): Promise<boolean>;
   // only for output pins
-  digitalWrite(pin: number, value: boolean): Promise<void>;
+  digitalWrite(pin: number, level: boolean): Promise<void>;
   digitalGetPinMode(pin: number): Promise<DigitalPinMode | undefined>;
 
   // only for input pins
   // Listen to change events
-  digitalAddListener(pin: number, handler: ChangeHandler): Promise<number>;
+  digitalOnChange(pin: number, handler: ChangeHandler): Promise<number>;
 
   removeListener(handlerIndex: number): Promise<void>;
 }

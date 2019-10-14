@@ -11,6 +11,7 @@ const servicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'services');
 export default async function systemEntitiesPlugin (env: PluginEnv) {
   // devices
   await env.addDevice(path.join(devicesRoot, 'ClickSensor/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'GpioLocal/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'BinarySensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Toggle/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));
@@ -32,7 +33,6 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'HttpClient/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'HttpServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'HttpServerRouter/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Digital_local/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital_pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Digital_portExpander/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cData/manifest.yaml'));
