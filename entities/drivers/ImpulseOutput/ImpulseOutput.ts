@@ -2,11 +2,12 @@ import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import {resolveOutputPinMode} from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 import Promised from 'system/lib/Promised';
+import {GpioDigital} from 'system/interfaces/Gpio';
 
 
 type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';
@@ -61,7 +62,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private deferredWritePromise?: Promised<void>;
   private _isInverted: boolean = false;
 
-  private get gpio(): DigitalIo {
+  private get gpio(): GpioDigital {
     return this.depsInstances.gpioDevice.gpio;
   }
 
@@ -87,7 +88,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.setupOutput(this.props.pin, initialIoValue, this.getPinMode());
+      await this.gpio.digitalSetupOutput(this.props.pin, initialIoValue, this.getPinMode());
     }
     catch (err) {
       this.log.error(
@@ -200,7 +201,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     this.setImpulseTimeout();
     this.changeEvents.emit(true);
 
-    this.writingStartPromise = this.gpio.write(this.props.pin, ioValue);
+    this.writingStartPromise = this.gpio.digitalWrite(this.props.pin, ioValue);
 
     try {
       await this.writingStartPromise;
@@ -244,7 +245,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
     const ioValue: boolean = invertIfNeed(false, this.isInverted());
 
-    this.writingEndPromise = this.gpio.write(this.props.pin, ioValue);
+    this.writingEndPromise = this.gpio.digitalWrite(this.props.pin, ioValue);
 
     try {
       await this.writingEndPromise;

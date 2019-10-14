@@ -1,13 +1,11 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import DigitalIo, {DigitalInputMode, Edge, ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {DigitalInputMode, Edge, ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
-import {omitObj} from 'system/lib/objects';
-import {makeDigitalSourceDriverName, generateSubDriverId, resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
+import {resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';
-import {JsonTypes} from 'system/interfaces/Types';
-import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
+import {GpioDigital} from 'system/interfaces/Gpio';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -35,8 +33,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   private _isInverted: boolean = false;
   private blockTimeout: any;
 
-  private get source(): DigitalIo {
-    return this.depsInstances.source;
+  private get gpio(): GpioDigital {
+    return this.depsInstances.gpioDevice.gpio;
   }
 
 
@@ -48,24 +46,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       this.props.pullup
     );
 
-    // make rest of props to pass them to the sub driver
-    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
-      this.props,
-      'blockTime',
-      'invert',
-      'invertOnPullup',
-      'edge',
-      'debounce',
-      'pullup',
-      'pulldown',
-      'pin',
-      'source'
-    );
-
-    this.depsInstances.source = this.context.getSubDriver(
-      makeDigitalSourceDriverName(this.props.source),
-      subDriverProps
-    );
+    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
   }
 
   // setup pin after all the drivers has been initialized
@@ -73,22 +54,22 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     const edge: Edge = resolveEdge(this.props.edge, this._isInverted);
 
     // TODO: print unique id of sub driver
-    this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.source}`);
+    this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
+      await this.gpio.digitalSetupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
     }
     catch (err) {
       this.log.error(
-        `BinaryInput ${this.props.pin} of ${this.props.source}: Can't setup pin. ` +
+        `BinaryInput ${this.props.pin} of ${this.props.gpio}: Can't setup pin. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
 
     // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
-    await this.source.addListener(this.props.pin, this.handleChange);
+    await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
   }
 
 
@@ -105,7 +86,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.source.read(this.props.pin), this.isInverted());
+    return invertIfNeed(await this.gpio.read(this.props.pin), this.isInverted());
 
     // TODO: может поднять событие если значение изменилось
   }
@@ -162,8 +143,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 export default class Factory extends DriverFactoryBase<BinaryInput, BinaryInputProps> {
   protected SubDriverClass = BinaryInput;
   protected instanceId = (props: BinaryInputProps): string => {
-    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
-
-    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+    return `${props.gpio}${props.pin}`;
   }
 }

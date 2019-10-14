@@ -1,18 +1,13 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {omitObj} from 'system/lib/objects';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
-import {InitialLevel, JsonTypes} from 'system/interfaces/Types';
-import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
-import {
-  generateSubDriverId,
-  makeDigitalSourceDriverName,
-  resolveOutputPinMode,
-} from 'system/lib/base/digital/digitalHelpers';
-import DigitalIo, {ChangeHandler, DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
+import {InitialLevel} from 'system/interfaces/Types';
+import {resolveOutputPinMode} from 'system/lib/base/digital/digitalHelpers';
+import {ChangeHandler, DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
+import {GpioDigital} from 'system/interfaces/Gpio';
 
 
 export type BlockMode = 'refuse' | 'defer';
@@ -61,8 +56,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private blockTimeout: any;
   private _isInverted: boolean = false;
 
-  private get source(): DigitalIo {
-    return this.depsInstances.source;
+  private get gpio(): GpioDigital {
+    return this.depsInstances.gpioDevice.gpio;
   }
 
 
@@ -73,28 +68,12 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       this.props.openDrain
     );
 
-    // make rest of props to pass them to the sub driver
-    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
-      this.props,
-      'blockTime',
-      'blockMode',
-      'invert',
-      'invertOnOpenDrain',
-      'initial',
-      'openDrain',
-      'pin',
-      'source'
-    );
-
-    this.depsInstances.source = this.context.getSubDriver(
-      makeDigitalSourceDriverName(this.props.source),
-      subDriverProps
-    );
+    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
   }
 
   // setup pin after all the drivers has been initialized
   devicesDidInit = async () => {
-    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
+    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // set initial value
     this.currentIoValue = this.resolveInitialLevel();
@@ -102,11 +81,11 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.source.setupOutput(this.props.pin, this.currentIoValue, this.getPinMode());
+      await this.gpio.digitalSetupOutput(this.props.pin, this.currentIoValue, this.getPinMode());
     }
     catch (err) {
       this.log.error(
-        `BinaryOutput: Can't setup pin ${this.props.pin} of ${this.props.source}. ` +
+        `BinaryOutput: Can't setup pin ${this.props.pin} of ${this.props.gpio}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
@@ -169,7 +148,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
    * Read value from IO
    */
   async read(): Promise<boolean> {
-    const ioValue: boolean = await this.source.read(this.props.pin);
+    const ioValue: boolean = await this.gpio.digitalRead(this.props.pin);
     const resolvedValue: boolean = invertIfNeed(ioValue, this.isInverted());
 
     // update current value and emit change event if need
@@ -216,7 +195,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
     // wait for writing
     try {
-      await this.source.write(this.props.pin, ioValue);
+      await this.gpio.digitalWrite(this.props.pin, ioValue);
     }
     catch (err) {
       this.writing = false;
@@ -318,8 +297,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 export default class Factory extends DriverFactoryBase<BinaryOutput, BinaryOutputProps> {
   protected SubDriverClass = BinaryOutput;
   protected instanceId = (props: BinaryOutputProps): string => {
-    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
-
-    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+    return `${props.gpio}${props.pin}`;
   }
 }

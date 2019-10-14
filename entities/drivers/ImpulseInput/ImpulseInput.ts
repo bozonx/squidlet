@@ -1,17 +1,11 @@
-import DigitalIo, {ChangeHandler, DigitalInputMode, Edge} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, DigitalInputMode, Edge} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {omitObj} from 'system/lib/objects';
 import {isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
-import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
-import {
-  generateSubDriverId,
-  makeDigitalSourceDriverName,
-  resolveInputPinMode,
-} from 'system/lib/base/digital/digitalHelpers';
+import {resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
 import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
-import {JsonTypes} from 'system/interfaces/Types';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {GpioDigital} from 'system/interfaces/Gpio';
 
 
 type RisingHandler = () => void;
@@ -52,8 +46,8 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private impulseTimeout: any;
   private _isInverted: boolean = false;
 
-  private get source(): DigitalIo {
-    return this.depsInstances.source;
+  private get gpio(): GpioDigital {
+    return this.depsInstances.gpioDevice.gpio;
   }
 
 
@@ -64,30 +58,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
       this.props.pullup
     );
 
-    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
-      this.props,
-      'impulseLength',
-      'blockTime',
-      'mode',
-      'invert',
-      'invertOnPullup',
-      'debounce',
-      'pullup',
-      'pulldown',
-      'pin',
-      'source'
-    );
-
-    this.depsInstances.source = this.context.getSubDriver(
-      makeDigitalSourceDriverName(this.props.source),
-      subDriverProps
-    );
+    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
   }
 
   // setup pin after all the drivers has been initialized
   devicesDidInit = async () => {
     // TODO: print unique id of sub driver
-    this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.source}`);
+    this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     const edge: Edge = resolveEdge('rising', this.isInverted());
 
@@ -95,17 +72,17 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     // wait for pin has initialized but don't break initialization on error
     try {
       // listen to only high levels
-      await this.source.setupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
+      await this.gpio.digitalSetupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
     }
     catch (err) {
       this.log.error(
-        `ImpulseInput: Can't setup pin ${this.props.pin} of ${this.props.source}. ` +
+        `ImpulseInput: Can't setup pin ${this.props.pin} of ${this.props.gpio}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
 
     // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
-    await this.source.addListener(this.props.pin, this.handleChange);
+    await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
   }
 
 
@@ -220,8 +197,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 export default class Factory extends DriverFactoryBase<ImpulseInput, ImpulseInputProps> {
   protected SubDriverClass = ImpulseInput;
   protected instanceId = (props: ImpulseInputProps): string => {
-    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
-
-    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+    return `${props.gpio}${props.pin}`;
   }
 }
