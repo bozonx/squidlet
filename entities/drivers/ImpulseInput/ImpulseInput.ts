@@ -85,7 +85,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
   // setup pin after all the drivers has been initialized
-  driversDidInit = async () => {
+  devicesDidInit = async () => {
     // TODO: print unique id of sub driver
     this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.source}`);
 

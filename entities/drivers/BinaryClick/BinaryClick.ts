@@ -84,7 +84,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
   // setup pin after all the drivers has been initialized
-  driversDidInit = async () => {
+  devicesDidInit = async () => {
     // TODO: print unique id of sub driver
     this.log.debug(`BinaryClick: Setup pin ${this.props.pin} of ${this.props.source}`);
 

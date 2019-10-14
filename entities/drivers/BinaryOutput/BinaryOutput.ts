@@ -93,7 +93,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   // setup pin after all the drivers has been initialized
-  driversDidInit = async () => {
+  devicesDidInit = async () => {
     this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
     // set initial value
@@ -102,7 +102,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.source.setupOutput(this.props.pin, this.getPinMode(), this.currentIoValue);
+      await this.source.setupOutput(this.props.pin, this.currentIoValue, this.getPinMode());
     }
     catch (err) {
       this.log.error(

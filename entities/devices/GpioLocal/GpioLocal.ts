@@ -36,7 +36,7 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
     },
 
     digitalSetupOutput: (pin: number, initialValue: boolean, outputMode: DigitalOutputMode): Promise<void> => {
-      return this.digitalIo.setupOutput(pin, outputMode, initialValue);
+      return this.digitalIo.setupOutput(pin, initialValue, outputMode);
     },
 
     digitalRead: (pin: number): Promise<boolean> => {

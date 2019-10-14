@@ -69,7 +69,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
   // setup pin after all the drivers has been initialized
-  driversDidInit = async () => {
+  devicesDidInit = async () => {
     const edge: Edge = resolveEdge(this.props.edge, this._isInverted);
 
     // TODO: print unique id of sub driver

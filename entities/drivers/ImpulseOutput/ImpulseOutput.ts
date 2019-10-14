@@ -1,19 +1,12 @@
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {omitObj} from 'system/lib/objects';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
-import {JsonTypes} from 'system/interfaces/Types';
-import SourceDriverFactoryBase from 'system/lib/base/digital/SourceDriverFactoryBase';
-import {
-  generateSubDriverId,
-  makeDigitalSourceDriverName,
-  resolveOutputPinMode,
-} from 'system/lib/base/digital/digitalHelpers';
+import {resolveOutputPinMode} from 'system/lib/base/digital/digitalHelpers';
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
-import Promised from '../../../system/lib/Promised';
+import Promised from 'system/lib/Promised';
 
 
 type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';
@@ -68,8 +61,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private deferredWritePromise?: Promised<void>;
   private _isInverted: boolean = false;
 
-  private get source(): DigitalIo {
-    return this.depsInstances.source;
+  private get gpio(): DigitalIo {
+    return this.depsInstances.gpioDevice.gpio;
   }
 
 
@@ -80,31 +73,13 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       this.props.openDrain
     );
 
-    // make rest of props to pass them to the sub driver
-    const subDriverProps: {[index: string]: JsonTypes} = omitObj(
-      this.props,
-      'impulseLength',
-      'blockTime',
-      'blockMode',
-      'invert',
-      'invertOnOpenDrain',
-      'openDrain',
-      'pin',
-      'source'
-    );
-
-    // TODO: get device specified in gpio param
-    this.depsInstances.source = this.context.getSubDriver(
-      makeDigitalSourceDriverName(this.props.source),
-      subDriverProps
-    );
+    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
   }
 
 
-  // TODO: use devicesDidInit !!!!
-  // setup pin after all the drivers has been initialized
-  driversDidInit = async () => {
-    this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
+  // setup pin after all the devices has been initialized
+  devicesDidInit = async () => {
+    this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // resolve initial value
     const initialIoValue = invertIfNeed(false, this.isInverted());
@@ -112,11 +87,11 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.source.setupOutput(this.props.pin, this.getPinMode(), initialIoValue);
+      await this.gpio.setupOutput(this.props.pin, initialIoValue, this.getPinMode());
     }
     catch (err) {
       this.log.error(
-        `ImpulseOutput: Can't setup pin ${this.props.pin} of ${this.props.source}. ` +
+        `ImpulseOutput: Can't setup pin ${this.props.pin} of ${this.props.gpio}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
@@ -225,7 +200,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     this.setImpulseTimeout();
     this.changeEvents.emit(true);
 
-    this.writingStartPromise = this.source.write(this.props.pin, ioValue);
+    this.writingStartPromise = this.gpio.write(this.props.pin, ioValue);
 
     try {
       await this.writingStartPromise;
@@ -269,7 +244,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
     const ioValue: boolean = invertIfNeed(false, this.isInverted());
 
-    this.writingEndPromise = this.source.write(this.props.pin, ioValue);
+    this.writingEndPromise = this.gpio.write(this.props.pin, ioValue);
 
     try {
       await this.writingEndPromise;
@@ -351,8 +326,6 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 export default class Factory extends DriverFactoryBase<ImpulseOutput, ImpulseOutputProps> {
   protected SubDriverClass = ImpulseOutput;
   protected instanceId = (props: ImpulseOutputProps): string => {
-    const driver: SourceDriverFactoryBase = this.context.getDriver(makeDigitalSourceDriverName(props.source)) as any;
-
-    return generateSubDriverId(props.source, props.pin, driver.generateUniqId(props));
+    return `${props.gpio}${props.pin}`;
   }
 }
