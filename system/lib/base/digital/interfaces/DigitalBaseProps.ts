@@ -1,5 +1,5 @@
 export default interface DigitalBaseProps {
   pin: number;
-  // by default is local driver used
-  source: string;
+  // GPIO defice which will be used. By default the local GPIO is used
+  gpio: string;
 }

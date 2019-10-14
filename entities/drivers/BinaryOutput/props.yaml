@@ -26,6 +26,6 @@ openDrain:
 pin:
   type: number
   required: true
-source:
+gpio:
   type: string
-  default: 'local'
+  default: 'gpio'

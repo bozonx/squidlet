@@ -22,6 +22,8 @@ export default class DigitalPinInputBase<Props extends DigitalPinInputProps> ext
   private lastValue?: boolean;
   private secondCheckTimeout: number = 0;
 
+  // TODO: rveiw
+
   private get source(): DigitalSubDriver {
     return this.depsInstances.source;
   }
