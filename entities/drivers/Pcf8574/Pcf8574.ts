@@ -41,7 +41,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly pinDebounces: {[index: string]: number | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private readonly events = new IndexedEvents<ChangeStateHandler>();
+  private readonly changeEvents = new IndexedEvents<ChangeStateHandler>();
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
@@ -116,11 +116,11 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Call this method inside a init() callback of your driver or device or after.
    */
   addListener(handler: ChangeStateHandler): number {
-    return this.events.addListener(handler);
+    return this.changeEvents.addListener(handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.events.removeListener(handlerIndex);
+    this.changeEvents.removeListener(handlerIndex);
   }
 
   /**
@@ -296,14 +296,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
 
     if (!this.pinDebounces[pinNum]) {
-      this.events.emit(pinNum, pinValue);
+      this.changeEvents.emit(pinNum, pinValue);
     }
     else {
       // wait for debounce and read current level
       this.debounceCall.invoke(async () => {
         const realLevel = await this.read(pinNum);
 
-        this.events.emit(pinNum, realLevel);
+        this.changeEvents.emit(pinNum, realLevel);
       }, this.pinDebounces[pinNum], pinNum);
     }
   }

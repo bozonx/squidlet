@@ -1,7 +1,7 @@
 import {ChangeHandler, DigitalInputMode, DigitalOutputMode, DigitalPinMode, Edge} from './io/DigitalIo';
 
 
-export default interface Gpio {
+export interface GpioDigital {
   digitalSetupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
   digitalSetupOutput(pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void>;
   digitalRead(pin: number): Promise<boolean>;
@@ -14,4 +14,8 @@ export default interface Gpio {
   digitalOnChange(pin: number, handler: ChangeHandler): Promise<number>;
 
   removeListener(handlerIndex: number): Promise<void>;
+}
+
+export interface Gpio extends GpioDigital {
+  // digital, analog, PWM, serial, i2c, etc
 }

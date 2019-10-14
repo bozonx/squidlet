@@ -31,6 +31,7 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
 
   private gpio: Gpio = {
     digitalSetupInput: (pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> => {
+      // TODO: use default debounce
       return this.digitalIo.setupInput(pin, inputMode, debounce, edge);
     },
 
