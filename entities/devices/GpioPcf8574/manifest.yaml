@@ -1,12 +1,15 @@
-name: Pcf8574
+name: GpioPcf8574
+main: GpioPcf8574.ts
 type: expander
-main: Pcf8574.ts
 
 drivers:
   - Pcf8574
 
 props:
   $base: 'drivers.Pcf8574'
+
+  defaultDebounce:
+    type: number
 
   ###### Other props
   ### I2cToSlaveDriverProps
