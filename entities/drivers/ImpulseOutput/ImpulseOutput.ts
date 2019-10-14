@@ -32,6 +32,27 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
 }
 
 
+/**
+ * Impulse output logic steps:
+ * fixed mode:
+ * * 0 - nothing is happening
+ * * 1 - start impulse for fixed time. Skip any other requests.
+ * * 0 - stop impulse
+ * blocking. Skip any requests during this time
+ *
+ * increasing mode:
+ * * 0 - nothing is happening
+ * * 1 - start impulse for fixed time. Other requests increase impulse time
+ * * 0 - stop impulse if there aren't any other requests
+ * blocking. Skip any requests during this time
+ *
+ * defer mode:
+ * * 0 - nothing is happening
+ * * 1 - start impulse for fixed time. Other requests make new impulse start after that.
+ * * 0 - stop impulse
+ * blocking. Skip any requests during this time
+ * * Start one deferred impulse
+ */
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private deferredImpulse: boolean = false;
