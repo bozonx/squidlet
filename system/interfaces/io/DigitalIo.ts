@@ -34,10 +34,10 @@ export default interface DigitalIo {
   /**
    * Setup pin as an output
    * @param pin - pin number
-   * @param outputMode - one of modes: output | output_opendrain
    * @param initialValue - value which will be set on default. Be careful with inverting and pullup mode.
+   * @param outputMode - one of modes: output | output_opendrain
    */
-  setupOutput(pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void>;
+  setupOutput(pin: number, initialValue: boolean, outputMode: DigitalOutputMode): Promise<void>;
 
   // output and input pins can be read
   read(pin: number): Promise<boolean>;

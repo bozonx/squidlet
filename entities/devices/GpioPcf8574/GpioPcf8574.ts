@@ -1,5 +1,5 @@
 import DeviceBase from 'system/base/DeviceBase';
-import {ChangeHandler, DigitalInputMode, DigitalOutputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {GpioDigital} from 'system/interfaces/Gpio';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
@@ -30,7 +30,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
       return this.expander.setupInput(pin, debounce, edge);
     },
 
-    digitalSetupOutput: (pin: number, outputMode: DigitalOutputMode = 'output', initialValue: boolean): Promise<void> => {
+    digitalSetupOutput: (pin: number, initialValue: boolean): Promise<void> => {
       return this.expander.setupOutput(pin, initialValue);
     },
 

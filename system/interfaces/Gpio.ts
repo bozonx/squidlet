@@ -3,7 +3,7 @@ import {ChangeHandler, DigitalInputMode, DigitalOutputMode, DigitalPinMode, Edge
 
 export interface GpioDigital {
   digitalSetupInput(pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void>;
-  digitalSetupOutput(pin: number, outputMode: DigitalOutputMode, initialValue: boolean): Promise<void>;
+  digitalSetupOutput(pin: number, initialValue: boolean, outputMode: DigitalOutputMode): Promise<void>;
   digitalRead(pin: number): Promise<boolean>;
   // only for output pins
   digitalWrite(pin: number, level: boolean): Promise<void>;
@@ -16,6 +16,6 @@ export interface GpioDigital {
   removeListener(handlerIndex: number): Promise<void>;
 }
 
-export interface Gpio extends GpioDigital {
+export default interface Gpio extends GpioDigital {
   // digital, analog, PWM, serial, i2c, etc
 }
