@@ -13,6 +13,7 @@ import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
 import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
+import Promised from '../../../system/lib/Promised';
 
 
 type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';
@@ -59,6 +60,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private blockTimeout: any;
   private impulseTimeout: any;
   private writingPromise?: Promise<any>;
+  private deferredWritePromise?: Promised<void>;
   private _isInverted: boolean = false;
 
   private get source(): DigitalIo {
@@ -93,6 +95,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     );
   }
 
+
+  // TODO: use devicesDidInit !!!!
   // setup pin after all the drivers has been initialized
   driversDidInit = async () => {
     this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
@@ -123,6 +127,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
   isImpulseInProgress(): boolean {
+    // TODO: должна учитываться запись ???
     return Boolean(this.impulseTimeout);
   }
 
@@ -156,6 +161,9 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     clearTimeout(this.impulseTimeout);
     clearTimeout(this.blockTimeout);
 
+    if (this.deferredWritePromise) this.deferredWritePromise.cancel();
+
+    delete this.deferredWritePromise;
     delete this.impulseTimeout;
     delete this.blockTimeout;
 
@@ -168,29 +176,34 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
    * Start impulse
    */
   async impulse(): Promise<void> {
-    // skip other changes while block time
-    if (this.isBlocked()) return;
-
-    if (this.props.blockMode === 'fixed') {
-      // if is "refuse": skip while block time if impulse is in progress
+    if (this.props.blockMode === 'increasing') {
+      // increasing mode
+      // TODO: нужно учитывать этапы записи???
       if (this.isImpulseInProgress()) {
+        // increase mode
+        // TODO: если идет финальная запись 0 то отклонять increase
+        clearTimeout(this.impulseTimeout);
+        this.setImpulseTimeout();
+
         return;
       }
+      else if (this.isBlocked()) {
+        // skip other changes while block time
+        return;
+      }
+      // else start a new impulse
     }
     else if (this.props.blockMode === 'defer') {
-      // mark that there is a deferred impulse and exit
-      this.deferredImpulse = true;
-
-      // TODO: return deferred promise
-      return;
+      // if impulse or block time are in progress
+      // mark that there is a deferred impulse and return deferred promise
+      if (this.isInProgress()) return this.setDeferredValue();
+      // else start a new impulse
     }
     else {
-      // increase mode
-      // TODO: если идет финальная запись 0 то отклонять increase
-      clearTimeout(this.impulseTimeout);
-      this.setImpulseTimeout();
-
-      return;
+      // fixed mode
+      // if "refuse": skip while block time or impulse are in progress
+      if (this.isInProgress()) return;
+      // else start a new impulse
     }
     // start the new impulse in case cycle isn't started
     await this.doStartImpulse();
@@ -279,6 +292,17 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
         // TODO: review
         this.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
       });
+  }
+
+  private setDeferredValue(): Promise<void> {
+    this.deferredImpulse = true;
+
+    // make defer promise if need
+    if (!this.deferredWritePromise) {
+      this.deferredWritePromise = new Promised<void>();
+    }
+
+    return this.deferredWritePromise.promise;
   }
 
 }
