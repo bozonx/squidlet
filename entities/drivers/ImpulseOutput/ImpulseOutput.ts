@@ -94,7 +94,6 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
   // setup pin after all the drivers has been initialized
   driversDidInit = async () => {
-    // TODO: print unique id of sub driver
     this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
     // resolve initial value
@@ -186,8 +185,10 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     }
     else {
       // increase mode
-      // TODO: remove current impulse timeout, make new and return promise of it
       // TODO: если идет финальная запись 0 то отклонять increase
+      clearTimeout(this.impulseTimeout);
+      this.setImpulseTimeout();
+
       return;
     }
     // start the new impulse in case cycle isn't started
@@ -199,11 +200,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     const ioValue: boolean = invertIfNeed(true, this.isInverted());
 
     this.changeEvents.emit(true);
+    this.setImpulseTimeout();
 
-    this.impulseTimeout = setTimeout(() => {
-      this.impulseFinished()
-        .catch(this.log.error);
-    }, this.props.impulseLength);
     this.writingPromise = this.source.write(this.props.pin, ioValue);
 
     try {
@@ -215,6 +213,13 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     }
 
     delete this.writingPromise;
+  }
+
+  setImpulseTimeout() {
+    this.impulseTimeout = setTimeout(() => {
+      this.impulseFinished()
+        .catch(this.log.error);
+    }, this.props.impulseLength);
   }
 
   private async impulseFinished() {

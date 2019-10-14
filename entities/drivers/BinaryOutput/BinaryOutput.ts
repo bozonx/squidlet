@@ -94,7 +94,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
   // setup pin after all the drivers has been initialized
   driversDidInit = async () => {
-    // TODO: print unique id of sub driver
     this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.source}`);
 
     // set initial value
