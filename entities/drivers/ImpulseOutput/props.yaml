@@ -9,6 +9,7 @@ blockTime:
 blockMode:
   type: '"fixed" | "defer" | "increasing"'
   default: refuse
+# invert value that will be sent to IO
 invert:
   type: boolean
 # In true case it inverts value if pullup resistor is on

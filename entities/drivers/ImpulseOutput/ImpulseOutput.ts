@@ -59,7 +59,10 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private deferredImpulse: boolean = false;
   private blockTimeout: any;
   private impulseTimeout: any;
-  private writingPromise?: Promise<any>;
+  // promise of writing of the beginning of impulse
+  private writingStartPromise?: Promise<any>;
+  // promise of writing of the end of impulse
+  private writingEndPromise?: Promise<any>;
   private deferredWritePromise?: Promised<void>;
   private _isInverted: boolean = false;
 
@@ -126,11 +129,16 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     return Boolean(this.blockTimeout);
   }
 
+  /**
+   * Impulse or writing is in progress.
+   */
   isImpulseInProgress(): boolean {
-    // TODO: должна учитываться запись ???
-    return Boolean(this.impulseTimeout);
+    return Boolean(this.impulseTimeout || this.writingEndPromise || this.writingStartPromise);
   }
 
+  /**
+   * Any step is in progress
+   */
   isInProgress(): boolean {
     return this.isImpulseInProgress() || this.isBlocked();
   }
@@ -178,17 +186,15 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   async impulse(): Promise<void> {
     if (this.props.blockMode === 'increasing') {
       // increasing mode
-      // TODO: нужно учитывать этапы записи???
-      if (this.isImpulseInProgress()) {
-        // increase mode
-        // TODO: если идет финальная запись 0 то отклонять increase
+      if (this.writingEndPromise || this.isBlocked()) {
+        // if it is the end of cycle - refuse increasing
+        return;
+      }
+      else if (this.isInProgress()) {
+        // if start of impulse is writing or the impulse is in progress > increase mode
         clearTimeout(this.impulseTimeout);
         this.setImpulseTimeout();
 
-        return;
-      }
-      else if (this.isBlocked()) {
-        // skip other changes while block time
         return;
       }
       // else start a new impulse
@@ -200,8 +206,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       // else start a new impulse
     }
     else {
-      // fixed mode
-      // if "refuse": skip while block time or impulse are in progress
+      // fixed mode - skip while block time or impulse are in progress
       if (this.isInProgress()) return;
       // else start a new impulse
     }
@@ -210,23 +215,33 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
 
+  /**
+   * Start a new cycle.
+   */
   private async doStartImpulse() {
     const ioValue: boolean = invertIfNeed(true, this.isInverted());
 
-    this.changeEvents.emit(true);
     this.setImpulseTimeout();
+    this.changeEvents.emit(true);
 
-    this.writingPromise = this.source.write(this.props.pin, ioValue);
+    this.writingStartPromise = this.source.write(this.props.pin, ioValue);
 
     try {
-      await this.writingPromise;
+      await this.writingStartPromise;
     }
     catch (err) {
-      delete this.writingPromise;
-      // TODO: !!!! поидее нужно все отменить
+      delete this.writingStartPromise;
+
+      // on error cancel deferred queue and start blocking
+      const errorMsg = `BinaryOutput driver: Can't write start of impulse,
+        props: "${JSON.stringify(this.props)}". ${String(err)}`;
+
+      this.handleError(errorMsg);
+
+      throw new Error(errorMsg);
     }
 
-    delete this.writingPromise;
+    delete this.writingStartPromise;
   }
 
   setImpulseTimeout() {
@@ -237,46 +252,35 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
   private async impulseFinished() {
-    // TODO: отменить возможность продления импульса ????
+    delete this.impulseTimeout;
 
     // if impulse finished faster than writing of beginning of impulse
     // then wait for writing has been finished
-    if (this.writingPromise) {
+    if (this.writingStartPromise) {
       try {
-        await this.writingPromise;
+        await this.writingStartPromise;
       }
       catch (e) {
-        // TODO: что делать в случае ошибки?? наверное ничего
+        // do noting on error because impulse has been cancelled
         return;
       }
     }
 
-    delete this.impulseTimeout;
-
     const ioValue: boolean = invertIfNeed(false, this.isInverted());
 
-    // TODO: неопределенное состояние пока идет запись
-    //  * либо добавить новое состояние
-    //  * либо продлить импульс
-    //  * либо запустить blockTime
+    this.writingEndPromise = this.source.write(this.props.pin, ioValue);
 
     try {
-      await this.source.write(this.props.pin, ioValue);
+      await this.writingEndPromise;
     }
     catch (err) {
+      delete this.writingEndPromise;
       // TODO: завершить импульс и запустить block time. Отменить defer
     }
 
+    delete this.writingEndPromise;
+
     this.startBlocking();
-  }
-
-  private startBlocking(): void {
-    if (!this.props.blockTime) return this.startDeferred();
-
-    setTimeout(() => {
-      delete this.blockTimeout;
-      this.startDeferred();
-    }, this.props.blockTime);
   }
 
   private startDeferred(): void {
@@ -292,6 +296,28 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
         // TODO: review
         this.log.error(`ImpulseOutput: Error with writing deferred impulse: ${String(err)}`);
       });
+  }
+
+  private startBlocking(): void {
+    if (!this.props.blockTime) return this.startDeferred();
+
+    setTimeout(() => {
+      delete this.blockTimeout;
+      this.startDeferred();
+    }, this.props.blockTime);
+  }
+
+  private handleError(errorMsg: string) {
+    if (this.deferredWritePromise) {
+      this.deferredWritePromise.reject(new Error(errorMsg));
+
+      delete this.deferredWritePromise;
+    }
+
+    this.cancel();
+
+    // start blocking
+    this.startBlocking();
   }
 
   private setDeferredValue(): Promise<void> {

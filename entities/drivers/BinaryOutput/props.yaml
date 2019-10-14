@@ -10,6 +10,7 @@ blockMode:
 initial:
   type: '1 | 0 | "1" | "0" | "on" | "off" | "low" | "high" | "true" | "false" | true | false'
   default: low
+# invert value that will be sent to IO
 invert:
   type: boolean
 # In true case it inverts value if pullup resistor is on

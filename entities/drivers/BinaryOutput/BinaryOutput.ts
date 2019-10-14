@@ -189,7 +189,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   async write(level: boolean): Promise<void> {
     // if there is writing or blocking check block modes
     if (this.isInProgress()) {
-      // TODO: где проверка что идет block time???
       // don't allow writing while another writing or block time is in progress in "refuse" mode
       if (this.props.blockMode === 'refuse') return;
       // else defer mode - store value to write after current writing has been completed
@@ -249,14 +248,13 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   }
 
   private handleError(errorMsg: string) {
-    // removing deferred and make deferred promise rejected
-    delete this.lastDeferredValue;
-
     if (this.deferredWritePromise) {
       this.deferredWritePromise.reject(new Error(errorMsg));
 
       delete this.deferredWritePromise;
     }
+
+    this.cancel();
 
     // start blocking
     this.startBlocking();
