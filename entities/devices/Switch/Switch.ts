@@ -19,11 +19,11 @@ export default class Switch extends DeviceBase<Props> {
   protected didInit = async () => {
     this.depsInstances.binaryOutput = await this.context.getSubDriver('BinaryOutput', this.props);
 
-    this.depsInstances.binaryOutput.onIncomeChange((newLevel: boolean) => {
-      if (!this.statusState) throw new Error(`No status`);
-
-      this.statusState.setIncomeState({ [DEFAULT_DEVICE_STATUS]: newLevel });
-    });
+    // this.binaryOutput.onIncomeChange((newLevel: boolean) => {
+    //   if (!this.statusState) throw new Error(`No status`);
+    //
+    //   this.statusState.setIncomeState({ [DEFAULT_DEVICE_STATUS]: newLevel });
+    // });
   }
 
 
@@ -39,8 +39,9 @@ export default class Switch extends DeviceBase<Props> {
     turn: async (onOrOff: any): Promise<boolean> => {
       if (!this.statusState) throw new Error(`No status`);
 
-      // skip while switch at block time
-      if (this.binaryOutput.isBlocked()) return this.getStatus() as boolean;
+      // TODO: review
+      // skip while writing or block time are in progress
+      if (this.binaryOutput.isInProgress()) return this.getStatus() as boolean;
 
       const level: boolean = resolveLevel(onOrOff);
 
@@ -54,8 +55,9 @@ export default class Switch extends DeviceBase<Props> {
 
       const currentLevel: boolean = this.getStatus() as boolean;
 
-      // skip while switch at block time
-      if (this.binaryOutput.isBlocked()) return currentLevel;
+      // TODO: review
+      // skip while writing or block time are in progress
+      if (this.binaryOutput.isInProgress()) return currentLevel;
 
       const resultLevel: boolean = !currentLevel;
 

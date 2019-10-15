@@ -32,7 +32,7 @@ export default class Toggle extends DeviceBase<Props> {
     );
 
     // listen only keyUp events
-    this.binaryClick.addUpListener(this.onUp);
+    this.binaryClick.onUp(this.onUp);
   }
 
   protected initialStatus = async (): Promise<Dictionary> => {

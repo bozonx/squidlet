@@ -5,26 +5,13 @@ publish:
   type: '"down" | "up" | "both"'
   default: both
 
-###### Other props
 ### BinaryClick driver
 # releaseTimeoutMs: {}
-#
-### BinaryInput driver props
 # blockTime: {}
 # invert: {}
 # invertOnPullup: {}
-#
-### DigitalPinInput driver
 # debounce: {}
-# doubleCheck: {}
-# edge: {}
 # pullup: {}
 # pulldown: {}
-#
-#### DigitalPin base props
 # pin: {}
-# sorce: {}
-#
-#### Device base props
-#----- statusRepublishInterval: {}
-#----- configRepublishInterval: {}
+# gpio: {}

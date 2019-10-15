@@ -4,25 +4,12 @@ $base: 'drivers.BinaryClick'
 blockTime:
   default: 50
 
-###### Other props
 ### BinaryClick driver
 # releaseTimeoutMs: {}
-#
-### BinaryInput driver props
 # invert: {}
 # invertOnPullup: {}
-#
-### DigitalPinInput driver
 # debounce: {}
-# doubleCheck: {}
-# edge: {}
 # pullup: {}
 # pulldown: {}
-#
-#### DigitalPin base props
 # pin: {}
-# sorce: {}
-#
-#### Device base props
-##----- statusRepublishInterval: {}
-#====== configRepublishInterval: {}
+# gpio: {}

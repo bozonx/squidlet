@@ -7,28 +7,13 @@ blockTime:
 # see DigitalPinInput driver
 debounce:
   default: 25
-doubleCheck:
-  default: true
 
-###### Other props
 ### BinaryClick driver
 # releaseTimeoutMs: {}
-#
-### BinaryInput driver props
 # invert: {}
 # invertOnPullup: {}
-#
-### DigitalPinInput driver
 # debounce: {}
-# doubleCheck: {}
-# edge: {}
 # pullup: {}
 # pulldown: {}
-#
-#### DigitalPin base props
 # pin: {}
-# sorce: {}
-#
-#### Device base props
-#----- statusRepublishInterval: {}
-#----- configRepublishInterval: {}
+# gpio: {}
