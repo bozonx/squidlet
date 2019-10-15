@@ -5,16 +5,11 @@ $base: 'devices.Switch'
 blockTime:
   default: 100
 
-###### Other props
-#### BinaryOutput driver
+### BinaryOutput driver
 # blockMode: {}
-# invert: {}
 # initial: {}
-#
-#### DigitalPin base props
+# invert: {}
+# invertOnOpenDrain: {}
+# openDrain: {}
 # pin: {}
-# sorce: {}
-#
-#### Device base props
-#------ statusRepublishInterval: {}
-#------ configRepublishInterval: {}
+# gpio: {}

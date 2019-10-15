@@ -12,17 +12,8 @@ debounce:
 ### BinaryInput driver props
 # invert: {}
 # invertOnPullup: {}
-#
-### DigitalPinInput driver
-# doubleCheck: {}
 # edge: {}
 # pullup: {}
 # pulldown: {}
-#
-#### DigitalPin base props
 # pin: {}
-# sorce: {}
-#
-#### Device base props
-#------ statusRepublishInterval: {}
-#------ configRepublishInterval: {}
+# gpio: {}

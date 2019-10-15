@@ -1,20 +1,11 @@
 $base: 'drivers.BinaryOutput'
 
-# timeout after switching. At this time it doesn't receive any signals.
-# see BinaryOutput driver.
-blockTime:
-  default: 0
-
-###### Other props
 ### BinaryOutput driver
+# blockTime: {}
 # blockMode: {}
-# invert: {}
 # initial: {}
-#
-### DigitalPin base props
+# invert: {}
+# invertOnOpenDrain: {}
+# openDrain: {}
 # pin: {}
-# sorce: {}
-#
-### Device base props
-#------ statusRepublishInterval: {}
-#------ configRepublishInterval: {}
+# gpio: {}
