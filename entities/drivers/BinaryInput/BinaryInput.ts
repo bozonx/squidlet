@@ -28,7 +28,8 @@ export interface BinaryInputProps extends DigitalPinInputProps {
  */
 export class BinaryInput extends DriverBase<BinaryInputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
-  private lastLevel?: boolean;
+  // last not inverted level represent level of board's pin
+  private lastIoLevel?: boolean;
   // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
   private blockTimeout: any;
@@ -39,7 +40,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
 
   init = async () => {
-    // TODO: isDigitalPinInverted перенести в digital helpers
     this._isInverted = isDigitalPinInverted(
       this.props.invert,
       this.props.invertOnPullup,
@@ -67,7 +67,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       );
     }
 
-    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
     await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
   }
 
@@ -85,9 +84,17 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
   async read(): Promise<boolean> {
-    return invertIfNeed(await this.gpio.read(this.props.pin), this.isInverted());
+    const level = await this.gpio.digitalRead(this.props.pin);
 
-    // TODO: может поднять событие если значение изменилось
+    if (level !== this.lastIoLevel) {
+      // save last level to compare next time
+      this.lastIoLevel = level;
+      // rise event if level is changed
+      // emit event and invert the value if need
+      this.changeEvents.emit(invertIfNeed(level, this.isInverted()));
+    }
+
+    return level;
   }
 
   /**
@@ -102,7 +109,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     return this.changeEvents.once(handler);
   }
 
-  removeListener(handlerIndex: number): void {
+  removeListener(handlerIndex: number) {
     this.changeEvents.removeListener(handlerIndex);
   }
 
@@ -118,22 +125,18 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   private handleChange = async (level: boolean) => {
     // do nothing if there is block time in progress
     if (this.isBlocked()) return;
-
     // don't rise any events if value hasn't changed
-    if (level === this.lastLevel) return;
+    if (level === this.lastIoLevel) return;
     // save last level to compare next time
-    this.lastLevel = level;
-
-    // TODO: наверное события запустить после таймаута чтобы на момент правильно пределилися isBlocked
+    this.lastIoLevel = level;
+    // don't use blocking logic if blockTime is 0 or less
+    if (this.props.blockTime) {
+      // start block time
+      // unblock after timeout
+      this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
+    }
     // emit event and invert the value if need
     this.changeEvents.emit(invertIfNeed(level, this.isInverted()));
-
-    // don't use blocking logic if blockTime is 0 or less
-    if (!this.props.blockTime) return;
-
-    // start block time
-    // unblock after timeout
-    this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
   }
 
 }
