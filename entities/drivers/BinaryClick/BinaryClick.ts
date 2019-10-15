@@ -61,7 +61,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
 
   // setup pin after all the drivers has been initialized
   devicesDidInit = async () => {
-    // TODO: print unique id of sub driver
     this.log.debug(`BinaryClick: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // setup pin as an input with resistor if specified
@@ -76,7 +75,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
       );
     }
 
-    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
     await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
   }
 
@@ -92,7 +90,9 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     return Boolean(this.blockTimeout);
   }
 
-  // TODO: add isInProgress()
+  isInProgress(): boolean {
+    return this.isDown() || this.isBlocked();
+  }
 
   /**
    * If changes from IO comes inverted
@@ -121,7 +121,15 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     this.events.removeListener(handlerIndex);
   }
 
-  // TODO: add cancel blocking and down
+  cancel() {
+    this.keyDown = false;
+
+    clearTimeout(this.releaseTimeout);
+    clearTimeout(this.blockTimeout);
+
+    delete this.releaseTimeout;
+    delete this.blockTimeout;
+  }
 
 
   private handleChange = async (level: boolean) => {
@@ -150,10 +158,6 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     // set keyDown state
     this.keyDown = true;
 
-    // TODO: наверное события запустить после таймаута чтобы на момент события был isKeyDown true
-    this.events.emit(BinaryClickEvents.change, this.keyDown);
-    this.events.emit(BinaryClickEvents.down);
-
     if (this.props.releaseTimeoutMs) {
       // release if timeout is reached
       this.releaseTimeout = setTimeout(() => {
@@ -164,6 +168,9 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
         delete this.releaseTimeout;
       }, this.props.releaseTimeoutMs);
     }
+
+    this.events.emit(BinaryClickEvents.change, this.keyDown);
+    this.events.emit(BinaryClickEvents.down);
   }
 
   private async finishDownState() {

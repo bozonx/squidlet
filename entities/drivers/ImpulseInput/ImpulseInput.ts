@@ -63,7 +63,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
   // setup pin after all the drivers has been initialized
   devicesDidInit = async () => {
-    // TODO: print unique id of sub driver
     this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     const edge: Edge = resolveEdge('rising', this.isInverted());
@@ -81,7 +80,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
       );
     }
 
-    // TODO: поидее надо разрешить слушать пин даже если он ещё не проинициализировался ???
     await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
   }
 
