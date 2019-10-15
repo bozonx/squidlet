@@ -1,4 +1,4 @@
-import {DigitalInputMode, DigitalOutputMode} from '../../../interfaces/io/DigitalIo';
+import {DigitalInputMode, DigitalOutputMode} from '../interfaces/io/DigitalIo';
 
 
 // export function generateSubDriverId(source: string, pin: number, address?: string) {

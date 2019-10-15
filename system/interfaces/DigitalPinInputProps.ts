@@ -1,5 +1,5 @@
 import DigitalBaseProps from './DigitalBaseProps';
-import {Edge} from '../../../../interfaces/io/DigitalIo';
+import {Edge} from './io/DigitalIo';
 
 
 export default interface DigitalPinInputProps extends DigitalBaseProps {

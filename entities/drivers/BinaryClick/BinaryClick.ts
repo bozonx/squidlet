@@ -1,8 +1,8 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
-import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
-import {resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
+import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
+import {resolveInputPinMode} from 'system/lib/digitalHelpers';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';

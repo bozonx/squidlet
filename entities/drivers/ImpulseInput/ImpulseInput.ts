@@ -2,8 +2,8 @@ import {ChangeHandler, DigitalInputMode, Edge} from 'system/interfaces/io/Digita
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
-import {resolveInputPinMode} from 'system/lib/base/digital/digitalHelpers';
-import DigitalPinInputProps from 'system/lib/base/digital/interfaces/DigitalPinInputProps';
+import {resolveInputPinMode} from 'system/lib/digitalHelpers';
+import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';
 

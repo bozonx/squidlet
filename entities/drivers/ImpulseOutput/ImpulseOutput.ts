@@ -1,10 +1,10 @@
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
-import {resolveOutputPinMode} from 'system/lib/base/digital/digitalHelpers';
+import {resolveOutputPinMode} from 'system/lib/digitalHelpers';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import DigitalPinOutputProps from 'system/lib/base/digital/interfaces/DigitalPinOutputProps';
+import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
