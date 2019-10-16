@@ -1,0 +1,11 @@
+name: BinaryState
+main: BinaryState.ts
+type: switch
+
+props:
+  blockTime:
+    type: number
+
+status:
+  default:
+    type: boolean

@@ -1,11 +1,10 @@
-$base: 'drivers.BinaryClick'
+$base: 'drivers.BinaryInput'
 
 # timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   default: 50
 
-### BinaryClick driver
-# releaseTimeoutMs: {}
+### BinaryInput driver
 # invert: {}
 # invertOnPullup: {}
 # debounce: {}

@@ -1,6 +1,6 @@
 name: Switch
-type: switch
 main: Switch.ts
+type: switch
 drivers:
   - BinaryOutput
 
