@@ -1,5 +1,5 @@
 import DeviceBase from 'system/base/DeviceBase';
-import {ChangeHandler, DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, DigitalInputMode, DigitalOutputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
 import {GpioDigital} from 'system/interfaces/Gpio';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
@@ -47,6 +47,14 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
      */
     digitalWrite: (pin: number, value: boolean): Promise<void> => {
       return this.expander.write(pin, value);
+    },
+
+    digitalSetupAndRead(pin: number, inputMode?: DigitalInputMode): Promise<boolean> {
+      // TODO: add
+    },
+
+    digitalSetupAndWrite(pin: number, value: boolean, outputMode?: DigitalOutputMode): Promise<void> {
+      // TODO: add
     },
 
     // only for input pins

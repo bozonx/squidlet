@@ -48,6 +48,14 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
       return this.digitalIo.write(pin, level);
     },
 
+    digitalSetupAndRead(pin: number, inputMode?: DigitalInputMode): Promise<boolean> {
+      // TODO: add
+    },
+
+    digitalSetupAndWrite(pin: number, value: boolean, outputMode?: DigitalOutputMode): Promise<void> {
+      // TODO: add
+    },
+
     digitalGetPinMode: (pin: number): Promise<DigitalPinMode | undefined> => {
       return this.digitalIo.getPinMode(pin);
     },

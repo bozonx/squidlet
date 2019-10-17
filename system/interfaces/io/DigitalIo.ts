@@ -9,15 +9,14 @@ export type Edge = 'rising' | 'falling' | 'both';
 
 
 export const Methods = [
+  'setupInput',
+  'setupOutput',
   'read',
   'write',
   'getPinMode',
-  'addListener',
+  'onChange',
   'removeListener',
   'removeAllListeners',
-  'setupInput',
-  'setupOutput',
-  'getPinMode',
 ];
 
 
