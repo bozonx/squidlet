@@ -2,10 +2,9 @@
 import {Gpio} from 'pigpio';
 
 import DigitalIo, {
-  Edge,
   DigitalPinMode,
   ChangeHandler,
-  DigitalInputMode
+  DigitalInputMode, Edge,
 } from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/DebounceCall';
 
@@ -37,6 +36,7 @@ export default class Digital implements DigitalIo {
     // make a new instance of Gpio
     this.pinInstances[pin] = new Gpio(pin, {
       ...convertedMode,
+      // TODO: review
       edge: this.resolveEdge(edge),
       //alert: true,
     });
@@ -173,10 +173,10 @@ export default class Digital implements DigitalIo {
   }
 
   private resolveEdge(edge?: Edge): number {
-    if (edge === 'rising') {
+    if (edge === Edge.rising) {
       return Gpio.RISING_EDGE;
     }
-    else if (edge === 'falling') {
+    else if (edge === Edge.falling) {
       return Gpio.FALLING_EDGE;
     }
 

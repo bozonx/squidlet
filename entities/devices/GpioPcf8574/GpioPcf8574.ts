@@ -1,5 +1,5 @@
 import DeviceBase from 'system/base/DeviceBase';
-import {ChangeHandler, DigitalInputMode, DigitalOutputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, DigitalInputMode, DigitalOutputMode, DigitalPinMode} from 'system/interfaces/io/DigitalIo';
 import {GpioDigital} from 'system/interfaces/Gpio';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';

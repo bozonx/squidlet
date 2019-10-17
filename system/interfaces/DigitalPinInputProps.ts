@@ -1,8 +1,8 @@
 import DigitalBaseProps from './DigitalBaseProps';
-import {Edge} from './io/DigitalIo';
 
 
 export default interface DigitalPinInputProps extends DigitalBaseProps {
+  // TODO: какой должен быть edge - строкой или всетаки enum
   // Listen to low, high or both levels. By default is both.
   edge: Edge;
   // debounce time in ms only for input pins. If not set system defaults will be used.

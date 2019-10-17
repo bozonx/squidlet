@@ -2,7 +2,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler, InputResistorMode} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
-import {resolveInputPinMode} from 'system/lib/digitalHelpers';
+import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';
@@ -79,7 +79,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   }
 
   getResistorMode(): InputResistorMode {
-    return resolveInputPinMode(this.props.pullup, this.props.pulldown);
+    return resolveInputResistorMode(this.props.pullup, this.props.pulldown);
   }
 
   isDown(): boolean {

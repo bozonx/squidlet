@@ -11,14 +11,14 @@ import {InputResistorMode, OutputResistorMode} from '../interfaces/io/DigitalIo'
 //   return `Digital_${source}`;
 // }
 
-export function resolveInputPinMode(pullup?: boolean, pulldown?: boolean): InputResistorMode {
+export function resolveInputResistorMode(pullup?: boolean, pulldown?: boolean): InputResistorMode {
   if (pullup) return InputResistorMode.pullup;
   else if (pulldown) return InputResistorMode.pulldown;
 
   return InputResistorMode.none;
 }
 
-export function resolveOutputPinMode(openDrain?: boolean): OutputResistorMode {
+export function resolveOutputResistorMode(openDrain?: boolean): OutputResistorMode {
   if (openDrain) return OutputResistorMode.opendrain;
 
   return OutputResistorMode.none;

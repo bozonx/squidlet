@@ -5,7 +5,6 @@ import DigitalIo, {
   DigitalInputMode,
   DigitalOutputMode,
   DigitalPinMode,
-  Edge,
 } from 'system/interfaces/io/DigitalIo';
 
 

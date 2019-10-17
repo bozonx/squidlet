@@ -1,11 +1,10 @@
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
-import {resolveOutputPinMode} from 'system/lib/digitalHelpers';
-import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
+import {ChangeHandler, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
-import {DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
 
@@ -88,7 +87,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupOutput(this.props.pin, initialIoValue, this.getPinMode());
+      await this.gpio.digitalSetupOutput(this.props.pin, initialIoValue, this.getResistorMode());
     }
     catch (err) {
       this.log.error(
@@ -99,8 +98,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   }
 
 
-  getPinMode(): DigitalOutputMode {
-    return resolveOutputPinMode(this.props.openDrain);
+  getResistorMode(): OutputResistorMode {
+    return resolveOutputResistorMode(this.props.openDrain);
   }
 
   isBlocked(): boolean {

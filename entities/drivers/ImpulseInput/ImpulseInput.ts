@@ -2,7 +2,7 @@ import {ChangeHandler, Edge, InputResistorMode} from 'system/interfaces/io/Digit
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
-import {resolveInputPinMode} from 'system/lib/digitalHelpers';
+import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';
@@ -85,7 +85,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
 
   getResistorMode(): InputResistorMode {
-    return resolveInputPinMode(this.props.pullup, this.props.pulldown);
+    return resolveInputResistorMode(this.props.pullup, this.props.pulldown);
   }
 
   isBlocked(): boolean {

@@ -1,4 +1,4 @@
-import {DigitalInputMode, DigitalPinMode, Edge} from 'system/interfaces/io/DigitalIo';
+import {DigitalInputMode, DigitalPinMode} from 'system/interfaces/io/DigitalIo';
 import {bitsToBytes} from 'system/lib/binaryHelpers';
 import {getKeyOfObject} from 'system/lib/objects';
 import {makeSizedArray} from 'system/lib/arrays';

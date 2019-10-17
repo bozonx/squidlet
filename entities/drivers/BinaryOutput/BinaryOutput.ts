@@ -3,8 +3,8 @@ import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
 import {InitialLevel} from 'system/interfaces/Types';
-import {resolveOutputPinMode} from 'system/lib/digitalHelpers';
-import {ChangeHandler, DigitalOutputMode} from 'system/interfaces/io/DigitalIo';
+import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
+import {ChangeHandler, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
@@ -81,7 +81,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupOutput(this.props.pin, this.currentIoValue, this.getPinMode());
+      await this.gpio.digitalSetupOutput(this.props.pin, this.currentIoValue, this.getResistorMode());
     }
     catch (err) {
       this.log.error(
@@ -91,8 +91,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     }
   }
 
-  getPinMode(): DigitalOutputMode {
-    return resolveOutputPinMode(this.props.openDrain);
+  getResistorMode(): OutputResistorMode {
+    return resolveOutputResistorMode(this.props.openDrain);
   }
 
   isBlocked(): boolean {

@@ -6,7 +6,6 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
-import {Edge} from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
