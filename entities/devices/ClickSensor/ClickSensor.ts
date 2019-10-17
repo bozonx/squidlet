@@ -8,8 +8,13 @@ import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryCli
 
 
 interface Props extends BinaryClickProps {
-  // TODO: review
-  publish: 'down' | 'up' | 'both';
+  /**
+   * Which state will be published.
+   * * pushed - publish only high level when button is pushed
+   * * risen - publish only low level when button is risen
+   * * both - publish both of states
+   */
+  publish: 'pushed' | 'risen' | 'both';
 }
 
 
@@ -25,20 +30,19 @@ export default class ClickSensor extends DeviceBase<Props> {
       omitObj(this.props, 'publish')
     );
 
-    if (this.props.publish === 'down') {
-      // change status silently
-      this.binaryClick.addStateListener(this.onSilentStatusChange);
+    // TODO: pushed and risen не будут работать пока не будет решена проблема
+    //  чтобы публиковать не изменившийся стейт
+
+    if (this.props.publish === 'pushed') {
       // rise 1 on key up
-      this.binaryClick.addDownListener(this.onDown);
+      this.binaryClick.onDown(this.handleDown);
     }
-    else if (this.props.publish === 'up') {
-      // change status silently
-      this.binaryClick.addStateListener(this.onSilentStatusChange);
+    else if (this.props.publish === 'risen') {
       // rise 0 on key up
-      this.binaryClick.addUpListener(this.onUp);
+      this.binaryClick.onUp(this.handleUp);
     }
     else if (this.props.publish === 'both') {
-      this.binaryClick.addStateListener(this.onClickStateChange);
+      this.binaryClick.onChange(this.handleChange);
     }
   }
 
@@ -47,34 +51,20 @@ export default class ClickSensor extends DeviceBase<Props> {
     return { [DEFAULT_DEVICE_STATUS]: this.binaryClick.isDown() };
   }
 
-  // protected transformPublishValue = (value: boolean): number => {
-  //   return Number(value);
-  // }
 
-
-  private onSilentStatusChange = this.wrapErrors(async () => {
+  private handleDown = this.wrapErrors(async () => {
     if (!this.statusState) return;
 
-    // TODO: почему тут silent write был ????
-
-    await this.statusState.write({[DEFAULT_DEVICE_STATUS]: true});
-  });
-
-  private onDown = this.wrapErrors(async () => {
-    if (!this.statusState) return;
-
-    //this.status.publish(true);
     await this.setStatus(true);
   });
 
-  private onUp = this.wrapErrors(async () => {
+  private handleUp = this.wrapErrors(async () => {
     if (!this.statusState) return;
 
-    //this.status.publish(false);
     await this.setStatus(false);
   });
 
-  private onClickStateChange = this.wrapErrors(async (level: boolean) => {
+  private handleChange = this.wrapErrors(async (level: boolean) => {
     await this.setStatus(level);
   });
 
