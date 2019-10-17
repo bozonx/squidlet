@@ -12,7 +12,7 @@ type RisingHandler = () => void;
 type ImpulseInputMode = 'fixed' | 'increasing';
 
 
-// TODO: edge doesn't supported but it in DigitalPinInputProps
+// TODO: edge isn't supported but it in DigitalPinInputProps
 export interface ImpulseInputProps extends DigitalPinInputProps {
   // duration of impulse in ms
   impulseLength: number;

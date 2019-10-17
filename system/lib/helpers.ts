@@ -2,8 +2,8 @@ import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {compactUndefined} from './arrays';
 import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
 import {JsonTypes, Primitives} from '../interfaces/Types';
-import {parseValue} from './common';
 import {Edge} from '../interfaces/io/DigitalIo';
+import {EdgeString} from '../interfaces/DigitalPinInputProps';
 
 
 /**
@@ -48,18 +48,26 @@ export function invertIfNeed(value?: boolean, invert?: boolean): boolean {
 /**
  * Resolve inverted edge.
  */
-export function resolveEdge(edge?: Edge, inverted?: boolean): Edge {
+export function resolveEdge(edge?: EdgeString, inverted?: boolean): Edge {
   if (typeof edge === 'undefined') {
     return Edge.both;
   }
-  else if (inverted && edge === Edge.rising) {
+  else if (inverted && edge === 'rising') {
     return Edge.falling;
   }
-  else if (inverted && edge === Edge.falling) {
+  else if (inverted && edge === 'falling') {
     return Edge.rising;
   }
 
-  return edge;
+  if (edge === 'rising') {
+    return Edge.rising;
+  }
+  else if (edge === 'falling') {
+    return Edge.falling;
+  }
+  else {
+    return Edge.both;
+  }
 }
 
 /**
