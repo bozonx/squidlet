@@ -1,6 +1,6 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {DigitalInputMode, Edge, ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, Edge, InputResistorMode} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
 import {resolveInputPinMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
@@ -58,7 +58,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
+      await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, edge);
     }
     catch (err) {
       this.log.error(
@@ -71,7 +71,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   }
 
 
-  getPinMode(): DigitalInputMode {
+  getResistorMode(): InputResistorMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
 

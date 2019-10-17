@@ -1,5 +1,5 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {ChangeHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, InputResistorMode} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import {resolveInputPinMode} from 'system/lib/digitalHelpers';
@@ -66,7 +66,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupInput(this.props.pin, this.getPinMode(), this.props.debounce, 'both');
+      await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, 'both');
     }
     catch (err) {
       this.log.error(
@@ -78,7 +78,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
   }
 
-  getPinMode(): DigitalInputMode {
+  getResistorMode(): InputResistorMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
 

@@ -1,4 +1,4 @@
-import {ChangeHandler, DigitalInputMode, Edge} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler, Edge, InputResistorMode} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
@@ -65,13 +65,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   devicesDidInit = async () => {
     this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
-    const edge: Edge = resolveEdge('rising', this.isInverted());
+    const edge: Edge = resolveEdge(Edge.rising, this.isInverted());
 
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
       // listen to only high levels
-      await this.gpio.digitalSetupInput(this.props.pin, this.getPinMode(), this.props.debounce, edge);
+      await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, edge);
     }
     catch (err) {
       this.log.error(
@@ -84,7 +84,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
 
-  getPinMode(): DigitalInputMode {
+  getResistorMode(): InputResistorMode {
     return resolveInputPinMode(this.props.pullup, this.props.pulldown);
   }
 

@@ -1,6 +1,6 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {DigitalSubDriver, Edge, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
+import {DigitalSubDriver, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
 import {lastItem} from 'system/lib/arrays';
 
 import {PortExpander} from '../PortExpander';
