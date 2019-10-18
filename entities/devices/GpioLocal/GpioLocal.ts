@@ -2,9 +2,9 @@ import DeviceBase from 'system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
 import DigitalIo, {
   ChangeHandler,
-  DigitalInputMode,
-  DigitalOutputMode,
-  DigitalPinMode,
+  Edge,
+  InputResistorMode,
+  OutputResistorMode
 } from 'system/interfaces/io/DigitalIo';
 
 
@@ -29,12 +29,12 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
 
 
   private gpio: Gpio = {
-    digitalSetupInput: (pin: number, inputMode: DigitalInputMode, debounce: number, edge: Edge): Promise<void> => {
+    digitalSetupInput: (pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> => {
       // TODO: use default debounce
       return this.digitalIo.setupInput(pin, inputMode, debounce, edge);
     },
 
-    digitalSetupOutput: (pin: number, initialValue: boolean, outputMode: DigitalOutputMode): Promise<void> => {
+    digitalSetupOutput: (pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> => {
       return this.digitalIo.setupOutput(pin, initialValue, outputMode);
     },
 
@@ -47,11 +47,11 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
       return this.digitalIo.write(pin, level);
     },
 
-    digitalSetupAndRead(pin: number, inputMode?: DigitalInputMode): Promise<boolean> {
+    digitalSetupAndRead(pin: number, inputMode?: InputResistorMode): Promise<boolean> {
       // TODO: add
     },
 
-    digitalSetupAndWrite(pin: number, value: boolean, outputMode?: DigitalOutputMode): Promise<void> {
+    digitalSetupAndWrite(pin: number, value: boolean, outputMode?: OutputResistorMode): Promise<void> {
       // TODO: add
     },
 

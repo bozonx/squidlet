@@ -1,4 +1,8 @@
 export type ChangeHandler = (level: boolean) => void;
+export enum PinDirection {
+  input,
+  output
+}
 // export type DigitalInputMode = 'input'
 //   | 'input_pullup'
 //   | 'input_pulldown';
@@ -59,8 +63,8 @@ export default interface DigitalIo {
   read(pin: number): Promise<boolean>;
   // only for output pins
   write(pin: number, value: boolean): Promise<void>;
-  // TODO: review
-  getPinMode(pin: number): Promise<DigitalPinMode | undefined>;
+  getPinDirection(pin: number): Promise<PinDirection | undefined>;
+  getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
 
   // only for input pins
   // Listen to changes

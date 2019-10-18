@@ -2,10 +2,13 @@
 import {Gpio} from 'pigpio';
 
 import DigitalIo, {
-  DigitalPinMode,
   ChangeHandler,
-  DigitalInputMode, Edge,
+  Edge,
+  PinDirection,
+  InputResistorMode,
+  OutputResistorMode
 } from 'system/interfaces/io/DigitalIo';
+// TODO: неправильный debounce - нужно просто ждать и считать потом финальное значение
 import DebounceCall from 'system/lib/DebounceCall';
 
 
@@ -29,14 +32,14 @@ export default class Digital implements DigitalIo {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
-    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode(inputMode);
+  async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
+    const pullUpDown: number = this.convertInputResistorMode(inputMode);
     // save debounce time
     this.debounceTimes[pin] = debounce;
     // make a new instance of Gpio
     this.pinInstances[pin] = new Gpio(pin, {
-      ...convertedMode,
-      // TODO: review
+      pullUpDown,
+      mode: Gpio.INPUT,
       edge: this.resolveEdge(edge),
       //alert: true,
     });
@@ -46,34 +49,40 @@ export default class Digital implements DigitalIo {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
-    const convertedMode: {mode: number, pullUpDown: number} = this.convertMode('output');
+  async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
+    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
 
     this.pinInstances[pin] = new Gpio(pin, {
-      ...convertedMode,
+      pullUpDown,
+      mode: Gpio.OUTPUT,
     });
 
     // set initial value if is set
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
 
+  async getPinDirection(pin: number): Promise<PinDirection | undefined> {
+    // TODO: что будет если пин не скорфигурирован???? наверное ошибка ??? - тогда вернуть undefined
+    const pinInstance = this.getPinInstance('getPinDirection', pin);
+    const modeConst: number = pinInstance.getMode();
+
+    if (modeConst === Gpio.INPUT) {
+      return PinDirection.input;
+    }
+    else if (modeConst === Gpio.OUTPUT) {
+      return PinDirection.output;
+    }
+
+    return;
+  }
+
   /**
    * Get pin mode.
    * It throws an error if pin hasn't configured before
    */
-  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    const pinInstance = this.getPinInstance('getPinMode', pin);
-    const modeConst: number = pinInstance.getMode();
-
-    if (modeConst === Gpio.INPUT) {
-      return 'input';
-
-      // TODO: add support of input_pullup and input_pulldown
-    }
-    else if (modeConst === Gpio.OUTPUT) {
-      return 'output';
-    }
-
+  async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
+    // TODO: что будет если пин не скорфигурирован???? наверное ошибка ??? - тогда вернуть undefined
+    // TODO: add !!!!
     return;
   }
 
@@ -145,34 +154,33 @@ export default class Digital implements DigitalIo {
   }
 
 
-  private convertMode(pinMode: DigitalPinMode): {mode: number, pullUpDown: number} {
-    switch (pinMode) {
-      case ('input'):
-        return {
-          mode: Gpio.INPUT,
-          pullUpDown: Gpio.PUD_OFF,
-        };
-      case ('input_pullup'):
-        return {
-          mode: Gpio.INPUT,
-          pullUpDown: Gpio.PUD_UP,
-        };
-      case ('input_pulldown'):
-        return {
-          mode: Gpio.INPUT,
-          pullUpDown: Gpio.PUD_DOWN,
-        };
-      case ('output'):
-        return {
-          mode: Gpio.OUTPUT,
-          pullUpDown: Gpio.PUD_OFF,
-        };
+  private convertInputResistorMode(resistorMode: InputResistorMode): number {
+    switch (resistorMode) {
+      case (InputResistorMode.none):
+        return Gpio.PUD_OFF;
+      case (InputResistorMode.pullup):
+        return Gpio.PUD_UP;
+      case (InputResistorMode.pulldown):
+        return Gpio.PUD_DOWN;
       default:
-        throw new Error(`Unknown mode "${pinMode}"`);
+        throw new Error(`Unknown mode "${resistorMode}"`);
     }
   }
 
-  private resolveEdge(edge?: Edge): number {
+  private convertOutputResistorMode(resistorMode: OutputResistorMode): number {
+    switch (resistorMode) {
+      case (OutputResistorMode.none):
+        return Gpio.PUD_OFF;
+        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
+      case (OutputResistorMode.opendrain):
+        throw new Error(`Open-drain mode isn't supported`);
+        //return Gpio.PUD_UP;
+      default:
+        throw new Error(`Unknown mode "${resistorMode}"`);
+    }
+  }
+
+  private resolveEdge(edge: Edge): number {
     if (edge === Edge.rising) {
       return Gpio.RISING_EDGE;
     }
@@ -183,6 +191,7 @@ export default class Digital implements DigitalIo {
     return Gpio.EITHER_EDGE;
   }
 
+  // TODO: review
   private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
     if (!this.pinInstances[pin]) {
       throw new Error(`Nodejs Digital io ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
