@@ -28,6 +28,11 @@ export default class Digital implements DigitalIo {
   private debounceTimes: {[index: string]: number | undefined} = {};
 
 
+  destroy(): Promise<void> {
+    return this.clearAll();
+  }
+
+
   /**
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
@@ -93,6 +98,7 @@ export default class Digital implements DigitalIo {
   }
 
   async write(pin: number, value: boolean): Promise<void> {
+    // TODO: проверить режим - если input - то поднять ошибку - нельзя писать
     const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
 
@@ -103,7 +109,7 @@ export default class Digital implements DigitalIo {
   // TODO: должен работать даже если пин не сконфигурирован - это просто слушатель событий
   // TODO: навешивание на interrupt должно происходить при setup
   // TODO: но если пин output - то не навешиваться
-  async setWatch(pin: number, handler: ChangeHandler): Promise<number> {
+  async onChange(pin: number, handler: ChangeHandler): Promise<number> {
     const pinInstance = this.getPinInstance('setWatch', pin);
     const handlerWrapper: GpioHandler = (level: number) => {
       const value: boolean = Boolean(level);
@@ -131,7 +137,7 @@ export default class Digital implements DigitalIo {
     return this.alertListeners.length - 1;
   }
 
-  async clearWatch(id: number): Promise<void> {
+  async removeListener(handlerIndex: number): Promise<void> {
     if (typeof id === 'undefined') {
       throw new Error(`You have to specify a watch id`);
     }
@@ -147,9 +153,13 @@ export default class Digital implements DigitalIo {
     delete this.alertListeners[id];
   }
 
-  async clearAllWatches(): Promise<void> {
-    for (let index in this.alertListeners) {
-      await this.clearWatch(parseInt(index));
+  async clearPin(pin: number): Promise<void> {
+    // TODO: remove listener - see this.alertListeners
+  }
+
+  async clearAll(): Promise<void> {
+    for (let index in this.pinInstances) {
+      await this.clearPin(parseInt(index));
     }
   }
 
@@ -191,7 +201,6 @@ export default class Digital implements DigitalIo {
     return Gpio.EITHER_EDGE;
   }
 
-  // TODO: review
   private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
     if (!this.pinInstances[pin]) {
       throw new Error(`Nodejs Digital io ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);

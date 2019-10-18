@@ -1,3 +1,6 @@
+import IoItem from '../IoItem';
+
+
 export type ChangeHandler = (level: boolean) => void;
 export enum PinDirection {
   input,
@@ -41,7 +44,7 @@ export const Methods = [
 ];
 
 
-export default interface DigitalIo {
+export default interface DigitalIo extends IoItem {
   /**
    * Setup pin as an input
    * @param pin - pin number
@@ -59,16 +62,21 @@ export default interface DigitalIo {
    */
   setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void>;
 
+  getPinDirection(pin: number): Promise<PinDirection | undefined>;
+  getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
   // output and input pins can be read
   read(pin: number): Promise<boolean>;
   // only for output pins
   write(pin: number, value: boolean): Promise<void>;
-  getPinDirection(pin: number): Promise<PinDirection | undefined>;
-  getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
 
   // only for input pins
   // Listen to changes
   onChange(pin: number, handler: ChangeHandler): Promise<number>;
   removeListener(handlerIndex: number): Promise<void>;
-  removeAllListeners(): Promise<void>;
+
+  /**
+   * Remove listeners of the pin and destroy pin (unmanage)
+   */
+  clearPin(): Promise<void>;
+  clearAll(): Promise<void>;
 }

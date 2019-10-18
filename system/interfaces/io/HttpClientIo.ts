@@ -1,4 +1,5 @@
 import {HttpRequest, HttpResponse} from '../Http';
+import IoItem from '../IoItem';
 
 
 export const Methods = [
@@ -6,6 +7,6 @@ export const Methods = [
 ];
 
 
-export interface HttpClientIo {
+export interface HttpClientIo extends IoItem {
   fetch(request: HttpRequest): Promise<HttpResponse>;
 }

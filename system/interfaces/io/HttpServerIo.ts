@@ -1,4 +1,5 @@
 import {HttpRequest, HttpResponse} from '../Http';
+import IoItem from '../IoItem';
 
 
 export const Methods = [
@@ -29,7 +30,7 @@ export interface HttpServerProps {
 }
 
 
-export interface HttpServerIo {
+export interface HttpServerIo extends IoItem {
   /**
    * Destroy server and don't rise a close event.
    */
