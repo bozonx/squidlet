@@ -6,26 +6,15 @@ export enum PinDirection {
   input,
   output
 }
-// export type DigitalInputMode = 'input'
-//   | 'input_pullup'
-//   | 'input_pulldown';
-// export type DigitalOutputMode = 'output'
-//   | 'output_opendrain';
-// export type DigitalPinMode = DigitalInputMode | DigitalOutputMode;
-// export type Edge = 'rising' | 'falling' | 'both';
-//
-
 export enum InputResistorMode {
   none,
   pullup,
   pulldown,
 }
-
 export enum OutputResistorMode {
   none,
   opendrain,
 }
-
 export enum Edge {
   rising,
   falling,
@@ -71,13 +60,18 @@ export default interface DigitalIo extends IoItem {
 
   /**
    * Listen of changes of input pins.
-   * Pin has to be set up before and has to be an input.
+   * It allows to add listener event pin hasn't been set up, but better to check it before add a listener.
    */
   onChange(pin: number, handler: ChangeHandler): Promise<number>;
+
+  /**
+   * Remove listener which has been added by "onChange" method.
+   */
   removeListener(handlerIndex: number): Promise<void>;
 
   /**
-   * Remove listeners of the pin and destroy pin (unmanage) if need
+   * Remove listeners of the pin and destroy pin (unmanage) if need.
+   * After that pin is uncontrolled, if you want to control it again then set it up.
    */
   clearPin(pin: number): Promise<void>;
   clearAll(): Promise<void>;

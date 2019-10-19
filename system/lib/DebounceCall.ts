@@ -10,7 +10,7 @@ export default class DebounceCall {
   private lastCb?: (...args: any[]) => void;
 
 
-  invoke(id: string | number, debounce: number | undefined, cb: (...args: any[]) => void, ...args: any[]) {
+  invoke(cb: (...args: any[]) => void, id: string | number, debounce: number | undefined) {
     // if there isn't debounce - call immediately
     if (!debounce) {
       if (typeof this.debounceTimeouts[id] !== 'undefined') this.clear(id);
@@ -37,6 +37,10 @@ export default class DebounceCall {
     clearTimeout(this.debounceTimeouts[id]);
     delete this.debounceTimeouts[id];
     delete this.lastCb;
+  }
+
+  destroy() {
+    // TODO: add !!!
   }
 
 }

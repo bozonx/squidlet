@@ -14,7 +14,8 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 type GpioHandler = (level: number) => void;
 
-const INT_EVENT_NAME = 'interrupt';
+const INTERRUPT_EVENT_NAME = 'interrupt';
+const ALERT_EVENT_NAME = 'alert';
 
 
 export default class Digital implements DigitalIo {
@@ -24,8 +25,6 @@ export default class Digital implements DigitalIo {
   private readonly pinListeners: {[index: string]: GpioHandler} = {};
   // resistor constant of pins by id
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
-  // TODO: use real debounce not increasing
-  // TODO: неправильный debounce - нужно просто ждать и считать потом финальное значение
   private readonly debounceCall: DebounceCall = new DebounceCall();
 
 
@@ -47,15 +46,26 @@ export default class Digital implements DigitalIo {
     this.pinInstances[pin] = new Gpio(pin, {
       pullUpDown,
       mode: Gpio.INPUT,
-      edge: this.resolveEdge(edge),
-      //alert: true,
     });
     this.resistors[pin] = inputMode;
 
-    this.pinListeners[pin] = (level: number) => this.handlePinChange(pin, level, debounce);
-    // start listen pin changes
-    // TODO: чем interrupt отличается от alert ???
-    this.pinInstances[pin].on(INT_EVENT_NAME, this.pinListeners[pin]);
+    // try to use "interrupt" event because "alert" event emits too many changes.
+    // But not all the pins can have an interruption, in this case better to use the "alert" event.
+    try {
+      this.pinInstances[pin].enableInterrupt(this.resolveEdge(edge));
+
+      this.pinListeners[pin] = (level: number) => this.handlePinChange(pin, level, debounce);
+
+      // start listen pin changes
+      this.pinInstances[pin].on(INTERRUPT_EVENT_NAME, this.pinListeners[pin]);
+    }
+    catch (e) {
+      this.pinInstances[pin].enableAlert();
+      // use own edge handler because alert mode doesn't have edge
+      this.pinListeners[pin] = (level: number) => this.handlePinChange(pin, level, debounce, edge);
+      // start listen pin changes
+      this.pinInstances[pin].on(ALERT_EVENT_NAME, this.pinListeners[pin]);
+    }
   }
 
   /**
@@ -134,7 +144,9 @@ export default class Digital implements DigitalIo {
     if (!this.pinInstances[pin]) return;
 
     this.events.removeAllListeners(pin);
-    this.pinInstances[pin].removeListener(INT_EVENT_NAME, this.pinListeners[pin]);
+    // TODO: не будет ли ошибки если нет такого хэндлера ????
+    this.pinInstances[pin].removeListener(INTERRUPT_EVENT_NAME, this.pinListeners[pin]);
+    this.pinInstances[pin].removeListener(ALERT_EVENT_NAME, this.pinListeners[pin]);
 
     // TODO: не вызовет ли ошибки если не исользовалось?
     // TODO: не отключит ли навсегда, что даже при следующем запуске будет выключенно???
@@ -154,17 +166,27 @@ export default class Digital implements DigitalIo {
   }
 
 
-  private handlePinChange(pin: number, level: number, debounce: number) {
-    const value: boolean = Boolean(level);
+  private handlePinChange(pin: number, numLevel: number, debounce: number, edge?: Edge) {
+    const level: boolean = Boolean(numLevel);
+
+    // don't handle edge which is not suitable to edge that has been set up
+    if (typeof edge !== 'undefined') {
+      if (edge === Edge.rising && !level) {
+        return;
+      }
+      else if (edge === Edge.falling && level) {
+        return;
+      }
+    }
 
     // if undefined or 0 - call handler immediately
     if (!debounce) {
-      this.events.emit(pin, value);
+      this.events.emit(pin, level);
     }
     else {
-      // TODO: remake
-      // wait for debounce and read current level
-      this.debounceCall.invoke(async () => {
+      // wait for debounce and read current level and emit an event
+      this.debounceCall.invoke(() => {
+        // TODO: обработать ошибку
         const realLevel = await this.read(pin);
 
         this.events.emit(pin, realLevel);
