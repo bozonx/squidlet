@@ -8,16 +8,11 @@ import DigitalIo, {
   OutputResistorMode,
   PinDirection,
 } from 'system/interfaces/io/DigitalIo';
-// TODO: неправильный debounce - нужно просто ждать и считать потом финальное значение
 import DebounceCall from 'system/lib/DebounceCall';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 
 type GpioHandler = (level: number) => void;
-
-interface Listener {
-  pin: number;
-  handler: GpioHandler;
-}
 
 
 // TODO: нужно ли включать/выключать interrupt or alert при старте и дестрое ???
@@ -25,13 +20,14 @@ interface Listener {
 
 export default class Digital implements DigitalIo {
   private readonly pinInstances: {[index: string]: Gpio} = {};
-  private readonly alertListeners: Listener[] = [];
-
-  // TODO: запоминать резисторы
-
+  private readonly events = new IndexedEventEmitter<ChangeHandler>();
+  // pin change listeners by
+  private readonly pinListeners: {[index: string]: GpioHandler} = {};
+  // resistor constant of pins by id
+  private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
+  // TODO: use real debounce not increasing
+  // TODO: неправильный debounce - нужно просто ждать и считать потом финальное значение
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  // debounce times by pin number
-  private debounceTimes: {[index: string]: number | undefined} = {};
 
 
   destroy(): Promise<void> {
@@ -45,8 +41,6 @@ export default class Digital implements DigitalIo {
    */
   async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
-    // save debounce time
-    this.debounceTimes[pin] = debounce;
     // make a new instance of Gpio
     this.pinInstances[pin] = new Gpio(pin, {
       pullUpDown,
@@ -54,6 +48,12 @@ export default class Digital implements DigitalIo {
       edge: this.resolveEdge(edge),
       //alert: true,
     });
+    this.resistors[pin] = inputMode;
+
+    // start listen pin changes
+    // TODO: чем interrupt отличается от alert ???
+    this.pinInstances[pin]
+      .on('interrupt', (level: number) => this.handlePinChange(pin, level, debounce));
   }
 
   /**
@@ -67,6 +67,7 @@ export default class Digital implements DigitalIo {
       pullUpDown,
       mode: Gpio.OUTPUT,
     });
+    this.resistors[pin] = outputMode;
 
     // set initial value if is set
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
@@ -81,9 +82,7 @@ export default class Digital implements DigitalIo {
    * It throws an error if pin hasn't configured before
    */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    // TODO: что будет если пин не скорфигурирован???? наверное ошибка ??? - тогда вернуть undefined
-    // TODO: add !!!!
-    return;
+    return this.resistors[pin];
   }
 
   async read(pin: number): Promise<boolean> {
@@ -109,6 +108,7 @@ export default class Digital implements DigitalIo {
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
+    // TODO: remake new pinListeners
     const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
 
     if (typeof pinDirection === 'undefined') {
@@ -144,6 +144,7 @@ export default class Digital implements DigitalIo {
   }
 
   async clearPin(pin: number): Promise<void> {
+    // TODO: remake new pinListeners
     for (let handlerIndex in this.alertListeners) {
       if (this.alertListeners[handlerIndex].pin !== pin) continue;
 
@@ -158,7 +159,11 @@ export default class Digital implements DigitalIo {
   }
 
 
-  private handlePinChange(pin: number, handler: ChangeHandler, level: number) {
+  private handlePinChange(pin: number, level: number, debounce: number) {
+    // TODO: это вызыватся на все пины - проверить чтобы небыло наложений
+    // TODO: use events
+
+    // TODO: remake new pinListeners
     const value: boolean = Boolean(level);
 
     // if undefined or 0 - call handler immediately
@@ -177,6 +182,9 @@ export default class Digital implements DigitalIo {
   }
 
   private clearListener(handlerIndex: number) {
+
+    // TODO: remove pinListeners[pin]
+
     // it has been removed recently
     if (!this.alertListeners[handlerIndex]) return;
 
