@@ -127,7 +127,7 @@ export default class Digital implements DigitalIo {
       this.handlePinChange(pin, handler, level);
     };
 
-    // TODO: зачем навешиватьна пин больше 1го листенера????
+    // TODO: зачем навешивать на пин больше 1го листенера????
 
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
@@ -166,6 +166,7 @@ export default class Digital implements DigitalIo {
       handler(value);
     }
     else {
+      // TODO: remake
       // wait for debounce and read current level
       this.debounceCall.invoke(async () => {
         const realLevel = await this.read(pin);
