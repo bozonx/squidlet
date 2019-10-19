@@ -14,8 +14,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 type GpioHandler = (level: number) => void;
 
-
-// TODO: нужно ли включать/выключать interrupt or alert при старте и дестрое ???
+const INT_EVENT_NAME = 'interrupt';
 
 
 export default class Digital implements DigitalIo {
@@ -30,8 +29,11 @@ export default class Digital implements DigitalIo {
   private readonly debounceCall: DebounceCall = new DebounceCall();
 
 
-  destroy(): Promise<void> {
-    return this.clearAll();
+  async destroy(): Promise<void> {
+    await this.clearAll();
+
+    this.events.destroy();
+    this.debounceCall.destroy();
   }
 
 
@@ -50,10 +52,10 @@ export default class Digital implements DigitalIo {
     });
     this.resistors[pin] = inputMode;
 
+    this.pinListeners[pin] = (level: number) => this.handlePinChange(pin, level, debounce);
     // start listen pin changes
     // TODO: чем interrupt отличается от alert ???
-    this.pinInstances[pin]
-      .on('interrupt', (level: number) => this.handlePinChange(pin, level, debounce));
+    this.pinInstances[pin].on(INT_EVENT_NAME, this.pinListeners[pin]);
   }
 
   /**
@@ -79,7 +81,8 @@ export default class Digital implements DigitalIo {
 
   /**
    * Get pin mode.
-   * It throws an error if pin hasn't configured before
+   * It throws an error if pin hasn't configured before.
+   * To be sure about direction, please check it before.
    */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
     return this.resistors[pin];
@@ -108,49 +111,70 @@ export default class Digital implements DigitalIo {
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-    // TODO: remake new pinListeners
-    const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
+    // TODO: по сути можно сейчас навешиваться даже если пин не проинициализирован
+    //const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
+    // if (typeof pinDirection === 'undefined') {
+    //   throw new Error(`Digital.onChange: pin ${pin} hasn't been set up yet`);
+    // }
+    // else if (pinDirection !== PinDirection.input) {
+    //   throw new Error(
+    //     `Digital.onChange: pin ${pin}: listening of change events ` +
+    //     `are allowed only for input pins`
+    //   );
+    // }
 
-    if (typeof pinDirection === 'undefined') {
-      throw new Error(`Digital.onChange: pin ${pin} hasn't been set up yet`);
-    }
-    else if (pinDirection !== PinDirection.input) {
-      throw new Error(
-        `Digital.onChange: pin ${pin}: listening of change events ` +
-        `are allowed only for input pins`
-      );
-    }
+    return this.events.addListener(pin, handler);
 
-    const pinInstance = this.getPinInstance('onChange', pin);
-
-    const handlerWrapper: GpioHandler = (level: number) => {
-      this.handlePinChange(pin, handler, level);
-    };
-
-    // TODO: зачем навешивать на пин больше 1го листенера????
-
-    // register
-    this.alertListeners.push({ pin, handler: handlerWrapper });
-    // start listen
-    // TODO: чем interrupt отличается от alert ???
-    pinInstance.on('interrupt', handlerWrapper);
-    //pinInstance.on('alert', handlerWrapper);
-    // return an index
-    return this.alertListeners.length - 1;
+    // const pinInstance = this.getPinInstance('onChange', pin);
+    //
+    // const handlerWrapper: GpioHandler = (level: number) => {
+    //   this.handlePinChange(pin, handler, level);
+    // };
+    //
+    // // register
+    // this.alertListeners.push({ pin, handler: handlerWrapper });
+    // // start listen
+    // // TODO: чем interrupt отличается от alert ???
+    // pinInstance.on('interrupt', handlerWrapper);
+    // //pinInstance.on('alert', handlerWrapper);
+    // // return an index
+    // return this.alertListeners.length - 1;
   }
 
   async removeListener(handlerIndex: number): Promise<void> {
-    this.clearListener(handlerIndex);
+    this.events.removeListener(handlerIndex);
   }
 
   async clearPin(pin: number): Promise<void> {
-    // TODO: remake new pinListeners
-    for (let handlerIndex in this.alertListeners) {
-      if (this.alertListeners[handlerIndex].pin !== pin) continue;
+    if (!this.pinInstances[pin]) return;
 
-      this.clearListener(Number(handlerIndex));
-    }
+    this.events.removeAllListeners(pin);
+    this.pinInstances[pin].removeListener(INT_EVENT_NAME, this.pinListeners[pin]);
+
+    // TODO: не вызовет ли ошибки если не исользовалось?
+    // TODO: не отключит ли навсегда, что даже при следующем запуске будет выключенно???
+    // TODO: нужно ли включать/выключать interrupt or alert при старте и дестрое ???
+    this.pinInstances[pin].disableInterrupt();
+    this.pinInstances[pin].disableAlert();
+
+    delete this.pinListeners[pin];
+    delete this.resistors[pin];
+    delete this.pinInstances[pin];
   }
+  // private clearListener(handlerIndex: number) {
+  //
+  //   // TODO: remove pinListeners[pin]
+  //
+  //   // it has been removed recently
+  //   if (!this.alertListeners[handlerIndex]) return;
+  //
+  //   const {pin, handler} = this.alertListeners[handlerIndex];
+  //   const pinInstance = this.getPinInstance('removeListener', pin);
+  //
+  //   pinInstance.off('interrupt', handler);
+  //
+  //   delete this.alertListeners[handlerIndex];
+  // }
 
   async clearAll(): Promise<void> {
     for (let index in this.pinInstances) {
@@ -167,8 +191,8 @@ export default class Digital implements DigitalIo {
     const value: boolean = Boolean(level);
 
     // if undefined or 0 - call handler immediately
-    if (!this.debounceTimes[pin]) {
-      handler(value);
+    if (!debounce) {
+      this.events.emit(pin, value);
     }
     else {
       // TODO: remake
@@ -176,24 +200,9 @@ export default class Digital implements DigitalIo {
       this.debounceCall.invoke(async () => {
         const realLevel = await this.read(pin);
 
-        handler(realLevel);
-      }, this.debounceTimes[pin], pin);
+        this.events.emit(pin, realLevel);
+      }, debounce, pin);
     }
-  }
-
-  private clearListener(handlerIndex: number) {
-
-    // TODO: remove pinListeners[pin]
-
-    // it has been removed recently
-    if (!this.alertListeners[handlerIndex]) return;
-
-    const {pin, handler} = this.alertListeners[handlerIndex];
-    const pinInstance = this.getPinInstance('removeListener', pin);
-
-    pinInstance.off('interrupt', handler);
-
-    delete this.alertListeners[handlerIndex];
   }
 
   private convertInputResistorMode(resistorMode: InputResistorMode): number {
