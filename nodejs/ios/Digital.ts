@@ -124,21 +124,6 @@ export default class Digital implements DigitalIo {
     // }
 
     return this.events.addListener(pin, handler);
-
-    // const pinInstance = this.getPinInstance('onChange', pin);
-    //
-    // const handlerWrapper: GpioHandler = (level: number) => {
-    //   this.handlePinChange(pin, handler, level);
-    // };
-    //
-    // // register
-    // this.alertListeners.push({ pin, handler: handlerWrapper });
-    // // start listen
-    // // TODO: чем interrupt отличается от alert ???
-    // pinInstance.on('interrupt', handlerWrapper);
-    // //pinInstance.on('alert', handlerWrapper);
-    // // return an index
-    // return this.alertListeners.length - 1;
   }
 
   async removeListener(handlerIndex: number): Promise<void> {
@@ -161,20 +146,6 @@ export default class Digital implements DigitalIo {
     delete this.resistors[pin];
     delete this.pinInstances[pin];
   }
-  // private clearListener(handlerIndex: number) {
-  //
-  //   // TODO: remove pinListeners[pin]
-  //
-  //   // it has been removed recently
-  //   if (!this.alertListeners[handlerIndex]) return;
-  //
-  //   const {pin, handler} = this.alertListeners[handlerIndex];
-  //   const pinInstance = this.getPinInstance('removeListener', pin);
-  //
-  //   pinInstance.off('interrupt', handler);
-  //
-  //   delete this.alertListeners[handlerIndex];
-  // }
 
   async clearAll(): Promise<void> {
     for (let index in this.pinInstances) {
@@ -184,10 +155,6 @@ export default class Digital implements DigitalIo {
 
 
   private handlePinChange(pin: number, level: number, debounce: number) {
-    // TODO: это вызыватся на все пины - проверить чтобы небыло наложений
-    // TODO: use events
-
-    // TODO: remake new pinListeners
     const value: boolean = Boolean(level);
 
     // if undefined or 0 - call handler immediately
