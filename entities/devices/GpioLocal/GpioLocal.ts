@@ -62,6 +62,7 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
     // only for input pins
     // Listen to change events
     digitalOnChange: (pin: number, handler: ChangeHandler): Promise<number> => {
+      // TODO: не будет работать если пин не сконфигурирован
       return this.digitalIo.onChange(pin, handler);
     },
 

@@ -69,14 +69,16 @@ export default interface DigitalIo extends IoItem {
   // only for output pins
   write(pin: number, value: boolean): Promise<void>;
 
-  // only for input pins
-  // Listen to changes
+  /**
+   * Listen of changes of input pins.
+   * Pin has to be set up before and has to be an input.
+   */
   onChange(pin: number, handler: ChangeHandler): Promise<number>;
   removeListener(handlerIndex: number): Promise<void>;
 
   /**
-   * Remove listeners of the pin and destroy pin (unmanage)
+   * Remove listeners of the pin and destroy pin (unmanage) if need
    */
-  clearPin(): Promise<void>;
+  clearPin(pin: number): Promise<void>;
   clearAll(): Promise<void>;
 }

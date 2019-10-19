@@ -4,9 +4,9 @@ import {Gpio} from 'pigpio';
 import DigitalIo, {
   ChangeHandler,
   Edge,
-  PinDirection,
   InputResistorMode,
-  OutputResistorMode
+  OutputResistorMode,
+  PinDirection,
 } from 'system/interfaces/io/DigitalIo';
 // TODO: неправильный debounce - нужно просто ждать и считать потом финальное значение
 import DebounceCall from 'system/lib/DebounceCall';
@@ -20,9 +20,15 @@ interface Listener {
 }
 
 
+// TODO: нужно ли включать/выключать interrupt or alert при старте и дестрое ???
+
+
 export default class Digital implements DigitalIo {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly alertListeners: Listener[] = [];
+
+  // TODO: запоминать резисторы
+
   private readonly debounceCall: DebounceCall = new DebounceCall();
   // debounce times by pin number
   private debounceTimes: {[index: string]: number | undefined} = {};
@@ -67,18 +73,7 @@ export default class Digital implements DigitalIo {
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    // TODO: что будет если пин не скорфигурирован???? наверное ошибка ??? - тогда вернуть undefined
-    const pinInstance = this.getPinInstance('getPinDirection', pin);
-    const modeConst: number = pinInstance.getMode();
-
-    if (modeConst === Gpio.INPUT) {
-      return PinDirection.input;
-    }
-    else if (modeConst === Gpio.OUTPUT) {
-      return PinDirection.output;
-    }
-
-    return;
+    return this.resolvePinDirection(pin);
   }
 
   /**
@@ -98,39 +93,46 @@ export default class Digital implements DigitalIo {
   }
 
   async write(pin: number, value: boolean): Promise<void> {
-    // TODO: проверить режим - если input - то поднять ошибку - нельзя писать
+    const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
+
+    if (typeof pinDirection === 'undefined') {
+      throw new Error(`Digital.write: pin ${pin} hasn't been set up yet`);
+    }
+    else if (pinDirection !== PinDirection.output) {
+      throw new Error(`Digital.write: pin ${pin}: writing is allowed only for output pins`);
+    }
+
     const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
 
     pinInstance.digitalWrite(numValue);
   }
 
-  // TODO: remake to onChange
-  // TODO: должен работать даже если пин не сконфигурирован - это просто слушатель событий
-  // TODO: навешивание на interrupt должно происходить при setup
-  // TODO: но если пин output - то не навешиваться
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-    const pinInstance = this.getPinInstance('setWatch', pin);
+    const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
+
+    if (typeof pinDirection === 'undefined') {
+      throw new Error(`Digital.onChange: pin ${pin} hasn't been set up yet`);
+    }
+    else if (pinDirection !== PinDirection.input) {
+      throw new Error(
+        `Digital.onChange: pin ${pin}: listening of change events ` +
+        `are allowed only for input pins`
+      );
+    }
+
+    const pinInstance = this.getPinInstance('onChange', pin);
+
     const handlerWrapper: GpioHandler = (level: number) => {
-      const value: boolean = Boolean(level);
-
-      // if undefined or 0 - call handler immediately
-      if (!this.debounceTimes[pin]) {
-        handler(value);
-      }
-      else {
-        // wait for debounce and read current level
-        this.debounceCall.invoke(async () => {
-          const realLevel = await this.read(pin);
-
-          handler(realLevel);
-        }, this.debounceTimes[pin], pin);
-      }
+      this.handlePinChange(pin, handler, level);
     };
+
+    // TODO: зачем навешиватьна пин больше 1го листенера????
 
     // register
     this.alertListeners.push({ pin, handler: handlerWrapper });
     // start listen
+    // TODO: чем interrupt отличается от alert ???
     pinInstance.on('interrupt', handlerWrapper);
     //pinInstance.on('alert', handlerWrapper);
     // return an index
@@ -138,23 +140,15 @@ export default class Digital implements DigitalIo {
   }
 
   async removeListener(handlerIndex: number): Promise<void> {
-    if (typeof id === 'undefined') {
-      throw new Error(`You have to specify a watch id`);
-    }
-
-    // it has been removed recently
-    if (!this.alertListeners[id]) return;
-
-    const {pin, handler} = this.alertListeners[id];
-    const pinInstance = this.getPinInstance('clearWatch', pin);
-
-    pinInstance.off('interrupt', handler);
-
-    delete this.alertListeners[id];
+    this.clearListener(handlerIndex);
   }
 
   async clearPin(pin: number): Promise<void> {
-    // TODO: remove listener - see this.alertListeners
+    for (let handlerIndex in this.alertListeners) {
+      if (this.alertListeners[handlerIndex].pin !== pin) continue;
+
+      this.clearListener(Number(handlerIndex));
+    }
   }
 
   async clearAll(): Promise<void> {
@@ -163,6 +157,35 @@ export default class Digital implements DigitalIo {
     }
   }
 
+
+  private handlePinChange(pin: number, handler: ChangeHandler, level: number) {
+    const value: boolean = Boolean(level);
+
+    // if undefined or 0 - call handler immediately
+    if (!this.debounceTimes[pin]) {
+      handler(value);
+    }
+    else {
+      // wait for debounce and read current level
+      this.debounceCall.invoke(async () => {
+        const realLevel = await this.read(pin);
+
+        handler(realLevel);
+      }, this.debounceTimes[pin], pin);
+    }
+  }
+
+  private clearListener(handlerIndex: number) {
+    // it has been removed recently
+    if (!this.alertListeners[handlerIndex]) return;
+
+    const {pin, handler} = this.alertListeners[handlerIndex];
+    const pinInstance = this.getPinInstance('removeListener', pin);
+
+    pinInstance.off('interrupt', handler);
+
+    delete this.alertListeners[handlerIndex];
+  }
 
   private convertInputResistorMode(resistorMode: InputResistorMode): number {
     switch (resistorMode) {
@@ -181,10 +204,11 @@ export default class Digital implements DigitalIo {
     switch (resistorMode) {
       case (OutputResistorMode.none):
         return Gpio.PUD_OFF;
-        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
+
       case (OutputResistorMode.opendrain):
-        throw new Error(`Open-drain mode isn't supported`);
-        //return Gpio.PUD_UP;
+        //throw new Error(`Open-drain mode isn't supported`);
+        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
+        return Gpio.PUD_UP;
       default:
         throw new Error(`Unknown mode "${resistorMode}"`);
     }
@@ -199,6 +223,27 @@ export default class Digital implements DigitalIo {
     }
 
     return Gpio.EITHER_EDGE;
+  }
+
+  private resolvePinDirection(pin: number): PinDirection | undefined {
+    let pinInstance: Gpio;
+
+    try {
+      pinInstance = this.getPinInstance('resolvePinDirection', pin);
+    }
+    catch (e) {
+      // if instance of pin hasn't been created yet = undefined
+      return;
+    }
+
+    // it returns input or output. Input by default.
+    const modeConst: number = pinInstance.getMode();
+
+    if (modeConst === Gpio.OUTPUT) {
+      return PinDirection.output;
+    }
+
+    return PinDirection.input;
   }
 
   private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
