@@ -46,7 +46,7 @@ export default class DebounceCallIncreasing {
       clearTimeout(this.items[id][ItemPosition.timeoutId]);
     }
     else {
-      // make new item
+      // make a new item
       this.items[id] = [ cb, new Promised<void>(), undefined ];
     }
 
