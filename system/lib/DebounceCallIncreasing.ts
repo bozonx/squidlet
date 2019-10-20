@@ -57,6 +57,8 @@ export default class DebounceCallIncreasing {
   }
 
   clear(id: string | number) {
+    if (!this.items[id]) return;
+
     clearTimeout(this.items[id][ItemPosition.timeoutId]);
     this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
 

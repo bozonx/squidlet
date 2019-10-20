@@ -41,6 +41,13 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
+    if (this.pinInstances[pin]) {
+      throw new Error(
+        `Digital IO setupInput(): Pin ${pin} has been set up before. ` +
+        `You should to call \`clearPin(${pin})\` and after that try again.`
+      );
+    }
+
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
     // make a new instance of Gpio
     this.pinInstances[pin] = new Gpio(pin, {
@@ -73,6 +80,13 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
+    if (this.pinInstances[pin]) {
+      throw new Error(
+        `Digital IO setupOutput(): Pin ${pin} has been set up before. ` +
+        `You should to call \`clearPin(${pin})\` and after that try again.`
+      );
+    }
+
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
 
     this.pinInstances[pin] = new Gpio(pin, {
@@ -89,11 +103,6 @@ export default class Digital implements DigitalIo {
     return this.resolvePinDirection(pin);
   }
 
-  /**
-   * Get pin mode.
-   * It throws an error if pin hasn't configured before.
-   * To be sure about direction, please check it before.
-   */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
     return this.resistors[pin];
   }
@@ -141,21 +150,27 @@ export default class Digital implements DigitalIo {
   }
 
   async clearPin(pin: number): Promise<void> {
-    if (!this.pinInstances[pin]) return;
-
+    delete this.resistors[pin];
     this.events.removeAllListeners(pin);
-    // TODO: не будет ли ошибки если нет такого хэндлера ????
-    this.pinInstances[pin].removeListener(INTERRUPT_EVENT_NAME, this.pinListeners[pin]);
-    this.pinInstances[pin].removeListener(ALERT_EVENT_NAME, this.pinListeners[pin]);
 
-    // TODO: не вызовет ли ошибки если не исользовалось?
-    // TODO: не отключит ли навсегда, что даже при следующем запуске будет выключенно???
-    // TODO: нужно ли включать/выключать interrupt or alert при старте и дестрое ???
+    if (!this.pinInstances[pin]) {
+      delete this.pinListeners[pin];
+
+      return;
+    }
+
+    // remove listeners. It won't rise error event the listener hasn't been registered before.
+    if (this.pinListeners[pin]) {
+      this.pinInstances[pin].removeListener(INTERRUPT_EVENT_NAME, this.pinListeners[pin]);
+      this.pinInstances[pin].removeListener(ALERT_EVENT_NAME, this.pinListeners[pin]);
+    }
+
+    // it won't throw the error event interrupt or alert haven't been configured before.
     this.pinInstances[pin].disableInterrupt();
     this.pinInstances[pin].disableAlert();
+    this.debounceCall.clear(pin);
 
     delete this.pinListeners[pin];
-    delete this.resistors[pin];
     delete this.pinInstances[pin];
   }
 

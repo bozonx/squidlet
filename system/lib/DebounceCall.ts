@@ -34,6 +34,8 @@ export default class DebounceCall {
   }
 
   clear(id: string | number) {
+    if (!this.items[id]) return;
+
     clearTimeout(this.debounceTimeouts[id]);
     delete this.debounceTimeouts[id];
     delete this.lastCb;

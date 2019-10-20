@@ -52,15 +52,28 @@ export default interface DigitalIo extends IoItem {
   setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void>;
 
   getPinDirection(pin: number): Promise<PinDirection | undefined>;
+
+  /**
+   * Get resistor pin mode.
+   * To be sure about direction, please check it before.
+   * Results might be:
+   * * undefined - pin hasn't been set up
+   * * 0 - resistor isn't used
+   * * 1 - pullUp for inputs or openDrain for outputs
+   * * 2 - pullDown for inputs
+   */
   getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
   // output and input pins can be read
   read(pin: number): Promise<boolean>;
-  // only for output pins
+
+  /**
+   * Writing is allowed only for output pins
+   */
   write(pin: number, value: boolean): Promise<void>;
 
   /**
    * Listen of changes of input pins.
-   * It allows to add listener event pin hasn't been set up, but better to check it before add a listener.
+   * It allows to add listener even pin hasn't been set up, but better to check it before add a listener.
    */
   onChange(pin: number, handler: ChangeHandler): Promise<number>;
 
@@ -70,9 +83,13 @@ export default interface DigitalIo extends IoItem {
   removeListener(handlerIndex: number): Promise<void>;
 
   /**
-   * Remove listeners of the pin and destroy pin (unmanage) if need.
+   * Destroy pin and remove listeners of it.
    * After that pin is uncontrolled, if you want to control it again then set it up.
    */
   clearPin(pin: number): Promise<void>;
+
+  /**
+   * Destroy all the pins but not destroy Digital IO instance.
+   */
   clearAll(): Promise<void>;
 }
