@@ -42,22 +42,30 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
 
 
   private gpio: GpioDigital = {
-    digitalSetupInput(pin: number, inputMode: InputResistorMode, debounce?: number, edge?: Edge): Promise<void> {
-      // TODO: use default debounce
-      return this.expander.setupInput(pin, debounce, edge);
+    digitalSetupInput: (
+      pin: number,
+      // on PCF8574 pins always have pullup resistors
+      inputMode: InputResistorMode = InputResistorMode.pullup,
+      debounce: number = 0,
+      edge: Edge = Edge.both
+    ): Promise<void> => {
+      const resolvedDebounce: number = (typeof debounce === 'undefined')
+        ? (this.props.defaultDebounce || 0)
+        : debounce;
+
+      return this.expander.setupInput(pin, resolvedDebounce, edge);
     },
 
-    digitalSetupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
+    digitalSetupOutput: (pin: number, initialValue: boolean): Promise<void> => {
       return this.expander.setupOutput(pin, initialValue);
     },
 
     digitalGetPinDirection: (pin: number): Promise<PinDirection | undefined> => {
-      //return this.expander.getPinMode(pin);
-      // TODO: add
+      return this.expander.getPinDirection(pin);
     },
 
     digitalGetPinResistorMode: (pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> => {
-      // TODO: add
+      return this.expander.getPinResistorMode(pin);
     },
 
     digitalRead: (pin: number): Promise<boolean> => {
@@ -75,7 +83,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
       return this.expander.onChange(pin, handler);
     },
 
-    removeListener: async (handlerIndex: number): Promise<void> => {
+    digitalRemoveListener: async (handlerIndex: number): Promise<void> => {
       return this.expander.removeListener(handlerIndex);
     },
 
