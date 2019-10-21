@@ -2,11 +2,12 @@ import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
 import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
-import {ChangeHandler, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
+import {OutputResistorMode} from 'system/interfaces/gpioTypes';
 
 
 type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';

@@ -1,11 +1,12 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {ChangeHandler, InputResistorMode} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';
+import {InputResistorMode} from 'system/interfaces/gpioTypes';
 
 
 type Handler = () => void;

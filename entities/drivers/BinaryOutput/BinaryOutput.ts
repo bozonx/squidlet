@@ -4,10 +4,11 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
 import {InitialLevel} from 'system/interfaces/Types';
 import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
-import {ChangeHandler, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
+import {OutputResistorMode} from 'system/interfaces/gpioTypes';
 
 
 export type BlockMode = 'refuse' | 'defer';

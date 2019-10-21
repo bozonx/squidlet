@@ -120,7 +120,7 @@ export default class DeviceBase<
   /**
    * Call action and return it's result.
    */
-  async action(actionName: string, ...params: any[]): Promise<JsonTypes | undefined> {
+  async action(actionName: string, ...params: any[]): Promise<JsonTypes | void> {
     if (!this.actions[actionName]) {
       throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
     }

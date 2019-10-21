@@ -1,11 +1,12 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {ChangeHandler, Edge, InputResistorMode} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';
 import {GpioDigital} from 'system/interfaces/Gpio';
+import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -51,6 +52,9 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 
   // setup pin after all the drivers has been initialized
   devicesDidInit = async () => {
+
+    // TODO: может навешаться на событие ожидания инициализации самого девайса ???
+
     const edge: Edge = resolveEdge(this.props.edge, this._isInverted);
 
     this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);

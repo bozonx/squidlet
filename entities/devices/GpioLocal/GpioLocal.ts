@@ -86,6 +86,22 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
     },
 
     /**
+     * Read level of an input or output pin.
+     * Pin has to be setup first. To force setup use `digitalForceRead()`
+     */
+    digitalRead: (pin: number): Promise<boolean> => {
+      return this.digitalIo.read(pin);
+    },
+
+    /**
+     * Write level to an output pin.
+     * Pin has to be setup first as an output. To force setup use `digitalForceWrite()`
+     */
+    digitalWrite: (pin: number, level: boolean): Promise<void> => {
+      return this.digitalIo.write(pin, level);
+    },
+
+    /**
      * Setup pin as input and return it's value.
      * If mode and direction don't change then setup won't be done.
      */
