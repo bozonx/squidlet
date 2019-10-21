@@ -6,9 +6,9 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
-// TODO: review debounce
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
@@ -19,10 +19,6 @@ export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
 }
 
 
-// Constant for input pin direction.
-export const DIR_IN = 1;
-// Constant for output pin direction.
-export const DIR_OUT = 0;
 // Count of pins which IC has
 export const PINS_COUNT = 8;
 // length of data to send and receive
@@ -31,15 +27,18 @@ export const DATA_LENGTH = 1;
 
 export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // Direction of each pin. By default all the pin directions are undefined
-  private readonly directions: Array<number> = [];
+  private readonly directions: (PinDirection | undefined)[] = [];
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
   // State which is sets on write and removes after it
   private tmpState?: number;
   private wasIcInited: boolean = false;
+  // TODO: review
   private initingIcInProgress: boolean = false;
-  private readonly pinEdges: {[index: string]: Edge | undefined} = {};
+  // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number | undefined} = {};
+  // collection of edges values of each pin to use in change handler
+  private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly changeEvents = new IndexedEventEmitter<ChangeStateHandler>();
 
@@ -53,12 +52,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       'I2cToSlave',
       {
         ...this.props,
+        // TODO: review
         poll: [
           {length: DATA_LENGTH}
         ],
       }
     );
 
+    // TODO: review
     this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
       this.log.error(String(err));
     });
@@ -66,15 +67,23 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
-  // TODO: review - лучше наверное вручную дергать когда инициализировать IC
-  protected appDidInit = async () => {
-    // init IC state after app is initialized if it isn't at this moment
-    try {
-      await this.writeToIc(this.currentState);
-    }
-    catch (err) {
-      this.log.error(`PCF8574. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
-    }
+  // protected appDidInit = async () => {
+  //   // init IC state after app is initialized if it isn't at this moment
+  //   try {
+  //     await this.writeToIc(this.currentState);
+  //   }
+  //   catch (err) {
+  //     this.log.error(`PCF8574. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
+  //   }
+  // }
+
+  /**
+   * Manually initialize IC.
+   * Call this method after all the pins have been initialized and initial values are set up.
+   */
+  async initIc() {
+    // TODO: add
+    //await this.writeToIc(this.currentState);
   }
 
 
@@ -82,14 +91,15 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
-      this.log.warn(`PCF8574Driver.setupInput(${pin}, ${debounce}, ${edge}). This pin has been already set up`);
-
-      return;
+      throw new Error(
+        `PCF8574Driver.setupInput(${pin}, ${debounce}, ${edge}). This pin has been already set up.` +
+        `Call "clearPin()" and try to set up again`
+      );
     }
 
     this.pinDebounces[pin] = debounce;
     this.pinEdges[pin] = edge;
-    this.directions[pin] = DIR_IN;
+    this.directions[pin] = PinDirection.input;
 
     // set input pin to high
     this.updateCurrentState(pin, true);
@@ -99,16 +109,21 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
-      this.log.warn(`PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up`);
-
-      return;
+      throw new Error(
+        `PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up` +
+        `Call "clearPin()" and try to set up again`
+      );
     }
 
-    this.directions[pin] = DIR_OUT;
+    this.directions[pin] = PinDirection.output;
 
     if (typeof outputInitialValue !== 'undefined') {
       this.updateCurrentState(pin, outputInitialValue);
     }
+  }
+
+  async getPinDirection(pin: number): Promise<PinDirection | undefined> {
+    //return this.resolvePinDirection(pin);
   }
 
   /**
@@ -135,11 +150,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this.getState();
   }
 
+  // TODO: не нужно !!!
   async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
-    if (this.directions[pin] === DIR_IN) {
+    if (this.directions[pin] === PinDirection.input) {
       return 'input';
     }
-    else if (this.directions[pin] === DIR_OUT) {
+    else if (this.directions[pin] === PinDirection.output) {
       return 'output';
     }
 
@@ -183,7 +199,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     this.checkPin(pin);
 
-    if (this.directions[pin] !== DIR_OUT) {
+    if (this.directions[pin] !== PinDirection.output) {
       throw new Error('Pin is not defined as an output');
     }
 
@@ -225,7 +241,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skit not an output pin
-      if (this.directions[pin] !== DIR_OUT) continue;
+      if (this.directions[pin] !== PinDirection.output) continue;
 
       this.tmpState = updateBitInByte(this.tmpState, pin, outputValues[pin]);
     }
@@ -245,6 +261,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
   }
 
+  clearPin(pin: number) {
+    // TODO: add
+  }
+
+  clearAll() {
+    // TODO: add
+  }
+
 
   private handleIcStateChange = (functionStr: number | string | undefined, data: Uint8Array) => {
     if (!data || data.length !== DATA_LENGTH) {
@@ -259,7 +283,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skip not input pins
-      if (this.directions[pin] !== DIR_IN) continue;
+      if (this.directions[pin] !== PinDirection.input) continue;
 
       this.updateCurrentState(pin, getBitFromByte(data[0], pin));
     }
@@ -278,7 +302,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       const pinNum: number = parseInt(pinNumStr);
 
       // skip not input pins
-      if (this.directions[pinNum] !== DIR_IN) continue;
+      if (this.directions[pinNum] !== PinDirection.input) continue;
 
       if (currentBoolState[pinNum] !== oldBoolState[pinNum]) {
         this.emitPinEvent(pinNum, currentBoolState[pinNum]);
@@ -351,6 +375,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return true;
   }
 
+  // TODO: решить на каком уровне делать
+  // TODO: использовать board setup
   private checkPin(pin: number) {
     if (pin < 0 || pin >= PINS_COUNT) {
       throw new Error(`Pin "${pin}" out of range`);
@@ -363,7 +389,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   private hasInputPins(): boolean {
-    return this.directions.includes(DIR_IN);
+    return this.directions.includes(PinDirection.input);
   }
 
 

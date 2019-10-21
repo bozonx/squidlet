@@ -32,10 +32,11 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
   }
 
   protected appDidInit = () => {
-    return this.depsInstances.initIc();
+    // initialize IC after app did init
+    return this.expander.initIc();
   }
 
-  destroy = () => {
+  destroy = async () => {
     // clear all the pins on destroy this instance (actually means destroy system).
     return this.expander.clearAll();
   }
@@ -64,8 +65,8 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
       return this.expander.getPinDirection(pin);
     },
 
-    digitalGetPinResistorMode: (pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> => {
-      return this.expander.getPinResistorMode(pin);
+    digitalGetPinResistorMode: async (pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> => {
+      return InputResistorMode.pullup;
     },
 
     digitalRead: (pin: number): Promise<boolean> => {

@@ -1,4 +1,11 @@
-import {Edge, EdgeString, InputResistorMode, OutputResistorMode, PinDirection} from '../interfaces/gpioTypes';
+import {
+  directionString,
+  Edge,
+  EdgeString,
+  InputResistorMode,
+  OutputResistorMode,
+  PinDirection,
+} from '../interfaces/gpioTypes';
 
 /*
  * Helpers for digital drivers, devices and IOs.
@@ -93,7 +100,7 @@ export function stringifyPinMode(
 }
 
 // TODO: test
-export function stringifyPinDirection(direction: PinDirection | undefined): string {
+export function stringifyPinDirection(direction: PinDirection | undefined): directionString | 'unset' {
   if (typeof direction === 'undefined') {
     return 'unset';
   }
