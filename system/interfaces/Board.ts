@@ -1,4 +1,4 @@
-import {PinDirection} from './io/DigitalIo';
+import {PinDirection} from './gpioTypes';
 
 
 export interface BoardPin {
@@ -7,7 +7,7 @@ export interface BoardPin {
   hasOpenDrain: boolean;
   // support of interruption on pin
   hasInterruption: boolean;
-  directions: PinDirection | 'both';
+  directions: PinDirection;
 
   // TODO: add analog, pwm etc
 }

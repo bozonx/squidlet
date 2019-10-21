@@ -1,25 +1,9 @@
 import IoItem from '../IoItem';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../gpioTypes';
 
 
 export type ChangeHandler = (level: boolean) => void;
-export enum PinDirection {
-  input,
-  output
-}
-export enum InputResistorMode {
-  none,
-  pullup,
-  pulldown,
-}
-export enum OutputResistorMode {
-  none,
-  opendrain,
-}
-export enum Edge {
-  rising,
-  falling,
-  both,
-}
+
 
 export const Methods = [
   'setupInput',

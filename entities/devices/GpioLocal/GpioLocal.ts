@@ -1,7 +1,8 @@
 import DeviceBase from 'system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
-import DigitalIo, {ChangeHandler, Edge, InputResistorMode, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {PinDirection} from 'system/interfaces/io/DigitalIo';
+import {Edge, InputResistorMode, OutputResistorMode} from '../../../system/interfaces/gpioTypes';
 
 
 interface GpioLocalProps {

@@ -1,7 +1,5 @@
-import DigitalBaseProps from './GpioBaseProps';
-
-
-export type EdgeString = 'rising' | 'falling' | 'both';
+import DigitalBaseProps from './GpioPinBaseProps';
+import {EdgeString} from './gpioTypes';
 
 
 export default interface DigitalPinInputProps extends DigitalBaseProps {

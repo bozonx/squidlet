@@ -1,6 +1,8 @@
 export type ReceiveHandler = (dataAddressStr: number | string | undefined, data: Uint8Array) => void;
 //export type ReceiveHandler = (data: Uint8Array) => void;
 
+// TODO: strong review
+
 
 export default interface DuplexDriver {
   /**

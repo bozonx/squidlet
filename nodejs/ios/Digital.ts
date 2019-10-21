@@ -1,15 +1,10 @@
 // @ts-ignore
 import {Gpio} from 'pigpio';
 
-import DigitalIo, {
-  ChangeHandler,
-  Edge,
-  InputResistorMode,
-  OutputResistorMode,
-  PinDirection,
-} from 'system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 
 
 type GpioHandler = (level: number) => void;

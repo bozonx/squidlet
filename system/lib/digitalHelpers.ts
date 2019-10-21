@@ -1,5 +1,4 @@
-import {Edge, InputResistorMode, OutputResistorMode} from '../interfaces/io/DigitalIo';
-import {EdgeString} from '../interfaces/DigitalPinInputProps';
+import {EdgeString, Edge, InputResistorMode, OutputResistorMode} from '../interfaces/gpioTypes';
 
 /*
  * Helpers for digital drivers, devices and IOs.

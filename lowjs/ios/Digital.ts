@@ -2,12 +2,7 @@ import {callPromised} from '../../system/lib/common';
 
 const gpio = require('gpio');
 
-import DigitalIo, {
-  Edge,
-  DigitalPinMode,
-  WatchHandler,
-  DigitalInputMode
-} from 'system/interfaces/io/DigitalIo';
+import DigitalIo from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 
 
