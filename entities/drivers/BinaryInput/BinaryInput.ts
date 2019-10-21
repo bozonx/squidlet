@@ -1,7 +1,7 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler, Edge, InputResistorMode} from 'system/interfaces/io/DigitalIo';
-import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/helpers';
+import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';

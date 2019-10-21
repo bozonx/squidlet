@@ -1,6 +1,6 @@
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
+import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
 import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
 import {ChangeHandler, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';

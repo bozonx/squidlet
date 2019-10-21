@@ -2,48 +2,6 @@ helpers = require('../../../system/lib/helpers')
 
 
 describe 'system.lib.helpers', ->
-  it 'resolveLevel', ->
-    assert.isTrue(helpers.resolveLevel(true))
-    assert.isTrue(helpers.resolveLevel(1))
-    assert.isTrue(helpers.resolveLevel('high'))
-    assert.isTrue(helpers.resolveLevel('true'))
-    assert.isTrue(helpers.resolveLevel('1'))
-    assert.isTrue(helpers.resolveLevel('ON'))
-    assert.isTrue(helpers.resolveLevel('On'))
-    assert.isTrue(helpers.resolveLevel('on'))
-    assert.isFalse(helpers.resolveLevel(false))
-    assert.isFalse(helpers.resolveLevel(0))
-    assert.isFalse(helpers.resolveLevel(5))
-    assert.isFalse(helpers.resolveLevel('low, off and other...'))
-
-  it 'isDigitalPinInverted', ->
-    assert.isFalse(helpers.isDigitalPinInverted(false, false, false))
-    assert.isFalse(helpers.isDigitalPinInverted(false, true, false))
-    # double invert
-    assert.isFalse(helpers.isDigitalPinInverted(true, true, true))
-
-    assert.isTrue(helpers.isDigitalPinInverted(true, false, false))
-    assert.isTrue(helpers.isDigitalPinInverted(false, true, true))
-    # don't use pullup
-    assert.isTrue(helpers.isDigitalPinInverted(true, false, true))
-
-  it 'invertIfNeed', ->
-    assert.isTrue(helpers.invertIfNeed(true, false))
-    assert.isTrue(helpers.invertIfNeed(false, true))
-    assert.isFalse(helpers.invertIfNeed(false, false))
-    assert.isFalse(helpers.invertIfNeed(true, true))
-
-  it 'resolveEdge', ->
-    assert.equal(helpers.resolveEdge(undefined), 'both')
-    assert.equal(helpers.resolveEdge(undefined, true), 'both')
-    assert.equal(helpers.resolveEdge('both'), 'both')
-    assert.equal(helpers.resolveEdge('both', true), 'both')
-    assert.equal(helpers.resolveEdge('rising', false), 'rising')
-    assert.equal(helpers.resolveEdge('falling', false), 'falling')
-    # invert
-    assert.equal(helpers.resolveEdge('rising', true), 'falling')
-    assert.equal(helpers.resolveEdge('falling', true), 'rising')
-
   it 'combineTopic', ->
     assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
     assert.equal(helpers.combineTopic('/', 'first', undefined, 'third'), 'first/third')

@@ -1,5 +1,5 @@
 import DeviceBase from 'system/base/DeviceBase';
-import {resolveLevel, invertIfNeed} from 'system/lib/helpers';
+import {resolveLevel, invertIfNeed} from 'system/lib/digitalHelpers';
 import {Dictionary} from 'system/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 

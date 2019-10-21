@@ -1,7 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/helpers';
+import {resolveLevel, invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
 import {InitialLevel} from 'system/interfaces/Types';
 import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
 import {ChangeHandler, OutputResistorMode} from 'system/interfaces/io/DigitalIo';
