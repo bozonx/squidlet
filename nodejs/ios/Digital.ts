@@ -8,7 +8,7 @@ import DigitalIo, {
   OutputResistorMode,
   PinDirection,
 } from 'system/interfaces/io/DigitalIo';
-import DebounceCall from 'system/lib/DebounceCall';
+import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 

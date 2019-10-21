@@ -1,36 +1,27 @@
-import Promised from './Promised';
+import Promised from '../Promised';
 
 
-const DEFAULT_ID = 'default';
+export const DEFAULT_ID = 'default';
 
-enum ItemPosition {
+export enum ItemPosition {
   lastCbToCall,
   promiseForWholeDebounce,
   timeoutId
 }
-type DebounceCb = (...args: any[]) => void;
+export type DebounceCb = (...args: any[]) => void;
 // Array like [ lastCbToCall, promiseForWholeDebounce, timeoutId ]
-type DebounceItem = [DebounceCb, Promised<void>, any];
+export type DebounceItem = [DebounceCb, Promised<void>, any];
 
 
-/**
- * Call only the LAST callback of specified id.
- * Each call of "invoke" will increase the timer.
- */
-export default class DebounceCallIncreasing {
+export default class DebounceBase {
   // items by id
-  private items: {[index: string]: DebounceItem} = {};
+  protected items: {[index: string]: DebounceItem} = {};
 
 
   isInvoking(id: string | number = DEFAULT_ID): boolean {
     return Boolean(this.items[id]);
   }
 
-  /**
-   * Call this method on each change.
-   * Only the last time will be fulfilled.
-   * It returns a promise which will be fulfilled at the end of full cycle.
-   */
   invoke(
     cb: DebounceCb,
     debounce: number | undefined,
@@ -40,18 +31,15 @@ export default class DebounceCallIncreasing {
     if (!debounce) return this.callCbImmediately(id, cb);
 
     if (this.items[id]) {
-      // update cb
-      this.items[id][ItemPosition.lastCbToCall] = cb;
-      // clear previous timeout
-      clearTimeout(this.items[id][ItemPosition.timeoutId]);
+      this.updateItem(this.items[id], id, cb, debounce);
     }
     else {
       // make a new item
       this.items[id] = [ cb, new Promised<void>(), undefined ];
+      // make a new timeout
+      this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounce);
     }
 
-    // make a new timeout
-    this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounce);
     // return promise of item
     return this.items[id][ItemPosition.promiseForWholeDebounce].promise;
   }
@@ -74,34 +62,29 @@ export default class DebounceCallIncreasing {
   }
 
 
+  protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounce?: number) {
+    // update cb
+    item[ItemPosition.lastCbToCall] = cb;
+  }
+
   /**
    * It will be called when the last timeout will be exceeded
    */
-  private callCb(id: string | number) {
-    if (!this.items[id]) {
-      this.clear(id);
-
-      return;
-    }
+  protected callCb(id: string | number) {
+    if (!this.items[id]) return;
 
     try {
       // call cb
       this.items[id][ItemPosition.lastCbToCall]();
     }
     catch (err) {
-      return this.endOfDebounce(id, err);
+      return this.endOfDebounce(err, id);
     }
 
-    this.endOfDebounce(id);
+    this.endOfDebounce(undefined, id);
   }
 
-  private async callCbImmediately(id: string | number, cb: DebounceCb) {
-    if (typeof this.items[id] !== 'undefined') this.clear(id);
-
-    cb();
-  }
-
-  private endOfDebounce(id: string | number, err?: Error) {
+  protected endOfDebounce(err: Error | undefined, id: string | number) {
     clearTimeout(this.items[id][ItemPosition.timeoutId]);
 
     const promised = this.items[id][ItemPosition.promiseForWholeDebounce];
@@ -116,6 +99,12 @@ export default class DebounceCallIncreasing {
     }
 
     promised.destroy();
+  }
+
+  protected async callCbImmediately(id: string | number, cb: DebounceCb) {
+    if (typeof this.items[id] !== 'undefined') this.clear(id);
+
+    cb();
   }
 
 }

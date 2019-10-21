@@ -1,4 +1,4 @@
-DebounceCall = require('../../../system/lib/DebounceCallIncreasing').default;
+DebounceCall = require('../../../system/lib/debounceCall/DebounceCallIncreasing').default;
 
 
 describe 'system.lib.DebounceCallIncreasing', ->

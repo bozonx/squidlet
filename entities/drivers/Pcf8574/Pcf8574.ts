@@ -7,7 +7,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 // TODO: review debounce
-import DebounceCall from 'system/lib/DebounceCall';
+import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
