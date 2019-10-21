@@ -9,15 +9,13 @@ export interface GpioDigital {
   digitalRead(pin: number): Promise<boolean>;
   // only for output pins
   digitalWrite(pin: number, level: boolean): Promise<void>;
-  // setup pin as input and return it's value. It useful for debug purpose
-  digitalSetupAndRead(pin: number, inputMode?: InputResistorMode): Promise<boolean>;
-  // setup pin as output and write the value. It useful for debug purpose
-  digitalSetupAndWrite(pin: number, value: boolean, outputMode?: OutputResistorMode): Promise<void>;
-  // only for input pins
-  // Listen to change events
-  digitalOnChange(pin: number, handler: ChangeHandler): Promise<number>;
 
-  removeListener(handlerIndex: number): Promise<void>;
+  /**
+   * Listen of changes of input pins according to specified edge in setup.
+   * It allows to add listener even pin hasn't been set up, but better to check it before add a listener.
+   */
+  digitalOnChange(pin: number, handler: ChangeHandler): Promise<number>;
+  digitalRemoveListener(handlerIndex: number): Promise<void>;
 }
 
 export default interface Gpio extends GpioDigital {

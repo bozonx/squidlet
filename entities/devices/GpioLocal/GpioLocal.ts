@@ -5,6 +5,7 @@ import {PinDirection} from 'system/interfaces/io/DigitalIo';
 
 
 interface GpioLocalProps {
+  // default debounce for all ge input pins
   defaultDebounce?: number;
 }
 
@@ -62,25 +63,46 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
       return this.digitalIo.write(pin, level);
     },
 
-    digitalSetupAndRead(pin: number, inputMode?: InputResistorMode): Promise<boolean> {
-      // TODO: add
-    },
-
-    digitalSetupAndWrite(pin: number, value: boolean, outputMode?: OutputResistorMode): Promise<void> {
-      // TODO: add
-    },
-
-    // only for input pins
-    // Listen to change events
     digitalOnChange: (pin: number, handler: ChangeHandler): Promise<number> => {
-      // TODO: не будет работать если пин не сконфигурирован
       return this.digitalIo.onChange(pin, handler);
     },
 
-    removeListener: (handlerIndex: number): Promise<void> => {
+    digitalRemoveListener: (handlerIndex: number): Promise<void> => {
       return this.digitalIo.removeListener(handlerIndex);
     },
   };
 
-  protected actions = this.gpio as any;
+  protected actions = {
+    digitalGetPinDirection: (pin: number): Promise<PinDirection | undefined> => {
+      return this.digitalIo.getPinDirection(pin);
+    },
+
+    digitalGetPinResistorMode: (pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> => {
+      return this.digitalIo.getPinResistorMode(pin);
+    },
+
+    /**
+     * setup pin as input and return it's value. It useful for debug purpose
+     */
+    digitalSetupAndRead: async (pin: number, inputMode?: InputResistorMode): Promise<boolean> => {
+      // TODO: если текущий direction = undefined - делаем setup
+      // TODO: если текущий direction = заданному - ничего не делаем
+      // TODO: если текущий direction != заданному - очищаем пин из делаем setup
+      //if (await this.digitalIo.getPinDirection(pin) === 1)
+
+      return this.digitalIo.read(pin);
+    },
+
+    /**
+     * setup pin as output and write the value. It useful for debug purpose
+     */
+    digitalSetupAndWrite: async (pin: number, level: boolean, outputMode?: OutputResistorMode): Promise<void> => {
+      // TODO: если текущий direction = undefined - делаем setup
+      // TODO: если текущий direction = заданному - ничего не делаем
+      // TODO: если текущий direction != заданному - очищаем пин из делаем setup
+
+      return this.digitalIo.write(pin, level);
+    },
+  };
+
 }

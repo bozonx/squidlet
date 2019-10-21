@@ -128,18 +128,6 @@ export default class Digital implements DigitalIo {
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-    // TODO: по сути можно сейчас навешиваться даже если пин не проинициализирован
-    //const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
-    // if (typeof pinDirection === 'undefined') {
-    //   throw new Error(`Digital.onChange: pin ${pin} hasn't been set up yet`);
-    // }
-    // else if (pinDirection !== PinDirection.input) {
-    //   throw new Error(
-    //     `Digital.onChange: pin ${pin}: listening of change events ` +
-    //     `are allowed only for input pins`
-    //   );
-    // }
-
     return this.events.addListener(pin, handler);
   }
 

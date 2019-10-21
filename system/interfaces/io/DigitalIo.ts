@@ -72,7 +72,7 @@ export default interface DigitalIo extends IoItem {
   write(pin: number, value: boolean): Promise<void>;
 
   /**
-   * Listen of changes of input pins.
+   * Listen of changes of input pins according to specified edge in setup.
    * It allows to add listener even pin hasn't been set up, but better to check it before add a listener.
    */
   onChange(pin: number, handler: ChangeHandler): Promise<number>;
