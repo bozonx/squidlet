@@ -108,9 +108,7 @@ export default class Digital implements DigitalIo {
   }
 
   async read(pin: number): Promise<boolean> {
-    const pinInstance = this.getPinInstance('read', pin);
-
-    return Boolean(pinInstance.digitalRead());
+    return this.simpleRead(pin);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
@@ -200,13 +198,26 @@ export default class Digital implements DigitalIo {
     }
     else {
       // wait for debounce and read current level and emit an event
-      this.debounceCall.invoke(() => {
-        // TODO: обработать ошибку
-        const realLevel = await this.read(pin);
-
-        this.events.emit(pin, realLevel);
-      }, debounce, pin);
+      this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
+        .catch((e) => {
+          // TODO: call IO's logError()
+          console.error(e);
+        });
     }
+  }
+
+  private handleEndOfDebounce(pin: number) {
+    let realLevel: boolean;
+
+    try {
+      realLevel = this.simpleRead(pin);
+    }
+    catch (e) {
+      // TODO: call IO's logError()
+      return console.error(e);
+    }
+
+    this.events.emit(pin, realLevel);
   }
 
   private convertInputResistorMode(resistorMode: InputResistorMode): number {
@@ -274,6 +285,12 @@ export default class Digital implements DigitalIo {
     }
 
     return this.pinInstances[pin];
+  }
+
+  private simpleRead(pin: number): boolean {
+    const pinInstance = this.getPinInstance('simpleRead', pin);
+
+    return Boolean(pinInstance.digitalRead());
   }
 
 }
