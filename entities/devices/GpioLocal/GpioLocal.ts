@@ -2,7 +2,7 @@ import DeviceBase from 'system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
-import {stringifyPinDirection, stringifyResistorMode} from 'system/lib/digitalHelpers';
+import {stringifyPinMode} from 'system/lib/digitalHelpers';
 
 
 interface GpioLocalProps {
@@ -77,25 +77,19 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
   };
 
   protected actions = {
-    digitalGetPinDirection: async (pin: number): Promise<string> => {
-      const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
-
-      return stringifyPinDirection(direction);
-    },
-
-    digitalGetPinResistorMode: async (pin: number): Promise<string> => {
+    getPinMode: async (pin: number): Promise<string> => {
       const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
       const mode: InputResistorMode | OutputResistorMode | undefined =
         await this.digitalIo.getPinResistorMode(pin);
 
-      return stringifyResistorMode(direction, mode);
+      return stringifyPinMode(direction, mode);
     },
 
     /**
      * Setup pin as input and return it's value.
      * If mode and direction don't change then setup won't be done.
      */
-    digitalSetupAndRead: async (pin: number, inputMode?: InputResistorMode): Promise<boolean> => {
+    digitalForceRead: async (pin: number, inputMode?: InputResistorMode): Promise<boolean> => {
       const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
       const mode: InputResistorMode | OutputResistorMode | undefined =
         await this.digitalIo.getPinResistorMode(pin);
@@ -129,7 +123,7 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
      * Setup pin as output and write the value.
      * If mode and direction don't change then setup won't be done.
      */
-    digitalSetupAndWrite: async (pin: number, level: boolean, outputMode?: OutputResistorMode): Promise<void> => {
+    digitalForceWrite: async (pin: number, level: boolean, outputMode?: OutputResistorMode): Promise<void> => {
       const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
       const mode: InputResistorMode | OutputResistorMode | undefined =
         await this.digitalIo.getPinResistorMode(pin);

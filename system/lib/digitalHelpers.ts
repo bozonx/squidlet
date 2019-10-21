@@ -85,6 +85,14 @@ export function resolveOutputResistorMode(openDrain?: boolean): OutputResistorMo
 }
 
 // TODO: test
+export function stringifyPinMode(
+  direction: PinDirection | undefined,
+  mode: InputResistorMode | OutputResistorMode | undefined
+): string {
+  return `${stringifyPinDirection(direction)}_${stringifyResistorMode(direction, mode)}`;
+}
+
+// TODO: test
 export function stringifyPinDirection(direction: PinDirection | undefined): string {
   if (typeof direction === 'undefined') {
     return 'unset';
