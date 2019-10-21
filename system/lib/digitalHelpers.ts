@@ -1,4 +1,4 @@
-import {EdgeString, Edge, InputResistorMode, OutputResistorMode} from '../interfaces/gpioTypes';
+import {Edge, EdgeString, InputResistorMode, OutputResistorMode, PinDirection} from '../interfaces/gpioTypes';
 
 /*
  * Helpers for digital drivers, devices and IOs.
@@ -82,4 +82,37 @@ export function resolveOutputResistorMode(openDrain?: boolean): OutputResistorMo
   if (openDrain) return OutputResistorMode.opendrain;
 
   return OutputResistorMode.none;
+}
+
+// TODO: test
+export function stringifyPinDirection(direction: PinDirection | undefined): string {
+  if (typeof direction === 'undefined') {
+    return 'unset';
+  }
+  else if (direction === PinDirection.input) {
+    return 'input';
+  }
+
+  return 'output';
+}
+
+// TODO: test
+export function stringifyResistorMode(
+  direction: PinDirection | undefined,
+  mode: InputResistorMode | OutputResistorMode | undefined
+): string {
+  if (typeof direction === 'undefined' || typeof mode === 'undefined') {
+    return 'unset';
+  }
+  else if (mode === InputResistorMode.pulldown) {
+    return 'pulldown';
+  }
+  else if (mode === InputResistorMode.pullup && direction === PinDirection.input) {
+    return 'pullup';
+  }
+  else if (mode === OutputResistorMode.opendrain && direction === PinDirection.output) {
+    return 'opendrain';
+  }
+
+  return 'none';
 }

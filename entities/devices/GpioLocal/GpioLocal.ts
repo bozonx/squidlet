@@ -1,8 +1,8 @@
 import DeviceBase from 'system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
-import {PinDirection} from 'system/interfaces/io/DigitalIo';
-import {Edge, InputResistorMode, OutputResistorMode} from '../../../system/interfaces/gpioTypes';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import {stringifyPinDirection, stringifyResistorMode} from 'system/lib/digitalHelpers';
 
 
 interface GpioLocalProps {
@@ -29,7 +29,10 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
   }
 
 
-  private gpio: Gpio = {
+  /**
+   * Methods for manipulate via Binary drivers
+   */
+  gpio: Gpio = {
     digitalSetupInput: (
       pin: number,
       inputMode: InputResistorMode,
@@ -74,33 +77,80 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
   };
 
   protected actions = {
-    digitalGetPinDirection: (pin: number): Promise<string> => {
-      return this.digitalIo.getPinDirection(pin);
+    digitalGetPinDirection: async (pin: number): Promise<string> => {
+      const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
+
+      return stringifyPinDirection(direction);
     },
 
-    digitalGetPinResistorMode: (pin: number): Promise<string> => {
-      return this.digitalIo.getPinResistorMode(pin);
+    digitalGetPinResistorMode: async (pin: number): Promise<string> => {
+      const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
+      const mode: InputResistorMode | OutputResistorMode | undefined =
+        await this.digitalIo.getPinResistorMode(pin);
+
+      return stringifyResistorMode(direction, mode);
     },
 
     /**
-     * setup pin as input and return it's value. It useful for debug purpose
+     * Setup pin as input and return it's value.
+     * If mode and direction don't change then setup won't be done.
      */
     digitalSetupAndRead: async (pin: number, inputMode?: InputResistorMode): Promise<boolean> => {
-      // TODO: если текущий direction = undefined - делаем setup
-      // TODO: если текущий direction = заданному - ничего не делаем
-      // TODO: если текущий direction != заданному - очищаем пин из делаем setup
-      //if (await this.digitalIo.getPinDirection(pin) === 1)
+      const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
+      const mode: InputResistorMode | OutputResistorMode | undefined =
+        await this.digitalIo.getPinResistorMode(pin);
+      const isSetupDifferent: boolean = typeof direction === 'undefined'
+        || typeof mode === 'undefined'
+        || direction !== PinDirection.input
+        || mode !== inputMode;
+
+      // clear pin only if it has another mode
+      if (typeof direction !== 'undefined' && isSetupDifferent) {
+        await this.digitalIo.clearPin(pin);
+      }
+
+      if (isSetupDifferent) {
+        const mode: InputResistorMode | OutputResistorMode | undefined =
+          await this.digitalIo.getPinResistorMode(pin);
+
+        // in case pin hasn't been setup or need to resetup
+        await this.digitalIo.setupInput(
+          pin,
+          inputMode || InputResistorMode.none,
+          0,
+          Edge.both
+        );
+      }
 
       return this.digitalIo.read(pin);
     },
 
     /**
-     * setup pin as output and write the value. It useful for debug purpose
+     * Setup pin as output and write the value.
+     * If mode and direction don't change then setup won't be done.
      */
     digitalSetupAndWrite: async (pin: number, level: boolean, outputMode?: OutputResistorMode): Promise<void> => {
-      // TODO: если текущий direction = undefined - делаем setup
-      // TODO: если текущий direction = заданному - ничего не делаем
-      // TODO: если текущий direction != заданному - очищаем пин из делаем setup
+      const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
+      const mode: InputResistorMode | OutputResistorMode | undefined =
+        await this.digitalIo.getPinResistorMode(pin);
+      const isSetupDifferent: boolean = typeof direction === 'undefined'
+        || typeof mode === 'undefined'
+        || direction !== PinDirection.output
+        || mode !== outputMode;
+
+      // clear pin only if it has another mode
+      if (typeof direction !== 'undefined' && isSetupDifferent) {
+        await this.digitalIo.clearPin(pin);
+      }
+
+      if (isSetupDifferent) {
+        // in case pin hasn't been setup or need to resetup
+        await this.digitalIo.setupOutput(
+          pin,
+          level,
+          outputMode || OutputResistorMode.none
+        );
+      }
 
       return this.digitalIo.write(pin, level);
     },
