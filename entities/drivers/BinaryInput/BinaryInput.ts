@@ -58,6 +58,8 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
+      // TODO: debounce and edge могут быть undefined чтобы можно было переопределить в Gpio device
+
       await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, edge);
     }
     catch (err) {

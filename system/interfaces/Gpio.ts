@@ -1,11 +1,11 @@
-import {ChangeHandler, Edge, InputResistorMode, OutputResistorMode} from './io/DigitalIo';
+import {ChangeHandler, Edge, InputResistorMode, OutputResistorMode, PinDirection} from './io/DigitalIo';
 
 
 export interface GpioDigital {
-  digitalSetupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void>;
+  digitalSetupInput(pin: number, inputMode: InputResistorMode, debounce?: number, edge?: Edge): Promise<void>;
   digitalSetupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void>;
-  // TODO: review
-  digitalGetPinMode(pin: number): Promise<DigitalPinMode | undefined>;
+  digitalGetPinDirection(pin: number): Promise<PinDirection | undefined>;
+  digitalGetPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
   digitalRead(pin: number): Promise<boolean>;
   // only for output pins
   digitalWrite(pin: number, level: boolean): Promise<void>;
