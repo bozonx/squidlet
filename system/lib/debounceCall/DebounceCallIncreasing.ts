@@ -1,4 +1,4 @@
-import DebounceBase, {DebounceCb, DebounceItem, ItemPosition} from './DebounceBase';
+import DebounceCall, {DebounceCb, DebounceItem, ItemPosition} from './DebounceCall';
 
 
 /**
@@ -8,7 +8,7 @@ import DebounceBase, {DebounceCb, DebounceItem, ItemPosition} from './DebounceBa
  * Call invoke method on each change. Only the last time will be fulfilled.
  * It returns a promise which will be fulfilled at the end of full cycle.
  */
-export default class DebounceCallIncreasing extends DebounceBase {
+export default class DebounceCallIncreasing extends DebounceCall {
   protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounce?: number) {
     // update cb
     item[ItemPosition.lastCbToCall] = cb;
