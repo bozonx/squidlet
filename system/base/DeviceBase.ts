@@ -7,7 +7,7 @@ import {StateCategories} from '../interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '../constants';
 
 
-export type DeviceAction = (...param: any[]) => JsonTypes | Promise<JsonTypes>;
+export type DeviceAction = (...param: any[]) => JsonTypes | void | Promise<JsonTypes | void>;
 export type StatusChangeHandler = (paramName: string, value?: JsonTypes) => void;
 export type ConfigChangeHandler = () => void;
 

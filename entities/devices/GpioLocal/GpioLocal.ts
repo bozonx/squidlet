@@ -73,11 +73,11 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
   };
 
   protected actions = {
-    digitalGetPinDirection: (pin: number): Promise<PinDirection | undefined> => {
+    digitalGetPinDirection: (pin: number): Promise<string> => {
       return this.digitalIo.getPinDirection(pin);
     },
 
-    digitalGetPinResistorMode: (pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> => {
+    digitalGetPinResistorMode: (pin: number): Promise<string> => {
       return this.digitalIo.getPinResistorMode(pin);
     },
 
