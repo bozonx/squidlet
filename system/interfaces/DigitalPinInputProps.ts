@@ -1,11 +1,11 @@
-import DigitalBaseProps from './DigitalBaseProps';
+import DigitalBaseProps from './GpioBaseProps';
 
 
 export type EdgeString = 'rising' | 'falling' | 'both';
 
 
 export default interface DigitalPinInputProps extends DigitalBaseProps {
-  // TODO: какой должен быть edge - строкой или всетаки enum  // Listen to low, high or both levels. By default is both.
+  // Listen to low, high or both levels. By default is both.
   edge: EdgeString;
   // debounce time in ms only for input pins. If not set system defaults will be used.
   debounce: number;
