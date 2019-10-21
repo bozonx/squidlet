@@ -13,7 +13,7 @@ props:
 
   ###### Other props
   ### I2cToSlaveDriverProps
-  # bus: {}
+  # busNum: {}
   # address: {}
   #
   ## MasterSlaveBusProps

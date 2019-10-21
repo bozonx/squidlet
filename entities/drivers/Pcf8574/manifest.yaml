@@ -9,7 +9,7 @@ props:
   $base: 'drivers.I2cToSlave'
 
   ### I2cToSlave driver props
-  #bus: {}
+  #busNum: {}
   #address: {}
   #int: {}
   #feedback: {}

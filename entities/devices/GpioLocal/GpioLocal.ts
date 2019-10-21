@@ -13,7 +13,7 @@ interface GpioLocalProps {
 
 /**
  * GPIO device which is represent a local digital, analog and PWM IO ports.
- * Don't specify more than one instance please in config.
+ * Don't specify more than one instance in config please.
  * Default instance in config should be names as "gpio".
  * Props of this instance will be defaults of IO devices.
  */

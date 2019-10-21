@@ -47,6 +47,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       this.props.pullup
     );
 
+    // TODO: обработать ошибку чтобы сообщение было более понятно что не такого девайса
     this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
   }
 
