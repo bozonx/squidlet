@@ -48,7 +48,9 @@ export default class ConfigsSet {
       if (entitySet.system) allSystemDrivers.push(driverName);
     }
 
-    return sortByIncludeInList(driversClasses, allSystemDrivers);
+    const result = sortByIncludeInList(driversClasses, allSystemDrivers);
+
+    return [...result[0], ...result[1]];
   }
 
   /**
@@ -65,7 +67,9 @@ export default class ConfigsSet {
       if (entitySet.system) allSystemServices.push(serviceName);
     }
 
-    return sortByIncludeInList(servicesClasses, allSystemServices);
+    const result = sortByIncludeInList(servicesClasses, allSystemServices);
+
+    return [...result[0], ...result[1]];
   }
 
 }
