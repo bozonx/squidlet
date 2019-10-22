@@ -78,13 +78,23 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   // TODO: review - наверное лучше запускать вручную
-  protected appDidInit = async () => {
-    // start polling or int listeners after app is initialized
-    this.setupFeedback();
-  }
+  // protected appDidInit = async () => {
+  //   // start polling or int listeners after app is initialized
+  //   this.setupFeedback();
+  // }
 
   // destroy = () => {
   // }
+
+  /**
+   * Start feedback manually.
+   * It will do the first poll and then start listening for int or do poll according props.
+   */
+  startFeedback() {
+    // TODO: make poll once at the beginning and don't wait it????
+
+    this.setupFeedback();
+  }
 
 
   getLastData(functionStr: string | number | undefined): Uint8Array | undefined {

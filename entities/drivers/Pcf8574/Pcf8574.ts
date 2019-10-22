@@ -33,7 +33,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private tmpState?: number;
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
-  // TODO: review
   private initIcStep: boolean = false;
   // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number | undefined} = {};
@@ -95,17 +94,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     // if I2C driver doesn't have feedback then it doesn't need to be setup
     if (!this.i2cDriver.hasFeedback()) return;
 
-    // TODO: нужно сделать poll чтобы собрать занчения с инпутов
-    // TODO: и только после этого начать делать poling и слушать int в драйвере i2cDriver
-
-    // TODO: не навешиваться если не указанно ни int ни poll в конфиге - см как рабоатет в I2c driver
-    // TODO: review
-
+    // TODO: review - почему бы это не сделать в самом i2cDriver ?
     this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
       this.log.error(String(err));
     });
 
     this.i2cDriver.addListener(this.handleIcStateChange);
+    // make first request and start handle feedback
+    this.i2cDriver.startFeedback();
 
     this.initIcStep = false;
   }
@@ -179,9 +175,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Poll expander manually.
    */
   pollOnce(): Promise<void> {
-    // TODO: может повешать на промис инициализации ????
+    // TODO: лучше повешать на промис 1го poll или так оставить
     // there is no need to do poll before initialization because after initialization it will be done
-    if (!this.wasIcInited || this.initIcStep) return Promise.resolve();
+    if (!this.isIcInitialized()) return Promise.resolve();
 
     return this.i2cDriver.pollOnce();
   }
@@ -218,19 +214,23 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * @return {Promise}
    */
   async write(pin: number, value: boolean): Promise<void> {
-    // TODO: review
-    //if (!this.checkInitialization('write')) return;
-
     this.checkPin(pin);
 
     if (this.directions[pin] !== PinDirection.output) {
       throw new Error('Pin is not defined as an output');
     }
 
-    // TODO: если не запущенна инициализация - то записываем в стейт
+    if (this.setupStep) {
+      // update current value of pin and go out if there is setup step
+      this.currentState = updateBitInByte(this.currentState, pin, value);
+
+      return;
+    }
+
     // TODO: если запущенна инициализация - то записываем в стейт и ставим в очередь новую запись
 
     // TODO: что будет если ещё выполнится 2й запрос в очереди - на тот момент же будет удален tmpState ???
+    // TODO: что за логика с tmpState ???
 
     if (typeof this.tmpState === 'undefined') {
       this.tmpState = this.currentState;
@@ -261,7 +261,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Not output pins (input, undefined) are ignored.
    */
   async writeState(outputValues: boolean[]): Promise<void> {
-    // TODO: review
+    // TODO: full review
     //if (!this.checkInitialization('writeState')) return;
 
     if (typeof this.tmpState === 'undefined') {

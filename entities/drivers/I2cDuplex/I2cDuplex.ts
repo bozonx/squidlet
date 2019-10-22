@@ -31,6 +31,7 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
     });
   }
 
+  // TODO: add start feedback
 
   send(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
 
@@ -75,6 +76,6 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDrive
 export default class Factory extends DriverFactoryBase<I2cDuplex, I2cDuplexProps> {
   protected SubDriverClass = I2cDuplex;
   protected instanceId = (props: I2cDuplexProps): string => {
-    return `${props.bus || 'default'}-${props.address}`;
+    return `${props.busNum || 'default'}-${props.address}`;
   }
 }
