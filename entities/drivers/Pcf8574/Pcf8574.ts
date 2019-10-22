@@ -76,23 +76,42 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   /**
    * Manually initialize IC.
    * Call this method after all the pins have been initialized and initial values are set up.
+   * And you can repeat it if you setup pin after initialization.
    */
   async initIc() {
-    // TODO: add
-    //await this.writeToIc(this.currentState);
+    // TODO: add возможность перезапуска вручную
+    // TODO: review может использовать promise
+    this.initingIcInProgress = true;
 
-    // TODO: не запускать poll если нет ни одного input ??? хотя вдруг потом появятся ???
+    try {
+      await this.writeToIc(this.currentState);
+    }
+    catch (e) {
+      this.initingIcInProgress = false;
 
+      throw e;
+    }
+
+    // TODO: нужно сделать poll чтобы собрать занчения с инпутов
+    // TODO: и только после этого начать делать poling и слушать int в драйвере i2cDriver
+
+    this.initingIcInProgress = false;
+    // it means that IC is inited when first data is written
+    this.wasIcInited = true;
+
+    // TODO: не навешиваться если не указанно ни int ни poll в конфиге - см как рабоатет в I2c driver
     // TODO: review
     this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
       this.log.error(String(err));
     });
 
-    // TODO: не навешивать листенер если нет ни одного инпута? хотя вдруг потом появятся ???
     this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
 
+  /**
+   * If you did setup after IC initialized then do `initIc()`.
+   */
   async setupInput(pin: number, debounce?: number, edge?: Edge): Promise<void> {
     this.checkPin(pin);
 
@@ -128,8 +147,15 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
   }
 
-  async getPinDirection(pin: number): Promise<PinDirection | undefined> {
+  getPinDirection(pin: number): PinDirection | undefined {
     return this.directions[pin];
+  }
+
+  /**
+   * Are there any input pins.
+   */
+  hasInputPins(): boolean {
+    return this.directions.includes(PinDirection.input);
   }
 
   /**
@@ -146,13 +172,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   /**
    * Poll expander manually.
    */
-  async pollOnce(): Promise<void> {
-    // TODO: review
-    if (!this.checkInitialization('poll')) return;
-    // TODO: review
-    else if (!this.wasIcInited) return;
+  pollOnce(): Promise<void> {
+    // TODO: может повешать на промис инициализации ????
+    // there is no need to do poll before initialization because after initialization it will be done
+    if (!this.wasIcInited || this.initingIcInProgress) return Promise.resolve();
 
-    await this.i2cDriver.pollOnce();
+    return this.i2cDriver.pollOnce();
   }
 
   /**
@@ -175,6 +200,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   read(pin: number): boolean {
     this.checkPin(pin);
 
+    // TODO: или всетаки зачитать значения сначала из IC ???
+
     return getBitFromByte(this.currentState, pin);
   }
 
@@ -186,7 +213,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    */
   async write(pin: number, value: boolean): Promise<void> {
     // TODO: review
-    if (!this.checkInitialization('write')) return;
+    //if (!this.checkInitialization('write')) return;
 
     this.checkPin(pin);
 
@@ -194,8 +221,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       throw new Error('Pin is not defined as an output');
     }
 
-    // It doesn't need to initialize IC, because new state will send below
-    // TODO: пока идет инициализация - записывать просто в стейт
+    // TODO: если не запущенна инициализация - то записываем в стейт
+    // TODO: если запущенна инициализация - то записываем в стейт и ставим в очередь новую запись
 
     // TODO: что будет если ещё выполнится 2й запрос в очереди - на тот момент же будет удален tmpState ???
 
@@ -204,6 +231,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
 
     this.tmpState = updateBitInByte(this.tmpState, pin, value);
+
+    // TODO: нельзя записывать пока не запущенна инициализация
+    // TODO: если инициализация в процессе - то после ее завершения сделать новую запись
 
     try {
       await this.writeToIc(this.tmpState);
@@ -226,7 +256,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    */
   async writeState(outputValues: boolean[]): Promise<void> {
     // TODO: review
-    if (!this.checkInitialization('writeState')) return;
+    //if (!this.checkInitialization('writeState')) return;
 
     if (typeof this.tmpState === 'undefined') {
       this.tmpState = this.currentState;
@@ -238,6 +268,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       this.tmpState = updateBitInByte(this.tmpState, pin, outputValues[pin]);
     }
+
+    // TODO: нельзя записывать пока не запущенна инициализация
+    // TODO: если инициализация в процессе - то после ее завершения сделать новую запись
 
     try {
       await this.writeToIc(this.tmpState);
@@ -331,46 +364,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   /**
-   * Write the current state to the IC.
-   * @return {Promise} gets resolved when the state is written to the IC, or rejected in case of an error.
+   * Write given state to the IC.
    */
-  private async writeToIc(newState: number): Promise<void> {
-    if (!this.wasIcInited) {
-      this.initingIcInProgress = true;
-    }
-
+  private writeToIc(newStateByte: number): Promise<void> {
     const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
+    // fill data
+    dataToSend[0] = newStateByte;
 
-    // send one byte to IC
-    dataToSend[0] = newState;
-
-    try {
-      await this.i2cDriver.write(undefined, dataToSend);
-    }
-    catch (err) {
-      this.initingIcInProgress = false;
-
-      throw err;
-    }
-
-    this.initingIcInProgress = false;
-    // it means that IC is inited when first data is written
-    this.wasIcInited = true;
-  }
-
-  private checkInitialization(methodWhichCheck: string): boolean {
-    if (this.initingIcInProgress) {
-      this.log.warn(`PCF8574Driver.${methodWhichCheck}. IC initialization is in progress. Props are: "${JSON.stringify(this.props)}"`);
-
-      return false;
-    }
-    else if (!this.context.isInitialized) {
-      this.log.warn(`PCF8574Driver.${methodWhichCheck}. It runs before app is initialized. Props are: "${JSON.stringify(this.props)}"`);
-
-      return false;
-    }
-
-    return true;
+    return this.i2cDriver.write(undefined, dataToSend);
   }
 
   // TODO: решить на каком уровне делать
@@ -384,10 +385,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // TODO: remove ???
   private updateCurrentState(pin: number, newValue: boolean) {
     this.currentState = updateBitInByte(this.currentState, pin, newValue);
-  }
-
-  private hasInputPins(): boolean {
-    return this.directions.includes(PinDirection.input);
   }
 
   // /**
