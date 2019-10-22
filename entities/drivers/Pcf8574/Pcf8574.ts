@@ -278,6 +278,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       // skip not input pins
       if (this.directions[pin] !== PinDirection.input) continue;
       // if value was changed then update state and rise an event.
+      // TODO: проверять только после debounce
       if (newBoolState[pin] !== oldBoolState[pin]) {
         // TODO: значение можно устанавливать только когда пройдет debounce !!!!
         this.updateCurrentState(pin, newBoolState[pin]);
@@ -287,6 +288,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   private emitPinEvent(pin: number, pinValue: boolean) {
+    // TODO: проверять только после debounce!!!!
     // skip not suitable edge
     if (this.pinEdges[pin] === Edge.rising && !pinValue) {
       return;
@@ -296,6 +298,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
 
     if (!this.pinDebounces[pin]) {
+      // TODO: установить значение если изменилось и проверить edge
       // emit right now if there isn't debounce
       this.changeEvents.emit(pin, pinValue);
     }
@@ -383,16 +386,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   private hasInputPins(): boolean {
     return this.directions.includes(PinDirection.input);
-  }
-
-
-  protected validateProps = (props: Pcf8574ExpanderProps): string | undefined => {
-
-    // if(address < 0 || address > 255){
-    //   throw new Error('Address out of range');
-    // }
-
-    return;
   }
 
   // /**
