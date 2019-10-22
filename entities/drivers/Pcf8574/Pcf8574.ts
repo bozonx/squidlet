@@ -13,6 +13,7 @@ import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 import {omitObj} from '../../../system/lib/objects';
+import ExpanderLogic from './ExpanderLogic';
 
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
@@ -42,9 +43,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly changeEvents = new IndexedEventEmitter<ChangeHandler>();
+  private _expanderLogic?: ExpanderLogic;
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
+  }
+
+  private get expanderLogic(): ExpanderLogic {
+    return this._expanderLogic as any;
   }
 
 
@@ -58,6 +64,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
           {length: DATA_LENGTH}
         ],
       }
+    );
+
+    this._expanderLogic = new ExpanderLogic(
+      this.log.error,
+      this.config.config.queueJobTimeoutSec,
+      this.props.writeBufferMs
     );
   }
 
