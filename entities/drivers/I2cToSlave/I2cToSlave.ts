@@ -130,7 +130,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
         );
       }
 
-      this.impulseInput.addListener(this.pollAllFunctionNumbers);
+      this.impulseInput.onChange(this.pollAllFunctionNumbers);
     }
     // start polling if feedback is poll
     this.startPolls();

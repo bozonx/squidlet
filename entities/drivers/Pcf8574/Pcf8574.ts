@@ -12,9 +12,11 @@ import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
+import {omitObj} from '../../../system/lib/objects';
 
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
+  writeBufferMs?: number;
 }
 
 
@@ -50,7 +52,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.depsInstances.i2cDriver = await this.context.getSubDriver(
       'I2cToSlave',
       {
-        ...this.props,
+        ...omitObj(this.props, 'writeBufferMs'),
         // TODO: review
         poll: [
           {length: DATA_LENGTH}

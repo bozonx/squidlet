@@ -8,6 +8,9 @@ drivers:
 props:
   $base: 'drivers.I2cToSlave'
 
+  writeBufferMs:
+    type: number
+
   ### I2cToSlave driver props
   #busNum: {}
   #address: {}
