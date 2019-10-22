@@ -46,6 +46,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
 
   async write(functionStr?: string | number, data?: Uint8Array): Promise<void> {
+    // TODO: add debug
     const functionHex: number | undefined = this.makeFunctionHex(functionStr);
     const senderId = this.makeSenderId(functionStr, 'write');
 
@@ -53,6 +54,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
   async read(functionStr?: string | number, length?: number): Promise<Uint8Array> {
+    // TODO: add debug
     const functionHex: number | undefined = this.makeFunctionHex(functionStr);
     const resolvedLength: number = this.resolveReadLength(functionStr, length);
     const senderId = this.makeSenderId(functionStr, 'read', resolvedLength);
@@ -78,6 +80,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     dataToSend?: Uint8Array,
     readLength?: number
   ): Promise<Uint8Array> {
+    // TODO: add debug
     const functionHex: number | undefined = this.makeFunctionHex(functionStr);
     const resolvedLength: number = this.resolveReadLength(functionStr, readLength);
     const senderId = this.makeSenderId(functionStr, 'request', resolvedLength);
@@ -101,6 +104,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
    * Read data once and rise an data event
    */
   protected async doPoll(functionStr?: string | number): Promise<Uint8Array> {
+    // TODO: add debug
     const functionHex: number | undefined = this.makeFunctionHex(functionStr);
     const resolvedLength: number = this.resolveReadLength(functionStr);
     const senderId = this.makeSenderId(functionStr, 'doPoll');

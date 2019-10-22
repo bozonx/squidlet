@@ -34,6 +34,10 @@ export const UNDEFINED_DATA_ADDRESS = 'default';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
+
+  // TODO: почему называется functionStr ????
+
+
   /**
    * Write data to slave.
    * * write(functionStr, data) - write data to data address

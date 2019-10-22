@@ -20,7 +20,7 @@ export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
 
 // Count of pins which IC has
 export const PINS_COUNT = 8;
-// length of data to send and receive
+// length of data to send and receive to IC
 export const DATA_LENGTH = 1;
 
 
@@ -64,6 +64,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     });
 
     this.i2cDriver.addListener(this.handleIcStateChange);
+  }
+
+  destroy = async () => {
+    // TODO: add
   }
 
   // protected appDidInit = async () => {
@@ -137,20 +141,22 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   /**
-   * Poll expander and return values of all the pins
+   * Poll expander manually.
    */
-  async pollOnce(): Promise<boolean[]> {
-    if (!this.checkInitialization('poll')) return this.getState();
-    else if (!this.wasIcInited) return this.getState();
+  async pollOnce(): Promise<void> {
+    // TODO: review
+    if (!this.checkInitialization('poll')) return;
+    // TODO: review
+    else if (!this.wasIcInited) return;
 
     await this.i2cDriver.pollOnce();
-
-    return this.getState();
   }
 
   /**
    * Returns array like [true, true, false, false, true, true, false, false].
-   * It is full state includes values of input and output pins.
+   * It is full state includes values of input and output pins. Input pins are always true.
+   * If you did't setup poll or interrupt then call `pollOnce()` before
+   * to be sure that you will receive the last actual data.
    */
   getState(): boolean[] {
     return byteToBinArr(this.currentState);
@@ -158,17 +164,13 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   /**
    * Returns the current value of a pin.
-   * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
-   * To get the current value call doPoll() first, if you're not using interrupts.
+   * If you did't setup poll or interrupt then call `pollOnce()` before
+   * to be sure that you will receive the last actual data.
    * @param  {number} pin The pin number. (0 to 7)
-   * @return {boolean}               The current value.
+   * @return {boolean} The current value.
    */
-  async read(pin: number): Promise<boolean> {
+  read(pin: number): boolean {
     this.checkPin(pin);
-
-    if (this.hasInputPins()) {
-      await this.pollOnce();
-    }
 
     return getBitFromByte(this.currentState, pin);
   }
@@ -180,6 +182,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * @return {Promise}
    */
   async write(pin: number, value: boolean): Promise<void> {
+    // TODO: review
     if (!this.checkInitialization('write')) return;
 
     this.checkPin(pin);
@@ -189,6 +192,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
 
     // It doesn't need to initialize IC, because new state will send below
+    // TODO: пока идет инициализация - записывать просто в стейт
 
     // TODO: что будет если ещё выполнится 2й запрос в очереди - на тот момент же будет удален tmpState ???
 
@@ -218,6 +222,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Not output pins (input, undefined) are ignored.
    */
   async writeState(outputValues: boolean[]): Promise<void> {
+    // TODO: review
     if (!this.checkInitialization('writeState')) return;
 
     if (typeof this.tmpState === 'undefined') {
@@ -251,70 +256,73 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   clearAll() {
-    // TODO: add
+    for (let pin = 0; pin < PINS_COUNT; pin ++) {
+      this.clearPin(pin);
+    }
   }
 
 
   private handleIcStateChange = (functionStr: number | string | undefined, data: Uint8Array) => {
     if (!data || data.length !== DATA_LENGTH) {
-      throw new Error(`PCF8574Driver: No data has been received`);
+      return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
     }
 
-    const oldState = this.currentState;
+    this.setNewInputsState(data[0]);
+  }
 
-    //console.log(11111111, 'current - ', this.currentState.toString(2), ' | new - ', data[0].toString(2));
-
-    // TODO: нужно ли инвертировать???
-
+  private setNewInputsState(receivedByte: number) {
+    const newBoolState: boolean[] = byteToBinArr(receivedByte);
+    const oldBoolState: boolean[] = byteToBinArr(this.currentState);
+    // update values add rise change event of input pins which are changed
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skip not input pins
       if (this.directions[pin] !== PinDirection.input) continue;
-
-      this.updateCurrentState(pin, getBitFromByte(data[0], pin));
-    }
-
-    this.emitChangeEvents(oldState);
-  }
-
-  /**
-   * Emit event on changed input pins
-   */
-  private emitChangeEvents(oldState: number) {
-    const oldBoolState: boolean[] = byteToBinArr(oldState);
-    const currentBoolState: boolean[] = this.getState();
-
-    for (let pinNumStr in currentBoolState) {
-      const pinNum: number = parseInt(pinNumStr);
-
-      // skip not input pins
-      if (this.directions[pinNum] !== PinDirection.input) continue;
-
-      if (currentBoolState[pinNum] !== oldBoolState[pinNum]) {
-        this.emitPinEvent(pinNum, currentBoolState[pinNum]);
+      // if value was changed then update state and rise an event.
+      if (newBoolState[pin] !== oldBoolState[pin]) {
+        // TODO: значение можно устанавливать только когда пройдет debounce !!!!
+        this.updateCurrentState(pin, newBoolState[pin]);
+        this.emitPinEvent(pin, newBoolState[pin]);
       }
     }
   }
 
-  private emitPinEvent(pinNum: number, pinValue: boolean) {
+  private emitPinEvent(pin: number, pinValue: boolean) {
     // skip not suitable edge
-    if (this.pinEdges[pinNum] === 'rising' && !pinValue) {
+    if (this.pinEdges[pin] === Edge.rising && !pinValue) {
       return;
     }
-    else if (this.pinEdges[pinNum] === 'falling' && pinValue) {
+    else if (this.pinEdges[pin] === Edge.falling && pinValue) {
       return;
     }
 
-    if (!this.pinDebounces[pinNum]) {
-      this.changeEvents.emit(pinNum, pinValue);
+    if (!this.pinDebounces[pin]) {
+      // emit right now if there isn't debounce
+      this.changeEvents.emit(pin, pinValue);
     }
     else {
       // wait for debounce and read current level
-      this.debounceCall.invoke(async () => {
-        const realLevel = await this.read(pinNum);
-
-        this.changeEvents.emit(pinNum, realLevel);
-      }, this.pinDebounces[pinNum], pinNum);
+      this.debounceCall.invoke(
+        () => this.handleEndOfDebounce(pin, pinValue),
+        this.pinDebounces[pin],
+        pin
+      )
+        .catch((e) => this.log.error(e));
     }
+  }
+
+  private handleEndOfDebounce(pin: number, valueBeforeInvoke: boolean) {
+    // make poll and then read a value to confirm valueBeforeInvoke.
+    this.pollOnce()
+      .then(() => {
+        const newValue: boolean = this.read(pin);
+
+        // TODO: test by hard!
+        // value hasn't been confirmed - means actually didn't change.
+        if (valueBeforeInvoke !== newValue) return;
+
+        this.changeEvents.emit(pin, newValue);
+      })
+      .catch((e) => this.log.error(e));
   }
 
   /**
