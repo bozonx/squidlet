@@ -57,13 +57,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
         ],
       }
     );
-
-    // TODO: review
-    this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
-      this.log.error(String(err));
-    });
-
-    this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
   destroy = async () => {
@@ -87,6 +80,16 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   async initIc() {
     // TODO: add
     //await this.writeToIc(this.currentState);
+
+    // TODO: не запускать poll если нет ни одного input ??? хотя вдруг потом появятся ???
+
+    // TODO: review
+    this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
+      this.log.error(String(err));
+    });
+
+    // TODO: не навешивать листенер если нет ни одного инпута? хотя вдруг потом появятся ???
+    this.i2cDriver.addListener(this.handleIcStateChange);
   }
 
 
@@ -271,61 +274,60 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   private setNewInputsState(receivedByte: number) {
-    const newBoolState: boolean[] = byteToBinArr(receivedByte);
-    const oldBoolState: boolean[] = byteToBinArr(this.currentState);
     // update values add rise change event of input pins which are changed
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skip not input pins
       if (this.directions[pin] !== PinDirection.input) continue;
-      // if value was changed then update state and rise an event.
-      // TODO: проверять только после debounce
-      if (newBoolState[pin] !== oldBoolState[pin]) {
-        // TODO: значение можно устанавливать только когда пройдет debounce !!!!
-        this.updateCurrentState(pin, newBoolState[pin]);
-        this.emitPinEvent(pin, newBoolState[pin]);
+
+      const newValue: boolean = getBitFromByte(receivedByte, pin);
+      const oldValue: boolean = getBitFromByte(this.currentState, pin);
+
+      // check if value changed. If not changed = nothing happened.
+      if (newValue !== oldValue) {
+        // if value was changed then update state and rise an event.
+        this.handleInputPinChange(pin, newValue);
       }
     }
   }
 
-  private emitPinEvent(pin: number, pinValue: boolean) {
-    // TODO: проверять только после debounce!!!!
-    // skip not suitable edge
-    if (this.pinEdges[pin] === Edge.rising && !pinValue) {
-      return;
-    }
-    else if (this.pinEdges[pin] === Edge.falling && pinValue) {
-      return;
-    }
+  private handleInputPinChange(pin: number, newPinValue: boolean) {
+    // TODO: в обоих случаях сначала сделать свой poll который поставится в очередь и ждать его завершения
+    // TODO: нужно накапливать запросы poll и если в процессе были новые то делать ещё 1 запрос
+    // TODO: но если мы сделаем poll once то опять поднимется событие и будет зацикленность
+    //       может тогда просто ждать завершения poll ????
+    // TODO: либо не делать poll здесь, а учитывать чтобы debounce был больше poll interval
+
+    // this.pollOnce()
+    //   .then(() => {
+    //   })
+    //   .catch((e) => this.log.error(e));
 
     if (!this.pinDebounces[pin]) {
-      // TODO: установить значение если изменилось и проверить edge
       // emit right now if there isn't debounce
-      this.changeEvents.emit(pin, pinValue);
+      this.handleEndOfDebounce(pin, newPinValue);
     }
     else {
       // wait for debounce and read current level
-      this.debounceCall.invoke(
-        () => this.handleEndOfDebounce(pin, pinValue),
-        this.pinDebounces[pin],
-        pin
-      )
+      this.debounceCall.invoke(() => {
+        this.handleEndOfDebounce(pin, newPinValue);
+      }, this.pinDebounces[pin], pin)
         .catch((e) => this.log.error(e));
     }
   }
 
-  private handleEndOfDebounce(pin: number, valueBeforeInvoke: boolean) {
-    // make poll and then read a value to confirm valueBeforeInvoke.
-    this.pollOnce()
-      .then(() => {
-        const newValue: boolean = this.read(pin);
+  private handleEndOfDebounce(pin: number, newPinValue: boolean) {
+    // skip not suitable edge
+    if (this.pinEdges[pin] === Edge.rising && !newPinValue) {
+      return;
+    }
+    else if (this.pinEdges[pin] === Edge.falling && newPinValue) {
+      return;
+    }
 
-        // TODO: test by hard!
-        // value hasn't been confirmed - means actually didn't change.
-        if (valueBeforeInvoke !== newValue) return;
-
-        this.changeEvents.emit(pin, newValue);
-      })
-      .catch((e) => this.log.error(e));
+    // set a new value
+    this.updateCurrentState(pin, newPinValue);
+    // rise a new event even value hasn't been actually changed since first check
+    this.changeEvents.emit(pin, newPinValue);
   }
 
   /**

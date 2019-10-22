@@ -272,7 +272,7 @@ export function getBitFromByte(byte: number, position: number): boolean {
 
   // TODO: why position from the end???
 
-  if (position < 0 && position > 7) {
+  if (position < 0 && position >= BITS_IN_BYTE) {
     throw new Error(`getBitFromByte: incorrect position "${position}" it has to be 0-7.`);
   }
 
