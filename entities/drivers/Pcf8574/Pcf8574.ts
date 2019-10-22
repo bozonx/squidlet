@@ -9,11 +9,10 @@ import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHe
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
+import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
-
-export type ChangeStateHandler = (level: boolean) => void;
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
 }
@@ -40,7 +39,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // collection of edges values of each pin to use in change handler
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private readonly changeEvents = new IndexedEventEmitter<ChangeStateHandler>();
+  private readonly changeEvents = new IndexedEventEmitter<ChangeHandler>();
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
@@ -123,14 +122,13 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    //return this.resolvePinDirection(pin);
+    return this.directions[pin];
   }
 
   /**
    * Listen to changes of pin after edge and debounce were processed.
-   * Call this method inside a init() callback of your driver or device or after.
    */
-  onChange(pin: number, handler: ChangeStateHandler): number {
+  onChange(pin: number, handler: ChangeHandler): number {
     return this.changeEvents.addListener(pin, handler);
   }
 
@@ -148,19 +146,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     await this.i2cDriver.pollOnce();
 
     return this.getState();
-  }
-
-  // TODO: не нужно !!!
-  async getPinMode(pin: number): Promise<'input' | 'output' | undefined> {
-    if (this.directions[pin] === PinDirection.input) {
-      return 'input';
-    }
-    else if (this.directions[pin] === PinDirection.output) {
-      return 'output';
-    }
-
-    // undefined means didn't specify
-    return;
   }
 
   /**
