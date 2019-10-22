@@ -61,7 +61,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
       return this.expander.setupOutput(pin, initialValue);
     },
 
-    digitalGetPinDirection: (pin: number): Promise<PinDirection | undefined> => {
+    digitalGetPinDirection: async (pin: number): Promise<PinDirection | undefined> => {
       return this.expander.getPinDirection(pin);
     },
 
@@ -69,7 +69,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
       return InputResistorMode.pullup;
     },
 
-    digitalRead: (pin: number): Promise<boolean> => {
+    digitalRead: async (pin: number): Promise<boolean> => {
       return this.expander.read(pin);
     },
 

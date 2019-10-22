@@ -24,7 +24,9 @@ export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
+  // TODO: почему poll обязательный???
   poll: PollProps[];
+  // TODO: зачем нужно если можно определить тип по int и poll ????
   feedback?: FeedbackType;
   // Default poll interval. By default is 1000
   pollInterval: number;
@@ -75,6 +77,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
+  // TODO: review - наверное лучше запускать вручную
   protected appDidInit = async () => {
     // start polling or int listeners after app is initialized
     this.setupFeedback();
@@ -88,6 +91,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     const resolvedDataAddr: string = this.resolvefunctionStr(functionStr);
 
     return this.pollLastData[resolvedDataAddr];
+  }
+
+  hasFeedback(): boolean {
+    return Boolean(this.props.int || this.props.poll);
   }
 
   /**

@@ -31,9 +31,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private currentState: number = 0;
   // State which is sets on write and removes after it
   private tmpState?: number;
-  private wasIcInited: boolean = false;
+  // time from the beginning to start initializing IC
+  private setupStep: boolean = true;
   // TODO: review
-  private initingIcInProgress: boolean = false;
+  private initIcStep: boolean = false;
   // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number | undefined} = {};
   // collection of edges values of each pin to use in change handler
@@ -79,33 +80,34 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * And you can repeat it if you setup pin after initialization.
    */
   async initIc() {
-    // TODO: add возможность перезапуска вручную
-    // TODO: review может использовать promise
-    this.initingIcInProgress = true;
+    // mark end of setup step
+    this.setupStep = false;
+    this.initIcStep = true;
 
     try {
       await this.writeToIc(this.currentState);
     }
     catch (e) {
-      this.initingIcInProgress = false;
+      this.initIcStep = false;
 
       throw e;
     }
+    // if I2C driver doesn't have feedback then it doesn't need to be setup
+    if (!this.i2cDriver.hasFeedback()) return;
 
     // TODO: нужно сделать poll чтобы собрать занчения с инпутов
     // TODO: и только после этого начать делать poling и слушать int в драйвере i2cDriver
 
-    this.initingIcInProgress = false;
-    // it means that IC is inited when first data is written
-    this.wasIcInited = true;
-
     // TODO: не навешиваться если не указанно ни int ни poll в конфиге - см как рабоатет в I2c driver
     // TODO: review
+
     this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
       this.log.error(String(err));
     });
 
     this.i2cDriver.addListener(this.handleIcStateChange);
+
+    this.initIcStep = false;
   }
 
 
@@ -151,6 +153,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this.directions[pin];
   }
 
+  isIcInitialized(): boolean {
+    return !this.setupStep && !this.initIcStep;
+  }
+
   /**
    * Are there any input pins.
    */
@@ -175,7 +181,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   pollOnce(): Promise<void> {
     // TODO: может повешать на промис инициализации ????
     // there is no need to do poll before initialization because after initialization it will be done
-    if (!this.wasIcInited || this.initingIcInProgress) return Promise.resolve();
+    if (!this.wasIcInited || this.initIcStep) return Promise.resolve();
 
     return this.i2cDriver.pollOnce();
   }
