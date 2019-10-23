@@ -90,19 +90,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   destroy = async () => {
+    this.initializationPromise.destroy();
     this.expanderInput.destroy();
     this.expanderOutput.destroy();
   }
-
-  // protected appDidInit = async () => {
-  //   // init IC state after app is initialized if it isn't at this moment
-  //   try {
-  //     await this.writeToIc(this.currentState);
-  //   }
-  //   catch (err) {
-  //     this.log.error(`PCF8574. Can't init IC state, props are "${JSON.stringify(this.props)}". ${String(err)}`);
-  //   }
-  // }
 
   /**
    * Manually initialize IC.
@@ -121,8 +112,17 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     catch (e) {
       this.initIcStep = false;
 
+      // TODO: если произолша ошибка - как тогда потом проинициализироваться ????
+
+      this.initializationPromise.reject(e);
+
       throw e;
     }
+
+    this.initIcStep = false;
+
+    this.initializationPromise.resolve();
+
     // if I2C driver doesn't have feedback then it doesn't need to be setup
     if (!this.i2cDriver.hasFeedback()) return;
 
@@ -134,10 +134,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.i2cDriver.addListener(this.handleIcStateChange);
     // make first request and start handle feedback
     this.i2cDriver.startFeedback();
-
-    this.initIcStep = false;
-
-    // TODO: resolve or reject initializationPromise
   }
 
 
