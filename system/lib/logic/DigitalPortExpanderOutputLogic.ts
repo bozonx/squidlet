@@ -14,8 +14,6 @@ export default class DigitalPortExpanderLogic {
   private readonly writeBufferMs?: number;
   private readonly queue: RequestQueue;
   private readonly debounce = new DebounceCall();
-  // Bitmask representing the current state of the pins
-  //private currentState: number = 0;
   // temporary state while saving values are buffering
   private writeBuffer?: number;
   private writingInProgress: boolean = false;
@@ -38,13 +36,10 @@ export default class DigitalPortExpanderLogic {
   }
 
   destroy() {
-    // TODO: add !!!!
+    this.queue.destroy();
+    this.debounce.destroy();
   }
 
-
-  // getState(): number {
-  //   return this.currentState;
-  // }
 
   isInProgress(): boolean {
     return this.isBuffering() || this.isWriting();
@@ -57,17 +52,6 @@ export default class DigitalPortExpanderLogic {
   isWriting(): boolean {
     return this.writingInProgress;
   }
-
-  // /**
-  //  * Just update state and don't save it to IC
-  //  */
-  // updateState(pin: number, value: boolean) {
-  //   this.currentState = updateBitInByte(this.currentState, pin, value);
-  // }
-  //
-  // setWholeState(state: number) {
-  //   this.currentState = state;
-  // }
 
   async write(pin: number, value: boolean): Promise<void> {
     if (this.isWriting()) {
@@ -99,6 +83,8 @@ export default class DigitalPortExpanderLogic {
   }
 
   async writeState(): Promise<void> {
+    const state: number = this.getState();
+
     // TODO: add write whole current state
     // TODO: ожидать промиса конца записи
   }

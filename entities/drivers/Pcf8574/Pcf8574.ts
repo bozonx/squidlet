@@ -106,8 +106,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.initIcStep = true;
 
     try {
-      // TODO: использовать expander write чтобы образовалась очередь ???
-      await this.writeToIc(this.currentState);
+      await this.expanderOutput.writeState();
     }
     catch (e) {
       this.initIcStep = false;
