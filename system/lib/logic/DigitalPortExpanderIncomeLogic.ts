@@ -7,10 +7,10 @@ import IndexedEventEmitter from '../IndexedEventEmitter';
 export default class DigitalPortExpanderIncomeLogic {
   private readonly logError: (msg: string) => void;
   private readonly pollOnce: () => Promise<void>;
+  private readonly getState: () => number;
+  private readonly updateState: (pin: number, value: boolean) => void;
   private readonly queue: RequestQueue;
   private readonly debounce = new DebounceCall();
-  // Bitmask representing the current state of the pins
-  //private currentState: number = 0;
   // buffer by pin for input pins while debounce or poll are in progress
   private inputPinBuffer: {[index: string]: boolean} = {};
   // change events of input pins
@@ -20,11 +20,14 @@ export default class DigitalPortExpanderIncomeLogic {
   constructor(
     logError: (msg: string) => void,
     pollOnce: () => Promise<void>,
+    getState: () => number,
+    updateState: (pin: number, value: boolean) => void,
     queueJobTimeoutSec: number,
-    writeBufferMs?: number
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;
+    this.getState = getState;
+    this.updateState = updateState;
     this.queue = new RequestQueue(logError, queueJobTimeoutSec);
   }
 
@@ -32,10 +35,6 @@ export default class DigitalPortExpanderIncomeLogic {
     // TODO: add !!!!
   }
 
-
-  // getState(): number {
-  //   return this.currentState;
-  // }
 
   isInputBuffering(pin: number) {
     return typeof this.inputPinBuffer[pin] !== 'undefined';
@@ -51,17 +50,6 @@ export default class DigitalPortExpanderIncomeLogic {
   removeListener(handlerIndex: number) {
     this.changeEvents.removeListener(handlerIndex);
   }
-
-  // /**
-  //  * Just update state and don't save it to IC
-  //  */
-  // updateState(pin: number, value: boolean) {
-  //   this.currentState = updateBitInByte(this.currentState, pin, value);
-  // }
-  //
-  // setWholeState(state: number) {
-  //   this.currentState = state;
-  // }
 
   /**
    * State which is income after poling request.

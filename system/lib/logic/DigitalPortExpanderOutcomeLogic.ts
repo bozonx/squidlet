@@ -9,6 +9,8 @@ const DEBOUNCE_WRITE_ID = 'write';
 export default class DigitalPortExpanderLogic {
   private readonly logError: (msg: string) => void;
   private readonly writeCb: (state: number) => Promise<void>;
+  private readonly getState: () => number;
+  private readonly updateState: (pin: number, value: boolean) => void;
   private readonly writeBufferMs?: number;
   private readonly queue: RequestQueue;
   private readonly debounce = new DebounceCall();
@@ -22,11 +24,15 @@ export default class DigitalPortExpanderLogic {
   constructor(
     logError: (msg: string) => void,
     writeCb: (state: number) => Promise<void>,
+    getState: () => number,
+    updateState: (pin: number, value: boolean) => void,
     queueJobTimeoutSec: number,
     writeBufferMs?: number
   ) {
     this.logError = logError;
     this.writeCb = writeCb;
+    this.getState = getState;
+    this.updateState = updateState;
     this.writeBufferMs = writeBufferMs;
     this.queue = new RequestQueue(logError, queueJobTimeoutSec);
   }
@@ -86,7 +92,7 @@ export default class DigitalPortExpanderLogic {
       return;
     }
 
-    const stateToWrite = updateBitInByte(this.currentState, pin, value);
+    const stateToWrite = updateBitInByte(this.getState(), pin, value);
 
     // TODO: нужно ли ожидать???
     this.startWriting(stateToWrite);
