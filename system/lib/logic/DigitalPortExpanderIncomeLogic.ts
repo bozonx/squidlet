@@ -2,6 +2,8 @@ import RequestQueue from '../RequestQueue';
 import DebounceCall from '../debounceCall/DebounceCall';
 import {ChangeHandler} from '../../interfaces/io/DigitalIo';
 import IndexedEventEmitter from '../IndexedEventEmitter';
+import {Edge} from '../../interfaces/gpioTypes';
+import {getBitFromByte} from '../binaryHelpers';
 
 
 export default class DigitalPortExpanderIncomeLogic {
@@ -54,7 +56,31 @@ export default class DigitalPortExpanderIncomeLogic {
   /**
    * State which is income after poling request.
    */
-  incomeState(pin: number, value: boolean, debounceMs?: number) {
+  incomeState(pin: number, newValue: boolean, debounceMs?: number, edge?: Edge) {
+
+    //const newValue: boolean = getBitFromByte(receivedByte, pin);
+    const oldValue: boolean = getBitFromByte(this.getState(), pin);
+
+    // skip not suitable edge
+    if (edge === Edge.rising && !newValue) {
+      return;
+    }
+    else if (edge === Edge.falling && newValue) {
+      return;
+    }
+
+    // TODO: если edge falling or rising - то схема будет упрощенной
+    //   просто throttle и poll не нужен
+
+    // check if value changed. If not changed = nothing happened.
+    if (newValue !== oldValue) {
+      // if value was changed then update state and rise an event.
+      this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
+    }
+
+
+
+
     const isBuffering: boolean = this.isInputBuffering(pin);
 
     this.inputPinBuffer[pin] = value;

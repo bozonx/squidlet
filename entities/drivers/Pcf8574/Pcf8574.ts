@@ -203,8 +203,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Poll expander manually.
    */
   pollOnce = (): Promise<void> => {
-    // TODO: лучше повешать на промис 1го poll или так оставить
-    // TODO: может сделать через expander logic - тогда будет в очереди
+    // TODO: вернуть промис полной IC инициализации
     // there is no need to do poll before initialization because after initialization it will be done
     if (!this.isIcInitialized()) return Promise.resolve();
 
@@ -221,19 +220,22 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return byteToBinArr(this.currentState);
   }
 
+  getPinState(pin: number): boolean {
+    return getBitFromByte(this.currentState, pin);
+  }
+
   /**
-   * Returns the current value of a pin.
-   * If you did't setup poll or interrupt then call `pollOnce()` before
-   * to be sure that you will receive the last actual data.
-   * @param  {number} pin The pin number. (0 to 7)
-   * @return {boolean} The current value.
+   * Asks IC and returns the current value of a pin.
    */
-  read(pin: number): boolean {
+  async read(pin: number): Promise<boolean> {
     this.checkPin(pin);
 
-    // TODO: всетаки зачитать значения сначала из IC ??? лучше через expander logic
+    if (this.i2cDriver.hasFeedback()) {
+      // TODO: как удостовериться что после poll отработают хэндлеры которые установят стейт
+      await this.pollOnce();
+    }
 
-    return getBitFromByte(this.currentState, pin);
+    return this.getPinState(pin);
   }
 
   /**
@@ -252,7 +254,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     if (this.setupStep) {
       // update current value of pin and go out if there is setup step
       this.updateState(pin, value);
-      // TODO: ожидать промиса конца инициализации
+      // TODO: ожидать промиса конца полной инициализации
       return;
     }
     // TODO: ожидать промиса конца записи
@@ -275,8 +277,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     if (this.setupStep) {
       // set current state and go out if there is setup step
-      this.expander.setWholeState(newState);
-      // TODO: ожидать промиса конца инициализации
+      this.currentState = newState;
+      // TODO: ожидать промиса конца полной инициализации
       return;
     }
     // TODO: ожидать промиса конца записи
@@ -309,24 +311,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       if (this.directions[pin] !== PinDirection.input) continue;
 
       const newValue: boolean = getBitFromByte(receivedByte, pin);
-      const oldValue: boolean = getBitFromByte(this.currentState, pin);
 
-      // skip not suitable edge
-      if (this.pinEdges[pin] === Edge.rising && !newValue) {
-        return;
-      }
-      else if (this.pinEdges[pin] === Edge.falling && newValue) {
-        return;
-      }
-
-      // TODO: если edge falling or rising - то схема будет упрощенной
-      //   просто throttle и poll не нужен
-
-      // check if value changed. If not changed = nothing happened.
-      if (newValue !== oldValue) {
-        // if value was changed then update state and rise an event.
-        this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
-      }
+      this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin], this.pinEdges[pin]);
     }
   }
 
