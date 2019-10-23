@@ -11,6 +11,7 @@ import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderIncomeLogic from 'system/lib/logic/DigitalPortExpanderIncomeLogic';
 import DigitalPortExpanderOutcomeLogic from 'system/lib/logic/DigitalPortExpanderOutcomeLogic';
+import Promised from 'system/lib/Promised';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
@@ -32,6 +33,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
+  private initializationPromise = new Promised<void>();
   // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number} = {};
   // collection of edges values of each pin to use in change handler
@@ -51,6 +53,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   private get expanderInput(): DigitalPortExpanderIncomeLogic {
     return this._expanderInput as any;
+  }
+
+  private get initIcPromise(): Promise<void> {
+    return this.initializationPromise.promise;
   }
 
 
@@ -130,6 +136,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.i2cDriver.startFeedback();
 
     this.initIcStep = false;
+
+    // TODO: resolve or reject initializationPromise
   }
 
 
@@ -204,9 +212,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Poll expander manually.
    */
   pollOnce = (): Promise<void> => {
-    // TODO: вернуть промис полной IC инициализации
-    // there is no need to do poll before initialization because after initialization it will be done
-    if (!this.isIcInitialized()) return Promise.resolve();
+    // it is no need to do poll while initialization time because it will be done after initialization
+    if (!this.isIcInitialized()) return this.initIcPromise;
 
     return this.i2cDriver.pollOnce();
   }
@@ -255,11 +262,11 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     if (this.setupStep) {
       // update current value of pin and go out if there is setup step
       this.updateState(pin, value);
-      // TODO: ожидать промиса конца полной инициализации
-      return;
+
+      return this.initIcPromise;
     }
-    // TODO: ожидать промиса конца записи
-    this.expanderOutput.write(pin, value);
+
+    await this.expanderOutput.write(pin, value);
   }
 
   /**
@@ -279,11 +286,11 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     if (this.setupStep) {
       // set current state and go out if there is setup step
       this.currentState = newState;
-      // TODO: ожидать промиса конца полной инициализации
-      return;
+
+      return this.initIcPromise;
     }
-    // TODO: ожидать промиса конца записи
-    this.expanderOutput.writeState();
+
+    await this.expanderOutput.writeState();
   }
 
   clearPin(pin: number) {

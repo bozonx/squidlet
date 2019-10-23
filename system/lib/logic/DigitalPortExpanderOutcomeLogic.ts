@@ -69,7 +69,7 @@ export default class DigitalPortExpanderLogic {
   //   this.currentState = state;
   // }
 
-  write(pin: number, value: boolean) {
+  async write(pin: number, value: boolean): Promise<void> {
     if (this.isWriting()) {
       // TODO: поставить в очередь - только 1  раз выполнится
 
@@ -94,12 +94,13 @@ export default class DigitalPortExpanderLogic {
 
     const stateToWrite = updateBitInByte(this.getState(), pin, value);
 
-    // TODO: нужно ли ожидать???
+    // TODO: ожидать промиса конца записи
     this.startWriting(stateToWrite);
   }
 
-  writeState() {
+  async writeState(): Promise<void> {
     // TODO: add write whole current state
+    // TODO: ожидать промиса конца записи
   }
 
   clearPin(pin: number) {
