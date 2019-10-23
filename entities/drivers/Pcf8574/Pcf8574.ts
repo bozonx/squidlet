@@ -7,12 +7,11 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {omitObj} from 'system/lib/objects';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
-import {omitObj} from '../../../system/lib/objects';
 import ExpanderLogic from './ExpanderLogic';
 
 
@@ -30,19 +29,14 @@ export const DATA_LENGTH = 1;
 export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // Direction of each pin. By default all the pin directions are undefined
   private readonly directions: (PinDirection | undefined)[] = [];
-  // Bitmask representing the current state of the pins
-  private currentState: number = 0;
-  // State which is sets on write and removes after it
-  private tmpState?: number;
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
   // collection of numbers of ms to use in debounce logic for each pin.
-  private readonly pinDebounces: {[index: string]: number | undefined} = {};
+  private readonly pinDebounces: {[index: string]: number} = {};
   // collection of edges values of each pin to use in change handler
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private readonly changeEvents = new IndexedEventEmitter<ChangeHandler>();
   private _expanderLogic?: ExpanderLogic;
 
   private get i2cDriver(): I2cToSlave {
@@ -68,6 +62,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     this._expanderLogic = new ExpanderLogic(
       this.log.error,
+      this.writeToIc,
+      this.pollOnce,
       this.config.config.queueJobTimeoutSec,
       this.props.writeBufferMs
     );
@@ -98,7 +94,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.initIcStep = true;
 
     try {
-      await this.writeToIc(this.currentState);
+      // TODO: использовать expanderLogic ???
+      await this.writeToIc(this.expanderLogic.getState());
     }
     catch (e) {
       this.initIcStep = false;
@@ -134,12 +131,15 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       );
     }
 
-    this.pinDebounces[pin] = debounce;
+    if (typeof debounce !== 'undefined') {
+      this.pinDebounces[pin] = debounce;
+    }
+
     this.pinEdges[pin] = edge;
     this.directions[pin] = PinDirection.input;
 
     // set input pin to high
-    this.updateCurrentState(pin, true);
+    this.expanderLogic.updateState(pin, true);
   }
 
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
@@ -155,7 +155,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.directions[pin] = PinDirection.output;
 
     if (typeof outputInitialValue !== 'undefined') {
-      this.updateCurrentState(pin, outputInitialValue);
+      this.expanderLogic.updateState(pin, outputInitialValue);
     }
   }
 
@@ -178,17 +178,17 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Listen to changes of pin after edge and debounce were processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
-    return this.changeEvents.addListener(pin, handler);
+    return this.expanderLogic.onChange(pin, handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.changeEvents.removeListener(handlerIndex);
+    this.expanderLogic.removeListener(handlerIndex);
   }
 
   /**
    * Poll expander manually.
    */
-  pollOnce(): Promise<void> {
+  pollOnce = (): Promise<void> => {
     // TODO: лучше повешать на промис 1го poll или так оставить
     // there is no need to do poll before initialization because after initialization it will be done
     if (!this.isIcInitialized()) return Promise.resolve();
@@ -203,7 +203,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * to be sure that you will receive the last actual data.
    */
   getState(): boolean[] {
-    return byteToBinArr(this.currentState);
+    return byteToBinArr(this.expanderLogic.getState());
   }
 
   /**
@@ -216,9 +216,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   read(pin: number): boolean {
     this.checkPin(pin);
 
-    // TODO: или всетаки зачитать значения сначала из IC ???
+    // TODO: всетаки зачитать значения сначала из IC ???
 
-    return getBitFromByte(this.currentState, pin);
+    return getBitFromByte(this.expanderLogic.getState(), pin);
   }
 
   /**
@@ -236,75 +236,36 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     if (this.setupStep) {
       // update current value of pin and go out if there is setup step
-      this.currentState = updateBitInByte(this.currentState, pin, value);
+      this.expanderLogic.updateState(pin, value);
 
       return;
     }
-
-    // TODO: если запущенна инициализация - то записываем в стейт и ставим в очередь новую запись
-
-    // TODO: что будет если ещё выполнится 2й запрос в очереди - на тот момент же будет удален tmpState ???
-    // TODO: что за логика с tmpState ???
-
-    if (typeof this.tmpState === 'undefined') {
-      this.tmpState = this.currentState;
-    }
-
-    this.tmpState = updateBitInByte(this.tmpState, pin, value);
-
-    // TODO: нельзя записывать пока не запущенна инициализация
-    // TODO: если инициализация в процессе - то после ее завершения сделать новую запись
-
-    try {
-      await this.writeToIc(this.tmpState);
-
-      if (this.tmpState) {
-        this.currentState = this.tmpState;
-        this.tmpState = undefined;
-      }
-    }
-    catch (err) {
-      this.tmpState = undefined;
-
-      throw err;
-    }
+    // TODO: нужно ли ожидать промиса конца записи ???
+    this.expanderLogic.write(pin, value);
   }
 
   /**
    * Set new state of output pins and write them to IC.
    * Not output pins (input, undefined) are ignored.
    */
-  async writeState(outputValues: boolean[]): Promise<void> {
-    // TODO: full review
-    //if (!this.checkInitialization('writeState')) return;
-
-    if (typeof this.tmpState === 'undefined') {
-      this.tmpState = this.currentState;
-    }
+  async writeState(outputValues: (boolean | undefined)[]): Promise<void> {
+    let newState: number = this.expanderLogic.getState();
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
-      // skit not an output pin
-      if (this.directions[pin] !== PinDirection.output) continue;
+      // skip undefined values and not an output pin
+      if (typeof outputValues[pin] !== 'boolean' || this.directions[pin] !== PinDirection.output) continue;
 
-      this.tmpState = updateBitInByte(this.tmpState, pin, outputValues[pin]);
+      newState = updateBitInByte(newState, pin, outputValues[pin] as boolean);
     }
 
-    // TODO: нельзя записывать пока не запущенна инициализация
-    // TODO: если инициализация в процессе - то после ее завершения сделать новую запись
+    if (this.setupStep) {
+      // set current state and go out if there is setup step
+      this.expanderLogic.setWholeState(newState);
 
-    try {
-      await this.writeToIc(this.tmpState);
-
-      if (this.tmpState) {
-        this.currentState = this.tmpState;
-        this.tmpState = undefined;
-      }
+      return;
     }
-    catch (err) {
-      this.tmpState = undefined;
-
-      throw err;
-    }
+    // TODO: нужно ли ожидать промиса конца записи ???
+    this.expanderLogic.writeState();
   }
 
   clearPin(pin: number) {
@@ -323,70 +284,81 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
     }
 
-    this.setNewInputsState(data[0]);
+    this.setNewInputsStates(data[0]);
   }
 
-  private setNewInputsState(receivedByte: number) {
+  private setNewInputsStates(receivedByte: number) {
     // update values add rise change event of input pins which are changed
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skip not input pins
       if (this.directions[pin] !== PinDirection.input) continue;
 
       const newValue: boolean = getBitFromByte(receivedByte, pin);
-      const oldValue: boolean = getBitFromByte(this.currentState, pin);
+      const oldValue: boolean = getBitFromByte(this.expanderLogic.getState(), pin);
+
+      // skip not suitable edge
+      if (this.pinEdges[pin] === Edge.rising && !newValue) {
+        return;
+      }
+      else if (this.pinEdges[pin] === Edge.falling && newValue) {
+        return;
+      }
+
+      // TODO: если edge falling or rising - то схема будет упрощенной
+      //   просто throttle и poll не нужен
 
       // check if value changed. If not changed = nothing happened.
       if (newValue !== oldValue) {
         // if value was changed then update state and rise an event.
-        this.handleInputPinChange(pin, newValue);
+        this.expanderLogic.incomeState(pin, newValue, this.pinDebounces[pin]);
       }
     }
   }
 
-  private handleInputPinChange(pin: number, newPinValue: boolean) {
-    // TODO: в обоих случаях сначала сделать свой poll который поставится в очередь и ждать его завершения
-    // TODO: нужно накапливать запросы poll и если в процессе были новые то делать ещё 1 запрос
-    // TODO: но если мы сделаем poll once то опять поднимется событие и будет зацикленность
-    //       может тогда просто ждать завершения poll ????
-    // TODO: либо не делать poll здесь, а учитывать чтобы debounce был больше poll interval
-
-    // this.pollOnce()
-    //   .then(() => {
-    //   })
-    //   .catch((e) => this.log.error(e));
-
-    if (!this.pinDebounces[pin]) {
-      // emit right now if there isn't debounce
-      this.handleEndOfDebounce(pin, newPinValue);
-    }
-    else {
-      // wait for debounce and read current level
-      this.debounceCall.invoke(() => {
-        this.handleEndOfDebounce(pin, newPinValue);
-      }, this.pinDebounces[pin], pin)
-        .catch((e) => this.log.error(e));
-    }
-  }
-
-  private handleEndOfDebounce(pin: number, newPinValue: boolean) {
-    // skip not suitable edge
-    if (this.pinEdges[pin] === Edge.rising && !newPinValue) {
-      return;
-    }
-    else if (this.pinEdges[pin] === Edge.falling && newPinValue) {
-      return;
-    }
-
-    // set a new value
-    this.updateCurrentState(pin, newPinValue);
-    // rise a new event even value hasn't been actually changed since first check
-    this.changeEvents.emit(pin, newPinValue);
-  }
+  // private handleInputPinChange(pin: number, newPinValue: boolean) {
+  //   // TODO: в обоих случаях сначала сделать свой poll который поставится в очередь и ждать его завершения
+  //   // TODO: нужно накапливать запросы poll и если в процессе были новые то делать ещё 1 запрос
+  //   // TODO: но если мы сделаем poll once то опять поднимется событие и будет зацикленность
+  //   //       может тогда просто ждать завершения poll ????
+  //   // TODO: либо не делать poll здесь, а учитывать чтобы debounce был больше poll interval
+  //
+  //   // this.pollOnce()
+  //   //   .then(() => {
+  //   //   })
+  //   //   .catch((e) => this.log.error(e));
+  //
+  //   if (!this.pinDebounces[pin]) {
+  //     // emit right now if there isn't debounce
+  //     this.handleEndOfDebounce(pin, newPinValue);
+  //   }
+  //   else {
+  //     // wait for debounce and read current level
+  //     this.debounceCall.invoke(() => {
+  //       this.handleEndOfDebounce(pin, newPinValue);
+  //     }, this.pinDebounces[pin], pin)
+  //       .catch((e) => this.log.error(e));
+  //   }
+  // }
+  //
+  // private handleEndOfDebounce(pin: number, newPinValue: boolean) {
+  //   // skip not suitable edge
+  //   if (this.pinEdges[pin] === Edge.rising && !newPinValue) {
+  //     return;
+  //   }
+  //   else if (this.pinEdges[pin] === Edge.falling && newPinValue) {
+  //     return;
+  //   }
+  //
+  //   // set a new value
+  //   this.expanderLogic.updateState(pin, newPinValue);
+  //   // rise a new event even value hasn't been actually changed since first check
+  //   this.changeEvents.emit(pin, newPinValue);
+  // }
 
   /**
    * Write given state to the IC.
    */
-  private writeToIc(newStateByte: number): Promise<void> {
+  private writeToIc = (newStateByte: number): Promise<void> => {
     const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
     // fill data
     dataToSend[0] = newStateByte;
@@ -400,11 +372,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     if (pin < 0 || pin >= PINS_COUNT) {
       throw new Error(`Pin "${pin}" out of range`);
     }
-  }
-
-  // TODO: remove ???
-  private updateCurrentState(pin: number, newValue: boolean) {
-    this.currentState = updateBitInByte(this.currentState, pin, newValue);
   }
 
   // /**
