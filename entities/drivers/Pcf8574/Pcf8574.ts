@@ -12,7 +12,7 @@ import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
-import ExpanderLogic from './ExpanderLogic';
+import DigitalPortExpanderLogic from '../../../system/lib/logic/DigitalPortExpanderLogic';
 
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
@@ -37,14 +37,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // collection of edges values of each pin to use in change handler
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private _expanderLogic?: ExpanderLogic;
+  private _expander?: DigitalPortExpanderLogic;
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
   }
 
-  private get expanderLogic(): ExpanderLogic {
-    return this._expanderLogic as any;
+  private get expander(): DigitalPortExpanderLogic {
+    return this._expander as any;
   }
 
 
@@ -60,7 +60,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       }
     );
 
-    this._expanderLogic = new ExpanderLogic(
+    this._expander = new DigitalPortExpanderLogic(
       this.log.error,
       this.writeToIc,
       this.pollOnce,
@@ -94,8 +94,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.initIcStep = true;
 
     try {
-      // TODO: использовать expanderLogic ???
-      await this.writeToIc(this.expanderLogic.getState());
+      // TODO: использовать expander write чтобы образовалась очередь ???
+      await this.writeToIc(this.expander.getState());
     }
     catch (e) {
       this.initIcStep = false;
@@ -139,7 +139,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.directions[pin] = PinDirection.input;
 
     // set input pin to high
-    this.expanderLogic.updateState(pin, true);
+    this.expander.updateState(pin, true);
   }
 
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
@@ -155,7 +155,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.directions[pin] = PinDirection.output;
 
     if (typeof outputInitialValue !== 'undefined') {
-      this.expanderLogic.updateState(pin, outputInitialValue);
+      this.expander.updateState(pin, outputInitialValue);
     }
   }
 
@@ -178,11 +178,11 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Listen to changes of pin after edge and debounce were processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
-    return this.expanderLogic.onChange(pin, handler);
+    return this.expander.onChange(pin, handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.expanderLogic.removeListener(handlerIndex);
+    this.expander.removeListener(handlerIndex);
   }
 
   /**
@@ -190,6 +190,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    */
   pollOnce = (): Promise<void> => {
     // TODO: лучше повешать на промис 1го poll или так оставить
+    // TODO: может сделать через expander logic - тогда будет в очереди
     // there is no need to do poll before initialization because after initialization it will be done
     if (!this.isIcInitialized()) return Promise.resolve();
 
@@ -203,7 +204,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * to be sure that you will receive the last actual data.
    */
   getState(): boolean[] {
-    return byteToBinArr(this.expanderLogic.getState());
+    return byteToBinArr(this.expander.getState());
   }
 
   /**
@@ -216,9 +217,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   read(pin: number): boolean {
     this.checkPin(pin);
 
-    // TODO: всетаки зачитать значения сначала из IC ???
+    // TODO: всетаки зачитать значения сначала из IC ??? лучше через expander logic
 
-    return getBitFromByte(this.expanderLogic.getState(), pin);
+    return getBitFromByte(this.expander.getState(), pin);
   }
 
   /**
@@ -236,12 +237,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     if (this.setupStep) {
       // update current value of pin and go out if there is setup step
-      this.expanderLogic.updateState(pin, value);
-
+      this.expander.updateState(pin, value);
+      // TODO: ожидать промиса конца инициализации
       return;
     }
-    // TODO: нужно ли ожидать промиса конца записи ???
-    this.expanderLogic.write(pin, value);
+    // TODO: ожидать промиса конца записи
+    this.expander.write(pin, value);
   }
 
   /**
@@ -249,7 +250,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Not output pins (input, undefined) are ignored.
    */
   async writeState(outputValues: (boolean | undefined)[]): Promise<void> {
-    let newState: number = this.expanderLogic.getState();
+    let newState: number = this.expander.getState();
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skip undefined values and not an output pin
@@ -260,12 +261,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     if (this.setupStep) {
       // set current state and go out if there is setup step
-      this.expanderLogic.setWholeState(newState);
-
+      this.expander.setWholeState(newState);
+      // TODO: ожидать промиса конца инициализации
       return;
     }
-    // TODO: нужно ли ожидать промиса конца записи ???
-    this.expanderLogic.writeState();
+    // TODO: ожидать промиса конца записи
+    this.expander.writeState();
   }
 
   clearPin(pin: number) {
@@ -294,7 +295,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       if (this.directions[pin] !== PinDirection.input) continue;
 
       const newValue: boolean = getBitFromByte(receivedByte, pin);
-      const oldValue: boolean = getBitFromByte(this.expanderLogic.getState(), pin);
+      const oldValue: boolean = getBitFromByte(this.expander.getState(), pin);
 
       // skip not suitable edge
       if (this.pinEdges[pin] === Edge.rising && !newValue) {
@@ -310,50 +311,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       // check if value changed. If not changed = nothing happened.
       if (newValue !== oldValue) {
         // if value was changed then update state and rise an event.
-        this.expanderLogic.incomeState(pin, newValue, this.pinDebounces[pin]);
+        this.expander.incomeState(pin, newValue, this.pinDebounces[pin]);
       }
     }
   }
-
-  // private handleInputPinChange(pin: number, newPinValue: boolean) {
-  //   // TODO: в обоих случаях сначала сделать свой poll который поставится в очередь и ждать его завершения
-  //   // TODO: нужно накапливать запросы poll и если в процессе были новые то делать ещё 1 запрос
-  //   // TODO: но если мы сделаем poll once то опять поднимется событие и будет зацикленность
-  //   //       может тогда просто ждать завершения poll ????
-  //   // TODO: либо не делать poll здесь, а учитывать чтобы debounce был больше poll interval
-  //
-  //   // this.pollOnce()
-  //   //   .then(() => {
-  //   //   })
-  //   //   .catch((e) => this.log.error(e));
-  //
-  //   if (!this.pinDebounces[pin]) {
-  //     // emit right now if there isn't debounce
-  //     this.handleEndOfDebounce(pin, newPinValue);
-  //   }
-  //   else {
-  //     // wait for debounce and read current level
-  //     this.debounceCall.invoke(() => {
-  //       this.handleEndOfDebounce(pin, newPinValue);
-  //     }, this.pinDebounces[pin], pin)
-  //       .catch((e) => this.log.error(e));
-  //   }
-  // }
-  //
-  // private handleEndOfDebounce(pin: number, newPinValue: boolean) {
-  //   // skip not suitable edge
-  //   if (this.pinEdges[pin] === Edge.rising && !newPinValue) {
-  //     return;
-  //   }
-  //   else if (this.pinEdges[pin] === Edge.falling && newPinValue) {
-  //     return;
-  //   }
-  //
-  //   // set a new value
-  //   this.expanderLogic.updateState(pin, newPinValue);
-  //   // rise a new event even value hasn't been actually changed since first check
-  //   this.changeEvents.emit(pin, newPinValue);
-  // }
 
   /**
    * Write given state to the IC.
@@ -373,17 +334,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       throw new Error(`Pin "${pin}" out of range`);
     }
   }
-
-  // /**
-  //  * Helper function to set/clear one bit in a bitmask.
-  //  * @param  {number}            current The current bitmask.
-  //  * @param  {number}            pin     The bit-number in the bitmask.
-  //  * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
-  //  * @return {number}                    The new (modified) bitmask.
-  //  */
-  // private updatePinInBitMask(current: number, pin: number, value: boolean): number{
-  //   return updateBitInByte(current, pin, value);
-  // }
 
 }
 

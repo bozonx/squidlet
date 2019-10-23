@@ -1,17 +1,14 @@
-import RequestQueue from '../../../system/lib/RequestQueue';
-import {getBitFromByte, updateBitInByte} from '../../../system/lib/binaryHelpers';
-import DebounceCall from '../../../system/lib/debounceCall/DebounceCall';
-import {ChangeHandler} from '../../../system/interfaces/io/DigitalIo';
-import IndexedEventEmitter from '../../../system/lib/IndexedEventEmitter';
+import RequestQueue from '../RequestQueue';
+import {getBitFromByte, updateBitInByte} from '../binaryHelpers';
+import DebounceCall from '../debounceCall/DebounceCall';
+import {ChangeHandler} from '../../interfaces/io/DigitalIo';
+import IndexedEventEmitter from '../IndexedEventEmitter';
 
 
 const DEBOUNCE_WRITE_ID = 'write';
 
 
-// TODO: может сделать поддержку 16 bit ?
-
-
-export default class ExpanderLogic {
+export default class DigitalPortExpanderLogic {
   private readonly logError: (msg: string) => void;
   private readonly writeCb: (state: number) => Promise<void>;
   private readonly pollOnce: () => Promise<void>;
