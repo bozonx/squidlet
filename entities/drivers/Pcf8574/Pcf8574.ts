@@ -9,10 +9,10 @@ import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHe
 import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
+import DigitalPortExpanderIncomeLogic from 'system/lib/logic/DigitalPortExpanderIncomeLogic';
+import DigitalPortExpanderOutcomeLogic from 'system/lib/logic/DigitalPortExpanderOutcomeLogic';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
-import DigitalPortExpanderIncomeLogic from '../../../system/lib/logic/DigitalPortExpanderIncomeLogic';
-import DigitalPortExpanderOutcomeLogic from '../../../system/lib/logic/DigitalPortExpanderOutcomeLogic';
 
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
@@ -84,7 +84,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   destroy = async () => {
-    // TODO: add
+    this.expanderInput.destroy();
+    this.expanderOutput.destroy();
   }
 
   // protected appDidInit = async () => {
@@ -286,7 +287,16 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   clearPin(pin: number) {
-    // TODO: add
+    if (this.directions[pin] === PinDirection.input) {
+      this.expanderInput.clearPin(pin);
+    }
+    else if (this.directions[pin] === PinDirection.output) {
+      this.expanderOutput.clearPin(pin);
+    }
+
+    delete this.directions[pin];
+    delete this.pinDebounces[pin];
+    delete this.pinEdges[pin];
   }
 
   clearAll() {

@@ -102,6 +102,10 @@ export default class DigitalPortExpanderLogic {
     // TODO: add write whole current state
   }
 
+  clearPin(pin: number) {
+    // TODO: add
+  }
+
 
   private startWriting(state: number) {
     // TODO: ставить в очередь

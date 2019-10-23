@@ -103,6 +103,10 @@ export default class DigitalPortExpanderIncomeLogic {
     }
   }
 
+  clearPin(pin: number) {
+    // TODO: add
+  }
+
   /**
    * It is only the first one callback of debounce cycle.
    */
