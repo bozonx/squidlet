@@ -1,4 +1,8 @@
 import {isPromise} from './common';
+import Promised from './Promised';
+
+
+type QueuedCb = () => Promise<void>;
 
 const DEFAULT_ID = 'default';
 
@@ -12,10 +16,16 @@ const DEFAULT_ID = 'default';
  * * if some else cb is added then it will replace previous cb which is in queue
  */
 export default class QueueOverride {
-  private currentPendingPromise?: Promise<void>;
+  private currentPendingPromise: {[index: string]: Promise<void>} = {};
+  // promise witch represent when the queued cb will be finished
+  private queueFinishPromise: {[index: string]: Promised<void>} = {};
+  private queuedCb: {[index: string]: QueuedCb} = {};
 
 
-  constructor() {
+  destroy() {
+    delete this.currentPendingPromise;
+    delete this.queueFinishPromise;
+    delete this.queuedCb;
   }
 
 
@@ -24,38 +34,39 @@ export default class QueueOverride {
   }
 
   hasQueuedCb(id: string | number): boolean {
-    // TODO: add
+    return Boolean(this.queuedCb);
   }
 
-  add(cb: () => Promise<void>, id: string | number = DEFAULT_ID): Promise<void> {
-    if (this.isPending(id)) {
-      this.addToQueue(cb, id);
+  /**
+   * Cancel queue and waiting for current cb finished.
+   * But if current cb is pending - it won't cancel it!
+   */
+  cancel(id: string | number) {
+    delete this.currentPendingPromise[id];
+    delete this.queueFinishPromise[id];
+    delete this.queuedCb[id];
+  }
 
-      if (!this.currentPendingPromise) {
-        throw new Error(`No pending promise`);
+  add(cb: QueuedCb, id: string | number = DEFAULT_ID): Promise<void> {
+    if (this.isPending(id)) {
+      // just set or update a queued cb
+      this.queuedCb[id] = cb;
+
+      if (!this.queueFinishPromise[id]) {
+        this.queueFinishPromise[id] = new Promised<void>();
       }
 
-      return this.currentPendingPromise;
+      return this.queueFinishPromise[id].promise;
     }
 
     // no one is in queue or pending - just start cb and return is't promise
-    const promise: Promise<void> = this.startCb(cb, id);
+    this.currentPendingPromise[id] = this.startCb(cb, id);
 
-    this.currentPendingPromise = promise;
-
-    return this.currentPendingPromise;
+    return this.currentPendingPromise[id];
   }
 
 
-  private addToQueue(cb: () => Promise<void>, id: string | number) {
-    if (this.hasQueuedCb(id)) {
-
-    }
-
-
-  }
-
-  private startCb(cb: () => Promise<void>, id: string | number): Promise<void> {
+  private startCb(cb: QueuedCb, id: string | number): Promise<void> {
     let promise: Promise<void>;
 
     try {
@@ -68,6 +79,8 @@ export default class QueueOverride {
     if (!isPromise(promise)) {
       return Promise.reject(`Callback has to return a promise`);
     }
+
+    // TODO: после выполнения запустить очредь
 
     return promise;
   }
