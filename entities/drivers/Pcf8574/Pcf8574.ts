@@ -9,8 +9,8 @@ import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHe
 import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
-import DigitalPortExpanderIncomeLogic from 'system/lib/logic/DigitalPortExpanderIncomeLogic';
-import DigitalPortExpanderOutcomeLogic from 'system/lib/logic/DigitalPortExpanderOutcomeLogic';
+import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
+import DigitalPortExpanderOutcomeLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
 import Promised from 'system/lib/Promised';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
@@ -41,7 +41,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
   private _expanderOutput?: DigitalPortExpanderOutcomeLogic;
-  private _expanderInput?: DigitalPortExpanderIncomeLogic;
+  private _expanderInput?: DigitalPortExpanderInputLogic;
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
@@ -51,7 +51,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this._expanderOutput as any;
   }
 
-  private get expanderInput(): DigitalPortExpanderIncomeLogic {
+  private get expanderInput(): DigitalPortExpanderInputLogic {
     return this._expanderInput as any;
   }
 
@@ -80,7 +80,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       this.config.config.queueJobTimeoutSec,
       this.props.writeBufferMs
     );
-    this._expanderInput = new DigitalPortExpanderIncomeLogic(
+    this._expanderInput = new DigitalPortExpanderInputLogic(
       this.log.error,
       this.pollOnce,
       (): number => this.currentState,

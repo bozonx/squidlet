@@ -6,7 +6,7 @@ import {Edge} from '../../interfaces/gpioTypes';
 import {getBitFromByte} from '../binaryHelpers';
 
 
-export default class DigitalPortExpanderIncomeLogic {
+export default class DigitalPortExpanderInputLogic {
   private readonly logError: (msg: string) => void;
   private readonly pollOnce: () => Promise<void>;
   private readonly getState: () => number;
