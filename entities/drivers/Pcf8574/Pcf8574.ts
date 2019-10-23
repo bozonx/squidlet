@@ -12,7 +12,8 @@ import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
-import DigitalPortExpanderLogic from '../../../system/lib/logic/DigitalPortExpanderLogic';
+import DigitalPortExpanderIncomeLogic from '../../../system/lib/logic/DigitalPortExpanderIncomeLogic';
+import DigitalPortExpanderOutcomeLogic from '../../../system/lib/logic/DigitalPortExpanderOutcomeLogic';
 
 
 export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
@@ -37,14 +38,19 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   // collection of edges values of each pin to use in change handler
   private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private _expander?: DigitalPortExpanderLogic;
+  private _expanderOutput?: DigitalPortExpanderOutcomeLogic;
+  private _expanderInput?: DigitalPortExpanderIncomeLogic;
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
   }
 
-  private get expander(): DigitalPortExpanderLogic {
-    return this._expander as any;
+  private get expanderOutput(): DigitalPortExpanderOutcomeLogic {
+    return this._expanderOutput as any;
+  }
+
+  private get expanderInput(): DigitalPortExpanderIncomeLogic {
+    return this._expanderInput as any;
   }
 
 
@@ -60,12 +66,16 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       }
     );
 
-    this._expander = new DigitalPortExpanderLogic(
+    this._expanderOutput = new DigitalPortExpanderOutcomeLogic(
       this.log.error,
       this.writeToIc,
-      this.pollOnce,
       this.config.config.queueJobTimeoutSec,
       this.props.writeBufferMs
+    );
+    this._expanderInput = new DigitalPortExpanderIncomeLogic(
+      this.log.error,
+      this.pollOnce,
+      this.config.config.queueJobTimeoutSec,
     );
   }
 
@@ -178,11 +188,11 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Listen to changes of pin after edge and debounce were processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
-    return this.expander.onChange(pin, handler);
+    return this.expanderInput.onChange(pin, handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.expander.removeListener(handlerIndex);
+    this.expanderInput.removeListener(handlerIndex);
   }
 
   /**
@@ -242,7 +252,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       return;
     }
     // TODO: ожидать промиса конца записи
-    this.expander.write(pin, value);
+    this.expanderOutput.write(pin, value);
   }
 
   /**
@@ -266,7 +276,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       return;
     }
     // TODO: ожидать промиса конца записи
-    this.expander.writeState();
+    this.expanderOutput.writeState();
   }
 
   clearPin(pin: number) {
@@ -311,7 +321,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       // check if value changed. If not changed = nothing happened.
       if (newValue !== oldValue) {
         // if value was changed then update state and rise an event.
-        this.expander.incomeState(pin, newValue, this.pinDebounces[pin]);
+        this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
       }
     }
   }

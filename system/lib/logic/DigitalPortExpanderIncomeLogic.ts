@@ -1,43 +1,31 @@
 import RequestQueue from '../RequestQueue';
-import {getBitFromByte, updateBitInByte} from '../binaryHelpers';
 import DebounceCall from '../debounceCall/DebounceCall';
 import {ChangeHandler} from '../../interfaces/io/DigitalIo';
 import IndexedEventEmitter from '../IndexedEventEmitter';
 
 
-const DEBOUNCE_WRITE_ID = 'write';
-
-
-export default class DigitalPortExpanderLogic {
+export default class DigitalPortExpanderIncomeLogic {
   private readonly logError: (msg: string) => void;
-  private readonly writeCb: (state: number) => Promise<void>;
   private readonly pollOnce: () => Promise<void>;
-  private readonly writeBufferMs?: number;
   private readonly queue: RequestQueue;
   private readonly debounce = new DebounceCall();
   // Bitmask representing the current state of the pins
-  private currentState: number = 0;
-  // temporary state while saving values are buffering
-  private writeBuffer?: number;
+  //private currentState: number = 0;
   // buffer by pin for input pins while debounce or poll are in progress
   private inputPinBuffer: {[index: string]: boolean} = {};
-  private writingInProgress: boolean = false;
   // change events of input pins
   private readonly changeEvents = new IndexedEventEmitter<ChangeHandler>();
 
 
   constructor(
     logError: (msg: string) => void,
-    writeCb: (state: number) => Promise<void>,
     pollOnce: () => Promise<void>,
     queueJobTimeoutSec: number,
     writeBufferMs?: number
   ) {
     this.logError = logError;
-    this.writeCb = writeCb;
     this.pollOnce = pollOnce;
     this.queue = new RequestQueue(logError, queueJobTimeoutSec);
-    this.writeBufferMs = writeBufferMs;
   }
 
   destroy() {
@@ -45,24 +33,12 @@ export default class DigitalPortExpanderLogic {
   }
 
 
-  getState(): number {
-    return this.currentState;
-  }
-
-  isInProgress(): boolean {
-    return this.isBuffering() || this.isWriting();
-  }
-
-  isBuffering(): boolean {
-    return typeof this.writeBuffer !== 'undefined';
-  }
+  // getState(): number {
+  //   return this.currentState;
+  // }
 
   isInputBuffering(pin: number) {
     return typeof this.inputPinBuffer[pin] !== 'undefined';
-  }
-
-  isWriting(): boolean {
-    return this.writingInProgress;
   }
 
   /**
@@ -76,16 +52,16 @@ export default class DigitalPortExpanderLogic {
     this.changeEvents.removeListener(handlerIndex);
   }
 
-  /**
-   * Just update state and don't save it to IC
-   */
-  updateState(pin: number, value: boolean) {
-    this.currentState = updateBitInByte(this.currentState, pin, value);
-  }
-
-  setWholeState(state: number) {
-    this.currentState = state;
-  }
+  // /**
+  //  * Just update state and don't save it to IC
+  //  */
+  // updateState(pin: number, value: boolean) {
+  //   this.currentState = updateBitInByte(this.currentState, pin, value);
+  // }
+  //
+  // setWholeState(state: number) {
+  //   this.currentState = state;
+  // }
 
   /**
    * State which is income after poling request.
@@ -111,56 +87,6 @@ export default class DigitalPortExpanderLogic {
       // emit right now if there isn't debounce
       this.handleEndOfDebounce(pin);
     }
-  }
-
-  write(pin: number, value: boolean) {
-    if (this.isWriting()) {
-      // TODO: поставить в очередь - только 1  раз выполнится
-
-      return;
-    }
-
-    if (this.writeBufferMs) {
-      // collect data into buffer
-      if (typeof this.writeBuffer === 'undefined') this.writeBuffer = 0;
-
-      this.writeBuffer = updateBitInByte(this.writeBuffer, pin, value);
-
-      this.debounce.invoke(() => {
-        this.startWriting(this.writeBuffer || 0);
-
-        delete this.writeBuffer;
-      }, this.writeBufferMs, DEBOUNCE_WRITE_ID)
-        .catch((e) => this.logError(e));
-
-      return;
-    }
-
-    const stateToWrite = updateBitInByte(this.currentState, pin, value);
-
-    // TODO: нужно ли ожидать???
-    this.startWriting(stateToWrite);
-  }
-
-  writeState() {
-    // TODO: add write whole current state
-  }
-
-
-  private startWriting(state: number) {
-    // TODO: ставить в очередь
-    this.writingInProgress = true;
-
-    this.writeCb(state)
-      .then(() => {
-        this.writingInProgress = false;
-        this.currentState = state;
-      })
-      .catch((e: Error) => {
-        this.writingInProgress = false;
-        // TODO: сбрасываем очередь
-        this.logError(String(e));
-      });
   }
 
   /**
