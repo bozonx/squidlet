@@ -15,7 +15,7 @@ export default class DigitalPortExpanderLogic {
   private readonly queue = new QueueOverride();
   private readonly debounce = new DebounceCall();
   // temporary state while saving values are buffering
-  private writeBuffer?: number;
+  private beforeWritingBuffer?: number;
 
 
   constructor(
@@ -44,7 +44,7 @@ export default class DigitalPortExpanderLogic {
   }
 
   isBuffering(): boolean {
-    return typeof this.writeBuffer !== 'undefined';
+    return typeof this.beforeWritingBuffer !== 'undefined';
   }
 
   isWriting(): boolean {
@@ -52,29 +52,33 @@ export default class DigitalPortExpanderLogic {
   }
 
   async write(pin: number, value: boolean): Promise<void> {
+    // in case it is writing at the moment - save buffer and add cb to queue
     if (this.isWriting()) {
       // TODO: поставить в очередь - только 1  раз выполнится
+      // TODO: нужно собрать буфер на следующий раз
 
       return;
     }
 
+    // in buffering case collect data at the buffering time (before writing)
     if (this.writeBufferMs) {
+      // TODO: почему не getState ???
       // collect data into buffer
-      if (typeof this.writeBuffer === 'undefined') this.writeBuffer = 0;
+      if (typeof this.beforeWritingBuffer === 'undefined') this.beforeWritingBuffer = 0;
 
-      this.writeBuffer = updateBitInByte(this.writeBuffer, pin, value);
-
+      this.beforeWritingBuffer = updateBitInByte(this.beforeWritingBuffer, pin, value);
+      // flush buffer which has been collected at buffering time
       this.debounce.invoke(() => {
-        // TODO: обработать промис
-        this.startWriting(this.writeBuffer || 0);
+        this.startWriting(this.beforeWritingBuffer || 0)
+          .catch((e: Error) => this.logError(String(e)));
 
-        delete this.writeBuffer;
+        delete this.beforeWritingBuffer;
       }, this.writeBufferMs, WRITE_ID)
         .catch((e) => this.logError(e));
 
       return;
     }
-
+    // in case without buffering - just start writing wright now
     const stateToWrite = updateBitInByte(this.getState(), pin, value);
 
     return this.startWriting(stateToWrite);
