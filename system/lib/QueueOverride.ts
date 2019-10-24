@@ -9,8 +9,7 @@ const DEFAULT_ID = 'default';
 
 /**
  * Simple queue where callbacks are overwritten by a new one.
- * Steps:
- * Start:
+ * Logic:
  * * cb is calling right now and promise which is returned is waiting while it will finished
  * * if other cb is added then it will be executed as soon as current cb finish
  * * if some else cb is added then it will replace previous cb which is in queue
@@ -29,6 +28,10 @@ export default class QueueOverride {
     delete this.queuedCb;
   }
 
+
+  isInProgress(id: string | number): boolean {
+    return this.isPending(id) || this.hasQueuedCb(id);
+  }
 
   isPending(id: string | number): boolean {
     return Boolean(this.currentPendingPromise);

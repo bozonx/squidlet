@@ -1,9 +1,9 @@
-import RequestQueue from '../RequestQueue';
+import QueueOverride from '../QueueOverride';
 import {updateBitInByte} from '../binaryHelpers';
 import DebounceCall from '../debounceCall/DebounceCall';
 
 
-const DEBOUNCE_WRITE_ID = 'write';
+const WRITE_ID = 'write';
 
 
 export default class DigitalPortExpanderLogic {
@@ -12,11 +12,10 @@ export default class DigitalPortExpanderLogic {
   private readonly getState: () => number;
   private readonly updateState: (pin: number, value: boolean) => void;
   private readonly writeBufferMs?: number;
-  private readonly queue: RequestQueue;
+  private readonly queue = new QueueOverride();
   private readonly debounce = new DebounceCall();
   // temporary state while saving values are buffering
   private writeBuffer?: number;
-  private writingInProgress: boolean = false;
 
 
   constructor(
@@ -32,7 +31,6 @@ export default class DigitalPortExpanderLogic {
     this.getState = getState;
     this.updateState = updateState;
     this.writeBufferMs = writeBufferMs;
-    this.queue = new RequestQueue(logError, queueJobTimeoutSec);
   }
 
   destroy() {
@@ -50,7 +48,7 @@ export default class DigitalPortExpanderLogic {
   }
 
   isWriting(): boolean {
-    return this.writingInProgress;
+    return this.queue.isPending(WRITE_ID);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
@@ -67,10 +65,11 @@ export default class DigitalPortExpanderLogic {
       this.writeBuffer = updateBitInByte(this.writeBuffer, pin, value);
 
       this.debounce.invoke(() => {
+        // TODO: обработать промис
         this.startWriting(this.writeBuffer || 0);
 
         delete this.writeBuffer;
-      }, this.writeBufferMs, DEBOUNCE_WRITE_ID)
+      }, this.writeBufferMs, WRITE_ID)
         .catch((e) => this.logError(e));
 
       return;
@@ -78,8 +77,7 @@ export default class DigitalPortExpanderLogic {
 
     const stateToWrite = updateBitInByte(this.getState(), pin, value);
 
-    // TODO: ожидать промиса конца записи
-    this.startWriting(stateToWrite);
+    return this.startWriting(stateToWrite);
   }
 
   async writeState(): Promise<void> {
@@ -94,20 +92,18 @@ export default class DigitalPortExpanderLogic {
   }
 
 
-  private startWriting(state: number) {
-    // TODO: ставить в очередь
-    this.writingInProgress = true;
-
-    this.writeCb(state)
-      .then(() => {
-        this.writingInProgress = false;
-        this.currentState = state;
-      })
-      .catch((e: Error) => {
-        this.writingInProgress = false;
+  private startWriting(state: number): Promise<void> {
+    return this.queue.add(async () => {
+      try {
+        await this.writeCb(state);
+      }
+      catch(e) {
         // TODO: сбрасываем очередь
         this.logError(String(e));
-      });
+      }
+
+      this.currentState = state;
+    });
   }
 
 }
