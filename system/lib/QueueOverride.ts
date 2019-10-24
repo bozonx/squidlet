@@ -14,6 +14,7 @@ const DEFAULT_ID = 'default';
  * * cb is calling right now and promise which is returned is waiting while it will finished
  * * if other cb is added then it will be executed as soon as current cb finish
  * * if some else cb is added then it will replace previous cb which is in queue
+ * * if there was an error while current cb is executed then queue will be cancelled
  */
 export default class QueueOverride {
   private currentPendingPromise: {[index: string]: Promise<void>} = {};
@@ -66,23 +67,63 @@ export default class QueueOverride {
   }
 
 
-  private startCb(cb: QueuedCb, id: string | number): Promise<void> {
+  private async startCb(cb: QueuedCb, id: string | number) {
     let promise: Promise<void>;
-
+    // call
     try {
       promise = cb();
     }
     catch (e) {
-      return Promise.reject(e);
-    }
+      this.cancel(id);
 
+      throw e;
+    }
+    // check if it promise
     if (!isPromise(promise)) {
-      return Promise.reject(`Callback has to return a promise`);
+      this.cancel(id);
+
+      throw new Error(`Callback has to return a promise`);
+    }
+    // wait for the end
+    try {
+      await promise;
+    }
+    catch (e) {
+      // cancel queue on error
+      this.cancel(id);
+
+      throw e;
     }
 
-    // TODO: после выполнения запустить очредь
+    this.startQueue(id);
+  }
 
-    return promise;
+  private startQueue(id: string | number) {
+    delete this.currentPendingPromise[id];
+
+    if (!this.queuedCb[id]) {
+      // end of cycle if there isn't any queue
+      return;
+    }
+    else if (!this.queueFinishPromise[id]) {
+      throw new Error(`No queueFinishPromise`);
+    }
+
+    const cb: QueuedCb = this.queuedCb[id];
+    const queueFinishPromise = this.queueFinishPromise[id];
+    // remove queue to start it
+    delete this.queuedCb[id];
+    delete this.queueFinishPromise[id];
+    // make current pending promise
+    this.currentPendingPromise[id] = this.startCb(cb, id);
+
+    this.currentPendingPromise[id]
+      .then(() => {
+        queueFinishPromise.resolve();
+      })
+      .catch((e) => {
+        queueFinishPromise.reject(e);
+      });
   }
 
 }
