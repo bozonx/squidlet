@@ -29,9 +29,9 @@ export default class QueueOverride {
   }
 
 
-  isInProgress(id: string | number): boolean {
-    return this.isPending(id) || this.hasQueuedCb(id);
-  }
+  // isInProgress(id: string | number): boolean {
+  //   return this.isPending(id) || this.hasQueuedCb(id);
+  // }
 
   isPending(id: string | number): boolean {
     return Boolean(this.currentPendingPromise);
