@@ -76,16 +76,16 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       this.log.error,
       this.writeToIc,
       (): number => this.currentState,
-      this.updateState,
-      this.config.config.queueJobTimeoutSec,
-      this.props.writeBufferMs
+      this.setWholeState,
+      //this.config.config.queueJobTimeoutSec,
+      this.props.writeBufferMs,
     );
     this._expanderInput = new DigitalPortExpanderInputLogic(
       this.log.error,
       this.pollOnce,
       (): number => this.currentState,
       this.updateState,
-      this.config.config.queueJobTimeoutSec,
+      //this.config.config.queueJobTimeoutSec,
     );
   }
 
@@ -106,7 +106,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.initIcStep = true;
 
     try {
-      await this.expanderOutput.writeState();
+      await this.expanderOutput.writeState(this.currentState);
     }
     catch (e) {
       this.initIcStep = false;
@@ -285,7 +285,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       return this.initIcPromise;
     }
 
-    await this.expanderOutput.writeState();
+    await this.expanderOutput.writeState(this.currentState);
   }
 
   clearPin(pin: number) {

@@ -1,9 +1,9 @@
-import RequestQueue from '../RequestQueue';
 import DebounceCall from '../debounceCall/DebounceCall';
 import {ChangeHandler} from '../../interfaces/io/DigitalIo';
 import IndexedEventEmitter from '../IndexedEventEmitter';
 import {Edge} from '../../interfaces/gpioTypes';
 import {getBitFromByte} from '../binaryHelpers';
+import QueueOverride from '../QueueOverride';
 
 
 export default class DigitalPortExpanderInputLogic {
@@ -11,7 +11,7 @@ export default class DigitalPortExpanderInputLogic {
   private readonly pollOnce: () => Promise<void>;
   private readonly getState: () => number;
   private readonly updateState: (pin: number, value: boolean) => void;
-  private readonly queue: RequestQueue;
+  private readonly queue = new QueueOverride();
   private readonly debounce = new DebounceCall();
   // buffer by pin for input pins while debounce or poll are in progress
   private inputPinBuffer: {[index: string]: boolean} = {};
@@ -24,13 +24,12 @@ export default class DigitalPortExpanderInputLogic {
     pollOnce: () => Promise<void>,
     getState: () => number,
     updateState: (pin: number, value: boolean) => void,
-    queueJobTimeoutSec: number,
+    //queueJobTimeoutSec: number,
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;
     this.getState = getState;
     this.updateState = updateState;
-    this.queue = new RequestQueue(logError, queueJobTimeoutSec);
   }
 
   destroy() {
