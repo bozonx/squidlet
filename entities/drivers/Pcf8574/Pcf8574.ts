@@ -235,6 +235,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     if (this.i2cDriver.hasFeedback()) {
       // TODO: как удостовериться что после poll отработают хэндлеры которые установят стейт
+      // TODO: может сделать через input helper чтобы сработали события ?
       await this.pollOnce();
     }
 

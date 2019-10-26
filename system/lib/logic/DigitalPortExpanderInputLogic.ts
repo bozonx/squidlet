@@ -56,10 +56,6 @@ export default class DigitalPortExpanderInputLogic {
    * State which is income after poling request.
    */
   incomeState(pin: number, newValue: boolean, debounceMs?: number, edge?: Edge) {
-
-    //const newValue: boolean = getBitFromByte(receivedByte, pin);
-    const oldValue: boolean = getBitFromByte(this.getState(), pin);
-
     // skip not suitable edge
     if (edge === Edge.rising && !newValue) {
       return;
@@ -68,25 +64,39 @@ export default class DigitalPortExpanderInputLogic {
       return;
     }
 
-    // TODO: если edge falling or rising - то схема будет упрощенной
-    //   просто throttle и poll не нужен
+    if (edge === Edge.rising || edge === Edge.falling) {
+      // TODO: если edge falling or rising - то схема будет упрощенной
+      //   просто throttle и poll не нужен
 
-    // check if value changed. If not changed = nothing happened.
-    if (newValue !== oldValue) {
-      // if value was changed then update state and rise an event.
-      this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
+      return;
     }
+    // else edge both
+
+    // If not changed = nothing happened.
+    if (newValue === getBitFromByte(this.getState(), pin)) return;
+
+    // if value was changed then update state and rise an event.
+    this.handleIncomeState(pin, newValue, debounceMs);
+  }
+
+  clearPin(pin: number) {
+    // TODO: add - rename to cancel ???
+  }
 
 
-
-
+  /**
+   * Handle income state for edge both.
+   */
+  private handleIncomeState(pin: number, newValue: boolean, debounceMs?: number) {
+    // TODO: зачем ????
     const isBuffering: boolean = this.isInputBuffering(pin);
 
-    this.inputPinBuffer[pin] = value;
+    // TODO: review
+    this.inputPinBuffer[pin] = newValue;
 
     // debounce or polling are in progress - just update the last value
     if (isBuffering) return;
-
+    // else start debounce on first time
     if (debounceMs) {
       // wait for debounce and read current level
       this.debounce.invoke(() => {
@@ -100,10 +110,6 @@ export default class DigitalPortExpanderInputLogic {
       // emit right now if there isn't debounce
       this.handleEndOfDebounce(pin);
     }
-  }
-
-  clearPin(pin: number) {
-    // TODO: add
   }
 
   /**
