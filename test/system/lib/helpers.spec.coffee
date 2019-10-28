@@ -42,6 +42,7 @@ describe 'system.lib.helpers', ->
     assert.deepEqual(helpers.parseArgs('[5, "str", undefined, true], 5'), [[5, "str", undefined, true], 5])
     assert.deepEqual(helpers.parseArgs('{a: 5, b: undefined, c: true}, 5'), [{a: 5, c: true}, 5])
     assert.deepEqual(helpers.parseArgs('{a: {b: "bb"}}'), [{a: {b: 'bb'}}])
+    assert.deepEqual(helpers.parseArgs('"bedroom.light1","turn",1'), ['bedroom.light1', 'turn', 1])
 
 #  it 'splitTopicId', ->
 #    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])

@@ -116,7 +116,7 @@ export default class HttpServer implements HttpServerIo {
     const events = new IndexedEventEmitter();
     const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {
         this.handleIncomeRequest(serverId, req, res)
-          .catch((err) => events.emit(HttpServerEvent.serverError, err));
+          .catch((e: Error) => events.emit(HttpServerEvent.serverError, e));
     });
 
     server.on('error', (err: Error) => events.emit(HttpServerEvent.serverError, String(err)));

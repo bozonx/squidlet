@@ -1,5 +1,3 @@
-$base: 'drivers.DigitalPinOutput'
-
 blockTime:
   type: number
 blockMode:

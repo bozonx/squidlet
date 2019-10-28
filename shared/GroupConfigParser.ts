@@ -142,7 +142,7 @@ export default class GroupConfigParser {
 
   private validateHostConfig(hostConfig: PreHostConfig) {
     if (!hostConfig.id) {
-      throw new Error(`Host does't have an id: ${JSON.stringify(hostConfig)}`);
+      throw new Error(`Host does't have an id`);
     }
 
     // if (hostConfig.config) {

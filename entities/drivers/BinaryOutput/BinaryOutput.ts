@@ -9,6 +9,7 @@ import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
 import {OutputResistorMode} from 'system/interfaces/gpioTypes';
+import DeviceBase from 'system/base/DeviceBase';
 
 
 export type BlockMode = 'refuse' | 'defer';
@@ -69,11 +70,18 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       this.props.openDrain
     );
 
-    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
+    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+
+    this.depsInstances.gpioDevice = device;
+
+    device.onInit(() => {
+      this.handleGpioInit()
+        .catch(this.log.error);
+    });
   }
 
   // setup pin after all the drivers has been initialized
-  devicesDidInit = async () => {
+  handleGpioInit = async () => {
     this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // set initial value
@@ -260,8 +268,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
         this.handleSuccessWriting();
       })
-      .catch((err) => {
-        if (deferredWritePromise) deferredWritePromise.reject(err);
+      .catch((e: Error) => {
+        if (deferredWritePromise) deferredWritePromise.reject(e);
       });
   }
 

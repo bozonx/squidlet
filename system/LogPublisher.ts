@@ -23,8 +23,8 @@ export default class LogPublisher {
     this.emit('warn', message);
   }
 
-  error = (message: string) => {
-    this.emit('error', message);
+  error = (message: string | Error) => {
+    this.emit('error', String(message));
   }
 
 

@@ -4,7 +4,6 @@ import {Dictionary} from 'system/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
-import {BinaryInput, BinaryInputProps} from '../../drivers/BinaryInput/BinaryInput';
 
 
 interface Props extends BinaryClickProps {
@@ -20,33 +19,29 @@ export default class Toggle extends DeviceBase<Props> {
   private blockTimeout?: any;
 
 
-  private get binaryClick(): BinaryInput {
+  private get binaryClick(): BinaryClick {
     return this.depsInstances.binaryClick;
   }
 
 
   protected didInit = async () => {
-    const binaryInputProps: BinaryInputProps = {
+    const subDriverProps: BinaryClickProps = {
       ...this.props,
-      edge: 'rising',
-      // TODO: use debounce
-      // TODO: review
-      // BinaryInput driver doesn't need a block time because it uses here
+      // BinaryClick driver doesn't need a block time because it uses here
       blockTime: 0,
     };
 
     this.depsInstances.binaryClick = await this.context.getSubDriver(
-      'BinaryInput',
-      binaryInputProps
+      'BinaryClick',
+      subDriverProps
     );
 
     // listen only keyUp events
-    this.binaryClick.onChange(this.onUp);
+    this.binaryClick.onUp(this.onUp);
   }
 
   protected initialStatus = async (): Promise<Dictionary> => {
-    // TODO: review
-    return { [DEFAULT_DEVICE_STATUS]: invertIfNeed(false, this.props.invert) };
+    return { [DEFAULT_DEVICE_STATUS]: false };
   }
 
 
@@ -57,7 +52,7 @@ export default class Toggle extends DeviceBase<Props> {
       const level: boolean = resolveLevel(onOrOff);
 
       this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
-
+      // set local status
       await this.setStatus(level);
 
       return level;
@@ -69,8 +64,9 @@ export default class Toggle extends DeviceBase<Props> {
   };
 
 
-  private onUp = async () => {
-    await this.doToggle();
+  private onUp = () => {
+    this.doToggle()
+      .catch(this.log.error);
   }
 
   private async doToggle(): Promise<boolean> {
@@ -79,7 +75,7 @@ export default class Toggle extends DeviceBase<Props> {
     const level: boolean = !this.getStatus();
 
     this.blockTimeout = setTimeout(() => delete this.blockTimeout, this.props.blockTime);
-
+    // set local status
     await this.setStatus(level);
 
     return level;

@@ -49,9 +49,9 @@ export class SerialDuplex extends DriverBase<SerialDuplexProps> implements Duple
 
       // TODO: тоже ждать таймаут - лучше наверное тогда вызвать this.send()
       this.sendData(dataAddressStr, data)
-        .catch((err) => {
+        .catch((e) => {
           failed = true;
-          reject(err);
+          reject(e);
         });
 
       // listen for response

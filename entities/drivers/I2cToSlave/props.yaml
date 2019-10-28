@@ -16,7 +16,7 @@ feedback:
 # default polling interval in ms
 pollInterval:
   type: number
-  default: 1000
+  default: 100
 
 #  # length of data which will be requested by polling or interruption
 #  pollDataLength:

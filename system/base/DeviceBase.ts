@@ -5,6 +5,9 @@ import {Getter, Initialize, Setter} from '../lib/ConsistentState';
 import DeviceState from '../DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '../constants';
+import Promised from '../lib/Promised';
+import Context from '../Context';
+import EntityDefinition from '../interfaces/EntityDefinition';
 
 
 export type DeviceAction = (...param: any[]) => JsonTypes | void | Promise<JsonTypes | void>;
@@ -53,22 +56,22 @@ export default class DeviceBase<
 
   private _statusState?: DeviceState;
   private _configState?: DeviceState;
+  private initPromised?: Promised<void>;
 
+
+  constructor(context: Context, definition: EntityDefinition) {
+    super(context, definition);
+
+    this.initPromised = new Promised<void>();
+  }
 
   init = async () => {
     const manifest: DeviceManifest = await this.getManifest();
 
     if (manifest.status) {
-      this._statusState = new DeviceState(
+      this._statusState = this.initializeState(
         manifest.status,
-        (): Dictionary => {
-          return this.context.state.getState(StateCategories.devicesStatus, this.id) || {};
-        },
-        (partialState: Dictionary): void => {
-          this.context.state.updateState(StateCategories.devicesStatus, this.id, partialState);
-        },
-        this.log.error,
-        this.context.config.config.queueJobTimeoutSec,
+        StateCategories.devicesStatus,
         this.initialStatus,
         this.statusGetter,
         this.statusSetter
@@ -76,16 +79,9 @@ export default class DeviceBase<
     }
 
     if (manifest.config) {
-      this._configState = new DeviceState(
+      this._statusState = this.initializeState(
         manifest.config,
-        (): Dictionary => {
-          return this.context.state.getState(StateCategories.devicesConfig, this.id) || {};
-        },
-        (partialState: Dictionary): void => {
-          this.context.state.updateState(StateCategories.devicesConfig, this.id, partialState);
-        },
-        this.log.error,
-        this.context.config.config.queueJobTimeoutSec,
+        StateCategories.devicesConfig,
         this.initialConfig,
         this.configGetter,
         this.configSetter
@@ -94,14 +90,23 @@ export default class DeviceBase<
 
     // initialize status and config after all the devices has been initialized
     this.context.onDevicesInit(async () => {
-      await Promise.all([
+      // TODO: review
+      Promise.all([
         this.statusState && this.statusState.init(),
         this.configState && this.configState.init(),
-      ]);
+      ])
+        .catch(this.log.error);
     });
 
     // call didInit handler of device if set
     if (this.didInit) await this.didInit();
+
+    if (!this.initPromised) throw new Error(`no initPromised`);
+
+    this.initPromised.resolve();
+    this.initPromised.destroy();
+
+    delete this.initPromised;
   }
 
   destroy = async () => {
@@ -113,6 +118,22 @@ export default class DeviceBase<
   }
 
 
+  onInit(cb: () => void) {
+    const callCb = () => {
+      try {
+        cb();
+      }
+      catch (e) {
+        this.log.error(e);
+      }
+    };
+
+    if (!this.initPromised) return callCb();
+
+    this.initPromised.promise
+      .then(callCb);
+  }
+
   getActionsList(): string[] {
     return Object.keys(this.actions);
   }
@@ -120,12 +141,12 @@ export default class DeviceBase<
   /**
    * Call action and return it's result.
    */
-  async action(actionName: string, ...params: any[]): Promise<JsonTypes | void> {
+  async action(actionName: string, ...args: any[]): Promise<JsonTypes | void> {
     if (!this.actions[actionName]) {
       throw new Error(`Unknown action "${actionName}" of device "${this.id}"`);
     }
 
-    return this.actions[actionName](...params);
+    return this.actions[actionName](...args);
   }
 
   /**
@@ -221,6 +242,30 @@ export default class DeviceBase<
     };
 
     return this.context.state.onChange(wrapper);
+  }
+
+
+  private initializeState(
+    schema: {[index: string]: any},
+    stateCategory: StateCategories,
+    initialCb?: Initialize,
+    getterCb?: Getter,
+    setterCb?: Setter
+  ): DeviceState {
+    return new DeviceState(
+      schema,
+      (): Dictionary => {
+        return this.context.state.getState(stateCategory, this.id) || {};
+      },
+      (partialState: Dictionary): void => {
+        this.context.state.updateState(stateCategory, this.id, partialState);
+      },
+      this.log.error,
+      this.context.config.config.queueJobTimeoutSec,
+      initialCb,
+      getterCb,
+      setterCb
+    );
   }
 
 }

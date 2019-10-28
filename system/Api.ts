@@ -8,6 +8,7 @@ import {calcAllowedLogLevels} from './lib/helpers';
 import SysIo from './interfaces/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
 import {SystemEvents} from './constants';
+import DeviceBase from './base/DeviceBase';
 
 
 export default class Api {
@@ -42,8 +43,8 @@ export default class Api {
   /**
    * Call device action
    */
-  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes | undefined> {
-    const device = this.context.system.devicesManager.getDevice(deviceId);
+  action(deviceId: string, actionName: string, ...args: any[]): Promise<JsonTypes | void> {
+    const device: DeviceBase = this.context.system.devicesManager.getDevice(deviceId);
 
     this.context.log.info(`Api: called device's "${deviceId}" action: ${actionName} ${JSON.stringify(args)}`);
 

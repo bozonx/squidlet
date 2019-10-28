@@ -7,7 +7,7 @@ const WRITE_ID = 'write';
 
 
 export default class DigitalPortExpanderLogic {
-  private readonly logError: (msg: string) => void;
+  private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (state: number) => Promise<void>;
   private readonly getState: () => number;
   private readonly setState: (wholeState: number) => void;
@@ -21,7 +21,7 @@ export default class DigitalPortExpanderLogic {
 
 
   constructor(
-    logError: (msg: string) => void,
+    logError: (msg: Error | string) => void,
     writeCb: (state: number) => Promise<void>,
     getState: () => number,
     setState: (wholeState: number) => void,
@@ -54,6 +54,8 @@ export default class DigitalPortExpanderLogic {
   }
 
   write(pin: number, value: boolean): Promise<void> {
+    console.log(77777777, pin, value, this.isWriting())
+
     // in case it is writing at the moment - save buffer and add cb to queue
     if (this.isWriting()) {
       return this.invokeAtWritingTime(pin, value);
@@ -117,7 +119,7 @@ export default class DigitalPortExpanderLogic {
 
       // flush buffer which has been collected at buffering time
       this.startWriting(lastBufferedState)
-        .catch((e: Error) => this.logError(String(e)));
+        .catch(this.logError);
     }, this.writeBufferMs, WRITE_ID);
   }
 
@@ -142,6 +144,8 @@ export default class DigitalPortExpanderLogic {
    */
   private startWriting(stateToSave: number): Promise<void> {
     this.writingTimeBuffer = stateToSave;
+
+    console.log(888888888, stateToSave)
 
     return this.queue.add(this.doWriteCb);
   }

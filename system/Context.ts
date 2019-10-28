@@ -107,14 +107,12 @@ export default class Context {
         const promise: Promise<void> | undefined = cb();
 
         if (promise) promise.catch(this.log.error);
-
-        return -1;
       }
       catch (err) {
         this.log.error(err);
-
-        return -1;
       }
+
+      return -1;
     }
 
     return this.system.events.once(eventName, cb);

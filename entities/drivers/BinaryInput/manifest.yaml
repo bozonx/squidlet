@@ -2,7 +2,4 @@ name: BinaryInput
 main: BinaryInput.ts
 system: true
 
-drivers:
-  - DigitalPinInput
-
 props: props.yaml

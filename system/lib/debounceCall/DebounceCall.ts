@@ -27,20 +27,20 @@ export default class DebounceCall {
 
   invoke(
     cb: DebounceCb,
-    debounce: number | undefined,
+    debounceMs: number | undefined,
     id: string | number = DEFAULT_ID,
   ): Promise<void> {
     // if there isn't debounce time - call immediately
-    if (!debounce) return this.callCbImmediately(id, cb);
+    if (!debounceMs) return this.callCbImmediately(id, cb);
 
     if (this.items[id]) {
-      this.updateItem(this.items[id], id, cb, debounce);
+      this.updateItem(this.items[id], id, cb, debounceMs);
     }
     else {
       // make a new item
       this.items[id] = [ cb, new Promised<void>(), undefined ];
       // make a new timeout
-      this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounce);
+      this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounceMs);
     }
 
     // return promise of item
@@ -51,9 +51,16 @@ export default class DebounceCall {
     if (!this.items[id]) return;
 
     clearTimeout(this.items[id][ItemPosition.timeoutId]);
+    // TODO: может лучше зарезолвить промис. Но при дестрое дестроить
     this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
 
     delete this.items[id];
+  }
+
+  clearAll() {
+    for (let id of Object.keys(this.items)) {
+      this.clear(id);
+    }
   }
 
   destroy() {
@@ -65,7 +72,7 @@ export default class DebounceCall {
   }
 
 
-  protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounce?: number) {
+  protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounceMs?: number) {
     // update cb
     item[ItemPosition.lastCbToCall] = cb;
   }

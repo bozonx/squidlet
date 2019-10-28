@@ -43,10 +43,20 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
         ? (this.props.defaultDebounce || 0)
         : debounce;
 
+      this.log.debug(
+        `GpioLocal.digitalSetupInput. ` +
+        `pin: ${pin}, inputMode: ${inputMode}, debounce: ${debounce}, edge: ${edge}`
+      );
+
       return this.digitalIo.setupInput(pin, inputMode, resolvedDebounce, edge);
     },
 
     digitalSetupOutput: (pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> => {
+      this.log.debug(
+        `GpioLocal.digitalSetupOutput. ` +
+        `pin: ${pin}, initialValue: ${initialValue}, outputMode: ${outputMode}`
+      );
+
       return this.digitalIo.setupOutput(pin, initialValue, outputMode);
     },
 
@@ -59,11 +69,15 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
     },
 
     digitalRead: (pin: number): Promise<boolean> => {
+      this.log.debug(`GpioLocal.digitalRead. pin: ${pin}`);
+
       return this.digitalIo.read(pin);
     },
 
     // only for output pins
     digitalWrite: (pin: number, level: boolean): Promise<void> => {
+      this.log.debug(`GpioLocal.digitalWrite. pin: ${pin}, level: ${level}`);
+
       return this.digitalIo.write(pin, level);
     },
 
@@ -103,26 +117,21 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
 
     /**
      * Setup pin as input and return it's value.
-     * If mode and direction don't change then setup won't be done.
+     * If mode and direction aren't change then setup won't be done.
      */
     digitalForceRead: async (pin: number, inputMode?: InputResistorMode): Promise<boolean> => {
       const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
       const mode: InputResistorMode | OutputResistorMode | undefined =
         await this.digitalIo.getPinResistorMode(pin);
-      const isSetupDifferent: boolean = typeof direction === 'undefined'
+      // if setup different or not set
+      if (
+        typeof direction === 'undefined'
         || typeof mode === 'undefined'
         || direction !== PinDirection.input
-        || mode !== inputMode;
-
-      // clear pin only if it has another mode
-      if (typeof direction !== 'undefined' && isSetupDifferent) {
-        await this.digitalIo.clearPin(pin);
-      }
-
-      if (isSetupDifferent) {
-        const mode: InputResistorMode | OutputResistorMode | undefined =
-          await this.digitalIo.getPinResistorMode(pin);
-
+        || mode !== inputMode
+      ) {
+        // clear pin only if it has another mode
+        if (typeof direction !== 'undefined') await this.digitalIo.clearPin(pin);
         // in case pin hasn't been setup or need to resetup
         await this.digitalIo.setupInput(
           pin,
@@ -136,24 +145,23 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
     },
 
     /**
-     * Setup pin as output and write the value.
-     * If mode and direction don't change then setup won't be done.
+     * Setup pin as output and write the initial value.
+     * If mode and direction aren't changed then setup won't be done.
      */
     digitalForceWrite: async (pin: number, level: boolean, outputMode?: OutputResistorMode): Promise<void> => {
       const direction: PinDirection | undefined = await this.digitalIo.getPinDirection(pin);
       const mode: InputResistorMode | OutputResistorMode | undefined =
         await this.digitalIo.getPinResistorMode(pin);
-      const isSetupDifferent: boolean = typeof direction === 'undefined'
+      // if setup different or not set
+      if (
+        typeof direction === 'undefined'
         || typeof mode === 'undefined'
         || direction !== PinDirection.output
-        || mode !== outputMode;
+        || mode !== outputMode
+      ) {
+        // clear pin only if it has another mode
+        if (typeof direction !== 'undefined') await this.digitalIo.clearPin(pin);
 
-      // clear pin only if it has another mode
-      if (typeof direction !== 'undefined' && isSetupDifferent) {
-        await this.digitalIo.clearPin(pin);
-      }
-
-      if (isSetupDifferent) {
         // in case pin hasn't been setup or need to resetup
         await this.digitalIo.setupOutput(
           pin,
@@ -161,7 +169,7 @@ export default class GpioLocal extends DeviceBase<GpioLocalProps> {
           outputMode || OutputResistorMode.none
         );
       }
-
+      // write initial value
       return this.digitalIo.write(pin, level);
     },
   };

@@ -2,7 +2,4 @@ name: ImpulseInput
 main: ImpulseInput.ts
 system: true
 
-drivers:
-  - DigitalPinInput
-
 props: props.yaml

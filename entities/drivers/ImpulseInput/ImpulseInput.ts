@@ -7,6 +7,7 @@ import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
+import DeviceBase from 'system/base/DeviceBase';
 
 
 type RisingHandler = () => void;
@@ -59,11 +60,18 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
       this.props.pullup
     );
 
-    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
+    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+
+    this.depsInstances.gpioDevice = device;
+
+    device.onInit(() => {
+      this.handleGpioInit()
+        .catch(this.log.error);
+    });
   }
 
   // setup pin after all the drivers has been initialized
-  devicesDidInit = async () => {
+  handleGpioInit = async () => {
     this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     const edge: Edge = resolveEdge('rising', this.isInverted());

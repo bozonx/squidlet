@@ -8,6 +8,7 @@ import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 import {GpioDigital} from 'system/interfaces/Gpio';
 import {OutputResistorMode} from 'system/interfaces/gpioTypes';
+import DeviceBase from 'system/base/DeviceBase';
 
 
 type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';
@@ -74,12 +75,19 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       this.props.openDrain
     );
 
-    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
+    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+
+    this.depsInstances.gpioDevice = device;
+
+    device.onInit(() => {
+      this.handleGpioInit()
+        .catch(this.log.error);
+    });
   }
 
 
   // setup pin after all the devices has been initialized
-  devicesDidInit = async () => {
+  handleGpioInit = async () => {
     this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // resolve initial value

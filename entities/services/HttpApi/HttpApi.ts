@@ -73,17 +73,23 @@ export default class HttpApi extends ServiceBase<HttpServerProps> {
     let body: HttpApiBody;
     let result: any;
 
+    console.log(22222222, apiMethodName, args)
+
     try {
       result = await this.context.system.apiManager.callApi(apiMethodName, args);
     }
     catch (err) {
       body = { error: String(err) };
 
+      console.log(333333333, err)
+
       return {
         status: 500,
         body: body as {[index: string]: Primitives},
       };
     }
+
+    console.log(4444444, result)
 
     body = { result };
 

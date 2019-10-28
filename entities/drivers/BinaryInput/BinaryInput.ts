@@ -7,6 +7,7 @@ import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';
 import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
+import DeviceBase from 'system/base/DeviceBase';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -48,14 +49,18 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     );
 
     // TODO: обработать ошибку чтобы сообщение было более понятно что не такого девайса
-    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
+    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+
+    this.depsInstances.gpioDevice = device;
+
+    device.onInit(() => {
+      this.handleGpioInit()
+        .catch(this.log.error);
+    });
   }
 
   // setup pin after all the drivers has been initialized
-  devicesDidInit = async () => {
-
-    // TODO: может навешаться на событие ожидания инициализации самого девайса ???
-
+  handleGpioInit = async () => {
     const edge: Edge = resolveEdge(this.props.edge, this._isInverted);
 
     this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);

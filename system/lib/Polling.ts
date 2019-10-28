@@ -52,8 +52,9 @@ export default class Polling {
     const pollingCbWrapper: MethodWrapper = () => {
       methodWhichWillPoll()
       // TODO: don't use null
+      // TODO: add types
         .then((result) => this.events.emit(id, null, result))
-        .catch((err) => this.events.emit(id, err));
+        .catch((e) => this.events.emit(id, e));
     };
 
     // start first time immediately

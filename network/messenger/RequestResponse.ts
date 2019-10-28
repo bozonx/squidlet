@@ -40,9 +40,9 @@ export default class RequestResponse {
 
       // send request
       this.messenger.$sendMessage(request)
-        .catch((err) => {
+        .catch((e: Error) => {
           this.stopWaitForResponse(request.requestId);
-          reject(err);
+          reject(e);
         });
     });
   }

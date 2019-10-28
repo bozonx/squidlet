@@ -1,5 +1,3 @@
-$base: 'drivers.DigitalPinOutput'
-
 impulseLength:
   type: number
   # TODO: не может быть 0 или меньше

@@ -258,7 +258,7 @@ export default class RequestQueue {
       try {
         job[JobPositions.cb]()
           .then(() => this.handleCbFinished(undefined, job))
-          .catch((err: Error) => this.handleCbFinished(String(err), job));
+          .catch((e: Error) => this.handleCbFinished(String(e), job));
       }
       catch (err) {
         this.handleCbFinished(err, job);

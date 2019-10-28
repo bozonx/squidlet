@@ -9,13 +9,13 @@ import DebounceCall, {DebounceCb, DebounceItem, ItemPosition} from './DebounceCa
  * It returns a promise which will be fulfilled at the end of full cycle.
  */
 export default class DebounceCallIncreasing extends DebounceCall {
-  protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounce?: number) {
+  protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounceMs?: number) {
     // update cb
     item[ItemPosition.lastCbToCall] = cb;
     // clear previous timeout
     clearTimeout(item[ItemPosition.timeoutId]);
     // make a new timeout
-    item[ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounce || 0);
+    item[ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounceMs || 0);
   }
 
 }

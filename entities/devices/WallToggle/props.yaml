@@ -4,7 +4,6 @@ $base: 'devices.Toggle'
 blockTime:
   default: 500
 
-# see DigitalPinInput driver
 debounce:
   default: 25
 

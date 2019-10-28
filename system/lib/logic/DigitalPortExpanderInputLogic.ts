@@ -1,26 +1,25 @@
 import DebounceCall from '../debounceCall/DebounceCall';
 import {ChangeHandler} from '../../interfaces/io/DigitalIo';
 import IndexedEventEmitter from '../IndexedEventEmitter';
-import {Edge} from '../../interfaces/gpioTypes';
 import {getBitFromByte} from '../binaryHelpers';
-import QueueOverride from '../QueueOverride';
 
 
 export default class DigitalPortExpanderInputLogic {
-  private readonly logError: (msg: string) => void;
+  private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
   private readonly getState: () => number;
   private readonly updateState: (pin: number, value: boolean) => void;
-  private readonly queue = new QueueOverride();
   private readonly debounce = new DebounceCall();
-  // buffer by pin for input pins while debounce or poll are in progress
-  private inputPinBuffer: {[index: string]: boolean} = {};
+  // promise while poll is in progress
+  private pollPromise?: Promise<void>;
+  // there are stored pins which are changed while polling
+  private polledPinsBuffer?: {[index: string]: boolean};
   // change events of input pins
   private readonly changeEvents = new IndexedEventEmitter<ChangeHandler>();
 
 
   constructor(
-    logError: (msg: string) => void,
+    logError: (msg: Error | string) => void,
     pollOnce: () => Promise<void>,
     getState: () => number,
     updateState: (pin: number, value: boolean) => void,
@@ -33,16 +32,24 @@ export default class DigitalPortExpanderInputLogic {
   }
 
   destroy() {
-    // TODO: add !!!!
+    this.debounce.destroy();
+    this.changeEvents.destroy();
+
+    delete this.pollPromise;
+    delete this.polledPinsBuffer;
   }
 
 
-  isInputBuffering(pin: number) {
-    return typeof this.inputPinBuffer[pin] !== 'undefined';
+  isInProgress(pin: number) {
+    return this.debounce.isInvoking(pin) || this.isPollInProgress();
+  }
+
+  isPollInProgress(): boolean {
+    return Boolean(this.pollPromise);
   }
 
   /**
-   * Listen to changes of pin after edge and debounce were processed.
+   * Listen to changes of pin after debounce was processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
     return this.changeEvents.addListener(pin, handler);
@@ -55,24 +62,20 @@ export default class DigitalPortExpanderInputLogic {
   /**
    * State which is income after poling request.
    */
-  incomeState(pin: number, newValue: boolean, debounceMs?: number, edge?: Edge) {
-    // skip not suitable edge
-    if (edge === Edge.rising && !newValue) {
-      return;
-    }
-    else if (edge === Edge.falling && newValue) {
-      return;
-    }
+  incomeState(pin: number, newValue: boolean, debounceMs?: number) {
+    // save value to the buffer if poling is in progress
+    if (this.isPollInProgress()) {
+      if (!this.polledPinsBuffer) {
+        return this.logError(`No polledPinsBuffer`);
+      }
 
-    if (edge === Edge.rising || edge === Edge.falling) {
-      // TODO: если edge falling or rising - то схема будет упрощенной
-      //   просто throttle и poll не нужен
+      this.polledPinsBuffer[pin] = newValue;
 
       return;
     }
-    // else edge both
 
-    // If not changed = nothing happened.
+    // else first time or at debounce time.
+    // If not changed = nothing happened. It needs because we don't exactly know which pin is changed.
     if (newValue === getBitFromByte(this.getState(), pin)) return;
 
     // if value was changed then update state and rise an event.
@@ -80,62 +83,77 @@ export default class DigitalPortExpanderInputLogic {
   }
 
   clearPin(pin: number) {
-    // TODO: add - rename to cancel ???
+    this.debounce.clear(pin);
+  }
+
+  cancel() {
+    this.debounce.clearAll();
+
+    delete this.pollPromise;
+    delete this.polledPinsBuffer;
   }
 
 
   /**
-   * Handle income state for edge both.
+   * Handle income state
    */
   private handleIncomeState(pin: number, newValue: boolean, debounceMs?: number) {
-    // TODO: зачем ????
-    const isBuffering: boolean = this.isInputBuffering(pin);
-
-    // TODO: review
-    this.inputPinBuffer[pin] = newValue;
-
-    // debounce or polling are in progress - just update the last value
-    if (isBuffering) return;
-    // else start debounce on first time
+    // make debounced call
     if (debounceMs) {
       // wait for debounce and read current level
       this.debounce.invoke(() => {
-        this.handleEndOfDebounce(pin);
+        this.handleEndOfDebounce(pin)
+          .catch(this.logError);
       }, debounceMs, pin)
-        .catch((e: Error) => this.logError(String(e)));
+        .catch(this.logError);
     }
     else {
-      // TODO: не делать poll
-      // TODO: очистить debounce если есть
       // emit right now if there isn't debounce
-      this.handleEndOfDebounce(pin);
+      // clear debounce if set
+      if (this.debounce.isInvoking(pin)) this.debounce.clear(pin);
+      // set a new value
+      this.updateState(pin, newValue);
+      // rise a new event even value hasn't been actually changed since first check
+      this.changeEvents.emit(pin, newValue);
     }
   }
 
   /**
    * It is only the first one callback of debounce cycle.
    */
-  private handleEndOfDebounce(pin: number) {
-    // TODO: нужно накапливать запросы poll и если в процессе были новые то делать ещё 1 запрос
+  private async handleEndOfDebounce(pin: number) {
+    this.polledPinsBuffer = {};
 
-    // start polling
-    this.pollOnce()
-      .then(() => {
-        // TODO: как удосторевиться что выполнились обработчики и теперь this.inputPinBuffer[pin] верный???
+    // TODO: нужно удостовериться что сначала выполнились все обработчики которые вызывают incomeState()
+    try {
+      this.pollPromise = this.pollOnce();
 
-        const lastValue = this.inputPinBuffer[pin];
+      await this.pollPromise;
+    }
+    catch (e) {
+      delete this.pollPromise;
+      delete this.polledPinsBuffer;
 
-        delete this.inputPinBuffer[pin];
-        // set a new value
-        this.updateState(pin, lastValue);
-        // rise a new event even value hasn't been actually changed since first check
-        this.changeEvents.emit(pin, lastValue);
-      })
-      .catch((e: Error) => {
-        // on error we can't certainly recognize the value because of that not rise an event.
-        delete this.inputPinBuffer[pin];
-        this.logError(String(e));
-      });
+      throw e;
+    }
+
+    // means that pall has been canceled
+    if (!this.polledPinsBuffer) return;
+
+    const stateBeforePolling: number = this.getState();
+
+    // set all the values which has been received via last poll
+    for (let pinStr of Object.keys(this.polledPinsBuffer)) {
+      if (getBitFromByte(stateBeforePolling, pin) === this.polledPinsBuffer[pinStr]) continue;
+
+      // set a new value
+      this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);
+      // rise a new event even value hasn't been actually changed since first check
+      this.changeEvents.emit(Number(pinStr), this.polledPinsBuffer[pinStr]);
+    }
+
+    delete this.pollPromise;
+    delete this.polledPinsBuffer;
   }
 
 }

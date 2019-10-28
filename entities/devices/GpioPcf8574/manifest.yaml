@@ -8,6 +8,9 @@ drivers:
 props:
   $base: 'drivers.Pcf8574'
 
+  writeBufferMs:
+    default: 10
+
   defaultDebounce:
     type: number
 

@@ -25,7 +25,7 @@ export default class Promised<T = any> {
   }
 
 
-  resolve(result?: T) {
+  resolve = (result?: T) => {
     if (this.canceled) return;
 
     if (this.promiseResolve) this.promiseResolve(result);
@@ -36,7 +36,7 @@ export default class Promised<T = any> {
     delete this.promiseReject;
   }
 
-  reject(err: Error) {
+  reject = (err: Error) => {
     if (this.canceled) return;
 
     if (this.promiseReject) this.promiseReject(err);

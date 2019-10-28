@@ -110,9 +110,12 @@ export default class System {
 
     this.context.log.info(`---> Initializing devices`);
     await this.devicesManager.initialize();
+
+    this.context.log.info(`---> start after devices initialized handlers`);
     this._wasDevicesInitialized = true;
     await this.emitEventSync(SystemEvents.devicesInitialized);
 
+    this.context.log.info(`---> start after app initialized handlers`);
     this._wasAppInitialized = true;
     await this.emitEventSync(SystemEvents.appInitialized);
 

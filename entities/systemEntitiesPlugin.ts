@@ -57,9 +57,11 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   env.afterRegistering(async () => {
     const machineIos: string[] = makeListOfNamesFromPaths(env.getMachineConfig().ios);
 
-    if (machineIos.includes('Digital')) {
-      await env.addUsedEntity('driver', 'Digital_local');
-    }
+    // TODO: review
+
+    // if (machineIos.includes('Digital')) {
+    //   await env.addUsedEntity('driver', 'Digital_local');
+    // }
 
     // if (machineIos.includes('Serial')) {
     //   await env.addUsedEntity('driver', 'SerialDuplex');

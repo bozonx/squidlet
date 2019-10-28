@@ -5,6 +5,7 @@ import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
 
 
 type GpioHandler = (level: number) => void;
@@ -21,6 +22,7 @@ export default class Digital implements DigitalIo {
   // resistor constant of pins by id
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
+  private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
   async destroy(): Promise<void> {
@@ -177,16 +179,27 @@ export default class Digital implements DigitalIo {
 
     // if undefined or 0 - call handler immediately
     if (!debounce) {
-      this.events.emit(pin, level);
+      return this.events.emit(pin, level);
     }
-    else {
-      // wait for debounce and read current level and emit an event
-      this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
+    // use throttle instead of debounce if rising or falling edge is set
+    else if (edge === Edge.rising || edge === Edge.falling) {
+      this.throttleCall.invoke(() => {
+        this.events.emit(pin, level);
+      }, debounce, pin)
         .catch((e) => {
           // TODO: call IO's logError()
           console.error(e);
         });
+
+      return;
     }
+    // else edge both and debounce is set
+    // wait for debounce and read current level and emit an event
+    this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
+      .catch((e) => {
+        // TODO: call IO's logError()
+        console.error(e);
+      });
   }
 
   private handleEndOfDebounce(pin: number) {

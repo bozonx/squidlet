@@ -2,7 +2,4 @@ name: ImpulseOutput
 main: ImpulseOutput.ts
 system: true
 
-drivers:
-  - DigitalPinOutput
-
 props: props.yaml

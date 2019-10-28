@@ -23,6 +23,7 @@ export default class BinarySensor extends DeviceBase<Props> {
 
 
   protected statusGetter = async (): Promise<Dictionary> => {
+    // TODO: нужно ли тут делать read ???? делается до инициализации gpio
     return { [DEFAULT_DEVICE_STATUS]: await this.binaryInput.read() };
   }
 

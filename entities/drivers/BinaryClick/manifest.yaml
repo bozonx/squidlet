@@ -2,7 +2,4 @@ name: BinaryClick
 main: BinaryClick.ts
 system: true
 
-drivers:
-  - BinaryInput
-
 props: props.yaml

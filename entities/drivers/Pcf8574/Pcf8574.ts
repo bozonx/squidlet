@@ -36,8 +36,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private initializationPromise = new Promised<void>();
   // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number} = {};
-  // collection of edges values of each pin to use in change handler
-  private readonly pinEdges: {[index: string]: Edge | undefined} = {};
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
   private _expanderOutput?: DigitalPortExpanderOutcomeLogic;
@@ -142,9 +140,16 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   async setupInput(pin: number, debounce?: number, edge?: Edge): Promise<void> {
     this.checkPin(pin);
 
+    if (typeof edge !== 'undefined' && edge !== Edge.both) {
+      throw new Error(
+        `Edge "rising" or "falling" aren't supported on Pcf8574 board because there isn't way ` +
+        `to recognize which pin has been exactly changed`
+      );
+    }
+
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
-        `PCF8574Driver.setupInput(${pin}, ${debounce}, ${edge}). This pin has been already set up.` +
+        `PCF8574Driver.setupInput(${pin}, ${debounce}). This pin has been already set up.` +
         `Call "clearPin()" and try to set up again`
       );
     }
@@ -153,7 +158,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       this.pinDebounces[pin] = debounce;
     }
 
-    this.pinEdges[pin] = edge;
     this.directions[pin] = PinDirection.input;
 
     // set input pin to high
@@ -251,9 +255,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   async write(pin: number, value: boolean): Promise<void> {
     this.checkPin(pin);
 
+    console.log(6666666666, pin, value, this.setupStep, this.directions[pin])
+
     if (this.directions[pin] !== PinDirection.output) {
       throw new Error('Pin is not defined as an output');
     }
+
 
     if (this.setupStep) {
       // update current value of pin and go out if there is setup step
@@ -293,18 +300,18 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     if (this.directions[pin] === PinDirection.input) {
       this.expanderInput.clearPin(pin);
     }
-    else if (this.directions[pin] === PinDirection.output) {
-      this.expanderOutput.clearPin(pin);
-    }
 
     delete this.directions[pin];
     delete this.pinDebounces[pin];
-    delete this.pinEdges[pin];
   }
 
   clearAll() {
+    this.expanderInput.cancel();
+    this.expanderOutput.cancel();
+
     for (let pin = 0; pin < PINS_COUNT; pin ++) {
-      this.clearPin(pin);
+      delete this.directions[pin];
+      delete this.pinDebounces[pin];
     }
   }
 
@@ -314,10 +321,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
     }
 
-    this.setNewInputsStates(data[0]);
-  }
+    const receivedByte: number = data[0];
 
-  private setNewInputsStates(receivedByte: number) {
     // update values add rise change event of input pins which are changed
     for (let pin = 0; pin < PINS_COUNT; pin++) {
       // skip not input pins
@@ -325,7 +330,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       const newValue: boolean = getBitFromByte(receivedByte, pin);
 
-      this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin], this.pinEdges[pin]);
+      this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
     }
   }
 
@@ -336,6 +341,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
     // fill data
     dataToSend[0] = newStateByte;
+
+    console.log(9999999999, newStateByte)
 
     return this.i2cDriver.write(undefined, dataToSend);
   }

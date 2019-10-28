@@ -1,10 +1,8 @@
 $base: 'devices.BinarySensor'
 
-# see BinaryInput driver
 blockTime:
   default: 300
 
-# see DigitalPinInput driver
 debounce:
   default: 100
 

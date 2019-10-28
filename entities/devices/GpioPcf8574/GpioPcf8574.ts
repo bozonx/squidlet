@@ -6,6 +6,7 @@ import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interf
 import {omitObj} from 'system/lib/objects';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
+import {stringifyPinMode} from '../../../system/lib/digitalHelpers';
 
 
 interface Props extends Pcf8574ExpanderProps {
@@ -31,9 +32,12 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
     // TODO: нужно ли явно включать буферизацию запросов ???
   }
 
-  protected appDidInit = () => {
+  protected appDidInit = async () => {
+    this.log.debug(`GpioPcf8574: init IC: ${this.props.address}`);
     // initialize IC after app did init
-    return this.expander.initIc();
+    // don't wait while ic is initialized
+    this.expander.initIc()
+      .catch(this.log.error);
   }
 
   destroy = async () => {
@@ -91,7 +95,62 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
   };
 
   protected actions = {
-    // TODO: add actions like in GpioLocal
+    getPinMode: async (pin: number): Promise<string> => {
+      const direction: PinDirection | undefined = await this.expander.getPinDirection(pin);
+
+      return stringifyPinMode(direction, InputResistorMode.pullup);
+    },
+
+    /**
+     * Read level of an input or output pin.
+     * Pin has to be setup first. To force setup use `digitalForceRead()`
+     */
+    digitalRead: (pin: number): Promise<boolean> => {
+      return this.expander.read(pin);
+    },
+
+    /**
+     * Write level to an output pin.
+     * Pin has to be setup first as an output. To force setup use `digitalForceWrite()`
+     */
+    digitalWrite: (pin: number, level: boolean): Promise<void> => {
+      return this.expander.write(pin, level);
+    },
+
+    /**
+     * Setup pin as input and return it's value.
+     * If direction isn't changed then setup won't be done.
+     */
+    digitalForceRead: async (pin: number): Promise<boolean> => {
+      const direction: PinDirection | undefined = await this.expander.getPinDirection(pin);
+      // if setup different or not set
+      if (typeof direction === 'undefined' || direction !== PinDirection.input) {
+        // clear pin only if it has another mode
+        if (typeof direction !== 'undefined') await this.expander.clearPin(pin);
+        // in case pin hasn't been setup or need to resetup
+        await this.expander.setupInput(pin, 0);
+      }
+
+      return this.expander.read(pin);
+    },
+
+    /**
+     * Setup pin as output and write the initial value.
+     * If direction isn't changed then setup won't be done.
+     */
+    digitalForceWrite: async (pin: number, level: boolean, outputMode?: OutputResistorMode): Promise<void> => {
+      const direction: PinDirection | undefined = await this.expander.getPinDirection(pin);
+      // if setup different or not set
+      if (typeof direction === 'undefined' || direction !== PinDirection.output) {
+        // clear pin only if it has another mode
+        if (typeof direction !== 'undefined') await this.expander.clearPin(pin);
+
+        // in case pin hasn't been setup or need to resetup
+        await this.expander.setupOutput(pin, level);
+      }
+      // write initial value
+      return this.expander.write(pin, level);
+    },
   };
 
 }

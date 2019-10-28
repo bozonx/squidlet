@@ -1,6 +1,6 @@
-$base: 'drivers.BinaryInput'
+$base: 'drivers.BinaryClick'
 
-# timeout after received signal. At this time it doesn't receive any signals.
+# Toggle's block time. Timeout after received signal. At this time it doesn't receive any signals.
 blockTime:
   default: 50
 

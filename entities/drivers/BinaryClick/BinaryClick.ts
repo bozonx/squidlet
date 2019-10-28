@@ -2,11 +2,11 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
-import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
-import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
+import {invertIfNeed, isDigitalPinInverted, resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {GpioDigital} from 'system/interfaces/Gpio';
-import {InputResistorMode} from 'system/interfaces/gpioTypes';
+import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
+import DeviceBase from 'system/base/DeviceBase';
 
 
 type Handler = () => void;
@@ -57,17 +57,29 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
       this.props.pullup
     );
 
-    this.depsInstances.gpioDevice = this.context.system.devicesManager.getDevice(this.props.gpio);
+    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+
+    this.depsInstances.gpioDevice = device;
+
+    device.onInit(() => {
+      this.handleGpioInit()
+        .catch(this.log.error);
+    });
   }
 
   // setup pin after all the drivers has been initialized
-  devicesDidInit = async () => {
+  handleGpioInit = async () => {
     this.log.debug(`BinaryClick: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, 'both');
+      await this.gpio.digitalSetupInput(
+        this.props.pin,
+        this.getResistorMode(),
+        this.props.debounce,
+        Edge.both
+      );
     }
     catch (err) {
       this.log.error(

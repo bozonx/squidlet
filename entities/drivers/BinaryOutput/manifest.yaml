@@ -2,7 +2,4 @@ name: BinaryOutput
 main: BinaryOutput.ts
 system: true
 
-drivers:
-  - DigitalPinOutput
-
 props: props.yaml

@@ -121,12 +121,8 @@ export default class QueueOverride {
     this.currentPendingPromise[id] = this.startCb(cb, id);
 
     this.currentPendingPromise[id]
-      .then(() => {
-        queueFinishPromise.resolve();
-      })
-      .catch((e) => {
-        queueFinishPromise.reject(e);
-      });
+      .then(queueFinishPromise.resolve)
+      .catch(queueFinishPromise.reject);
   }
 
 }
