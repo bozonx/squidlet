@@ -138,7 +138,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * If you did setup after IC initialized then do `initIc()`.
    */
   async setupInput(pin: number, debounce?: number): Promise<void> {
-    this.checkPin(pin);
+    //this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
@@ -158,7 +158,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
-    this.checkPin(pin);
+    //this.checkPin(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
@@ -228,7 +228,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Asks IC and returns the current value of a pin.
    */
   async read(pin: number): Promise<boolean> {
-    this.checkPin(pin);
+    //this.checkPin(pin);
 
     if (this.i2cDriver.hasFeedback()) {
       // TODO: как удостовериться что после poll отработают хэндлеры которые установят стейт
@@ -246,7 +246,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * @return {Promise}
    */
   async write(pin: number, value: boolean): Promise<void> {
-    this.checkPin(pin);
+    //this.checkPin(pin);
 
     console.log(6666666666, pin, value, this.setupStep, this.directions[pin])
 

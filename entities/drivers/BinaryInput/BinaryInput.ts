@@ -95,7 +95,17 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     return this._isInverted;
   }
 
-  async read(): Promise<boolean> {
+  /**
+   * Just read and return a value
+   */
+  read(): Promise<boolean> {
+    return this.gpio.digitalRead(this.props.pin);
+  }
+
+  /**
+   * Read from IO and rise event if need.
+   */
+  async poll(): Promise<void> {
     const level = await this.gpio.digitalRead(this.props.pin);
 
     if (level !== this.lastIoLevel) {
@@ -105,8 +115,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       // emit event and invert the value if need
       this.changeEvents.emit(invertIfNeed(level, this.isInverted()));
     }
-
-    return level;
   }
 
   /**

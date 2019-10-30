@@ -89,15 +89,17 @@ export default class DeviceBase<
     }
 
     // initialize status and config after all the devices has been initialized
-    this.context.onDevicesInit(async () => {
-      this.log.debug(`Init status and config if set of device ${this.id}`);
-      // TODO: review - будет делаться запись которая ждет окончания инициализации в pcf - поэтому зависнет
-      Promise.all([
-        this.statusState && this.statusState.init(),
-        this.configState && this.configState.init(),
-      ])
-        .catch(this.log.error);
-    });
+    if (manifest.status || manifest.config) {
+      this.context.onDevicesInit(async () => {
+        this.log.debug(`Init status and config if set of device ${this.id}`);
+        // TODO: review - будет делаться запись которая ждет окончания инициализации в pcf - поэтому зависнет
+        Promise.all([
+          this.statusState && this.statusState.init(),
+          this.configState && this.configState.init(),
+        ])
+          .catch(this.log.error);
+      });
+    }
 
     // call didInit handler of device if set
     if (this.didInit) await this.didInit();
@@ -168,6 +170,8 @@ export default class DeviceBase<
     if (!this.statusState) {
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
     }
+
+    console.log('--------- setStatus start', this.id)
 
     try {
       await this.statusState.write({[statusName]: newValue});
