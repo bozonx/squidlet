@@ -10,11 +10,11 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   abstract readonly entityType: EntityType;
   readonly context: Context;
   // define this method and it will be called on system init
-  init?: () => Promise<void>;
+  init?(): Promise<void>;
   readonly definition: EntityDefinition;
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
-  destroy?: () => Promise<void>;
+  destroy?(): Promise<void>;
 
   get id(): string {
     return this.definition.id;
@@ -36,12 +36,12 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   // you can store there drivers instances if need
   protected depsInstances: {[index: string]: any} = {};
   // it will be called after all the entities of entityType have been inited
-  protected driversDidInit?: () => Promise<void>;
-  protected servicesDidInit?: () => Promise<void>;
+  protected driversDidInit?(): Promise<void>;
+  protected servicesDidInit?(): Promise<void>;
   // it will be risen after devices init or immediately if devices were inited
-  protected devicesDidInit?: () => Promise<void>;
+  protected devicesDidInit?(): Promise<void>;
   // it will be risen after app init or immediately if app was inited
-  protected appDidInit?: () => Promise<void>;
+  protected appDidInit?(): Promise<void>;
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
 
@@ -52,10 +52,10 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
 
     this.doPropsValidation();
 
-    if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit);
-    if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit);
-    if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit);
-    if (this.appDidInit) this.context.onAppInit(this.appDidInit);
+    if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit.bind(this));
+    if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit.bind(this));
+    if (this.devicesDidInit) this.context.onDevicesInit(this.devicesDidInit.bind(this));
+    if (this.appDidInit) this.context.onAppInit(this.appDidInit.bind(this));
   }
 
 

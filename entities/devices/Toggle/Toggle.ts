@@ -24,7 +24,7 @@ export default class Toggle extends DeviceBase<Props> {
   }
 
 
-  protected didInit = async () => {
+  protected async didInit() {
     const subDriverProps: BinaryClickProps = {
       ...this.props,
       // BinaryClick driver doesn't need a block time because it uses here

@@ -24,7 +24,7 @@ export default class ClickSensor extends DeviceBase<Props> {
   }
 
 
-  protected didInit = async () => {
+  protected async didInit() {
     this.depsInstances.binaryClick = await this.context.getSubDriver(
       'BinaryClick',
       omitObj(this.props, 'publish')

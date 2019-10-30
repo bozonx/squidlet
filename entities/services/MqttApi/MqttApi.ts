@@ -26,7 +26,7 @@ export default class MqttApi extends ServiceBase<MqttProps> {
     this.context.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
   }
 
-  protected devicesDidInit = async () => {
+  protected async devicesDidInit() {
     await this.subscribeToTopic();
   }
 

@@ -100,6 +100,7 @@ export default class System {
 
     this.context.log.info(`---> Initializing drivers`);
     await this.driversManager.initialize();
+    // TODO: можно вынести в мэнеджер
     this._wasDriversInitialized = true;
     await this.emitEventSync(SystemEvents.driversInitialized);
 
@@ -110,7 +111,6 @@ export default class System {
 
     this.context.log.info(`---> Initializing devices`);
     await this.devicesManager.initialize();
-
     this.context.log.info(`---> start after devices initialized handlers`);
     this._wasDevicesInitialized = true;
     await this.emitEventSync(SystemEvents.devicesInitialized);
@@ -118,12 +118,13 @@ export default class System {
     this.context.log.info(`---> start after app initialized handlers`);
     this._wasAppInitialized = true;
     await this.emitEventSync(SystemEvents.appInitialized);
-
     this.context.log.info(`===> System initialization has been finished`);
   }
 
 
   private async emitEventSync(eventName: number) {
+    console.log(11111111, eventName, this.events.getListeners(eventName).length)
+
     try {
       await this.events.emitSync(eventName);
     }

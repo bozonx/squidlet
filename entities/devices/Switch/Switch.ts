@@ -16,7 +16,7 @@ export default class Switch extends DeviceBase<Props> {
   }
 
 
-  protected didInit = async () => {
+  protected async didInit() {
     this.depsInstances.binaryOutput = await this.context.getSubDriver('BinaryOutput', this.props);
 
     // this.binaryOutput.onIncomeChange((newLevel: boolean) => {

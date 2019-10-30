@@ -6,7 +6,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
-import {Edge, PinDirection} from 'system/interfaces/gpioTypes';
+import {PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
@@ -137,15 +137,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   /**
    * If you did setup after IC initialized then do `initIc()`.
    */
-  async setupInput(pin: number, debounce?: number, edge?: Edge): Promise<void> {
+  async setupInput(pin: number, debounce?: number): Promise<void> {
     this.checkPin(pin);
-
-    if (typeof edge !== 'undefined' && edge !== Edge.both) {
-      throw new Error(
-        `Edge "rising" or "falling" aren't supported on Pcf8574 board because there isn't way ` +
-        `to recognize which pin has been exactly changed`
-      );
-    }
 
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(

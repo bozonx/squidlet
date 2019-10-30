@@ -28,8 +28,10 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
     this.apiTopicsLogic.onOutcome(this.handleOutcomeMessages);
   }
 
-  protected devicesDidInit = async () => {
+  protected async devicesDidInit() {
     this.log.debug(`MqttApiTopics: subscribe to devices`);
+
+    // TODO: проверить
 
     this.mqtt.connectedPromise
       .then(() => {

@@ -15,7 +15,7 @@ export default class BinarySensor extends DeviceBase<Props> {
   }
 
 
-  protected didInit = async () => {
+  protected async didInit() {
     this.depsInstances.binaryInput = await this.context.getSubDriver('BinaryInput', this.props);
     // listen driver's change
     this.binaryInput.onChange(this.onInputChange);

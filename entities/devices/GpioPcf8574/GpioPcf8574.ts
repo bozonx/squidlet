@@ -4,9 +4,9 @@ import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge} from 'system/interfaces/gpioTypes';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {omitObj} from 'system/lib/objects';
+import {stringifyPinMode} from 'system/lib/digitalHelpers';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
-import {stringifyPinMode} from '../../../system/lib/digitalHelpers';
 
 
 interface Props extends Pcf8574ExpanderProps {
@@ -25,14 +25,14 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
     return this.depsInstances.expander;
   }
 
-  protected didInit = async () => {
+  protected async didInit() {
     this.depsInstances.expander = await this.context.getSubDriver('Pcf8574', {
       ...omitObj(this.props, 'defaultDebounce'),
     });
     // TODO: нужно ли явно включать буферизацию запросов ???
   }
 
-  protected appDidInit = async () => {
+  protected async devicesDidInit() {
     this.log.debug(`GpioPcf8574: init IC: ${this.props.address}`);
     // initialize IC after app did init
     // don't wait while ic is initialized
@@ -58,10 +58,27 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
         ? (this.props.defaultDebounce || 0)
         : debounce;
 
-      return this.expander.setupInput(pin, resolvedDebounce, edge);
+      if (typeof edge !== 'undefined' && edge !== Edge.both) {
+        throw new Error(
+          `GpioPcf8574.digitalSetupInput: Edge "rising" or "falling" aren't supported ` +
+          ` on Pcf8574 board because there isn't way to recognize which pin has been exactly changed`
+        );
+      }
+
+      this.log.debug(
+        `GpioPcf8574.digitalSetupInput. ` +
+        `pin: ${pin}, inputMode: ${inputMode}, debounce: ${debounce}`
+      );
+
+      return this.expander.setupInput(pin, resolvedDebounce);
     },
 
     digitalSetupOutput: (pin: number, initialValue: boolean): Promise<void> => {
+      this.log.debug(
+        `GpioPcf8574.digitalSetupOutput. ` +
+        `pin: ${pin}, initialValue: ${initialValue}`
+      );
+
       return this.expander.setupOutput(pin, initialValue);
     },
 

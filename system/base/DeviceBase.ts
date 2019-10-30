@@ -41,7 +41,7 @@ export default class DeviceBase<
   }
 
   // define it to do initialization after states have inited.
-  protected didInit?: () => Promise<void>;
+  protected didInit?(): Promise<void>;
   /**
    * Callback to setup initial status to not use statusGetter at init time.
    */
@@ -90,7 +90,8 @@ export default class DeviceBase<
 
     // initialize status and config after all the devices has been initialized
     this.context.onDevicesInit(async () => {
-      // TODO: review
+      this.log.debug(`Init status and config if set of device ${this.id}`);
+      // TODO: review - будет делаться запись которая ждет окончания инициализации в pcf - поэтому зависнет
       Promise.all([
         this.statusState && this.statusState.init(),
         this.configState && this.configState.init(),

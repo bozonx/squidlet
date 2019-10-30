@@ -127,7 +127,7 @@ export class PortExpander extends DriverBase<PortExpanderProps> {
   }
 
   // TODO: reivew
-  protected didInit = async () => {
+  protected async didInit() {
     // Listen to received data
     this.node.onReceive((dataAddressStr: number | string, data: Uint8Array) => {
       // TODO: не может быть undefined
