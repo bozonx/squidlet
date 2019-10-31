@@ -6,7 +6,7 @@ import Timeout = NodeJS.Timeout;
 
 type QueuedCb = () => Promise<void>;
 // array like [pendingPromise, queuedCb, finishPromised, timeout]
-type QueuedItem = [Promise<void>, QueuedCb | undefined, Promised<void> | undefined, Timeout | undefined];
+type QueuedItem = [Promise<void>, QueuedCb?, Promised<void>?, Timeout?];
 
 enum QueuedItemPosition {
   // promise of current cb
@@ -50,7 +50,9 @@ export default class QueueOverride {
     }
   }
 
-
+  /**
+   * Is current cb pending
+   */
   isPending(id: string | number): boolean {
     if (!this.items[id]) return false;
 
@@ -83,24 +85,23 @@ export default class QueueOverride {
   }
 
   add(cb: QueuedCb, id: string | number = DEFAULT_ID): Promise<void> {
-    // TODO: првоерить условие
     if (this.isPending(id)) {
+      const item: QueuedItem = this.items[id];
       // just set or update a queued cb
-      this.items[id][QueuedItemPosition.queuedCb] = cb;
+      item[QueuedItemPosition.queuedCb] = cb;
 
-      if (!this.queueFinishPromise[id]) {
-        this.queueFinishPromise[id] = new Promised<void>();
+      // and crate a finished Promised if need
+      if (!item[QueuedItemPosition.finishPromised]) {
+        item[QueuedItemPosition.finishPromised] = new Promised<void>();
       }
 
-      return this.queueFinishPromise[id].promise;
+      return (item[QueuedItemPosition.finishPromised] as Promised<void>).promise;
     }
-
-
 
     // no one is in queue or pending - just start cb and return is't promise
     const pendingPromise: Promise<void> = this.startCb(cb, id);
 
-    this.items[id] = [pendingPromise, undefined, undefined, undefined];
+    this.items[id] = [pendingPromise];
 
     return this.items[id][QueuedItemPosition.pendingPromise];
   }
@@ -156,7 +157,10 @@ export default class QueueOverride {
     const queudCb: QueuedCb | undefined = this.items[id][QueuedItemPosition.queuedCb];
     const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
 
-    if (!finishPromised) {
+    if (!queudCb) {
+      throw new Error(`No queudCb`);
+    }
+    else if (!finishPromised) {
       throw new Error(`No finishPromised`);
     }
 
