@@ -39,7 +39,7 @@ export default class ThrottleCall {
         cb();
       }
       catch (e) {
-        // do nothing if cb ends with error
+        // do nothing if cb ends with error - just wait debounce
       }
     }
 
