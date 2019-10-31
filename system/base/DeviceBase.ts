@@ -69,7 +69,7 @@ export default class DeviceBase<
     const manifest: DeviceManifest = await this.getManifest();
 
     if (manifest.status) {
-      this._statusState = this.initializeState(
+      this._statusState = this.instantiateState(
         manifest.status,
         StateCategories.devicesStatus,
         this.initialStatus,
@@ -79,7 +79,7 @@ export default class DeviceBase<
     }
 
     if (manifest.config) {
-      this._statusState = this.initializeState(
+      this._statusState = this.instantiateState(
         manifest.config,
         StateCategories.devicesConfig,
         this.initialConfig,
@@ -91,7 +91,7 @@ export default class DeviceBase<
     // initialize status and config after all the devices has been initialized
     if (manifest.status || manifest.config) {
       this.context.onDevicesInit(async () => {
-        this.log.debug(`Init status and config if set of device ${this.id}`);
+        this.log.debug(`Init status and config of device ${this.id} if set`);
         // TODO: review - будет делаться запись которая ждет окончания инициализации в pcf - поэтому зависнет
         Promise.all([
           this.statusState && this.statusState.init(),
@@ -250,7 +250,7 @@ export default class DeviceBase<
   }
 
 
-  private initializeState(
+  private instantiateState(
     schema: {[index: string]: any},
     stateCategory: StateCategories,
     initialCb?: Initialize,

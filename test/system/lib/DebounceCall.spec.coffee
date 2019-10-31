@@ -1,7 +1,7 @@
 DebounceCall = require('../../../system/lib/debounceCall/DebounceCall').default;
 
 
-describe.only 'system.lib.DebounceCall', ->
+describe 'system.lib.DebounceCall', ->
   beforeEach ->
     @id = 'myId'
     @otherId = 'otherId'

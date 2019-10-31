@@ -51,8 +51,7 @@ export default class ThrottleCall {
     if (!this.items[id]) return;
 
     clearTimeout(this.items[id][ItemPosition.timeoutId]);
-    // TODO: может лучше зарезолвить промис. Но при дестрое дестроить
-    this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
+    this.items[id][ItemPosition.promiseForWholeDebounce].resolve();
 
     delete this.items[id];
   }
@@ -65,7 +64,8 @@ export default class ThrottleCall {
 
   destroy() {
     for (let id of Object.keys(this.items)) {
-      this.clear(id);
+      clearTimeout(this.items[id][ItemPosition.timeoutId]);
+      this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
 
       delete this.items[id];
     }

@@ -1,7 +1,7 @@
 ThrottleCall = require('../../../system/lib/debounceCall/ThrottleCall').default;
 
 
-describe.only 'system.lib.ThrottleCall', ->
+describe 'system.lib.ThrottleCall', ->
   beforeEach ->
     @id = 'myId'
     @otherId = 'otherId'
@@ -69,8 +69,6 @@ describe.only 'system.lib.ThrottleCall', ->
       @id
     )
 
-    # TODO: не должeн фулфилиться здесь
-    assert.isFulfilled(promise1)
     assert.isTrue(@throttleCall.isInvoking(@id))
 
     clock.tick(@debounce)
@@ -87,49 +85,23 @@ describe.only 'system.lib.ThrottleCall', ->
     assert.isFalse(@throttleCall.isInvoking(@id))
     sinon.assert.calledOnce(@cb1)
 
-#  it "invoke - force current debounce", ->
-#    clock = sinon.useFakeTimers()
-#
-#    promise1 = @throttleCall.invoke(@cb1, @debounce, @id)
-#    @throttleCall.invoke(@cb2, 0, @id)
-#
-#    assert.isFalse(@throttleCall.isInvoking(@id))
-#    sinon.assert.notCalled(@cb1)
-#    sinon.assert.calledOnce(@cb2)
-#    assert.isFulfilled(promise1)
-#
-#    clock.tick(@debounce)
-#
-#    assert.isFalse(@throttleCall.isInvoking(@id))
-#    sinon.assert.notCalled(@cb1)
-#    sinon.assert.calledOnce(@cb2)
-#
-#    clock.restore()
-#
-#  it "clear", ->
-#    clock = sinon.useFakeTimers()
-#
-#    @throttleCall.invoke(@cb1, @debounce, @id)
-#    @throttleCall.invoke(@cb2, @debounce, @otherId)
-#    @throttleCall.clear(@id)
-#
-#    clock.tick(@debounce)
-#
-#    sinon.assert.notCalled(@cb1)
-#    sinon.assert.calledOnce(@cb2)
-#
-#    clock.restore()
-#
-#  it "destroy", ->
-#    clock = sinon.useFakeTimers()
-#
-#    @throttleCall.invoke(@cb1, @debounce, @id)
-#    @throttleCall.invoke(@cb2, @debounce, @otherId)
-#    @throttleCall.destroy(@id)
-#
-#    clock.tick(@debounce)
-#
-#    sinon.assert.notCalled(@cb1)
-#    sinon.assert.notCalled(@cb2)
-#
-#    clock.restore()
+  it "invoke - force current debounce", ->
+    promise1 = @throttleCall.invoke(@cb1, @debounce, @id)
+    @throttleCall.invoke(@cb2, 0, @id)
+
+    assert.isFalse(@throttleCall.isInvoking(@id))
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.calledOnce(@cb2)
+    assert.isFulfilled(promise1)
+
+  it "clear", ->
+    @throttleCall.invoke(@cb1, @debounce, @id)
+    @throttleCall.clear(@id)
+
+    assert.isFalse(@throttleCall.isInvoking(@id))
+
+  it "destroy", ->
+    @throttleCall.invoke(@cb1, @debounce, @id)
+    @throttleCall.destroy(@id)
+
+    assert.isFalse(@throttleCall.isInvoking(@id))
