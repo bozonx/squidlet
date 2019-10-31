@@ -43,3 +43,24 @@ describe 'system.lib.digitalHelpers', ->
     # invert
     assert.equal(helpers.resolveEdge('rising', true), 1)
     assert.equal(helpers.resolveEdge('falling', true), 0)
+
+  it 'resolveInputResistorMode', ->
+    assert.equal(helpers.resolveInputResistorMode(), 0)
+    assert.equal(helpers.resolveInputResistorMode(false, false), 0)
+    assert.equal(helpers.resolveInputResistorMode(true), 1)
+    assert.equal(helpers.resolveInputResistorMode(true, true), 1)
+    assert.equal(helpers.resolveInputResistorMode(undefined, true), 2)
+
+  it 'resolveOutputResistorMode', ->
+    assert.equal(helpers.resolveOutputResistorMode(), 0)
+    assert.equal(helpers.resolveOutputResistorMode(true), 1)
+
+  it 'stringifyPinMode', ->
+    assert.equal(helpers.stringifyPinMode(), 'unset_unset')
+    assert.equal(helpers.stringifyPinMode(undefined, 0), 'unset_unset')
+    assert.equal(helpers.stringifyPinMode(0), 'input_unset')
+    assert.equal(helpers.stringifyPinMode(1), 'output_unset')
+    assert.equal(helpers.stringifyPinMode(0, 0), 'input_none')
+    assert.equal(helpers.stringifyPinMode(0, 1), 'input_pullup')
+    assert.equal(helpers.stringifyPinMode(1, 1), 'output_opendrain')
+    assert.equal(helpers.stringifyPinMode(0, 2), 'input_pulldown')

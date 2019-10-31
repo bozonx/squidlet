@@ -76,7 +76,6 @@ export function resolveEdge(edge?: EdgeString, inverted?: boolean): Edge {
   }
 }
 
-// TODO: test
 export function resolveInputResistorMode(pullup?: boolean, pulldown?: boolean): InputResistorMode {
   if (pullup) return InputResistorMode.pullup;
   else if (pulldown) return InputResistorMode.pulldown;
@@ -84,14 +83,12 @@ export function resolveInputResistorMode(pullup?: boolean, pulldown?: boolean): 
   return InputResistorMode.none;
 }
 
-// TODO: test
 export function resolveOutputResistorMode(openDrain?: boolean): OutputResistorMode {
   if (openDrain) return OutputResistorMode.opendrain;
 
   return OutputResistorMode.none;
 }
 
-// TODO: test
 export function stringifyPinMode(
   direction: PinDirection | undefined,
   mode: InputResistorMode | OutputResistorMode | undefined
@@ -99,7 +96,6 @@ export function stringifyPinMode(
   return `${stringifyPinDirection(direction)}_${stringifyResistorMode(direction, mode)}`;
 }
 
-// TODO: test
 export function stringifyPinDirection(direction: PinDirection | undefined): directionString | 'unset' {
   if (typeof direction === 'undefined') {
     return 'unset';
@@ -111,7 +107,6 @@ export function stringifyPinDirection(direction: PinDirection | undefined): dire
   return 'output';
 }
 
-// TODO: test
 export function stringifyResistorMode(
   direction: PinDirection | undefined,
   mode: InputResistorMode | OutputResistorMode | undefined
