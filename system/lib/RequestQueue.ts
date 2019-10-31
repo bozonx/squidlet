@@ -41,6 +41,7 @@ let unnamedJobIdCounter = -1;
  */
 export default class RequestQueue {
   private readonly jobTimeoutSec: number;
+  // TODO: может если сделать обертку для промиса то можно там делать reject а не писать в лог
   private readonly logError: (msg: string) => void;
   private readonly startJobEvents = new IndexedEvents<StartJobHandler>();
   private readonly endJobEvents = new IndexedEvents<EndJobHandler>();
