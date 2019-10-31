@@ -23,7 +23,6 @@ export default class DigitalPortExpanderInputLogic {
     pollOnce: () => Promise<void>,
     getState: () => number,
     updateState: (pin: number, value: boolean) => void,
-    //queueJobTimeoutSec: number,
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;

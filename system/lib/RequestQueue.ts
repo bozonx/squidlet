@@ -1,4 +1,5 @@
 import IndexedEvents from './IndexedEvents';
+import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
 
 
 /**
@@ -29,7 +30,6 @@ enum JobPositions {
   canceled,
   recall,
 }
-const DEFAULT_JOB_TIMEOUT_SEC = 120;
 let unnamedJobIdCounter = -1;
 
 

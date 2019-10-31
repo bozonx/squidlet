@@ -6,13 +6,13 @@ import DebounceCall from '../debounceCall/DebounceCall';
 const WRITE_ID = 'write';
 
 
-export default class DigitalPortExpanderLogic {
+export default class DigitalPortExpanderOutputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (state: number) => Promise<void>;
   private readonly getState: () => number;
   private readonly setState: (wholeState: number) => void;
   private readonly writeBufferMs?: number;
-  private readonly queue = new QueueOverride();
+  private readonly queue: QueueOverride;
   private readonly debounce = new DebounceCall();
   // temporary state while values are buffering before writing
   private beforeWritingBuffer?: number;
@@ -25,7 +25,7 @@ export default class DigitalPortExpanderLogic {
     writeCb: (state: number) => Promise<void>,
     getState: () => number,
     setState: (wholeState: number) => void,
-    //queueJobTimeoutSec: number,
+    queueJobTimeoutSec?: number,
     writeBufferMs?: number
   ) {
     this.logError = logError;
@@ -33,6 +33,7 @@ export default class DigitalPortExpanderLogic {
     this.getState = getState;
     this.setState = setState;
     this.writeBufferMs = writeBufferMs;
+    this.queue = new QueueOverride(queueJobTimeoutSec);
   }
 
   destroy() {

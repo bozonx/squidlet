@@ -10,7 +10,7 @@ import {PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
-import DigitalPortExpanderOutcomeLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
+import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
 import Promised from 'system/lib/Promised';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
@@ -38,14 +38,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private readonly pinDebounces: {[index: string]: number} = {};
   // Bitmask representing the current state of the pins
   private currentState: number = 0;
-  private _expanderOutput?: DigitalPortExpanderOutcomeLogic;
+  private _expanderOutput?: DigitalPortExpanderOutputLogic;
   private _expanderInput?: DigitalPortExpanderInputLogic;
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
   }
 
-  private get expanderOutput(): DigitalPortExpanderOutcomeLogic {
+  private get expanderOutput(): DigitalPortExpanderOutputLogic {
     return this._expanderOutput as any;
   }
 
@@ -70,12 +70,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       }
     );
 
-    this._expanderOutput = new DigitalPortExpanderOutcomeLogic(
+    this._expanderOutput = new DigitalPortExpanderOutputLogic(
       this.log.error,
       this.writeToIc,
       (): number => this.currentState,
       this.setWholeState,
-      //this.config.config.queueJobTimeoutSec,
+      this.config.config.queueJobTimeoutSec,
       this.props.writeBufferMs,
     );
     this._expanderInput = new DigitalPortExpanderInputLogic(
@@ -83,7 +83,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       this.pollOnce,
       (): number => this.currentState,
       this.updateState,
-      //this.config.config.queueJobTimeoutSec,
     );
   }
 
@@ -102,6 +101,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     // mark end of setup step
     this.setupStep = false;
     this.initIcStep = true;
+
+    console.log(3333333, this.props.address, this.currentState);
 
     try {
       await this.expanderOutput.writeState(this.currentState);
@@ -204,8 +205,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Poll expander manually.
    */
   pollOnce = (): Promise<void> => {
+    // TODO: return as was
     // it is no need to do poll while initialization time because it will be done after initialization
-    if (!this.isIcInitialized()) return this.initIcPromise;
+    //if (!this.isIcInitialized()) return this.initIcPromise;
+    if (!this.isIcInitialized()) return Promise.resolve();
 
     return this.i2cDriver.pollOnce();
   }
@@ -259,7 +262,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       // update current value of pin and go out if there is setup step
       this.updateState(pin, value);
 
-      return this.initIcPromise;
+      // TODO: return as was
+
+      return;
+      //return this.initIcPromise;
     }
 
     await this.expanderOutput.write(pin, value);

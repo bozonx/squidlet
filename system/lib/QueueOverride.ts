@@ -1,5 +1,6 @@
 import {isPromise} from './common';
 import Promised from './Promised';
+import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
 
 
 type QueuedCb = () => Promise<void>;
@@ -16,10 +17,16 @@ const DEFAULT_ID = 'default';
  * * if there was an error while current cb is executed then queue will be cancelled
  */
 export default class QueueOverride {
+  private readonly jobTimeoutSec: number;
   private currentPendingPromise: {[index: string]: Promise<void>} = {};
   // promise witch represent when the queued cb will be finished
   private queueFinishPromise: {[index: string]: Promised<void>} = {};
   private queuedCb: {[index: string]: QueuedCb} = {};
+
+
+  constructor(jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
+    this.jobTimeoutSec = jobTimeoutSec;
+  }
 
 
   destroy() {
