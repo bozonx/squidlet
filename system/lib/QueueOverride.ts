@@ -1,16 +1,16 @@
-import {isPromise} from './common';
+import Timeout = NodeJS.Timeout;
+
 import Promised from './Promised';
 import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
-import Timeout = NodeJS.Timeout;
 
 
 type QueuedCb = () => Promise<void> | void;
 // array like [pendingPromise, queuedCb, finishPromised, timeout]
-type QueuedItem = [Promise<void>, QueuedCb?, Promised<void>?, Timeout?];
+type QueuedItem = [Promised<void>, QueuedCb?, Promised<void>?, Timeout?];
 
-enum QueuedItemPosition {
+enum ItemPosition {
   // promise of current cb
-  pendingPromise,
+  pendingPromised,
   queuedCb,
   // promise witch represent when the queued cb will be finished
   finishPromised,
@@ -42,11 +42,11 @@ export default class QueueOverride {
 
   destroy() {
     for (let id of Object.keys(this.items)) {
-      const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
-
-      this.clearTimeout(id);
+      const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
 
       if (finishPromised) finishPromised.destroy();
+      this.items[id][ItemPosition.pendingPromised].destroy();
+      this.clearTimeout(id);
 
       delete this.items[id];
     }
@@ -56,30 +56,34 @@ export default class QueueOverride {
    * Is current cb pending
    */
   isPending(id: string | number): boolean {
-    if (!this.items[id]) return false;
-
-    return Boolean(this.items[id][QueuedItemPosition.pendingPromise]);
+    return Boolean(this.items[id]);
   }
 
-  hasQueuedCb(id: string | number): boolean {
+  hasQueue(id: string | number): boolean {
     if (!this.items[id]) return false;
 
-    return Boolean(this.items[id][QueuedItemPosition.queuedCb]);
+    return Boolean(this.items[id][ItemPosition.queuedCb]);
   }
 
   /**
-   * Cancel queue and waiting for current cb finished.
-   * But if current cb is pending - it won't cancel it!
+   * Stop waiting and clear timeouts.
+   * It will resolve promises and removes queue and current cb.
    */
-  cancel(id: string | number) {
+  stop(id: string | number) {
     if (!this.items[id]) return;
 
-    const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
+    const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
+    const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
 
     this.clearTimeout(id);
 
+    if (pendingPromised) {
+      pendingPromised.resolve();
+      pendingPromised.destroy();
+    }
+
     if (finishPromised) {
-      finishPromised.cancel();
+      finishPromised.resolve();
       finishPromised.destroy();
     }
 
@@ -90,50 +94,48 @@ export default class QueueOverride {
     if (this.isPending(id)) {
       const item: QueuedItem = this.items[id];
       // just set or update a queued cb
-      item[QueuedItemPosition.queuedCb] = cb;
+      item[ItemPosition.queuedCb] = cb;
 
       // and crate a finished Promised if need
-      if (!item[QueuedItemPosition.finishPromised]) {
-        item[QueuedItemPosition.finishPromised] = new Promised<void>();
+      if (!item[ItemPosition.finishPromised]) {
+        item[ItemPosition.finishPromised] = new Promised<void>();
       }
-
-      return (item[QueuedItemPosition.finishPromised] as Promised<void>).promise;
+      // return promise which will be resolved after queued cb finished
+      return (item[ItemPosition.finishPromised] as Promised<void>).promise;
     }
+    // else no one is in queue or pending - just start cb and return is't promise
+    this.items[id] = [new Promised<void>()];
 
-    // no one is in queue or pending - just start cb and return is't promise
-    const pendingPromise: Promise<void> = this.startCb(cb, id);
+    this.startCb(cb, id);
 
-    this.items[id] = [pendingPromise];
-
-    return this.items[id][QueuedItemPosition.pendingPromise];
+    return this.items[id][ItemPosition.pendingPromised].promise;
   }
 
 
-  private async startCb(cb: QueuedCb, id: string | number) {
+  private startCb(cb: QueuedCb, id: string | number) {
     if (!this.items[id]) throw new Error(`No item ${id}`);
 
-    this.items[id][QueuedItemPosition.timeout] = setTimeout(() => {
+    this.items[id][ItemPosition.timeout] = setTimeout(() => {
       this.handleJobTimeout(id);
     }, this.jobTimeoutSec);
 
-    try {
-      this.callCb(cb);
-    }
-    catch (e) {
-      this.handleCbError(id, e);
-
-      throw e;
-    }
-
-    // after first cb successfully finished
-    this.handleCbSuccess(id);
+    this.callCb(cb)
+      .then(() => this.handleCbSuccess(id))
+      .catch((e: Error) => this.handleCbError(id, e));
   }
 
   private handleCbError(id: string | number, e: Error) {
+    // if no item - means timeout has been exceeded
+    if (!this.items[id]) return;
+
     // clear queue on error
-    const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
+    const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
+    const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
 
     this.clearTimeout(id);
+    // reject current cb promise
+    pendingPromised.reject(e);
+    pendingPromised.destroy();
 
     // if there is queue - then reject queue promise
     if (finishPromised) {
@@ -145,27 +147,40 @@ export default class QueueOverride {
   }
 
   private handleCbSuccess(id: string | number) {
-    this.clearTimeout(id);
+    // if no item - means timeout has been exceeded
+    if (!this.items[id]) return;
 
-    if (this.hasQueuedCb(id)) {
+    const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
+
+    this.clearTimeout(id);
+    // resolve current cb promise
+    pendingPromised.resolve();
+    pendingPromised.destroy();
+
+    if (this.hasQueue(id)) {
       // start queued cb if need and don't wait for it
       this.startQueue(id);
 
       return;
     }
     // or just finish cycle if there isn't a queued cb
-    this.finishCycle(id);
+    if (this.items[id][ItemPosition.finishPromised]) {
+      this.logError(`No queue but there is finishPromised`);
+    }
+
+    delete this.items[id];
   }
 
   private handleJobTimeout(id: string | number) {
+    if (!this.items[id]) return this.logError(`No item ${id}`);
+
     const msg = `Timeout of job "${id}" has been exceeded`;
+    const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
+    const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
 
-    // TODO: убедиться что выполнившийся колбэк после таймаута уже ничего не сделает
-    // TODO: если сделать обертку promised для главного промиса - то можно туда затулить error
-    this.logError(msg);
-
-    const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
-
+    // reject current cb promise
+    pendingPromised.reject(new Error(msg));
+    pendingPromised.destroy();
     // if there is queue - then reject queue promise
     if (finishPromised) {
       finishPromised.reject(new Error(msg));
@@ -178,8 +193,9 @@ export default class QueueOverride {
   private startQueue(id: string | number) {
     if (!this.items[id]) return;
 
-    const queuedCb: QueuedCb | undefined = this.items[id][QueuedItemPosition.queuedCb];
-    const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
+    const queuedCb: QueuedCb | undefined = this.items[id][ItemPosition.queuedCb];
+    const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
+    const newPendingPromised = new Promised<void>();
 
     if (!queuedCb) {
       throw new Error(`No queuedCb`);
@@ -189,35 +205,22 @@ export default class QueueOverride {
     }
 
     // remove queue to start it
-    delete this.items[id][QueuedItemPosition.queuedCb];
-    delete this.items[id][QueuedItemPosition.finishPromised];
+    delete this.items[id][ItemPosition.queuedCb];
+    delete this.items[id][ItemPosition.finishPromised];
     // make current pending promise
-    this.items[id][QueuedItemPosition.pendingPromise] = this.startCb(queuedCb, id);
+    this.items[id][ItemPosition.pendingPromised] = newPendingPromised;
 
-    this.items[id][QueuedItemPosition.pendingPromise]
+    this.startCb(queuedCb, id);
+
+    newPendingPromised.promise
       .then(finishPromised.resolve)
       .catch(finishPromised.reject);
-  }
-
-  private finishCycle(id: string | number) {
-    if (!this.items[id]) return;
-
-    const finishPromised: Promised<void> | undefined = this.items[id][QueuedItemPosition.finishPromised];
-
-    //this.clearTimeout(id);
-
-    if (finishPromised) {
-      finishPromised.resolve();
-      finishPromised.destroy();
-    }
-
-    delete this.items[id];
   }
 
   private clearTimeout(id: string | number) {
     if (!this.items[id]) return;
 
-    const timeout: Timeout | undefined = this.items[id][QueuedItemPosition.timeout];
+    const timeout: Timeout | undefined = this.items[id][ItemPosition.timeout];
 
     if (timeout) {
       clearTimeout(timeout);
