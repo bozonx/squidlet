@@ -2,11 +2,9 @@ QueueOverride = require('../../../system/lib/QueueOverride').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.QueueOverride', ->
+describe 'system.lib.QueueOverride', ->
   beforeEach ->
-    #@id = 'myId'
-    #@otherId = 'otherId'
-    @timeout = 10
+    @timeout = 1
     @promised1 = new Promised();
     @promised2 = new Promised();
     @promised3 = new Promised();
@@ -119,8 +117,64 @@ describe.only 'system.lib.QueueOverride', ->
     assert.isFalse(@queue.hasQueue())
     sinon.assert.notCalled(@cb2)
 
-  # TODO: stop
-  # TODO: destroy
-  # TODO: hasQueue
-  # TODO: timeout
-  # TODO: разные id
+  it "stop", ->
+    promise1 = @queue.add(@cb1)
+    promise2 = @queue.add(@cb2)
+
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.notCalled(@cb2)
+
+    @queue.stop()
+
+    await promise1
+
+    assert.isFalse(@queue.isPending())
+    assert.isFalse(@queue.hasQueue())
+    sinon.assert.notCalled(@cb2)
+
+  it "different id", ->
+    promise1 = @queue.add(@cb1, 1)
+    promise2 = @queue.add(@cb2, 2)
+
+    assert.isTrue(@queue.isPending(1))
+    assert.isTrue(@queue.isPending(2))
+
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.calledOnce(@cb2)
+
+    @promised1.resolve()
+    @promised2.resolve()
+
+    await promise1
+    await promise2
+
+    assert.isFalse(@queue.isPending(1))
+    assert.isFalse(@queue.isPending(2))
+
+  it "timeout - clear queue", ->
+    clock = sinon.useFakeTimers()
+
+    promise1 = @queue.add(@cb1)
+    promise2 = @queue.add(@cb2)
+
+    sinon.assert.calledOnce(@cb1)
+    sinon.assert.notCalled(@cb2)
+
+    clock.tick(1000)
+
+    try
+      await promise1
+
+    assert.isFalse(@queue.isPending())
+    assert.isRejected(promise2)
+
+    clock.restore()
+
+  it "destroy", ->
+    @queue.add(@cb1)
+    @queue.add(@cb2)
+
+    @queue.destroy()
+
+    assert.isFalse(@queue.isPending())
+    assert.isFalse(@queue.hasQueue())

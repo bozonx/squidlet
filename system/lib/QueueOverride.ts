@@ -27,6 +27,7 @@ const DEFAULT_ID = 'default';
  * * if other cb is added then it will be executed as soon as current cb finish
  * * if some else cb is added then it will replace previous cb which is in queue
  * * if there was an error while current cb is executed then queue will be cancelled
+ * * if timeout of executing cb is exceeded then queue will be cleared
  */
 export default class QueueOverride {
   private readonly jobTimeoutSec: number;
@@ -157,6 +158,10 @@ export default class QueueOverride {
     pendingPromised.resolve();
     pendingPromised.destroy();
 
+    this.startNextStep(id);
+  }
+
+  private startNextStep(id: string | number) {
     if (this.hasQueue(id)) {
       // start queued cb if need and don't wait for it
       this.startQueue(id);
@@ -164,13 +169,16 @@ export default class QueueOverride {
       return;
     }
     // or just finish cycle if there isn't a queued cb
-    if (this.items[id][ItemPosition.finishPromised]) {
+    if (!this.items[id] || this.items[id][ItemPosition.finishPromised]) {
       this.logError(`No queue but there is finishPromised`);
     }
 
     delete this.items[id];
   }
 
+  /**
+   * Reject current cb and clear queue
+   */
   private handleJobTimeout(id: string | number) {
     if (!this.items[id]) return this.logError(`No item ${id}`);
 
