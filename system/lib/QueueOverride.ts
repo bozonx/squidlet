@@ -55,11 +55,11 @@ export default class QueueOverride {
   /**
    * Is current cb pending
    */
-  isPending(id: string | number): boolean {
+  isPending(id: string | number = DEFAULT_ID): boolean {
     return Boolean(this.items[id]);
   }
 
-  hasQueue(id: string | number): boolean {
+  hasQueue(id: string | number = DEFAULT_ID): boolean {
     if (!this.items[id]) return false;
 
     return Boolean(this.items[id][ItemPosition.queuedCb]);
@@ -69,7 +69,7 @@ export default class QueueOverride {
    * Stop waiting and clear timeouts.
    * It will resolve promises and removes queue and current cb.
    */
-  stop(id: string | number) {
+  stop(id: string | number = DEFAULT_ID) {
     if (!this.items[id]) return;
 
     const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
@@ -117,7 +117,7 @@ export default class QueueOverride {
 
     this.items[id][ItemPosition.timeout] = setTimeout(() => {
       this.handleJobTimeout(id);
-    }, this.jobTimeoutSec);
+    }, this.jobTimeoutSec * 1000);
 
     this.callCb(cb)
       .then(() => this.handleCbSuccess(id))

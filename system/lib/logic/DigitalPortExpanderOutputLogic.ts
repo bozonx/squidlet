@@ -33,7 +33,7 @@ export default class DigitalPortExpanderOutputLogic {
     this.getState = getState;
     this.setState = setState;
     this.writeBufferMs = writeBufferMs;
-    this.queue = new QueueOverride(queueJobTimeoutSec);
+    this.queue = new QueueOverride(this.logError, queueJobTimeoutSec);
   }
 
   destroy() {
