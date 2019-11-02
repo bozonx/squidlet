@@ -1,5 +1,7 @@
 import IndexedEvents from './IndexedEvents';
 import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
+import IndexedEventEmitter from './IndexedEventEmitter';
+import Promised from './Promised';
 
 
 type RequestCb = () => Promise<void>;
@@ -7,13 +9,19 @@ type StartJobHandler = (jobId: JobId) => void;
 type EndJobHandler = (error: string | undefined, jobId: JobId) => void;
 type JobId = string;
 // array like [JobId, RequestCb, isCanceled]
-type Job = [JobId, RequestCb, boolean];
+type Job = [JobId, RequestCb, Promised<void>, boolean];
 
 enum JobPositions {
   id,
   cb,
+  pendingPromised,
   canceled,
 }
+enum QueueEvents {
+  startJob,
+  endJob,
+}
+
 let unnamedJobIdCounter = -1;
 
 
@@ -27,8 +35,7 @@ export default class RequestQueue {
   private readonly jobTimeoutSec: number;
   // TODO: может если сделать обертку для промиса то можно там делать reject а не писать в лог
   private readonly logError: (msg: string) => void;
-  private readonly startJobEvents = new IndexedEvents<StartJobHandler>();
-  private readonly endJobEvents = new IndexedEvents<EndJobHandler>();
+  private readonly events = new IndexedEventEmitter();
   private queue: Job[] = [];
   private currentJob?: Job;
   private runningTimeout?: any;
@@ -42,8 +49,7 @@ export default class RequestQueue {
   // TODO: test
   destroy() {
     // TODO: review
-    this.startJobEvents.destroy();
-    this.endJobEvents.destroy();
+    this.events.destroy();
 
     if (this.currentJob) this.cancelCurrentJob(this.currentJob[JobPositions.id]);
 
@@ -100,7 +106,7 @@ export default class RequestQueue {
 
   // TODO: review
   /**
-   * Cancel current and delayed job with uniq id.
+   * Cancel job with uniq id. It can be current or wait in the queue
    */
   cancelJob(jobId: JobId) {
     this.cancelCurrentJob(jobId);
@@ -114,7 +120,7 @@ export default class RequestQueue {
   async waitCurrentJobFinished(): Promise<void> {
     if (!this.currentJob) return;
 
-    return this.getWaitJobPromise(this.endJobEvents, this.currentJob[JobPositions.id]);
+    return this.getWaitJobPromise(QueueEvents.endJob, this.currentJob[JobPositions.id]);
   }
 
   /**
@@ -129,10 +135,10 @@ export default class RequestQueue {
     }
 
     return new Promise<void>((resolve) => {
-      const handlerIndex = this.startJobEvents.addListener((startedJobId: JobId) => {
+      const handlerIndex = this.events.addListener(QueueEvents.startJob, (startedJobId: JobId) => {
         if (startedJobId !== jobId) return;
 
-        this.startJobEvents.removeListener(handlerIndex);
+        this.events.removeListener(handlerIndex, QueueEvents.startJob);
         resolve();
       });
 
@@ -153,25 +159,22 @@ export default class RequestQueue {
       return Promise.reject(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
-    return this.getWaitJobPromise(this.endJobEvents, jobId);
+    return this.getWaitJobPromise(QueueEvents.endJob, jobId);
   }
 
   onJobStart(cb: StartJobHandler): number {
-    return this.startJobEvents.addListener(cb);
+    return this.events.addListener(QueueEvents.startJob, cb);
   }
 
   onJobEnd(cb: EndJobHandler): number {
-    return this.endJobEvents.addListener(cb);
+    return this.events.addListener(QueueEvents.endJob, cb);
   }
 
-  removeStartJobListener(handlerIndex: number) {
-    this.startJobEvents.removeListener(handlerIndex);
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
   }
 
-  removeEndJobListener(handlerIndex: number) {
-    this.endJobEvents.removeListener(handlerIndex);
-  }
-
+  // TODO: review
   /**
    * Add job to queue.
    * If job with the same jobId is in progress it will refused in default mode
@@ -179,7 +182,7 @@ export default class RequestQueue {
    * It id is different with the current - the job will be add to the end of queue.
    * It there is a job with the same is in queue - the cb in queue will be replaced to a new one.
    */
-  request(jobId: JobId | undefined, cb: RequestCb, mode: Mode = 'default'): JobId {
+  request(jobId: JobId | undefined, cb: RequestCb): JobId {
     const resolvedId: JobId = this.resolveJobId(jobId);
 
     // if the job is running
@@ -336,7 +339,7 @@ export default class RequestQueue {
   }
 
   // TODO: review
-  private getWaitJobPromise(events: IndexedEvents<any>, jobId: JobId): Promise<void> {
+  private getWaitJobPromise(eventName: QueueEvents, jobId: JobId): Promise<void> {
     if (typeof jobId !== 'string') {
       throw new Error(`RequestQueue.getWaitJobPromise: JobId has to be a string`);
     }

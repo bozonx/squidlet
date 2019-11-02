@@ -107,6 +107,7 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     return Boolean(this.indexes[eventName] && this.indexes[eventName].length);
   }
 
+  // TODO: наверное не нужнен eventName - вносит неопределенность
   /**
    * Remove handler by index.
    * You can omit eventName, but if you defined it then removing will be faster.
