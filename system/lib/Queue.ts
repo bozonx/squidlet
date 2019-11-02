@@ -15,6 +15,7 @@ enum JobPositions {
   id,
   cb,
   pendingPromised,
+  // TODO: может убрать
   canceled,
 }
 enum QueueEvents {
@@ -174,38 +175,43 @@ export default class RequestQueue {
     this.events.removeListener(handlerIndex);
   }
 
-  // TODO: review
   /**
    * Add job to queue.
-   * If job with the same jobId is in progress it will refused in default mode
-   * or set as a recall cb in recall mode.
-   * It id is different with the current - the job will be add to the end of queue.
-   * It there is a job with the same is in queue - the cb in queue will be replaced to a new one.
+   * If job with the same jobId is in progress the new cb will be refused
+   * If the id and current job's are different - the job will be added to the end of queue.
+   * If there is a job with the same is in queue - the cb in queue will be replaced to a new one.
+   * @param cb - callback which will be called when job starts
+   * @param jobId - specify if of job to avoid the duplicates. It not set then it will be generated.
    */
-  request(jobId: JobId | undefined, cb: RequestCb): JobId {
+  add(cb: RequestCb, jobId: JobId | undefined): JobId {
     const resolvedId: JobId = this.resolveJobId(jobId);
 
-    // if the job is running
+    // The job with specified id is running
+    // do noting - don't update the current job and don't add job to queue
     if (this.currentJob && this.currentJob[JobPositions.id] === resolvedId) {
-      // set or replace recall cb in recall mode
-      if (mode === 'recall') this.currentJob[JobPositions.recall] = cb;
-
-      // in default mode do noting - don't update the current job and don't add job to queue
       return resolvedId;
     }
 
-    const jobIndex: number = this.getJobIndex(resolvedId);
+    // TODO: а если есть currentJob ???
 
-    // if the job in a queue - update queued job
+    // else job is not running
+    // get job index in the queue
+    const jobIndex: number = this.getJobIndex(resolvedId);
+    // check that job is in the queue
     if (jobIndex >= 0) {
+      // if the job in a queue - update cb in this job
       this.queue[jobIndex][JobPositions.cb] = cb;
-      this.queue[jobIndex][JobPositions.mode] = mode;
     }
-    // add a new job to queue
-    else {
-      // add a new job
-      this.queue.push([resolvedId, cb, mode, false]);
+    else if (this.queue.length) {
+      // not in a queue but queue not empty - add a new job to queue
+      this.queue.push([resolvedId, cb, new Promised<void>(), false]);
       this.startNextJob();
+    }
+    else {
+      // queue is empty - just start
+      this.currentJob = [resolvedId, cb, new Promised<void>(), false];
+
+      this.startCurrentJob();
     }
 
     return resolvedId;
@@ -229,6 +235,7 @@ export default class RequestQueue {
     this.startCurrentJob();
   }
 
+  // TODO: review
   private startCurrentJob() {
     // start job on next tick
     setTimeout(() => {
@@ -236,7 +243,7 @@ export default class RequestQueue {
 
       const job: Job = this.currentJob;
 
-      this.startJobEvents.emit(job[JobPositions.id]);
+      this.events.emit(QueueEvents.startJob, job[JobPositions.id]);
 
       this.runningTimeout = setTimeout(
         () => this.handleTimeoutOfJob(job),
