@@ -389,7 +389,7 @@ export default class RequestQueue {
 
     if (jobIndex < 0) return;
 
-    this.queue.splice(jobIndex);
+    this.queue.splice(jobIndex, 1);
   }
 
   private getJobIndex(jobId: JobId): number {

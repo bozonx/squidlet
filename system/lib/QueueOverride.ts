@@ -5,6 +5,7 @@ import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
 
 
 type QueuedCb = () => Promise<void> | void;
+// TODO: зачем сохранять таймаут на каждую job если он 1 для current job
 // array like [pendingPromise, queuedCb, finishPromised, timeout]
 type QueuedItem = [Promised<void>, QueuedCb?, Promised<void>?, Timeout?];
 
