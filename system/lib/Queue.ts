@@ -2,7 +2,6 @@ import Timeout = NodeJS.Timeout;
 
 import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
 import IndexedEventEmitter from './IndexedEventEmitter';
-import Promised from './Promised';
 
 
 type QueuedCb = () => Promise<void>;
@@ -10,13 +9,11 @@ type StartJobHandler = (jobId: JobId) => void;
 type EndJobHandler = (error: string | undefined, jobId: JobId) => void;
 type JobId = string;
 // array like [JobId, QueuedCb, isCanceled]
-type Job = [JobId, QueuedCb, Promised<void>, boolean];
+type Job = [JobId, QueuedCb, boolean];
 
 enum JobPositions {
   id,
   cb,
-  pendingPromised,
-  // TODO: может убрать
   canceled,
 }
 enum QueueEvents {
@@ -37,7 +34,6 @@ let unnamedJobIdCounter = -1;
  */
 export default class RequestQueue {
   private readonly jobTimeoutSec: number;
-  // TODO: может если сделать обертку для промиса то можно там делать reject а не писать в лог
   private readonly logError: (msg: string) => void;
   private readonly events = new IndexedEventEmitter();
   private queue: Job[] = [];
@@ -121,10 +117,10 @@ export default class RequestQueue {
   /**
    * Return the promise which will be fulfilled when the current job is finished.
    */
-  async waitCurrentJobFinished(): Promise<void> {
-    if (!this.currentJob) return;
+  waitCurrentJobFinished(): Promise<void> {
+    if (!this.currentJob) return Promise.resolve();
 
-    return this.getWaitJobPromise(QueueEvents.endJob, this.currentJob[JobPositions.id]);
+    return this.makeWaitJobPromise(QueueEvents.endJob, this.currentJob[JobPositions.id]);
   }
 
   /**
@@ -163,7 +159,7 @@ export default class RequestQueue {
       return Promise.reject(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
-    return this.getWaitJobPromise(QueueEvents.endJob, jobId);
+    return this.makeWaitJobPromise(QueueEvents.endJob, jobId);
   }
 
   onJobStart(cb: StartJobHandler): number {
@@ -204,7 +200,7 @@ export default class RequestQueue {
     }
     else {
       // not in a queue - add a new job to queue
-      this.queue.push([resolvedId, cb, new Promised<void>(), false]);
+      this.queue.push([resolvedId, cb, false]);
       this.startNextJobIfNeed();
     }
 
@@ -287,26 +283,21 @@ export default class RequestQueue {
     this.events.emit(QueueEvents.endJob, undefined, jobId);
   }
 
-  // TODO: review
-  private getWaitJobPromise(eventName: QueueEvents, jobId: JobId): Promise<void> {
-    if (typeof jobId !== 'string') {
-      throw new Error(`RequestQueue.getWaitJobPromise: JobId has to be a string`);
-    }
-
+  private makeWaitJobPromise(eventName: QueueEvents, jobId: JobId): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let handlerIndex: number;
 
       const cb = (error: string | undefined, finishedJobId: JobId) => {
         if (finishedJobId !== jobId) return;
 
-        events.removeListener(handlerIndex);
+        this.events.removeListener(handlerIndex, eventName);
 
         if (error) return reject(error);
 
         resolve();
       };
 
-      handlerIndex = events.addListener(cb);
+      handlerIndex = this.events.addListener(eventName, cb);
     });
   }
 
