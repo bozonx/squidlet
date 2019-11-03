@@ -77,12 +77,13 @@ export default class RequestQueue {
     return queuedIds;
   }
 
-  // TODO: test
   /**
    * Is something in progress
    */
   isInProgress(): boolean {
-    return Boolean(this.currentJob);
+    // check also queue length because if it is checked at event handler of the end of job then
+    // there is current job will be removed.
+    return Boolean(this.currentJob) || Boolean(this.queue.length);
   }
 
   isJobInProgress(jobId: JobId): boolean {
@@ -162,14 +163,17 @@ export default class RequestQueue {
     return this.makeWaitJobPromise(QueueEvents.endJob, jobId);
   }
 
+  // TODO: test
   onJobStart(cb: StartJobHandler): number {
     return this.events.addListener(QueueEvents.startJob, cb);
   }
 
+  // TODO: test
   onJobEnd(cb: EndJobHandler): number {
     return this.events.addListener(QueueEvents.endJob, cb);
   }
 
+  // TODO: test
   removeListener(handlerIndex: number) {
     this.events.removeListener(handlerIndex);
   }
