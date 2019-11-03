@@ -112,7 +112,7 @@ export default class RequestQueue {
   cancelJob(jobId: JobId) {
     this.cancelCurrentJob(jobId);
     this.removeJobFromQueue(jobId);
-    this.startNextJob();
+    this.startNextJobIfNeed();
   }
 
   /**
@@ -182,18 +182,15 @@ export default class RequestQueue {
    * If there is a job with the same is in queue - the cb in queue will be replaced to a new one.
    * @param cb - callback which will be called when job starts
    * @param jobId - specify if of job to avoid the duplicates. It not set then it will be generated.
+   * @return jobId which is specified of generated if isn't specified
    */
-  add(cb: RequestCb, jobId: JobId | undefined): JobId {
+  add(cb: RequestCb, jobId?: JobId): JobId {
     const resolvedId: JobId = this.resolveJobId(jobId);
-
     // The job with specified id is running
     // do noting - don't update the current job and don't add job to queue
     if (this.currentJob && this.currentJob[JobPositions.id] === resolvedId) {
       return resolvedId;
     }
-
-    // TODO: а если есть currentJob ???
-
     // else job is not running
     // get job index in the queue
     const jobIndex: number = this.getJobIndex(resolvedId);
@@ -202,16 +199,10 @@ export default class RequestQueue {
       // if the job in a queue - update cb in this job
       this.queue[jobIndex][JobPositions.cb] = cb;
     }
-    else if (this.queue.length) {
-      // not in a queue but queue not empty - add a new job to queue
-      this.queue.push([resolvedId, cb, new Promised<void>(), false]);
-      this.startNextJob();
-    }
     else {
-      // queue is empty - just start
-      this.currentJob = [resolvedId, cb, new Promised<void>(), false];
-
-      this.startCurrentJob();
+      // not in a queue - add a new job to queue
+      this.queue.push([resolvedId, cb, new Promised<void>(), false]);
+      this.startNextJobIfNeed();
     }
 
     return resolvedId;
@@ -222,22 +213,19 @@ export default class RequestQueue {
    * Start a new job if there isn't a current job and queue has some jobs.
    * It doesn't start a new job while current is in progress.
    */
-  private startNextJob = () => {
+  private startNextJobIfNeed = () => {
     // do nothing if there is current job or no one in queue
     if (this.currentJob || !this.queue.length) return;
-
-    // set first job in queue as current
+    // move queue's first job to the current
     this.currentJob = this.queue[0];
-
     // remove the first element from queue
     this.queue.shift();
-
     this.startCurrentJob();
   }
 
   // TODO: review
   private startCurrentJob() {
-    // start job on next tick
+    // start job on the next tick
     setTimeout(() => {
       if (!this.currentJob) throw new Error(`RequestQueue.startCurrentJob: no currentJob`);
 
@@ -273,7 +261,7 @@ export default class RequestQueue {
     this.endJobEvents.emit(errMsg, job[JobPositions.id]);
 
     try {
-      this.startNextJob();
+      this.startNextJobIfNeed();
     }
     catch (err) {
       this.logError(`Error occurred on starting a new job after exceeded timeout: ${err}`);
@@ -318,7 +306,7 @@ export default class RequestQueue {
     // in default mode - just go to the next job
 
     try {
-      this.startNextJob();
+      this.startNextJobIfNeed();
     }
     catch (err) {
       this.logError(`Error occurred on starting a new job after successful previous job: ${err}`);
