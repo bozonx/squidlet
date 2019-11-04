@@ -47,16 +47,22 @@ export default class RequestQueue {
     this.jobTimeoutSec = jobTimeoutSec;
   }
 
-  // TODO: test
   destroy() {
     this.events.destroy();
 
-    // TODO: review - не нужно
-    if (this.currentJob) this.cancelCurrentJob(this.currentJob[JobPositions.id]);
-
     delete this.queue;
-    // TODO: just delete
-    this.finalizeCurrentJob();
+
+    if (this.runningTimeout) {
+      clearTimeout(this.runningTimeout);
+
+      delete this.runningTimeout;
+    }
+
+    if (this.currentJob) {
+      this.currentJob[JobPositions.canceled] = true;
+
+      delete this.currentJob;
+    }
   }
 
 

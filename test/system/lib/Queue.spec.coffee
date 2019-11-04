@@ -136,7 +136,16 @@ describe.only 'system.lib.Queue', ->
     sinon.assert.calledWith(handler.getCall(0), 'Job was cancelled', @jobId1)
     sinon.assert.calledWith(handler.getCall(1), undefined , @jobId2)
 
+  it "destroy", ->
+    @queue.add(@cb1, @jobId1)
+    @queue.add(@cb2, @jobId2)
+
+    @queue.destroy()
+
+    assert.isUndefined(@queue.currentJob)
+    assert.isUndefined(@queue.runningTimeout)
+    assert.isUndefined(@queue.queue)
+
 # TODO: test events
-# TODO: test destroy
 # TODO: test startNextJobIfNeed
 # TODO: test timeout
