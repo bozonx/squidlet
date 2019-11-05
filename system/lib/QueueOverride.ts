@@ -5,9 +5,8 @@ import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
 
 
 type QueuedCb = () => Promise<void> | void;
-// TODO: зачем сохранять таймаут на каждую job если он 1 для current job
-// array like [pendingPromise, queuedCb, finishPromised, timeout]
-type QueuedItem = [Promised<void>, QueuedCb?, Promised<void>?, Timeout?];
+// array like [pendingPromise, queuedCb, finishPromised]
+type QueuedItem = [Promised<void>, QueuedCb?, Promised<void>?];
 
 enum ItemPosition {
   // promise of current cb
@@ -15,7 +14,6 @@ enum ItemPosition {
   queuedCb,
   // promise witch represent when the queued cb will be finished
   finishPromised,
-  timeout,
 }
 
 const DEFAULT_ID = 'default';
@@ -34,6 +32,8 @@ export default class QueueOverride {
   private readonly jobTimeoutSec: number;
   private readonly logError: (msg: string) => void;
   private items: {[index: string]: QueuedItem} = {};
+  // timeout of currentJob
+  private runningTimeout?: Timeout;
 
 
   constructor(logError: (msg: string) => void, jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
@@ -48,7 +48,7 @@ export default class QueueOverride {
 
       if (finishPromised) finishPromised.destroy();
       this.items[id][ItemPosition.pendingPromised].destroy();
-      this.clearTimeout(id);
+      this.clearTimeout();
 
       delete this.items[id];
     }
@@ -77,7 +77,7 @@ export default class QueueOverride {
     const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
     const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
 
-    this.clearTimeout(id);
+    this.clearTimeout();
 
     if (pendingPromised) {
       pendingPromised.resolve();
@@ -117,7 +117,7 @@ export default class QueueOverride {
   private startCb(cb: QueuedCb, id: string | number) {
     if (!this.items[id]) throw new Error(`No item ${id}`);
 
-    this.items[id][ItemPosition.timeout] = setTimeout(() => {
+    this.runningTimeout = setTimeout(() => {
       this.handleJobTimeout(id);
     }, this.jobTimeoutSec * 1000);
 
@@ -134,7 +134,7 @@ export default class QueueOverride {
     const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
     const finishPromised: Promised<void> | undefined = this.items[id][ItemPosition.finishPromised];
 
-    this.clearTimeout(id);
+    this.clearTimeout();
     // reject current cb promise
     pendingPromised.reject(e);
     pendingPromised.destroy();
@@ -154,7 +154,7 @@ export default class QueueOverride {
 
     const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
 
-    this.clearTimeout(id);
+    this.clearTimeout();
     // resolve current cb promise
     pendingPromised.resolve();
     pendingPromised.destroy();
@@ -181,7 +181,8 @@ export default class QueueOverride {
    * Reject current cb and clear queue
    */
   private handleJobTimeout(id: string | number) {
-    if (!this.items[id]) return this.logError(`No item ${id}`);
+    // item definitely has to be at this moment
+    if (!this.items[id]) return;
 
     const msg = `Timeout of job "${id}" has been exceeded`;
     const pendingPromised: Promised<void> | undefined = this.items[id][ItemPosition.pendingPromised];
@@ -226,14 +227,12 @@ export default class QueueOverride {
       .catch(finishPromised.reject);
   }
 
-  private clearTimeout(id: string | number) {
-    if (!this.items[id]) return;
+  private clearTimeout() {
+    if (!this.runningTimeout) return;
 
-    const timeout: Timeout | undefined = this.items[id][ItemPosition.timeout];
+    clearTimeout(this.runningTimeout);
 
-    if (timeout) {
-      clearTimeout(timeout);
-    }
+    delete this.runningTimeout;
   }
 
   private async callCb(cb: QueuedCb) {
