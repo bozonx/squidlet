@@ -160,7 +160,7 @@ describe 'system.lib.QueueOverride', ->
     sinon.assert.calledOnce(@cb1)
     sinon.assert.notCalled(@cb2)
 
-    clock.tick(1000)
+    clock.tick(@timeout * 1000)
 
     try
       await promise1

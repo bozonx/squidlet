@@ -136,14 +136,15 @@ export default class DigitalPortExpanderInputLogic {
       throw e;
     }
 
-    // means that pall has been canceled
+    // means that poll has been canceled
     if (!this.polledPinsBuffer) return;
 
-    const stateBeforePolling: number = this.getState();
+    const actualState: number = this.getState();
 
     // set all the values which has been received via last poll
     for (let pinStr of Object.keys(this.polledPinsBuffer)) {
-      if (getBitFromByte(stateBeforePolling, pin) === this.polledPinsBuffer[pinStr]) continue;
+      // TODO: review
+      if (getBitFromByte(actualState, pin) === this.polledPinsBuffer[pinStr]) continue;
 
       // set a new value
       this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);
