@@ -2,7 +2,7 @@ QueueOverride = require('../../../system/lib/QueueOverride').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.lib.QueueOverride', ->
+describe.only 'system.lib.QueueOverride', ->
   beforeEach ->
     @timeout = 1
     @promised1 = new Promised();

@@ -1,7 +1,8 @@
 Queue = require('../../../system/lib/Queue').default;
+Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.Queue', ->
+describe 'system.lib.Queue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
@@ -174,14 +175,35 @@ describe.only 'system.lib.Queue', ->
   it "removeListener", ->
     handler1 = sinon.spy()
 
-    hadnlerIndex = @queue.onJobStart(handler1)
+    handlerIndex = @queue.onJobStart(handler1)
 
-    @queue.removeListener(hadnlerIndex)
+    @queue.removeListener(handlerIndex)
     @queue.add(@cb1)
 
     await @queue.waitCurrentJobFinished()
 
     sinon.assert.notCalled(handler1)
 
-# TODO: test startNextJobIfNeed
-# TODO: test timeout
+  it "timeout - job will be cancelled but the next job will be started", ->
+    clock = sinon.useFakeTimers()
+    promised = new Promised()
+    cb = () => promised.promise
+    handler1 = sinon.spy()
+
+    @queue.add(cb, @jobId1)
+    @queue.add(@cb2, @jobId2)
+    @queue.onJobEnd(handler1)
+
+    clock.tick(120000)
+
+    sinon.assert.calledOnce(handler1)
+
+    await @queue.waitJobFinished(@jobId2)
+
+    sinon.assert.calledTwice(handler1)
+
+    promised.resolve()
+
+    sinon.assert.calledTwice(handler1)
+
+    clock.restore()
