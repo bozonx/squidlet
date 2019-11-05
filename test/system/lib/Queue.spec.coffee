@@ -5,12 +5,11 @@ describe.only 'system.lib.Queue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
-    #@cbPromise = () => new Promise((resolve) => setTimeout(resolve, 1))
+    # TODO: remove
     @cbPromise = () => Promise.resolve()
     @cb1 = sinon.stub().returns(@cbPromise())
     @cb2 = sinon.stub().returns(@cbPromise())
-    @logError = sinon.spy()
-    @queue = new Queue(@logError)
+    @queue = new Queue()
 
   it "ordinary queue with jobs with different id. Check queue states", ->
     resolvedJobId1 = @queue.add(@cb1, @jobId1)
@@ -119,7 +118,6 @@ describe.only 'system.lib.Queue', ->
     assert.equal(@queue.getQueueLength(), 0)
 
   it "cancelJob current job. It won't called ever", ->
-    # TODO: check
     handler = sinon.spy()
     @queue.onJobEnd(handler)
     @queue.add(@cb1, @jobId1)
@@ -133,7 +131,7 @@ describe.only 'system.lib.Queue', ->
     await @queue.waitCurrentJobFinished()
 
     sinon.assert.calledTwice(handler)
-    sinon.assert.calledWith(handler.getCall(0), 'Job was cancelled', @jobId1)
+    sinon.assert.calledWith(handler.getCall(0), undefined, @jobId1)
     sinon.assert.calledWith(handler.getCall(1), undefined , @jobId2)
 
   it "destroy", ->
@@ -146,6 +144,44 @@ describe.only 'system.lib.Queue', ->
     assert.isUndefined(@queue.runningTimeout)
     assert.isUndefined(@queue.queue)
 
-# TODO: test events
+  it "onJobStart - emits as soon as first job is added", ->
+    handler1 = sinon.spy()
+    handler2 = sinon.spy()
+
+    @queue.onJobStart(handler1)
+
+    @queue.add(@cb1, @jobId1)
+
+    @queue.onJobStart(handler2)
+
+    await @queue.waitCurrentJobFinished()
+
+    sinon.assert.calledOnce(handler1)
+    sinon.assert.notCalled(handler2)
+
+  it "onJobStart - emits after current job finished", ->
+    handler1 = sinon.spy()
+
+    @queue.add(@cb1)
+    @queue.add(@cb2)
+
+    @queue.onJobStart(handler1)
+
+    await @queue.waitCurrentJobFinished()
+
+    sinon.assert.calledOnce(handler1)
+
+  it "removeListener", ->
+    handler1 = sinon.spy()
+
+    hadnlerIndex = @queue.onJobStart(handler1)
+
+    @queue.removeListener(hadnlerIndex)
+    @queue.add(@cb1)
+
+    await @queue.waitCurrentJobFinished()
+
+    sinon.assert.notCalled(handler1)
+
 # TODO: test startNextJobIfNeed
 # TODO: test timeout

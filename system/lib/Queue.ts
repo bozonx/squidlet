@@ -34,7 +34,6 @@ let unnamedJobIdCounter = -1;
  */
 export default class RequestQueue {
   private readonly jobTimeoutSec: number;
-  private readonly logError: (msg: string) => void;
   private readonly events = new IndexedEventEmitter();
   private queue: Job[] = [];
   private currentJob?: Job;
@@ -42,8 +41,7 @@ export default class RequestQueue {
   private runningTimeout?: Timeout;
 
 
-  constructor(logError: (msg: string) => void, jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
-    this.logError = logError;
+  constructor(jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
     this.jobTimeoutSec = jobTimeoutSec;
   }
 
@@ -116,7 +114,14 @@ export default class RequestQueue {
    * Cancel job with uniq id. It can be current or wait in the queue
    */
   cancelJob(jobId: JobId) {
-    this.cancelCurrentJob(jobId);
+    // cancel current job if set
+    if (this.currentJob && this.currentJob[JobPositions.id] === jobId) {
+      this.currentJob[JobPositions.canceled] = true;
+      // delete timeout and current job
+      this.finalizeCurrentJob();
+      this.events.emit(QueueEvents.endJob, undefined, jobId);
+    }
+
     this.removeJobFromQueue(jobId);
     this.startNextJobIfNeed();
   }
@@ -127,7 +132,7 @@ export default class RequestQueue {
   waitCurrentJobFinished(): Promise<void> {
     if (!this.currentJob) return Promise.resolve();
 
-    return this.makeWaitJobPromise(QueueEvents.endJob, this.currentJob[JobPositions.id]);
+    return this.makeJobFinishPromise(this.currentJob[JobPositions.id]);
   }
 
   /**
@@ -166,7 +171,7 @@ export default class RequestQueue {
       return Promise.reject(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
-    return this.makeWaitJobPromise(QueueEvents.endJob, jobId);
+    return this.makeJobFinishPromise(jobId);
   }
 
   // TODO: test
@@ -174,7 +179,6 @@ export default class RequestQueue {
     return this.events.addListener(QueueEvents.startJob, cb);
   }
 
-  // TODO: test
   onJobEnd(cb: EndJobHandler): number {
     return this.events.addListener(QueueEvents.endJob, cb);
   }
@@ -284,30 +288,21 @@ export default class RequestQueue {
     delete this.currentJob;
   }
 
-  private cancelCurrentJob(jobId: string) {
-    if (!this.currentJob || this.currentJob[JobPositions.id] !== jobId) return;
-
-    this.currentJob[JobPositions.canceled] = true;
-    // delete timeout and current job
-    this.finalizeCurrentJob();
-    this.events.emit(QueueEvents.endJob, undefined, jobId);
-  }
-
-  private makeWaitJobPromise(eventName: QueueEvents, jobId: JobId): Promise<void> {
+  private makeJobFinishPromise(jobId: JobId): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let handlerIndex: number;
 
       const cb = (error: string | undefined, finishedJobId: JobId) => {
         if (finishedJobId !== jobId) return;
 
-        this.events.removeListener(handlerIndex, eventName);
+        this.events.removeListener(handlerIndex, QueueEvents.endJob);
 
         if (error) return reject(error);
 
         resolve();
       };
 
-      handlerIndex = this.events.addListener(eventName, cb);
+      handlerIndex = this.events.addListener(QueueEvents.endJob, cb);
     });
   }
 
