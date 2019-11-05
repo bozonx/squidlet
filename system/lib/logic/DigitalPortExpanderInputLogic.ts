@@ -123,7 +123,6 @@ export default class DigitalPortExpanderInputLogic {
   private async handleEndOfDebounce(pin: number) {
     this.polledPinsBuffer = {};
 
-    // TODO: нужно удостовериться что сначала выполнились все обработчики которые вызывают incomeState()
     try {
       this.pollPromise = this.pollOnce();
 
@@ -136,15 +135,19 @@ export default class DigitalPortExpanderInputLogic {
       throw e;
     }
 
+    this.setFinalState(pin);
+  }
+
+  private setFinalState(pin: number) {
     // means that poll has been canceled
     if (!this.polledPinsBuffer) return;
 
-    const actualState: number = this.getState();
+    // old state
+    const stateBeforePoll: number = this.getState();
 
     // set all the values which has been received via last poll
     for (let pinStr of Object.keys(this.polledPinsBuffer)) {
-      // TODO: review
-      if (getBitFromByte(actualState, pin) === this.polledPinsBuffer[pinStr]) continue;
+      if (getBitFromByte(stateBeforePoll, pin) === this.polledPinsBuffer[pinStr]) continue;
 
       // set a new value
       this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);

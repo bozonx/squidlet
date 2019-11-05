@@ -68,8 +68,9 @@ describe.only 'system.lib.logic.DigitalPortExpanderInputLogic', ->
 
     assert.isTrue(@logic.isInProgress(@pin0))
     assert.isTrue(@logic.isPollInProgress())
-
-    @state = 1
+    # income state after polling
+    @logic.incomeState(@pin0, true, @debounceMs)
+    @logic.incomeState(1, true, @debounceMs)
 
     await @pollPromise
 
@@ -77,5 +78,7 @@ describe.only 'system.lib.logic.DigitalPortExpanderInputLogic', ->
     assert.isFalse(@logic.isPollInProgress())
     sinon.assert.calledOnce(@handler1)
     sinon.assert.calledWith(@handler1, true)
+    assert.equal(@state, 3)
 
     clock.restore()
+

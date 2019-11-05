@@ -210,6 +210,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     //if (!this.isIcInitialized()) return this.initIcPromise;
     if (!this.isIcInitialized()) return Promise.resolve();
 
+    // TODO: нужно удостовериться что сначала выполнились все обработчики которые вызывают incomeState()
+    //  тоесть должны подняться и отрабоать все события перед завершением этого промиса
+    //  иначе this.expanderInput.incomeState может сработать позже и income state не получит изменений
+
     return this.i2cDriver.pollOnce();
   }
 
