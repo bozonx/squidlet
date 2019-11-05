@@ -30,10 +30,9 @@ export default class ThrottleCall {
     }
 
     if (!this.items[id]) {
+      const timeout = setTimeout(() => this.endOfTimeout(id), debounceMs);
       // make a new item
-      this.items[id] = [ cb, new Promised<void>(), undefined ];
-      // make a new timeout
-      this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.endOfTimeout(id), debounceMs);
+      this.items[id] = [ cb, new Promised<void>(), timeout ];
 
       try {
         cb();
@@ -50,7 +49,8 @@ export default class ThrottleCall {
   clear(id: string | number) {
     if (!this.items[id]) return;
 
-    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+    if (this.items[id][ItemPosition.timeout]) clearTimeout(this.items[id][ItemPosition.timeout]);
+
     this.items[id][ItemPosition.promiseForWholeDebounce].resolve();
 
     delete this.items[id];
@@ -64,7 +64,8 @@ export default class ThrottleCall {
 
   destroy() {
     for (let id of Object.keys(this.items)) {
-      clearTimeout(this.items[id][ItemPosition.timeoutId]);
+      if (this.items[id][ItemPosition.timeout]) clearTimeout(this.items[id][ItemPosition.timeout]);
+
       this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
 
       delete this.items[id];
@@ -73,7 +74,7 @@ export default class ThrottleCall {
 
 
   private endOfTimeout(id: string | number) {
-    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+    if (this.items[id][ItemPosition.timeout]) clearTimeout(this.items[id][ItemPosition.timeout]);
 
     const promised = this.items[id][ItemPosition.promiseForWholeDebounce];
 

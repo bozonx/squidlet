@@ -1,3 +1,4 @@
+import Timeout = NodeJS.Timeout;
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
@@ -44,8 +45,8 @@ enum ImpulseInputEvents {
  */
 export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private readonly events = new IndexedEventEmitter();
-  private blockTimeout: any;
-  private impulseTimeout: any;
+  private blockTimeout?: Timeout;
+  private impulseTimeout?: Timeout;
   private _isInverted: boolean = false;
 
   private get gpio(): GpioDigital {
@@ -120,8 +121,8 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
    * Cancel impulse or block
    */
   cancel() {
-    clearTimeout(this.impulseTimeout);
-    clearTimeout(this.blockTimeout);
+    if (this.impulseTimeout) clearTimeout(this.impulseTimeout);
+    if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
     delete this.impulseTimeout;
     delete this.blockTimeout;
@@ -175,7 +176,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     if (this.isImpulseInProgress()) {
       // increase current impulse
       // clear current impulse timeout
-      clearTimeout(this.impulseTimeout);
+      if (this.impulseTimeout) clearTimeout(this.impulseTimeout);
       // set a new impulse timeout
       this.setImpulseTimeout();
     }

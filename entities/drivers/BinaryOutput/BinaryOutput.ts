@@ -1,3 +1,4 @@
+import Timeout = NodeJS.Timeout;
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
@@ -55,7 +56,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private lastDeferredValue?: boolean;
   // last not inverted value which is represent value of IO
   private currentIoValue?: boolean;
-  private blockTimeout: any;
+  private blockTimeout?: Timeout;
   private _isInverted: boolean = false;
 
   private get gpio(): GpioDigital {
@@ -139,7 +140,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
    * Cancel block time but not cancel writing.
    */
   cancel() {
-    clearTimeout(this.blockTimeout);
+    if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
     if (this.deferredWritePromise) this.deferredWritePromise.cancel();
 

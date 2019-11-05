@@ -1,3 +1,5 @@
+import Timeout = NodeJS.Timeout;
+
 import Promised from '../Promised';
 
 
@@ -6,11 +8,11 @@ export const DEFAULT_ID = 'default';
 export enum ItemPosition {
   lastCbToCall,
   promiseForWholeDebounce,
-  timeoutId
+  timeout
 }
 export type DebounceCb = (...args: any[]) => void;
-// Array like [ lastCbToCall, promiseForWholeDebounce, timeoutId ]
-export type DebounceItem = [DebounceCb, Promised<void>, any];
+// Array like [ lastCbToCall, promiseForWholeDebounce, Timeout ]
+export type DebounceItem = [DebounceCb, Promised<void>, Timeout];
 
 /**
  * Call only the LAST callback of specified id.
@@ -37,10 +39,9 @@ export default class DebounceCall {
       this.updateItem(this.items[id], id, cb, debounceMs);
     }
     else {
+      const timeout = setTimeout(() => this.callCb(id), debounceMs);
       // make a new item
-      this.items[id] = [ cb, new Promised<void>(), undefined ];
-      // make a new timeout
-      this.items[id][ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounceMs);
+      this.items[id] = [ cb, new Promised<void>(), timeout ];
     }
 
     // return promise of item
@@ -50,7 +51,7 @@ export default class DebounceCall {
   clear(id: string | number) {
     if (!this.items[id]) return;
 
-    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+    if (this.items[id][ItemPosition.timeout]) clearTimeout(this.items[id][ItemPosition.timeout]);
     // TODO: может лучше зарезолвить промис. Но при дестрое дестроить
     this.items[id][ItemPosition.promiseForWholeDebounce].destroy();
 
@@ -95,7 +96,7 @@ export default class DebounceCall {
   }
 
   protected endOfDebounce(err: Error | undefined, id: string | number) {
-    clearTimeout(this.items[id][ItemPosition.timeoutId]);
+    if (this.items[id][ItemPosition.timeout]) clearTimeout(this.items[id][ItemPosition.timeout]);
 
     const promised = this.items[id][ItemPosition.promiseForWholeDebounce];
 

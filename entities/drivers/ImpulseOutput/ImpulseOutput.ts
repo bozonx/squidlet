@@ -1,3 +1,4 @@
+import Timeout = NodeJS.Timeout;
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
@@ -54,8 +55,8 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
 export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private readonly changeEvents = new IndexedEvents<ChangeHandler>();
   private deferredImpulse?: boolean;
-  private blockTimeout: any;
-  private impulseTimeout: any;
+  private blockTimeout?: Timeout;
+  private impulseTimeout?: Timeout;
   // promise of writing of the beginning of impulse
   private writingStartPromise?: Promise<any>;
   // promise of writing of the end of impulse
@@ -152,8 +153,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
    * Cancel block time but not cancel writing.
    */
   cancel() {
-    clearTimeout(this.impulseTimeout);
-    clearTimeout(this.blockTimeout);
+    if (this.impulseTimeout) clearTimeout(this.impulseTimeout);
+    if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
     if (this.deferredWritePromise) this.deferredWritePromise.cancel();
 
@@ -177,7 +178,8 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       }
       else if (this.isInProgress()) {
         // if start of impulse is writing or the impulse is in progress > increase mode
-        clearTimeout(this.impulseTimeout);
+        if (this.impulseTimeout) clearTimeout(this.impulseTimeout);
+
         this.setImpulseTimeout();
 
         return;

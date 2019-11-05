@@ -1,3 +1,4 @@
+import Timeout = NodeJS.Timeout;
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
@@ -34,7 +35,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   private lastIoLevel?: boolean;
   // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
-  private blockTimeout: any;
+  private blockTimeout?: Timeout;
 
   private get gpio(): GpioDigital {
     return this.depsInstances.gpioDevice.gpio;
@@ -137,7 +138,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
    * Cancel blocking of input.
    */
   cancel() {
-    clearTimeout(this.blockTimeout);
+    if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
     delete this.blockTimeout;
   }

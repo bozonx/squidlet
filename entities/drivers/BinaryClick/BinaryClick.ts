@@ -1,3 +1,4 @@
+import Timeout = NodeJS.Timeout;
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
@@ -42,8 +43,8 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   // should invert value which is received from IO
   private _isInverted: boolean = false;
   private keyDown: boolean = false;
-  private releaseTimeout: any;
-  private blockTimeout: any;
+  private releaseTimeout?: Timeout;
+  private blockTimeout?: Timeout;
 
   private get gpio(): GpioDigital {
     return this.depsInstances.gpioDevice.gpio;
@@ -137,8 +138,8 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   cancel() {
     this.keyDown = false;
 
-    clearTimeout(this.releaseTimeout);
-    clearTimeout(this.blockTimeout);
+    if (this.releaseTimeout) clearTimeout(this.releaseTimeout);
+    if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
     delete this.releaseTimeout;
     delete this.blockTimeout;
@@ -189,7 +190,7 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
   private async finishDownState() {
     this.keyDown = false;
 
-    clearTimeout(this.releaseTimeout);
+    if (this.releaseTimeout) clearTimeout(this.releaseTimeout);
 
     delete this.releaseTimeout;
 

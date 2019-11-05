@@ -13,9 +13,9 @@ export default class DebounceCallIncreasing extends DebounceCall {
     // update cb
     item[ItemPosition.lastCbToCall] = cb;
     // clear previous timeout
-    clearTimeout(item[ItemPosition.timeoutId]);
+    if (item[ItemPosition.timeout]) clearTimeout(item[ItemPosition.timeout]);
     // make a new timeout
-    item[ItemPosition.timeoutId] = setTimeout(() => this.callCb(id), debounceMs || 0);
+    item[ItemPosition.timeout] = setTimeout(() => this.callCb(id), debounceMs || 0);
   }
 
 }

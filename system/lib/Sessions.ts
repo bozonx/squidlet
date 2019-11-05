@@ -1,5 +1,6 @@
 import IndexedEvents from './IndexedEvents';
 import {JsonTypes} from '../interfaces/Types';
+import Timeout = NodeJS.Timeout;
 
 
 /**
@@ -11,7 +12,7 @@ export default class Sessions {
   private readonly closeEvents = new IndexedEvents<(sessionId: string) => void>();
   // TODO: make immutable
   private sessionStorage: {[index: string]: {[index: string]: any}} = {};
-  private closeConnectionTimeouts: {[index: string]: any} = {};
+  private closeConnectionTimeouts: {[index: string]: Timeout} = {};
   // TODO: review
   // like {sessionId: expireSec}
   private activeSession: {[index: string]: number} = {};
@@ -64,7 +65,8 @@ export default class Sessions {
    * You shouldn't use it for short connection mode like http
    */
   recoverSession(sessionId: string) {
-    clearTimeout(this.closeConnectionTimeouts[sessionId]);
+    if (this.closeConnectionTimeouts[sessionId]) clearTimeout(this.closeConnectionTimeouts[sessionId]);
+
     delete this.closeConnectionTimeouts[sessionId];
   }
 
@@ -90,7 +92,8 @@ export default class Sessions {
    * Call it only when you are destroying your entity.
    */
   destroySession(sessionId: string) {
-    clearTimeout(this.closeConnectionTimeouts[sessionId]);
+    if (this.closeConnectionTimeouts[sessionId]) clearTimeout(this.closeConnectionTimeouts[sessionId]);
+
     delete this.closeConnectionTimeouts[sessionId];
     delete this.sessionStorage[sessionId];
     delete this.activeSession[sessionId];
@@ -118,7 +121,8 @@ export default class Sessions {
 
 
   private newSessionTimeout(sessionId: string) {
-    clearTimeout(this.closeConnectionTimeouts[sessionId]);
+    if (this.closeConnectionTimeouts[sessionId]) clearTimeout(this.closeConnectionTimeouts[sessionId]);
+
     delete this.closeConnectionTimeouts[sessionId];
 
     this.closeConnectionTimeouts[sessionId] = setTimeout(() => {

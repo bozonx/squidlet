@@ -1,3 +1,4 @@
+import Timeout = NodeJS.Timeout;
 import WebSocketClientIo, {
   OnMessageHandler, WebSocketClientProps, WsClientEvent, WsCloseStatus,
 } from 'system/interfaces/io/WebSocketClientIo';
@@ -56,7 +57,7 @@ export default class WsClientLogic {
   // was previous open promise fulfilled
   private wasPrevOpenFulfilled: boolean = false;
   private connectionTries: number = 0;
-  private reconnectTimeout: any;
+  private reconnectTimeout?: Timeout;
   private isConnectionOpened: boolean = false;
   private cookies: {[index: string]: Primitives} = {};
   private waitingCookies: boolean = true;
@@ -308,7 +309,9 @@ export default class WsClientLogic {
   private destroyInstance() {
     this.isConnectionOpened = false;
     this.openPromise.destroy();
-    clearTimeout(this.reconnectTimeout);
+
+    if (this.reconnectTimeout) clearTimeout(this.reconnectTimeout);
+
     delete this.openPromise;
     delete this.reconnectTimeout;
     this.messageEvents.destroy();
