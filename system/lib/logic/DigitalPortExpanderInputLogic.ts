@@ -105,16 +105,16 @@ export default class DigitalPortExpanderInputLogic {
           .catch(this.logError);
       }, debounceMs, pin)
         .catch(this.logError);
+
+      return;
     }
-    else {
-      // emit right now if there isn't debounce
-      // clear debounce if set
-      if (this.debounce.isInvoking(pin)) this.debounce.clear(pin);
-      // set a new value
-      this.updateState(pin, newValue);
-      // rise a new event even value hasn't been actually changed since first check
-      this.changeEvents.emit(pin, newValue);
-    }
+    // else emit right now if there isn't debounce
+    // clear debounce if set
+    if (this.debounce.isInvoking(pin)) this.debounce.clear(pin);
+    // set a new value
+    this.updateState(pin, newValue);
+    // rise a new event even value hasn't been actually changed since first check
+    this.changeEvents.emit(pin, newValue);
   }
 
   /**
