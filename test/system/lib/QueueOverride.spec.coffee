@@ -2,7 +2,7 @@ QueueOverride = require('../../../system/lib/QueueOverride').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.QueueOverride', ->
+describe 'system.lib.QueueOverride', ->
   beforeEach ->
     @timeout = 1
     @promised1 = new Promised();
@@ -11,7 +11,7 @@ describe.only 'system.lib.QueueOverride', ->
     @cb1 = sinon.stub().returns(@promised1.promise)
     @cb2 = sinon.stub().returns(@promised2.promise)
     @cb3 = sinon.stub().returns(@promised3.promise)
-    @queue = new QueueOverride(() =>, @timeout)
+    @queue = new QueueOverride(@timeout)
 
   it "add - simple", ->
     assert.isFalse(@queue.isPending())

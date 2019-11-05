@@ -30,14 +30,12 @@ const DEFAULT_ID = 'default';
  */
 export default class QueueOverride {
   private readonly jobTimeoutSec: number;
-  private readonly logError: (msg: string) => void;
   private items: {[index: string]: QueuedItem} = {};
   // timeout of currentJob
   private runningTimeout?: Timeout;
 
 
-  constructor(logError: (msg: string) => void, jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
-    this.logError = logError;
+  constructor(jobTimeoutSec: number = DEFAULT_JOB_TIMEOUT_SEC) {
     this.jobTimeoutSec = jobTimeoutSec;
   }
 
@@ -169,9 +167,14 @@ export default class QueueOverride {
 
       return;
     }
+
+    if (!this.items[id]) return;
+
     // or just finish cycle if there isn't a queued cb
-    if (!this.items[id] || this.items[id][ItemPosition.finishPromised]) {
-      this.logError(`No queue but there is finishPromised`);
+    const finishPromised = this.items[id][ItemPosition.finishPromised];
+
+    if (finishPromised) {
+      finishPromised.reject(new Error(`No queue but there is finishPromised`));
     }
 
     delete this.items[id];
