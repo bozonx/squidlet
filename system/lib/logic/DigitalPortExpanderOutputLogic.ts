@@ -55,8 +55,6 @@ export default class DigitalPortExpanderOutputLogic {
   }
 
   write(pin: number, value: boolean): Promise<void> {
-    console.log(77777777, pin, value, this.isWriting())
-
     // in case it is writing at the moment - save buffer and add cb to queue
     if (this.isWriting()) {
       return this.invokeAtWritingTime(pin, value);
@@ -96,7 +94,7 @@ export default class DigitalPortExpanderOutputLogic {
 
   cancel() {
     this.debounce.clear(WRITE_ID);
-    this.queue.cancel(WRITE_ID);
+    this.queue.stop(WRITE_ID);
 
     delete this.beforeWritingBuffer;
     delete this.writingTimeBuffer;
@@ -145,8 +143,6 @@ export default class DigitalPortExpanderOutputLogic {
    */
   private startWriting(stateToSave: number): Promise<void> {
     this.writingTimeBuffer = stateToSave;
-
-    console.log(888888888, stateToSave)
 
     return this.queue.add(this.doWriteCb);
   }
