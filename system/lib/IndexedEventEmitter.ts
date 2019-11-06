@@ -9,6 +9,11 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   // indexes by event names
   private indexes: {[index: string]: number[]} = {};
 
+  // TODO: test
+  get isDestroyed(): boolean {
+    return typeof this.handlers === 'undefined' && typeof this.indexes === 'undefined';
+  }
+
 
   emit = (eventName: string | number, ...args: any[]) => {
     if (!this.indexes[eventName]) return;

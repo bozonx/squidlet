@@ -154,3 +154,21 @@ describe.only 'system.lib.logic.DigitalPortExpanderInputLogic', ->
     @logic.incomeState(@pin0, true)
 
     sinon.assert.notCalled(@handler1)
+
+  it "destroy - check events", ->
+    @logic.incomeState(@pin0, true, @debounceMs)
+
+    @logic.destroy()
+
+    assert.isTrue(@logic.events.isDestroyed)
+    assert.isTrue(@logic.debounce.isDestroyed)
+    assert.isUndefined(@logic.pollPromise)
+    assert.isUndefined(@logic.polledPinsBuffer)
+
+  it "removeListener", ->
+    handlerIndex = @logic.onChange(@pin0, @handler1)
+    @logic.removeListener(handlerIndex)
+
+    @logic.incomeState(@pin0, true)
+
+    sinon.assert.notCalled(@handler1)

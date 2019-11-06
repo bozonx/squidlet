@@ -31,8 +31,8 @@ export default class DigitalPortExpanderInputLogic {
   }
 
   destroy() {
-    this.debounce.destroy();
     this.events.destroy();
+    this.debounce.destroy();
 
     delete this.pollPromise;
     delete this.polledPinsBuffer;

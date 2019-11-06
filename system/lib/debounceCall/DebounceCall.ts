@@ -22,6 +22,10 @@ export default class DebounceCall {
   // items by id
   protected items: {[index: string]: DebounceItem} = {};
 
+  // TODO: test
+  get isDestroyed(): boolean {
+    return typeof this.items === 'undefined';
+  }
 
   isInvoking(id: string | number = DEFAULT_ID): boolean {
     return Boolean(this.items[id]);
@@ -67,9 +71,10 @@ export default class DebounceCall {
   destroy() {
     for (let id of Object.keys(this.items)) {
       this.clear(id);
-
-      delete this.items[id];
     }
+
+    // TODO: test
+    delete this.items;
   }
 
 
