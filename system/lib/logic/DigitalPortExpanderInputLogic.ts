@@ -9,13 +9,13 @@ export default class DigitalPortExpanderInputLogic {
   private readonly pollOnce: () => Promise<void>;
   private readonly getState: () => number;
   private readonly updateState: (pin: number, value: boolean) => void;
-  private readonly debounce = new DebounceCall();
   // promise while poll is in progress
   private pollPromise?: Promise<void>;
   // there are stored pins which are changed while polling
   private polledPinsBuffer?: {[index: string]: boolean};
   // change events of input pins
-  private readonly changeEvents = new IndexedEventEmitter<ChangeHandler>();
+  private readonly events = new IndexedEventEmitter<ChangeHandler>();
+  private readonly debounce = new DebounceCall();
 
 
   constructor(
@@ -32,7 +32,7 @@ export default class DigitalPortExpanderInputLogic {
 
   destroy() {
     this.debounce.destroy();
-    this.changeEvents.destroy();
+    this.events.destroy();
 
     delete this.pollPromise;
     delete this.polledPinsBuffer;
@@ -51,11 +51,11 @@ export default class DigitalPortExpanderInputLogic {
    * Listen to changes of pin after debounce was processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
-    return this.changeEvents.addListener(pin, handler);
+    return this.events.addListener(pin, handler);
   }
 
   removeListener(handlerIndex: number) {
-    this.changeEvents.removeListener(handlerIndex);
+    this.events.removeListener(handlerIndex);
   }
 
   /**
@@ -81,7 +81,13 @@ export default class DigitalPortExpanderInputLogic {
     this.handleIncomeState(pin, newValue, debounceMs);
   }
 
+  /**
+   * It just clears debounce and handlers of pin
+   */
   clearPin(pin: number) {
+    if (this.polledPinsBuffer) delete this.polledPinsBuffer[pin];
+
+    this.events.removeAllListeners(pin);
     this.debounce.clear(pin);
   }
 
@@ -89,6 +95,7 @@ export default class DigitalPortExpanderInputLogic {
     this.debounce.clearAll();
 
     delete this.pollPromise;
+    // it means don't handle poll result
     delete this.polledPinsBuffer;
   }
 
@@ -114,7 +121,7 @@ export default class DigitalPortExpanderInputLogic {
     // set a new value
     this.updateState(pin, newValue);
     // rise a new event even value hasn't been actually changed since first check
-    this.changeEvents.emit(pin, newValue);
+    this.events.emit(pin, newValue);
   }
 
   /**
@@ -152,7 +159,7 @@ export default class DigitalPortExpanderInputLogic {
       // set a new value
       this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);
       // rise a new event even value hasn't been actually changed since first check
-      this.changeEvents.emit(Number(pinStr), this.polledPinsBuffer[pinStr]);
+      this.events.emit(Number(pinStr), this.polledPinsBuffer[pinStr]);
     }
 
     delete this.pollPromise;
