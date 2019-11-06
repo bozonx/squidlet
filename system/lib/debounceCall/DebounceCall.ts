@@ -52,7 +52,7 @@ export default class DebounceCall {
     return this.items[id][ItemPosition.promiseForWholeDebounce].promise;
   }
 
-  clear(id: string | number) {
+  clear(id: string | number = DEFAULT_ID) {
     if (!this.items[id]) return;
 
     if (this.items[id][ItemPosition.timeout]) clearTimeout(this.items[id][ItemPosition.timeout]);

@@ -301,6 +301,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   clearPin(pin: number) {
     if (this.directions[pin] === PinDirection.input) {
+      // TODO: правильно ли что удаляются обработчики событий ???
       this.expanderInput.clearPin(pin);
     }
 

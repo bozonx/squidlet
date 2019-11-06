@@ -3,9 +3,6 @@ import {updateBitInByte} from '../binaryHelpers';
 import DebounceCall from '../debounceCall/DebounceCall';
 
 
-const WRITE_ID = 'write';
-
-
 export default class DigitalPortExpanderOutputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (state: number) => Promise<void>;
@@ -51,7 +48,7 @@ export default class DigitalPortExpanderOutputLogic {
   }
 
   isWriting(): boolean {
-    return this.queue.isPending(WRITE_ID);
+    return this.queue.isPending();
   }
 
   write(pin: number, value: boolean): Promise<void> {
@@ -75,7 +72,7 @@ export default class DigitalPortExpanderOutputLogic {
    */
   async writeState(state: number): Promise<void> {
     if (this.isBuffering()) {
-      this.debounce.clear(WRITE_ID);
+      this.debounce.clear();
 
       delete this.beforeWritingBuffer;
     }
@@ -93,8 +90,8 @@ export default class DigitalPortExpanderOutputLogic {
   }
 
   cancel() {
-    this.debounce.clear(WRITE_ID);
-    this.queue.stop(WRITE_ID);
+    this.debounce.clear();
+    this.queue.stop();
 
     delete this.beforeWritingBuffer;
     delete this.writingTimeBuffer;
@@ -119,7 +116,7 @@ export default class DigitalPortExpanderOutputLogic {
       // flush buffer which has been collected at buffering time
       this.startWriting(lastBufferedState)
         .catch(this.logError);
-    }, this.writeBufferMs, WRITE_ID);
+    }, this.writeBufferMs);
   }
 
   /**
@@ -163,7 +160,7 @@ export default class DigitalPortExpanderOutputLogic {
       throw e;
     }
 
-    if (!this.queue.isPending(WRITE_ID)) {
+    if (!this.queue.isPending()) {
       // remove buffer if there aren't no queue
       delete this.writingTimeBuffer;
     }

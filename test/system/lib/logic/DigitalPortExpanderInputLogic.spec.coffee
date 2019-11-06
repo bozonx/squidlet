@@ -2,7 +2,7 @@ DigitalPortExpanderInputLogic = require('../../../../system/lib/logic/DigitalPor
 binaryHelpers = require('../../../../system/lib/binaryHelpers');
 
 
-describe.only 'system.lib.logic.DigitalPortExpanderInputLogic', ->
+describe 'system.lib.logic.DigitalPortExpanderInputLogic', ->
   beforeEach ->
     @state = 0
     @handler1 = sinon.spy()
