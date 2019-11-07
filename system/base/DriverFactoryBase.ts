@@ -81,6 +81,7 @@ export default abstract class DriverFactoryBase<
     instanceProps: {[index: string]: any},
     mergedProps: {[index: string]: any}
   ) {
+    // TODO: а нужно ли повторно загружать манифест, он же должен быть заружен в drivers manager
     const manifest: DriverManifest = await this.context.system.envSet.loadManifest(
       'driver',
       this.definition.id

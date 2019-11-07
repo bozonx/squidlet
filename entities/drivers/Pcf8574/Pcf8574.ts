@@ -53,6 +53,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this._expanderInput as any;
   }
 
+  // TODO: может сделать публичным ?
   private get initIcPromise(): Promise<void> {
     return this.initializationPromise.promise;
   }
@@ -191,6 +192,20 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   /**
+   * Returns array like [true, true, false, false, true, true, false, false].
+   * It is full state includes values of input and output pins. Input pins are always true.
+   * If you did't setup poll or interrupt then call `pollOnce()` before
+   * to be sure that you will receive the last actual data.
+   */
+  getState(): boolean[] {
+    return byteToBinArr(this.currentState);
+  }
+
+  getPinState(pin: number): boolean {
+    return getBitFromByte(this.currentState, pin);
+  }
+
+  /**
    * Listen to changes of pin after edge and debounce were processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
@@ -215,20 +230,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     //  иначе this.expanderInput.incomeState может сработать позже и income state не получит изменений
 
     return this.i2cDriver.pollOnce();
-  }
-
-  /**
-   * Returns array like [true, true, false, false, true, true, false, false].
-   * It is full state includes values of input and output pins. Input pins are always true.
-   * If you did't setup poll or interrupt then call `pollOnce()` before
-   * to be sure that you will receive the last actual data.
-   */
-  getState(): boolean[] {
-    return byteToBinArr(this.currentState);
-  }
-
-  getPinState(pin: number): boolean {
-    return getBitFromByte(this.currentState, pin);
   }
 
   /**
