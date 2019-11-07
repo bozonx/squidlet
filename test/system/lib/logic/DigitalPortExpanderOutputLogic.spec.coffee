@@ -200,6 +200,23 @@ describe.only 'system.lib.logic.DigitalPortExpanderOutputLogic', ->
 
     assert.equal(@state, 0b00000010)
 
+  it "error while writing", ->
+    writeErrPromise = Promise.reject('e');
+    @logic.writeCb = sinon.stub().returns(writeErrPromise)
+    promise = @logic.writeState(0b00000001)
+
+    assert.isTrue(@logic.isWriting())
+
+    sinon.assert.calledOnce(@logic.writeCb)
+    sinon.assert.calledWith(@logic.writeCb, 0b00000001)
+
+    try
+      await promise
+
+    assert.isRejected(promise)
+    assert.isFalse(@logic.isWriting())
+    assert.equal(@state, 0b00000000)
+
   it "destroy", ->
     @logic.writeState(0b00000001)
 
