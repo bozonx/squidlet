@@ -79,6 +79,7 @@ export default class DigitalPortExpanderOutputLogic {
 
     // in case it is writing at the moment - replace buffer and add cb to queue
     if (this.isWriting()) {
+      // TODO: review
       this.writingTimeBuffer = state;
       // collect data into buffer
 
@@ -98,10 +99,14 @@ export default class DigitalPortExpanderOutputLogic {
   }
 
 
+  /**
+   * This method is called while buffering time.
+   * All the changes are buffered and only the last one will be written.
+   */
   private invokeBuffering(pin: number, value: boolean): Promise<void> {
     // collect data into buffer
     if (typeof this.beforeWritingBuffer === 'undefined') this.beforeWritingBuffer = this.getState();
-
+    // set value to buffer
     this.beforeWritingBuffer = updateBitInByte(this.beforeWritingBuffer, pin, value);
     // only the last one cb will be called
     return this.debounce.invoke(() => {
@@ -159,6 +164,8 @@ export default class DigitalPortExpanderOutputLogic {
       // the queue will be canceled
       throw e;
     }
+
+    // TODO: test чтобы не остался writingTimeBuffer
 
     if (!this.queue.isPending()) {
       // remove buffer if there aren't no queue

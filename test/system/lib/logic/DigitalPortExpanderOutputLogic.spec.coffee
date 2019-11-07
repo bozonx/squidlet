@@ -5,7 +5,8 @@ describe.only 'system.lib.logic.DigitalPortExpanderOutputLogic', ->
   beforeEach ->
     @pin0 = 0
     @state = 0
-    @writeCb = sinon.stub().returns(Promise.resolve())
+    @writePromise = Promise.resolve()
+    @writeCb = sinon.stub().returns(@writePromise)
     @getState = () => @state
     @setState = (newState) => @state = newState
     @queueJobTimeoutSec = 1
@@ -32,4 +33,79 @@ describe.only 'system.lib.logic.DigitalPortExpanderOutputLogic', ->
     assert.isFalse(@logic.isInProgress())
     assert.isFalse(@logic.isWriting())
     sinon.assert.calledOnce(@writeCb)
-    sinon.assert.calledWith(@writeCb, 1)
+    sinon.assert.calledWith(@writeCb, 0b00000001)
+
+  it "write buffer - write only the last value", ->
+    clock = sinon.useFakeTimers()
+
+    promise1 = @logic.write(@pin0, true)
+    promise2 = @logic.write(@pin0, false)
+    @logic.write(1, true)
+
+    assert.isTrue(@logic.isInProgress())
+    assert.isTrue(@logic.isBuffering())
+    assert.isFalse(@logic.isWriting())
+    assert.isTrue(promise1 == promise2)
+
+    clock.tick(@writeBufferMs)
+
+    assert.isTrue(@logic.isInProgress())
+    assert.isFalse(@logic.isBuffering())
+    assert.isTrue(@logic.isWriting())
+    sinon.assert.calledOnce(@writeCb)
+    sinon.assert.calledWith(@writeCb, 0b00000010)
+
+    await @writePromise
+
+    assert.equal(@state, 0b00000010)
+
+    clock.restore()
+
+  it "cancel buffer", ->
+    clock = sinon.useFakeTimers()
+
+    @logic.write(@pin0, true)
+    @logic.write(@pin0, false)
+
+    assert.isTrue(@logic.isBuffering())
+
+    @logic.cancel();
+
+    assert.isFalse(@logic.isBuffering())
+    assert.isFalse(@logic.isInProgress())
+    assert.isFalse(@logic.isWriting())
+
+    clock.tick(@writeBufferMs)
+
+    sinon.assert.notCalled(@writeCb)
+
+    await @writePromise
+
+    assert.equal(@state, 0b00000000)
+
+    clock.restore()
+
+  it "write - add new request while writing - start new write after current is finished", ->
+    @logic.writeBufferMs = 0
+
+    promise1 = @logic.write(@pin0, false)
+
+    assert.isTrue(@logic.isWriting())
+
+    sinon.assert.calledOnce(@writeCb)
+
+    promise2 = @logic.write(@pin0, true)
+
+    sinon.assert.calledOnce(@writeCb)
+
+    await @writePromise
+
+    assert.isTrue(@logic.isWriting())
+    sinon.assert.calledTwice(@writeCb)
+    sinon.assert.calledWith(@writeCb.getCall(0), 0b00000000)
+    sinon.assert.calledWith(@writeCb.getCall(1), 0b00000001)
+    assert.equal(@state, 0b00000000)
+
+    await promise2
+
+    assert.equal(@state, 0b00000001)

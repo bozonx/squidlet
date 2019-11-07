@@ -25,7 +25,7 @@ describe 'system.lib.logic.DigitalPortExpanderInputLogic', ->
     @logic.incomeState(@pin0, true)
     @logic.incomeState(1, true)
 
-    assert.equal(@state, 3)
+    assert.equal(@state, 0b00000011)
     assert.isFalse(@logic.isInProgress())
 
     sinon.assert.calledOnce(@handler1)
@@ -37,7 +37,7 @@ describe 'system.lib.logic.DigitalPortExpanderInputLogic', ->
     @logic.incomeState(@pin0, true)
     @logic.incomeState(@pin0, false)
 
-    assert.equal(@state, 0)
+    assert.equal(@state, 0b00000000)
 
     sinon.assert.calledTwice(@handler1)
     sinon.assert.calledWith(@handler1, false)
@@ -48,7 +48,7 @@ describe 'system.lib.logic.DigitalPortExpanderInputLogic', ->
     @logic.incomeState(@pin0, true)
     @logic.incomeState(@pin0, true)
 
-    assert.equal(@state, 1)
+    assert.equal(@state, 0b00000001)
 
     sinon.assert.calledOnce(@handler1)
     sinon.assert.calledWith(@handler1, true)
@@ -78,7 +78,7 @@ describe 'system.lib.logic.DigitalPortExpanderInputLogic', ->
     assert.isFalse(@logic.isPollInProgress())
     sinon.assert.calledOnce(@handler1)
     sinon.assert.calledWith(@handler1, true)
-    assert.equal(@state, 3)
+    assert.equal(@state, 0b00000011)
 
     clock.restore()
 
