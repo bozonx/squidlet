@@ -71,6 +71,7 @@ export default class DigitalPortExpanderOutputLogic {
    * Force write full state
    */
   async writeState(state: number): Promise<void> {
+    // if buffering time - clear buffer and start write immediately
     if (this.isBuffering()) {
       this.debounce.clear();
 
