@@ -166,9 +166,7 @@ export default class DigitalPortExpanderOutputLogic {
       throw e;
     }
 
-    // TODO: test чтобы не остался writingTimeBuffer
-
-    if (!this.queue.isPending()) {
+    if (!this.queue.hasQueue()) {
       // remove buffer if there aren't no queue
       delete this.writingTimeBuffer;
     }

@@ -1,7 +1,7 @@
 DigitalPortExpanderOutputLogic = require('../../../../system/lib/logic/DigitalPortExpanderOutputLogic').default;
 
 
-describe.only 'system.lib.logic.DigitalPortExpanderOutputLogic', ->
+describe 'system.lib.logic.DigitalPortExpanderOutputLogic', ->
   beforeEach ->
     @pin0 = 0
     @state = 0
@@ -110,6 +110,7 @@ describe.only 'system.lib.logic.DigitalPortExpanderOutputLogic', ->
     await promise2
 
     assert.equal(@state, 0b00000001)
+    assert.isUndefined(@logic.writingTimeBuffer)
 
   it "cancel writing - it will resolve promise", ->
     @logic.writeBufferMs = 0
