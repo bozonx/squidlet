@@ -74,7 +74,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this._expanderOutput = new DigitalPortExpanderOutputLogic(
       this.log.error,
       this.writeToIc,
-      (): number => this.currentState,
+      this.getState,
       this.setWholeState,
       this.config.config.queueJobTimeoutSec,
       this.props.writeBufferMs,
@@ -82,7 +82,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this._expanderInput = new DigitalPortExpanderInputLogic(
       this.log.error,
       this.pollOnce,
-      (): number => this.currentState,
+      this.getState,
       this.updateState,
     );
   }
@@ -191,14 +191,18 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this.directions.includes(PinDirection.input);
   }
 
-  /**
-   * Returns array like [true, true, false, false, true, true, false, false].
-   * It is full state includes values of input and output pins. Input pins are always true.
-   * If you did't setup poll or interrupt then call `pollOnce()` before
-   * to be sure that you will receive the last actual data.
-   */
-  getState(): boolean[] {
-    return byteToBinArr(this.currentState);
+  // /**
+  //  * Returns array like [true, true, false, false, true, true, false, false].
+  //  * It is full state includes values of input and output pins. Input pins are always true.
+  //  * If you did't setup poll or interrupt then call `pollOnce()` before
+  //  * to be sure that you will receive the last actual data.
+  //  */
+  // getState(): boolean[] {
+  //   return byteToBinArr(this.currentState);
+  // }
+
+  getState = (): number => {
+    return this.currentState;
   }
 
   getPinState(pin: number): boolean {
@@ -302,7 +306,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   clearPin(pin: number) {
     if (this.directions[pin] === PinDirection.input) {
-      // TODO: правильно ли что удаляются обработчики событий ???
       this.expanderInput.clearPin(pin);
     }
 
