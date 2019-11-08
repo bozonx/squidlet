@@ -6,6 +6,11 @@ describe.only 'entities.drivers.Pcf8574', ->
   beforeEach ->
     @pin0 = 0
     @i2cToSlave = {
+      write: sinon.stub().returns(Promise.resolve())
+      hasFeedback: () => true
+      addPollErrorListener: sinon.spy()
+      addListener: sinon.spy()
+      startFeedback: sinon.spy()
     }
     @context = {
       log: {
@@ -89,4 +94,29 @@ describe.only 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0)
     await @expander.setupOutput(1, true)
 
+    assert.isTrue(@expander.setupStep)
+    assert.isFalse(@expander.initIcStep)
+    assert.isFalse(@expander.isIcInitialized())
 
+    promise = @expander.initIc()
+
+    assert.isFalse(@expander.setupStep)
+    assert.isTrue(@expander.initIcStep)
+    assert.isFalse(@expander.isIcInitialized())
+    assert.isFalse(@expander.initIcPromised.isResolved())
+
+    sinon.assert.calledOnce(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00000011]))
+
+    await promise
+
+    assert.isFalse(@expander.setupStep)
+    assert.isFalse(@expander.initIcStep)
+    assert.isTrue(@expander.isIcInitialized())
+    assert.isTrue(@expander.initIcPromised.isResolved())
+
+    sinon.assert.calledOnce(@i2cToSlave.addPollErrorListener)
+    sinon.assert.calledOnce(@i2cToSlave.addListener)
+    sinon.assert.calledOnce(@i2cToSlave.startFeedback)
+
+  it "write before initIc", ->

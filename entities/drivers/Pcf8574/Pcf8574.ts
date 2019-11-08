@@ -5,7 +5,7 @@
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import {byteToBinArr, getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
+import {getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
@@ -28,12 +28,16 @@ export const DATA_LENGTH = 1;
 
 
 export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
+  get initIcPromise(): Promise<void> {
+    return this.initIcPromised.promise;
+  }
+
   // Direction of each pin. By default all the pin directions are undefined
   private readonly directions: (PinDirection | undefined)[] = [];
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
-  private initializationPromise = new Promised<void>();
+  private initIcPromised = new Promised<void>();
   // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number} = {};
   // Bitmask representing the current state of the pins
@@ -51,11 +55,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   private get expanderInput(): DigitalPortExpanderInputLogic {
     return this._expanderInput as any;
-  }
-
-  // TODO: может сделать публичным ?
-  private get initIcPromise(): Promise<void> {
-    return this.initializationPromise.promise;
   }
 
 
@@ -88,7 +87,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   destroy = async () => {
-    this.initializationPromise.destroy();
+    this.initIcPromised.destroy();
     this.expanderInput.destroy();
     this.expanderOutput.destroy();
   }
@@ -103,8 +102,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.setupStep = false;
     this.initIcStep = true;
 
-    console.log(3333333, this.props.address, this.currentState);
-
     try {
       await this.expanderOutput.writeState(this.currentState);
     }
@@ -113,28 +110,17 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       // TODO: если произолша ошибка - как тогда потом проинициализироваться ????
 
-      this.initializationPromise.reject(e);
+      this.initIcPromised.reject(e);
 
       throw e;
     }
 
     this.initIcStep = false;
 
-    this.initializationPromise.resolve();
+    this.initIcPromised.resolve();
 
-    // if I2C driver doesn't have feedback then it doesn't need to be setup
-    if (!this.i2cDriver.hasFeedback()) return;
-
-    // TODO: review - почему бы это не сделать в самом i2cDriver ?
-    this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
-      this.log.error(String(err));
-    });
-
-    this.i2cDriver.addListener(this.handleIcStateChange);
-    // make first request and start handle feedback
-    this.i2cDriver.startFeedback();
+    this.startFeedback();
   }
-
 
   /**
    * If you did setup after IC initialized then do `initIc()`.
@@ -324,6 +310,20 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
 
+  private startFeedback() {
+    // if I2C driver doesn't have feedback then it doesn't need to be setup
+    if (!this.i2cDriver.hasFeedback()) return;
+
+    // TODO: review - почему бы это не сделать в самом i2cDriver ?
+    this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
+      this.log.error(String(err));
+    });
+
+    this.i2cDriver.addListener(this.handleIcStateChange);
+    // make first request and start handle feedback
+    this.i2cDriver.startFeedback();
+  }
+
   private handleIcStateChange = (functionStr: number | string | undefined, data: Uint8Array) => {
     if (!data || data.length !== DATA_LENGTH) {
       return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
@@ -349,8 +349,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
     // fill data
     dataToSend[0] = newStateByte;
-
-    console.log(9999999999, newStateByte)
 
     return this.i2cDriver.write(undefined, dataToSend);
   }
