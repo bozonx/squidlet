@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/binaryHelpers')
 
 
-describe 'system.lib.binaryHelpers', ->
+describe.only 'system.lib.binaryHelpers', ->
   it 'isEqualUint8Array', ->
     assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([]), new Uint8Array([])))
     assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([1,2,3]), new Uint8Array([1,2,3])))
@@ -95,10 +95,16 @@ describe 'system.lib.binaryHelpers', ->
     )
 
   it 'updateBitInByte', ->
-    assert.equal(helpers.updateBitInByte(0, 2 , true), 4)
+    assert.equal(helpers.updateBitInByte(0b00000001, 2, true), 0b00000101)
+    assert.equal(helpers.updateBitInByte(0b00000000, 5, true), 0b00100000)
+    assert.equal(helpers.updateBitInByte(0b11111111, 4, false), 0b11101111)
+    assert.throws(() => helpers.updateBitInByte(0b00000000, 8, true))
 
   it 'getBitFromByte', ->
-    assert.equal(helpers.getBitFromByte(5, 2), true)
+    assert.equal(helpers.getBitFromByte(0b00000001, 0), true)
+    assert.equal(helpers.getBitFromByte(0b11000101, 1), false)
+    assert.equal(helpers.getBitFromByte(0b10000000, 7), true)
+    assert.throws(() => helpers.getBitFromByte(0b00000000, 8))
 
   it 'getAsciiNumber', ->
     assert.equal(helpers.getAsciiNumber(1), 49)

@@ -252,8 +252,9 @@ export function bytesToBits(bytes: Uint8Array): boolean[] {
  * @param value
  */
 export function updateBitInByte(byte: number, position: number, value: boolean): number {
-
-  // TODO: why position from the end???
+  if (position < 0 || position >= BITS_IN_BYTE) {
+    throw new Error(`updateBitInByte: incorrect position "${position}" it has to be 0-7.`);
+  }
 
   if (value) {
     // set the bit
@@ -269,10 +270,7 @@ export function updateBitInByte(byte: number, position: number, value: boolean):
  * Get bit on specific position from byte (as number)
  */
 export function getBitFromByte(byte: number, position: number): boolean {
-
-  // TODO: why position from the end???
-
-  if (position < 0 && position >= BITS_IN_BYTE) {
+  if (position < 0 || position >= BITS_IN_BYTE) {
     throw new Error(`getBitFromByte: incorrect position "${position}" it has to be 0-7.`);
   }
 
