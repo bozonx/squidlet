@@ -4,7 +4,7 @@ import RuleItem from './interfaces/RuleItem';
 import RuleDefinition from './interfaces/RuleDefinition';
 import {RuleTriggers} from './rule/RuleTriggers';
 import {RuleActions} from './rule/RuleActions';
-import RuleCheck from './rule/RuleCheck';
+import RuleCheckCondition from './rule/RuleCheckCondition';
 
 
 interface Props {
@@ -27,8 +27,9 @@ export default class Automation extends ServiceBase<Props> {
   destroy = async () => {
     for (let rule of this.rules) {
       rule.triggers.destroy();
-      rule.check.destroy();
       rule.actions.destroy();
+
+      if (rule.checkCondition) rule.checkCondition.destroy();
     }
 
     delete this.rules;
@@ -67,8 +68,15 @@ export default class Automation extends ServiceBase<Props> {
 
       const name: string = ruleDefinition.name || this.generateUniqName();
       const actions = new RuleActions(this.context, this.rules, name, ruleDefinition);
-      const check = new RuleCheck(this.context, this.rules, name, ruleDefinition);
+      let checkCondition: RuleCheckCondition | undefined;
+
+      if (ruleDefinition.if) {
+        checkCondition = new RuleCheckCondition(this.context, this.rules, name, ruleDefinition)
+      }
+
       const triggeredCb = () => {
+        if (checkCondition && !checkCondition.isAllowedExecute()) return;
+
         actions.execute();
       };
       const triggers = new RuleTriggers(
@@ -82,8 +90,8 @@ export default class Automation extends ServiceBase<Props> {
       const ruleItem: RuleItem = {
         name,
         triggers,
-        check,
         actions,
+        checkCondition,
       };
 
       this.rules.push(ruleItem);

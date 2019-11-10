@@ -1,3 +1,5 @@
+import ValueDefinition from './ValueDefinition';
+
 export type TriggerTypes = 'deviceState' | 'automation' | 'mqtt' | 'http' | 'I2C';
 export type ActionTypes = 'deviceAction' | 'automation' | 'mqtt' | 'http';
 
@@ -16,4 +18,5 @@ export default interface RuleDefinition {
   name?: string;
   trigger: TriggerDefinition[];
   action: ActionDefinition[];
+  if?: ValueDefinition[];
 }

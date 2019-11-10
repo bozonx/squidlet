@@ -2,15 +2,17 @@ import Context from 'system/Context';
 
 import ValueDefinition from '../interfaces/ValueDefinition';
 import {makeValue} from './allValues';
+import {invertIfNeed} from '../../../../system/lib/digitalHelpers';
 
 
 interface AndDefinition extends ValueDefinition {
   check: ValueDefinition[];
+  invert?: boolean;
 }
 
 
-export default function (context: Context, definition: AndDefinition): boolean | Promise<boolean> {
-  for (let valueDefinition of definition.check) {
+const resolveAndValue = (context: Context, check: ValueDefinition[]) => {
+  for (let valueDefinition of check) {
     const result: any = makeValue(context, valueDefinition);
 
     // TODO: если вернулся promise - то все далее проверяем по очереди с промисами
@@ -20,4 +22,9 @@ export default function (context: Context, definition: AndDefinition): boolean |
   }
 
   return true;
+};
+
+
+export default function (context: Context, definition: AndDefinition): boolean | Promise<boolean> {
+  return invertIfNeed(resolveAndValue(context, definition.check), definition.invert);
 }

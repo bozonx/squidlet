@@ -1,11 +1,11 @@
 import {RuleTriggers} from '../rule/RuleTriggers';
 import {RuleActions} from '../rule/RuleActions';
-import RuleCheck from '../rule/RuleCheck';
+import RuleCheckCondition from '../rule/RuleCheckCondition';
 
 
 export default interface RuleItem {
   name: string;
   triggers: RuleTriggers;
-  check: RuleCheck;
   actions: RuleActions;
+  checkCondition?: RuleCheckCondition;
 }

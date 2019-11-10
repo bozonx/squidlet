@@ -37,8 +37,9 @@ export default class DeviceAction implements ActionItem {
 
 
   async execute() {
+    // TODO: зачем оно асинхронное ???
     // do nothing if condition is false
-    if (!this.checkCondition()) return;
+    if (!await this.isAllowedExecute()) return;
 
     const device: DeviceBase = this.actions.context.system.devicesManager.getDevice(this.definition.id);
     const args: any[] = await this.makeArgs();
@@ -76,8 +77,12 @@ export default class DeviceAction implements ActionItem {
     // return Promise.all(promises);
   }
 
-  private async checkCondition(): Promise<boolean> {
-    if (!this.definition.if) return false;
+  private async isAllowedExecute(): Promise<boolean> {
+
+    // TODO: не обязательно должно венуть промис
+
+    // allow execute if there isn't "if" section
+    if (!this.definition.if) return true;
 
     return AndValue(this.actions.context, {
       type: 'and',
