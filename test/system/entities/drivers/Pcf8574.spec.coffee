@@ -182,7 +182,7 @@ describe.only 'entities.drivers.Pcf8574', ->
   it "write - disallow write to pin which hasn't been setup", ->
     assert.isRejected(@expander.write(@pin0, true))
 
-  it "write with buffer", ->
+  it "write with buffer - collect write request and make only one write to IC", ->
     @expander._expanderOutput.writeBufferMs = 1
 
     await @expander.setupOutput(@pin0)
@@ -198,3 +198,18 @@ describe.only 'entities.drivers.Pcf8574', ->
     sinon.assert.calledWith(@i2cToSlave.write.getCall(0), undefined, new Uint8Array([0b00000000]))
     sinon.assert.calledWith(@i2cToSlave.write.getCall(1), undefined, new Uint8Array([0b00000011]))
 
+  it "write while IC is initializing", ->
+    await @expander.setupOutput(@pin0)
+
+    initPromise = @expander.initIc()
+
+    assert.isFalse(@expander.isIcInitialized())
+
+    writePromise = @expander.write(@pin0, true)
+
+    await initPromise
+    await writePromise
+
+    sinon.assert.calledTwice(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(0), undefined, new Uint8Array([0b00000000]))
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(1), undefined, new Uint8Array([0b00000001]))

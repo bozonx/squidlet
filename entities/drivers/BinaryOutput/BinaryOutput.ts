@@ -184,8 +184,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
    * @param level - top level value
    */
   async write(level: boolean): Promise<void> {
-    console.log('--------- BinaryOutput write start', this.props.pin, this.props.gpio, level, this.isInProgress());
-
     // if there is writing or blocking check block modes
     if (this.isInProgress()) {
       // don't allow writing while another writing or block time is in progress in "refuse" mode
@@ -196,8 +194,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     }
     // normally write only if there isn't writing or blocking in progress
     await this.doWrite(level);
-
-    console.log('--------- BinaryOutput write end', this.props.pin, this.props.gpio);
 
     this.handleSuccessWriting();
   }
@@ -215,8 +211,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
     this.writing = true;
 
-    console.log('--------- BinaryOutput doWrite start', this.props.pin, this.props.gpio, level);
-
     // wait for writing
     try {
       await this.gpio.digitalWrite(this.props.pin, ioValue);
@@ -231,8 +225,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
       throw new Error(errorMsg);
     }
-
-    console.log('--------- BinaryOutput doWrite end', this.props.pin, this.props.gpio, level);
 
     this.writing = false;
   }

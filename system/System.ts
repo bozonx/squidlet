@@ -123,8 +123,6 @@ export default class System {
 
 
   private async emitEventSync(eventName: number) {
-    console.log(11111111, eventName, this.events.getListeners(eventName).length)
-
     try {
       await this.events.emitSync(eventName);
     }

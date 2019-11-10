@@ -171,8 +171,6 @@ export default class DeviceBase<
       throw new Error(`DeviceBase.setStatus: device "${this.id}", status hasn't been set.`);
     }
 
-    console.log('--------- setStatus start', this.id)
-
     try {
       await this.statusState.write({[statusName]: newValue});
     }

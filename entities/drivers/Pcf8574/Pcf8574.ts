@@ -254,7 +254,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       // update current value of pin and go out if there is setup step
       this.updateState(pin, value);
 
-      // TODO: должнен ли он вернуть this.initIcPromise
       return Promise.resolve();
     }
 
@@ -284,7 +283,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       // set current state and go out if there is setup step
       this.currentState = preparedState;
 
-      // TODO: должнен ли он вернуть this.initIcPromise
       return Promise.resolve();
     }
 
