@@ -120,3 +120,30 @@ describe.only 'entities.drivers.Pcf8574', ->
     sinon.assert.calledOnce(@i2cToSlave.startFeedback)
 
   it "write before initIc", ->
+    await @expander.setupOutput(@pin0)
+
+    assert.equal(@expander.getState(), 0b00000000)
+
+    await @expander.write(@pin0, true)
+
+    assert.equal(@expander.getState(), 0b00000001)
+    sinon.assert.notCalled(@i2cToSlave.write)
+
+    await @expander.initIc()
+
+    sinon.assert.calledOnce(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00000001]))
+
+  it "writeState before initIc", ->
+    await @expander.setupOutput(@pin0)
+    await @expander.setupInput(3)
+
+    await @expander.writeState(0b11111111)
+
+    assert.equal(@expander.getState(), 0b00001001)
+    sinon.assert.notCalled(@i2cToSlave.write)
+
+    await @expander.initIc()
+
+    sinon.assert.calledOnce(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00001001]))

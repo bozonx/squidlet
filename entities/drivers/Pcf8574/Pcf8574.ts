@@ -239,55 +239,56 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   /**
    * Set the value of an output pin.
-   * @param  {number}  pin   The pin number. (0 to 7)
+   * @param  {number}  pin The pin number. (0 to 7)
    * @param  {boolean} value The new value for this pin.
    * @return {Promise}
    */
-  async write(pin: number, value: boolean): Promise<void> {
+  write(pin: number, value: boolean): Promise<void> {
     //this.checkPin(pin);
 
-    console.log(6666666666, pin, value, this.setupStep, this.directions[pin])
-
     if (this.directions[pin] !== PinDirection.output) {
-      throw new Error('Pin is not defined as an output');
+      return Promise.reject(new Error('Pin is not defined as an output'));
     }
-
 
     if (this.setupStep) {
       // update current value of pin and go out if there is setup step
       this.updateState(pin, value);
 
-      // TODO: return as was
-
-      return;
-      //return this.initIcPromise;
+      // TODO: должнен ли он вернуть this.initIcPromise
+      return Promise.resolve();
     }
 
-    await this.expanderOutput.write(pin, value);
+    return this.expanderOutput.write(pin, value);
   }
 
   /**
    * Set new state of output pins and write them to IC.
    * Not output pins (input, undefined) are ignored.
+   * e.g to turn pin 0 and pin3 to high level pass 0b00001001
    */
-  async writeState(outputValues: (boolean | undefined)[]): Promise<void> {
-    let newState: number = this.currentState;
+  async writeState(newState: number): Promise<void> {
+    let preparedState: number = this.currentState;
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
-      // skip undefined values and not an output pin
-      if (typeof outputValues[pin] !== 'boolean' || this.directions[pin] !== PinDirection.output) continue;
-
-      newState = updateBitInByte(newState, pin, outputValues[pin] as boolean);
+      if (this.directions[pin] === PinDirection.input) {
+        // inputs are always in high level
+        preparedState = updateBitInByte(preparedState, pin, true);
+      }
+      else if (this.directions[pin] === PinDirection.output) {
+        // update outputs
+        preparedState = updateBitInByte(preparedState, pin, getBitFromByte(newState, pin));
+      }
     }
 
     if (this.setupStep) {
       // set current state and go out if there is setup step
-      this.currentState = newState;
+      this.currentState = preparedState;
 
-      return this.initIcPromise;
+      // TODO: должнен ли он вернуть this.initIcPromise
+      return Promise.resolve();
     }
 
-    await this.expanderOutput.writeState(this.currentState);
+    await this.expanderOutput.writeState(preparedState);
   }
 
   clearPin(pin: number) {
