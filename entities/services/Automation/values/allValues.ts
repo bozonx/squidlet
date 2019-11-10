@@ -4,6 +4,7 @@ import AndValue from './AndValue';
 import OrValue from './OrValue';
 import Context from 'system/Context';
 import {JsonTypes} from 'system/interfaces/Types';
+import Value from './Value';
 
 
 export type ValueFunctionReturnType = (JsonTypes | undefined) | Promise<JsonTypes | undefined>;
@@ -14,6 +15,7 @@ const allValues: {[index: string]: ValueFunction} = {
   or: OrValue,
   statusBoolean: StatusBooleanValue,
   status: StatusValue,
+  value: Value,
 };
 
 

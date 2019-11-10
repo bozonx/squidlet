@@ -38,7 +38,10 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   emitSync = async (eventName: string | number, ...args: any[]): Promise<void> => {
     if (!this.indexes[eventName]) return;
 
-    for (let index of this.indexes[eventName]) {
+    // make clone of indexes because some indexes are able be removed while processing "once" events
+    const indexes: number[] = [ ...this.indexes[eventName] ];
+
+    for (let index of indexes) {
       const handler: T | undefined = this.handlers[index];
 
       // TODO: test
@@ -55,10 +58,15 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   // TODO: можно сделать вариант когда выполняются все, ошибочные пропускаются и выводятся ошибки списокм
 
   // TODO: test
+  // TODO: review
   emitAll = async (eventName: string | number, ...args: any[]): Promise<void> => {
     if (!this.indexes[eventName]) return;
 
     const promises: Promise<any>[] = [];
+
+
+    // TODO: не будет рабоать ?????
+    // TODO: делать клон индексов
 
     for (let index of this.indexes[eventName]) {
       const handler: T | undefined = this.handlers[index];
