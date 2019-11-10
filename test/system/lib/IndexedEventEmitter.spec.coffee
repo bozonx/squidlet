@@ -2,7 +2,7 @@ Events = require('../../../system/lib/IndexedEventEmitter').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.lib.IndexedEventEmitter', ->
+describe.only 'system.lib.IndexedEventEmitter', ->
   beforeEach ->
     @eventName = 'name'
     @handler = sinon.spy()
@@ -48,6 +48,17 @@ describe 'system.lib.IndexedEventEmitter', ->
 
     sinon.assert.calledOnce(@handler)
 
+  it "once several", ->
+    @events.once(@eventName, @handler)
+    @events.once(@eventName, @handler)
+    @events.once(@eventName, @handler)
+
+    assert.equal(@events.getListeners(@eventName).length, 3)
+
+    @events.emit(@eventName)
+
+    sinon.assert.calledThrice(@handler)
+
   it "getListeners", ->
     handler1 = () =>
     handler2 = () =>
@@ -78,6 +89,19 @@ describe 'system.lib.IndexedEventEmitter', ->
     assert.isUndefined(@events.handlers[index])
     assert.equal(@events.indexes[@eventName], 1)
 
+  it "removeListener with eventName - one of several handlers", ->
+    handler1 = () =>
+    handler3 = () =>
+    index1 = @events.addListener(@eventName, handler1)
+    index2 = @events.addListener(@eventName, @handler)
+    index3 = @events.addListener(@eventName, handler3)
+
+    @events.removeListener(index2, @eventName)
+
+    assert.equal(@events.getListeners(@eventName).length, 2)
+    assert.equal(@events.getListeners(@eventName)[0], handler1)
+    assert.equal(@events.getListeners(@eventName)[1], handler3)
+
   it "removeListener without eventName", ->
     handler2 = sinon.spy()
     index = @events.addListener(@eventName, @handler)
@@ -89,6 +113,19 @@ describe 'system.lib.IndexedEventEmitter', ->
     sinon.assert.calledOnce(handler2)
     assert.isUndefined(@events.handlers[index])
     assert.equal(@events.indexes[@eventName], 1)
+
+  it "removeListener without eventName - one of several handlers", ->
+    handler1 = () =>
+    handler3 = () =>
+    index1 = @events.addListener(@eventName, handler1)
+    index2 = @events.addListener(@eventName, @handler)
+    index3 = @events.addListener(@eventName, handler3)
+
+    @events.removeListener(index2)
+
+    assert.equal(@events.getListeners(@eventName).length, 2)
+    assert.equal(@events.getListeners(@eventName)[0], handler1)
+    assert.equal(@events.getListeners(@eventName)[1], handler3)
 
   it "removeListener with eventName and clean up", ->
     index = @events.addListener(@eventName, @handler)

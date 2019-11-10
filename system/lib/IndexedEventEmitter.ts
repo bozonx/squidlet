@@ -18,10 +18,18 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
   emit = (eventName: string | number, ...args: any[]) => {
     if (!this.indexes[eventName]) return;
 
-    for (let index of this.indexes[eventName]) {
+    // make clone of indexes because some indexes are able be removed while processing "once" events
+    const indexes: number[] = [ ...this.indexes[eventName] ];
+
+    for (let index of indexes) {
       const handler: T | undefined = this.handlers[index];
 
-      if (!handler) continue;
+      // TODO: test
+      if (!handler) {
+        throw new Error(
+          `IndexedEventEmitter.emit: can't find handler of event "${eventName}" by index "${index}"`
+        );
+      }
 
       handler(...args);
     }
@@ -33,7 +41,12 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     for (let index of this.indexes[eventName]) {
       const handler: T | undefined = this.handlers[index];
 
-      if (!handler) continue;
+      // TODO: test
+      if (!handler) {
+        throw new Error(
+          `IndexedEventEmitter.emitSync: can't find handler of event "${eventName}" by index "${index}"`
+        );
+      }
 
       await handler(...args);
     }
@@ -50,7 +63,12 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     for (let index of this.indexes[eventName]) {
       const handler: T | undefined = this.handlers[index];
 
-      if (!handler) continue;
+      // TODO: test
+      if (!handler) {
+        throw new Error(
+          `IndexedEventEmitter.emitAll: can't find handler of event "${eventName}" by index "${index}"`
+        );
+      }
 
       const result: any = handler(...args);
 
@@ -67,6 +85,7 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     const wrapper = ((...args: any[]) => {
       this.removeListener(wrapperIndex, eventName);
       // return in promise case
+      // TODO: что если произойдет ошибка ???
       return handler(...args);
     }) as T;
 
@@ -83,9 +102,9 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
       this.indexes[eventName] = [];
     }
 
-    this.handlers.push(handler);
+    const index: number = this.handlers.length;
 
-    const index: number = this.handlers.length - 1;
+    this.handlers.push(handler);
 
     this.indexes[eventName].push(index);
 
@@ -100,7 +119,12 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     for (let index of this.indexes[eventName]) {
       const handler: T | undefined = this.handlers[index];
 
-      if (!handler) continue;
+      // TODO: test
+      if (!handler) {
+        throw new Error(
+          `IndexedEventEmitter.getListeners: can't find handler of event "${eventName}" by index "${index}"`
+        );
+      }
 
       result.push(handler);
     }
@@ -112,23 +136,25 @@ export default class IndexedEventEmitter<T extends DefaultHandler = DefaultHandl
     return Boolean(this.indexes[eventName] && this.indexes[eventName].length);
   }
 
-  // TODO: наверное не нужнен eventName - вносит неопределенность
   /**
    * Remove handler by index.
    * You can omit eventName, but if you defined it then removing will be faster.
    */
   removeListener(handlerIndex: number, eventName?: string | number): void {
-    if (eventName) {
+    if (typeof eventName !== 'undefined') {
       if (!this.indexes[eventName]) return;
 
       // find index of handler index in list belongs to eventName
-      const foundIndex: number = this.indexes[eventName].findIndex((item) => item === handlerIndex);
+      const foundIndexInEvents: number = this.indexes[eventName].findIndex((item) => item === handlerIndex);
 
-      if (foundIndex < 0) return;
+      if (foundIndexInEvents < 0) return;
 
-      this.indexes[eventName].splice(foundIndex, 1);
+      this.indexes[eventName].splice(foundIndexInEvents, 1);
 
-      if (!this.indexes[eventName].length) delete this.indexes[eventName];
+      // remove event's array if it is empty
+      if (!this.indexes[eventName].length) {
+        delete this.indexes[eventName];
+      }
 
       delete this.handlers[handlerIndex];
 
