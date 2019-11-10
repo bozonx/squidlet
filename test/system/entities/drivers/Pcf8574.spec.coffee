@@ -28,14 +28,13 @@ describe.only 'entities.drivers.Pcf8574', ->
         }
       }
     }
-    @writeBufferMs = 100
     @definition = {
       id: 'Pcf8574'
       className: 'Pcf8574'
       props: {
         busNum: 1
         address: '5a'
-        writeBufferMs: @writeBufferMs
+        writeBufferMs: 0
       }
     }
     @driver = new Pcf8574(@context, @definition)
@@ -147,3 +146,55 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     sinon.assert.calledOnce(@i2cToSlave.write)
     sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00001001]))
+
+  it "write after initIc", ->
+    await @expander.setupOutput(@pin0)
+    await @expander.initIc()
+
+    promise = @expander.write(@pin0, true)
+
+    assert.equal(@expander.getState(), 0b00000000)
+
+    await promise
+
+    assert.equal(@expander.getState(), 0b00000001)
+
+    sinon.assert.calledTwice(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(0), undefined, new Uint8Array([0b00000000]))
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(1), undefined, new Uint8Array([0b00000001]))
+
+  it "writeState after initIc", ->
+    await @expander.setupOutput(@pin0)
+    await @expander.initIc()
+
+    promise = @expander.writeState(0b00000001)
+
+    assert.equal(@expander.getState(), 0b00000000)
+
+    await promise
+
+    assert.equal(@expander.getState(), 0b00000001)
+
+    sinon.assert.calledTwice(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(0), undefined, new Uint8Array([0b00000000]))
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(1), undefined, new Uint8Array([0b00000001]))
+
+  it "write - disallow write to pin which hasn't been setup", ->
+    assert.isRejected(@expander.write(@pin0, true))
+
+  it "write with buffer", ->
+    @expander._expanderOutput.writeBufferMs = 1
+
+    await @expander.setupOutput(@pin0)
+    await @expander.setupOutput(1)
+    await @expander.initIc()
+
+    @expander.write(@pin0, true)
+    promise2 = @expander.write(1, true)
+
+    await promise2
+
+    sinon.assert.calledTwice(@i2cToSlave.write)
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(0), undefined, new Uint8Array([0b00000000]))
+    sinon.assert.calledWith(@i2cToSlave.write.getCall(1), undefined, new Uint8Array([0b00000011]))
+
