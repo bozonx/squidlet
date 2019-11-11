@@ -260,7 +260,11 @@ describe.only 'entities.drivers.Pcf8574', ->
     assert.isFalse(await readPromise)
     assert.equal(@expander.getState(), 0b00000000)
 
+<<<<<<< HEAD
   it "read after IC inited - make poll and return a value", ->
+=======
+  it "read after IC inited - make poo and return a value", ->
+>>>>>>> develop
     await @expander.setupInput(@pin0)
     await @expander.initIc()
 
