@@ -126,7 +126,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * If you did setup after IC initialized then do `initIc()`.
    */
   async setupInput(pin: number, debounce?: number): Promise<void> {
-    //this.checkPin(pin);
+    this.checkPinRange(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
@@ -143,7 +143,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
-    //this.checkPin(pin);
+    this.checkPinRange(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
@@ -160,6 +160,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   getPinDirection(pin: number): PinDirection | undefined {
+    this.checkPinRange(pin);
+
     return this.directions[pin];
   }
 
@@ -190,6 +192,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   getPinState(pin: number): boolean {
+    this.checkPinRange(pin);
+
     return getBitFromByte(this.currentState, pin);
   }
 
@@ -197,6 +201,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Listen to changes of pin after edge and debounce were processed.
    */
   onChange(pin: number, handler: ChangeHandler): number {
+    this.checkPinRange(pin);
+
     return this.expanderInput.onChange(pin, handler);
   }
 
@@ -216,13 +222,13 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   /**
    * Asks IC and returns the current value of a pin.
+   * If IC hasn't been initialized then it will return false.
+   * If pin is output then current state of this pin will be returned
    */
   async read(pin: number): Promise<boolean> {
-    //this.checkPin(pin);
+    this.checkPinRange(pin);
 
-    if (this.i2cDriver.hasFeedback()) {
-      // TODO: как удостовериться что после poll отработают хэндлеры которые установят стейт
-      // TODO: может сделать через input helper чтобы сработали события ?
+    if (this.i2cDriver.hasFeedback() && this.directions[pin] == PinDirection.input) {
       await this.pollOnce();
     }
 
@@ -236,7 +242,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * @return {Promise}
    */
   write(pin: number, value: boolean): Promise<void> {
-    //this.checkPin(pin);
+    this.checkPinRange(pin);
 
     if (this.directions[pin] !== PinDirection.output) {
       return Promise.reject(new Error('Pin is not defined as an output'));
@@ -278,6 +284,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   clearPin(pin: number) {
+    this.checkPinRange(pin);
+
     if (this.directions[pin] === PinDirection.input) {
       this.expanderInput.clearPin(pin);
     }
@@ -350,9 +358,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this.i2cDriver.write(undefined, dataToSend);
   }
 
-  // TODO: решить на каком уровне делать
-  // TODO: использовать board setup
-  private checkPin(pin: number) {
+  private checkPinRange(pin: number) {
     if (pin < 0 || pin >= PINS_COUNT) {
       throw new Error(`Pin "${pin}" out of range`);
     }
