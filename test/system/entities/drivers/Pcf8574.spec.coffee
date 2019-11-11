@@ -234,3 +234,17 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     sinon.assert.calledOnce(@handler1)
     sinon.assert.calledWith(@handler1, true)
+
+  it "removeListener", ->
+    await @expander.setupInput(@pin0)
+    handlerIndex = @expander.onChange(@pin0, @handler1)
+
+    await @expander.initIc()
+    await @expander.pollOnce()
+
+    @expander.removeListener(handlerIndex)
+
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+
+    sinon.assert.notCalled(@handler1)
+

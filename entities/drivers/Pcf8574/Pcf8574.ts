@@ -325,8 +325,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       const newValue: boolean = getBitFromByte(receivedByte, pin);
 
-      // TODO: похоже что input стейт считается 1 хотя это просто устанавливается для записи на IC
-
       this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
     }
   }
