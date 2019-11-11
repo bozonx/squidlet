@@ -40,7 +40,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private initIcPromised = new Promised<void>();
   // collection of numbers of ms to use in debounce logic for each pin.
   private readonly pinDebounces: {[index: string]: number} = {};
-  // Bitmask representing the current state of the pins
+  // Bit mask representing the current state on IC of the input and outputs pins.
   private currentState: number = 0;
   private _expanderOutput?: DigitalPortExpanderOutputLogic;
   private _expanderInput?: DigitalPortExpanderInputLogic;
@@ -140,9 +140,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     }
 
     this.directions[pin] = PinDirection.input;
-
-    // set input pin to high
-    this.updateState(pin, true);
   }
 
   async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
@@ -174,6 +171,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Are there any input pins.
    */
   hasInputPins(): boolean {
+    // TODO: лучше сохранять готовый стейт после каждого setupInput
     return this.directions.includes(PinDirection.input);
   }
 
@@ -210,14 +208,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Poll expander manually.
    */
   pollOnce = (): Promise<void> => {
-    // TODO: return as was
     // it is no need to do poll while initialization time because it will be done after initialization
-    //if (!this.isIcInitialized()) return this.initIcPromise;
     if (!this.isIcInitialized()) return Promise.resolve();
-
-    // TODO: нужно удостовериться что сначала выполнились все обработчики которые вызывают incomeState()
-    //  тоесть должны подняться и отрабоать все события перед завершением этого промиса
-    //  иначе this.expanderInput.incomeState может сработать позже и income state не получит изменений
 
     return this.i2cDriver.pollOnce();
   }
@@ -269,14 +261,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     let preparedState: number = this.currentState;
 
     for (let pin = 0; pin < PINS_COUNT; pin++) {
-      if (this.directions[pin] === PinDirection.input) {
-        // inputs are always in high level
-        preparedState = updateBitInByte(preparedState, pin, true);
-      }
-      else if (this.directions[pin] === PinDirection.output) {
-        // update outputs
-        preparedState = updateBitInByte(preparedState, pin, getBitFromByte(newState, pin));
-      }
+      // don't care about input pins has to be high because they will be set to high in writeToIc() method.
+      if (this.directions[pin] !== PinDirection.output) continue;
+      // update outputs only
+      preparedState = updateBitInByte(preparedState, pin, getBitFromByte(newState, pin));
     }
 
     if (this.setupStep) {
@@ -337,6 +325,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
       const newValue: boolean = getBitFromByte(receivedByte, pin);
 
+      // TODO: похоже что input стейт считается 1 хотя это просто устанавливается для записи на IC
+
       this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
     }
   }
@@ -345,9 +335,19 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Write given state to the IC.
    */
   private writeToIc = (newStateByte: number): Promise<void> => {
+    let preparedState: number = newStateByte;
+
+    if (this.hasInputPins()) {
+      for (let pin = 0; pin < PINS_COUNT; pin++) {
+        if (this.directions[pin] !== PinDirection.input) continue;
+        // set height level for inputs. It needs for PCF IC
+        preparedState = updateBitInByte(preparedState, pin, true);
+      }
+    }
+
     const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
     // fill data
-    dataToSend[0] = newStateByte;
+    dataToSend[0] = preparedState;
 
     return this.i2cDriver.write(undefined, dataToSend);
   }

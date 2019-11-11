@@ -1,15 +1,19 @@
 Pcf8574 = require('../../../../entities/drivers/Pcf8574/Pcf8574').default;
 {PinDirection} = require('../../../../system/interfaces/gpioTypes');
+IndexedEvents = require('../../../../system/lib/IndexedEvents').default;
 
 
 describe.only 'entities.drivers.Pcf8574', ->
   beforeEach ->
     @pin0 = 0
+    @handler1 = sinon.spy()
+    @i2cEvents = new IndexedEvents();
     @i2cToSlave = {
       write: sinon.stub().returns(Promise.resolve())
+      pollOnce: sinon.stub().returns(Promise.resolve())
       hasFeedback: () => true
       addPollErrorListener: sinon.spy()
-      addListener: sinon.spy()
+      addListener: (handler) => @i2cEvents.addListener(handler)
       startFeedback: sinon.spy()
     }
     @context = {
@@ -47,7 +51,7 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     assert.equal(@expander.getPinDirection(@pin0), PinDirection.input)
     # input pins are marked as high level
-    assert.equal(@expander.getState(), 0b00000001)
+    assert.equal(@expander.getState(), 0b00000000)
     assert.isTrue(@expander.hasInputPins())
     assert.isFalse(@expander.isIcInitialized())
 
@@ -115,7 +119,7 @@ describe.only 'entities.drivers.Pcf8574', ->
     assert.isTrue(@expander.initIcPromised.isResolved())
 
     sinon.assert.calledOnce(@i2cToSlave.addPollErrorListener)
-    sinon.assert.calledOnce(@i2cToSlave.addListener)
+    #sinon.assert.calledOnce(@i2cToSlave.addListener)
     sinon.assert.calledOnce(@i2cToSlave.startFeedback)
 
   it "write before initIc", ->
@@ -135,7 +139,8 @@ describe.only 'entities.drivers.Pcf8574', ->
 
   it "writeState before initIc", ->
     await @expander.setupOutput(@pin0)
-    await @expander.setupInput(3)
+    await @expander.setupInput(2)
+    await @expander.setupOutput(3)
 
     await @expander.writeState(0b11111111)
 
@@ -145,7 +150,7 @@ describe.only 'entities.drivers.Pcf8574', ->
     await @expander.initIc()
 
     sinon.assert.calledOnce(@i2cToSlave.write)
-    sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00001001]))
+    sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00001101]))
 
   it "write after initIc", ->
     await @expander.setupOutput(@pin0)
@@ -213,3 +218,19 @@ describe.only 'entities.drivers.Pcf8574', ->
     sinon.assert.calledTwice(@i2cToSlave.write)
     sinon.assert.calledWith(@i2cToSlave.write.getCall(0), undefined, new Uint8Array([0b00000000]))
     sinon.assert.calledWith(@i2cToSlave.write.getCall(1), undefined, new Uint8Array([0b00000001]))
+
+  it "pollOnce before or while IC initilized - do nothing", ->
+    await @expander.pollOnce()
+
+    sinon.assert.notCalled(@i2cToSlave.pollOnce)
+
+  it "pollOnce after IC initilized - make request and catch events", ->
+    await @expander.setupInput(@pin0)
+    @expander.onChange(@pin0, @handler1)
+
+    await @expander.initIc()
+    await @expander.pollOnce()
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+
+    sinon.assert.calledOnce(@handler1)
+    sinon.assert.calledWith(@handler1, true)
