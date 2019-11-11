@@ -230,10 +230,14 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     await @expander.initIc()
     await @expander.pollOnce()
+
+    assert.equal(@expander.getState(), 0b00000000)
+
     @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
 
     sinon.assert.calledOnce(@handler1)
     sinon.assert.calledWith(@handler1, true)
+    assert.equal(@expander.getState(), 0b00000001)
 
   it "removeListener", ->
     await @expander.setupInput(@pin0)
@@ -248,3 +252,21 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     sinon.assert.notCalled(@handler1)
 
+  it "read before IC inited - just return false", ->
+    await @expander.setupInput(@pin0)
+
+    readPromise = @expander.read(@pin0)
+
+    assert.isFalse(await readPromise)
+    assert.equal(@expander.getState(), 0b00000000)
+
+  it "read after IC inited - make poll and return a value", ->
+    await @expander.setupInput(@pin0)
+    await @expander.initIc()
+
+    readPromise = @expander.read(@pin0)
+
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+
+    assert.isTrue(await readPromise)
+    assert.equal(@expander.getState(), 0b00000001)
