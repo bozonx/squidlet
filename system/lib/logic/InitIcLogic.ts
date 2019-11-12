@@ -2,27 +2,24 @@ import Promised from '../Promised';
 
 
 export default class InitIcLogic {
+  get initPromise(): Promise<void> {
+    return this.initIcPromised.promise;
+  }
+  get isSetupStep(): boolean {
+    return this.setupStep;
+  }
+  get isInitIcStep(): boolean {
+    return this.initIcStep;
+  }
+  get wasInitialized(): boolean {
+    return !this.setupStep && !this.initIcStep;
+  }
+
   private initCb: () => Promise<void>;
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
   private initIcPromised = new Promised<void>();
-
-  get initPromise(): Promise<void> {
-    return this.initIcPromised.promise;
-  }
-
-  get isSetupStep(): boolean {
-    return this.setupStep;
-  }
-
-  get isInitIcStep(): boolean {
-    return this.initIcStep;
-  }
-
-  get wasInitialized(): boolean {
-    return !this.setupStep && !this.initIcStep;
-  }
 
 
   constructor(initCb: () => Promise<void>) {

@@ -98,29 +98,28 @@ describe.only 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0)
     await @expander.setupOutput(1, true)
 
-    assert.isTrue(@expander.setupStep)
-    assert.isFalse(@expander.initIcStep)
+    assert.isTrue(@expander.initIcLogic.isSetupStep)
+    assert.isFalse(@expander.initIcLogic.isInitIcStep)
     assert.isFalse(@expander.wasIcInitialized())
 
     promise = @expander.initIc()
 
-    assert.isFalse(@expander.setupStep)
-    assert.isTrue(@expander.initIcStep)
+    assert.isFalse(@expander.initIcLogic.isSetupStep)
+    assert.isTrue(@expander.initIcLogic.isInitIcStep)
     assert.isFalse(@expander.wasIcInitialized())
-    assert.isFalse(@expander.initIcPromised.isResolved())
+    assert.isFalse(@expander.initIcLogic.initIcPromised.isResolved())
 
     sinon.assert.calledOnce(@i2cToSlave.write)
     sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00000011]))
 
     await promise
 
-    assert.isFalse(@expander.setupStep)
-    assert.isFalse(@expander.initIcStep)
+    assert.isFalse(@expander.initIcLogic.isSetupStep)
+    assert.isFalse(@expander.initIcLogic.isInitIcStep)
     assert.isTrue(@expander.wasIcInitialized())
-    assert.isTrue(@expander.initIcPromised.isResolved())
+    assert.isTrue(@expander.initIcLogic.initIcPromised.isResolved())
 
     sinon.assert.calledOnce(@i2cToSlave.addPollErrorListener)
-    #sinon.assert.calledOnce(@i2cToSlave.addListener)
     sinon.assert.calledOnce(@i2cToSlave.startFeedback)
 
   it "write before initIc", ->
@@ -323,8 +322,8 @@ describe.only 'entities.drivers.Pcf8574', ->
     @expander.destroy()
 
     assert.isUndefined(@expander.directions)
-    assert.isUndefined(@expander.initIcPromised)
     assert.isUndefined(@expander.pinDebounces)
     assert.isUndefined(@expander.currentState)
+    assert.isUndefined(@expander._initIcLogic)
     assert.isUndefined(@expander._expanderOutput)
     assert.isUndefined(@expander._expanderInput)
