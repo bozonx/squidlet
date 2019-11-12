@@ -292,3 +292,39 @@ describe.only 'entities.drivers.Pcf8574', ->
     sinon.assert.calledWith(@handler1, true)
 
     clock.restore()
+
+  it "clearPin", ->
+    await @expander.setupInput(@pin0)
+    @expander.onChange(@pin0, @handler1)
+
+    await @expander.initIc()
+
+    @expander.clearPin(@pin0)
+
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+
+    sinon.assert.notCalled(@handler1)
+    assert.isUndefined(@expander.getPinDirection(@pin0))
+
+  it "clearAll", ->
+    await @expander.setupInput(@pin0)
+    @expander.onChange(@pin0, @handler1)
+
+    await @expander.initIc()
+
+    @expander.clearAll()
+
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+
+    sinon.assert.notCalled(@handler1)
+    assert.isUndefined(@expander.getPinDirection(@pin0))
+
+  it "destroy", ->
+    @expander.destroy()
+
+    assert.isUndefined(@expander.directions)
+    assert.isUndefined(@expander.initIcPromised)
+    assert.isUndefined(@expander.pinDebounces)
+    assert.isUndefined(@expander.currentState)
+    assert.isUndefined(@expander._expanderOutput)
+    assert.isUndefined(@expander._expanderInput)

@@ -33,13 +33,13 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   // Direction of each pin. By default all the pin directions are undefined
-  private readonly directions: (PinDirection | undefined)[] = [];
+  private directions: (PinDirection | undefined)[] = [];
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
   private initIcPromised = new Promised<void>();
   // collection of numbers of ms to use in debounce logic for each pin.
-  private readonly pinDebounces: {[index: string]: number} = {};
+  private pinDebounces: {[index: string]: number} = {};
   // Bit mask representing the current state on IC of the input and outputs pins.
   private currentState: number = 0;
   private _expanderOutput?: DigitalPortExpanderOutputLogic;
@@ -90,6 +90,13 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     this.initIcPromised.destroy();
     this.expanderInput.destroy();
     this.expanderOutput.destroy();
+
+    delete this.directions;
+    delete this.initIcPromised;
+    delete this.pinDebounces;
+    delete this.currentState;
+    delete this._expanderOutput;
+    delete this._expanderInput;
   }
 
   /**
