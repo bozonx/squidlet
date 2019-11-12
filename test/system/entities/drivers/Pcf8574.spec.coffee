@@ -8,9 +8,10 @@ describe.only 'entities.drivers.Pcf8574', ->
     @pin0 = 0
     @handler1 = sinon.spy()
     @i2cEvents = new IndexedEvents();
+    @pollPromise = Promise.resolve();
     @i2cToSlave = {
       write: sinon.stub().returns(Promise.resolve())
-      pollOnce: sinon.stub().returns(Promise.resolve())
+      pollOnce: sinon.stub().returns(@pollPromise)
       hasFeedback: () => true
       addPollErrorListener: sinon.spy()
       addListener: (handler) => @i2cEvents.addListener(handler)
@@ -270,3 +271,24 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     assert.isTrue(await readPromise)
     assert.equal(@expander.getState(), 0b00000001)
+
+  it "debounce", ->
+    clock = sinon.useFakeTimers()
+    await @expander.setupInput(@pin0, 100)
+    @expander.onChange(@pin0, @handler1)
+
+    await @expander.initIc()
+
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000000]))
+
+    clock.tick(100)
+
+    # means emit after poll
+    @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
+    await @pollPromise;
+
+    sinon.assert.calledOnce(@handler1)
+    sinon.assert.calledWith(@handler1, true)
+
+    clock.restore()
