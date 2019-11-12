@@ -54,7 +54,7 @@ describe.only 'entities.drivers.Pcf8574', ->
     # input pins are marked as high level
     assert.equal(@expander.getState(), 0b00000000)
     assert.isTrue(@expander.hasInputPins())
-    assert.isFalse(@expander.isIcInitialized())
+    assert.isFalse(@expander.wasIcInitialized())
 
   it "setupInput - don't allow resetup, only after clear pin", ->
     await @expander.setupInput(@pin0)
@@ -78,7 +78,7 @@ describe.only 'entities.drivers.Pcf8574', ->
     # initial value of pin 0 = true
     assert.equal(@expander.getState(), 0b00000001)
     assert.isFalse(@expander.hasInputPins())
-    assert.isFalse(@expander.isIcInitialized())
+    assert.isFalse(@expander.wasIcInitialized())
 
   it "setupOutput - don't allow resetup, only after clear pin", ->
     await @expander.setupOutput(@pin0)
@@ -100,13 +100,13 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     assert.isTrue(@expander.setupStep)
     assert.isFalse(@expander.initIcStep)
-    assert.isFalse(@expander.isIcInitialized())
+    assert.isFalse(@expander.wasIcInitialized())
 
     promise = @expander.initIc()
 
     assert.isFalse(@expander.setupStep)
     assert.isTrue(@expander.initIcStep)
-    assert.isFalse(@expander.isIcInitialized())
+    assert.isFalse(@expander.wasIcInitialized())
     assert.isFalse(@expander.initIcPromised.isResolved())
 
     sinon.assert.calledOnce(@i2cToSlave.write)
@@ -116,7 +116,7 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     assert.isFalse(@expander.setupStep)
     assert.isFalse(@expander.initIcStep)
-    assert.isTrue(@expander.isIcInitialized())
+    assert.isTrue(@expander.wasIcInitialized())
     assert.isTrue(@expander.initIcPromised.isResolved())
 
     sinon.assert.calledOnce(@i2cToSlave.addPollErrorListener)
@@ -209,7 +209,7 @@ describe.only 'entities.drivers.Pcf8574', ->
 
     initPromise = @expander.initIc()
 
-    assert.isFalse(@expander.isIcInitialized())
+    assert.isFalse(@expander.wasIcInitialized())
 
     writePromise = @expander.write(@pin0, true)
 

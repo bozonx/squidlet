@@ -11,7 +11,7 @@ import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
 import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
-import Promised from 'system/lib/Promised';
+import InitIcLogic from 'system/lib/logic/InitIcLogic';
 
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
@@ -29,24 +29,25 @@ export const DATA_LENGTH = 1;
 
 export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   get initIcPromise(): Promise<void> {
-    return this.initIcPromised.promise;
+    return this.initIcLogic.initPromise;
   }
 
   // Direction of each pin. By default all the pin directions are undefined
   private directions: (PinDirection | undefined)[] = [];
-  // time from the beginning to start initializing IC
-  private setupStep: boolean = true;
-  private initIcStep: boolean = false;
-  private initIcPromised = new Promised<void>();
   // collection of numbers of ms to use in debounce logic for each pin.
   private pinDebounces: {[index: string]: number} = {};
   // Bit mask representing the current state on IC of the input and outputs pins.
   private currentState: number = 0;
+  private _initIcLogic?: InitIcLogic;
   private _expanderOutput?: DigitalPortExpanderOutputLogic;
   private _expanderInput?: DigitalPortExpanderInputLogic;
 
   private get i2cDriver(): I2cToSlave {
     return this.depsInstances.i2cDriver;
+  }
+
+  private get initIcLogic(): InitIcLogic {
+    return this._initIcLogic as any;
   }
 
   private get expanderOutput(): DigitalPortExpanderOutputLogic {
@@ -70,6 +71,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       }
     );
 
+    this._initIcLogic = new InitIcLogic((): Promise<void> => this.expanderOutput.writeState(this.currentState));
     this._expanderOutput = new DigitalPortExpanderOutputLogic(
       this.log.error,
       this.writeToIc,
@@ -87,14 +89,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   destroy = async () => {
-    this.initIcPromised.destroy();
+    this.initIcLogic.destroy();
     this.expanderInput.destroy();
     this.expanderOutput.destroy();
 
     delete this.directions;
-    delete this.initIcPromised;
     delete this.pinDebounces;
     delete this.currentState;
+    delete this._initIcLogic;
     delete this._expanderOutput;
     delete this._expanderInput;
   }
@@ -105,26 +107,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * And you can repeat it if you setup pin after initialization.
    */
   async initIc() {
-    // mark end of setup step
-    this.setupStep = false;
-    this.initIcStep = true;
-
-    try {
-      await this.expanderOutput.writeState(this.currentState);
-    }
-    catch (e) {
-      this.initIcStep = false;
-
-      // TODO: если произолша ошибка - как тогда потом проинициализироваться ????
-
-      this.initIcPromised.reject(e);
-
-      throw e;
-    }
-
-    this.initIcStep = false;
-
-    this.initIcPromised.resolve();
+    await this.initIcLogic.init();
 
     this.startFeedback();
   }
@@ -172,8 +155,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     return this.directions[pin];
   }
 
-  isIcInitialized(): boolean {
-    return !this.setupStep && !this.initIcStep;
+  wasIcInitialized(): boolean {
+    return this.initIcLogic.wasInitialized;
   }
 
   /**
@@ -222,7 +205,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    */
   pollOnce = (): Promise<void> => {
     // it is no need to do poll while initialization time because it will be done after initialization
-    if (!this.isIcInitialized()) return Promise.resolve();
+    if (!this.initIcLogic.wasInitialized) return Promise.resolve();
 
     return this.i2cDriver.pollOnce();
   }
@@ -255,7 +238,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       return Promise.reject(new Error('Pin is not defined as an output'));
     }
 
-    if (this.setupStep) {
+    if (this.initIcLogic.isSetupStep) {
       // update current value of pin and go out if there is setup step
       this.updateState(pin, value);
 
@@ -280,7 +263,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       preparedState = updateBitInByte(preparedState, pin, getBitFromByte(newState, pin));
     }
 
-    if (this.setupStep) {
+    if (this.initIcLogic.isSetupStep) {
       // set current state and go out if there is setup step
       this.currentState = preparedState;
 
