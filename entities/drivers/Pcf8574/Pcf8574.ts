@@ -73,7 +73,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
     this._initIcLogic = new InitIcLogic(
       (): Promise<void> => this.expanderOutput.writeState(this.currentState),
-      () => this.startFeedback(),
       this.log.error,
       this.config.config.requestTimeoutSec
     );
@@ -91,6 +90,10 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       this.getState,
       this.updateState,
     );
+
+    this.initIcLogic.initPromise
+      .then(() => this.startFeedback())
+      .catch(this.log.error);
   }
 
   destroy = async () => {

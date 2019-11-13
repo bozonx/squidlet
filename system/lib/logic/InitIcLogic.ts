@@ -21,7 +21,6 @@ export default class InitIcLogic {
   }
 
   private initCb: () => Promise<void>;
-  private onInit: () => void;
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
@@ -32,12 +31,10 @@ export default class InitIcLogic {
 
   constructor(
     initCb: () => Promise<void>,
-    onInit: () => void,
     logError: (message: Error) => void,
     minIntervalSec: number,
   ) {
     this.initCb = initCb;
-    this.onInit = onInit;
     this.logError = logError;
     this.minIntervalSec = minIntervalSec;
   }
@@ -65,7 +62,7 @@ export default class InitIcLogic {
     const timeoutPromised = new Promised<void>();
     const timeoutOfTry = setTimeout(() => {
       timeoutPromised.resolve();
-    }, this.minIntervalSec);
+    }, this.minIntervalSec * 1000);
 
     // try to call cb and wait while it has been finished
     try {

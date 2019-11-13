@@ -3,7 +3,7 @@ Pcf8574 = require('../../../../entities/drivers/Pcf8574/Pcf8574').default;
 IndexedEvents = require('../../../../system/lib/IndexedEvents').default;
 
 
-describe.only 'entities.drivers.Pcf8574', ->
+describe 'entities.drivers.Pcf8574', ->
   beforeEach ->
     @pin0 = 0
     @handler1 = sinon.spy()
