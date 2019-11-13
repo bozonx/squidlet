@@ -8,7 +8,7 @@ export interface HostConfigConfig {
   // republish config silently every 10 minutes if it hasn't been changed
   //defaultConfigRepublishIntervalMs: number;
   // main timeout in seconds
-  senderTimeout: number;
+  requestTimeoutSec: number;
   // resend timeout in seconds
   senderResendTimeout: number;
   // default response of remote call in seconds

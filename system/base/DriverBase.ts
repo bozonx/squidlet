@@ -8,7 +8,7 @@ export default class DriverBase<Props extends {[index: string]: any} = any> exte
   // TODO: review - move to context
   protected newSender(): Sender {
     return new Sender(
-      this.context.config.config.senderTimeout,
+      this.context.config.config.requestTimeoutSec,
       this.context.config.config.senderResendTimeout,
       this.context.log.debug,
       this.context.log.warn

@@ -12,8 +12,8 @@ export interface PreHostConfigConfig {
   //defaultStatusRepublishIntervalMs?: number;
   // republish config silently every 10 minutes if it hasn't been changed
   //defaultConfigRepublishIntervalMs?: number;
-  // main timeout in seconds
-  senderTimeout?: number;
+  // timeout for common requests in seconds
+  requestTimeoutSec?: number;
   // resend timeout in seconds
   senderResendTimeout?: number;
   // response of remote ioSet

@@ -87,7 +87,7 @@ describe 'envBuilder.validateHostConfig', ->
       #logLevel: 'debug'
       #defaultStatusRepublishIntervalMs: 5
       #defaultConfigRepublishIntervalMs: 5
-      senderTimeout: 5
+      requestTimeoutSec: 5
       senderResendTimeout: 5
     } }))
     # incorrect types
@@ -96,5 +96,5 @@ describe 'envBuilder.validateHostConfig', ->
     #assert.isString(validateHostConfig({ @hostConfig..., config: {logLevel: 'other'} }))
     #assert.isString(validateHostConfig({ @hostConfig..., config: {defaultStatusRepublishIntervalMs: 'str'} }))
     #assert.isString(validateHostConfig({ @hostConfig..., config: {defaultConfigRepublishIntervalMs: 'str'} }))
-    assert.isString(validateHostConfig({ @hostConfig..., config: {senderTimeout: 'str'} }))
+    assert.isString(validateHostConfig({ @hostConfig..., config: {requestTimeoutSec: 'str'} }))
     assert.isString(validateHostConfig({ @hostConfig..., config: {senderResendTimeout: 'str'} }))

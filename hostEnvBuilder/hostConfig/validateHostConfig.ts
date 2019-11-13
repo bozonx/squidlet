@@ -23,7 +23,7 @@ function checkConfig(rawConfig: {[index: string]: any}): string | undefined {
     // () => isString(rawConfig.config.envSetDir, 'config.envSetDir'),
     //() => isNumber(rawConfig.config.defaultStatusRepublishIntervalMs, 'config.defaultStatusRepublishIntervalMs'),
     //() => isNumber(rawConfig.config.defaultConfigRepublishIntervalMs, 'config.defaultConfigRepublishIntervalMs'),
-    () => isNumber(rawConfig.config.senderTimeout, 'config.senderTimeout'),
+    () => isNumber(rawConfig.config.requestTimeoutSec, 'config.requestTimeoutSec'),
     () => isNumber(rawConfig.config.senderResendTimeout, 'config.senderResendTimeout'),
   ]);
 }

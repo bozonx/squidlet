@@ -71,7 +71,12 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       }
     );
 
-    this._initIcLogic = new InitIcLogic((): Promise<void> => this.expanderOutput.writeState(this.currentState));
+    this._initIcLogic = new InitIcLogic(
+      (): Promise<void> => this.expanderOutput.writeState(this.currentState),
+      () => this.startFeedback(),
+      this.log.error,
+      this.config.config.requestTimeoutSec
+    );
     this._expanderOutput = new DigitalPortExpanderOutputLogic(
       this.log.error,
       this.writeToIc,
@@ -106,10 +111,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
    * Call this method after all the pins have been initialized and initial values are set up.
    * And you can repeat it if you setup pin after initialization.
    */
-  async initIc() {
-    await this.initIcLogic.init();
-
-    this.startFeedback();
+  initIc() {
+    this.initIcLogic.init();
   }
 
   /**
