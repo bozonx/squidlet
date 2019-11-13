@@ -40,21 +40,26 @@ describe.only 'system.lib.InitIcLogic', ->
 
     @logic.init()
 
-    @initCbPromised.reject()
+    firstPromise = @initCbPromised.promise
+
+    @initCbPromised.reject('e')
     @initCbPromised = new Promised()
     sinon.assert.calledOnce(@initSpy)
 
+    # wait timeout
     clock.tick(@minIntervalSec * 1000)
 
     assert.isFalse(@logic.isSetupStep)
     assert.isTrue(@logic.isInitIcStep)
     assert.isFalse(@logic.wasInitialized)
 
+    try
+      await firstPromise
+
     sinon.assert.calledTwice(@initSpy)
 
+    # resolve next try
     @initCbPromised.resolve()
-
-    #assert.isResolved(@logic.initPromise)
 
     await @logic.initPromise
 
