@@ -66,3 +66,39 @@ describe.only 'system.lib.InitIcLogic', ->
     sinon.assert.calledTwice(@initSpy)
 
     clock.restore()
+
+  it "init - error and after that success. Cb will be rejected after timeout", ->
+    clock = sinon.useFakeTimers()
+
+    @logic.init()
+
+    # wait timeout
+    clock.tick(@minIntervalSec * 1000)
+
+    sinon.assert.calledOnce(@initSpy)
+
+    firstPromise = @initCbPromised.promise
+    @initCbPromised.reject('e')
+    @initCbPromised = new Promised()
+
+    try
+      await firstPromise
+
+    sinon.assert.calledTwice(@initSpy)
+
+    @initCbPromised.resolve()
+
+    await @logic.initPromise
+
+    sinon.assert.calledTwice(@initSpy)
+
+    clock.restore()
+
+  it "init - error and after that success. Cb will be rejected after timeout", ->
+    @logic.init()
+
+    assert.throws(() => @logic.init())
+
+    @initCbPromised.resolve()
+
+  it "destroy", ->

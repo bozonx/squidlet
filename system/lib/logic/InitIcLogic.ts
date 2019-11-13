@@ -20,13 +20,13 @@ export default class InitIcLogic {
     return !this.setupStep && !this.initIcStep;
   }
 
-  private initCb: () => Promise<void>;
+  private readonly initCb: () => Promise<void>;
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
   private initIcStep: boolean = false;
   private initIcPromised = new Promised<void>();
-  private logError: (message: Error) => void;
-  private minIntervalSec: number;
+  private readonly logError: (message: Error) => void;
+  private readonly minIntervalSec: number;
 
 
   constructor(
@@ -40,6 +40,7 @@ export default class InitIcLogic {
   }
 
   destroy() {
+    // TODO: отменить выполнение
     this.initIcPromised.destroy();
 
     delete this.initIcPromised;
