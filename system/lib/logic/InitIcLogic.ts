@@ -1,3 +1,5 @@
+import Timeout = NodeJS.Timeout;
+
 import Promised from '../Promised';
 
 
@@ -27,6 +29,8 @@ export default class InitIcLogic {
   private initIcPromised = new Promised<void>();
   private readonly logError: (message: Error) => void;
   private readonly minIntervalSec: number;
+  private timeoutPromised?: Promised<void>;
+  private timeoutOfTry?: Timeout;
 
 
   constructor(
@@ -40,7 +44,7 @@ export default class InitIcLogic {
   }
 
   destroy() {
-    // TODO: отменить выполнение
+    this.cancel();
     this.initIcPromised.destroy();
 
     delete this.initIcPromised;
@@ -58,11 +62,24 @@ export default class InitIcLogic {
       .catch(this.logError);
   }
 
+  cancel() {
+    if (!this.wasInitialized) {
+      this.setupStep = true;
+      this.initIcStep = false;
+    }
+
+    this.timeoutOfTry && clearTimeout(this.timeoutOfTry);
+    this.timeoutPromised && this.timeoutPromised.destroy();
+
+    delete this.timeoutOfTry;
+    delete this.timeoutPromised;
+  }
+
 
   private callInitCb = async () => {
-    const timeoutPromised = new Promised<void>();
-    const timeoutOfTry = setTimeout(() => {
-      timeoutPromised.resolve();
+    this.timeoutPromised = new Promised<void>();
+    this.timeoutOfTry = setTimeout(() => {
+      this.timeoutPromised && this.timeoutPromised.resolve();
     }, this.minIntervalSec * 1000);
 
     // try to call cb and wait while it has been finished
@@ -70,20 +87,35 @@ export default class InitIcLogic {
       await this.initCb();
     }
     catch (e) {
-      // if request has been finished before timeout then wait for interval timeout
-      if (!timeoutPromised.isFulfilled()) await timeoutPromised.promise;
-
-      timeoutPromised.destroy();
-
-      this.callInitCb()
-        .catch(this.logError);
-
-      return;
+      return this.handleCbError();
     }
 
+    this.handleCbSuccess();
+  }
+
+  private async handleCbError() {
+    // means cancelled
+    if (!this.timeoutPromised || !this.timeoutOfTry) return this.cancel();
+
+    // if request has been finished before timeout then wait for interval timeout
+    if (!this.timeoutPromised.isFulfilled()) await this.timeoutPromised.promise;
+
+    this.timeoutPromised.destroy();
+
+    this.callInitCb()
+      .catch(this.logError);
+  }
+
+  private handleCbSuccess() {
+    // means cancelled
+    if (!this.timeoutPromised || !this.timeoutOfTry) return this.cancel();
+
     // success
-    clearTimeout(timeoutOfTry);
-    timeoutPromised.destroy();
+    clearTimeout(this.timeoutOfTry);
+    this.timeoutPromised.destroy();
+
+    delete this.timeoutOfTry;
+    delete this.timeoutPromised;
 
     this.initIcStep = false;
 
