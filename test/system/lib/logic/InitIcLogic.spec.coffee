@@ -2,7 +2,7 @@ InitIcLogic = require('../../../../system/lib/logic/InitIcLogic').default;
 Promised = require('../../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.InitIcLogic', ->
+describe 'system.lib.InitIcLogic', ->
   beforeEach ->
     @initCbPromised = new Promised()
     @initSpy = sinon.spy()

@@ -102,7 +102,7 @@ describe 'entities.drivers.Pcf8574', ->
     assert.isFalse(@expander.initIcLogic.isInitIcStep)
     assert.isFalse(@expander.wasIcInitialized())
 
-    promise = @expander.initIc()
+    @expander.initIc()
 
     assert.isFalse(@expander.initIcLogic.isSetupStep)
     assert.isTrue(@expander.initIcLogic.isInitIcStep)
@@ -112,7 +112,7 @@ describe 'entities.drivers.Pcf8574', ->
     sinon.assert.calledOnce(@i2cToSlave.write)
     sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00000011]))
 
-    await promise
+    await @expander.initIcPromise
 
     assert.isFalse(@expander.initIcLogic.isSetupStep)
     assert.isFalse(@expander.initIcLogic.isInitIcStep)
@@ -132,7 +132,7 @@ describe 'entities.drivers.Pcf8574', ->
     assert.equal(@expander.getState(), 0b00000001)
     sinon.assert.notCalled(@i2cToSlave.write)
 
-    await @expander.initIc()
+    @expander.initIc()
 
     sinon.assert.calledOnce(@i2cToSlave.write)
     sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00000001]))
@@ -147,14 +147,14 @@ describe 'entities.drivers.Pcf8574', ->
     assert.equal(@expander.getState(), 0b00001001)
     sinon.assert.notCalled(@i2cToSlave.write)
 
-    await @expander.initIc()
+    @expander.initIc()
 
     sinon.assert.calledOnce(@i2cToSlave.write)
     sinon.assert.calledWith(@i2cToSlave.write, undefined, new Uint8Array([0b00001101]))
 
   it "write after initIc", ->
     await @expander.setupOutput(@pin0)
-    await @expander.initIc()
+    @expander.initIc()
 
     promise = @expander.write(@pin0, true)
 
@@ -170,7 +170,7 @@ describe 'entities.drivers.Pcf8574', ->
 
   it "writeState after initIc", ->
     await @expander.setupOutput(@pin0)
-    await @expander.initIc()
+    @expander.initIc()
 
     promise = @expander.writeState(0b00000001)
 
@@ -192,7 +192,7 @@ describe 'entities.drivers.Pcf8574', ->
 
     await @expander.setupOutput(@pin0)
     await @expander.setupOutput(1)
-    await @expander.initIc()
+    @expander.initIc()
 
     @expander.write(@pin0, true)
     promise2 = @expander.write(1, true)
@@ -206,13 +206,12 @@ describe 'entities.drivers.Pcf8574', ->
   it "write while IC is initializing", ->
     await @expander.setupOutput(@pin0)
 
-    initPromise = @expander.initIc()
+    @expander.initIc()
 
     assert.isFalse(@expander.wasIcInitialized())
 
     writePromise = @expander.write(@pin0, true)
 
-    await initPromise
     await writePromise
 
     sinon.assert.calledTwice(@i2cToSlave.write)
@@ -228,7 +227,8 @@ describe 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0)
     @expander.onChange(@pin0, @handler1)
 
-    await @expander.initIc()
+    @expander.initIc()
+    await @expander.initIcPromise
     await @expander.pollOnce()
 
     assert.equal(@expander.getState(), 0b00000000)
@@ -243,7 +243,7 @@ describe 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0)
     handlerIndex = @expander.onChange(@pin0, @handler1)
 
-    await @expander.initIc()
+    @expander.initIc()
     await @expander.pollOnce()
 
     @expander.removeListener(handlerIndex)
@@ -262,7 +262,8 @@ describe 'entities.drivers.Pcf8574', ->
 
   it "read after IC inited - make poll and return a value", ->
     await @expander.setupInput(@pin0)
-    await @expander.initIc()
+    @expander.initIc()
+    await @expander.initIcPromise
 
     readPromise = @expander.read(@pin0)
 
@@ -276,7 +277,8 @@ describe 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0, 100)
     @expander.onChange(@pin0, @handler1)
 
-    await @expander.initIc()
+    @expander.initIc()
+    await @expander.initIcPromise
 
     @i2cEvents.emit(undefined, new Uint8Array([0b00000001]))
     @i2cEvents.emit(undefined, new Uint8Array([0b00000000]))
@@ -296,7 +298,7 @@ describe 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0)
     @expander.onChange(@pin0, @handler1)
 
-    await @expander.initIc()
+    @expander.initIc()
 
     @expander.clearPin(@pin0)
 
@@ -309,7 +311,7 @@ describe 'entities.drivers.Pcf8574', ->
     await @expander.setupInput(@pin0)
     @expander.onChange(@pin0, @handler1)
 
-    await @expander.initIc()
+    @expander.initIc()
 
     @expander.clearAll()
 
