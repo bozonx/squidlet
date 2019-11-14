@@ -101,4 +101,18 @@ describe.only 'system.lib.InitIcLogic', ->
 
     @initCbPromised.resolve()
 
+  it "cancel", ->
+    @logic.init()
+
+    @logic.cancel()
+
+    assert.isTrue(@logic.isSetupStep)
+    assert.isFalse(@logic.isInitIcStep)
+    assert.isFalse(@logic.wasInitialized)
+
   it "destroy", ->
+    @logic.destroy()
+
+    assert.isUndefined(@logic.timeoutPromised)
+    assert.isUndefined(@logic.timeoutOfTry)
+    assert.isUndefined(@logic.initIcPromised)

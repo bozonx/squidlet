@@ -16,16 +16,15 @@ export default class InitIcLogic {
     return this.setupStep;
   }
   get isInitIcStep(): boolean {
-    return this.initIcStep;
+    return Boolean(this.timeoutOfTry || this.timeoutPromised);
   }
   get wasInitialized(): boolean {
-    return !this.setupStep && !this.initIcStep;
+    return !this.setupStep && !this.isInitIcStep;
   }
 
   private readonly initCb: () => Promise<void>;
   // time from the beginning to start initializing IC
   private setupStep: boolean = true;
-  private initIcStep: boolean = false;
   private initIcPromised = new Promised<void>();
   private readonly logError: (message: Error) => void;
   private readonly minIntervalSec: number;
@@ -52,11 +51,10 @@ export default class InitIcLogic {
 
 
   init() {
-    if (this.initIcStep) throw new Error(`IC is already initializing at the moment`);
+    if (this.isInitIcStep) throw new Error(`IC is already initializing at the moment`);
 
     // mark end of setup step
     this.setupStep = false;
-    this.initIcStep = true;
 
     this.callInitCb()
       .catch(this.logError);
@@ -65,7 +63,6 @@ export default class InitIcLogic {
   cancel() {
     if (!this.wasInitialized) {
       this.setupStep = true;
-      this.initIcStep = false;
     }
 
     this.timeoutOfTry && clearTimeout(this.timeoutOfTry);
@@ -116,8 +113,6 @@ export default class InitIcLogic {
 
     delete this.timeoutOfTry;
     delete this.timeoutPromised;
-
-    this.initIcStep = false;
 
     this.initIcPromised.resolve();
   }
