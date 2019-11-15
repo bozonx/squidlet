@@ -1,7 +1,8 @@
 import {cloneDeepObject, mergeDeepObjects} from './objects';
 import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
-import RequestQueue from './RequestQueue';
+import Queue from './Queue';
+import QueueOverride from './QueueOverride';
 import {pickObj} from './objects';
 import {arraysDifference} from './arrays';
 
@@ -28,7 +29,8 @@ export default class ConsistentState {
   protected readonly getter?: Getter;
   protected readonly setter?: Setter;
 
-  private readonly queue: RequestQueue;
+  private readonly queue: Queue;
+  private readonly writeOverride: QueueOverride;
   // actual state on server before saving
   private actualRemoteState?: Dictionary;
   // list of parameters which are saving to server
@@ -51,7 +53,8 @@ export default class ConsistentState {
     this.getter = getter;
     this.setter = setter;
 
-    this.queue = new RequestQueue(this.logError, jobTimeoutSec);
+    this.queue = new Queue(jobTimeoutSec);
+    this.writeOverride = new QueueOverride(jobTimeoutSec);
   }
 
   init(): Promise<void> {
@@ -85,13 +88,23 @@ export default class ConsistentState {
     return this.queue.getCurrentJobId() === READING_ID;
   }
 
+  // TODO: test
+  isInProgress(): boolean {
+    return this.queue.isInProgress();
+  }
+
   getState(): Dictionary {
     return this.stateGetter();
   }
 
+  /**
+   * Call this method after you have received state handling device or driver events.
+   *
+   */
   setIncomeState(partialState: Dictionary) {
+    // TODO: review
     if (this.isReading()) {
-      // do nothing if force reading is in progress. It will return the full actual state
+      // do nothing if reading is in progress. It will return the full actual state
       return;
     }
     else if (this.isWriting()) {
@@ -113,14 +126,14 @@ export default class ConsistentState {
    * But usually it doesn't need because it's better to pass income state which you received by listening
    * to income data events to setIncomeState() method.
    * The logic of this method:
-   * * If getter is set it will be called
+   * * If getter is set - it will be proceeded
    * * If there isn't any getter - it will do nothing
    * * If reading is in progress it will return promise of current reading process
    */
   load(): Promise<void> {
     if (!this.getter) return Promise.resolve();
 
-    this.queue.request(READING_ID, this.handleLoading);
+    this.queue.add(this.handleLoading, READING_ID);
 
     return this.queue.waitJobFinished(READING_ID);
   }
@@ -141,6 +154,8 @@ export default class ConsistentState {
       return Promise.resolve();
     }
 
+    // TODO: review
+
     // Save actual state. It has to be called only once on starting of cycle
     if (!this.actualRemoteState) {
       // TODO: review - можно ли обойтись без clone???
@@ -152,6 +167,7 @@ export default class ConsistentState {
 
     return this.doWriteRequest(partialData);
   }
+
 
   private doWriteRequest(partialData: Dictionary): Promise<void> {
     // update local state on each call of write
@@ -187,16 +203,19 @@ export default class ConsistentState {
     }
   }
 
+  /**
+   * Ask for latest state at init time.
+   */
   private async doInitialize(getter: Getter): Promise<void> {
     let result: Dictionary | undefined = undefined;
 
-    this.queue.request(READING_ID, async () => {
+    this.queue.add(async () => {
       result = await getter();
-    });
+    }, READING_ID);
 
     await this.queue.waitJobFinished(READING_ID);
 
-    if (!result) throw new Error(`ConsistentState.requestGetter: no result`);
+    if (!result) throw new Error(`ConsistentState.doInitialize: no result`);
 
     this.stateUpdater(result);
   }
