@@ -18,7 +18,7 @@ export interface PreHostConfigConfig {
   senderResendTimeout?: number;
   // response of remote ioSet
   rcResponseTimoutSec?: number;
-  // default timeout for jobs in RequestQueue
+  // default timeout for jobs in a queue
   queueJobTimeoutSec?: number;
   // delay before rebooting a host in seconds
   rebootDelaySec?: number;

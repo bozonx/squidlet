@@ -95,6 +95,9 @@ export default class QueueOverride {
     delete this.items[id];
   }
 
+  /**
+   * Add cb into queue and return a promise that will be resolved after cb is finished.
+   */
   add(cb: QueuedCb, id: string | number = DEFAULT_ID): Promise<void> {
     if (this.isPending(id)) {
       const item: QueuedItem = this.items[id];

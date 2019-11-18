@@ -102,12 +102,13 @@ export default class ConsistentState {
    *
    */
   setIncomeState(partialState: Dictionary) {
-    // TODO: review
     if (this.isReading()) {
       // do nothing if reading is in progress. It will return the full actual state
       return;
     }
     else if (this.isWriting()) {
+      // make new state but don't update params which are saving at the moment because
+      // these params are the most actual
       const newState = this.generateSafeNewState(partialState);
 
       this.stateUpdater(newState);
@@ -154,11 +155,8 @@ export default class ConsistentState {
       return Promise.resolve();
     }
 
-    // TODO: review
-
     // Save actual state. It has to be called only once on starting of cycle
     if (!this.actualRemoteState) {
-      // TODO: review - можно ли обойтись без clone???
       this.actualRemoteState = cloneDeepObject(this.getState());
     }
 
@@ -174,33 +172,21 @@ export default class ConsistentState {
     this.stateUpdater(partialData);
 
     // do writing request any way if it is a new request or there is writing is in progress
-    try {
-      this.queue.request(WRITING_ID, this.handleWrite, 'recall');
-    }
-    catch (err) {
-      this.handleWriteError();
 
-      return Promise.reject(err);
+    const overridePromise: Promise<void> = this.writeOverride.add(this.handleWrite);
+
+    // TODO: test момент что закончился предыдущий cb и начался следующий
+
+    // add queue cb at the first time
+    if (!this.queue.hasJob(WRITING_ID)) {
+      this.queue.add(() => {
+        if (!this.writeOverride.isPending()) return Promise.resolve();
+
+        // TODO: берем промис override ожидаем пока закончится, если не закончился - то ещё раз берем
+      }, WRITING_ID);
     }
 
-    // TODO: !!! wrong - уточнить условие, иначе срабатывает на самый первый write
-    // wait while passed data will be actually saved
-    if (this.queue.isJobInProgress(WRITING_ID)) {
-      // TODO: test
-      // wait current saving
-      return this.queue.waitJobFinished(WRITING_ID);
-        // wait the next recall. And don't wait if the current is fail
-        //.then(() => this.queue.waitJobFinished(WRITING_ID));
-
-      // // wait current saving
-      // await this.queue.waitJobFinished(WRITING_ID);
-      // // wait the next recall. And don't wait if the current is fail
-      // return this.queue.waitJobFinished(WRITING_ID);
-    }
-    else {
-      // wait current saving
-      return this.queue.waitJobFinished(WRITING_ID);
-    }
+    return this.queue.waitJobFinished(WRITING_ID);
   }
 
   /**
@@ -232,7 +218,7 @@ export default class ConsistentState {
       return;
     }
 
-    // if reading was in progress when saving started - it needs to update actual server state
+    // if saving has being in progress when the reading started - it needs to update actual server state
     // and carefully update the state.
     this.actualRemoteState = result;
 
@@ -243,15 +229,14 @@ export default class ConsistentState {
 
   private handleWrite = async () => {
     if (!this.setter) {
-      throw new Error(`ConsistentState.write: no setter`);
+      throw new Error(`ConsistentState.handleWrite: no setter`);
     }
     else if (!this.paramsListToSave) {
-      throw new Error(`ConsistentState.write: no paramsListToSave`);
+      throw new Error(`ConsistentState.handleWrite: no paramsListToSave`);
     }
-
     // generate the last combined data to save
     const dataToSave: Dictionary = pickObj(this.getState(), ...this.paramsListToSave);
-
+    // write collected data
     try {
       await this.setter(dataToSave);
     }
@@ -265,6 +250,7 @@ export default class ConsistentState {
   }
 
   private finalizeWriting(dataToSave: Dictionary) {
+    // TODO: review
     if (!this.queue.jobHasRecallCb(WRITING_ID)) {
       // end of cycle
       delete this.actualRemoteState;
@@ -290,6 +276,8 @@ export default class ConsistentState {
   private handleWriteError() {
     this.stateUpdater(this.restorePreviousState());
 
+    // TODO: test что очереди удалились на этот момент
+
     delete this.actualRemoteState;
     delete this.paramsListToSave;
   }
@@ -307,7 +295,7 @@ export default class ConsistentState {
 
     const newParams: Dictionary = {};
 
-    // TODO: test
+    // TODO: test что undefined точно заменить лишние параметры
     for (let paramName of arraysDifference(this.paramsListToSave, Object.keys(this.actualRemoteState))) {
       newParams[paramName] = undefined;
     }
@@ -325,7 +313,10 @@ export default class ConsistentState {
   private generateSafeNewState(mostActualState: Dictionary): Dictionary {
     // TODO: test
     // get key witch won't be saved
-    const keysToUpdate: string[] = arraysDifference(Object.keys(mostActualState), this.paramsListToSave || []);
+    const keysToUpdate: string[] = arraysDifference(
+      Object.keys(mostActualState),
+      this.paramsListToSave || []
+    );
 
     return {
       ...this.getState(),
