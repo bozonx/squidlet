@@ -1,5 +1,5 @@
-import IndexedEvents from './IndexedEvents';
-import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
+import IndexedEvents from '../../system/lib/IndexedEvents';
+import {DEFAULT_JOB_TIMEOUT_SEC} from '../../system/lib/constants';
 
 
 /**
