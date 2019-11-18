@@ -2,7 +2,6 @@ import {cloneDeepObject, mergeDeepObjects} from './objects';
 import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
 import Queue from './Queue';
-import QueueOverride from './QueueOverride';
 import {pickObj} from './objects';
 import {arraysDifference} from './arrays';
 
@@ -30,11 +29,14 @@ export default class ConsistentState {
   protected readonly setter?: Setter;
 
   private readonly queue: Queue;
-  private readonly writeOverride: QueueOverride;
+  //private readonly writeOverride: QueueOverride;
   // actual state on server before saving
   private actualRemoteState?: Dictionary;
   // list of parameters which are saving to server
   private paramsListToSave?: string[];
+  // if there is current write then the partial state of the next writing is collecting to write
+  // after current writing
+  private nextWritePartialState?: Dictionary;
 
 
   constructor(
@@ -54,7 +56,7 @@ export default class ConsistentState {
     this.setter = setter;
 
     this.queue = new Queue(jobTimeoutSec);
-    this.writeOverride = new QueueOverride(jobTimeoutSec);
+    //this.writeOverride = new QueueOverride(jobTimeoutSec);
   }
 
   init(): Promise<void> {
@@ -148,42 +150,58 @@ export default class ConsistentState {
    * * On error it will return state which was before saving started.
    */
   write(partialData: Dictionary): Promise<void> {
-    // if mode without setter - do noting else updating local state
     if (!this.setter) {
+      // if mode without setter - do noting else updating local state
       this.stateUpdater(partialData);
 
       return Promise.resolve();
     }
-
-    // Save actual state. It has to be called only once on starting of cycle
-    if (!this.actualRemoteState) {
-      this.actualRemoteState = cloneDeepObject(this.getState());
+    else if (this.queue.getCurrentJobId() === WRITING_ID) {
+      // TODO: нужно сразу установить стейт
+      // TODO: сохранять только имена ключей
+      // TODO: ?????? strong review - нужно сразу установить стейт, а потом решить какой стейт записывать
+      //                              и что возвращать когда будет ошибка
+      // if current job is writing
+      if (this.nextWritePartialState) {
+        this.nextWritePartialState = partialData;
+      }
+      else {
+        this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
+      }
     }
+    else if (this.queue.hasJob(WRITING_ID)) {
+      // if writing is in a queue but not started
+      if (!this.paramsListToSave) {
+        return Promise.reject(`ConsistentState.write: paramsListToSave has to be set`);
+      }
 
-    // collect list of params which will be actually written
-    this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave || [], Object.keys(partialData));
-
-    return this.doWriteRequest(partialData);
-  }
-
-
-  private doWriteRequest(partialData: Dictionary): Promise<void> {
-    // update local state on each call of write
-    this.stateUpdater(partialData);
-
-    // do writing request any way if it is a new request or there is writing is in progress
-    // add queue cb at the first time
-    if (this.queue.hasJob(WRITING_ID)) {
-      // TODO: обновлять промис queue override
-
+      // collect list of params which will be actually written
+      this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave, Object.keys(partialData));
     }
     else {
-      this.queue.add(this.handleWriteQueueStart, WRITING_ID);
+      // no writing in a queue
+      if (this.nextWritePartialState) {
+        return Promise.reject(`ConsistentState.write: nextWritePartialState has to be removed`);
+      }
+      else if (this.actualRemoteState) {
+        return Promise.reject(`ConsistentState.write: actualRemoteState has to be removed`);
+      }
+      else if (this.paramsListToSave) {
+        return Promise.reject(`ConsistentState.write: paramsListToSave has to be removed`);
+      }
 
+      // Save actual state. It has to be called only once on starting of cycle
+      this.actualRemoteState = cloneDeepObject(this.getState());
+      // collect list of params which will be actually written
+      this.paramsListToSave = Object.keys(partialData);
     }
+
+    // update local state right now
+    this.stateUpdater(partialData);
 
     return this.queue.waitJobFinished(WRITING_ID);
   }
+
 
   /**
    * Ask for latest state at init time.
@@ -222,6 +240,24 @@ export default class ConsistentState {
 
     this.stateUpdater(newState);
   }
+
+  // private doWriteRequest(partialData: Dictionary): Promise<void> {
+  //   // update local state on each call of write
+  //   this.stateUpdater(partialData);
+  //
+  //   // do writing request any way if it is a new request or there is writing is in progress
+  //   // add queue cb at the first time
+  //   if (this.queue.hasJob(WRITING_ID)) {
+  //     // TODO: обновлять промис queue override
+  //
+  //   }
+  //   else {
+  //     this.queue.add(this.handleWriteQueueStart, WRITING_ID);
+  //
+  //   }
+  //
+  //   return this.queue.waitJobFinished(WRITING_ID);
+  // }
 
   private handleWriteQueueStart = async () => {
     // TODO: нужно ли сохранять промис?
