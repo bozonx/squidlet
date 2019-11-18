@@ -172,18 +172,14 @@ export default class ConsistentState {
     this.stateUpdater(partialData);
 
     // do writing request any way if it is a new request or there is writing is in progress
-
-    const overridePromise: Promise<void> = this.writeOverride.add(this.handleWrite);
-
-    // TODO: test момент что закончился предыдущий cb и начался следующий
-
     // add queue cb at the first time
-    if (!this.queue.hasJob(WRITING_ID)) {
-      this.queue.add(() => {
-        if (!this.writeOverride.isPending()) return Promise.resolve();
+    if (this.queue.hasJob(WRITING_ID)) {
+      // TODO: обновлять промис queue override
 
-        // TODO: берем промис override ожидаем пока закончится, если не закончился - то ещё раз берем
-      }, WRITING_ID);
+    }
+    else {
+      this.queue.add(this.handleWriteQueueStart, WRITING_ID);
+
     }
 
     return this.queue.waitJobFinished(WRITING_ID);
@@ -225,6 +221,17 @@ export default class ConsistentState {
     const newState = this.generateSafeNewState(result);
 
     this.stateUpdater(newState);
+  }
+
+  private handleWriteQueueStart = async () => {
+    // TODO: нужно ли сохранять промис?
+    const overridePromise: Promise<void> = this.writeOverride.add(this.handleWrite);
+
+    // TODO: test момент что закончился предыдущий cb и начался следующий
+
+    if (!this.writeOverride.isPending()) return Promise.resolve();
+
+    // TODO: берем промис override ожидаем пока закончится, если не закончился - то ещё раз берем
   }
 
   private handleWrite = async () => {
