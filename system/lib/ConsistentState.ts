@@ -163,6 +163,8 @@ export default class ConsistentState {
       //                              и что возвращать когда будет ошибка
       // if current job is writing
       this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
+      // update local state right now in any case
+      this.stateUpdater(partialData);
     }
     else if (this.queue.hasJob(WRITING_ID)) {
       // if writing is in a queue but not started
@@ -172,6 +174,8 @@ export default class ConsistentState {
       }
       // collect list of params which will be actually written
       this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave, Object.keys(partialData));
+      // update local state right now in any case
+      this.stateUpdater(partialData);
     }
     else {
       try {
@@ -182,8 +186,6 @@ export default class ConsistentState {
       }
     }
 
-    // update local state right now in any case
-    this.stateUpdater(partialData);
     // return promise which will be resolved when write has done.
     return this.queue.waitJobFinished(WRITING_ID);
   }
@@ -242,6 +244,8 @@ export default class ConsistentState {
     this.actualRemoteState = cloneDeepObject(this.getState());
     // collect list of params which will be actually written
     this.paramsListToSave = Object.keys(partialData);
+    // update local state right now in any case
+    this.stateUpdater(partialData);
     // add job to queue
     this.queue.add(this.handleWriteQueueStart, WRITING_ID);
   }
@@ -268,28 +272,40 @@ export default class ConsistentState {
   }
 
   private finalizeWriting(dataToSave: Dictionary) {
+    // end of cycle
+    delete this.actualRemoteState;
+    delete this.paramsListToSave;
 
-    // TODO: test момент что закончился предыдущий cb и начался следующий
+    if (this.nextWritePartialState) {
+      const dataToSave: Dictionary = this.nextWritePartialState;
 
-    // TODO: берем промис override ожидаем пока закончится, если не закончился - то ещё раз берем
-    // TODO: review
-    if (!this.queue.jobHasRecallCb(WRITING_ID)) {
-      // end of cycle
-      delete this.actualRemoteState;
-      delete this.paramsListToSave;
+      delete this.nextWritePartialState;
 
-      return;
+      if (!this.nextWritePartialState) {
+        throw new Error(`ConsistentState.finalizeWriting: no nextWritePartialState`);
+      }
+
+      // start next writing
+      try {
+        this.startNewWriteJob(dataToSave);
+      }
+      catch (e) {
+        return this.logError(e);
+      }
     }
 
-    // If there is the next recall cb - then update actualRemoteState and paramsListToSave.
-    // Update actualRemoteState
-    this.actualRemoteState = {
-      ...this.actualRemoteState,
-      ...dataToSave,
-    };
-    // TODO: test
-    // remove saved keys from the list
-    this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));
+    // TODO: нужно поставить в новую очередь
+
+    // // If there is the next recall cb - then update actualRemoteState and paramsListToSave.
+    // // Update actualRemoteState
+    // this.actualRemoteState = {
+    //   ...this.actualRemoteState,
+    //   ...dataToSave,
+    // };
+    // // TODO: test
+    // // remove saved keys from the list
+    // this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));
+
   }
 
   /**
