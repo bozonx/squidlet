@@ -268,44 +268,32 @@ export default class ConsistentState {
       throw err;
     }
 
-    this.finalizeWriting(dataToSave);
+    this.handleWriteSuccess();
   }
 
-  private finalizeWriting(dataToSave: Dictionary) {
+  private handleWriteSuccess() {
     // end of cycle
     delete this.actualRemoteState;
     delete this.paramsListToSave;
+    // if no next state - then cycle has been finished
+    if (!this.nextWritePartialState) return;
 
-    if (this.nextWritePartialState) {
-      const dataToSave: Dictionary = this.nextWritePartialState;
+    // or start a new writing job
+    const dataToSave: Dictionary = this.nextWritePartialState;
 
-      delete this.nextWritePartialState;
+    delete this.nextWritePartialState;
 
-      if (!this.nextWritePartialState) {
-        throw new Error(`ConsistentState.finalizeWriting: no nextWritePartialState`);
-      }
-
-      // start next writing
-      try {
-        this.startNewWriteJob(dataToSave);
-      }
-      catch (e) {
-        return this.logError(e);
-      }
+    if (!this.nextWritePartialState) {
+      throw new Error(`ConsistentState.finalizeWriting: no nextWritePartialState`);
     }
 
-    // TODO: нужно поставить в новую очередь
-
-    // // If there is the next recall cb - then update actualRemoteState and paramsListToSave.
-    // // Update actualRemoteState
-    // this.actualRemoteState = {
-    //   ...this.actualRemoteState,
-    //   ...dataToSave,
-    // };
-    // // TODO: test
-    // // remove saved keys from the list
-    // this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));
-
+    // start next writing
+    try {
+      this.startNewWriteJob(dataToSave);
+    }
+    catch (e) {
+      return this.logError(e);
+    }
   }
 
   /**
@@ -389,3 +377,13 @@ export default class ConsistentState {
   }
 
 }
+
+// // If there is the next recall cb - then update actualRemoteState and paramsListToSave.
+// // Update actualRemoteState
+// this.actualRemoteState = {
+//   ...this.actualRemoteState,
+//   ...dataToSave,
+// };
+// // TODO: test
+// // remove saved keys from the list
+// this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));
