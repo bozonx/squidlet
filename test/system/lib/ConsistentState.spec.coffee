@@ -3,9 +3,6 @@ ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 describe 'system.lib.ConsistentState', ->
   beforeEach ->
-    @cbPromise = (dataToResolve) => new Promise((resolve) =>
-      setTimeout((() -> resolve(dataToResolve)), 1)
-    )
     @stateObj = {}
     @logError = sinon.spy()
     @stateGetter = () => @stateObj
@@ -14,8 +11,15 @@ describe 'system.lib.ConsistentState', ->
     @initializeResult = {initParam: 1}
     @initialize = () => Promise.resolve(@initializeResult)
     @getterResult = {getterParam: 1}
-    @getter = sinon.stub().returns(@cbPromise(@getterResult))
-    @setter = sinon.stub().returns(@cbPromise())
+    @getterSpy = sinon.spy()
+    @getter = () =>
+      @getterSpy()
+      return Promise.resolve(@getterResult)
+    @setterSpy = sinon.spy()
+    @setter = (data) =>
+      @setterSpy(data)
+      return Promise.resolve()
+
     @consistentState = new ConsistentState(
       @logError,
       @stateGetter,
@@ -61,7 +65,7 @@ describe 'system.lib.ConsistentState', ->
     await promise1
     await promise2
 
-    sinon.assert.calledOnce(@getter)
+    sinon.assert.calledOnce(@getterSpy)
 
   it "load - no getter - do nothing", ->
     @consistentState.getter = undefined
@@ -89,8 +93,8 @@ describe 'system.lib.ConsistentState', ->
     assert.isUndefined(@consistentState.actualRemoteState)
     assert.isUndefined(@consistentState.paramsListToSave)
     assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
-    sinon.assert.calledOnce(@setter)
-    sinon.assert.calledWith(@setter, {writeParam: 1})
+    sinon.assert.calledOnce(@setterSpy)
+    sinon.assert.calledWith(@setterSpy, {writeParam: 1})
 
   it "write - no setter - just update the local state", ->
     data = {writeParam: 1}
@@ -125,25 +129,39 @@ describe 'system.lib.ConsistentState', ->
     assert.isFalse(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
 
-  it.only "add reading to queue while writing is in progress - wait while reading is finished", ->
+  it "add reading to queue while writing is in progress - wait while reading is finished", ->
     writePromise = @consistentState.write({writeParam: 1})
     loadPromise = @consistentState.load()
 
     assert.isFalse(@consistentState.isReading())
     assert.isTrue(@consistentState.isWriting())
+    assert.isTrue(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {writeParam: 1})
+    sinon.assert.notCalled(@getterSpy)
+
+    console.log(55555, @consistentState.getState())
 
     await writePromise
 
+    console.log(6666666, @consistentState.getState())
+
+    #await @consistentState.queue.waitJobStart('read')
+
+    # write has been finished and reading is started
     assert.isTrue(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
+    assert.isTrue(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {writeParam: 1})
+    #assert.deepEqual(@consistentState.getState(), { getterParam: 1, writeParam: 1})
 
     await loadPromise
 
     assert.isFalse(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
+    assert.isFalse(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+    sinon.assert.calledOnce(@getterSpy)
+    sinon.assert.calledOnce(@setterSpy)
 
   it "add writing several times while the first writing is in progress - it will combine stat", ->
     writePromise1 = @consistentState.write({param1: 1})
@@ -152,23 +170,23 @@ describe 'system.lib.ConsistentState', ->
 
     assert.isTrue(@consistentState.isWriting())
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
-    sinon.assert.calledOnce(@setter)
-    sinon.assert.calledWith(@setter, {param1: 1})
+    sinon.assert.calledOnce(@setterSpy)
+    sinon.assert.calledWith(@setterSpy, {param1: 1})
     assert.deepEqual(@consistentState.actualRemoteState, {});
     assert.deepEqual(@consistentState.paramsListToSave, ['param1', 'param2', 'param3']);
 
     await writePromise1
 
     assert.isTrue(@consistentState.isWriting())
-    sinon.assert.calledTwice(@setter)
-    sinon.assert.calledWith(@setter.getCall(1), {param2: 3, param3: 3})
+    sinon.assert.calledTwice(@setterSpy)
+    sinon.assert.calledWith(@setterSpy.getCall(1), {param2: 3, param3: 3})
     assert.deepEqual(@consistentState.actualRemoteState, {param1: 1});
     assert.deepEqual(@consistentState.paramsListToSave, ['param2', 'param3']);
 
     await writePromise3
 
     assert.isFalse(@consistentState.isWriting())
-    sinon.assert.calledTwice(@setter)
+    sinon.assert.calledTwice(@setterSpy)
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
     assert.isUndefined(@consistentState.actualRemoteState);
     assert.isUndefined(@consistentState.paramsListToSave);
@@ -179,7 +197,7 @@ describe 'system.lib.ConsistentState', ->
     writePromise2 = @consistentState.write({param2: 2})
 
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
-    sinon.assert.notCalled(@setter)
+    sinon.assert.notCalled(@setterSpy)
 
     await loadPromise
 
@@ -187,8 +205,8 @@ describe 'system.lib.ConsistentState', ->
 
     await writePromise2
 
-    sinon.assert.calledOnce(@setter)
-    sinon.assert.calledWith(@setter, {param1: 1, param2: 2})
+    sinon.assert.calledOnce(@setterSpy)
+    sinon.assert.calledWith(@setterSpy, {param1: 1, param2: 2})
 
   it "clear state on error while writing - restore state", ->
     @consistentState.setter = sinon.stub().returns(Promise.reject('err'))
@@ -238,7 +256,7 @@ describe 'system.lib.ConsistentState', ->
       await writePromise2
 
     assert.isRejected(writePromise2)
-    sinon.assert.calledOnce(@setter)
+    sinon.assert.calledOnce(@setterSpy)
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: undefined})
     assert.isUndefined(@consistentState.actualRemoteState);
     assert.isUndefined(@consistentState.paramsListToSave);
@@ -263,7 +281,7 @@ describe 'system.lib.ConsistentState', ->
 
     await writePromise
 
-    sinon.assert.calledOnce(@setter)
+    sinon.assert.calledOnce(@setterSpy)
     assert.deepEqual(@consistentState.getState(), {param: 1})
 
   it "setIncomeState - just set", ->

@@ -2,14 +2,12 @@ Queue = require('../../../system/lib/Queue').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.lib.Queue', ->
+describe.only 'system.lib.Queue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
-    # TODO: remove
-    @cbPromise = () => Promise.resolve()
-    @cb1 = sinon.stub().returns(@cbPromise())
-    @cb2 = sinon.stub().returns(@cbPromise())
+    @cb1 = sinon.stub().returns(Promise.resolve())
+    @cb2 = sinon.stub().returns(Promise.resolve())
     @queue = new Queue()
 
   it "ordinary queue with jobs with different id. Check queue states", ->
@@ -207,3 +205,26 @@ describe 'system.lib.Queue', ->
     sinon.assert.calledTwice(handler1)
 
     clock.restore()
+
+  it "order of calling cb", ->
+    cb1Spy = sinon.spy()
+    cb2Spy = sinon.spy()
+    cb1 = () =>
+      cb1Spy()
+      return Promise.resolve()
+    cb2 = () =>
+      cb2Spy()
+      return Promise.resolve()
+
+    @queue.add(cb1, 'writing')
+    @queue.add(cb2, 'reading')
+
+    assert.equal(@queue.getCurrentJobId(), 'writing')
+    sinon.assert.calledOnce(cb1Spy)
+    sinon.assert.notCalled(cb2Spy)
+
+    await @queue.waitJobFinished('writing')
+
+    assert.equal(@queue.getCurrentJobId(), 'reading')
+    sinon.assert.calledOnce(cb1Spy)
+    sinon.assert.calledOnce(cb2Spy)
