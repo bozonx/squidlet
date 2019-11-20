@@ -157,14 +157,11 @@ export default class ConsistentState {
       return Promise.resolve();
     }
     else if (this.queue.getCurrentJobId() === WRITING_ID) {
-      // TODO: нужно сразу установить стейт
-      // TODO: сохранять только имена ключей
-      // TODO: ?????? strong review - нужно сразу установить стейт, а потом решить какой стейт записывать
-      //                              и что возвращать когда будет ошибка
       // if current job is writing
       this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
-      // update local state right now in any case
-      this.stateUpdater(partialData);
+
+      return this.queue.waitJobFinished(WRITING_ID)
+        .then(() => this.queue.waitJobFinished(WRITING_ID));
     }
     else if (this.queue.hasJob(WRITING_ID)) {
       // if writing is in a queue but not started
@@ -176,16 +173,16 @@ export default class ConsistentState {
       this.paramsListToSave = concatUniqStrArrays(this.paramsListToSave, Object.keys(partialData));
       // update local state right now in any case
       this.stateUpdater(partialData);
+      // return promise which will be resolved when write has done.
+      return this.queue.waitJobFinished(WRITING_ID);
     }
-    else {
-      try {
-        this.startNewWriteJob(partialData);
-      }
-      catch (e) {
-        return Promise.reject(e);
-      }
+    // else no current writing or in the queue
+    try {
+      this.startNewWriteJob(partialData);
     }
-
+    catch (e) {
+      return Promise.reject(e);
+    }
     // return promise which will be resolved when write has done.
     return this.queue.waitJobFinished(WRITING_ID);
   }
@@ -271,6 +268,10 @@ export default class ConsistentState {
     this.handleWriteSuccess();
   }
 
+  /**
+   * When write is successful then it should device finish job or start one more writing
+   * if there is next state to write.
+   */
   private handleWriteSuccess() {
     // end of cycle
     delete this.actualRemoteState;
@@ -282,10 +283,6 @@ export default class ConsistentState {
     const dataToSave: Dictionary = this.nextWritePartialState;
 
     delete this.nextWritePartialState;
-
-    if (!this.nextWritePartialState) {
-      throw new Error(`ConsistentState.finalizeWriting: no nextWritePartialState`);
-    }
 
     // start next writing
     try {
