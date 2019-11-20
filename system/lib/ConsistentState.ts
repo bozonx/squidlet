@@ -93,7 +93,6 @@ export default class ConsistentState {
     return this.queue.getCurrentJobId() === READING_ID;
   }
 
-  // TODO: test
   isInProgress(): boolean {
     return this.queue.isInProgress();
   }
@@ -163,7 +162,8 @@ export default class ConsistentState {
       this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
 
       return this.queue.waitJobFinished(WRITING_ID)
-        .then(() => this.queue.waitJobFinished(WRITING_ID));
+      // TODO: test может и не нужен force ???
+        .then(() => this.queue.waitJobFinished(WRITING_ID, true));
     }
     else if (this.queue.hasJob(WRITING_ID)) {
       // if writing is in a queue but not started

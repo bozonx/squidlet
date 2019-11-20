@@ -1,12 +1,11 @@
 ConsistentState = require('../../../system/lib/ConsistentState').default;
 
 
-describe.only 'system.lib.ConsistentState', ->
+describe 'system.lib.ConsistentState', ->
   beforeEach ->
     @cbPromise = (dataToResolve) => new Promise((resolve) =>
       setTimeout((() -> resolve(dataToResolve)), 1)
     )
-    #@cbPromise = (dataToResolve) => Promise.resolve(dataToResolve)
     @stateObj = {}
     @logError = sinon.spy()
     @stateGetter = () => @stateObj
@@ -78,6 +77,7 @@ describe.only 'system.lib.ConsistentState', ->
     promise = @consistentState.write({writeParam: 1})
 
     assert.isTrue(@consistentState.isWriting())
+    assert.isTrue(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.actualRemoteState, {oldState: 1})
     assert.deepEqual(@consistentState.paramsListToSave, ['writeParam'])
     assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
@@ -85,6 +85,7 @@ describe.only 'system.lib.ConsistentState', ->
     await promise
 
     assert.isFalse(@consistentState.isWriting())
+    assert.isFalse(@consistentState.isInProgress())
     assert.isUndefined(@consistentState.actualRemoteState)
     assert.isUndefined(@consistentState.paramsListToSave)
     assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
@@ -94,11 +95,11 @@ describe.only 'system.lib.ConsistentState', ->
   it "write - no setter - just update the local state", ->
     data = {writeParam: 1}
     @consistentState.setter = undefined
-    @consistentState.queue.request = sinon.spy()
+    @consistentState.queue.add = sinon.spy()
 
     await @consistentState.write(data)
 
-    sinon.assert.notCalled(@consistentState.queue.request)
+    sinon.assert.notCalled(@consistentState.queue.add)
 
   it "add writing to queue while reading is in progress - wait while reading is finished", ->
     loadPromise = @consistentState.load()
@@ -106,12 +107,14 @@ describe.only 'system.lib.ConsistentState', ->
 
     assert.isTrue(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
+    assert.isTrue(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {writeParam: 1})
 
     await loadPromise
 
     assert.isFalse(@consistentState.isReading())
     assert.isTrue(@consistentState.isWriting())
+    assert.isTrue(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
     assert.deepEqual(@consistentState.actualRemoteState, {getterParam: 1});
 
@@ -119,9 +122,10 @@ describe.only 'system.lib.ConsistentState', ->
 
     assert.isFalse(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
+    assert.isFalse(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
 
-  it "add reading to queue while writing is in progress - wait while reading is finished", ->
+  it.only "add reading to queue while writing is in progress - wait while reading is finished", ->
     writePromise = @consistentState.write({writeParam: 1})
     loadPromise = @consistentState.load()
 
@@ -241,7 +245,7 @@ describe.only 'system.lib.ConsistentState', ->
 
   it "write - error in queue.request - cleanup", ->
     @stateUpdater({param: 1})
-    @consistentState.queue.request = () => throw new Error('err')
+    @consistentState.queue.add = () => throw new Error('err')
 
     assert.isRejected(@consistentState.write({newParam: 1}))
 
