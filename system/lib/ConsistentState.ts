@@ -176,15 +176,8 @@ export default class ConsistentState {
       // return promise which will be resolved when write has done.
       return this.queue.waitJobFinished(WRITING_ID);
     }
-    // else no current writing or in the queue
-    try {
-      this.startNewWriteJob(partialData);
-    }
-    catch (e) {
-      return Promise.reject(e);
-    }
-    // return promise which will be resolved when write has done.
-    return this.queue.waitJobFinished(WRITING_ID);
+    // else no current writing or in the queue - start a new job
+    return this.startNewWriteJob(partialData);
   }
 
 
@@ -226,16 +219,16 @@ export default class ConsistentState {
     this.stateUpdater(newState);
   }
 
-  private startNewWriteJob(partialData: Dictionary) {
+  private startNewWriteJob(partialData: Dictionary): Promise<void> {
     // no writing in a queue
     if (this.nextWritePartialState) {
-      throw new Error(`ConsistentState.write: nextWritePartialState has to be removed`);
+      return Promise.reject(`ConsistentState.write: nextWritePartialState has to be removed`);
     }
     else if (this.actualRemoteState) {
-      throw new Error(`ConsistentState.write: actualRemoteState has to be removed`);
+      return Promise.reject(`ConsistentState.write: actualRemoteState has to be removed`);
     }
     else if (this.paramsListToSave) {
-      throw new Error(`ConsistentState.write: paramsListToSave has to be removed`);
+      return Promise.reject(`ConsistentState.write: paramsListToSave has to be removed`);
     }
     // Save actual state. It needs to use it to do fallback on error
     this.actualRemoteState = cloneDeepObject(this.getState());
@@ -245,6 +238,8 @@ export default class ConsistentState {
     this.stateUpdater(partialData);
     // add job to queue
     this.queue.add(this.handleWriteQueueStart, WRITING_ID);
+    // return promise which will be resolved when write has done.
+    return this.queue.waitJobFinished(WRITING_ID);
   }
 
   private handleWriteQueueStart = async () => {
@@ -285,12 +280,8 @@ export default class ConsistentState {
     delete this.nextWritePartialState;
 
     // start next writing
-    try {
-      this.startNewWriteJob(dataToSave);
-    }
-    catch (e) {
-      return this.logError(e);
-    }
+    this.startNewWriteJob(dataToSave)
+      .catch(this.logError);
   }
 
   /**
