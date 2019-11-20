@@ -17,17 +17,20 @@ const READING_ID = 'read';
 /**
  * State which is consistent while reading and writing.
  * WARNING!: don't use nested state - it will work badly on save and reading when it combines a state to change
+ * It update state immediately on writing request but if there is writing request in progress then
+ * a new state will be temporary stored in a cache and if current request has been successful then
+ * cached state will be set at current and a new write request will be started.
  */
 export default class ConsistentState {
+  protected initialize?: Initialize;
+  protected readonly getter?: Getter;
+  protected readonly setter?: Setter;
+
   private readonly logError: (msg: string) => void;
   // getter of local state
   private readonly stateGetter: () => Dictionary;
   // updater of local state
   private readonly stateUpdater: (partialState: Dictionary) => void;
-  protected initialize?: Initialize;
-  protected readonly getter?: Getter;
-  protected readonly setter?: Setter;
-
   private readonly queue: Queue;
   //private readonly writeOverride: QueueOverride;
   // actual state on server before saving
@@ -56,7 +59,6 @@ export default class ConsistentState {
     this.setter = setter;
 
     this.queue = new Queue(jobTimeoutSec);
-    //this.writeOverride = new QueueOverride(jobTimeoutSec);
   }
 
   init(): Promise<void> {
