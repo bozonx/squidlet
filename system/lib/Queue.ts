@@ -165,9 +165,12 @@ export default class Queue {
    * WARNING! If you use it to wait for job finished and the next job started you should not to use async
    * functions and return from your function exactly this promise otherwise it will be fulfilled
    * not exactly at time when job actually get finished.
+   * @param jobId
+   * @param force - if true that don't chec if job exist in a queue
    */
-  waitJobFinished(jobId: JobId): Promise<void> {
-    if (!this.hasJob(jobId)) {
+  waitJobFinished(jobId: JobId, force: boolean = false): Promise<void> {
+    // TODO: test force
+    if (!force && !this.hasJob(jobId)) {
       return Promise.reject(`RequestQueue.waitJobFinished: There isn't any job "${jobId}"`);
     }
 
