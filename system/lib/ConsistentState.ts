@@ -232,9 +232,7 @@ export default class ConsistentState {
     // and carefully update the state.
     this.actualRemoteState = result;
 
-    const newState = this.generateSafeNewState(result);
-
-    this.stateUpdater(newState);
+    this.stateUpdater( this.generateSafeNewState(result) );
   }
 
   private startNewWriteJob(partialData: Dictionary): Promise<void> {
@@ -373,7 +371,6 @@ export default class ConsistentState {
    * but don't update params which are saving at the moment.
    */
   private generateSafeNewState(mostActualState: Dictionary): Dictionary {
-    // TODO: test
     // get key witch won't be saved
     const keysToUpdate: string[] = arraysDifference(
       Object.keys(mostActualState),
@@ -387,13 +384,3 @@ export default class ConsistentState {
   }
 
 }
-
-// // If there is the next recall cb - then update actualRemoteState and paramsListToSave.
-// // Update actualRemoteState
-// this.actualRemoteState = {
-//   ...this.actualRemoteState,
-//   ...dataToSave,
-// };
-// // TODO: test
-// // remove saved keys from the list
-// this.paramsListToSave = arraysDifference(this.paramsListToSave || [], Object.keys(dataToSave));

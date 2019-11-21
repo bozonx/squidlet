@@ -239,6 +239,27 @@ describe.only 'system.lib.ConsistentState', ->
 
     throw new Error('Setter has to be rejected')
 
+  it "first write is failed and second won't be called", ->
+    writePromise1 = @consistentState.write({param1: 1})
+    writePromise2 = @consistentState.write({param1: 2, param2: 2})
+
+    @setterPromised.reject('err')
+    @setterPromised = new Promised()
+
+    assert.deepEqual(@consistentState.getState(), {param1: 1})
+
+    try
+      await writePromise1
+    catch err
+      assert.isRejected(writePromise2)
+      sinon.assert.calledOnce(@setterSpy)
+      assert.isFalse(@consistentState.isInProgress())
+      assert.deepEqual(@consistentState.getState(), {param1: undefined})
+
+      return
+
+    throw new Error('Setter has to be rejected')
+
   it "first write is OK and second failed - revert state to first saved step", ->
     writePromise1 = @consistentState.write({param1: 1})
     writePromise2 = @consistentState.write({param1: 2, param2: 2})
@@ -317,3 +338,25 @@ describe.only 'system.lib.ConsistentState', ->
     assert.isUndefined(@consistentState.actualRemoteState)
     assert.isUndefined(@consistentState.paramsListToSave)
     assert.isUndefined(@consistentState.nextWritePartialState)
+
+  it "restorePreviousState", ->
+    # TODO: add
+
+  it "generateSafeNewState", ->
+    @stateObj = {
+      param1: 1
+      param2: 1
+      param3: 1
+    }
+    @stateWhichRead = {
+      param1: 2
+      param2: 2
+      param3: 2
+    }
+    @consistentState.paramsListToSave = ['param2', 'param3']
+
+    assert.deepEqual(@consistentState.generateSafeNewState(@stateWhichRead), {
+      param1: 2,
+      param2: 1
+      param3: 1
+    })
