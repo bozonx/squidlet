@@ -139,8 +139,6 @@ export default class ConsistentState {
 
     this.queue.add(this.handleLoading, READING_ID);
 
-    console.log('---------- load added to queue', this.getState())
-
     return this.queue.waitJobFinished(READING_ID);
   }
 
@@ -181,8 +179,6 @@ export default class ConsistentState {
       return this.queue.waitJobFinished(WRITING_ID);
     }
 
-    console.log('---------- save added to queue')
-
     // else no current writing or in the queue - start a new job
     return this.startNewWriteJob(partialData);
   }
@@ -208,14 +204,12 @@ export default class ConsistentState {
   private handleLoading = async () => {
     if (!this.getter) throw new Error(`No getter`);
 
-    console.log('------- laod started', this.getState())
-
     const result: Dictionary = await this.getter();
 
     // just update state in ordinary mode
     if (!this.actualRemoteState) {
       this.stateUpdater(result);
-      console.log('----------- load finished', this.getState())
+
       return;
     }
 
@@ -252,8 +246,6 @@ export default class ConsistentState {
   }
 
   private handleWriteQueueStart = async () => {
-    console.log('-------- write started')
-
     if (!this.setter) {
       throw new Error(`ConsistentState.handleWriteQueueStart: no setter`);
     }
@@ -272,8 +264,6 @@ export default class ConsistentState {
     }
 
     this.handleWriteSuccess();
-
-    console.log('-------- write finished')
   }
 
   /**

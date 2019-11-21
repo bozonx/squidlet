@@ -1,4 +1,5 @@
 ConsistentState = require('../../../system/lib/ConsistentState').default;
+Promised = require('../../../system/lib/Promised').default;
 
 
 describe 'system.lib.ConsistentState', ->
@@ -12,13 +13,15 @@ describe 'system.lib.ConsistentState', ->
     @initialize = () => Promise.resolve(@initializeResult)
     @getterResult = {getterParam: 1}
     @getterSpy = sinon.spy()
+    @getterPromised = new Promised()
     @getter = () =>
       @getterSpy()
-      return Promise.resolve(@getterResult)
+      return @getterPromised.promise
     @setterSpy = sinon.spy()
+    @setterPromised = new Promised()
     @setter = (data) =>
       @setterSpy(data)
-      return Promise.resolve()
+      return @setterPromised.promise
 
     @consistentState = new ConsistentState(
       @logError,
@@ -139,20 +142,19 @@ describe 'system.lib.ConsistentState', ->
     assert.deepEqual(@consistentState.getState(), {writeParam: 1})
     sinon.assert.notCalled(@getterSpy)
 
-    console.log(55555, @consistentState.getState())
+    # write has been finished and reading is started
+    @setterPromised.resolve()
+
+    assert.deepEqual(@consistentState.getState(), {writeParam: 1})
 
     await writePromise
 
-    console.log(6666666, @consistentState.getState())
-
-    #await @consistentState.queue.waitJobStart('read')
-
-    # write has been finished and reading is started
     assert.isTrue(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
     assert.isTrue(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {writeParam: 1})
-    #assert.deepEqual(@consistentState.getState(), { getterParam: 1, writeParam: 1})
+
+    @getterPromised.resolve(@getterResult)
 
     await loadPromise
 
@@ -163,7 +165,7 @@ describe 'system.lib.ConsistentState', ->
     sinon.assert.calledOnce(@getterSpy)
     sinon.assert.calledOnce(@setterSpy)
 
-  it "add writing several times while the first writing is in progress - it will combine stat", ->
+  it "add writing several times while the first writing is in progress - it will combine state", ->
     writePromise1 = @consistentState.write({param1: 1})
     @consistentState.write({param2: 2})
     writePromise3 = @consistentState.write({param2: 3, param3: 3})
