@@ -17,4 +17,5 @@ Easy make IoT devices and local net of devices which can be managed by master
       -v path/to/data:/data \
       -e PUID=1000 \
       -e PGID=1000 \
+      -e LOG_LEVEL=info \
       bozonx/squidlet

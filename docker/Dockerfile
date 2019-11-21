@@ -5,6 +5,7 @@ COPY ../build/updater/ updater/
 
 ENV PUID=1000
 ENV PGID=1000
+ENV LOG_LEVEL=error
 
 #USER node
 
@@ -14,4 +15,3 @@ WORKDIR /updater
 EXPOSE 8087/tcp 8088/tcp 8089/tcp
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD [ "node", "index.js" ]
-#CMD [ "npm", "start" ]
