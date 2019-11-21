@@ -29,6 +29,8 @@ export default class State {
     return this.state[category][stateName];
   }
 
+  // TODO: test (может уже есть) как будет работать если затереть существующие параметры использоуя undefined
+  //   должно затираться
   updateState(category: number, stateName: string, newPartialState?: Dictionary) {
     const oldState: Dictionary | undefined = this.getState(category, stateName);
     const changedParams: string[] = this.generateChangedParams(oldState, newPartialState);

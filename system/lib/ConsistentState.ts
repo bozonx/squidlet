@@ -305,8 +305,6 @@ export default class ConsistentState {
   private handleWriteError() {
     this.stateUpdater(this.restorePreviousState());
 
-    // TODO: test что очереди удалились на этот момент
-
     delete this.actualRemoteState;
     delete this.paramsListToSave;
     delete this.nextWritePartialState;

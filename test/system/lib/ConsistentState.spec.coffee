@@ -203,12 +203,11 @@ describe 'system.lib.ConsistentState', ->
     assert.isUndefined(@consistentState.paramsListToSave);
     assert.isUndefined(@consistentState.nextWritePartialState);
 
-  it.only "clear state on error while writing - restore state", ->
-    @consistentState.setter = sinon.stub().returns(Promise.reject('err'))
-
+  it "clear state on error while writing - restore state", ->
     loadPromise = @consistentState.load()
-    writePromise1 = @consistentState.write({param1: 1})
-    writePromise2 = @consistentState.write({param2: 2})
+    @consistentState.write({param1: 1})
+      .catch(() =>)
+    writePromise = @consistentState.write({param2: 2})
 
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
 
@@ -218,37 +217,38 @@ describe 'system.lib.ConsistentState', ->
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: 1, param2: 2})
 
     # reject
-    @setterPromised.resolve()
+    @setterPromised.reject('err')
 
     try
-      await writePromise1
-      await writePromise2
+      await writePromise
     catch err
       assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: undefined, param2: undefined})
+      assert.isFalse(@consistentState.isInProgress());
       assert.isUndefined(@consistentState.actualRemoteState);
       assert.isUndefined(@consistentState.paramsListToSave);
+      assert.isUndefined(@consistentState.nextWritePartialState);
 
-      #await new Promise((resolve) => setTimeout(resolve, 100))
-
-      sinon.assert.calledOnce(@consistentState.setter)
+      sinon.assert.calledOnce(@setterSpy)
 
       return
 
     throw new Error('Setter has to be rejected');
 
-  it "first write is OK and second failed - revert state to first save step", ->
-    saveCounter = 0
-
-    @consistentState.setter = (params...) =>
-      saveCounter++
-      if (saveCounter > 1)
-        return Promise.reject('err')
-      else
-        return @setter(params...)
+  it.only "first write is OK and second failed - revert state to first saved step", ->
+#    saveCounter = 0
+#
+#    @consistentState.setter = (params...) =>
+#      saveCounter++
+#      if (saveCounter > 1)
+#        return Promise.reject('err')
+#      else
+#        return @setter(params...)
 
     writePromise1 = @consistentState.write({param1: 1})
     writePromise2 = @consistentState.write({param1: 2, param2: 2})
 
+    @setterPromised.resolve()
+    @setterPromised = new Promised()
     await writePromise1
 
     try
