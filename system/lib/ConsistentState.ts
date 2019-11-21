@@ -1,7 +1,7 @@
 import {cloneDeepObject, isEmptyObject, mergeDeepObjects} from './objects';
 import {concatUniqStrArrays} from './arrays';
 import {Dictionary} from '../interfaces/Types';
-import Queue from './Queue';
+import Queue, {JobId} from './Queue';
 import {pickObj} from './objects';
 import {arraysDifference} from './arrays';
 
@@ -80,8 +80,8 @@ export default class ConsistentState {
   destroy() {
     this.queue.destroy();
     delete this.actualRemoteState;
+    delete this.paramsListToSave;
     delete this.nextWritePartialState;
-    //delete this.paramsListToSave;
   }
 
 
@@ -161,15 +161,24 @@ export default class ConsistentState {
       // if current job is writing
       this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
 
-      // TODO: затестить
-      // TODO: а что если произошла ошибка ?????
-      // return new Promise<void>((resolve, reject) => {
-      //   this.queue.onJobStart()
-      // });
+      // TODO: затестить - полный проход
+      return new Promise<void>((resolve, reject) => {
+        this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
+          if (jobId !== WRITING_ID) return;
+          else if (error) return reject(new Error(error));
 
-      return this.queue.waitJobStart(WRITING_ID)
-      // TODO: test может и не нужен force ???
-        .then(() => this.queue.waitJobFinished(WRITING_ID, true));
+          this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
+            if (jobId !== WRITING_ID) return;
+            else if (error) return reject(new Error(error));
+
+            resolve();
+          });
+        });
+      });
+
+      // return this.queue.waitJobStart(WRITING_ID)
+      // // TODO: test может и не нужен force ???
+      //   .then(() => this.queue.waitJobFinished(WRITING_ID, true));
     }
     else if (this.queue.hasJob(WRITING_ID)) {
       // if writing is in a queue but not started

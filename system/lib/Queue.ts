@@ -7,7 +7,7 @@ import IndexedEventEmitter from './IndexedEventEmitter';
 type QueuedCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
 type EndJobHandler = (error: string | undefined, jobId: JobId) => void;
-type JobId = string;
+export type JobId = string;
 // array like [JobId, QueuedCb, isCanceled]
 type Job = [JobId, QueuedCb, boolean];
 

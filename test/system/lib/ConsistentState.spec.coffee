@@ -2,7 +2,7 @@ ConsistentState = require('../../../system/lib/ConsistentState').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.lib.ConsistentState', ->
+describe.only 'system.lib.ConsistentState', ->
   beforeEach ->
     @stateObj = {}
     @logError = sinon.spy()
@@ -47,6 +47,7 @@ describe 'system.lib.ConsistentState', ->
   it "init - use getter", ->
     @consistentState.initialize = undefined
 
+    @getterPromised.resolve(@getterResult)
     await @consistentState.init()
 
     assert.deepEqual(@consistentState.getState(), @getterResult)
@@ -57,6 +58,7 @@ describe 'system.lib.ConsistentState', ->
     assert.isTrue(@consistentState.isReading())
     assert.deepEqual(@consistentState.getState(), {})
 
+    @getterPromised.resolve(@getterResult)
     await promise
 
     assert.deepEqual(@consistentState.getState(), @getterResult)
@@ -65,6 +67,7 @@ describe 'system.lib.ConsistentState', ->
     promise1 =  @consistentState.load()
     promise2 =  @consistentState.load()
 
+    @getterPromised.resolve(@getterResult)
     await promise1
     await promise2
 
@@ -74,6 +77,7 @@ describe 'system.lib.ConsistentState', ->
     @consistentState.getter = undefined
     @consistentState.queue.request = sinon.spy()
 
+    @getterPromised.resolve(@getterResult)
     await @consistentState.load()
 
     sinon.assert.notCalled(@consistentState.queue.request)
@@ -89,6 +93,7 @@ describe 'system.lib.ConsistentState', ->
     assert.deepEqual(@consistentState.paramsListToSave, ['writeParam'])
     assert.deepEqual(@consistentState.getState(), {oldState: 1, writeParam: 1})
 
+    @setterPromised.resolve()
     await promise
 
     assert.isFalse(@consistentState.isWriting())
@@ -232,18 +237,9 @@ describe 'system.lib.ConsistentState', ->
 
       return
 
-    throw new Error('Setter has to be rejected');
+    throw new Error('Setter has to be rejected')
 
-  it.only "first write is OK and second failed - revert state to first saved step", ->
-#    saveCounter = 0
-#
-#    @consistentState.setter = (params...) =>
-#      saveCounter++
-#      if (saveCounter > 1)
-#        return Promise.reject('err')
-#      else
-#        return @setter(params...)
-
+  it "first write is OK and second failed - revert state to first saved step", ->
     writePromise1 = @consistentState.write({param1: 1})
     writePromise2 = @consistentState.write({param1: 2, param2: 2})
 
@@ -251,33 +247,29 @@ describe 'system.lib.ConsistentState', ->
     @setterPromised = new Promised()
     await writePromise1
 
+    @setterPromised.reject('err')
+
     try
       await writePromise2
+    catch err
+      sinon.assert.calledTwice(@setterSpy)
+      assert.deepEqual(@consistentState.getState(), {param1: 1, param2: undefined})
+      assert.isUndefined(@consistentState.actualRemoteState);
+      assert.isUndefined(@consistentState.paramsListToSave);
+      assert.isUndefined(@consistentState.nextWritePartialState);
 
-    assert.isRejected(writePromise2)
-    sinon.assert.calledOnce(@setterSpy)
-    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: undefined})
-    assert.isUndefined(@consistentState.actualRemoteState);
-    assert.isUndefined(@consistentState.paramsListToSave);
+      return
 
-  it "write - error in queue.request - cleanup", ->
-    @stateUpdater({param: 1})
-    @consistentState.queue.add = () => throw new Error('err')
-
-    assert.isRejected(@consistentState.write({newParam: 1}))
-
-    assert.deepEqual(@consistentState.getState(), {param: 1, newParam: undefined})
-    assert.isUndefined(@consistentState.actualRemoteState);
-    assert.isUndefined(@consistentState.paramsListToSave);
+    throw new Error('Setter has to be rejected')
 
   it "after failed load the next saving will run", ->
-    @consistentState.getter = () => Promise.reject('err')
-
     loadPromise = @consistentState.load()
     writePromise = @consistentState.write({param: 1})
 
+    @getterPromised.reject('err')
     assert.isRejected(loadPromise)
 
+    @setterPromised.resolve()
     await writePromise
 
     sinon.assert.calledOnce(@setterSpy)
@@ -324,3 +316,4 @@ describe 'system.lib.ConsistentState', ->
     sinon.assert.calledOnce(@consistentState.queue.destroy)
     assert.isUndefined(@consistentState.actualRemoteState)
     assert.isUndefined(@consistentState.paramsListToSave)
+    assert.isUndefined(@consistentState.nextWritePartialState)
