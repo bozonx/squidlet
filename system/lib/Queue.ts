@@ -138,6 +138,8 @@ export default class Queue {
   /**
    * Return the promise which will be fulfilled before the job is get started.
    * You should check that the queue has this job by calling `hasJob(jobId)`.
+   * WARNING! It will be fulfilled on the next tick after event "startJob" has been risen.
+   *   That is because resolve() function of promise call handlers on the next tick
    */
   waitJobStart(jobId: JobId): Promise<void> {
     if (this.isJobInProgress(jobId)) return Promise.resolve();
@@ -162,9 +164,8 @@ export default class Queue {
   /**
    * Return the promise which will be fulfilled when the job is finished.
    * You should check that the queue has this job by calling `hasJob(jobId)`.
-   * WARNING! If you use it to wait for job finished and the next job started you should not to use async
-   * functions and return from your function exactly this promise otherwise it will be fulfilled
-   * not exactly at time when job actually get finished.
+   * WARNING! It will be fulfilled on the next tick after event "endJob" has been risen.
+   *   That is because resolve() function of promise call handlers on the next tick
    * @param jobId
    * @param force - if true that don't chec if job exist in a queue
    */

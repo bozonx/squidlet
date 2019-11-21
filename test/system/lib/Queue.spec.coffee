@@ -2,7 +2,7 @@ Queue = require('../../../system/lib/Queue').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.Queue', ->
+describe 'system.lib.Queue', ->
   beforeEach ->
     @jobId1 = 'jobId1'
     @jobId2 = 'jobId2'
@@ -206,7 +206,7 @@ describe.only 'system.lib.Queue', ->
 
     clock.restore()
 
-  it "order of calling cb", ->
+  it "order of calling cb - waitJobFinished() will be called on the next tick", ->
     cb1Spy = sinon.spy()
     cb2Spy = sinon.spy()
     cb1 = () =>
@@ -225,6 +225,9 @@ describe.only 'system.lib.Queue', ->
 
     await @queue.waitJobFinished('writing')
 
+    #assert.isUndefined(@queue.getCurrentJobId())
+    # actually there is should be undefined, but "waitJobFinished" promise has been fulfilled
+    # on the next tick and at the moment the next job is started
     assert.equal(@queue.getCurrentJobId(), 'reading')
     sinon.assert.calledOnce(cb1Spy)
     sinon.assert.calledOnce(cb2Spy)

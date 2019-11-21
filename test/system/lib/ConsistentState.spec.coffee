@@ -129,7 +129,7 @@ describe 'system.lib.ConsistentState', ->
     assert.isFalse(@consistentState.isInProgress())
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
 
-  it "add reading to queue while writing is in progress - wait while reading is finished", ->
+  it.only "add reading to queue while writing is in progress - wait while reading is finished", ->
     writePromise = @consistentState.write({writeParam: 1})
     loadPromise = @consistentState.load()
 
