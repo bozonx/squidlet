@@ -10,6 +10,8 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node ./control/index.ts",
+    "buildImage": "./docker/buildImage.sh",
+    "buildUpdater": "ts-node ./updater/build.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json",
     "postinstall": "cd node_modules && ln -s ../system ./"

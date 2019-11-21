@@ -142,6 +142,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   cancel() {
     if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
+    // TODO: better to resolve
     if (this.deferredWritePromise) this.deferredWritePromise.cancel();
 
     delete this.deferredWritePromise;

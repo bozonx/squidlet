@@ -155,7 +155,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   cancel() {
     if (this.impulseTimeout) clearTimeout(this.impulseTimeout);
     if (this.blockTimeout) clearTimeout(this.blockTimeout);
-
+    // TODO: better to resolve
     if (this.deferredWritePromise) this.deferredWritePromise.cancel();
 
     delete this.deferredWritePromise;

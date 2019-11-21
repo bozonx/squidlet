@@ -44,6 +44,7 @@ export default class InitIcLogic {
 
   destroy() {
     this.cancel();
+    // TODO: better to resolve
     this.initIcPromised.destroy();
 
     delete this.initIcPromised;
@@ -66,6 +67,7 @@ export default class InitIcLogic {
     }
 
     this.timeoutOfTry && clearTimeout(this.timeoutOfTry);
+    // TODO: better to resolve
     this.timeoutPromised && this.timeoutPromised.destroy();
 
     delete this.timeoutOfTry;
