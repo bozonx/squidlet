@@ -158,7 +158,6 @@ describe 'system.lib.ConsistentState', ->
     assert.deepEqual(@consistentState.getState(), {writeParam: 1})
 
     @getterPromised.resolve(@getterResult)
-
     await loadPromise
 
     assert.isFalse(@consistentState.isReading())
@@ -213,9 +212,13 @@ describe 'system.lib.ConsistentState', ->
 
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
 
+    @getterPromised.resolve(@getterResult)
     await loadPromise
 
     assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: 1, param2: 2})
+
+    # reject
+    @setterPromised.resolve()
 
     try
       await writePromise1
