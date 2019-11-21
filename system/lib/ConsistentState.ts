@@ -282,9 +282,15 @@ export default class ConsistentState {
 
     delete this.nextWritePartialState;
 
-    // start next writing
-    this.startNewWriteJob(dataToSave)
-      .catch(this.logError);
+    if (this.queue.getCurrentJobId() !== WRITING_ID) {
+      return this.logError(`ConsistentState.handleWriteSuccess: unexpectedly current job hasn't finished yed`);
+    }
+
+    this.queue.onJobEndOnce(() => {
+      // start next writing
+      this.startNewWriteJob(dataToSave)
+        .catch(this.logError);
+    });
   }
 
   /**

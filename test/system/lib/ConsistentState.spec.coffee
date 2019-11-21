@@ -108,31 +108,34 @@ describe 'system.lib.ConsistentState', ->
 
     sinon.assert.notCalled(@consistentState.queue.add)
 
-  it "add writing to queue while reading is in progress - wait while reading is finished", ->
+  it "add writing twice to queue while reading is in progress - wait while reading is finished. State of both writings will be combined", ->
     loadPromise = @consistentState.load()
-    writePromise = @consistentState.write({writeParam: 1})
+    @consistentState.write({writeParam: 1})
+    writePromise = @consistentState.write({writeParam: 2, otherParam: 2})
 
     assert.isTrue(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
     assert.isTrue(@consistentState.isInProgress())
-    assert.deepEqual(@consistentState.getState(), {writeParam: 1})
+    assert.deepEqual(@consistentState.getState(), {writeParam: 2, otherParam: 2})
 
+    @getterPromised.resolve(@getterResult)
     await loadPromise
 
     assert.isFalse(@consistentState.isReading())
     assert.isTrue(@consistentState.isWriting())
     assert.isTrue(@consistentState.isInProgress())
-    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 2, otherParam: 2})
     assert.deepEqual(@consistentState.actualRemoteState, {getterParam: 1});
 
+    @setterPromised.resolve()
     await writePromise
 
     assert.isFalse(@consistentState.isReading())
     assert.isFalse(@consistentState.isWriting())
     assert.isFalse(@consistentState.isInProgress())
-    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 1})
+    assert.deepEqual(@consistentState.getState(), {getterParam: 1, writeParam: 2, otherParam: 2})
 
-  it.only "add reading to queue while writing is in progress - wait while reading is finished", ->
+  it "add reading to queue while writing is in progress - wait while writing is finished", ->
     writePromise = @consistentState.write({writeParam: 1})
     loadPromise = @consistentState.load()
 
@@ -165,52 +168,43 @@ describe 'system.lib.ConsistentState', ->
     sinon.assert.calledOnce(@getterSpy)
     sinon.assert.calledOnce(@setterSpy)
 
-  it "add writing several times while the first writing is in progress - it will combine state", ->
+  it "add writing several times while the first writing is in progress - it will postpone state", ->
     writePromise1 = @consistentState.write({param1: 1})
     @consistentState.write({param2: 2})
     writePromise3 = @consistentState.write({param2: 3, param3: 3})
 
-    assert.isTrue(@consistentState.isWriting())
-    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
     sinon.assert.calledOnce(@setterSpy)
     sinon.assert.calledWith(@setterSpy, {param1: 1})
+    assert.isTrue(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {param1: 1})
     assert.deepEqual(@consistentState.actualRemoteState, {});
-    assert.deepEqual(@consistentState.paramsListToSave, ['param1', 'param2', 'param3']);
+    assert.deepEqual(@consistentState.paramsListToSave, ['param1']);
+    assert.deepEqual(@consistentState.nextWritePartialState, {param2: 3, param3: 3});
 
+    @setterPromised.resolve()
+    @setterPromised = new Promised()
     await writePromise1
 
-    assert.isTrue(@consistentState.isWriting())
     sinon.assert.calledTwice(@setterSpy)
     sinon.assert.calledWith(@setterSpy.getCall(1), {param2: 3, param3: 3})
+    assert.isTrue(@consistentState.isWriting())
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
     assert.deepEqual(@consistentState.actualRemoteState, {param1: 1});
     assert.deepEqual(@consistentState.paramsListToSave, ['param2', 'param3']);
+    assert.isUndefined(@consistentState.nextWritePartialState)
 
+    @setterPromised.resolve()
     await writePromise3
 
-    assert.isFalse(@consistentState.isWriting())
     sinon.assert.calledTwice(@setterSpy)
+    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
+    assert.isFalse(@consistentState.isWriting())
     assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 3, param3: 3})
     assert.isUndefined(@consistentState.actualRemoteState);
     assert.isUndefined(@consistentState.paramsListToSave);
+    assert.isUndefined(@consistentState.nextWritePartialState);
 
-  it "add writing several times while the reading is in progress - it will combine state", ->
-    loadPromise = @consistentState.load()
-    @consistentState.write({param1: 1})
-    writePromise2 = @consistentState.write({param2: 2})
-
-    assert.deepEqual(@consistentState.getState(), {param1: 1, param2: 2})
-    sinon.assert.notCalled(@setterSpy)
-
-    await loadPromise
-
-    assert.deepEqual(@consistentState.getState(), {getterParam: 1, param1: 1, param2: 2})
-
-    await writePromise2
-
-    sinon.assert.calledOnce(@setterSpy)
-    sinon.assert.calledWith(@setterSpy, {param1: 1, param2: 2})
-
-  it "clear state on error while writing - restore state", ->
+  it.only "clear state on error while writing - restore state", ->
     @consistentState.setter = sinon.stub().returns(Promise.reject('err'))
 
     loadPromise = @consistentState.load()

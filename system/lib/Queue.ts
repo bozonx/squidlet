@@ -183,8 +183,18 @@ export default class Queue {
     return this.events.addListener(QueueEvents.startJob, cb);
   }
 
+  // TODO: test
+  onJobStartOnce(cb: StartJobHandler): number {
+    return this.events.once(QueueEvents.startJob, cb);
+  }
+
   onJobEnd(cb: EndJobHandler): number {
     return this.events.addListener(QueueEvents.endJob, cb);
+  }
+
+  // TODO: test
+  onJobEndOnce(cb: EndJobHandler): number {
+    return this.events.once(QueueEvents.endJob, cb);
   }
 
   // TODO: test
