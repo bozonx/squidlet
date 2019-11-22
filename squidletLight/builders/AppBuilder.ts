@@ -108,6 +108,7 @@ export default class AppBuilder {
       + `import IoSetBuiltin from '${ioSetPath}';\n`
       + `import ConsoleLogger from '${ConsoleLoggerPath}';\n`
       + '\n\n'
+      // TODO: брать из переменной окружения ????
       + `const consoleLogger = new ConsoleLogger(${this.logLevel})`
       + '\n\n'
       + `async function start() {\n`

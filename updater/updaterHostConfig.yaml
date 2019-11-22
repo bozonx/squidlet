@@ -1,6 +1,6 @@
 id: updater
 
-config: {}
+#config: {}
 
 httpApi:
   host: 0.0.0.0

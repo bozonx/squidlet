@@ -11,16 +11,6 @@ import LogLevel from '../system/interfaces/LogLevel';
 const SQUIDLET_LIGHT_WORKDIR = 'light';
 
 
-/**
- * Supported params:
- * * --work-dir - optional. default is in the build dir of repository
- * * --platform - required
- * * --machine - required
- * * --minimize - default is true
- * * --io-server - build IO server standalone instead of full app.
- * * --log-level - Optional. Set log level for logger. debug|info|warn|error
- * * config path
- */
 export function resolveWorkDir(argWorkDir?: string): string {
   if (argWorkDir) {
     // if it set as an argument - make it absolute
