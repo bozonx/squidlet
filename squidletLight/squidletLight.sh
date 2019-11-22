@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+DIRNAME=$(dirname $0)
+
+
 . "$NVM_DIR/nvm.sh";
 
-ts-node ./index.ts $@
+ts-node ${DIRNAME}/index.ts ${@}

@@ -12,7 +12,7 @@ const machineConfig: MachineConfig = {
     './ios/HttpServer.ts',
 
     './ios/Digital.ts',
-    './ios/Serial',
+    './ios/Serial.ts',
     './ios/I2cMaster.ts',
     //'I2cSlave',
     //'Pwm',
