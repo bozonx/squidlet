@@ -1,0 +1,11 @@
+id: updater
+
+config: {}
+
+httpApi:
+  host: 0.0.0.0
+wsApi:
+  host: 0.0.0.0
+ioServer:
+  host: 0.0.0.0
+updater: {}
