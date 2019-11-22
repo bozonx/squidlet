@@ -1,7 +1,5 @@
 id: updater
 
-#config: {}
-
 httpApi:
   host: 0.0.0.0
 wsApi:

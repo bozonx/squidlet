@@ -22,6 +22,8 @@ else {
 system.start({
   user: process.env.PUID,
   group: process.env.PGID,
+  workDir: '/app/data',
+  ioServerMode: process.env.IOSERVER_MODE,
   hostConfig: {
     hostType: 'updater',
     mqtt: {
@@ -29,7 +31,6 @@ system.start({
       port: process.env.MQTT_BROKER_PORT,
     },
   },
-  workDir: '/app/data',
 });
 
 async function shutdown() {
