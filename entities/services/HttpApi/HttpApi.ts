@@ -1,6 +1,6 @@
 import ServiceBase from 'system/base/ServiceBase';
 import {HttpServerProps} from 'system/interfaces/io/HttpServerIo';
-import {Route} from 'system/lib/HttpRouterLogic';
+import {Route} from 'system/lib/logic/HttpRouterLogic';
 import {JsonTypes, Primitives} from 'system/interfaces/Types';
 import {parseArgs} from 'system/lib/helpers';
 

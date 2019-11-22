@@ -1,12 +1,12 @@
-import {JsonTypes, Primitives} from '../interfaces/Types';
-import {ParsedUrl, parseUrl} from './url';
-import IndexedEvents from './IndexedEvents';
-import {matchRoute, MatchRouteResult, prepareRoute} from './route';
-import {HttpMethods} from '../interfaces/Http';
-import {clearArray} from './arrays';
+import {JsonTypes, Primitives} from '../../interfaces/Types';
+import {ParsedUrl, parseUrl} from '../url';
+import IndexedEvents from '../IndexedEvents';
+import {matchRoute, MatchRouteResult, prepareRoute} from '../route';
+import {HttpMethods} from '../../interfaces/Http';
+import {clearArray} from '../arrays';
 // TODO: don't use dependencies
-import {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
-import {omitUndefined} from './objects';
+import {HttpDriverRequest, HttpDriverResponse} from '../../../entities/drivers/HttpServer/HttpServerLogic';
+import {omitUndefined} from '../objects';
 
 
 const EVENT_NAME_DELIMITER = '|';

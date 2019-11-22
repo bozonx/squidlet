@@ -1,4 +1,4 @@
-HttpRouterLogic = require('../../../system/lib/HttpRouterLogic').default
+HttpRouterLogic = require('../../../../system/lib/logic/HttpRouterLogic').default
 
 
 describe 'system.lib.HttpRouterLogic', ->
