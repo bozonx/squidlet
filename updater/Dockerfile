@@ -1,17 +1,15 @@
 FROM node:13.1.0
 
-# Copy files
-COPY ../build/updater/ updater/
+COPY ../build/app/index.js app/updater.js
 
 ENV PUID=1000
 ENV PGID=1000
-ENV LOG_LEVEL=error
-
-#USER node
+ENV MQTT_BROKER_HOST=""
+ENV MQTT_BROKER_PORT=""
 
 COPY docker-entrypoint.sh /usr/local/bin/
 VOLUME ["/data"]
-WORKDIR /updater
+WORKDIR /app
 EXPOSE 8087/tcp 8088/tcp 8089/tcp
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD [ "node", "index.js" ]
