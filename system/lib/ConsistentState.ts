@@ -161,24 +161,7 @@ export default class ConsistentState {
       // if current job is writing
       this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
 
-      // TODO: затестить - полный проход
-      return new Promise<void>((resolve, reject) => {
-        this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
-          if (jobId !== WRITING_ID) return;
-          else if (error) return reject(new Error(error));
-
-          this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
-            if (jobId !== WRITING_ID) return;
-            else if (error) return reject(new Error(error));
-
-            resolve();
-          });
-        });
-      });
-
-      // return this.queue.waitJobStart(WRITING_ID)
-      // // TODO: test может и не нужен force ???
-      //   .then(() => this.queue.waitJobFinished(WRITING_ID, true));
+      return this.makePostponedWritePromise();
     }
     else if (this.queue.hasJob(WRITING_ID)) {
       // if writing is in a queue but not started
@@ -321,7 +304,6 @@ export default class ConsistentState {
    * Make undefined that keys which weren't before string writing
    */
   private restorePreviousState(): Dictionary {
-    // TODO: review
     if (!this.actualRemoteState) {
       throw new Error(`ConsistentState.restorePreviousState: no actualRemoteState`);
     }
@@ -331,7 +313,6 @@ export default class ConsistentState {
 
     const newParams: Dictionary = {};
 
-    // TODO: test что undefined точно заменить лишние параметры
     for (let paramName of arraysDifference(this.paramsListToSave, Object.keys(this.actualRemoteState))) {
       newParams[paramName] = undefined;
     }
@@ -381,6 +362,22 @@ export default class ConsistentState {
       ...this.getState(),
       ...pickObj(mostActualState, ...keysToUpdate),
     };
+  }
+
+  private makePostponedWritePromise(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
+        if (jobId !== WRITING_ID) return;
+        else if (error) return reject(new Error(error));
+
+        this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
+          if (jobId !== WRITING_ID) return;
+          else if (error) return reject(new Error(error));
+
+          resolve();
+        });
+      });
+    });
   }
 
 }

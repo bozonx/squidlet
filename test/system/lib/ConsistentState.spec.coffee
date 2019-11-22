@@ -2,7 +2,7 @@ ConsistentState = require('../../../system/lib/ConsistentState').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.ConsistentState', ->
+describe 'system.lib.ConsistentState', ->
   beforeEach ->
     @stateObj = {}
     @logError = sinon.spy()
@@ -340,7 +340,12 @@ describe.only 'system.lib.ConsistentState', ->
     assert.isUndefined(@consistentState.nextWritePartialState)
 
   it "restorePreviousState", ->
-    # TODO: add
+    @consistentState.actualRemoteState = { param1: 1 }
+    @consistentState.paramsListToSave = ['param1', 'param2']
+    assert.deepEqual(@consistentState.restorePreviousState(), {
+      param1: 1
+      param2: undefined
+    })
 
   it "generateSafeNewState", ->
     @stateObj = {
@@ -356,7 +361,7 @@ describe.only 'system.lib.ConsistentState', ->
     @consistentState.paramsListToSave = ['param2', 'param3']
 
     assert.deepEqual(@consistentState.generateSafeNewState(@stateWhichRead), {
-      param1: 2,
+      param1: 2
       param2: 1
       param3: 1
     })
