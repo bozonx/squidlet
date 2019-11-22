@@ -1,4 +1,4 @@
-ThrottleCall = require('../../../system/lib/debounceCall/ThrottleCall').default;
+ThrottleCall = require('../../../../system/lib/debounceCall/ThrottleCall').default;
 
 
 describe 'system.lib.ThrottleCall', ->

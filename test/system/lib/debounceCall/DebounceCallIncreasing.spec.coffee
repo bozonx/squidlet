@@ -1,7 +1,7 @@
-DebounceCall = require('../../../system/lib/debounceCall/DebounceCall').default;
+DebounceCall = require('../../../../system/lib/debounceCall/DebounceCallIncreasing').default;
 
 
-describe 'system.lib.DebounceCall', ->
+describe 'system.lib.DebounceCallIncreasing', ->
   beforeEach ->
     @id = 'myId'
     @otherId = 'otherId'
@@ -28,8 +28,15 @@ describe 'system.lib.DebounceCall', ->
 
     clock.tick(500)
 
+    assert.isTrue(@debounceCall.isInvoking(@id))
+    sinon.assert.notCalled(@cb1)
+    sinon.assert.notCalled(@cb2)
+
+    # TODO: check that promise1 isn't fulfilled at the moment
+
+    clock.tick(500)
+
     assert.isFalse(@debounceCall.isInvoking(@id))
-    # only the last cb will be called
     sinon.assert.notCalled(@cb1)
     sinon.assert.calledOnce(@cb2)
 
@@ -54,9 +61,9 @@ describe 'system.lib.DebounceCall', ->
     assert.isTrue(@debounceCall.isInvoking(@otherId))
     assert.isFulfilled(promise1)
 
-    clock.tick(500)
+    # TODO: check that promise2 isn't fulfilled at the moment
 
-    assert.isFulfilled(promise2)
+    clock.tick(500)
 
     clock.restore()
 
