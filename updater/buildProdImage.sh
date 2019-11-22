@@ -1,6 +1,10 @@
 #!/bin/bash
+set -e;
 
-bash -c "cd ../; npm run buildUpdater-${1}"
+DIRNAME=$(dirname $0);
 
-cd ./${1}
-docker build -t "bozonx/squidlet:${1}" .
+cd ${DIRNAME}/../;
+
+npm run buildUpdater-${1};
+
+docker build -t "bozonx/squidlet:${1}" -f ./updater/${1}/Dockerfile .;
