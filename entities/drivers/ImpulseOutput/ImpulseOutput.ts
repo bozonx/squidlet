@@ -1,4 +1,4 @@
-import Timeout = NodeJS.Timeout;
+type Timeout = NodeJS.Timeout;
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';

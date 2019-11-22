@@ -1,4 +1,4 @@
-import Timeout = NodeJS.Timeout;
+type Timeout = NodeJS.Timeout;
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';

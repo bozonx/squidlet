@@ -1,4 +1,4 @@
-import Timeout = NodeJS.Timeout;
+type Timeout = NodeJS.Timeout;
 
 import Promised from '../Promised';
 

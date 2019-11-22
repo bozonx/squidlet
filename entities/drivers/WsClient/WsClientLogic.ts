@@ -1,4 +1,4 @@
-import Timeout = NodeJS.Timeout;
+type Timeout = NodeJS.Timeout;
 import WebSocketClientIo, {
   OnMessageHandler, WebSocketClientProps, WsClientEvent, WsCloseStatus,
 } from 'system/interfaces/io/WebSocketClientIo';
@@ -8,6 +8,7 @@ import {Primitives} from 'system/interfaces/Types';
 import {mergeDeepObjects} from 'system/lib/objects';
 import {parseCookie, stringifyCookie} from 'system/lib/cookies';
 import Promised from 'system/lib/Promised';
+
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
 
 

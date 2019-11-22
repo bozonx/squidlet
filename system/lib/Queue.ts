@@ -1,4 +1,4 @@
-import Timeout = NodeJS.Timeout;
+type Timeout = NodeJS.Timeout;
 
 import {DEFAULT_JOB_TIMEOUT_SEC} from './constants';
 import IndexedEventEmitter from './IndexedEventEmitter';
