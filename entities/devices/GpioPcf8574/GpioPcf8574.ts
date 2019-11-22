@@ -36,8 +36,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
     this.log.debug(`GpioPcf8574: init IC: ${this.props.address}`);
     // initialize IC after app did init
     // don't wait while ic is initialized
-    this.expander.initIc()
-      .catch(this.log.error);
+    this.expander.initIc();
   }
 
   destroy = async () => {
