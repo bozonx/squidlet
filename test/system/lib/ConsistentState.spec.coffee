@@ -2,7 +2,7 @@ ConsistentState = require('../../../system/lib/ConsistentState').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe 'system.lib.ConsistentState', ->
+describe.only 'system.lib.ConsistentState', ->
   beforeEach ->
     @stateObj = {}
     @logError = sinon.spy()
@@ -309,14 +309,18 @@ describe 'system.lib.ConsistentState', ->
     assert.deepEqual(@consistentState.getState(), {})
 
   it "setIncomeState - while writing - carefully update state", ->
-    @stateObj = { actualParam: 1, savingParam: 2 }
-    @consistentState.isWriting = () => true
-    @consistentState.actualRemoteState = {
-      actualParam: 1
-    }
-    @consistentState.paramsListToSave = ['savingParam']
+#    @stateObj = { actualParam: 1, savingParam: 2 }
+#    @consistentState.actualRemoteState = {
+#      actualParam: 1
+#    }
+#    @consistentState.paramsListToSave = ['savingParam']
+
+    writePromise = @consistentState.write({param: 1})
 
     @consistentState.setIncomeState({newParam: 3, actualParam: 3, savingParam: 3})
+
+    @setterPromised.resolve()
+    await writePromise
 
     assert.deepEqual(@consistentState.getState(), {
       newParam: 3

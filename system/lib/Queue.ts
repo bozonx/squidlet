@@ -82,6 +82,13 @@ export default class Queue {
   }
 
   /**
+   * Get jobs which are in the queue, not current.
+   */
+  getQueuedJobsId(): string[] {
+    return this.queue.map((item: Job) => item[JobPositions.id]);
+  }
+
+  /**
    * Is something in progress
    */
   isInProgress(): boolean {
@@ -335,10 +342,6 @@ export default class Queue {
    */
   private getJobIndex(jobId: JobId): number {
     return this.queue.findIndex((item: Job) => item[JobPositions.id] === jobId);
-  }
-
-  private getQueuedJobsId(): string[] {
-    return this.queue.map((item: Job) => item[JobPositions.id]);
   }
 
   /**

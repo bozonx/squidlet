@@ -103,7 +103,6 @@ export default class ConsistentState {
 
   /**
    * Call this method after you have received state handling device or driver events.
-   *
    */
   setIncomeState(partialState: Dictionary) {
     if (this.isReading()) {
@@ -157,13 +156,13 @@ export default class ConsistentState {
 
       return Promise.resolve();
     }
-    else if (this.queue.getCurrentJobId() === WRITING_ID) {
+    else if (this.isWriting()) {
       // if current job is writing
       this.nextWritePartialState = mergeDeepObjects(partialData, this.nextWritePartialState);
 
       return this.makePostponedWritePromise();
     }
-    else if (this.queue.hasJob(WRITING_ID)) {
+    else if (this.queue.getQueuedJobsId().includes(WRITING_ID)) {
       // if writing is in a queue but not started
       // save param names which should be written and update state
       if (!this.paramsListToSave) {
@@ -219,18 +218,21 @@ export default class ConsistentState {
   }
 
   private startNewWriteJob(partialData: Dictionary): Promise<void> {
+    // TODO: uncomment !!!!
     // no writing in a queue
-    if (this.nextWritePartialState) {
-      return Promise.reject(`ConsistentState.write: nextWritePartialState has to be removed`);
-    }
-    else if (this.actualRemoteState) {
-      return Promise.reject(`ConsistentState.write: actualRemoteState has to be removed`);
-    }
-    else if (this.paramsListToSave) {
-      return Promise.reject(`ConsistentState.write: paramsListToSave has to be removed`);
-    }
-    // Save actual state. It needs to use it to do fallback on error
-    this.actualRemoteState = cloneDeepObject(this.getState());
+    // if (this.nextWritePartialState) {
+    //   return Promise.reject(`ConsistentState.write: nextWritePartialState has to be removed`);
+    // }
+    // else if (this.actualRemoteState) {
+    //   return Promise.reject(`ConsistentState.write: actualRemoteState has to be removed`);
+    // }
+    // else if (this.paramsListToSave) {
+    //   return Promise.reject(`ConsistentState.write: paramsListToSave has to be removed`);
+    // }
+    // Save actual state. It needs to use it to do fallback on error.
+    // actualRemoteState can be exist if data came while writing
+    this.actualRemoteState = mergeDeepObjects(this.getState(), this.actualRemoteState);
+    //this.actualRemoteState = cloneDeepObject(this.getState());
     // collect list of params which will be actually written
     this.paramsListToSave = Object.keys(partialData);
     // update local state right now in any case
@@ -267,22 +269,22 @@ export default class ConsistentState {
    * if there is next state to write.
    */
   private handleWriteSuccess() {
-    // end of cycle
-    delete this.actualRemoteState;
-    delete this.paramsListToSave;
-    // if no next state - then cycle has been finished
-    if (!this.nextWritePartialState) return;
-
-    // or start a new writing job
-    const dataToSave: Dictionary = this.nextWritePartialState;
-
-    delete this.nextWritePartialState;
-
     if (this.queue.getCurrentJobId() !== WRITING_ID) {
       return this.logError(`ConsistentState.handleWriteSuccess: unexpectedly current job hasn't finished yed`);
     }
-
+    // wait while job finished
     this.queue.onJobEndOnce(() => {
+      // end of cycle
+      delete this.actualRemoteState;
+      delete this.paramsListToSave;
+      // if no next state - then cycle has been finished
+      if (!this.nextWritePartialState) return;
+
+      // or start a new writing job
+      const dataToSave: Dictionary = this.nextWritePartialState;
+
+      delete this.nextWritePartialState;
+
       // start next writing
       this.startNewWriteJob(dataToSave)
         .catch(this.logError);
