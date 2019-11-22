@@ -3,10 +3,7 @@ FROM node:13.1.0
 COPY build/updaterX86/index.js app/updater.js
 COPY updater/start.js app/start.js
 
-ENV PUID=1000
-ENV PGID=1000
-ENV MQTT_BROKER_HOST=""
-ENV MQTT_BROKER_PORT=""
+ENV PUID=1000 PGID=1000 MQTT_BROKER_HOST="" MQTT_BROKER_PORT=""
 
 COPY updater/docker-entrypoint.sh /usr/local/bin/
 VOLUME ["/data"]

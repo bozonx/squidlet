@@ -2,9 +2,16 @@ const fs = require('fs');
 
 const squidletIndex = '/data/envSet/bundle.js';
 const updaterIndex = '/app/updater.js';
-const stat = fs.statSync(squidletIndex);
 
-if (stat.isFile()) {
+let stat;
+
+try {
+  stat = fs.statSync(squidletIndex);
+}
+catch (e) {
+}
+
+if (stat && stat.isFile()) {
   require(squidletIndex)();
 }
 else {
