@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node ./control/index.ts",
-    "buildImage": "./docker/buildImage.sh",
+    "buildImage": "updater/buildImage.sh",
     "buildUpdaterX86": "./squidletLight/squidletLight.sh --work-dir=./build/updaterX86 --machine=x86 --platform=nodejs ./updater/updaterHostConfig.yaml",
     "buildUpdaterRpi": "./squidletLight/squidletLight.sh --work-dir=./build/updaterRpi --machine=rpi --platform=nodejs ./updater/updaterHostConfig.yaml",
     "buildUpdaterArm": "./squidletLight/squidletLight.sh --work-dir=./build/updaterArm --machine=arm --platform=nodejs ./updater/updaterHostConfig.yaml",
