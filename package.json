@@ -13,7 +13,7 @@
     "buildProdImage-x86": "updater/buildProdImage.sh x86",
     "buildProdImage-rpi": "updater/buildProdImage.sh rpi",
     "buildProdImage-arm": "updater/buildProdImage.sh arm",
-    "buildUpdater-x86": "./squidletLight/squidletLight.sh --work-dir=./build/updaterX86 --machine=x86 --platform=nodejs ./updater/updaterHostConfig.yaml",
+    "buildUpdater-x86": "./squidletLight/squidletLight.sh --minimize=false --work-dir=./build/updaterX86 --machine=x86 --platform=nodejs ./updater/updaterHostConfig.yaml",
     "buildUpdater-rpi": "./squidletLight/squidletLight.sh --work-dir=./build/updaterRpi --machine=rpi --platform=nodejs ./updater/updaterHostConfig.yaml",
     "buildUpdater-arm": "./squidletLight/squidletLight.sh --work-dir=./build/updaterArm --machine=arm --platform=nodejs ./updater/updaterHostConfig.yaml",
     "test": "mocha",

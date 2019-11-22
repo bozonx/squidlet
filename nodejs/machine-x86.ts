@@ -11,7 +11,7 @@ const machineConfig: MachineConfig = {
     './ios/HttpClient.ts',
     './ios/HttpServer.ts',
 
-    './ios/Serial.ts',
+    //'./ios/Serial.ts',
     //'Wifi',
     //'Bluetooth',
   ],

@@ -12,8 +12,8 @@ catch (e) {
 }
 
 if (stat && stat.isFile()) {
-  require(squidletIndex)();
+  require(squidletIndex);
 }
 else {
-  require(updaterIndex)();
+  require(updaterIndex);
 }
