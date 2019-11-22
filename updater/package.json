@@ -6,6 +6,7 @@
   "repository": "git@github.com:bozonx/squidlet.git",
   "license": "MIT",
   "scripts": {
+    "start": "node start.js"
   },
   "dependencies": {
     "axios": "*",

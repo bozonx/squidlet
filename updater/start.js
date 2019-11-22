@@ -1,9 +1,10 @@
 const fs = require('fs');
 
-const squidletIndex = '/data/envSet/bundle.js';
+const squidletIndex = '/app/data/envSet/bundle.js';
 const updaterIndex = '/app/updater.js';
 
 let stat;
+let system;
 
 try {
   stat = fs.statSync(squidletIndex);
@@ -12,8 +13,45 @@ catch (e) {
 }
 
 if (stat && stat.isFile()) {
-  require(squidletIndex);
+  system = require(squidletIndex);
 }
 else {
-  require(updaterIndex);
+  system = require(updaterIndex);
 }
+
+system.start({
+  user: process.env.PUID,
+  group: process.env.PGID,
+  hostConfig: {
+    hostType: 'updater',
+    mqtt: {
+      host: process.env.MQTT_BROKER_HOST,
+      port: process.env.MQTT_BROKER_PORT,
+    },
+  },
+  workDir: '/app/data',
+});
+
+async function shutdown() {
+  try {
+    await system.destroy();
+  }
+  catch (e) {
+    console.error(e);
+  }
+
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => {
+  console.info('SIGTERM signal has been caught');
+
+  shutdown()
+    .catch(console.error);
+});
+process.on('SIGINT', () => {
+  console.info('SIGINT signal has been caught');
+
+  shutdown()
+    .catch(console.error);
+});

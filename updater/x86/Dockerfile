@@ -19,7 +19,8 @@ WORKDIR /app
 RUN npm install;
 
 COPY updater/docker-entrypoint.sh /usr/local/bin/
-VOLUME ["/data"]
+VOLUME ["/app/data"]
 EXPOSE 8087/tcp 8088/tcp 8089/tcp
 ENTRYPOINT [ "docker-entrypoint.sh" ]
-CMD [ "node", "start.js" ]
+#CMD [ "node", "start.js" ]
+CMD [ "npm", "start" ]
