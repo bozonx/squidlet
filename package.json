@@ -13,9 +13,9 @@
     "buildProdImage-x86": "updater/buildProdImage.sh x86",
     "buildProdImage-rpi": "updater/buildProdImage.sh rpi",
     "buildProdImage-arm": "updater/buildProdImage.sh arm",
-    "buildUpdater-x86": "./squidletLight/squidletLight.sh --work-dir=./build/updaterX86 --machine=x86 --platform=nodejs ./updater/updaterHostConfig.yaml",
-    "buildUpdater-rpi": "./squidletLight/squidletLight.sh --work-dir=./build/updaterRpi --machine=rpi --platform=nodejs ./updater/updaterHostConfig.yaml",
-    "buildUpdater-arm": "./squidletLight/squidletLight.sh --work-dir=./build/updaterArm --machine=arm --platform=nodejs ./updater/updaterHostConfig.yaml",
+    "buildUpdater-x86": "./squidletLight/squidletLight.sh --output=./build/updater-x86/updater.js --machine=x86 --platform=nodejs --only-used-io=true ./updater/updaterHostConfig.yaml",
+    "buildUpdater-rpi": "./squidletLight/squidletLight.sh --output=./build/updater-rpi/updater.js --machine=rpi --platform=nodejs --only-used-io=true ./updater/updaterHostConfig.yaml",
+    "buildUpdater-arm": "./squidletLight/squidletLight.sh --output=./build/updater-arm/updater.js --machine=arm --platform=nodejs --only-used-io=true ./updater/updaterHostConfig.yaml",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json",
     "postinstall": "cd node_modules && ln -s ../system ./"
