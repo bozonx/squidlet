@@ -30,9 +30,11 @@ export default class AppBuilder {
 
   constructor(
     workDir: string,
+    outputPath: string,
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
+    onlyUsedIo: boolean = false,
     minimize: boolean = true,
     logLevel?: LogLevel
   ) {

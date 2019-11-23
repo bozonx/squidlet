@@ -20,7 +20,7 @@ export function resolveWorkDir(argWorkDir?: string): string {
   return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORKDIR);
 }
 
-export function resolveOutput(workDir: string, output?: string): string {
+export function resolveOutputPath(workDir: string, output?: string): string {
   if (output) {
     // if it set as an argument - make it absolute
     return path.resolve(process.cwd(), output);
@@ -32,12 +32,12 @@ export function resolveOutput(workDir: string, output?: string): string {
 
 export default async function(): Promise<void> {
   const workDir: string = resolveWorkDir(yargs.argv.workDir as any);
-  const output: string = resolveOutput(workDir, yargs.argv.output as any);
+  const outputPath: string = resolveOutputPath(workDir, yargs.argv.output as any);
   const platform: Platforms | undefined = yargs.argv.platform as any;
   const machine: string | undefined = yargs.argv.machine as any;
   const hostConfigPath: string | undefined = yargs.argv._[0] as any;
   const minimize: boolean = yargs.argv.minimize !== 'false';
-  const onlyUsedIo: boolean = Boolean(yargs.argv.onlyUsedIo);
+  const onlyUsedIo: boolean = yargs.argv.onlyUsedIo === 'true';
   const logLevel: LogLevel | undefined = yargs.argv.logLevel as any || undefined;
 
   if (!platform) {
@@ -57,7 +57,7 @@ export default async function(): Promise<void> {
     // build io server standalone
     const builder = new IoServerStandaloneBuilder(
       workDir,
-      output,
+      outputPath,
       platform,
       machine,
       hostConfigPath,
@@ -72,7 +72,7 @@ export default async function(): Promise<void> {
   // build app with app switcher
   const builder = new AppBuilder(
     workDir,
-    output,
+    outputPath,
     platform,
     machine,
     hostConfigPath,
