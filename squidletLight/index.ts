@@ -1,4 +1,4 @@
-import starter from './starter';
+import starter from './squidletLightBuilder';
 import {consoleError} from '../system/lib/helpers';
 
 
