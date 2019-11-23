@@ -36,23 +36,22 @@ export function makeExportString(defaultImportName: string, pathToFile: string):
   return `export {default as ${defaultImportName}} from '${removeExtFromFileName(pathToFile)}';\n`;
 }
 
-export async function rollupBuild(workDir: string, tmpDir: string, minimize: boolean = false) {
+export async function rollupBuild(outputPath: string, tmpDir: string, minimize: boolean = false) {
   const indexFilePath = path.join(tmpDir, 'index.ts');
-  const outputFilePath = path.join(workDir, 'index.js');
 
   await rollupToOneFile(
     'Squidlet',
     indexFilePath,
-    outputFilePath,
+    outputPath,
     undefined,
-    // TODO: better to build in
+    // TODO: в режиме билда для nodejs исключаем. Но для мк лучше вбилдить?
     [
       'ws',
       'mqtt-packet',
       'mqtt',
       'axios',
       // TODO: build in this
-      'bcx-expression-evaluator',
+      //'bcx-expression-evaluator',
     ],
     false,
     minimize,

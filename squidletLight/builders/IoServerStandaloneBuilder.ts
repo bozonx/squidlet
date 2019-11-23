@@ -12,6 +12,7 @@ import LogLevel from '../../system/interfaces/LogLevel';
 
 export class IoServerStandaloneBuilder {
   private readonly workDir: string;
+  private readonly outputPath: string;
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly tmpDir: string;
@@ -26,15 +27,17 @@ export class IoServerStandaloneBuilder {
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
-    onlyUsedIo: boolean = false,
     minimize: boolean = true,
     logLevel?: LogLevel
   ) {
     this.workDir = workDir;
+    this.outputPath = outputPath;
     this.platform = platform;
     this.machine = machine;
-    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
     this.minimize = minimize;
+    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+
+    // TODO: почему не используется logLevel???
   }
 
 
@@ -54,7 +57,9 @@ export class IoServerStandaloneBuilder {
     await this.os.writeFile(iosFilePath, iosFileStr);
     await this.os.writeFile(envSetPath, envSetStr);
 
-    await rollupBuild(this.workDir, this.tmpDir, this.minimize);
+    // TODO: use outputPath
+
+    await rollupBuild(this.outputPath, this.tmpDir, this.minimize);
   }
 
 

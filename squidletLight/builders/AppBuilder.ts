@@ -19,8 +19,10 @@ const SERViCES_MAIN_FILES = 'servicesMainFiles';
 
 export default class AppBuilder {
   private readonly workDir: string;
+  private readonly outputPath: string;
   private readonly platform: Platforms;
   private readonly machine: string;
+  private readonly onlyUsedIo: boolean;
   private readonly tmpDir: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
@@ -34,16 +36,18 @@ export default class AppBuilder {
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
-    onlyUsedIo: boolean = false,
     minimize: boolean = true,
+    onlyUsedIo: boolean = false,
     logLevel?: LogLevel
   ) {
     this.workDir = workDir;
+    this.outputPath = outputPath;
     this.platform = platform;
     this.machine = machine;
-    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
     this.minimize = minimize;
+    this.onlyUsedIo = onlyUsedIo;
     this.logLevel = logLevel;
+    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
 
     this.envBuilder = new EnvBuilder(
       hostConfigPath,
@@ -51,6 +55,7 @@ export default class AppBuilder {
       this.tmpDir,
       this.platform,
       this.machine,
+      // TODO: use onlyUsedIo
     );
   }
 
@@ -83,7 +88,7 @@ export default class AppBuilder {
     await this.os.writeFile(driversFilePath, driversFileStr);
     await this.os.writeFile(servicesFilePath, servicesFileStr);
 
-    await rollupBuild(this.workDir, this.tmpDir, this.minimize);
+    await rollupBuild(this.outputPath, this.tmpDir, this.minimize);
   }
 
 
