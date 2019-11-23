@@ -6,6 +6,7 @@ import IndexedEventEmitter from './IndexedEventEmitter';
 
 type QueuedCb = () => Promise<void>;
 type StartJobHandler = (jobId: JobId) => void;
+// TODO: why error is string and not Error() ?
 type EndJobHandler = (error: string | undefined, jobId: JobId) => void;
 export type JobId = string;
 // array like [JobId, QueuedCb, isCanceled]
@@ -191,8 +192,20 @@ export default class Queue {
   }
 
   // TODO: test
-  onJobStartOnce(cb: StartJobHandler): number {
-    return this.events.once(QueueEvents.startJob, cb);
+  onJobStartOnce(jobId: JobId, cb: () => void): number {
+    let handlerIndex: number;
+
+    const wrapper: StartJobHandler = (finishedJobId: JobId) => {
+      if (finishedJobId !== jobId) return;
+
+      this.events.removeListener(handlerIndex, QueueEvents.startJob);
+      // TODO: what to do with error of cb?
+      cb();
+    };
+
+    handlerIndex = this.events.addListener(QueueEvents.startJob, wrapper);
+
+    return handlerIndex;
   }
 
   onJobEnd(cb: EndJobHandler): number {
@@ -200,8 +213,20 @@ export default class Queue {
   }
 
   // TODO: test
-  onJobEndOnce(cb: EndJobHandler): number {
-    return this.events.once(QueueEvents.endJob, cb);
+  onJobEndOnce(jobId: JobId, cb: (error: string | undefined) => void): number {
+    let handlerIndex: number;
+
+    const wrapper: EndJobHandler = (error: string | undefined, finishedJobId: JobId) => {
+      if (finishedJobId !== jobId) return;
+
+      this.events.removeListener(handlerIndex, QueueEvents.endJob);
+      // TODO: what to do with error of cb?
+      cb(error);
+    };
+
+    handlerIndex = this.events.addListener(QueueEvents.endJob, wrapper);
+
+    return handlerIndex;
   }
 
   // TODO: test
@@ -313,7 +338,7 @@ export default class Queue {
     return new Promise<void>((resolve, reject) => {
       let handlerIndex: number;
 
-      const cb = (error: string | undefined, finishedJobId: JobId) => {
+      const cb: EndJobHandler = (error: string | undefined, finishedJobId: JobId) => {
         if (finishedJobId !== jobId) return;
 
         this.events.removeListener(handlerIndex, QueueEvents.endJob);

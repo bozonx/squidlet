@@ -153,7 +153,7 @@ export default class ConsistentState {
     if (!this.setter) {
       // if mode without setter - do noting else updating local state
       this.stateUpdater(partialData);
-
+      // just return resolved promise
       return Promise.resolve();
     }
     else if (this.isWriting()) {
@@ -175,8 +175,7 @@ export default class ConsistentState {
       // return promise which will be resolved when write has done.
       return this.queue.waitJobFinished(WRITING_ID);
     }
-
-    // else no current writing or in the queue - start a new job
+    // else reading in progress or no current writing or in the queue - start a new job
     return this.startNewWriteJob(partialData);
   }
 
@@ -217,18 +216,20 @@ export default class ConsistentState {
     this.stateUpdater( this.generateSafeNewState(result) );
   }
 
+  /**
+   * Start a new job. At this moment writing hasn't being processed.
+   * @param partialData
+   */
   private startNewWriteJob(partialData: Dictionary): Promise<void> {
-    // TODO: uncomment !!!!
-    // no writing in a queue
-    // if (this.nextWritePartialState) {
-    //   return Promise.reject(`ConsistentState.write: nextWritePartialState has to be removed`);
-    // }
-    // else if (this.actualRemoteState) {
-    //   return Promise.reject(`ConsistentState.write: actualRemoteState has to be removed`);
-    // }
-    // else if (this.paramsListToSave) {
-    //   return Promise.reject(`ConsistentState.write: paramsListToSave has to be removed`);
-    // }
+    if (this.nextWritePartialState) {
+      return Promise.reject(`ConsistentState.write: nextWritePartialState has to be removed`);
+    }
+    else if (this.actualRemoteState) {
+      return Promise.reject(`ConsistentState.write: actualRemoteState has to be removed`);
+    }
+    else if (this.paramsListToSave) {
+      return Promise.reject(`ConsistentState.write: paramsListToSave has to be removed`);
+    }
     // Save actual state. It needs to use it to do fallback on error.
     // actualRemoteState can be exist if data came while writing
     this.actualRemoteState = mergeDeepObjects(this.getState(), this.actualRemoteState);
@@ -238,27 +239,27 @@ export default class ConsistentState {
     // update local state right now in any case
     this.stateUpdater(partialData);
     // add job to queue
-    this.queue.add(this.handleWriteQueueStart, WRITING_ID);
+    this.queue.add(this.writeJobCb, WRITING_ID);
+    this.queue.onJobEndOnce(WRITING_ID, this.handleWritingJobEnd);
     // return promise which will be resolved when write has done.
     return this.queue.waitJobFinished(WRITING_ID);
   }
 
-  private handleWriteQueueStart = async () => {
+  private writeJobCb = (): Promise<void> => {
     if (!this.setter) {
-      throw new Error(`ConsistentState.handleWriteQueueStart: no setter`);
+      return Promise.reject(`ConsistentState.handleWriteQueueStart: no setter`);
     }
     // generate the last combined data to save
     const dataToSave: Dictionary = this.collectDataToSave();
     // do nothing if data is empty. It means that some params was changed while cb idled in a queue.
-    if (isEmptyObject(dataToSave)) return;
+    if (isEmptyObject(dataToSave)) return Promise.resolve();
     // write collected data
-    try {
-      await this.setter(dataToSave);
-    }
-    catch (err) {
-      this.handleWriteError();
+    return this.setter(dataToSave);
+  }
 
-      throw err;
+  private handleWritingJobEnd = (error: string | undefined) => {
+    if (error) {
+      return this.handleWriteError();
     }
 
     this.handleWriteSuccess();
@@ -269,26 +270,21 @@ export default class ConsistentState {
    * if there is next state to write.
    */
   private handleWriteSuccess() {
-    if (this.queue.getCurrentJobId() !== WRITING_ID) {
-      return this.logError(`ConsistentState.handleWriteSuccess: unexpectedly current job hasn't finished yed`);
-    }
-    // wait while job finished
-    this.queue.onJobEndOnce(() => {
-      // end of cycle
-      delete this.actualRemoteState;
-      delete this.paramsListToSave;
-      // if no next state - then cycle has been finished
-      if (!this.nextWritePartialState) return;
+    // end of cycle
+    delete this.actualRemoteState;
+    delete this.paramsListToSave;
 
-      // or start a new writing job
-      const dataToSave: Dictionary = this.nextWritePartialState;
+    // if no next state - then cycle has been finished
+    if (!this.nextWritePartialState) return;
 
-      delete this.nextWritePartialState;
+    // or start a new writing job
+    const dataToSave: Dictionary = this.nextWritePartialState;
 
-      // start next writing
-      this.startNewWriteJob(dataToSave)
-        .catch(this.logError);
-    });
+    delete this.nextWritePartialState;
+
+    // start next writing
+    this.startNewWriteJob(dataToSave)
+      .catch(this.logError);
   }
 
   /**
@@ -368,13 +364,11 @@ export default class ConsistentState {
 
   private makePostponedWritePromise(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
-        if (jobId !== WRITING_ID) return;
-        else if (error) return reject(new Error(error));
+      this.queue.onJobEndOnce(WRITING_ID, (error: string | undefined) => {
+        if (error) return reject(new Error(error));
 
-        this.queue.onJobEndOnce((error: string | undefined, jobId: JobId) => {
-          if (jobId !== WRITING_ID) return;
-          else if (error) return reject(new Error(error));
+        this.queue.onJobEndOnce(WRITING_ID, (error: string | undefined) => {
+          if (error) return reject(new Error(error));
 
           resolve();
         });
