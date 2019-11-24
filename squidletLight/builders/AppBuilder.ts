@@ -156,6 +156,8 @@ export default class AppBuilder {
       exportsStr += makeExportString(entities[entityName].manifest.name, relFileName);
     }
 
+    if (!exportsStr) return 'export default {};\n';
+
     return exportsStr;
   }
 

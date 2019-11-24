@@ -6,7 +6,7 @@ COPY build/updater-x86/ app/
 #COPY updater/start.js app/start.js
 #COPY updater/package.json app/package.json
 
-ENV PUID=1000 PGID=1000 MQTT_BROKER_HOST="" MQTT_BROKER_PORT="" IOSERVER_MODE=false
+ENV PUID=1000 PGID=1000 LOG_LEVEL="" MQTT_BROKER_HOST="" MQTT_BROKER_PORT="" IOSERVER_MODE=false
 
 WORKDIR /app
 

@@ -22,8 +22,9 @@ else {
 system.start({
   user: process.env.PUID,
   group: process.env.PGID,
-  workDir: '/app/data',
+  logLevel: process.env.LOG_LEVEL,
   ioServerMode: process.env.IOSERVER_MODE,
+  workDir: '/app/data',
   hostConfig: {
     hostType: 'updater',
     mqtt: {
