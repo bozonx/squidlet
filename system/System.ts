@@ -18,7 +18,6 @@ export type ShutdownHandler = (reason: ShutdownReason) => void;
 
 
 export default class System {
-  readonly shutdownRequest: ShutdownHandler;
   readonly context: Context;
   readonly events = new IndexedEventEmitter();
   readonly envSet: EnvSet;
@@ -51,15 +50,9 @@ export default class System {
   /**
    * The main app.
    * @param ioSet - has to be initialized before
-   * @param shutdownRequestCb - handler of shutdown request
    * @param hostConfigOverride - part of HostConfig to overwrite some params
    */
-  constructor(
-    ioSet: IoSet,
-    shutdownRequestCb: ShutdownHandler,
-    hostConfigOverride?: HostConfig
-  ) {
-    this.shutdownRequest = shutdownRequestCb;
+  constructor(ioSet: IoSet, hostConfigOverride?: HostConfig) {
     this.context = new Context(this, hostConfigOverride);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);

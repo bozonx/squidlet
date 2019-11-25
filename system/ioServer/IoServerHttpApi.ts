@@ -17,7 +17,6 @@ const SWITCH_TO_APP_TIMEOUT_SEC = 5;
 export default class IoServerHttpApi {
   private readonly ioSet: IoSet;
   private readonly hostConfig: HostConfig;
-  private readonly shutdownRequest: ShutdownHandler;
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
@@ -31,14 +30,12 @@ export default class IoServerHttpApi {
   constructor(
     ioSet: IoSet,
     hostConfig: HostConfig,
-    shutdownRequestCb: ShutdownHandler,
     logDebug: (msg: string) => void,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
     this.hostConfig = hostConfig;
-    this.shutdownRequest = shutdownRequestCb;
     this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
@@ -108,8 +105,12 @@ export default class IoServerHttpApi {
   }
 
   private apiSwitchToApp(): HttpApiBody {
+
+    // TODO: создать файл с указанием куда переключаться
+    // TODO: вызвать sys io restart - где будет process.exit(0)
+
     setTimeout(() => {
-      this.shutdownRequest('switchToApp');
+      //this.shutdownRequest('switchToApp');
     }, SWITCH_TO_APP_TIMEOUT_SEC * 1000);
 
     return { result: `Switching to the app in 1 second` };

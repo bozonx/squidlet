@@ -51,7 +51,6 @@ export default class StartIoServerStandalone extends StartDevelopBase {
     const consoleLogger = new ConsoleLogger(this.props.argLogLevel);
     const ioServer = new IoServer(
       this.ioSet,
-      this.shutdownRequestCb,
       consoleLogger.debug,
       consoleLogger.info,
       consoleLogger.error
@@ -60,9 +59,9 @@ export default class StartIoServerStandalone extends StartDevelopBase {
     await ioServer.start();
   }
 
-  private shutdownRequestCb = () => {
-    console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
-  }
+  // private shutdownRequestCb = () => {
+  //   console.warn(`WARNING: Restart isn't allowed in io-server standalone mode`);
+  // }
 
   protected async makeIoSet(): Promise<IoSet> {
     const ioSet: IoSet = new IoSetDevelopSrc(this.os, this.envBuilder);

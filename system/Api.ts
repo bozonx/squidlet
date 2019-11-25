@@ -96,7 +96,11 @@ export default class Api {
     }
 
     this.context.log.info(`Switching to IO server`);
-    this.context.system.shutdownRequest('switchToIoServer');
+
+    // TODO: создать файл с указанием куда переключаться
+    // TODO: вызвать sys io restart - где будет process.exit(0)
+
+    //this.context.system.shutdownRequest('switchToIoServer');
   }
 
   switchToApp() {

@@ -15,7 +15,6 @@ import IoServerHttpApi from './IoServerHttpApi';
 
 export default class IoServer {
   private readonly ioSet: IoSet;
-  private readonly shutdownRequest: ShutdownHandler;
   private _hostConfig?: HostConfig;
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
@@ -36,13 +35,11 @@ export default class IoServer {
   constructor(
     // initialized ioSet
     ioSet: IoSet,
-    shutdownRequestCb: ShutdownHandler,
     logDebug: (msg: string) => void,
     logInfo: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
-    this.shutdownRequest = shutdownRequestCb;
     this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
@@ -114,7 +111,6 @@ export default class IoServer {
     this.httpApi = new IoServerHttpApi(
       this.ioSet,
       this.hostConfig,
-      this.shutdownRequest,
       this.logDebug,
       this.logInfo,
       this.logError
