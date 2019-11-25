@@ -1,9 +1,10 @@
 import * as path from 'path';
+import * as _ from 'lodash';
 
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import {APP_SWITCHER_FILE_NAME, HOST_TMP_DIR} from '../../shared/constants';
+import {HOST_TMP_DIR} from '../../shared/constants';
 import Os from '../../shared/Os';
-import {REPO_ROOT, SYSTEM_DIR} from '../../shared/helpers';
+import {REPO_ROOT} from '../../shared/helpers';
 import Platforms from '../../system/interfaces/Platforms';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
@@ -15,6 +16,7 @@ import LogLevel from '../../system/interfaces/LogLevel';
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
 const DRIVERS_MAIN_FILES = 'driversMainFiles';
 const SERViCES_MAIN_FILES = 'servicesMainFiles';
+const INDEX_FILE_TPL_FILE_NAME = 'index.template.ts';
 
 
 export default class AppBuilder {
@@ -23,7 +25,6 @@ export default class AppBuilder {
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly onlyUsedIo: boolean;
-  //private readonly tmpDir: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
   private readonly os: Os = new Os();
@@ -56,21 +57,19 @@ export default class AppBuilder {
       envBuilderTmpDir,
       this.platform,
       this.machine,
-      // TODO: use onlyUsedIo
     );
   }
 
 
   async build() {
     // TODO: удаляет все вместе с родительской директорией, но лучше чтобы только содержимое
-    //await this.os.rimraf(this.workDir);
     await this.os.mkdirP(this.tmpDir);
 
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
     const indexFilePath = path.join(this.tmpDir, 'index.ts');
-    const indexFileStr: string = this.makeIndexFile();
+    const indexFileStr: string = await this.makeIndexFile();
     const iosFilePath: string = path.join(this.tmpDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
     const envSetPath: string = path.join(this.tmpDir, 'envSet.ts');
@@ -88,55 +87,19 @@ export default class AppBuilder {
     await this.os.writeFile(devicesFilePath, devicesFileStr);
     await this.os.writeFile(driversFilePath, driversFileStr);
     await this.os.writeFile(servicesFilePath, servicesFileStr);
-
+    // make bundle
     await rollupBuild(this.outputPath, this.tmpDir, this.minimize);
   }
 
 
-  private makeIndexFile(): string {
-    const appSwitcherPath = path.relative(
-      this.tmpDir,
-      path.join(SYSTEM_DIR, APP_SWITCHER_FILE_NAME)
-    );
-    const ioSetPath = path.relative(
-      this.tmpDir,
-      path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
-    );
-    const ConsoleLoggerPath = path.relative(
-      this.tmpDir,
-      path.join(REPO_ROOT, 'shared', 'ConsoleLogger')
-    );
+  private async makeIndexFile(): Promise<string> {
+    const fileContent: string = await this.os.getFileContent(INDEX_FILE_TPL_FILE_NAME);
 
-    return `import envSet from './envSet';\n`
-      + `import * as ios from './ios';\n`
-      + `import * as ${DEVICES_MAIN_FILES} from './${DEVICES_MAIN_FILES}';\n`
-      + `import * as ${DRIVERS_MAIN_FILES} from './${DRIVERS_MAIN_FILES}';\n`
-      + `import * as ${SERViCES_MAIN_FILES} from './${SERViCES_MAIN_FILES}';\n`
-      + `import AppSwitcher from '${appSwitcherPath}';\n`
-      + `import IoSetBuiltin from '${ioSetPath}';\n`
-      + `import ConsoleLogger from '${ConsoleLoggerPath}';\n`
-      + '\n\n'
-      // TODO: брать из переменной окружения ????
-      + `const consoleLogger = new ConsoleLogger(${this.logLevel})`
-      + '\n\n'
-      + `async function start() {\n`
-      + `  const ioSet: any = new IoSetBuiltin(envSet, ios, ${DEVICES_MAIN_FILES}, ${DRIVERS_MAIN_FILES}, ${SERViCES_MAIN_FILES});\n`
-      + `\n`
-      + `  await ioSet.init();\n`
-      + `\n`
-      // TODO: make real restart
-      + `  const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);\n`
-      + `  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, consoleLogger);\n`
-      + '\n'
-      + `  await app.start();\n`
-      + '}\n'
-      + '\n'
-      + 'start().catch(console.error);\n';
+    return _.template(fileContent)({ REPO_ROOT });
   }
 
   prepareIoClassesString(): string {
     const platformDir = this.envBuilder.configManager.machinePlatformDir;
-    // TODO: лучше брать только те что реально используются
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
 
     return prepareIoClassesString(machineIosList, platformDir, this.tmpDir);
@@ -163,3 +126,44 @@ export default class AppBuilder {
   }
 
 }
+
+// private makeIndexFile(): string {
+//   const appSwitcherPath = path.relative(
+//     this.tmpDir,
+//     path.join(SYSTEM_DIR, APP_SWITCHER_FILE_NAME)
+//   );
+//   const ioSetPath = path.relative(
+//     this.tmpDir,
+//     path.join(REPO_ROOT, 'squidletLight', 'IoSetBuiltin')
+//   );
+//   const ConsoleLoggerPath = path.relative(
+//     this.tmpDir,
+//     path.join(REPO_ROOT, 'shared', 'ConsoleLogger')
+//   );
+//
+//   return `import envSet from './envSet';\n`
+//     + `import * as ios from './ios';\n`
+//     + `import * as ${DEVICES_MAIN_FILES} from './${DEVICES_MAIN_FILES}';\n`
+//     + `import * as ${DRIVERS_MAIN_FILES} from './${DRIVERS_MAIN_FILES}';\n`
+//     + `import * as ${SERViCES_MAIN_FILES} from './${SERViCES_MAIN_FILES}';\n`
+//     + `import AppSwitcher from '${appSwitcherPath}';\n`
+//     + `import IoSetBuiltin from '${ioSetPath}';\n`
+//     + `import ConsoleLogger from '${ConsoleLoggerPath}';\n`
+//     + '\n\n'
+//     // TODO: брать из переменной окружения ????
+//     + `const consoleLogger = new ConsoleLogger(${this.logLevel})`
+//     + '\n\n'
+//     + `async function start() {\n`
+//     + `  const ioSet: any = new IoSetBuiltin(envSet, ios, ${DEVICES_MAIN_FILES}, ${DRIVERS_MAIN_FILES}, ${SERViCES_MAIN_FILES});\n`
+//     + `\n`
+//     + `  await ioSet.init();\n`
+//     + `\n`
+//     // TODO: make real restart
+//     + `  const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);\n`
+//     + `  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, consoleLogger);\n`
+//     + '\n'
+//     + `  await app.start();\n`
+//     + '}\n'
+//     + '\n'
+//     + 'start().catch(console.error);\n';
+// }

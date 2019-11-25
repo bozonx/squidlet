@@ -5,6 +5,7 @@ const updaterIndex = '/app/updater.js';
 
 let stat;
 let appStarter;
+let hostType = 'app';
 
 try {
   stat = fs.statSync(squidletIndex);
@@ -17,11 +18,12 @@ if (stat && stat.isFile()) {
 }
 else {
   appStarter = require(updaterIndex);
+  hostType = 'updater';
 }
 
 appStarter.start(
   {
-    hostType: 'updater',
+    hostType,
     mqtt: {
       host: process.env.MQTT_BROKER_HOST,
       port: process.env.MQTT_BROKER_PORT,
@@ -32,7 +34,8 @@ appStarter.start(
   process.env.PGID,
   process.env.LOG_LEVEL,
   process.env.IOSERVER_MODE === 'true',
-);
+)
+  .catch(console.error);
 
 async function shutdown() {
   try {
