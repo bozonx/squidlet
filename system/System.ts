@@ -9,12 +9,8 @@ import Api from './Api';
 import Context from './Context';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './constants';
-import {ShutdownReason} from './interfaces/ShutdownReason';
 import {AnyHandler} from './lib/IndexedEvents';
 import HostConfig from './interfaces/HostConfig';
-
-
-export type ShutdownHandler = (reason: ShutdownReason) => void;
 
 
 export default class System {

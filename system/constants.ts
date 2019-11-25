@@ -4,6 +4,8 @@ export const SERVER_STARTING_TIMEOUT_SEC = 30;
 export const WAIT_RESPONSE_TIMEOUT_SEC = 60;
 // default status name of devices which can be omitted on status get or set
 export const DEFAULT_DEVICE_STATUS = 'default';
+// should start IO server on app start
+export const START_APP_TYPE_FILE_NAME = 'startAppType';
 
 export enum SystemEvents {
   driversInitialized,

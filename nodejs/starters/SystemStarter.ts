@@ -14,7 +14,7 @@ interface SystemKind {
   start(): Promise<void>;
   destroy(): Promise<void>;
 }
-// AppSwitcher of System class
+// AppStarter of System class
 type SystemKindClass = new (
   ioSet: IoSet,
   restartRequest: () => void,
@@ -36,7 +36,7 @@ export default class SystemStarter {
 
 
   async start(pathToSystemDir: string, ioSet: IoSet) {
-    // use System if bareSystem is true or AppSwitcher if false
+    // use System if bareSystem is true or AppStarter if false
     const fileName: string = (this.bareSystem) ? SYSTEM_FILE_NAME : APP_SWITCHER_FILE_NAME;
     const systemKindFile = path.join(pathToSystemDir, fileName);
     const systemKindClass: SystemKindClass = this.os.require(systemKindFile).default;

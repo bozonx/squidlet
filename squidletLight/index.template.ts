@@ -3,7 +3,7 @@ import * as ios from './ios';
 import * as devicesMainFiles from './devicesMainFiles';
 import * as driversMainFiles from './driversMainFiles';
 import * as servicesMainFiles from './servicesMainFiles';
-import AppSwitcher from '${REPO_ROOT}/system/AppSwitcher';
+import AppStarter from '${REPO_ROOT}/system/AppStarter';
 import IoSetBuiltin from '${REPO_ROOT}/squidletLight/IoSetBuiltin';
 import ConsoleLogger from '${REPO_ROOT}/shared/ConsoleLogger';
 import LogLevel from '${REPO_ROOT}/system/interfaces/LogLevel';
@@ -19,7 +19,7 @@ export default async function (
   gid?: number,
   logLevel?: LogLevel,
   ioServerMode?: boolean,
-): Promise<AppSwitcher> {
+): Promise<AppStarter> {
   const consoleLogger = new ConsoleLogger(logLevel);
   const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
 
@@ -29,7 +29,7 @@ export default async function (
   // set uid, git and workDir to Storage IO
   await ioItem.configure({ uid, gid, workDir });
 
-  const app: AppSwitcher = new AppSwitcher(ioSet, hostConfigOverride, consoleLogger);
+  const app: AppStarter = new AppStarter(ioSet, hostConfigOverride, consoleLogger);
 
   await app.start(ioServerMode);
 
