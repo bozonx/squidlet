@@ -6,6 +6,8 @@ import StorageIo, {StatsSimplified, ConfigParams} from 'system/interfaces/io/Sto
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {ENCODE} from 'system/lib/constants';
+import {trimCharEnd} from '../../system/lib/strings';
+import {PATH_SEP} from '../../system/lib/paths';
 
 
 let config: ConfigParams | undefined;
@@ -18,10 +20,17 @@ export default class Storage implements StorageIo {
   //private readonly os = new Os();
 
   async configure(configParams: ConfigParams): Promise<void> {
+    // remove trailing slash if set
+    const resolvedWorkDir: string | undefined = (configParams.workDir)
+      ? trimCharEnd(configParams.workDir, PATH_SEP)
+      : undefined;
+
     config = {
       ...config,
       ...configParams,
     };
+
+    if (resolvedWorkDir) config.workDir = resolvedWorkDir;
   }
 
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
