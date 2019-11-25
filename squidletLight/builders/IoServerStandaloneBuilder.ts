@@ -1,6 +1,6 @@
 import * as path from 'path';
 import Platforms from '../../system/interfaces/Platforms';
-import {HOST_TMP_DIR, IO_SERVER_FILE_NAME} from '../../shared/constants';
+import {IO_SERVER_FILE_NAME} from '../../shared/constants';
 import Os from '../../shared/Os';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
@@ -11,18 +11,18 @@ import LogLevel from '../../system/interfaces/LogLevel';
 
 
 export class IoServerStandaloneBuilder {
-  private readonly workDir: string;
+  private readonly tmpDir: string;
   private readonly outputPath: string;
   private readonly platform: Platforms;
   private readonly machine: string;
-  private readonly tmpDir: string;
+  //private readonly tmpDir: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
   private readonly os: Os = new Os();
 
 
   constructor(
-    workDir: string,
+    tmpDir: string,
     outputPath: string,
     platform: Platforms,
     machine: string,
@@ -30,12 +30,12 @@ export class IoServerStandaloneBuilder {
     minimize: boolean = true,
     logLevel?: LogLevel
   ) {
-    this.workDir = workDir;
+    this.tmpDir = tmpDir;
     this.outputPath = outputPath;
     this.platform = platform;
     this.machine = machine;
     this.minimize = minimize;
-    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+    //this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
 
     // TODO: почему не используется logLevel???
   }
@@ -43,7 +43,7 @@ export class IoServerStandaloneBuilder {
 
   async build() {
     // TODO: удаляет все вместе с родительской директорией, но лучше чтобы только содержимое
-    await this.os.rimraf(this.workDir);
+    //await this.os.rimraf(this.workDir);
     await this.os.mkdirP(this.tmpDir);
 
     const indexFilePath = path.join(this.tmpDir, 'index.ts');

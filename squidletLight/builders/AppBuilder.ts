@@ -18,12 +18,12 @@ const SERViCES_MAIN_FILES = 'servicesMainFiles';
 
 
 export default class AppBuilder {
-  private readonly workDir: string;
+  private readonly tmpDir: string;
   private readonly outputPath: string;
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly onlyUsedIo: boolean;
-  private readonly tmpDir: string;
+  //private readonly tmpDir: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
   private readonly os: Os = new Os();
@@ -31,7 +31,7 @@ export default class AppBuilder {
 
 
   constructor(
-    workDir: string,
+    tmpDir: string,
     outputPath: string,
     platform: Platforms,
     machine: string,
@@ -40,19 +40,20 @@ export default class AppBuilder {
     onlyUsedIo: boolean = false,
     logLevel?: LogLevel
   ) {
-    this.workDir = workDir;
+    this.tmpDir = tmpDir;
     this.outputPath = outputPath;
     this.platform = platform;
     this.machine = machine;
     this.minimize = minimize;
     this.onlyUsedIo = onlyUsedIo;
     this.logLevel = logLevel;
-    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+
+    const envBuilderTmpDir = path.join(this.tmpDir, HOST_TMP_DIR);
 
     this.envBuilder = new EnvBuilder(
       hostConfigPath,
-      this.workDir,
-      this.tmpDir,
+      tmpDir,
+      envBuilderTmpDir,
       this.platform,
       this.machine,
       // TODO: use onlyUsedIo
@@ -62,7 +63,7 @@ export default class AppBuilder {
 
   async build() {
     // TODO: удаляет все вместе с родительской директорией, но лучше чтобы только содержимое
-    await this.os.rimraf(this.workDir);
+    //await this.os.rimraf(this.workDir);
     await this.os.mkdirP(this.tmpDir);
 
     console.info(`===> collect env set`);

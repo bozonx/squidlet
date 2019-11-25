@@ -16,7 +16,7 @@ Required params:
 
 Optional Params:
 
-* --work-dir - default is the build dir of repository
+* --tmp-dir - default is the build dir of repository
 * --output - path to output js bundle. By default it is `index.js` in work dir.
 * --minimize=true - default is true
 * --io-server=false - build IO server standalone instead of full app. Default is false

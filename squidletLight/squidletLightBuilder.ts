@@ -8,31 +8,30 @@ import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
 import LogLevel from '../system/interfaces/LogLevel';
 
 
-const SQUIDLET_LIGHT_WORKDIR = 'light';
+const SQUIDLET_LIGHT_TMP_DIR = 'light';
 
-
-export function resolveWorkDir(argWorkDir?: string): string {
-  if (argWorkDir) {
+export function resolveTmpDir(argTmpDir?: string): string {
+  if (argTmpDir) {
     // if it set as an argument - make it absolute
-    return path.resolve(process.cwd(), argWorkDir);
+    return path.resolve(process.cwd(), argTmpDir);
   }
 
-  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORKDIR);
+  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_TMP_DIR);
 }
 
-export function resolveOutputPath(workDir: string, output?: string): string {
+export function resolveOutputPath(tmpDir: string, output?: string): string {
   if (output) {
     // if it set as an argument - make it absolute
     return path.resolve(process.cwd(), output);
   }
 
-  return path.join(workDir, 'index.js');
+  return path.join(tmpDir, 'index.js');
 }
 
 
 export default async function(): Promise<void> {
-  const workDir: string = resolveWorkDir(yargs.argv.workDir as any);
-  const outputPath: string = resolveOutputPath(workDir, yargs.argv.output as any);
+  const tmpDir: string = resolveTmpDir(yargs.argv.tmpDir as any);
+  const outputPath: string = resolveOutputPath(tmpDir, yargs.argv.output as any);
   const platform: Platforms | undefined = yargs.argv.platform as any;
   const machine: string | undefined = yargs.argv.machine as any;
   const hostConfigPath: string | undefined = yargs.argv._[0] as any;
@@ -56,7 +55,7 @@ export default async function(): Promise<void> {
   if (yargs.argv.ioServer) {
     // build io server standalone
     const builder = new IoServerStandaloneBuilder(
-      workDir,
+      tmpDir,
       outputPath,
       platform,
       machine,
@@ -70,7 +69,7 @@ export default async function(): Promise<void> {
 
   // build app with app switcher
   const builder = new AppBuilder(
-    workDir,
+    tmpDir,
     outputPath,
     platform,
     machine,

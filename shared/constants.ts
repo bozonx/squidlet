@@ -13,6 +13,7 @@ export const BUILD_HOSTS_DIR = 'hosts';
 //export const BUILD_IO_DIR = 'io';
 
 export const HOSTS_WORK_DIRS = 'workdirs';
+// TODO: почему бы не брать из systemConfig????
 export const HOST_ENVSET_DIR = 'envSet';
 export const HOST_VAR_DATA_DIR = 'varData';
 export const HOST_TMP_DIR = 'tmp';
