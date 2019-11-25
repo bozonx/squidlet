@@ -6,8 +6,12 @@ import * as servicesMainFiles from './servicesMainFiles';
 import AppSwitcher from '${REPO_ROOT}/system/AppSwitcher';
 import IoSetBuiltin from '${REPO_ROOT}/squidletLight/IoSetBuiltin';
 import ConsoleLogger from '${REPO_ROOT}/shared/ConsoleLogger';
+// TODO: set paths
 import LogLevel from '../system/interfaces/LogLevel';
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import {SystemEvents} from '../system/constants';
+import IoSet from '../system/interfaces/IoSet';
+import StorageIo from '../system/interfaces/io/StorageIo';
 
 
 export default async function (
@@ -18,18 +22,29 @@ export default async function (
   logLevel?: LogLevel,
   ioServerMode?: boolean,
 ): Promise<AppSwitcher> {
-  // TODO: почему бы не сделать его в AppSwitcher ???
-  const consoleLogger = new ConsoleLogger(undefined)
-  const ioSet: any = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
+  // TODO: logLevel наверное не сюда должен передаваться а в System ???
+  const consoleLogger = new ConsoleLogger(logLevel);
 
-  // TODO: configure io set - pass user, group
-  await ioSet.init();
+  const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
 
-  const restartHandler = () => ioSet.getIo('Sys').restart().catch(console.error);
+  ioSet.init && await ioSet.init();
+  // get Storage IO
+  const ioItem = ioSet.getIo<StorageIo>('Storage');
+  // set uid, git and workDir to Storage IO
+  await ioItem.configure({ uid, gid, workDir });
+
+  // TODO: review
+  const restartHandler = () => ioSet.getIo('Sys').restart()
+    .catch(console.error);
 
   // TODO: ioServerMode - значит стазу переключиться в ioServer
 
   const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, consoleLogger);
+
+  // TODO: review
+  app.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
+    consoleLogger[level](message);
+  });
 
   await app.start();
 

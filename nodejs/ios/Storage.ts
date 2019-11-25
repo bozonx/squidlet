@@ -13,9 +13,6 @@ import {PATH_SEP} from '../../system/lib/paths';
 let config: ConfigParams | undefined;
 
 
-/**
- * The same for lowjs and nodejs
- */
 export default class Storage implements StorageIo {
   //private readonly os = new Os();
 
@@ -172,7 +169,7 @@ export default class Storage implements StorageIo {
   }
 
   private resolvePath(pathTo: string): string {
-    if (!config || !config.workDir) return pathTo;
+    if (!config || !config.workDir) throw new Error(`Storage IO: workDir han't been set`);
 
     return path.join(config.workDir, pathTo);
   }

@@ -1,9 +1,9 @@
 const systemConfig = {
   // default root dirs on micro controller
   rootDirs: {
-    envSet: '/envSet',
-    varData: '/varData',
-    tmp: '/tmp',
+    envSet: 'envSet',
+    varData: 'varData',
+    tmp: 'tmp',
   },
   // dirs of file system root
   envSetDirs: {

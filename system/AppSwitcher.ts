@@ -31,6 +31,8 @@ export default class AppSwitcher {
     await this.startSystem();
   }
 
+  // TODO: add addListener and removeListener - что делать при переключении????
+
   destroy = async () => {
     // destroy of System or IoServer
     if (this.system) {

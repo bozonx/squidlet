@@ -48,6 +48,7 @@ export default class StorageEnvMemoryWrapper {
     // if it isn't config or entity file - just load it.
     if (pathTo.indexOf(systemConfig.rootDirs.envSet) === -1) return originalReadFile(pathTo);
 
+    // TODO: почему split без delimiter ???
     const splat: string[] = pathTo.split(systemConfig.rootDirs.envSet);
     const relativePath: string = trimCharStart(splat[1], path.sep);
 

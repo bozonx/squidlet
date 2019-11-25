@@ -12,6 +12,8 @@ import {SystemEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
 import Logger from './interfaces/Logger';
 import LogLevel from './interfaces/LogLevel';
+import {AnyHandler} from './lib/IndexedEvents';
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 export type ShutdownHandler = (reason: ShutdownReason) => void;
@@ -52,9 +54,12 @@ export default class System {
    * The main app.
    * @param ioSet - has to be initialized before
    * @param shutdownRequestCb - handler of shutdown request
-   * @param logger - external logger
    */
-  constructor(ioSet: IoSet, shutdownRequestCb: ShutdownHandler, logger?: Logger) {
+  constructor(
+    ioSet: IoSet,
+    shutdownRequestCb: ShutdownHandler,
+    hostConfigOverride?: PreHostConfig
+  ) {
     this.shutdownRequest = shutdownRequestCb;
     this.context = new Context(this);
     this.ioManager = new IoManager(this.context, ioSet);
@@ -64,13 +69,6 @@ export default class System {
     this.devicesManager = new DevicesManager(this.context);
     this.apiManager = new ApiManager(this.context);
     this.api = new Api(this.context);
-
-    // send logs to an external logger to catch logs on initialization time
-    if (logger) {
-      this.events.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
-        logger[level](message);
-      });
-    }
   }
 
   destroy = async () => {
@@ -119,6 +117,14 @@ export default class System {
     this._wasAppInitialized = true;
     await this.emitEventSync(SystemEvents.appInitialized);
     this.context.log.info(`===> System initialization has been finished`);
+  }
+
+  addListener(eventName: number | string, cb: AnyHandler): number {
+    this.events.addListener(eventName, cb);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
   }
 
 
