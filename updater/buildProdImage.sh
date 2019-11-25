@@ -7,4 +7,4 @@ cd ${DIRNAME}/../;
 
 npm run buildUpdater-${1};
 
-docker build -t "bozonx/squidlet:${1}" -f ./updater/${1}/Dockerfile .;
+docker build -t "bozonx/squidlet:${1}" -f ./updater/${1}/Dockerfile-${1} .;
