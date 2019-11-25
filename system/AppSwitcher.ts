@@ -6,13 +6,16 @@ import IoItem from './interfaces/IoItem';
 import {consoleError} from './lib/helpers';
 import Logger from './interfaces/Logger';
 import ConsoleLogger from '../shared/ConsoleLogger';
-import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import {SystemEvents} from './constants';
+import LogLevel from './interfaces/LogLevel';
+import HostConfig from './interfaces/HostConfig';
 
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
   private readonly restartRequest: () => void;
-  private readonly hostConfigOverride?: PreHostConfig;
+  private readonly hostConfigOverride?: HostConfig;
+  private readonly logger: Logger;
   private system?: System;
   private ioServer?: IoServer;
 
@@ -20,26 +23,14 @@ export default class AppSwitcher {
   constructor(
     ioSet: IoSet,
     restartRequest: () => void,
-    hostConfigOverride?: PreHostConfig
-    //logger?: Logger
+    hostConfigOverride?: HostConfig,
+    logger: Logger = new ConsoleLogger()
   ) {
     this.ioSet = ioSet;
     this.restartRequest = restartRequest;
     this.hostConfigOverride = hostConfigOverride;
-    //this.logger = logger || new ConsoleLogger();
+    this.logger = logger;
   }
-
-
-  async start(startIoServerFirst?: boolean) {
-    if (startIoServerFirst) {
-      await this.startIoServer();
-    }
-    else {
-      await this.startSystem();
-    }
-  }
-
-  // TODO: add addListener and removeListener - что делать при переключении????
 
   destroy = async () => {
     // destroy of System or IoServer
@@ -64,8 +55,22 @@ export default class AppSwitcher {
   }
 
 
+  async start(startIoServerFirst?: boolean) {
+    if (startIoServerFirst) {
+      await this.startIoServer();
+    }
+    else {
+      await this.startSystem();
+    }
+  }
+
+
   private startSystem = async () => {
     this.system = new System(this.ioSet, this.handleShutdownRequest, this.hostConfigOverride);
+
+    this.system.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
+      this.logger[level](message);
+    });
 
     await this.system.start();
   }

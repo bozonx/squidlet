@@ -10,10 +10,8 @@ import Context from './Context';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './constants';
 import {ShutdownReason} from './interfaces/ShutdownReason';
-import Logger from './interfaces/Logger';
-import LogLevel from './interfaces/LogLevel';
 import {AnyHandler} from './lib/IndexedEvents';
-import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import HostConfig from './interfaces/HostConfig';
 
 
 export type ShutdownHandler = (reason: ShutdownReason) => void;
@@ -54,14 +52,15 @@ export default class System {
    * The main app.
    * @param ioSet - has to be initialized before
    * @param shutdownRequestCb - handler of shutdown request
+   * @param hostConfigOverride - part of HostConfig to overwrite some params
    */
   constructor(
     ioSet: IoSet,
     shutdownRequestCb: ShutdownHandler,
-    hostConfigOverride?: PreHostConfig
+    hostConfigOverride?: HostConfig
   ) {
     this.shutdownRequest = shutdownRequestCb;
-    this.context = new Context(this);
+    this.context = new Context(this, hostConfigOverride);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);
     this.driversManager = new DriversManager(this.context);
@@ -120,7 +119,7 @@ export default class System {
   }
 
   addListener(eventName: number | string, cb: AnyHandler): number {
-    this.events.addListener(eventName, cb);
+    return this.events.addListener(eventName, cb);
   }
 
   removeListener(handlerIndex: number) {

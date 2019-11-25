@@ -8,15 +8,14 @@ import IoSetBuiltin from '${REPO_ROOT}/squidletLight/IoSetBuiltin';
 import ConsoleLogger from '${REPO_ROOT}/shared/ConsoleLogger';
 // TODO: set paths
 import LogLevel from '../system/interfaces/LogLevel';
-import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import {SystemEvents} from '../system/constants';
 import IoSet from '../system/interfaces/IoSet';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import SysIo from '../system/interfaces/io/SysIo';
+import HostConfig from '../system/interfaces/HostConfig';
 
 
 export default async function (
-  hostConfigOverride?: PreHostConfig,
+  hostConfigOverride?: HostConfig,
   workDir?: string,
   uid?: number,
   gid?: number,
@@ -32,19 +31,13 @@ export default async function (
   // set uid, git and workDir to Storage IO
   await ioItem.configure({ uid, gid, workDir });
 
-  // TODO: review
   const restartHandler = () => {
     ioSet.getIo<SysIo>('Sys')
       .reboot()
       .catch(console.error);
   }
 
-  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, hostConfigOverride);
-
-  // TODO: review
-  app.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
-    consoleLogger[level](message);
-  });
+  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, hostConfigOverride, consoleLogger);
 
   await app.start(ioServerMode);
 

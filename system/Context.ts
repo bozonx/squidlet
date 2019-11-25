@@ -10,10 +10,13 @@ import IoItem from './interfaces/IoItem';
 import DriverBase from './base/DriverBase';
 import ServiceBase from './base/ServiceBase';
 import systemConfig from './systemConfig';
+import {mergeDeepObjects} from './lib/objects';
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 export default class Context {
   readonly system: System;
+  readonly hostConfigOverride?: HostConfig;
   readonly log: LogPublisher = new LogPublisher(this);
   readonly sessions: Sessions = new Sessions(makeUniqId);
   readonly state: State = new State();
@@ -30,15 +33,18 @@ export default class Context {
   private hostConfig?: HostConfig;
 
 
-  constructor(system: System) {
+  constructor(system: System, hostConfigOverride?: HostConfig) {
     this.system = system;
+    this.hostConfigOverride = hostConfigOverride;
   }
 
 
   async init() {
-    this.hostConfig = await this.system.envSet.loadConfig<HostConfig>(
+    const loadedConfig = await this.system.envSet.loadConfig<HostConfig>(
       systemConfig.fileNames.hostConfig
     );
+
+    this.hostConfig = mergeDeepObjects(this.hostConfigOverride, loadedConfig) as any;
   }
 
   destroy() {
