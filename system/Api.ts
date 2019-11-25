@@ -7,8 +7,12 @@ import HostInfo from './interfaces/HostInfo';
 import {calcAllowedLogLevels} from './lib/helpers';
 import SysIo from './interfaces/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
-import {SystemEvents} from './constants';
+import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
 import DeviceBase from './base/DeviceBase';
+import StorageIo from './interfaces/io/StorageIo';
+import {pathJoin} from './lib/paths';
+import systemConfig from './systemConfig';
+import {AppType} from './interfaces/AppType';
 
 
 export default class Api {
@@ -91,17 +95,23 @@ export default class Api {
   }
 
 
-  switchToIoServer() {
+  async switchToIoServer() {
     if (!this.context.config.ioServer) {
       throw new Error(`Switching to IO-server isn't allowed it config`);
     }
 
     this.context.log.info(`Switching to IO server`);
 
-    // TODO: создать файл с указанием куда переключаться
-    // TODO: вызвать sys io restart - где будет process.exit(0)
+    const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>('Storage');
+    const startAppTypeFileName: string = pathJoin(
+      systemConfig.rootDirs.tmp,
+      START_APP_TYPE_FILE_NAME,
+    );
+    const ioServerAppType: AppType = 'ioServer';
 
-    //this.context.system.shutdownRequest('switchToIoServer');
+    await storageIo.writeFile(startAppTypeFileName, ioServerAppType);
+
+    this.context.system.ioManager.getIo<SysIo>('Sys').restart();
   }
 
   switchToApp() {

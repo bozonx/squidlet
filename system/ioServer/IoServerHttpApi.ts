@@ -9,6 +9,11 @@ import HostConfig from '../interfaces/HostConfig';
 import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
 import {ShutdownHandler} from '../System';
 import SysIo from '../interfaces/io/SysIo';
+import StorageIo from '../interfaces/io/StorageIo';
+import {pathJoin} from '../lib/paths';
+import systemConfig from '../systemConfig';
+import {START_APP_TYPE_FILE_NAME} from '../constants';
+import {AppType} from '../interfaces/AppType';
 
 
 const SWITCH_TO_APP_TIMEOUT_SEC = 5;
@@ -81,7 +86,7 @@ export default class IoServerHttpApi {
       body = this.apiHostInfo();
     }
     else if (preparedPath === '/api/switchToApp') {
-      body = this.apiSwitchToApp();
+      body = await this.apiSwitchToApp();
     }
     else if (preparedPath === '/api/reboot') {
       body = this.apiReboot();
@@ -104,16 +109,24 @@ export default class IoServerHttpApi {
     return { result: `It will be rebooted in ${this.hostConfig.config.rebootDelaySec} seconds` };
   }
 
-  private apiSwitchToApp(): HttpApiBody {
+  private async apiSwitchToApp(): Promise<HttpApiBody> {
 
-    // TODO: создать файл с указанием куда переключаться
-    // TODO: вызвать sys io restart - где будет process.exit(0)
+    // TODO: запертить переключаться если standalone
+
+    const storageIo: StorageIo = await this.ioSet.getIo<StorageIo>('Storage');
+    const startAppTypeFileName: string = pathJoin(
+      systemConfig.rootDirs.tmp,
+      START_APP_TYPE_FILE_NAME,
+    );
+    const ioServerAppType: AppType = 'app';
+
+    await storageIo.writeFile(startAppTypeFileName, ioServerAppType);
 
     setTimeout(() => {
-      //this.shutdownRequest('switchToApp');
+      this.ioSet.ioManager.getIo<SysIo>('Sys').restart();
     }, SWITCH_TO_APP_TIMEOUT_SEC * 1000);
 
-    return { result: `Switching to the app in 1 second` };
+    return { result: `Switching to the app in ${SWITCH_TO_APP_TIMEOUT_SEC} second` };
   }
 
   private apiHostInfo(): HttpApiBody {
