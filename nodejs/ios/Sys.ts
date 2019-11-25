@@ -6,12 +6,12 @@ import SysInfo from '../../system/interfaces/SysInfo';
 
 
 export default class Sys implements SysIo {
-  // /**
-  //  * It just exits script. And starter has to restart it.
-  //  */
-  // async restart() {
-  //   process.exit(0);
-  // }
+  /**
+   * It just exits script. And starter has to restart it.
+   */
+  async exit(code = 0) {
+    process.exit(code);
+  }
 
   reboot(): Promise<void> {
     return new Promise<void>((resolve, reject) => {

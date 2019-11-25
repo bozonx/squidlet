@@ -7,7 +7,6 @@ import IoSet from '../interfaces/IoSet';
 import HostConfig from '../interfaces/HostConfig';
 // TODO: use from system's interfaces
 import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
-import {ShutdownHandler} from '../System';
 import SysIo from '../interfaces/io/SysIo';
 import StorageIo from '../interfaces/io/StorageIo';
 import {pathJoin} from '../lib/paths';
@@ -123,7 +122,7 @@ export default class IoServerHttpApi {
     await storageIo.writeFile(startAppTypeFileName, ioServerAppType);
 
     setTimeout(() => {
-      this.ioSet.ioManager.getIo<SysIo>('Sys').restart();
+      this.ioSet.getIo<SysIo>('Sys').exit();
     }, SWITCH_TO_APP_TIMEOUT_SEC * 1000);
 
     return { result: `Switching to the app in ${SWITCH_TO_APP_TIMEOUT_SEC} second` };

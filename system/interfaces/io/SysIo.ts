@@ -3,6 +3,7 @@ import SysInfo from '../SysInfo';
 
 
 export const Methods = [
+  'restart',
   'reboot',
   'shutdown',
   'info',
@@ -10,6 +11,11 @@ export const Methods = [
 
 
 export default interface SysIo extends IoItem {
+  /**
+   * It exists script
+   */
+  exit(): Promise<void>;
+
   /**
    * It is full reboot of system.
    */

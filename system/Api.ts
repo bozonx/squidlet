@@ -111,7 +111,7 @@ export default class Api {
 
     await storageIo.writeFile(startAppTypeFileName, ioServerAppType);
 
-    this.context.system.ioManager.getIo<SysIo>('Sys').restart();
+    this.context.system.ioManager.getIo<SysIo>('Sys').exit();
   }
 
   switchToApp() {
