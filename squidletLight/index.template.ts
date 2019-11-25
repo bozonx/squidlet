@@ -12,6 +12,7 @@ import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 import {SystemEvents} from '../system/constants';
 import IoSet from '../system/interfaces/IoSet';
 import StorageIo from '../system/interfaces/io/StorageIo';
+import SysIo from '../system/interfaces/io/SysIo';
 
 
 export default async function (
@@ -22,9 +23,7 @@ export default async function (
   logLevel?: LogLevel,
   ioServerMode?: boolean,
 ): Promise<AppSwitcher> {
-  // TODO: logLevel наверное не сюда должен передаваться а в System ???
   const consoleLogger = new ConsoleLogger(logLevel);
-
   const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
 
   ioSet.init && await ioSet.init();
@@ -34,19 +33,20 @@ export default async function (
   await ioItem.configure({ uid, gid, workDir });
 
   // TODO: review
-  const restartHandler = () => ioSet.getIo('Sys').restart()
-    .catch(console.error);
+  const restartHandler = () => {
+    ioSet.getIo<SysIo>('Sys')
+      .reboot()
+      .catch(console.error);
+  }
 
-  // TODO: ioServerMode - значит стазу переключиться в ioServer
-
-  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, consoleLogger);
+  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, hostConfigOverride);
 
   // TODO: review
   app.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
     consoleLogger[level](message);
   });
 
-  await app.start();
+  await app.start(ioServerMode);
 
   return app;
 }

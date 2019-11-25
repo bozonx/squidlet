@@ -4,7 +4,7 @@ const squidletIndex = '/app/data/envSet/bundle.js';
 const updaterIndex = '/app/updater.js';
 
 let stat;
-let app;
+let appSwitcher;
 
 try {
   stat = fs.statSync(squidletIndex);
@@ -13,13 +13,13 @@ catch (e) {
 }
 
 if (stat && stat.isFile()) {
-  app = require(squidletIndex);
+  appSwitcher = require(squidletIndex);
 }
 else {
-  app = require(updaterIndex);
+  appSwitcher = require(updaterIndex);
 }
 
-app.start(
+appSwitcher.start(
   {
     hostType: 'updater',
     mqtt: {
@@ -36,7 +36,7 @@ app.start(
 
 async function shutdown() {
   try {
-    await app.destroy();
+    await appSwitcher.destroy();
   }
   catch (e) {
     console.error(e);

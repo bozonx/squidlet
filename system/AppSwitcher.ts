@@ -6,12 +6,13 @@ import IoItem from './interfaces/IoItem';
 import {consoleError} from './lib/helpers';
 import Logger from './interfaces/Logger';
 import ConsoleLogger from '../shared/ConsoleLogger';
+import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
   private readonly restartRequest: () => void;
-  private readonly logger: Logger;
+  private readonly hostConfigOverride?: PreHostConfig;
   private system?: System;
   private ioServer?: IoServer;
 
@@ -19,16 +20,23 @@ export default class AppSwitcher {
   constructor(
     ioSet: IoSet,
     restartRequest: () => void,
-    logger?: Logger
+    hostConfigOverride?: PreHostConfig
+    //logger?: Logger
   ) {
     this.ioSet = ioSet;
     this.restartRequest = restartRequest;
-    this.logger = logger || new ConsoleLogger();
+    this.hostConfigOverride = hostConfigOverride;
+    //this.logger = logger || new ConsoleLogger();
   }
 
 
-  async start() {
-    await this.startSystem();
+  async start(startIoServerFirst?: boolean) {
+    if (startIoServerFirst) {
+      await this.startIoServer();
+    }
+    else {
+      await this.startSystem();
+    }
   }
 
   // TODO: add addListener and removeListener - что делать при переключении????
@@ -57,7 +65,7 @@ export default class AppSwitcher {
 
 
   private startSystem = async () => {
-    this.system = new System(this.ioSet, this.handleShutdownRequest, this.logger);
+    this.system = new System(this.ioSet, this.handleShutdownRequest, this.hostConfigOverride);
 
     await this.system.start();
   }
