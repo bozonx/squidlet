@@ -9,7 +9,6 @@ import ConsoleLogger from '${REPO_ROOT}/shared/ConsoleLogger';
 import LogLevel from '${REPO_ROOT}/system/interfaces/LogLevel';
 import IoSet from '${REPO_ROOT}/system/interfaces/IoSet';
 import StorageIo from '../system/interfaces/io/StorageIo';
-import SysIo from '${REPO_ROOT}/system/interfaces/io/SysIo';
 import HostConfig from '${REPO_ROOT}/system/interfaces/HostConfig';
 
 
@@ -30,13 +29,7 @@ export default async function (
   // set uid, git and workDir to Storage IO
   await ioItem.configure({ uid, gid, workDir });
 
-  const restartHandler = () => {
-    ioSet.getIo<SysIo>('Sys')
-      .reboot()
-      .catch(console.error);
-  }
-
-  const app: AppSwitcher = new AppSwitcher(ioSet, restartHandler, hostConfigOverride, consoleLogger);
+  const app: AppSwitcher = new AppSwitcher(ioSet, hostConfigOverride, consoleLogger);
 
   await app.start(ioServerMode);
 

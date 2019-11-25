@@ -13,21 +13,14 @@ import HostConfig from './interfaces/HostConfig';
 
 export default class AppSwitcher {
   private readonly ioSet: IoSet;
-  private readonly restartRequest: () => void;
   private readonly hostConfigOverride?: HostConfig;
   private readonly logger: Logger;
   private system?: System;
   private ioServer?: IoServer;
 
 
-  constructor(
-    ioSet: IoSet,
-    restartRequest: () => void,
-    hostConfigOverride?: HostConfig,
-    logger: Logger = new ConsoleLogger()
-  ) {
+  constructor(ioSet: IoSet, hostConfigOverride?: HostConfig, logger: Logger = new ConsoleLogger()) {
     this.ioSet = ioSet;
-    this.restartRequest = restartRequest;
     this.hostConfigOverride = hostConfigOverride;
     this.logger = logger;
   }
@@ -66,7 +59,7 @@ export default class AppSwitcher {
 
 
   private startSystem = async () => {
-    this.system = new System(this.ioSet, this.handleShutdownRequest, this.hostConfigOverride);
+    this.system = new System(this.ioSet, this.hostConfigOverride);
 
     this.system.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
       this.logger[level](message);
@@ -78,7 +71,6 @@ export default class AppSwitcher {
   private startIoServer = async () => {
     this.ioServer = new IoServer(
       this.ioSet,
-      this.handleShutdownRequest,
       this.logger.debug,
       this.logger.info,
       this.logger.error
@@ -87,37 +79,37 @@ export default class AppSwitcher {
     await this.ioServer.start();
   }
 
-  private handleShutdownRequest = (reason: ShutdownReason) => {
-    // TODO: add timeout ???
-    switch (reason) {
-      case 'switchToIoServer':
-        this.switchToIoServer()
-          .catch(consoleError);
-        break;
-      case 'switchToApp':
-        this.switchToApp()
-          .catch(consoleError);
-        break;
-      case 'restart':
-        this.restartRequest();
-        break;
-    }
-  }
+  // private handleShutdownRequest = (reason: ShutdownReason) => {
+  //   // TODO: add timeout ???
+  //   switch (reason) {
+  //     case 'switchToIoServer':
+  //       this.switchToIoServer()
+  //         .catch(consoleError);
+  //       break;
+  //     case 'switchToApp':
+  //       this.switchToApp()
+  //         .catch(consoleError);
+  //       break;
+  //     case 'restart':
+  //       this.restartRequest();
+  //       break;
+  //   }
+  // }
 
-  private async switchToIoServer() {
-    if (!this.system) throw new Error(`System isn't set`);
-
-    await this.system.destroy();
-    delete this.system;
-    await this.startIoServer();
-  }
-
-  private async switchToApp() {
-    if (!this.ioServer) throw new Error(`IoServer isn't set`);
-
-    await this.ioServer.destroy();
-    delete this.ioServer;
-    await this.startSystem();
-  }
+  // private async switchToIoServer() {
+  //   if (!this.system) throw new Error(`System isn't set`);
+  //
+  //   await this.system.destroy();
+  //   delete this.system;
+  //   await this.startIoServer();
+  // }
+  //
+  // private async switchToApp() {
+  //   if (!this.ioServer) throw new Error(`IoServer isn't set`);
+  //
+  //   await this.ioServer.destroy();
+  //   delete this.ioServer;
+  //   await this.startSystem();
+  // }
 
 }
