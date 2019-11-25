@@ -41,7 +41,7 @@ export default class EnvSet {
 
   /**
    * Get builtin manifest
-   * In development mode it will be loaded from memory by devlopment ioSet.
+   * In development mode it will be loaded from memory by development ioSet.
    * @param entityType - device, driver or service
    * @param entityName - name of entity
    */

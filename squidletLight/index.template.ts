@@ -6,12 +6,11 @@ import * as servicesMainFiles from './servicesMainFiles';
 import AppSwitcher from '${REPO_ROOT}/system/AppSwitcher';
 import IoSetBuiltin from '${REPO_ROOT}/squidletLight/IoSetBuiltin';
 import ConsoleLogger from '${REPO_ROOT}/shared/ConsoleLogger';
-// TODO: set paths
-import LogLevel from '../system/interfaces/LogLevel';
-import IoSet from '../system/interfaces/IoSet';
+import LogLevel from '${REPO_ROOT}/system/interfaces/LogLevel';
+import IoSet from '${REPO_ROOT}/system/interfaces/IoSet';
 import StorageIo from '../system/interfaces/io/StorageIo';
-import SysIo from '../system/interfaces/io/SysIo';
-import HostConfig from '../system/interfaces/HostConfig';
+import SysIo from '${REPO_ROOT}/system/interfaces/io/SysIo';
+import HostConfig from '${REPO_ROOT}/system/interfaces/HostConfig';
 
 
 export default async function (

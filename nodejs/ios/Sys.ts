@@ -2,6 +2,7 @@ import * as childProcess from 'child_process';
 import {ExecException} from 'child_process';
 
 import SysIo from 'system/interfaces/io/SysIo';
+import SysInfo from '../../system/interfaces/SysInfo';
 
 
 export default class Sys implements SysIo {
@@ -22,6 +23,22 @@ export default class Sys implements SysIo {
         resolve();
       });
     });
+  }
+
+  shutdown(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      childProcess.exec('shutdown', (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) {
+          return reject(error);
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  async info(): Promise<SysInfo> {
+    return {};
   }
 
 }

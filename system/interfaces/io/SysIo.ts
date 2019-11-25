@@ -1,23 +1,24 @@
 import IoItem from '../IoItem';
+import SysInfo from '../SysInfo';
 
 
 export const Methods = [
-  //'restart',
   'reboot',
+  'shutdown',
+  'info',
 ];
 
 
 export default interface SysIo extends IoItem {
-  // /**
-  //  * It restarts whole nodejs instance.
-  //  * On micro-controllers it make reboot.
-  //  * It uses for updates and switch to io-server
-  //  */
-  // restart(): Promise<void>;
-
   /**
    * It is full reboot of system.
-   * It doesn't use in any scenarios, use it by your self.
    */
   reboot(): Promise<void>;
+
+  /**
+   * It turn off the system.
+   */
+  shutdown(): Promise<void>;
+
+  info(): Promise<SysInfo>;
 }
