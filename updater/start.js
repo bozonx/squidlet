@@ -31,7 +31,7 @@ appStarter.start(
   process.env.PUID,
   process.env.PGID,
   process.env.LOG_LEVEL,
-  process.env.IOSERVER_MODE,
+  process.env.IOSERVER_MODE === 'true',
 );
 
 async function shutdown() {

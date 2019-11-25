@@ -62,7 +62,6 @@ export default async function(): Promise<void> {
       machine,
       hostConfigPath,
       minimize,
-      onlyUsedIo,
       logLevel
     );
 
@@ -77,6 +76,7 @@ export default async function(): Promise<void> {
     machine,
     hostConfigPath,
     minimize,
+    onlyUsedIo,
     logLevel
   );
 
