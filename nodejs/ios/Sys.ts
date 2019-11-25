@@ -3,13 +3,28 @@ import {ExecException} from 'child_process';
 
 import SysIo from 'system/interfaces/io/SysIo';
 import SysInfo from '../../system/interfaces/SysInfo';
+import {SysConfig} from '../../system/interfaces/io/SysIo';
+
+
+let config: SysConfig | undefined;
 
 
 export default class Sys implements SysIo {
+  async configure(configParams: SysConfig): Promise<void> {
+    config = {
+      ...config,
+      ...configParams,
+    };
+  }
+
   /**
    * It just exits script. And starter has to restart it.
    */
   async exit(code = 0) {
+    if (config && config.exit) {
+      return config.exit(code);
+    }
+    // or just exit
     process.exit(code);
   }
 

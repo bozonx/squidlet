@@ -9,8 +9,14 @@ export const Methods = [
   'info',
 ];
 
+export interface SysConfig {
+  exit?: (code: number) => void;
+}
+
 
 export default interface SysIo extends IoItem {
+  configure(props: SysConfig): Promise<void>;
+
   /**
    * It exists script
    */
