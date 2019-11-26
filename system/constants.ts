@@ -2,6 +2,7 @@
 export const SERVER_STARTING_TIMEOUT_SEC = 30;
 // wait for response for http and so on
 export const WAIT_RESPONSE_TIMEOUT_SEC = 60;
+export const APP_DESTROY_TIMEOUT_SEC = 60;
 // default status name of devices which can be omitted on status get or set
 export const DEFAULT_DEVICE_STATUS = 'default';
 // should start IO server on app start

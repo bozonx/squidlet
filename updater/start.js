@@ -47,6 +47,7 @@ async function gracefullyShutdown() {
     }
     catch (e) {
       console.error(e);
+      process.emit(3);
     }
   }
 

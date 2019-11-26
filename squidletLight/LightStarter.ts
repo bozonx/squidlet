@@ -5,6 +5,7 @@ import HostConfig from '../system/interfaces/HostConfig';
 import LogLevel from '../system/interfaces/LogLevel';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import SysIo from '../system/interfaces/io/SysIo';
+import {APP_DESTROY_TIMEOUT_SEC} from '../system/constants';
 
 
 export default class LightStarter {
@@ -59,16 +60,25 @@ export default class LightStarter {
     this.started = true;
   }
 
-  async destroy() {
+  destroy(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        reject(`App destroy timeout has been exceeded.`);
+      }, APP_DESTROY_TIMEOUT_SEC * 1000);
 
-    // TODO: add timeout - потом вернуть промис
+      if (!this.app) return reject('No app');
 
-    this.app && await this.app.destroy();
-    await this.ioSet.destroy();
+      this.app.destroy()
+        .then(() => this.ioSet.destroy())
+        .then(() => {
+          delete this.ioSet;
+          delete this.app;
+          delete this.consoleLogger;
 
-    delete this.ioSet;
-    delete this.app;
-    delete this.consoleLogger;
+          resolve();
+        })
+        .catch(reject);
+    });
   }
 
 }
