@@ -19,7 +19,7 @@ export default class LightStarter {
   private started: boolean = false;
 
 
-  constructor(ioSet: IoSet, ) {
+  constructor(ioSet: IoSet) {
     this.ioSet = ioSet;
   }
 
@@ -44,9 +44,7 @@ export default class LightStarter {
     // make destroy before process.exit
     await sysIo.configure({
       exit: (code: number) => {
-        if (!this.app) return console.error('No app');
-
-        this.app.destroy()
+        this.destroy()
           .then(() => process.exit(code))
           .catch((e: Error) => {
             console.error(e);

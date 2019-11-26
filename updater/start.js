@@ -4,7 +4,7 @@ const squidletIndex = '/app/data/envSet/bundle.js';
 const updaterIndex = '/app/updater.js';
 
 let stat;
-let Starter;
+let instantiateStarter;
 let hostType = 'app';
 const env = process.env;
 
@@ -15,14 +15,14 @@ catch (e) {
 }
 
 if (stat && stat.isFile()) {
-  Starter = require(squidletIndex);
+  instantiateStarter = require(squidletIndex);
 }
 else {
-  Starter = require(updaterIndex);
+  instantiateStarter = require(updaterIndex);
   hostType = 'updater';
 }
 
-const starter = new Starter();
+const starter = instantiateStarter();
 
 starter.start(
   {
