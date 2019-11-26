@@ -33,6 +33,15 @@ export default class IoSetLocal implements IoSet {
   }
 
   async destroy() {
+    // destroy of ios
+    const ioNames: string[] = this.getNames();
+
+    for (let ioName of ioNames) {
+      const ioItem: IoItem = this.getIo(ioName);
+
+      if (ioItem.destroy) await ioItem.destroy();
+    }
+
     delete this.ioCollection;
   }
 
