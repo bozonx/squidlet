@@ -4,7 +4,7 @@ const squidletIndex = '/app/data/envSet/bundle.js';
 const updaterIndex = '/app/updater.js';
 
 let stat;
-let appStarter;
+let Starter;
 let hostType = 'app';
 const env = process.env;
 
@@ -15,14 +15,14 @@ catch (e) {
 }
 
 if (stat && stat.isFile()) {
-  appStarter = require(squidletIndex);
+  Starter = require(squidletIndex);
 }
 else {
-  appStarter = require(updaterIndex);
+  Starter = require(updaterIndex);
   hostType = 'updater';
 }
 
-appStarter.start(
+const starter = new Starter(
   {
     hostType,
     mqtt: {
@@ -35,15 +35,19 @@ appStarter.start(
   (env.PGID) ? Number(env.PGID) : undefined,
   process.env.LOG_LEVEL || undefined,
   process.env.IOSERVER_MODE === 'true',
-)
+);
+
+starter.start()
   .catch(console.error);
 
 async function gracefullyShutdown() {
-  try {
-    await appStarter.destroy();
-  }
-  catch (e) {
-    console.error(e);
+  if (starter.hasBeenStarted()) {
+    try {
+      await starter.destroy();
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
   process.exit(0);
@@ -55,6 +59,7 @@ process.on('SIGTERM', () => {
   gracefullyShutdown()
     .catch(console.error);
 });
+
 process.on('SIGINT', () => {
   console.info('SIGINT signal has been caught');
 

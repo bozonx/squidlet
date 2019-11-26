@@ -12,39 +12,58 @@ import * as driversMainFiles from './driversMainFiles';
 import * as servicesMainFiles from './servicesMainFiles';
 
 
-export default async function (
-  hostConfigOverride?: HostConfig,
-  workDir?: string,
-  uid?: number,
-  gid?: number,
-  logLevel?: LogLevel,
-  ioServerMode?: boolean,
-): Promise<AppStarter> {
-  let app: AppStarter;
-  const consoleLogger = new ConsoleLogger(logLevel);
-  const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
+export default class LightStarter {
+  constructor(
+    hostConfigOverride?: HostConfig,
+    workDir?: string,
+    uid?: number,
+    gid?: number,
+    logLevel?: LogLevel,
+    ioServerMode?: boolean,
+  ) {
 
-  ioSet.init && await ioSet.init();
-  // get Storage IO
-  const storageIo = ioSet.getIo<StorageIo>('Storage');
-  const sysIo = ioSet.getIo<StorageIo>('Sys');
-  // set uid, git and workDir to Storage IO
-  await storageIo.configure({ uid, gid, workDir });
-  // make destroy before process.exit
-  await sysIo.configure({
-    exit: (code: number) => {
-      app.destroy()
-        .then(() => process.exit(code))
-        .catch((e: Error) => {
-          consoleLogger.error(e);
-          process.exit(code);
-        });
-    }
-  });
+  }
 
-  app = new AppStarter(ioSet, hostConfigOverride, consoleLogger);
 
-  await app.start(ioServerMode);
+  hasBeenStarted(): boolean {
 
-  return app;
+  }
+
+
+  async start() {
+    let app: AppStarter;
+    const consoleLogger = new ConsoleLogger(logLevel);
+    const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
+
+    // TODO: нужно же ещё задестроить ioSet
+
+    ioSet.init && await ioSet.init();
+    // get Storage IO
+    const storageIo = ioSet.getIo<StorageIo>('Storage');
+    const sysIo = ioSet.getIo<StorageIo>('Sys');
+    // set uid, git and workDir to Storage IO
+    await storageIo.configure({ uid, gid, workDir });
+    // make destroy before process.exit
+    await sysIo.configure({
+      exit: (code: number) => {
+        app.destroy()
+          .then(() => process.exit(code))
+          .catch((e: Error) => {
+            consoleLogger.error(e);
+            process.exit(code);
+          });
+      }
+    });
+
+    app = new AppStarter(ioSet, hostConfigOverride, consoleLogger);
+
+    await app.start(ioServerMode);
+
+    return app;
+  }
+
+  async destroy() {
+
+  }
+
 }
