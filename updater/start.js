@@ -5,7 +5,7 @@ const updaterIndex = '/app/updater.js';
 
 let stat;
 let instantiateStarter;
-let hostType = 'app';
+let appType = 'app';
 const env = process.env;
 
 try {
@@ -19,7 +19,7 @@ if (stat && stat.isFile()) {
 }
 else {
   instantiateStarter = require(updaterIndex);
-  hostType = 'updater';
+  appType = 'updater';
 }
 
 const starter = instantiateStarter();
@@ -27,7 +27,7 @@ const starter = instantiateStarter();
 starter.start(
   (code) => process.exit(code),
   {
-    hostType,
+    appType,
     mqtt: {
       host: env.MQTT_BROKER_HOST || undefined,
       port: (env.MQTT_BROKER_PORT) ? Number(env.MQTT_BROKER_PORT) : undefined,

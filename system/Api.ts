@@ -29,8 +29,7 @@ export default class Api {
    */
   info(): HostInfo {
     return {
-      // TODO: get from config
-      hostType: 'app',
+      appType: this.context.config.appType,
       platform: this.context.config.platform,
       machine: this.context.config.machine,
       usedIo: this.context.system.ioManager.getNames(),

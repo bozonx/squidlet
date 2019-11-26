@@ -129,8 +129,9 @@ export default class IoServerHttpApi {
   }
 
   private apiHostInfo(): HttpApiBody {
+    const ioServerAppType: AppType = 'ioServer';
     const hostInfo: HostInfo = {
-      hostType: 'ioServer',
+      appType: ioServerAppType,
       platform: this.hostConfig.platform,
       machine: this.hostConfig.machine,
       usedIo: this.ioSet.getNames(),

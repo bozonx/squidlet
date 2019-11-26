@@ -1,11 +1,9 @@
 import Platforms from './Platforms';
-
-
-export type HostType = 'app' | 'ioServer';
+import {AppType} from './AppType';
 
 
 export default interface HostInfo {
-  hostType: HostType;
+  appType: AppType;
   platform: Platforms;
   machine: string;
   usedIo: string[];

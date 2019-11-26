@@ -1,4 +1,5 @@
 import Platforms from './Platforms';
+import {AppType} from './AppType';
 
 
 export interface HostConfigConfig {
@@ -37,6 +38,7 @@ export interface HostConfigConfig {
 export default interface HostConfig {
   // id of host e.g master
   id: string;
+  appType: AppType;
   platform: Platforms;
   machine: string;
   //platform: Platforms;
