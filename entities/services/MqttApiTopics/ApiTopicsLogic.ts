@@ -123,7 +123,7 @@ export default class ApiTopicsLogic {
 
     const args: (JsonTypes | undefined)[] = parseArgs(data);
 
-    await this.context.system.api.action(deviceId, actionName, ...args);
+    await this.context.system.apiManager.callApi('action', [deviceId, actionName, ...args]);
   }
 
   /**
