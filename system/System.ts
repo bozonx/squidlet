@@ -11,6 +11,8 @@ import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './constants';
 import {AnyHandler} from './lib/IndexedEvents';
 import HostConfig from './interfaces/HostConfig';
+import StorageIo from './interfaces/io/StorageIo';
+import systemConfig from './systemConfig';
 
 
 export default class System {
@@ -79,6 +81,9 @@ export default class System {
     this.context.log.info(`---> Initializing context`);
     await this.context.init();
 
+    this.context.log.info(`---> Make file structure`);
+    await this.makeFileStructure();
+
     this.context.log.info(`---> Instantiating entities`);
     await this.driversManager.instantiate();
     await this.servicesManager.instantiate();
@@ -122,6 +127,28 @@ export default class System {
     }
     catch (err) {
       this.context.log.error(err);
+    }
+  }
+
+  private async makeFileStructure() {
+    const storage: StorageIo = this.ioManager.getIo<StorageIo>('Storage');
+
+    try {
+      await storage.mkdir(systemConfig.rootDirs.envSet);
+    }
+    catch (e) {
+    }
+
+    try {
+      await storage.mkdir(systemConfig.rootDirs.varData);
+    }
+    catch (e) {
+    }
+
+    try {
+      await storage.mkdir(systemConfig.rootDirs.tmp);
+    }
+    catch (e) {
     }
   }
 
