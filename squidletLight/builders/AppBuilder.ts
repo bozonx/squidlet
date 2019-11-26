@@ -93,7 +93,8 @@ export default class AppBuilder {
 
 
   private async makeIndexFile(): Promise<string> {
-    const fileContent: string = await this.os.getFileContent(INDEX_FILE_TPL_FILE_NAME);
+    const fileContentPath = path.join(__dirname, '../', INDEX_FILE_TPL_FILE_NAME);
+    const fileContent: string = await this.os.getFileContent(fileContentPath);
     const relativeRepoRoot = path.relative( this.tmpDir, REPO_ROOT );
 
     return _.template(fileContent)({ REPO_ROOT: relativeRepoRoot });
