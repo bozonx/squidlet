@@ -22,7 +22,9 @@ else {
   hostType = 'updater';
 }
 
-const starter = new Starter(
+const starter = new Starter();
+
+starter.start(
   {
     hostType,
     mqtt: {
@@ -35,13 +37,11 @@ const starter = new Starter(
   (env.PGID) ? Number(env.PGID) : undefined,
   process.env.LOG_LEVEL || undefined,
   process.env.IOSERVER_MODE === 'true',
-);
-
-starter.start()
+)
   .catch(console.error);
 
 async function gracefullyShutdown() {
-  if (starter.hasBeenStarted()) {
+  if (starter.hasBeenStarted) {
     try {
       await starter.destroy();
     }

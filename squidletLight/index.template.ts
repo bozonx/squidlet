@@ -5,6 +5,7 @@ import LogLevel from '${REPO_ROOT}/system/interfaces/LogLevel';
 import IoSet from '${REPO_ROOT}/system/interfaces/IoSet';
 import HostConfig from '${REPO_ROOT}/system/interfaces/HostConfig';
 import StorageIo from '${REPO_ROOT}/system/interfaces/io/StorageIo';
+import SysIo from '${REPO_ROOT}/system/interfaces/io/SysIo';
 import envSet from './envSet';
 import * as ios from './ios';
 import * as devicesMainFiles from './devicesMainFiles';
@@ -13,7 +14,17 @@ import * as servicesMainFiles from './servicesMainFiles';
 
 
 export default class LightStarter {
-  constructor(
+  get hasBeenStarted(): boolean {
+    return this.started;
+  }
+
+  private started: boolean = false;
+  private ioSet?: IoSet;
+  private app: AppStarter;
+  private consoleLogger?: ConsoleLogger;
+
+
+  async start(
     hostConfigOverride?: HostConfig,
     workDir?: string,
     uid?: number,
@@ -21,49 +32,41 @@ export default class LightStarter {
     logLevel?: LogLevel,
     ioServerMode?: boolean,
   ) {
+    this.consoleLogger = new ConsoleLogger(logLevel);
+    this.ioSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
 
-  }
-
-
-  hasBeenStarted(): boolean {
-
-  }
-
-
-  async start() {
-    let app: AppStarter;
-    const consoleLogger = new ConsoleLogger(logLevel);
-    const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
-
-    // TODO: нужно же ещё задестроить ioSet
-
-    ioSet.init && await ioSet.init();
+    this.ioSet.init && await this.ioSet.init();
     // get Storage IO
-    const storageIo = ioSet.getIo<StorageIo>('Storage');
-    const sysIo = ioSet.getIo<StorageIo>('Sys');
+    const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
+    const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
     // set uid, git and workDir to Storage IO
     await storageIo.configure({ uid, gid, workDir });
     // make destroy before process.exit
     await sysIo.configure({
       exit: (code: number) => {
-        app.destroy()
+        this.app.destroy()
           .then(() => process.exit(code))
           .catch((e: Error) => {
-            consoleLogger.error(e);
+            this.consoleLogger.error(e);
             process.exit(code);
           });
       }
     });
 
-    app = new AppStarter(ioSet, hostConfigOverride, consoleLogger);
+    this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
 
-    await app.start(ioServerMode);
+    await this.app.start(ioServerMode);
 
-    return app;
+    this.started = true;
   }
 
   async destroy() {
+    await this.app.destroy();
+    await this.ioSet.destroy();
 
+    delete this.ioSet;
+    delete this.app;
+    delete this.consoleLogger;
   }
 
 }
