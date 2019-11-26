@@ -2,7 +2,6 @@ import IoSet from './interfaces/IoSet';
 import System from './System';
 import IoServer from './ioServer/IoServer';
 import {AppType} from './interfaces/AppType';
-import IoItem from './interfaces/IoItem';
 import Logger from './interfaces/Logger';
 import ConsoleLogger from '../shared/ConsoleLogger';
 import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
@@ -28,9 +27,6 @@ export default class AppStarter {
   }
 
   destroy = async () => {
-
-    // TODO: add timeout - потом вернуть промис
-
     // destroy of System or IoServer
     if (this.system) {
       await this.system.destroy();
@@ -38,18 +34,6 @@ export default class AppStarter {
     else if (this.ioServer) {
       await this.ioServer.destroy();
     }
-
-    // destroy of ios
-    const ioNames: string[] = this.ioSet.getNames();
-
-    for (let ioName of ioNames) {
-      const ioItem: IoItem = this.ioSet.getIo(ioName);
-
-      if (ioItem.destroy) await ioItem.destroy();
-    }
-
-    // destroy of ioSet
-    await this.ioSet.destroy();
   }
 
 

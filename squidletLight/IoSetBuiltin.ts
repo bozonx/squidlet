@@ -55,6 +55,19 @@ export default class IoSetBuiltin implements IoSet {
   }
 
   async destroy() {
+    // TODO: review
+    // destroy of ios
+    const ioNames: string[] = this.ioSet.getNames();
+
+    for (let ioName of ioNames) {
+      const ioItem: IoItem = this.ioSet.getIo(ioName);
+
+      if (ioItem.destroy) await ioItem.destroy();
+    }
+
+    // destroy of ioSet
+    await this.ioSet.destroy();
+
     delete this.ioCollection;
   }
 

@@ -13,6 +13,9 @@ import * as driversMainFiles from './driversMainFiles';
 import * as servicesMainFiles from './servicesMainFiles';
 
 
+const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
+
+
 export default class LightStarter {
   get hasBeenStarted(): boolean {
     return this.started;
@@ -61,6 +64,9 @@ export default class LightStarter {
   }
 
   async destroy() {
+
+    // TODO: add timeout - потом вернуть промис
+
     await this.app.destroy();
     await this.ioSet.destroy();
 
