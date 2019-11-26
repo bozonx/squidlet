@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const squidletIndex = '/app/data/envSet/bundle.js';
+const squidletIndex = '/app/data/envSet/bundle/bundle.js';
 const updaterIndex = '/app/updater.js';
 
 let stat;

@@ -1,3 +1,6 @@
 name: Updater
 main: Updater.ts
 system: true
+
+ios:
+  - Storage
