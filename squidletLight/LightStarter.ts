@@ -30,8 +30,8 @@ export default class LightStarter {
     workDir?: string,
     uid?: number,
     gid?: number,
-    ioServerMode?: boolean,
-    logLevel?: LogLevel
+    logLevel?: LogLevel,
+    ioServerMode?: boolean
   ) {
     this.consoleLogger = new ConsoleLogger(logLevel);
     this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
@@ -68,7 +68,11 @@ export default class LightStarter {
       if (!this.app) return reject('No app');
 
       this.app.destroy()
-        .then(() => this.ioSet.destroy())
+        .then(() => {
+          console.info(`... destroying IoSet`);
+
+          this.ioSet.destroy();
+        })
         .then(() => {
           delete this.ioSet;
           delete this.app;

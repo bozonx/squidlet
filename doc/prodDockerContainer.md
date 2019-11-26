@@ -16,7 +16,7 @@
       -e MQTT_BROKER_HOST='localhost' \
       -e MQTT_BROKER_PORT=1234 \
       --privileged \
-      --device=/dev/ttyUSB0
+      --device=/dev/ttyUSB0 \
       bozonx/squidlet:x86
 
     docker rm -f squidlet; docker run --name squidlet -ti \
@@ -25,9 +25,9 @@
       -p 8089:8089 \
       -e PUID=1000 \
       -e PGID=1000 \
-      -e LOG_LEVEL=info \
+      -e LOG_LEVEL=debug \
       --privileged \
-      --device=/dev/ttyUSB0
+      --device=/dev/ttyUSB0 \
       bozonx/squidlet:x86
 
 ### Run image on Raspberry pi like machine

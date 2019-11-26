@@ -23,16 +23,17 @@ else {
 }
 
 const starter = instantiateStarter();
+const hostConfigOverride = {
+  appType,
+  mqtt: {
+    host: env.MQTT_BROKER_HOST || undefined,
+    port: (env.MQTT_BROKER_PORT) ? Number(env.MQTT_BROKER_PORT) : undefined,
+  },
+};
 
 starter.start(
   (code) => process.exit(code),
-  {
-    appType,
-    mqtt: {
-      host: env.MQTT_BROKER_HOST || undefined,
-      port: (env.MQTT_BROKER_PORT) ? Number(env.MQTT_BROKER_PORT) : undefined,
-    },
-  },
+  hostConfigOverride,
   '/app/data',
   (env.PUID) ? Number(env.PUID) : undefined,
   (env.PGID) ? Number(env.PGID) : undefined,

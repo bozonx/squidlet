@@ -1,6 +1,6 @@
 {
   "name": "squidlet-updater",
-  "version": "5.3.0",
+  "version": "5.4.0",
   "description": "Prod container for squidlet",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
