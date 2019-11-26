@@ -25,6 +25,7 @@ export default class LightStarter {
 
 
   async start(
+    processExit: (code: number) => void,
     hostConfigOverride?: HostConfig,
     workDir?: string,
     uid?: number,
@@ -45,10 +46,10 @@ export default class LightStarter {
     await sysIo.configure({
       exit: (code: number) => {
         this.destroy()
-          .then(() => process.exit(code))
+          .then(() => processExit(code))
           .catch((e: Error) => {
             console.error(e);
-            process.exit(code);
+            processExit(code);
           });
       }
     });

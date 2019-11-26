@@ -25,6 +25,7 @@ else {
 const starter = instantiateStarter();
 
 starter.start(
+  (code) => process.exit(code),
   {
     hostType,
     mqtt: {
