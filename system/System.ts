@@ -5,7 +5,6 @@ import EnvSet from './EnvSet';
 import IoSet from './interfaces/IoSet';
 import IoManager from './managers/IoManager';
 import ApiManager from './managers/ApiManager';
-import Api from './Api';
 import Context from './Context';
 import IndexedEventEmitter from './lib/IndexedEventEmitter';
 import {SystemEvents} from './constants';
@@ -24,7 +23,6 @@ export default class System {
   readonly servicesManager: ServicesManager;
   readonly devicesManager: DevicesManager;
   readonly apiManager: ApiManager;
-  readonly api: Api;
 
   get wasDriversInitialized(): boolean {
     return this._wasDriversInitialized;
@@ -58,7 +56,6 @@ export default class System {
     this.servicesManager = new ServicesManager(this.context);
     this.devicesManager = new DevicesManager(this.context);
     this.apiManager = new ApiManager(this.context);
-    this.api = new Api(this.context);
   }
 
   destroy = async () => {

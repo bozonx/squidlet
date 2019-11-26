@@ -4,13 +4,14 @@ import RemoteCall from '../lib/remoteCall/RemoteCall';
 import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 import {makeUniqId} from '../lib/uniqId';
 import {METHOD_DELIMITER} from '../constants';
+import StandardApi from '../StandardApi';
 
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
 
 
 /**
- * RemoteCall Api for acting remotely via ws or mqtt or others services.
+ * RemoteCall StandardApi for acting remotely via ws or mqtt or others services.
  */
 export default class ApiManager {
   private readonly context: Context;
@@ -20,10 +21,12 @@ export default class ApiManager {
   // separate instance of RemoteCall for each session. It needs to destroy whole instance on session end.
   private remoteCalls: {[index: string]: RemoteCall} = {};
   private endPoints: {[index: string]: {[index: string]: any}} = {};
+  private readonly standardApi: StandardApi;
 
 
   constructor(context: Context) {
     this.context = context;
+    this.standardApi = new StandardApi(this.context);
   }
 
   async destroy() {
@@ -73,7 +76,7 @@ export default class ApiManager {
 
     if (methodNameSplat.length === 1) {
       // call standard api
-      return (this.context.system.api as any)[methodName](...args);
+      return (this.standardApi as any)[methodName](...args);
     }
     else {
       // call endpoint's api

@@ -15,7 +15,7 @@ import systemConfig from './systemConfig';
 import {AppType} from './interfaces/AppType';
 
 
-export default class Api {
+export default class StandardApi {
   private readonly context: Context;
 
 
