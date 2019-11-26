@@ -5,6 +5,7 @@ export const servicesShortcut: {[index: string]: string} = {
   mqttApi: 'MqttApi',
   wsApi: 'WsApi',
   httpApi: 'HttpApi',
+  updater: 'Updater',
 };
 
 // services which set by default event you don't specify it in host config.

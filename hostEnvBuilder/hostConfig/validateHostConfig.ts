@@ -45,7 +45,8 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     () => isObject(rawConfig.mqttApi, 'mqttApi'),
     () => isObject(rawConfig.wsApi, 'wsApi'),
     () => isObject(rawConfig.httpApi, 'httpApi'),
-    () => isObject(rawConfig.backdoor, 'ioServer'),
+    () => isObject(rawConfig.ioServer, 'ioServer'),
+    () => isObject(rawConfig.updater, 'updater'),
 
     () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),
 
@@ -69,6 +70,7 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
       'wsApi',
       'httpApi',
       'ioServer',
+      'updater',
     ], 'host config'),
   ]);
 }
