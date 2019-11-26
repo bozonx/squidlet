@@ -6,6 +6,7 @@ const updaterIndex = '/app/updater.js';
 let stat;
 let appStarter;
 let hostType = 'app';
+const env = process.env;
 
 try {
   stat = fs.statSync(squidletIndex);
@@ -25,19 +26,19 @@ appStarter.start(
   {
     hostType,
     mqtt: {
-      host: process.env.MQTT_BROKER_HOST,
-      port: process.env.MQTT_BROKER_PORT,
+      host: env.MQTT_BROKER_HOST || undefined,
+      port: (env.MQTT_BROKER_PORT) ? Number(env.MQTT_BROKER_PORT) : undefined,
     },
   },
   '/app/data',
-  process.env.PUID,
-  process.env.PGID,
-  process.env.LOG_LEVEL,
+  (env.PUID) ? Number(env.PUID) : undefined,
+  (env.PGID) ? Number(env.PGID) : undefined,
+  process.env.LOG_LEVEL || undefined,
   process.env.IOSERVER_MODE === 'true',
 )
   .catch(console.error);
 
-async function shutdown() {
+async function gracefullyShutdown() {
   try {
     await appStarter.destroy();
   }
@@ -51,12 +52,12 @@ async function shutdown() {
 process.on('SIGTERM', () => {
   console.info('SIGTERM signal has been caught');
 
-  shutdown()
+  gracefullyShutdown()
     .catch(console.error);
 });
 process.on('SIGINT', () => {
   console.info('SIGINT signal has been caught');
 
-  shutdown()
+  gracefullyShutdown()
     .catch(console.error);
 });

@@ -12,6 +12,7 @@
     "axios": "*",
     "mqtt": "*",
     "mqtt-packet": "*",
+    "serialport": "*",
     "ws": "*"
   }
 }

@@ -30,6 +30,7 @@ export default async function (
   const sysIo = ioSet.getIo<StorageIo>('Sys');
   // set uid, git and workDir to Storage IO
   await storageIo.configure({ uid, gid, workDir });
+  // make destroy before process.exit
   await sysIo.configure({
     exit: (code: number) => {
       app.destroy()

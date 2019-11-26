@@ -1,4 +1,4 @@
-FROM node:13.1.0
+FROM amd64/node:13.1.0
 
 COPY build/updater-x86/ app/
 COPY updater/start.js app/start.js
@@ -17,6 +17,7 @@ WORKDIR /app
 #  ws;
 
 RUN npm install;
+RUN npm install pigpio i2c-bus;
 
 #COPY updater/docker-entrypoint.sh /usr/local/bin/
 VOLUME ["/app/data"]
