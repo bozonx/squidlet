@@ -1,5 +1,4 @@
 import ServiceBase from 'system/base/ServiceBase';
-import {EntityType} from 'system/interfaces/EntityTypes';
 
 
 interface Props {

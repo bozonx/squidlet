@@ -7,6 +7,8 @@ export const APP_DESTROY_TIMEOUT_SEC = 60;
 export const DEFAULT_DEVICE_STATUS = 'default';
 // should start IO server on app start
 export const START_APP_TYPE_FILE_NAME = 'startAppType';
+export const METHOD_DELIMITER = '.';
+
 
 export enum SystemEvents {
   driversInitialized,

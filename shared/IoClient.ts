@@ -6,7 +6,7 @@ import WebSocketClient from '../nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../system/lib/uniqId';
 import {WsCloseStatus} from '../system/interfaces/io/WebSocketClientIo';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
-import {METHOD_DELIMITER} from '../system/ioServer/IoServerConnection';
+import {METHOD_DELIMITER} from '../system/constants';
 
 
 const wsClientIo = new WebSocketClient();

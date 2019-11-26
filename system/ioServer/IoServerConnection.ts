@@ -5,9 +5,7 @@ import {deserializeJson, serializeJson} from '../lib/serialize';
 import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 import HostConfig from '../interfaces/HostConfig';
 import IoSet from '../interfaces/IoSet';
-
-
-export const METHOD_DELIMITER = '.';
+import {METHOD_DELIMITER} from '../constants';
 
 
 /**

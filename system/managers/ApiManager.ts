@@ -3,6 +3,7 @@ import IndexedEvents from '../lib/IndexedEvents';
 import RemoteCall from '../lib/remoteCall/RemoteCall';
 import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 import {makeUniqId} from '../lib/uniqId';
+import {METHOD_DELIMITER} from '../constants';
 
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
@@ -18,6 +19,7 @@ export default class ApiManager {
   private readonly rcOutcomeEvents = new IndexedEvents<RcOutcomeHandler>();
   // separate instance of RemoteCall for each session. It needs to destroy whole instance on session end.
   private remoteCalls: {[index: string]: RemoteCall} = {};
+  private endPoints: {[index: string]: {[index: string]: any}} = {};
 
 
   constructor(context: Context) {
@@ -32,6 +34,7 @@ export default class ApiManager {
     }
 
     delete this.remoteCalls;
+    delete this.endPoints;
   }
 
 
@@ -64,7 +67,24 @@ export default class ApiManager {
   callApi = async (methodName: string, args: any[]): Promise<any> => {
     this.context.log.debug(`ApiManager: called api method: ${methodName}(${args.join(', ')})`);
 
-    return (this.context.system.api as any)[methodName](...args);
+    if (!methodName) throw new Error(`No methodName`);
+
+    const methodNameSplat: string[] = methodName.split(METHOD_DELIMITER);
+
+    if (methodNameSplat.length === 1) {
+      // call standard api
+      return (this.context.system.api as any)[methodName](...args);
+    }
+    else {
+      // call endpoint's api
+      if (!this.endPoints[methodNameSplat[0]]) throw new Error(`Endpoint ${methodNameSplat[0]} not found`);
+
+      this.endPoints[methodNameSplat[0]][methodNameSplat[1]](...args);
+    }
+  }
+
+  registerEndpoint(endPointName: string, representObject: {[index: string]: any}) {
+    this.endPoints[endPointName] = representObject;
   }
 
 
