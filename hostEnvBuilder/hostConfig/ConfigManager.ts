@@ -16,6 +16,7 @@ import {IoDefinitions} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';
 import Platforms from '../../system/interfaces/Platforms';
+import {AppType} from '../../system/interfaces/AppType';
 
 
 export default class ConfigManager {
@@ -103,10 +104,14 @@ export default class ConfigManager {
   }
 
   private finalizeHostConfig(normalizedConfig: PreHostConfig): HostConfig {
+    // TODO: review
+    const appType: AppType = 'app';
+
     return {
       id: normalizedConfig.id as any,
       platform: this.platform as any,
       machine: this.machine as any,
+      appType,
       config: normalizedConfig.config as any,
       ioServer: normalizedConfig.ioServer as any,
     };
