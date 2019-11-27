@@ -24,6 +24,39 @@ export default class HttpApiCall {
   }
 
   /**
+   * Print device's status to console.
+   */
+  async getStatus(deviceId: string, host?: string, port?: string) {
+    const apiClient = await this.makeClient(host, port);
+
+    const result = await apiClient.callMethod('getDeviceStatus', deviceId);
+
+    console.info(JSON.stringify(result));
+  }
+
+  /**
+   * Print device's config to console.
+   */
+  async getConfig(deviceId: string, host?: string, port?: string) {
+    const apiClient = await this.makeClient(host, port);
+
+    const result = await apiClient.callMethod('getDeviceConfig', deviceId);
+
+    console.info(JSON.stringify(result));
+  }
+
+  /**
+   * Print state to console.
+   */
+  async getState(category: string, stateName: string, host?: string, port?: string) {
+    const apiClient = await this.makeClient(host, port);
+
+    const result = await apiClient.callMethod('getState', category, stateName);
+
+    console.info(JSON.stringify(result));
+  }
+
+  /**
    * Print host's info to console
    */
   async reboot(host?: string, port?: string) {

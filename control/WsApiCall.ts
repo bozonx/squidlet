@@ -7,89 +7,55 @@ import {consoleError} from '../system/lib/helpers';
 
 export default class WsApiCall {
   /**
-   * Print device's status to console.
-   * If watch param is set then it will listen to changes.
+   * listen to device's status changes.
    */
-  async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
+  async watchStatus(deviceId: string, host?: string, port?: string) {
     const apiClient = await this.makeClient(host, port);
 
-    if (watch) {
-      const handlerIndex = await apiClient.callMethod(
-        'listenDeviceStatus',
-        deviceId,
-        (changedValues: Dictionary) => {
-          console.info(JSON.stringify(changedValues));
-        }
-      );
-
-      listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
-    }
-    else {
-      const result = await apiClient.callMethod('getDeviceStatus', deviceId);
-      const resultKeys = Object.keys(result);
-
-      if (resultKeys.length === 1 && resultKeys[0] === 'default') {
-        console.info(JSON.stringify(resultKeys[0]));
+    const handlerIndex = await apiClient.callMethod(
+      'listenDeviceStatus',
+      deviceId,
+      (changedValues: Dictionary) => {
+        console.info(JSON.stringify(changedValues));
       }
-      else {
-        console.info(JSON.stringify(result));
-      }
+    );
 
-      await apiClient.close();
-    }
+    listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
   }
 
   /**
-   * Print device's config to console.
-   * If watch param is set then it will listen to changes.
+   * listen to device's config changes.
    */
-  async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
+  async watchConfig(deviceId: string, host?: string, port?: string) {
     const apiClient = await this.makeClient(host, port);
 
-    if (watch) {
-      const handlerIndex = await apiClient.callMethod(
-        'listenDeviceConfig',
-        deviceId,
-        (changedValues: Dictionary) => {
-          console.info(JSON.stringify(changedValues));
-        }
-      );
+    const handlerIndex = await apiClient.callMethod(
+      'listenDeviceConfig',
+      deviceId,
+      (changedValues: Dictionary) => {
+        console.info(JSON.stringify(changedValues));
+      }
+    );
 
-      listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
-    }
-    else {
-      const result = await apiClient.callMethod('getDeviceConfig', deviceId);
-
-      console.info(JSON.stringify(result));
-      await apiClient.close();
-    }
+    listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
   }
 
   /**
-   * Print state to console.
-   * If watch param is set then it will listen to changes.
+   * listen to state changes.
    */
-  async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
+  async watchState(category: string, stateName: string, host?: string, port?: string) {
     const apiClient = await this.makeClient(host, port);
 
-    if (watch) {
-      const handlerIndex = await apiClient.callMethod(
-        'listenState',
-        parseInt(category),
-        stateName,
-        (changedValues: Dictionary) => {
-          console.info(JSON.stringify(changedValues));
-        }
-      );
+    const handlerIndex = await apiClient.callMethod(
+      'listenState',
+      parseInt(category),
+      stateName,
+      (changedValues: Dictionary) => {
+        console.info(JSON.stringify(changedValues));
+      }
+    );
 
-      listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
-    }
-    else {
-      const result = await apiClient.callMethod('getState', parseInt(category), stateName);
-
-      console.info(JSON.stringify(result));
-      await apiClient.close();
-    }
+    listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
   }
 
   /**
@@ -121,6 +87,94 @@ export default class WsApiCall {
     return client;
   }
 }
+
+
+
+// /**
+//  * Print device's status to console.
+//  * If watch param is set then it will listen to changes.
+//  */
+// async status(deviceId: string, host?: string, port?: string, watch?: boolean) {
+//   const apiClient = await this.makeClient(host, port);
+//
+//   if (watch) {
+//     const handlerIndex = await apiClient.callMethod(
+//       'listenDeviceStatus',
+//       deviceId,
+//       (changedValues: Dictionary) => {
+//         console.info(JSON.stringify(changedValues));
+//       }
+//     );
+//
+//     listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
+//   }
+//   else {
+//     const result = await apiClient.callMethod('getDeviceStatus', deviceId);
+//     const resultKeys = Object.keys(result);
+//
+//     if (resultKeys.length === 1 && resultKeys[0] === 'default') {
+//       console.info(JSON.stringify(resultKeys[0]));
+//     }
+//     else {
+//       console.info(JSON.stringify(result));
+//     }
+//
+//     await apiClient.close();
+//   }
+// }
+//
+// /**
+//  * Print device's config to console.
+//  * If watch param is set then it will listen to changes.
+//  */
+// async config(deviceId: string, host?: string, port?: string, watch?: boolean) {
+//   const apiClient = await this.makeClient(host, port);
+//
+//   if (watch) {
+//     const handlerIndex = await apiClient.callMethod(
+//       'listenDeviceConfig',
+//       deviceId,
+//       (changedValues: Dictionary) => {
+//         console.info(JSON.stringify(changedValues));
+//       }
+//     );
+//
+//     listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
+//   }
+//   else {
+//     const result = await apiClient.callMethod('getDeviceConfig', deviceId);
+//
+//     console.info(JSON.stringify(result));
+//     await apiClient.close();
+//   }
+// }
+//
+// /**
+//  * Print state to console.
+//  * If watch param is set then it will listen to changes.
+//  */
+// async state(category: string, stateName: string, host?: string, port?: string, watch?: boolean) {
+//   const apiClient = await this.makeClient(host, port);
+//
+//   if (watch) {
+//     const handlerIndex = await apiClient.callMethod(
+//       'listenState',
+//       parseInt(category),
+//       stateName,
+//       (changedValues: Dictionary) => {
+//         console.info(JSON.stringify(changedValues));
+//       }
+//     );
+//
+//     listenScriptEnd(() => apiClient.callMethod('removeStateListener', handlerIndex));
+//   }
+//   else {
+//     const result = await apiClient.callMethod('getState', parseInt(category), stateName);
+//
+//     console.info(JSON.stringify(result));
+//     await apiClient.close();
+//   }
+// }
 
 // /**
 //  * Print host's info to console

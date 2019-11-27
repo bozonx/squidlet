@@ -30,11 +30,26 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
         args.port
       );
     case 'status':
-      return wsApiCall.status(positionArgsRest[0], args.host, args.port, args.watch);
+      if (args.watch) {
+        return wsApiCall.watchStatus(positionArgsRest[0], args.host, args.port);
+      }
+      else {
+        return httpApiCall.getStatus(positionArgsRest[0], args.host, args.port);
+      }
     case 'config':
-      return wsApiCall.config(positionArgsRest[0], args.host, args.port, args.watch);
+      if (args.watch) {
+        return wsApiCall.watchConfig(positionArgsRest[0], args.host, args.port);
+      }
+      else {
+        return httpApiCall.getConfig(positionArgsRest[0], args.host, args.port);
+      }
     case 'state':
-      return wsApiCall.state(positionArgsRest[0], positionArgsRest[1], args.host, args.port, args.watch);
+      if (args.watch) {
+        return wsApiCall.watchState(positionArgsRest[0], positionArgsRest[1], args.host, args.port);
+      }
+      else {
+        return httpApiCall.getState(positionArgsRest[0], positionArgsRest[1], args.host, args.port);
+      }
     case 'reboot':
       return httpApiCall.reboot(args.host, args.port);
     case 'info':

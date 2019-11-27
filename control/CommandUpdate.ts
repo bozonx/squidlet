@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
-import UpdateHost from './UpdateHost';
 import GroupConfigParser from '../shared/GroupConfigParser';
 import Os from '../shared/Os';
 import ResolveDirs, {Args} from './ResolveDirs';
