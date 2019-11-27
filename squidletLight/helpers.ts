@@ -1,8 +1,12 @@
 import * as path from 'path';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
 import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
+import {callPromised} from '../system/lib/common';
+import {ENCODE} from '../system/lib/constants';
 
 
 export function prepareIoClassesString(
@@ -56,4 +60,14 @@ export async function rollupBuild(outputPath: string, tmpDir: string, minimize: 
     false,
     minimize,
   );
+}
+
+export async function makeBundleCheckSum(bundlePath: string, sumFilePath: string) {
+  const bundleContent: string = await callPromised(fs.readFile, bundlePath);
+  const sum: string = crypto
+    .createHash('md5')
+    .update(bundleContent, ENCODE)
+    .digest('hex');
+
+  await callPromised(fs.writeFile, sumFilePath, sum, ENCODE);
 }

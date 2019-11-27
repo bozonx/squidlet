@@ -1,45 +1,65 @@
 import * as path from 'path';
 
 import Os from '../shared/Os';
-
-
-interface UpdateCommandParams {
-  groupConfigPath: string;
-  hostName?: string;
-}
+import squidletLightBuilder from '../squidletLight/squidletLightBuilder';
+import WsApiClient from '../shared/WsApiClient';
+import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
+import {consoleError} from '../system/lib/helpers';
+import HostInfo from '../system/interfaces/HostInfo';
+import Platforms from '../system/interfaces/Platforms';
 
 
 export default class CommandUpdate {
-  private readonly positionArgs: string[];
+  private readonly hostConfigPath: string;
+  private readonly args: {[index: string]: any};
   private readonly os: Os = new Os();
 
 
   constructor(positionArgs: string[], args: {[index: string]: any}) {
-    this.positionArgs = positionArgs;
+    this.hostConfigPath = positionArgs[0];
+    this.args = args;
   }
 
 
   async start() {
+    const apiClient = await this.makeClient(this.args.host, this.args.port);
+    const infoResult: HostInfo =  await apiClient.callMethod('info');
 
+    await this.buildBundle(infoResult.platform, infoResult.machine);
+
+    // TODO: make hash sum
+    // TODO: read bundle
+
+    await apiClient.close();
   }
 
 
-  private resolveParams(): UpdateCommandParams {
-    // specified only config group path
-    if (this.positionArgs[0] && !this.positionArgs[1]) {
-      return {
-        groupConfigPath: this.positionArgs[0],
-      };
-    }
-    // specified host name and group config
-    else if (this.positionArgs[0] && this.positionArgs[1]) {
-      return {
-        hostName: this.positionArgs[0],
-        groupConfigPath: this.positionArgs[1],
-      };
-    }
+  private async buildBundle(platform: Platforms, machine: string) {
+    await squidletLightBuilder(
+      undefined,
+      undefined,
+      platform,
+      machine,
+      this.args.minimize !== 'false',
+      this.args.ioServer === 'true',
+      undefined,
+      this.hostConfigPath
+    );
+  }
 
-    throw new Error(`You should specify a group config path`);
+  private async makeClient(host?: string, port?: string): Promise<WsApiClient> {
+    const client: WsApiClient = new WsApiClient(
+      hostDefaultConfig.config.rcResponseTimoutSec,
+      console.log,
+      console.info,
+      consoleError,
+      host,
+      (port) ? parseInt(port) : undefined
+    );
+
+    await client.init();
+
+    return client;
   }
 
 }

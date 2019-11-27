@@ -5,6 +5,7 @@ import Platforms from '../system/interfaces/Platforms';
 import {REPO_ROOT} from '../shared/helpers';
 import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
 import LogLevel from '../system/interfaces/LogLevel';
+import {makeBundleCheckSum} from './helpers';
 
 
 const SQUIDLET_LIGHT_TMP_DIR = 'light';
@@ -28,7 +29,7 @@ function resolveOutputPath(tmpDir: string, output?: string): string {
 }
 
 
-export default async function builder (
+export default async function squidletLightBuilder (
   argTmpDir?: string,
   argOutputPath?: string,
   platform?: Platforms,
@@ -40,6 +41,8 @@ export default async function builder (
 ): Promise<void> {
   const tmpDir: string = resolveTmpDir(argTmpDir);
   const outputPath: string = resolveOutputPath(tmpDir, argOutputPath);
+  // TODO: make it
+  const checkSumPath: string = ;
 
   if (!platform) {
     console.error(`--platform is required`);
@@ -81,4 +84,5 @@ export default async function builder (
   );
 
   await builder.build();
+  await makeBundleCheckSum(outputPath, checkSumPath);
 }

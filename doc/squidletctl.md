@@ -12,6 +12,9 @@ Params:
   which will be uploaded to the host.
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
+* --minimize=true - should minimize the bundle or not. Default is true
+* --io-server=false - build IO server instead of ordinary app
+* --log-level - Set builtin log level for logger. debug|info|warn|error. By default not set.
 * ./hostConfig.yaml - it is path to host config yaml file.
 
 Bundle will be built into `build/light` dir of current repo
