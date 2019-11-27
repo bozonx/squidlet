@@ -35,31 +35,33 @@ export default class CommandUpdate {
 
 
   async start() {
-    this.dirs.resolve();
-    await this.groupConfig.init();
 
-    console.info(`Using working dir ${this.dirs.workDir}`);
 
-    // clear whole tmp dir
-    await this.os.rimraf(`${this.dirs.tmpDir}/**/*`);
-
-    console.info(`===> Building system`);
-    await this.buildSystem.build(this.dirs.systemBuildDir, this.dirs.systemTmpDir);
-
-    // update only specified host
-    if (this.params.hostName) {
-      if (!this.groupConfig.hosts[this.params.hostName]) {
-        throw new Error(`Can't find host "${this.params.hostName}" in group config`);
-      }
-
-      await this.updateHost(this.groupConfig.hosts[this.params.hostName]);
-    }
-    // update all the hosts
-    else {
-      for (let currentHostName of Object.keys(this.groupConfig.hosts)) {
-        await this.updateHost(this.groupConfig.hosts[currentHostName]);
-      }
-    }
+    // this.dirs.resolve();
+    // await this.groupConfig.init();
+    //
+    // console.info(`Using working dir ${this.dirs.workDir}`);
+    //
+    // // clear whole tmp dir
+    // await this.os.rimraf(`${this.dirs.tmpDir}/**/*`);
+    //
+    // console.info(`===> Building system`);
+    // await this.buildSystem.build(this.dirs.systemBuildDir, this.dirs.systemTmpDir);
+    //
+    // // update only specified host
+    // if (this.params.hostName) {
+    //   if (!this.groupConfig.hosts[this.params.hostName]) {
+    //     throw new Error(`Can't find host "${this.params.hostName}" in group config`);
+    //   }
+    //
+    //   await this.updateHost(this.groupConfig.hosts[this.params.hostName]);
+    // }
+    // // update all the hosts
+    // else {
+    //   for (let currentHostName of Object.keys(this.groupConfig.hosts)) {
+    //     await this.updateHost(this.groupConfig.hosts[currentHostName]);
+    //   }
+    // }
   }
 
 

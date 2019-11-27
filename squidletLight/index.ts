@@ -1,6 +1,6 @@
-import starter from './squidletLightBuilder';
+import builder from './squidletLightBuilder';
 import {consoleError} from '../system/lib/helpers';
 
 
-starter()
+builder()
   .catch(consoleError);

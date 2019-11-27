@@ -1,9 +1,6 @@
 # ./squidletctl start ./test/test-x86.yaml
 
 id: testHost
-#platform: nodejs
-#machine: x86
-config: {}
 
 httpApi:
   host: 0.0.0.0
@@ -11,8 +8,6 @@ wsApi:
   host: 0.0.0.0
 ioServer:
   host: 0.0.0.0
+updater: {}
 
-devices:
-  bedroom:
-    people-count-sensor:
-      device: FakePeopleCount
+#devices:

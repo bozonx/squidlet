@@ -29,7 +29,7 @@ export function resolveOutputPath(tmpDir: string, output?: string): string {
 }
 
 
-export default async function(): Promise<void> {
+export default async function builder (): Promise<void> {
   const tmpDir: string = resolveTmpDir(yargs.argv.tmpDir as any);
   const outputPath: string = resolveOutputPath(tmpDir, yargs.argv.output as any);
   const platform: Platforms | undefined = yargs.argv.platform as any;

@@ -2,36 +2,22 @@
 
 ## Update hosts
 
-Update all the hosts of group config
+Update host
 
-    squidletctl update [--work-dir] ./groupConfig.yaml
-
-Update specified host of group config 
-
-    squidletctl update myHost [--work-dir] ./groupConfig.yaml
+    squidletctl update --light=true [--work-dir] --host=my-host [--port=8088] ./hostConfig.yaml
     
-Also you can specify the next params:
+Params:
 
-* ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
+* --light=true - Mandatory. Only light mode is supported at the moment. If true it make a bundle
+  which will be uploaded to the host.
+* --host - set remote host
+* --port - set remote port. Is isn't set - default will be used
 * --work-dir - path to dir where hosts and tmp files will be placed
+* ./hostConfig.yaml - it is path to host config yaml file.
+
+?????
   By default it is under $SQUIDLET_ROOT dir
 * SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
-
-
-### Group config yaml file
-
-    # plugins which are common for each host
-    plugins:
-      - ./myPlugin.yaml
-      
-    # list of host config files
-    hosts:
-      - ./myHost.yaml
-
-    hostDefaults:
-      config:
-        someParam: 1
-
 
 ## Start x86/arm/raspberry pi host on nodejs
  
