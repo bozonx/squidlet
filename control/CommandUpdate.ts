@@ -37,7 +37,6 @@ export default class CommandUpdate {
   private async buildBundle(platform: Platforms, machine: string) {
     await squidletLightBuilder(
       undefined,
-      undefined,
       platform,
       machine,
       this.args.minimize !== 'false',

@@ -10,7 +10,6 @@ const hostConfigPath: string | undefined = yargs.argv._[0] as any;
 
 
 builder(
-  yargs.argv.tmpDir as string | undefined,
   yargs.argv.output as string | undefined,
   yargs.argv.platform as Platforms | undefined,
   yargs.argv.machine as string | undefined,

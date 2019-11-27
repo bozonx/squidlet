@@ -13,11 +13,11 @@ const SQUIDLET_LIGHT_WORK_DIR = 'light';
 const TMP_SUB_DIR = 'tmp';
 
 
-function resolveWorkDir(argTmpDir?: string): string {
-  if (argTmpDir) {
-    // if it set as an argument - make it absolute
-    return path.resolve(process.cwd(), argTmpDir);
-  }
+function resolveWorkDir(): string {
+  // if (argTmpDir) {
+  //   // if it set as an argument - make it absolute
+  //   return path.resolve(process.cwd(), argTmpDir);
+  // }
 
   return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
 }
@@ -33,7 +33,6 @@ function resolveOutputDir(tmpDir: string, output?: string): string {
 
 
 export default async function squidletLightBuilder (
-  argWorkDir?: string,
   argOutputDir?: string,
   platform?: Platforms,
   machine?: string,
@@ -42,7 +41,7 @@ export default async function squidletLightBuilder (
   logLevel?: LogLevel,
   hostConfigPath?: string
 ): Promise<void> {
-  const workDir: string = resolveWorkDir(argWorkDir);
+  const workDir: string = resolveWorkDir();
   const tmpDir: string = path.join(workDir, TMP_SUB_DIR);
   const outputDir: string = resolveOutputDir(workDir, argOutputDir);
   const bundlePath: string = path.join(outputDir, BUNDLE_FILE_NAME);
