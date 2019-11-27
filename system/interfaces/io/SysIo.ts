@@ -20,7 +20,7 @@ export default interface SysIo extends IoItem {
   /**
    * It exists script
    */
-  exit(): Promise<void>;
+  exit(code?: number): Promise<void>;
 
   /**
    * It is full reboot of system.

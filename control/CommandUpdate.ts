@@ -31,8 +31,10 @@ export default class CommandUpdate {
 
     const bundleContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_FILE_NAME));
     const sumContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_SUM_FILE_NAME));
-
+    // upload bundle and check sum
     await apiClient.callMethod('updater.updateBundle', bundleContent, sumContent);
+    // restart the host
+    await apiClient.callMethod('exit', 0);
 
     await apiClient.close();
   }

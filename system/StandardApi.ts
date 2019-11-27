@@ -121,6 +121,17 @@ export default class StandardApi {
     // TODO: publish all the states of all the devices etc
   }
 
+  async exit(code: number = 0): Promise<string> {
+    const Sys = this.context.system.ioManager.getIo<SysIo>('Sys');
+
+    setTimeout(() => {
+      Sys.exit(code)
+        .catch(this.context.log.error);
+    }, this.context.config.config.rebootDelaySec * 1000);
+
+    return `It will be exited in ${this.context.config.config.rebootDelaySec} seconds`;
+  }
+
   async reboot(): Promise<string> {
     const Sys = this.context.system.ioManager.getIo<SysIo>('Sys');
 

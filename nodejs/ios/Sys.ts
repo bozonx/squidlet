@@ -20,7 +20,7 @@ export default class Sys implements SysIo {
   /**
    * It just exits script. And starter has to restart it.
    */
-  async exit(code = 0) {
+  async exit(code: number = 0) {
     if (config && config.exit) {
       return config.exit(code);
     }
