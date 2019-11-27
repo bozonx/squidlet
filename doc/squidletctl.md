@@ -4,7 +4,7 @@
 
 Update host
 
-    squidletctl update --light=true [--work-dir] --host=my-host [--port=8088] ./hostConfig.yaml
+    squidletctl update [...params] ./hostConfig.yaml
     
 Params:
 
@@ -18,6 +18,10 @@ Params:
 * ./hostConfig.yaml - it is path to host config yaml file.
 
 Bundle will be built into `build/light` dir of current repo
+
+Example:
+
+    squidletctl update --light=true --host=localhost ./hostConfig.yaml
 
 
 ## Start x86/arm/raspberry pi host on nodejs

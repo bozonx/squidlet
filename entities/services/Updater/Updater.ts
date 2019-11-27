@@ -10,7 +10,7 @@ interface Props {
 
 const BUNDLE_SUB_DIR = 'bundle';
 const BUNDLE_PREV_DIR = 'prev';
-const BUNDLE_FILE_NAME = 'bundle.js';
+export const BUNDLE_FILE_NAME = 'bundle.js';
 export const BUNDLE_SUM_FILE_NAME = 'bundle.sum';
 const bundleRootDir = pathJoin(systemConfig.rootDirs.envSet, BUNDLE_SUB_DIR);
 const bundlePrevDir = pathJoin(bundleRootDir, BUNDLE_PREV_DIR);

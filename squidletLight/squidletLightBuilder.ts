@@ -6,33 +6,35 @@ import {REPO_ROOT} from '../shared/helpers';
 import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
 import LogLevel from '../system/interfaces/LogLevel';
 import {makeBundleCheckSum} from './helpers';
-import {BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
+import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
 
 
-const SQUIDLET_LIGHT_TMP_DIR = 'light';
+const SQUIDLET_LIGHT_WORK_DIR = 'light';
+const TMP_SUB_DIR = 'tmp';
 
-function resolveTmpDir(argTmpDir?: string): string {
+
+function resolveWorkDir(argTmpDir?: string): string {
   if (argTmpDir) {
     // if it set as an argument - make it absolute
     return path.resolve(process.cwd(), argTmpDir);
   }
 
-  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_TMP_DIR);
+  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
 }
 
-function resolveOutputPath(tmpDir: string, output?: string): string {
+function resolveOutputDir(tmpDir: string, output?: string): string {
   if (output) {
     // if it set as an argument - make it absolute
     return path.resolve(process.cwd(), output);
   }
 
-  return path.join(tmpDir, 'index.js');
+  return tmpDir;
 }
 
 
 export default async function squidletLightBuilder (
-  argTmpDir?: string,
-  argOutputPath?: string,
+  argWorkDir?: string,
+  argOutputDir?: string,
   platform?: Platforms,
   machine?: string,
   minimize?: boolean,
@@ -40,9 +42,11 @@ export default async function squidletLightBuilder (
   logLevel?: LogLevel,
   hostConfigPath?: string
 ): Promise<void> {
-  const tmpDir: string = resolveTmpDir(argTmpDir);
-  const outputPath: string = resolveOutputPath(tmpDir, argOutputPath);
-  const checkSumPath: string = path.join(path.dirname(outputPath), BUNDLE_SUM_FILE_NAME);
+  const workDir: string = resolveWorkDir(argWorkDir);
+  const tmpDir: string = path.join(workDir, TMP_SUB_DIR);
+  const outputDir: string = resolveOutputDir(workDir, argOutputDir);
+  const bundlePath: string = path.join(outputDir, BUNDLE_FILE_NAME);
+  const checkSumPath: string = path.join(outputDir, BUNDLE_SUM_FILE_NAME);
 
   if (!platform) {
     console.error(`--platform is required`);
@@ -61,7 +65,7 @@ export default async function squidletLightBuilder (
     // build io server standalone
     const builder = new IoServerStandaloneBuilder(
       tmpDir,
-      outputPath,
+      bundlePath,
       platform,
       machine,
       hostConfigPath,
@@ -75,7 +79,7 @@ export default async function squidletLightBuilder (
   // build app with app switcher
   const builder = new AppBuilder(
     tmpDir,
-    outputPath,
+    bundlePath,
     platform,
     machine,
     hostConfigPath,
@@ -84,5 +88,5 @@ export default async function squidletLightBuilder (
   );
 
   await builder.build();
-  await makeBundleCheckSum(outputPath, checkSumPath);
+  await makeBundleCheckSum(bundlePath, checkSumPath);
 }
