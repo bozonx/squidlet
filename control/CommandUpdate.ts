@@ -27,14 +27,10 @@ export default class CommandUpdate {
     const apiClient = await this.makeClient(this.args.host, this.args.port);
     const infoResult: HostInfo =  await apiClient.callMethod('info');
 
-    // TODO: проверить в info что есть сервис updater - если нет то вывести ошибку
-
     await this.buildBundle(infoResult.platform, infoResult.machine);
 
     const bundleContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_FILE_NAME));
     const sumContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_SUM_FILE_NAME));
-
-    // TODO: check sum ???
 
     await apiClient.callMethod('updater.updateBundle', bundleContent, sumContent);
 

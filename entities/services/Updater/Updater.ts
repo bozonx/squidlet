@@ -26,6 +26,7 @@ export default class Updater extends ServiceBase<Props> {
     this.context.system.apiManager.registerEndpoint('updater', this.updaterApi);
     // make sub dir
     try {
+      await this.storage.mkdir(bundleRootDir);
       await this.storage.mkdir(bundlePrevDir);
     }
     catch (e) {
