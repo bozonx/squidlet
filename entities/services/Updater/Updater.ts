@@ -22,7 +22,7 @@ export default class Updater extends ServiceBase<Props> {
   }
 
 
-  async init() {
+  init = async () => {
     this.context.system.apiManager.registerEndpoint('updater', this.updaterApi);
     // make sub dir
     try {
@@ -58,7 +58,7 @@ export default class Updater extends ServiceBase<Props> {
   }
 
   private updaterApi = {
-    uploadBundle: this.updateBundle,
+    updateBundle: this.updateBundle,
     getBundleHashSum: this.getBundleHashSum,
   };
 

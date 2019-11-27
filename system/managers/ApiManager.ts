@@ -79,10 +79,13 @@ export default class ApiManager {
       return (this.standardApi as any)[methodName](...args);
     }
     else {
-      // call endpoint's api
-      if (!this.endPoints[methodNameSplat[0]]) throw new Error(`Endpoint ${methodNameSplat[0]} not found`);
+      const nameSpace: string = methodNameSplat[0];
+      const endPointMethod: string = methodNameSplat[1];
 
-      this.endPoints[methodNameSplat[0]][methodNameSplat[1]](...args);
+      // call endpoint's api
+      if (!this.endPoints[nameSpace]) throw new Error(`Endpoint ${nameSpace} not found`);
+
+      return this.endPoints[nameSpace][endPointMethod](...args);
     }
   }
 
