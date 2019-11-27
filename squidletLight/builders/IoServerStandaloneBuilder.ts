@@ -8,6 +8,7 @@ import {rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpe
 import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DIR} from '../../shared/helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import LogLevel from '../../system/interfaces/LogLevel';
+import {AppType} from '../../system/interfaces/AppType';
 
 
 export class IoServerStandaloneBuilder {
@@ -107,9 +108,13 @@ export class IoServerStandaloneBuilder {
   }
 
   private prepareEnvSetString(): string {
+    // TODO: review
+    const appType: AppType = 'ioServer';
+
     const envSet: HostEnvSet = {
       configs: {
         config: {
+          appType,
           id: 'io-server',
           platform: this.platform,
           machine: this.machine,

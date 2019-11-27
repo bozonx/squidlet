@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const squidletIndex = '/app/data/envSet/bundle/bundle.js';
-const updaterIndex = '/app/updater.js';
+const updaterIndex = '/app/bundle.js';
 
 let stat;
 let instantiateStarter;
