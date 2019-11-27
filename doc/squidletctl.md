@@ -12,12 +12,10 @@ Params:
   which will be uploaded to the host.
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
-* --work-dir - path to dir where hosts and tmp files will be placed
 * ./hostConfig.yaml - it is path to host config yaml file.
 
-?????
-  By default it is under $SQUIDLET_ROOT dir
-* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed
+Bundle will be built into `build/light` dir of current repo
+
 
 ## Start x86/arm/raspberry pi host on nodejs
  
