@@ -2,11 +2,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 
-import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers';
+import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT} from '../shared/helpers';
 import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import {callPromised} from '../system/lib/common';
 import {ENCODE} from '../system/lib/constants';
+
+
+const SQUIDLET_LIGHT_WORK_DIR = 'light';
 
 
 export function prepareIoClassesString(
@@ -70,4 +73,22 @@ export async function makeBundleCheckSum(bundlePath: string, sumFilePath: string
     .digest('hex');
 
   await callPromised(fs.writeFile, sumFilePath, sum, ENCODE);
+}
+
+export function resolveWorkDir(): string {
+  // if (argTmpDir) {
+  //   // if it set as an argument - make it absolute
+  //   return path.resolve(process.cwd(), argTmpDir);
+  // }
+
+  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
+}
+
+export function resolveOutputDir(tmpDir: string, output?: string): string {
+  if (output) {
+    // if it set as an argument - make it absolute
+    return path.resolve(process.cwd(), output);
+  }
+
+  return tmpDir;
 }

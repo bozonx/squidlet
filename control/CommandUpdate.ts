@@ -7,6 +7,8 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';
 import Platforms from '../system/interfaces/Platforms';
+import {resolveWorkDir} from '../squidletLight/helpers';
+import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
 
 
 export default class CommandUpdate {
@@ -27,8 +29,12 @@ export default class CommandUpdate {
 
     await this.buildBundle(infoResult.platform, infoResult.machine);
 
-    // TODO: make hash sum
-    // TODO: read bundle
+    const bundleContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_FILE_NAME));
+    const sumContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_SUM_FILE_NAME));
+
+    // TODO: check sum ???
+
+    await apiClient.callMethod('updater.updateBundle', bundleContent, sumContent);
 
     await apiClient.close();
   }
