@@ -1,9 +1,9 @@
-import SchemaElement from './interfaces/SchemaElement';
-import {isEmptyObject} from './lib/objects';
-import {validateParam} from './lib/validate';
-import ConsistentState, {Getter, Setter, Initialize} from './lib/ConsistentState';
-import {collectPropsDefaults} from './lib/helpers';
-import {Dictionary} from './interfaces/Types';
+import SchemaElement from '../../interfaces/SchemaElement';
+import {isEmptyObject} from '../objects';
+import {validateParam} from '../validate';
+import ConsistentState, {Getter, Setter, Initialize} from '../ConsistentState';
+import {collectPropsDefaults} from '../helpers';
+import {Dictionary} from '../../interfaces/Types';
 
 
 export type Schema = {[index: string]: SchemaElement};
