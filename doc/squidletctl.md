@@ -155,7 +155,7 @@ Params
     
     # example
     squidletctl state 0 bedroom.switch --host=remotehost
-        
+
 Params
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used

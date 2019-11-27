@@ -43,7 +43,7 @@ export interface ParsedUrl {
 export function parseUrl(rawUrl: string): ParsedUrl {
   if (!rawUrl) throw new Error(`Invalid url "${rawUrl}"`);
 
-  const decodedUrl = decodeURI(rawUrl.trim());
+  const decodedUrl = decodeURIComponent(rawUrl.trim());
   const { left, right } = splitUrl(decodedUrl);
 
   return {

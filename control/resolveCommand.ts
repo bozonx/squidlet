@@ -48,7 +48,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
         return wsApiCall.watchState(positionArgsRest[0], positionArgsRest[1], args.host, args.port);
       }
       else {
-        return httpApiCall.getState(positionArgsRest[0], positionArgsRest[1], args.host, args.port);
+        return httpApiCall.getState(Number(positionArgsRest[0]), positionArgsRest[1], args.host, args.port);
       }
     case 'reboot':
       return httpApiCall.reboot(args.host, args.port);

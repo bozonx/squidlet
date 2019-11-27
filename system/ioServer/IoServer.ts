@@ -4,7 +4,6 @@ import HostConfig from '../interfaces/HostConfig';
 import {pathJoin} from '../lib/paths';
 import systemConfig from '../systemConfig';
 import StorageIo from '../interfaces/io/StorageIo';
-import {ShutdownHandler} from '../System';
 import IoItem, {IoDefinitions} from '../interfaces/IoItem';
 // TODO: use ioSet's - use driver
 import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';

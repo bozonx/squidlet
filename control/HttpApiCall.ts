@@ -48,7 +48,7 @@ export default class HttpApiCall {
   /**
    * Print state to console.
    */
-  async getState(category: string, stateName: string, host?: string, port?: string) {
+  async getState(category: number, stateName: string, host?: string, port?: string) {
     const apiClient = await this.makeClient(host, port);
 
     const result = await apiClient.callMethod('getState', category, stateName);

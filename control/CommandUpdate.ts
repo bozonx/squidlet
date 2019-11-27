@@ -137,15 +137,15 @@ export default class CommandUpdate {
   }
 
   private async uploadToHost(hostConfig: PreHostConfig) {
-    const updateHost: UpdateHost = new UpdateHost(
-      this.os,
-      hostConfig,
-      this.dirs.workDir,
-      this.dirs.tmpDir
-    );
-
-    console.info(`===> updating host "${hostConfig.id}"`);
-    await updateHost.update();
+    // const updateHost: UpdateHost = new UpdateHost(
+    //   this.os,
+    //   hostConfig,
+    //   this.dirs.workDir,
+    //   this.dirs.tmpDir
+    // );
+    //
+    // console.info(`===> updating host "${hostConfig.id}"`);
+    // await updateHost.update();
   }
 
   // async build() {

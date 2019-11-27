@@ -257,6 +257,15 @@ describe 'system.lib.url', ->
       }
     })
 
+  it 'parseUrl - encoded by encodeURIComponent', ->
+    testUrl = 'http://192.168.88.3:8087/api/getState/0%2C%22bedroom.light1%22'
+    assert.deepEqual(url.parseUrl(testUrl), {
+      host: '192.168.88.3',
+      port: 8087,
+      path: '/api/getState/0,"bedroom.light1"',
+      scheme: 'http',
+    })
+
 
 #it 'parseUrl - bad url', ->
     # bad protocol

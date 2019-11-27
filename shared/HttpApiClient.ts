@@ -73,6 +73,9 @@ export default class HttpApiClient {
     url: string,
     result: HttpResponse
   ): T {
+
+    // TODO: review  - может вернут undefined если нет body ???
+
     if (!result.body) {
       throw new Error(`Result of request "${url}" doesn't content body`);
     }
