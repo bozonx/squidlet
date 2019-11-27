@@ -24,7 +24,6 @@ export default class AppBuilder {
   private readonly outputPath: string;
   private readonly platform: Platforms;
   private readonly machine: string;
-  private readonly onlyUsedIo: boolean;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
   private readonly os: Os = new Os();
@@ -38,7 +37,6 @@ export default class AppBuilder {
     machine: string,
     hostConfigPath: string,
     minimize: boolean = true,
-    onlyUsedIo: boolean = false,
     logLevel?: LogLevel
   ) {
     this.tmpDir = tmpDir;
@@ -46,7 +44,6 @@ export default class AppBuilder {
     this.platform = platform;
     this.machine = machine;
     this.minimize = minimize;
-    this.onlyUsedIo = onlyUsedIo;
     this.logLevel = logLevel;
 
     const envBuilderTmpDir = path.join(this.tmpDir, HOST_TMP_DIR);

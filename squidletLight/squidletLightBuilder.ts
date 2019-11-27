@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as yargs from 'yargs';
 
 import AppBuilder from './builders/AppBuilder';
 import Platforms from '../system/interfaces/Platforms';
@@ -10,7 +9,7 @@ import LogLevel from '../system/interfaces/LogLevel';
 
 const SQUIDLET_LIGHT_TMP_DIR = 'light';
 
-export function resolveTmpDir(argTmpDir?: string): string {
+function resolveTmpDir(argTmpDir?: string): string {
   if (argTmpDir) {
     // if it set as an argument - make it absolute
     return path.resolve(process.cwd(), argTmpDir);
@@ -19,7 +18,7 @@ export function resolveTmpDir(argTmpDir?: string): string {
   return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_TMP_DIR);
 }
 
-export function resolveOutputPath(tmpDir: string, output?: string): string {
+function resolveOutputPath(tmpDir: string, output?: string): string {
   if (output) {
     // if it set as an argument - make it absolute
     return path.resolve(process.cwd(), output);
@@ -29,15 +28,18 @@ export function resolveOutputPath(tmpDir: string, output?: string): string {
 }
 
 
-export default async function builder (): Promise<void> {
-  const tmpDir: string = resolveTmpDir(yargs.argv.tmpDir as any);
-  const outputPath: string = resolveOutputPath(tmpDir, yargs.argv.output as any);
-  const platform: Platforms | undefined = yargs.argv.platform as any;
-  const machine: string | undefined = yargs.argv.machine as any;
-  const hostConfigPath: string | undefined = yargs.argv._[0] as any;
-  const minimize: boolean = yargs.argv.minimize !== 'false';
-  const onlyUsedIo: boolean = yargs.argv.onlyUsedIo === 'true';
-  const logLevel: LogLevel | undefined = yargs.argv.logLevel as any || undefined;
+export default async function builder (
+  argTmpDir?: string,
+  argOutputPath?: string,
+  platform?: Platforms,
+  machine?: string,
+  minimize?: boolean,
+  ioServer?: boolean,
+  logLevel?: LogLevel,
+  hostConfigPath?: string
+): Promise<void> {
+  const tmpDir: string = resolveTmpDir(argTmpDir);
+  const outputPath: string = resolveOutputPath(tmpDir, argOutputPath);
 
   if (!platform) {
     console.error(`--platform is required`);
@@ -52,7 +54,7 @@ export default async function builder (): Promise<void> {
     return process.exit(2);
   }
 
-  if (yargs.argv.ioServer) {
+  if (ioServer) {
     // build io server standalone
     const builder = new IoServerStandaloneBuilder(
       tmpDir,
@@ -75,7 +77,6 @@ export default async function builder (): Promise<void> {
     machine,
     hostConfigPath,
     minimize,
-    onlyUsedIo,
     logLevel
   );
 
