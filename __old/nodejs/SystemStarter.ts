@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import {APP_STARTER_FILE_NAME, SYSTEM_FILE_NAME} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
-import Props from './Props';
+import Props from '../../nodejs/starters/Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
 import StorageIo from '../../system/interfaces/io/StorageIo';

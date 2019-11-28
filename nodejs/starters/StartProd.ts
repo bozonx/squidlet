@@ -10,7 +10,6 @@ import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
-import SystemStarter from './SystemStarter';
 import IoSetLocal from '../../system/IoSetLocal';
 import IoSet from '../../system/interfaces/IoSet';
 import LogLevel from '../../system/interfaces/LogLevel';
@@ -21,7 +20,6 @@ export default class StartProd {
   private readonly groupConfig: GroupConfigParser;
   private readonly props: Props;
   private readonly prodBuild: ProdBuild;
-  private readonly systemStarter: SystemStarter;
   private _envBuilder?: EnvBuilder;
   private get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
@@ -52,7 +50,6 @@ export default class StartProd {
       argGroup,
     );
     this.prodBuild = new ProdBuild(this.os, this.props);
-    this.systemStarter = new SystemStarter(this.os, this.props);
   }
 
   async init() {
@@ -101,7 +98,8 @@ export default class StartProd {
 
     const ioSet: IoSet = new IoSetLocal();
 
-    await this.systemStarter.start(this.getPathToProdSystemDir(), ioSet);
+    //await this.systemStarter.start(this.getPathToProdSystemDir(), ioSet);
+    // TODO: make starter
   }
 
 

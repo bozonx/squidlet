@@ -3,7 +3,6 @@ import {SYSTEM_DIR} from '../../shared/helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
 import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartDevelopBase from './StartDevelopBase';
-import SystemStarter from './SystemStarter';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';

@@ -1,4 +1,4 @@
-SystemStarter = require('../../nodejs/starters/SystemStarter').default
+SystemStarter = require('../../__old/nodejs/SystemStarter').default
 
 
 describe 'nodejs.SystemStarter', ->
