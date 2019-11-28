@@ -1,13 +1,13 @@
-import AppStarter from '../system/AppStarter';
-import IoSet from '../system/interfaces/IoSet';
-import HostConfig from '../system/interfaces/HostConfig';
-import LogLevel from '../system/interfaces/LogLevel';
-import StorageIo from '../system/interfaces/io/StorageIo';
-import SysIo from '../system/interfaces/io/SysIo';
+import AppStarter from './AppStarter';
+import IoSet from './interfaces/IoSet';
+import HostConfig from './interfaces/HostConfig';
+import LogLevel from './interfaces/LogLevel';
+import StorageIo from './interfaces/io/StorageIo';
+import SysIo from './interfaces/io/SysIo';
 import ConsoleLogger from '../shared/ConsoleLogger';
 
 
-export default class LightStarter {
+export default class SolidStarter {
   get hasBeenStarted(): boolean {
     return this.started;
   }
