@@ -6,7 +6,7 @@ import Props from './Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
 import StorageIo from '../../system/interfaces/io/StorageIo';
-import ConsoleLogger from '../../shared/ConsoleLogger';
+import ConsoleLogger from '../../system/ConsoleLogger';
 import Logger from '../../system/interfaces/Logger';
 import SysIo from '../../system/interfaces/io/SysIo';
 

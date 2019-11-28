@@ -4,9 +4,13 @@ import HostConfig from './interfaces/HostConfig';
 import LogLevel from './interfaces/LogLevel';
 import StorageIo from './interfaces/io/StorageIo';
 import SysIo from './interfaces/io/SysIo';
-import ConsoleLogger from '../shared/ConsoleLogger';
+import ConsoleLogger from './ConsoleLogger';
 
 
+/**
+ * Starter for builds where local IoSet is used.
+ * It manages ioSet object and system
+ */
 export default class SolidStarter {
   get hasBeenStarted(): boolean {
     return this.started;
@@ -80,6 +84,9 @@ export default class SolidStarter {
     // set uid, git and workDir to Storage IO
     await storageIo.configure({ uid, gid, workDir });
     // make destroy before process.exit
+
+    // TODO: может не нужен exit так как при нормальном destroy должно все отработать ?
+
     await sysIo.configure({
       exit: (code: number) => {
         this.destroy()
@@ -88,7 +95,6 @@ export default class SolidStarter {
             if (!this.consoleLogger) throw new Error('No consoleLogger');
 
             this.consoleLogger.error(e);
-            // TODO: может не нужен exit так как при нормальном destroy должно все отработать ?
             processExit(code);
           });
       }

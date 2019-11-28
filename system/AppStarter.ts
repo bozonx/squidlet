@@ -9,8 +9,7 @@ import HostConfig from './interfaces/HostConfig';
 import StorageIo from './interfaces/io/StorageIo';
 import {pathJoin} from './lib/paths';
 import systemConfig from './systemConfig';
-// TODO: remove !!! or move to system
-import ConsoleLogger from '../shared/ConsoleLogger';
+import ConsoleLogger from './ConsoleLogger';
 
 
 export default class AppStarter {

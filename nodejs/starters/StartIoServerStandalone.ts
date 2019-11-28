@@ -6,7 +6,7 @@ import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
 import StartDevelopBase from './StartDevelopBase';
-import ConsoleLogger from '../../shared/ConsoleLogger';
+import ConsoleLogger from '../../system/ConsoleLogger';
 
 
 export default class StartIoServerStandalone extends StartDevelopBase {
