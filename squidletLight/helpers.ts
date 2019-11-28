@@ -9,9 +9,6 @@ import {callPromised} from '../system/lib/common';
 import {ENCODE} from '../system/lib/constants';
 
 
-const SQUIDLET_LIGHT_WORK_DIR = 'light';
-
-
 export function prepareIoClassesString(
   machineIosList: string[],
   platformDir: string,
@@ -75,14 +72,14 @@ export async function makeBundleCheckSum(bundlePath: string, sumFilePath: string
   await callPromised(fs.writeFile, sumFilePath, sum, ENCODE);
 }
 
-export function resolveWorkDir(): string {
-  // if (argTmpDir) {
-  //   // if it set as an argument - make it absolute
-  //   return path.resolve(process.cwd(), argTmpDir);
-  // }
-
-  return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
-}
+// export function resolveWorkDir(): string {
+//   // if (argTmpDir) {
+//   //   // if it set as an argument - make it absolute
+//   //   return path.resolve(process.cwd(), argTmpDir);
+//   // }
+//
+//   return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
+// }
 
 export function resolveOutputDir(tmpDir: string, output?: string): string {
   if (output) {

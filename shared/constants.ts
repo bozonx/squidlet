@@ -7,21 +7,23 @@ export const TREE_DIR = 'tree';
 export const IO_SET_INDEX_FILE = 'index.js';
 
 // dirs inside build dir squidlet update command
-export const BUILD_ROOT_DIR = 'build';
-export const BUILD_HOSTS_DIR = 'hosts';
+// export const BUILD_ROOT_DIR = 'build';
+// export const BUILD_HOSTS_DIR = 'hosts';
 //export const BUILD_SYSTEM_DIR = 'system';
 //export const BUILD_IO_DIR = 'io';
 
+export const ENV_BUILD_TMP_DIR = 'envBuildTmp';
+
 export const HOSTS_WORK_DIRS = 'workdirs';
 // TODO: почему бы не брать из systemConfig????
-export const HOST_ENVSET_DIR = 'envSet';
-export const HOST_VAR_DATA_DIR = 'varData';
-export const HOST_TMP_DIR = 'tmp';
+// export const HOST_ENVSET_DIR = 'envSet';
+// export const HOST_VAR_DATA_DIR = 'varData';
+// export const HOST_TMP_DIR = 'tmp';
 // tmp dir of host under tmp dir (HOST_TMP_DIR)
-export const HOST_TMP_HOST_DIR = 'host';
+//export const HOST_TMP_HOST_DIR = 'host';
 
 export const IOSET_STRING_DELIMITER = ':';
 
 export const SYSTEM_FILE_NAME = 'System';
-export const APP_SWITCHER_FILE_NAME = 'AppStarter';
+export const APP_STARTER_FILE_NAME = 'AppStarter';
 export const IO_SERVER_FILE_NAME = 'IoServer';

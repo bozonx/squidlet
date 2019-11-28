@@ -4,10 +4,12 @@ import AppBuilder from './builders/AppBuilder';
 import Platforms from '../system/interfaces/Platforms';
 import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
 import LogLevel from '../system/interfaces/LogLevel';
-import {makeBundleCheckSum, resolveOutputDir, resolveWorkDir} from './helpers';
+import {makeBundleCheckSum, resolveOutputDir} from './helpers';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
+import {REPO_ROOT} from '../shared/helpers';
 
 
+const SQUIDLET_LIGHT_WORK_DIR = 'light';
 const TMP_SUB_DIR = 'tmp';
 
 
@@ -20,7 +22,7 @@ export default async function squidletLightBuilder (
   logLevel?: LogLevel,
   hostConfigPath?: string
 ): Promise<void> {
-  const workDir: string = resolveWorkDir();
+  const workDir: string = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
   const tmpDir: string = path.join(workDir, TMP_SUB_DIR);
   const outputDir: string = resolveOutputDir(workDir, argOutputDir);
   const bundlePath: string = path.join(outputDir, BUNDLE_FILE_NAME);

@@ -129,7 +129,7 @@ export default class AppBuilder {
 // private makeIndexFile(): string {
 //   const appSwitcherPath = path.relative(
 //     this.tmpDir,
-//     path.join(SYSTEM_DIR, APP_SWITCHER_FILE_NAME)
+//     path.join(SYSTEM_DIR, APP_STARTER_FILE_NAME)
 //   );
 //   const ioSetPath = path.relative(
 //     this.tmpDir,

@@ -1,17 +1,16 @@
 import * as path from 'path';
 
-import Os, {SpawnCmdResult} from '../../shared/Os';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import Props, {NoMachine} from './Props';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
-import {HOST_ENVSET_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import LogLevel from '../../system/interfaces/LogLevel';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import {isEmptyObject} from '../../system/lib/objects';
-import {REPO_ROOT} from '../../shared/helpers';
 import Platforms from '../../system/interfaces/Platforms';
+import systemConfig from '../../system/systemConfig';
+import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 
 
 export default abstract class StartDevelopBase {
@@ -22,6 +21,11 @@ export default abstract class StartDevelopBase {
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
   }
+
+  /**
+   * Prepare ioSet here.
+   */
+  protected abstract async makeIoSet(): Promise<IoSet>;
 
 
   constructor(
@@ -52,13 +56,18 @@ export default abstract class StartDevelopBase {
     await this.groupConfig.init();
     await this.props.resolve();
 
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    const appEnvSetDir = path.join(this.props.appWorkDir, systemConfig.rootDirs.envSet);
+    const envSetTmpDir = path.join(this.props.buildWorkDir, ENV_BUILD_TMP_DIR);
     const {platform, machine} = this.resolvePlatformMachine();
+
+    await this.os.mkdirP(this.props.appWorkDir, { uid: this.props.uid, gid: this.props.gid });
+    //await this.os.mkdirP(appEnvSetDir, { uid: this.props.uid, gid: this.props.gid });
+    //await this.os.mkdirP(envSetTmpDir, { uid: this.props.uid, gid: this.props.gid });
 
     this._envBuilder = new EnvBuilder(
       this.resolveHostConfig(),
-      this.props.envSetDir,
-      tmpDir,
+      appEnvSetDir,
+      envSetTmpDir,
       platform,
       machine,
       { uid: this.props.uid, gid: this.props.gid }
@@ -69,38 +78,11 @@ export default abstract class StartDevelopBase {
   async start() {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
-
-    // TODO: почему отдельные директории???
-    await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
-    await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
   }
 
-
-  /**
-   * Prepare ioSet here.
-   */
-  protected abstract async makeIoSet(): Promise<IoSet>;
 
   protected resolveHostConfig(): PreHostConfig {
     return this.props.hostConfig;
-  }
-
-  /**
-   * Install npm modules into node_modules of repository and don't save them to package.json
-   */
-  protected async installNpmModules(modules: string[] = [], cwd: string) {
-    const cmd = `npm install ${modules.join(' ')}`;
-
-    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, cwd, {
-      uid: this.props.uid,
-      gid: this.props.gid,
-    });
-
-    if (result.status) {
-      console.error(`ERROR: npm ends with code ${result.status}`);
-      console.error(result.stdout);
-      console.error(result.stderr);
-    }
   }
 
   protected resolvePlatformMachine(): {platform: Platforms, machine: string} {
@@ -143,4 +125,22 @@ export default abstract class StartDevelopBase {
 //   console.info(`===> Installing npm modules`);
 //
 //   await this.installNpmModules(toInstallModules, REPO_ROOT);
+// }
+//
+// /**
+//  * Install npm modules into node_modules of repository and don't save them to package.json
+//  */
+// protected async installNpmModules(modules: string[] = [], cwd: string) {
+//   const cmd = `npm install ${modules.join(' ')}`;
+//
+//   const result: SpawnCmdResult = await this.os.spawnCmd(cmd, cwd, {
+//     uid: this.props.uid,
+//     gid: this.props.gid,
+//   });
+//
+//   if (result.status) {
+//     console.error(`ERROR: npm ends with code ${result.status}`);
+//     console.error(result.stdout);
+//     console.error(result.stderr);
+//   }
 // }

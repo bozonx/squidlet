@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import {APP_SWITCHER_FILE_NAME, SYSTEM_FILE_NAME} from '../../shared/constants';
+import {APP_STARTER_FILE_NAME, SYSTEM_FILE_NAME} from '../../shared/constants';
 import IoSet from '../../system/interfaces/IoSet';
 import Props from './Props';
 import Os from '../../shared/Os';
@@ -37,7 +37,7 @@ export default class SystemStarter {
 
   async start(pathToSystemDir: string, ioSet: IoSet) {
     // use System if bareSystem is true or AppStarter if false
-    const fileName: string = (this.bareSystem) ? SYSTEM_FILE_NAME : APP_SWITCHER_FILE_NAME;
+    const fileName: string = (this.bareSystem) ? SYSTEM_FILE_NAME : APP_STARTER_FILE_NAME;
     const systemKindFile = path.join(pathToSystemDir, fileName);
     const systemKindClass: SystemKindClass = this.os.require(systemKindFile).default;
 

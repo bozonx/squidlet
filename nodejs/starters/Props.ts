@@ -4,13 +4,8 @@ import Os, {SpawnCmdResult} from '../../shared/Os';
 import Platforms from '../../system/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import {
-  HOST_ENVSET_DIR,
-  HOST_TMP_DIR,
-  HOST_VAR_DATA_DIR,
-  HOSTS_WORK_DIRS,
-} from '../../shared/constants';
-import {getOsMachine, resolveWorkDir} from '../../shared/helpers';
+import { HOSTS_WORK_DIRS } from '../../shared/constants';
+import {getOsMachine, REPO_ROOT, resolveWorkDir} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
 import {isKindOfNumber} from '../../system/lib/common';
@@ -21,10 +16,11 @@ export type NoMachine = 'noMachine';
 
 
 export default class Props {
-  workDir: string = '';
-  envSetDir: string = '';
-  varDataDir: string = '';
-  tmpDir: string = '';
+  appWorkDir: string = '';
+  buildWorkDir: string = '';
+  // envSetDir: string = '';
+  // varDataDir: string = '';
+  // tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
   uid?: number;
@@ -84,13 +80,16 @@ export default class Props {
 
     this.hostId = this.hostConfig.id as any;
 
-    const hostWorkDir = path.join(HOSTS_WORK_DIRS, this.hostId);
+    // TODO: почему не absolute ????
+    this.buildWorkDir = path.join(HOSTS_WORK_DIRS, this.hostId);
 
-    this.workDir = this.resolveWorkDir(hostWorkDir);
+    //this.buildWorkDir = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
+    // TODO: review
+    this.appWorkDir = this.resolveWorkDir(hostWorkDir);
 
-    this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
-    this.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
-    this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+    // this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
+    // this.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
+    // this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
   }
 
 
