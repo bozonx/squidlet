@@ -36,7 +36,7 @@ export default class ConsoleLogger implements Logger {
     console.warn(`WARNING: ${message}`);
   }
 
-  error = (message: string) => {
+  error = (message: string | Error) => {
     console.error(`ERROR: ${message}`);
   }
 

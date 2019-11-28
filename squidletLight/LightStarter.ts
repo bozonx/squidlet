@@ -1,10 +1,10 @@
-import IoSet from '../system/interfaces/IoSet';
 import AppStarter from '../system/AppStarter';
-import ConsoleLogger from '../shared/ConsoleLogger';
+import IoSet from '../system/interfaces/IoSet';
 import HostConfig from '../system/interfaces/HostConfig';
 import LogLevel from '../system/interfaces/LogLevel';
 import StorageIo from '../system/interfaces/io/StorageIo';
 import SysIo from '../system/interfaces/io/SysIo';
+import ConsoleLogger from '../shared/ConsoleLogger';
 
 
 export default class LightStarter {
@@ -44,21 +44,22 @@ export default class LightStarter {
 
   async destroy(): Promise<void> {
     if (!this.app) throw new Error('No app');
+    if (!this.consoleLogger) throw new Error('No consoleLogger');
 
     try {
       await this.app.destroy();
     }
     catch (e) {
-      console.error(e);
+      this.consoleLogger.error(e);
     }
 
-    console.info(`... destroying IoSet`);
+    this.consoleLogger.info(`... destroying IoSet`);
 
     try {
       await this.ioSet.destroy();
     }
     catch (e) {
-      console.error(e);
+      this.consoleLogger.error(e);
     }
 
     delete this.ioSet;
@@ -84,7 +85,10 @@ export default class LightStarter {
         this.destroy()
           .then(() => processExit(code))
           .catch((e: Error) => {
-            console.error(e);
+            if (!this.consoleLogger) throw new Error('No consoleLogger');
+
+            this.consoleLogger.error(e);
+            // TODO: может не нужен exit так как при нормальном destroy должно все отработать ?
             processExit(code);
           });
       }
