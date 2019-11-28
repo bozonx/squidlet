@@ -2,7 +2,6 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import {HOST_TMP_DIR} from '../../shared/constants';
 import Os from '../../shared/Os';
 import {REPO_ROOT} from '../../shared/helpers';
 import Platforms from '../../system/interfaces/Platforms';
@@ -11,6 +10,7 @@ import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
+import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 
 
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
@@ -46,7 +46,7 @@ export default class AppBuilder {
     this.minimize = minimize;
     this.logLevel = logLevel;
 
-    const envBuilderTmpDir = path.join(this.tmpDir, HOST_TMP_DIR);
+    const envBuilderTmpDir = path.join(this.tmpDir, ENV_BUILD_TMP_DIR);
 
     this.envBuilder = new EnvBuilder(
       hostConfigPath,

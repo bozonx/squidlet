@@ -84,12 +84,10 @@ export default class StartIoServerStandalone extends StartDevelopBase {
       'services',
       'devicesDefaults',
       'automation',
-      //'consoleLogger',
       'mqttApi',
       'wsApi',
       'httpApi',
       'updater',
-      //'dependencies',
     );
   }
 
