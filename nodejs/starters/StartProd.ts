@@ -2,16 +2,15 @@
 
 import * as path from 'path';
 
-import Os, {SpawnCmdResult} from '../../shared/Os';
+import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import systemConfig from '../../system/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
-import {HOST_ENVSET_DIR} from '../../shared/constants';
+import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Props from './Props';
 import ProdBuild from './ProdBuild';
 import SystemStarter from './SystemStarter';
-import {isEmptyObject} from '../../system/lib/objects';
 import IoSetLocal from '../../system/IoSetLocal';
 import IoSet from '../../system/interfaces/IoSet';
 import LogLevel from '../../system/interfaces/LogLevel';
@@ -43,6 +42,7 @@ export default class StartProd {
     this.props = new Props(
       this.os,
       this.groupConfig,
+      'prod',
       argForce,
       argLogLevel,
       argMachine,
@@ -59,7 +59,9 @@ export default class StartProd {
     await this.groupConfig.init();
     await this.props.resolve();
 
-    const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    //const tmpDir = path.join(this.props.tmpDir, HOST_ENVSET_DIR);
+    const appEnvSetDir = path.join(this.props.appWorkDir, systemConfig.rootDirs.envSet);
+    const envSetTmpDir = path.join(this.props.buildWorkDir, ENV_BUILD_TMP_DIR);
 
     if (!this.props.machine) {
       throw new Error(`No defined machine`);
@@ -67,14 +69,16 @@ export default class StartProd {
 
     this._envBuilder = new EnvBuilder(
       this.props.hostConfig,
-      this.props.envSetDir,
-      tmpDir,
+      appEnvSetDir,
+      envSetTmpDir,
       this.props.platform,
       this.props.machine,
       { uid: this.props.uid, gid: this.props.gid }
     );
 
-    console.info(`Use work dir ${this.props.workDir}`);
+    await this.os.mkdirP(this.props.appWorkDir, { uid: this.props.uid, gid: this.props.gid });
+
+    console.info(`Using app work dir ${this.props.appWorkDir} and build dir ${this.props.buildWorkDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
@@ -83,7 +87,7 @@ export default class StartProd {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
+    //await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
 
     //await this.installModules();
     await this.makeSystemSymLink();
@@ -123,26 +127,11 @@ export default class StartProd {
   }
 
   private getPathToProdSystemDir(): string {
-    return path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
+    return path.join(this.props.appWorkDir, systemConfig.rootDirs.envSet, systemConfig.envSetDirs.system);
   }
 
   private getNodeModulesDir(): string {
-    return path.join(this.props.workDir, 'node_modules');
-  }
-
-  private async runNpmInstall() {
-    const cmd = `npm install`;
-
-    const result: SpawnCmdResult = await this.os.spawnCmd(cmd, this.props.workDir, {
-      uid: this.props.uid,
-      gid: this.props.gid,
-    });
-
-    if (result.status) {
-      console.error(`ERROR: npm ends with code ${result.status}`);
-      console.error(result.stdout);
-      console.error(result.stderr);
-    }
+    return path.join(this.props.appWorkDir, 'node_modules');
   }
 
 }
@@ -169,5 +158,20 @@ export default class StartProd {
 //
 //   if (!isEmptyObject(this.envBuilder.configManager.dependencies)) {
 //     await this.runNpmInstall();
+//   }
+// }
+//
+// private async runNpmInstall() {
+//   const cmd = `npm install`;
+//
+//   const result: SpawnCmdResult = await this.os.spawnCmd(cmd, this.props.appWorkDir, {
+//     uid: this.props.uid,
+//     gid: this.props.gid,
+//   });
+//
+//   if (result.status) {
+//     console.error(`ERROR: npm ends with code ${result.status}`);
+//     console.error(result.stdout);
+//     console.error(result.stderr);
 //   }
 // }

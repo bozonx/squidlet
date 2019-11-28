@@ -9,15 +9,13 @@ export default class StartDevelop extends StartDevelopBase {
   async init() {
     await super.init();
 
-    console.info(`Using work dir ${this.props.workDir}`);
+    console.info(`Using app work dir ${this.props.appWorkDir} and build dir ${this.props.buildWorkDir}`);
     console.info(`Using host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
 
   async start() {
     await super.start();
-
-    //await this.installModules();
 
     const ioSet: IoSet = await this.makeIoSet();
     const systemStarter = new SystemStarter(this.os, this.props);
@@ -27,12 +25,10 @@ export default class StartDevelop extends StartDevelopBase {
 
 
   /**
-   * Resolve which io set will be used and make instance of it and pass ioSet config.
+   * Make development IO set which loads local ts files of entities.
    */
   protected async makeIoSet(): Promise<IoSet> {
-    const ioSet = new IoSetDevelopSrc(this.os, this.envBuilder);
-
-    return ioSet;
+    return new IoSetDevelopSrc(this.os, this.envBuilder);
   }
 
 }

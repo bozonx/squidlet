@@ -48,6 +48,9 @@ export default class SystemStarter {
     await this.configureStorage(ioSet);
 
     const consoleLogger = new ConsoleLogger(this.props.argLogLevel);
+
+    // TODO: pass workdir etc - see like in squidletLight
+
     const systemKind: SystemKind = new systemKindClass(
       ioSet,
       this.handleRestartRequest,

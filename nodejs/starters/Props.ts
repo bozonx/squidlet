@@ -47,6 +47,7 @@ export default class Props {
   constructor(
     os: Os,
     groupConfig: GroupConfigParser,
+    buildWorkDirRoot: string,
     argForce?: boolean,
     argLogLevel?: LogLevel,
     argMachine?: NodejsMachines | NoMachine,
