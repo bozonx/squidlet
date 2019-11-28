@@ -89,7 +89,7 @@ export default class StartIoServerStandalone extends StartDevelopBase {
       'wsApi',
       'httpApi',
       'updater',
-      'dependencies',
+      //'dependencies',
     );
   }
 

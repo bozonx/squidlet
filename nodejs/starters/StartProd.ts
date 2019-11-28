@@ -1,3 +1,5 @@
+// TODO: not actual because full build isn't under development at the moment. Use light build.
+
 import * as path from 'path';
 
 import Os, {SpawnCmdResult} from '../../shared/Os';
@@ -72,7 +74,7 @@ export default class StartProd {
       { uid: this.props.uid, gid: this.props.gid }
     );
 
-    console.info(`Use working dir ${this.props.workDir}`);
+    console.info(`Use work dir ${this.props.workDir}`);
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
@@ -83,7 +85,8 @@ export default class StartProd {
 
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
 
-    await this.installModules();
+    //await this.installModules();
+    await this.makeSystemSymLink();
 
     //if (!this.props.force && await this.os.exists(prodSystemDirPath)) return;
     await this.prodBuild.buildInitialSystem();
@@ -98,32 +101,7 @@ export default class StartProd {
   }
 
 
-  /**
-   * It builds package.json and installs node modules into root of working directory.
-   * And it makes link to system in node_modules/system.
-   * It installs only if node_modules directory doesn't exist it force parameter isn't set.
-   */
-  private async installModules() {
-    // do not install node modules if they have been installed previously
-    if (!this.props.force && await this.os.exists(this.getNodeModulesDir())) {
-      console.info(`Directory node_modules exists. It doesn't need to run npm install`);
-
-      return;
-    }
-
-    console.info(`===> writing package.json`);
-
-    await this.prodBuild.buildPackageJson(this.envBuilder.configManager.dependencies);
-
-    console.info(`===> Installing npm modules`);
-
-    if (!isEmptyObject(this.envBuilder.configManager.dependencies)) {
-      await this.runNpmInstall();
-    }
-
-    await this.makeSystemSymLink();
-  }
-
+  // TODO: review. Better to use just in package.json postinstall script
   private async makeSystemSymLink() {
     const nodeModulesDir = this.getNodeModulesDir();
     const symLinkDst = path.join(nodeModulesDir, 'system');
@@ -168,3 +146,28 @@ export default class StartProd {
   }
 
 }
+
+
+// /**
+//  * It builds package.json and installs node modules into root of working directory.
+//  * And it makes link to system in node_modules/system.
+//  * It installs only if node_modules directory doesn't exist it force parameter isn't set.
+//  */
+// private async installModules() {
+//   // do not install node modules if they have been installed previously
+//   if (!this.props.force && await this.os.exists(this.getNodeModulesDir())) {
+//     console.info(`Directory node_modules exists. It doesn't need to run npm install`);
+//
+//     return;
+//   }
+//
+//   console.info(`===> writing package.json`);
+//
+//   await this.prodBuild.buildPackageJson(this.envBuilder.configManager.dependencies);
+//
+//   console.info(`===> Installing npm modules`);
+//
+//   if (!isEmptyObject(this.envBuilder.configManager.dependencies)) {
+//     await this.runNpmInstall();
+//   }
+// }

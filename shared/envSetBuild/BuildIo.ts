@@ -54,7 +54,7 @@ export default class BuildIo {
 
     await this.copyIos(machineConfig);
     await this.buildIos();
-    await this.copySupportFiles(machineConfig);
+    //await this.copySupportFiles(machineConfig);
     await this.makeIoSetIndex(machineConfig);
   }
 
@@ -97,22 +97,22 @@ export default class BuildIo {
     await minimize(legacyDst, this.iosBuildDir);
   }
 
-  /**
-   * Copy support files
-   */
-  private async copySupportFiles(machineConfig: MachineConfig) {
-    if (!machineConfig.iosSupportFiles) return;
-
-    const platformDir = resolvePlatformDir(this.platform);
-
-    for (let supportFilePath of machineConfig.iosSupportFiles) {
-      const absFilePath: string = path.resolve(platformDir, supportFilePath);
-      const srcFile: string = await this.resolveFileTargetPath(absFilePath);
-      const dstFile: string = path.join(this.iosBuildDir, path.basename(supportFilePath));
-
-      await this.os.copyFile(srcFile, dstFile, this.ownerOptions);
-    }
-  }
+  // /**
+  //  * Copy support files
+  //  */
+  // private async copySupportFiles(machineConfig: MachineConfig) {
+  //   if (!machineConfig.iosSupportFiles) return;
+  //
+  //   const platformDir = resolvePlatformDir(this.platform);
+  //
+  //   for (let supportFilePath of machineConfig.iosSupportFiles) {
+  //     const absFilePath: string = path.resolve(platformDir, supportFilePath);
+  //     const srcFile: string = await this.resolveFileTargetPath(absFilePath);
+  //     const dstFile: string = path.join(this.iosBuildDir, path.basename(supportFilePath));
+  //
+  //     await this.os.copyFile(srcFile, dstFile, this.ownerOptions);
+  //   }
+  // }
 
   /**
    * Make index.js which requires all the io files.

@@ -9,7 +9,7 @@ export default class StartDevelop extends StartDevelopBase {
   async init() {
     await super.init();
 
-    console.info(`Using working dir ${this.props.workDir}`);
+    console.info(`Using work dir ${this.props.workDir}`);
     console.info(`Using host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
@@ -17,7 +17,7 @@ export default class StartDevelop extends StartDevelopBase {
   async start() {
     await super.start();
 
-    await this.installModules();
+    //await this.installModules();
 
     const ioSet: IoSet = await this.makeIoSet();
     const systemStarter = new SystemStarter(this.os, this.props);

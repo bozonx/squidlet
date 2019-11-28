@@ -70,6 +70,7 @@ export default abstract class StartDevelopBase {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
+    // TODO: почему отдельные директории???
     await this.os.mkdirP(this.props.varDataDir, { uid: this.props.uid, gid: this.props.gid });
     await this.os.mkdirP(this.props.envSetDir, { uid: this.props.uid, gid: this.props.gid });
   }
@@ -82,34 +83,6 @@ export default abstract class StartDevelopBase {
 
   protected resolveHostConfig(): PreHostConfig {
     return this.props.hostConfig;
-  }
-
-  /**
-   * Install modules that specified in host config according to platform.
-   * It installs modules into root node_modules dir of squidlet repository.
-   */
-  protected async installModules() {
-
-    // TODO: review
-    // TODO: why REPO_ROOT ????
-
-    const dependencies = this.envBuilder.configManager.dependencies;
-
-    if (!dependencies || isEmptyObject(dependencies)) return;
-
-    const toInstallModules: string[] = [];
-
-    for (let moduleName of Object.keys(dependencies)) {
-      if (!this.props.force && await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
-
-      toInstallModules.push(`${moduleName}@${dependencies[moduleName]}`);
-    }
-
-    if (!toInstallModules.length) return;
-
-    console.info(`===> Installing npm modules`);
-
-    await this.installNpmModules(toInstallModules, REPO_ROOT);
   }
 
   /**
@@ -142,3 +115,32 @@ export default abstract class StartDevelopBase {
   }
 
 }
+
+
+// /**
+//  * Install modules that specified in host config according to platform.
+//  * It installs modules into root node_modules dir of squidlet repository.
+//  */
+// protected async installModules() {
+//
+//   // TODO: review
+//   // TODO: why REPO_ROOT ????
+//
+//   const dependencies = this.envBuilder.configManager.dependencies;
+//
+//   if (!dependencies || isEmptyObject(dependencies)) return;
+//
+//   const toInstallModules: string[] = [];
+//
+//   for (let moduleName of Object.keys(dependencies)) {
+//     if (!this.props.force && await this.os.exists(path.join(REPO_ROOT, 'node_modules', moduleName))) continue;
+//
+//     toInstallModules.push(`${moduleName}@${dependencies[moduleName]}`);
+//   }
+//
+//   if (!toInstallModules.length) return;
+//
+//   console.info(`===> Installing npm modules`);
+//
+//   await this.installNpmModules(toInstallModules, REPO_ROOT);
+// }

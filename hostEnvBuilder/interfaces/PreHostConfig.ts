@@ -72,7 +72,7 @@ export default interface PreHostConfig {
   updater?: {[index: string]: any};
 
   // additional npm packages which will be installed
-  dependencies?: {[index: string]: string};
+  //dependencies?: {[index: string]: string};
 
   // host and port to listen to in IO server mode.
   // it will use default values if this param is an empty object.

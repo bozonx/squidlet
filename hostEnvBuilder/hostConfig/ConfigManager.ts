@@ -31,7 +31,7 @@ export default class ConfigManager {
   iosDefinitions: IoDefinitions = {};
   // default devices props from preConfig
   devicesDefaults?: {[index: string]: any};
-  dependencies?: {[index: string]: any};
+  //dependencies?: {[index: string]: any};
   readonly platform: Platforms;
   readonly machine: string;
   machinePlatformDir: string = '';
@@ -69,7 +69,7 @@ export default class ConfigManager {
 
     const normalizedConfig: PreHostConfig = this.preparePreHostConfig(preHostConfig);
 
-    this.dependencies = normalizedConfig.dependencies;
+    //this.dependencies = normalizedConfig.dependencies;
     this.devicesDefaults = normalizedConfig.devicesDefaults;
     this.iosDefinitions = normalizedConfig.ios || {};
 

@@ -36,10 +36,10 @@ const machineConfig: MachineConfig = {
         }
       },
     },
-    dependencies: {
-      //'i2c-bus': '*',
-      'pigpio': '*',
-    },
+    // dependencies: {
+    //   //'i2c-bus': '*',
+    //   'pigpio': '*',
+    // },
   }
 };
 
