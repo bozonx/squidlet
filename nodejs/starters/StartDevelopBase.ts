@@ -1,31 +1,37 @@
 import * as path from 'path';
 
-import Os from '../../shared/Os';
-import GroupConfigParser from '../../shared/GroupConfigParser';
-import Props, {NoMachine} from './Props';
-import NodejsMachines from '../interfaces/NodejsMachines';
 import IoSet from '../../system/interfaces/IoSet';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import LogLevel from '../../system/interfaces/LogLevel';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import systemConfig from '../../system/systemConfig';
-import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 import HostConfig from '../../system/interfaces/HostConfig';
 import SolidStarter from '../../system/SolidStarter';
+import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
+import Os from '../../shared/Os';
+import GroupConfigParser from '../../shared/GroupConfigParser';
+import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
+import NodejsMachines from '../interfaces/NodejsMachines';
+import Props, {NoMachine} from './Props';
 
+
+interface StarterLike {
+  destroy(): Promise<void>;
+}
 
 const DEV_BUILD_ROOT = 'dev';
 
 
 export default abstract class StartDevelopBase {
-  protected  readonly os: Os = new Os();
-  protected  readonly groupConfig: GroupConfigParser;
-  protected  readonly props: Props;
-  private _envBuilder?: EnvBuilder;
+  protected readonly os: Os = new Os();
+  protected readonly groupConfig: GroupConfigParser;
+  protected readonly props: Props;
+  protected starter?: StarterLike;
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
   }
+
+  private _envBuilder?: EnvBuilder;
 
   /**
    * Prepare ioSet here.
@@ -84,6 +90,12 @@ export default abstract class StartDevelopBase {
     await this.envBuilder.collect();
   }
 
+  async destroy() {
+    if (!this.starter) throw new Error(`Starter hasn't been initialized yet`);
+
+    await this.starter.destroy();
+  }
+
 
   protected resolveHostConfig(): PreHostConfig {
     return this.props.hostConfig;
@@ -104,8 +116,8 @@ export default abstract class StartDevelopBase {
     SolidStarterClass: new (ioSet: IoSet) => SolidStarter,
     ioSet: IoSet,
     ioServerMode: boolean = false
-  ) {
-    const systemKind: SolidStarter = new SolidStarterClass(ioSet);
+  ): Promise<SolidStarter> {
+    const solidStarter: SolidStarter = new SolidStarterClass(ioSet);
     const hostConfigOverride: HostConfig = {
       // TODO: resolve appType ???? или он зарезолвится ниже ???
       //appType: 'app',
@@ -113,8 +125,8 @@ export default abstract class StartDevelopBase {
 
     console.info(`===> Starting app`);
 
-    await systemKind.start(
-      (code: number) => process.exit(code),
+    await solidStarter.start(
+      (code: number) => this.os.processExit(code),
       hostConfigOverride,
       this.props.appWorkDir,
       this.props.uid,
@@ -122,6 +134,8 @@ export default abstract class StartDevelopBase {
       this.props.argLogLevel,
       ioServerMode,
     );
+
+    return solidStarter;
   }
 
 }

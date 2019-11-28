@@ -18,7 +18,7 @@ export default class StartDevelop extends StartDevelopBase {
 
     const ioSet: IoSet = await this.makeIoSet();
 
-    await this.startSolid(SolidStarter, ioSet);
+    this.starter = await this.startSolid(SolidStarter, ioSet);
   }
 
 

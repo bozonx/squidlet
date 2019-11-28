@@ -116,6 +116,8 @@ export default class CommandStart {
 
   // TODO: move upper ???
   private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
+    // TODO: првоерить если система ещё не проинициализровалась
+
     setTimeout(() => {
       console.error(`ERROR: App hasn't been gracefully destroyed during "${this.props.destroyTimeoutSec}" seconds`);
       this.os.processExit(3);
