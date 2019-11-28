@@ -11,6 +11,8 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import systemConfig from '../../system/systemConfig';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
+import HostConfig from '../../system/interfaces/HostConfig';
+import SolidStarter from '../../system/SolidStarter';
 
 
 const DEV_BUILD_ROOT = 'dev';
@@ -96,6 +98,30 @@ export default abstract class StartDevelopBase {
       platform: this.props.platform,
       machine: this.props.machine,
     };
+  }
+
+  protected async startSolid(
+    SolidStarterClass: new (ioSet: IoSet) => SolidStarter,
+    ioSet: IoSet,
+    ioServerMode: boolean = false
+  ) {
+    const systemKind: SolidStarter = new SolidStarterClass(ioSet);
+    const hostConfigOverride: HostConfig = {
+      // TODO: resolve appType ???? или он зарезолвится ниже ???
+      //appType: 'app',
+    } as HostConfig;
+
+    console.info(`===> Starting app`);
+
+    await systemKind.start(
+      (code: number) => process.exit(code),
+      hostConfigOverride,
+      this.props.appWorkDir,
+      this.props.uid,
+      this.props.gid,
+      this.props.argLogLevel,
+      ioServerMode,
+    );
   }
 
 }

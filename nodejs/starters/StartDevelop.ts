@@ -1,8 +1,7 @@
 import IoSet from '../../system/interfaces/IoSet';
-import {SYSTEM_DIR} from '../../shared/helpers';
 import StartDevelopBase from './StartDevelopBase';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
-import SystemStarter from './SystemStarter';
+import SolidStarter from '../../system/SolidStarter';
 
 
 export default class StartDevelop extends StartDevelopBase {
@@ -18,9 +17,8 @@ export default class StartDevelop extends StartDevelopBase {
     await super.start();
 
     const ioSet: IoSet = await this.makeIoSet();
-    const systemStarter = new SystemStarter(this.os, this.props);
 
-    await systemStarter.start(SYSTEM_DIR, ioSet);
+    await this.startSolid(SolidStarter, ioSet);
   }
 
 
