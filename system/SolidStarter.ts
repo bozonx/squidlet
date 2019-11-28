@@ -86,6 +86,7 @@ export default class SolidStarter {
     // make destroy before process.exit
 
     // TODO: может не нужен exit так как при нормальном destroy должно все отработать ?
+    // TODO: или вынести выше в колбэк
 
     await sysIo.configure({
       exit: (code: number) => {

@@ -3,6 +3,7 @@ import StartProd from '../nodejs/starters/StartProd';
 import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
 import LogLevel from '../system/interfaces/LogLevel';
 import StartRemoteDevelop from '../nodejs/starters/StartRemoteDevelop';
+import {listenScriptEnd} from '../shared/helpers';
 
 
 interface CommandStartArgs {
@@ -102,6 +103,32 @@ export default class CommandStart {
 
     await starter.init();
     await starter.start();
+
+
+    this.listenDestroySignals(systemKind.destroy);
+  }
+
+
+  // TODO: move upper ???
+  private listenDestroySignals(destroy: () => Promise<void>) {
+    listenScriptEnd(() => this.gracefullyDestroyCb(destroy));
+  }
+
+  // TODO: move upper ???
+  private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
+    setTimeout(() => {
+      console.error(`ERROR: App hasn't been gracefully destroyed during "${this.props.destroyTimeoutSec}" seconds`);
+      this.os.processExit(3);
+    }, this.props.destroyTimeoutSec * 1000);
+
+    try {
+      await destroy();
+      this.os.processExit(0);
+    }
+    catch (err) {
+      console.error(err);
+      this.os.processExit(2);
+    }
   }
 
 }
