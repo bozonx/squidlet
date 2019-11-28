@@ -13,8 +13,11 @@ export const IO_SET_INDEX_FILE = 'index.js';
 //export const BUILD_IO_DIR = 'io';
 
 export const ENV_BUILD_TMP_DIR = 'envBuildTmp';
+export const REPO_BUILD_DIR = 'build';
+export const BUILD_WORK_DIR = 'buildWorkDir';
+export const APP_WORK_DIR = 'appWorkDir';
 
-export const HOSTS_WORK_DIRS = 'workdirs';
+//export const HOSTS_WORK_DIRS = 'workdirs';
 // TODO: почему бы не брать из systemConfig????
 // export const HOST_ENVSET_DIR = 'envSet';
 // export const HOST_VAR_DATA_DIR = 'varData';

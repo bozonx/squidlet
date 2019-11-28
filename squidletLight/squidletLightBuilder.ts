@@ -9,7 +9,7 @@ import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updat
 import {REPO_ROOT} from '../shared/helpers';
 
 
-const SQUIDLET_LIGHT_WORK_DIR = 'light';
+export const SQUIDLET_LIGHT_WORK_DIR = 'light';
 const TMP_SUB_DIR = 'tmp';
 
 

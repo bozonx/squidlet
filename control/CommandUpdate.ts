@@ -1,14 +1,14 @@
 import * as path from 'path';
 
 import Os from '../shared/Os';
-import squidletLightBuilder from '../squidletLight/squidletLightBuilder';
+import squidletLightBuilder, {SQUIDLET_LIGHT_WORK_DIR} from '../squidletLight/squidletLightBuilder';
 import WsApiClient from '../shared/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';
 import Platforms from '../system/interfaces/Platforms';
-import {resolveWorkDir} from '../squidletLight/helpers';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
+import {REPO_ROOT} from '../shared/helpers';
 
 
 export default class CommandUpdate {
@@ -29,8 +29,9 @@ export default class CommandUpdate {
 
     await this.buildBundle(infoResult.platform, infoResult.machine);
 
-    const bundleContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_FILE_NAME));
-    const sumContent = await this.os.getFileContent(path.join(resolveWorkDir(), BUNDLE_SUM_FILE_NAME));
+    const workDir: string = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
+    const bundleContent = await this.os.getFileContent(path.join(workDir, BUNDLE_FILE_NAME));
+    const sumContent = await this.os.getFileContent(path.join(workDir, BUNDLE_SUM_FILE_NAME));
     // upload bundle and check sum
     await apiClient.callMethod('updater.updateBundle', bundleContent, sumContent);
     // restart the host

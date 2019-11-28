@@ -4,8 +4,8 @@ import Os, {SpawnCmdResult} from '../../shared/Os';
 import Platforms from '../../system/interfaces/Platforms';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import { HOSTS_WORK_DIRS } from '../../shared/constants';
-import {getOsMachine, REPO_ROOT, resolveWorkDir} from '../../shared/helpers';
+import {APP_WORK_DIR, BUILD_WORK_DIR, REPO_BUILD_DIR} from '../../shared/constants';
+import {getOsMachine, REPO_ROOT} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
 import {isKindOfNumber} from '../../system/lib/common';
@@ -18,9 +18,6 @@ export type NoMachine = 'noMachine';
 export default class Props {
   appWorkDir: string = '';
   buildWorkDir: string = '';
-  // envSetDir: string = '';
-  // varDataDir: string = '';
-  // tmpDir: string = '';
   platform: Platforms = 'nodejs';
   hostId: string = '';
   uid?: number;
@@ -35,6 +32,7 @@ export default class Props {
 
 
   private readonly os: Os;
+  private readonly buildWorkDirRoot: string = '';
   private readonly argMachine?: NodejsMachines | NoMachine;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
@@ -59,6 +57,7 @@ export default class Props {
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
+    this.buildWorkDirRoot = buildWorkDirRoot;
     this.force = Boolean(argForce);
     this.argLogLevel = argLogLevel;
     this.argMachine = argMachine;
@@ -70,6 +69,7 @@ export default class Props {
 
 
   async resolve() {
+    // TODO: review
     if (this.argMachine !== 'noMachine') {
       this.machine = await this.resolveMachine();
     }
@@ -81,16 +81,15 @@ export default class Props {
 
     this.hostId = this.hostConfig.id as any;
 
-    // TODO: почему не absolute ????
-    this.buildWorkDir = path.join(HOSTS_WORK_DIRS, this.hostId);
+    this.buildWorkDir = path.join(
+      REPO_ROOT,
+      REPO_BUILD_DIR,
+      this.buildWorkDirRoot,
+      this.hostId,
+      BUILD_WORK_DIR
+    );
 
-    //this.buildWorkDir = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
-    // TODO: review
-    this.appWorkDir = this.resolveWorkDir(hostWorkDir);
-
-    // this.envSetDir = path.join(this.workDir, HOST_ENVSET_DIR);
-    // this.varDataDir = path.join(this.workDir, HOST_VAR_DATA_DIR);
-    // this.tmpDir = path.join(this.workDir, HOST_TMP_DIR);
+    this.appWorkDir = this.resolveWorkDir();
   }
 
 
@@ -114,8 +113,19 @@ export default class Props {
     return this.getOsMachine();
   }
 
-  private resolveWorkDir(hostWorkDir: string): string {
-    return resolveWorkDir(hostWorkDir, this.argWorkDir);
+  private resolveWorkDir(): string {
+    if (this.appWorkDir) {
+      // if it set as an argument - make it absolute
+      return path.resolve(process.cwd(), this.appWorkDir);
+    }
+
+    return path.join(
+      REPO_ROOT,
+      REPO_BUILD_DIR,
+      this.buildWorkDirRoot,
+      this.hostId,
+      APP_WORK_DIR
+    );
   }
 
   private getOsMachine(): Promise<NodejsMachines> {

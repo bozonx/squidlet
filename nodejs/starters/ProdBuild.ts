@@ -9,6 +9,7 @@ import Os from '../../shared/Os';
 import PackageJson from '../../shared/interfaces/PackageJson';
 import Props from './Props';
 import {PACKAGE_JSON_TEMPLATE_PATH} from './constanats';
+import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 
 
 export default class ProdBuild {
@@ -28,8 +29,16 @@ export default class ProdBuild {
    * Build system to workDir/envsSet/system
    */
   async buildInitialSystem() {
-    const systemBuildDir = path.join(this.props.envSetDir, systemConfig.envSetDirs.system);
-    const systemTmpDir = path.join(this.props.tmpDir, systemConfig.envSetDirs.system);
+    const systemBuildDir = path.join(
+      this.props.appWorkDir,
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.system
+    );
+    const systemTmpDir = path.join(
+      this.props.buildWorkDir,
+      ENV_BUILD_TMP_DIR,
+      systemConfig.envSetDirs.system
+    );
 
     console.info(`===> Building system to "${systemBuildDir}"`);
 
@@ -42,8 +51,16 @@ export default class ProdBuild {
   async buildIos() {
     console.info(`===> Building io`);
 
-    const buildDir = path.join(this.props.envSetDir, systemConfig.envSetDirs.ios);
-    const tmpDir = path.join(this.props.tmpDir, systemConfig.envSetDirs.ios);
+    const buildDir = path.join(
+      this.props.appWorkDir,
+      systemConfig.rootDirs.envSet,
+      systemConfig.envSetDirs.ios
+    );
+    const tmpDir = path.join(
+      this.props.buildWorkDir,
+      ENV_BUILD_TMP_DIR,
+      systemConfig.envSetDirs.ios
+    );
 
     await this.doBuildIo(buildDir, tmpDir);
   }
@@ -51,7 +68,7 @@ export default class ProdBuild {
   async buildPackageJson(dependencies: {[index: string]: any} = {}) {
     const packageJson: string = await this.generatePackageJson(dependencies);
 
-    await this.os.writeFile(path.join(this.props.workDir, 'package.json'), packageJson, {
+    await this.os.writeFile(path.join(this.props.appWorkDir, 'package.json'), packageJson, {
       uid: this.props.uid,
       gid: this.props.gid,
     });

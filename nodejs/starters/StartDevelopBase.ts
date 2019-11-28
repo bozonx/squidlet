@@ -65,8 +65,6 @@ export default abstract class StartDevelopBase {
     const {platform, machine} = this.resolvePlatformMachine();
 
     await this.os.mkdirP(this.props.appWorkDir, { uid: this.props.uid, gid: this.props.gid });
-    //await this.os.mkdirP(appEnvSetDir, { uid: this.props.uid, gid: this.props.gid });
-    //await this.os.mkdirP(envSetTmpDir, { uid: this.props.uid, gid: this.props.gid });
 
     this._envBuilder = new EnvBuilder(
       this.resolveHostConfig(),

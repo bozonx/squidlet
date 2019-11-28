@@ -123,25 +123,25 @@ export function makeListOfNamesFromPaths(paths: string[]): string[] {
 
 // TODO: !!! test bellow
 
-/**
- * If work dir is passed then it will be made an absolute according CWD.
- * If isn't set then SQUIDLET_ROOT env variable will be used - $SQUIDLET_ROOT/<subDir>.
- * Otherwise "build/<subDir>" dir or this repository will be used.
- */
-export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
-  const envRoot: string | undefined = process.env['SQUIDLET_ROOT'];
-
-  if (argWorkDir) {
-    // if it set as an argument - make it absolute
-    return path.resolve(process.cwd(), argWorkDir);
-  }
-  else if (envRoot) {
-    // else use under a $SQUIDLET_ROOT
-    return path.join(envRoot, subDir);
-  }
-
-  return path.join(REPO_ROOT, 'build', subDir);
-}
+// /**
+//  * If work dir is passed then it will be made an absolute according CWD.
+//  * If isn't set then SQUIDLET_ROOT env variable will be used - $SQUIDLET_ROOT/<subDir>.
+//  * Otherwise "build/<subDir>" dir or this repository will be used.
+//  */
+// export function resolveWorkDir(subDir: string, argWorkDir?: string): string {
+//   const envRoot: string | undefined = process.env['SQUIDLET_ROOT'];
+//
+//   if (argWorkDir) {
+//     // if it set as an argument - make it absolute
+//     return path.resolve(process.cwd(), argWorkDir);
+//   }
+//   else if (envRoot) {
+//     // else use under a $SQUIDLET_ROOT
+//     return path.join(envRoot, subDir);
+//   }
+//
+//   return path.join(REPO_ROOT, 'build', subDir);
+// }
 
 /**
  * Call cb on SIGTERM and SIGINT signals

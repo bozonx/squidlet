@@ -25,7 +25,7 @@ export default class StartDevelop extends StartDevelopBase {
 
 
   /**
-   * Make development IO set which loads local ts files of entities.
+   * Make development IO set which loads local ts files of IOs.
    */
   protected async makeIoSet(): Promise<IoSet> {
     return new IoSetDevelopSrc(this.os, this.envBuilder);
