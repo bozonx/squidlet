@@ -20,6 +20,7 @@ export default class StartIoServerStandalone extends StartDevelopBase {
   }
 
   // TODO: review
+  // TODO: зачем вообще он нужен????
   async destroy() {
     // TODO: destroy ioServer
 

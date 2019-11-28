@@ -37,23 +37,7 @@ export default class LightStarter {
     this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
 
     this.ioSet.init && await this.ioSet.init();
-    // get Storage IO
-    const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
-    const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
-    // set uid, git and workDir to Storage IO
-    await storageIo.configure({ uid, gid, workDir });
-    // make destroy before process.exit
-    await sysIo.configure({
-      exit: (code: number) => {
-        this.destroy()
-          .then(() => processExit(code))
-          .catch((e: Error) => {
-            console.error(e);
-            processExit(code);
-          });
-      }
-    });
-
+    await this.configureIoSet(processExit, workDir, uid, gid);
     await this.app.start(ioServerMode);
 
     this.started = true;
@@ -81,6 +65,31 @@ export default class LightStarter {
           resolve();
         })
         .catch(reject);
+    });
+  }
+
+
+  private async configureIoSet(
+    processExit: (code: number) => void,
+    workDir?: string,
+    uid?: number,
+    gid?: number,
+  ) {
+    // get Storage IO
+    const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
+    const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
+    // set uid, git and workDir to Storage IO
+    await storageIo.configure({ uid, gid, workDir });
+    // make destroy before process.exit
+    await sysIo.configure({
+      exit: (code: number) => {
+        this.destroy()
+          .then(() => processExit(code))
+          .catch((e: Error) => {
+            console.error(e);
+            processExit(code);
+          });
+      }
     });
   }
 

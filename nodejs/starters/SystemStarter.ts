@@ -8,6 +8,7 @@ import {listenScriptEnd} from '../../shared/helpers';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import ConsoleLogger from '../../shared/ConsoleLogger';
 import Logger from '../../system/interfaces/Logger';
+import SysIo from '../../system/interfaces/io/SysIo';
 
 
 interface SystemKind {
@@ -57,7 +58,11 @@ export default class SystemStarter {
 
     const systemKind: SystemKind = new systemKindClass(
       ioSet,
-      this.handleRestartRequest,
+      {
+        // TODO: resolve appType
+        appType: 'app',
+      },
+      // this.handleRestartRequest,
       consoleLogger
     );
 
@@ -65,6 +70,7 @@ export default class SystemStarter {
 
     console.info(`===> Starting app`);
 
+    // TODO: use ioServer Mode
     await systemKind.start();
   }
 
@@ -101,11 +107,24 @@ export default class SystemStarter {
   private async configureStorage(ioSet: IoSet) {
     if (typeof this.props.uid === 'undefined' && typeof this.props.gid === 'undefined') return;
 
-    const ioItem = ioSet.getIo<StorageIo>('Storage');
+    const storageIo = ioSet.getIo<StorageIo>('Storage');
+    const sysIo: SysIo = ioSet.getIo<SysIo>('Sys');
 
-    await ioItem.configure({
+    await storageIo.configure({
       uid: this.props.uid,
       gid: this.props.gid,
+      workDir: this.props.appWorkDir,
+    });
+    // make destroy before process.exit
+    await sysIo.configure({
+      exit: (code: number) => {
+        this.destroy()
+          .then(() => process.exit(code))
+          .catch((e: Error) => {
+            console.error(e);
+            process.exit(code);
+          });
+      }
     });
   }
 
