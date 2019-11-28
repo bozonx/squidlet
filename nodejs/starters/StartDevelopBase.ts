@@ -90,7 +90,7 @@ export default abstract class StartDevelopBase {
     await this.envBuilder.collect();
   }
 
-  async destroy() {
+  destroy = async () => {
     if (!this.starter) throw new Error(`Starter hasn't been initialized yet`);
 
     await this.starter.destroy();

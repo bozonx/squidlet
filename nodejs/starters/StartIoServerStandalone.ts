@@ -21,7 +21,7 @@ export default class StartIoServerStandalone extends StartDevelopBase {
 
   // TODO: review
   // TODO: зачем вообще он нужен????
-  async destroy() {
+  destroy = async () => {
     // TODO: destroy ioServer
 
     if (!this.ioSet) throw new Error(`No IoSet`);

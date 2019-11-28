@@ -22,7 +22,7 @@ export default class Props {
   hostId: string = '';
   uid?: number;
   gid?: number;
-  destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
+  //destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
   readonly argLogLevel?: LogLevel;
   machine?: NodejsMachines;

@@ -10,7 +10,7 @@ describe 'nodejs.SystemStarter', ->
       workDir: 'workDir'
       envSetDir: 'envSetDir'
       tmpDir: 'tmpDir'
-      destroyTimeoutSec: 0
+      #destroyTimeoutSec: 0
     }
     @systemStarter = new SystemStarter(@os, @props)
 

@@ -162,39 +162,11 @@ export function listenScriptEnd(cb: () => Promise<void>) {
 
     return cbWrapper();
   });
+
   process.on('SIGINT', () => {
     console.info('SIGINT signal has been caught');
 
     return cbWrapper();
-  });
-
-  // TODO: решить какой испоьзовать на rpi
-  process.on('SIGUSR1', () => {
-    console.info('SIGUSR1 signal has been caught');
-  });
-  process.on('SIGUSR2', () => {
-    console.info('SIGUSR2 signal has been caught');
-  });
-  process.on('SIGPIPE', () => {
-    console.info('SIGPIPE signal has been caught');
-  });
-  process.on('SIGCHLD', () => {
-    console.info('SIGCHLD signal has been caught');
-  });
-  process.on('SIGWINCH', () => {
-    console.info('SIGWINCH signal has been caught');
-  });
-  // process.on('SIGKILL', () => {
-  //   console.info('SIGKILL signal has been caught');
-  // });
-  process.on('SIGSEGV', () => {
-    console.info('SIGSEGV signal has been caught');
-  });
-  process.on('SIGHUP', () => {
-    console.info('SIGHUP signal has been caught');
-  });
-  process.on('SIGCONT', () => {
-    console.info('SIGCONT signal has been caught');
   });
 }
 

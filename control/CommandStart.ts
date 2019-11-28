@@ -4,6 +4,7 @@ import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone'
 import LogLevel from '../system/interfaces/LogLevel';
 import StartRemoteDevelop from '../nodejs/starters/StartRemoteDevelop';
 import {listenScriptEnd} from '../shared/helpers';
+import {DESTROY_SYTEM_TIMEOUT_SEC} from '../nodejs/starters/constanats';
 
 
 interface CommandStartArgs {
@@ -48,6 +49,7 @@ export default class CommandStart {
         this.args.group,
       );
 
+      listenScriptEnd(() => this.gracefullyDestroyCb(starter.destroy));
       await starter.init();
       await starter.start();
 
@@ -64,6 +66,7 @@ export default class CommandStart {
         this.args.ioset,
       );
 
+      listenScriptEnd(() => this.gracefullyDestroyCb(starter.destroy));
       await starter.init();
       await starter.start();
 
@@ -82,6 +85,7 @@ export default class CommandStart {
       this.args.group,
     );
 
+    listenScriptEnd(() => this.gracefullyDestroyCb(starter.destroy));
     await starter.init();
     await starter.start();
   }
@@ -101,36 +105,29 @@ export default class CommandStart {
       this.args.group,
     );
 
+    listenScriptEnd(() => this.gracefullyDestroyCb(starter.destroy));
     await starter.init();
     await starter.start();
-
-
-    this.listenDestroySignals(systemKind.destroy);
   }
 
 
-  // TODO: move upper ???
-  private listenDestroySignals(destroy: () => Promise<void>) {
-    listenScriptEnd(() => this.gracefullyDestroyCb(destroy));
-  }
-
-  // TODO: move upper ???
   private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
-    // TODO: првоерить если система ещё не проинициализровалась
-
     setTimeout(() => {
-      console.error(`ERROR: App hasn't been gracefully destroyed during "${this.props.destroyTimeoutSec}" seconds`);
-      this.os.processExit(3);
-    }, this.props.destroyTimeoutSec * 1000);
+      console.error(
+        `ERROR: App hasn't been gracefully destroyed during "${DESTROY_SYTEM_TIMEOUT_SEC}" seconds`
+      );
+      process.exit(3);
+    }, DESTROY_SYTEM_TIMEOUT_SEC * 1000);
 
     try {
       await destroy();
-      this.os.processExit(0);
     }
     catch (err) {
       console.error(err);
-      this.os.processExit(2);
+      process.exit(2);
     }
+
+    process.exit(0);
   }
 
 }

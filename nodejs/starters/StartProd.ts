@@ -79,6 +79,10 @@ export default class StartProd {
     console.info(`Use host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
   }
 
+  destroy = async () => {
+
+  }
+
 
   async start() {
     console.info(`===> collect env set`);
