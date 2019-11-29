@@ -39,19 +39,19 @@ export default abstract class StartBase implements Starter {
   protected abstract async makeIoSet(): Promise<IoSet>;
 
 
-  constructor(starterProps: StarterProps) {
-    this.groupConfig = new GroupConfigParser(this.os, starterProps.configPath);
+  constructor(configPath: string, starterProps: StarterProps) {
+    this.groupConfig = new GroupConfigParser(this.os, configPath);
     this.props = new Props(
       this.os,
       this.groupConfig,
       DEV_BUILD_ROOT,
-      starterProps.argForce,
-      starterProps.argLogLevel,
-      starterProps.argMachine,
-      starterProps.argHostName,
-      starterProps.argWorkDir,
-      starterProps.argUser,
-      starterProps.argGroup,
+      starterProps.force,
+      starterProps.logLevel,
+      starterProps.machine,
+      starterProps.hostName,
+      starterProps.workDir,
+      starterProps.user,
+      starterProps.group,
     );
   }
 

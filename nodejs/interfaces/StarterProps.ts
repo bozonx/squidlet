@@ -4,12 +4,11 @@ import {NoMachine} from '../starters/Props';
 
 
 export default interface StarterProps {
-  configPath: string;
-  argForce?: boolean;
-  argLogLevel?: LogLevel;
-  argMachine?: NodejsMachines | NoMachine;
-  argHostName?: string;
-  argWorkDir?: string;
-  argUser?: string;
-  argGroup?: string;
+  force?: boolean;
+  logLevel?: LogLevel;
+  machine?: NodejsMachines | NoMachine;
+  hostName?: string;
+  workDir?: string;
+  user?: string | number;
+  group?: string | number;
 }

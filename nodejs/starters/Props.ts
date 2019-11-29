@@ -37,8 +37,8 @@ export default class Props {
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
-  private readonly argUser?: string;
-  private readonly argGroup?: string;
+  private readonly argUser?: string | number;
+  private readonly argGroup?: string | number;
   private _hostConfig?: PreHostConfig;
 
 
@@ -52,8 +52,8 @@ export default class Props {
     argHostName?: string,
     argWorkDir?: string,
     // TODO: test
-    argUser?: string,
-    argGroup?: string,
+    argUser?: string | number,
+    argGroup?: string | number,
   ) {
     this.os = os;
     this.groupConfig = groupConfig;
@@ -138,7 +138,7 @@ export default class Props {
       return;
     }
     else if (isKindOfNumber(this.argUser)) {
-      return parseInt(this.argUser);
+      return parseInt(this.argUser as any);
     }
 
     return this.getIdResult('u', this.argUser);
@@ -153,14 +153,14 @@ export default class Props {
       return;
     }
     else if (isKindOfNumber(this.argGroup)) {
-      return parseInt(this.argGroup);
+      return parseInt(this.argGroup as any);
     }
 
     return this.getIdResult('g', this.argGroup);
   }
 
   // TODO: test
-  private async getIdResult(userOrGroup: 'u' | 'g', name: string): Promise<number> {
+  private async getIdResult(userOrGroup: 'u' | 'g', name: string | number): Promise<number> {
     const cmd = `id -${userOrGroup} ${name}`;
     const result: SpawnCmdResult = await this.os.spawnCmd(cmd);
 

@@ -1,54 +1,34 @@
 import StartDevelop from '../nodejs/starters/StartDevelop';
 import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
-import LogLevel from '../system/interfaces/LogLevel';
 import StartRemoteDevelop from '../nodejs/starters/StartRemoteDevelop';
 import {listenScriptEnd} from '../shared/helpers';
 import {DESTROY_SYTEM_TIMEOUT_SEC} from '../nodejs/starters/constanats';
 import Starter from '../nodejs/interfaces/Starter';
 import StarterProps from '../nodejs/interfaces/StarterProps';
-
-
-// TODO: review - может сделать ближе к StarterProps
-interface CommandStartArgs {
-  machine?: string;
-  workDir?: string;
-  name?: string;
-  force?: boolean;
-  logLevel?: LogLevel;
-  user?: string;
-  group?: string;
-}
+import {omitObj} from '../system/lib/objects';
 
 
 export default class CommandStart {
   private readonly configPath: string;
-  private readonly args: CommandStartArgs;
   private readonly starterProps: StarterProps;
 
 
-  constructor(positionArgs: string[], args: CommandStartArgs) {
+  constructor(positionArgs: string[], args: {[index: string]: any}) {
     if (!positionArgs.length) {
       throw new Error(`You should specify a group config path`);
     }
 
     this.configPath = positionArgs[0];
-    this.args = args;
     this.starterProps = {
-      configPath: this.configPath,
-      argForce: this.args.force,
-      argLogLevel: this.args.logLevel,
-      argMachine: this.args.machine as any,
-      argHostName: this.args.name,
-      argWorkDir: this.args.workDir,
-      argUser: this.args.user,
-      argGroup: this.args.group,
+      ...omitObj(args, 'name'),
+      hostName: args.name,
     };
   }
 
 
   startProd(): Promise<void> {
     throw new Error(`Prod build isn't supported at the moment`);
-    // const starter = new StartProd(this.starterProps);
+    // const starter = new StartProd(this.configPath, this.starterProps);
     // return this.startApp(starter);
   }
 
@@ -59,8 +39,8 @@ export default class CommandStart {
   startDevRemote(ioset: string): Promise<void> {
     const starter = new StartRemoteDevelop(
       this.configPath,
-      this.args.logLevel,
-      this.args.name,
+      this.starterProps.logLevel,
+      this.starterProps.hostName,
       ioset,
     );
 
@@ -72,7 +52,7 @@ export default class CommandStart {
    */
   startDevSrc(): Promise<void> {
     // develop with local io set
-    const starter = new StartDevelop(this.starterProps);
+    const starter = new StartDevelop(this.configPath, this.starterProps);
 
     return this.startApp(starter);
   }
@@ -81,7 +61,7 @@ export default class CommandStart {
    * Start development io server on nodejs
    */
   startIoServer(): Promise<void> {
-    const starter = new StartIoServerStandalone(this.starterProps);
+    const starter = new StartIoServerStandalone(this.configPath, this.starterProps);
 
     return this.startApp(starter);
   }
