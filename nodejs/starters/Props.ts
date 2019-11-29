@@ -7,7 +7,6 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import {APP_WORK_DIR, BUILD_WORK_DIR, REPO_BUILD_DIR} from '../../shared/constants';
 import {getOsMachine, REPO_ROOT} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
-import {DESTROY_SYTEM_TIMEOUT_SEC} from './constanats';
 import {isKindOfNumber} from '../../system/lib/common';
 import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 
@@ -22,7 +21,6 @@ export default class Props {
   hostId: string = '';
   uid?: number;
   gid?: number;
-  //destroyTimeoutSec: number = DESTROY_SYTEM_TIMEOUT_SEC;
   readonly force: boolean;
   readonly argLogLevel?: LogLevel;
   machine?: NodejsMachines;

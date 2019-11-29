@@ -2,7 +2,6 @@ import StartDevelop from '../nodejs/starters/StartDevelop';
 import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
 import StartRemoteDevelop from '../nodejs/starters/StartRemoteDevelop';
 import {listenScriptEnd} from '../shared/helpers';
-import {DESTROY_SYTEM_TIMEOUT_SEC} from '../nodejs/starters/constanats';
 import Starter from '../nodejs/interfaces/Starter';
 import StarterProps from '../nodejs/interfaces/StarterProps';
 import {omitObj} from '../system/lib/objects';
@@ -74,13 +73,6 @@ export default class CommandStart {
   }
 
   private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
-    setTimeout(() => {
-      console.error(
-        `ERROR: App hasn't been gracefully destroyed during "${DESTROY_SYTEM_TIMEOUT_SEC}" seconds`
-      );
-      process.exit(3);
-    }, DESTROY_SYTEM_TIMEOUT_SEC * 1000);
-
     try {
       await destroy();
     }
