@@ -1,6 +1,5 @@
 import * as path from 'path';
 import Platforms from '../../system/interfaces/Platforms';
-import {IO_SERVER_FILE_NAME} from '../../shared/constants';
 import Os from '../../shared/Os';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
@@ -9,6 +8,9 @@ import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DI
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import LogLevel from '../../system/interfaces/LogLevel';
 import {AppType} from '../../system/interfaces/AppType';
+
+
+export const IO_SERVER_FILE_NAME = 'IoServer';
 
 
 export class IoServerStandaloneBuilder {
