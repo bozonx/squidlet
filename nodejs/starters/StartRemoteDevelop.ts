@@ -18,17 +18,14 @@ export default class StartRemoteDevelop extends StartBase {
   private readonly httpApiClient: HttpApiClient;
 
 
-  constructor(
-    configPath: string,
-    argLogLevel?: LogLevel,
-    argHostName?: string,
-    argIoSet?: string,
-  ) {
-    // not pass user and group to not set it to IoSet
-    // and not pass user and group to not set them to ioSet
-    super(configPath, undefined, argLogLevel, 'noMachine', argHostName);
+  constructor(configPath: string, logLevel?: LogLevel, hostName?: string, argIoSet?: string) {
+    super(configPath, {
+      logLevel,
+      machine: 'noMachine',
+      hostName,
+    });
 
-    if (!argIoSet) throw new Error(`ioset param is required`);
+    if (!argIoSet) throw new Error(`--ioset param is required`);
 
     const {host, port} = this.parseIoSetString(argIoSet);
 
@@ -79,7 +76,7 @@ export default class StartRemoteDevelop extends StartBase {
   }
 
   private parseIoSetString(ioSetString?: string): {host: string, port?: number} {
-    if (!ioSetString) throw new Error(`Host is required`);
+    if (!ioSetString) throw new Error(`IoSet host is required`);
 
     const splat = ioSetString.split(IOSET_STRING_DELIMITER);
 
