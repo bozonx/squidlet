@@ -6,12 +6,11 @@ import StartBase from './StartBase';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
-import {compactUndefined} from '../../system/lib/arrays';
 import HttpApiClient from '../../shared/HttpApiClient';
+import SolidStarter from '../../system/SolidStarter';
 
 
 export default class StartRemoteDevelop extends StartBase {
-  //private readonly argIoSet: string;
   private remoteHostInfo?: HostInfo;
   private readonly host: string;
   private readonly port?: number;
@@ -31,18 +30,19 @@ export default class StartRemoteDevelop extends StartBase {
 
     this.host = host;
     this.port = port;
-    this.httpApiClient = new HttpApiClient(console.log, this.host);
+    this.httpApiClient = new HttpApiClient(console.log, this.host, this.port);
   }
 
   async init() {
-    this.remoteHostInfo = await this.httpApiClient.callMethod('info') as any;
+    this.remoteHostInfo = await this.switchAppAndGetInfo();
+
+    // TODO: appWorkDir, следовательно appEnvSetDir - должен быть в build dir и вообще он не нужен
 
     await super.init();
 
-    console.info(`Using remote ioset of host "${this.joinHostPort()}".`);
+    if (!this.remoteHostInfo) throw new Error(`no remoteHostInfo`);
 
-    if (!this.remoteHostInfo) return;
-
+    console.info(`Using remote ioset of host "${this.httpApiClient.hostPort}".`);
     console.info(`Remote machine: ${this.remoteHostInfo.machine}, ${this.remoteHostInfo.platform}`);
   }
 
@@ -50,12 +50,15 @@ export default class StartRemoteDevelop extends StartBase {
   async start() {
     await super.start();
 
-    // TODO: проверить тип хоста и переключить хост в режим ioServer если нужно
-
     const ioSet: IoSet = await this.makeIoSet();
-    const systemStarter = new SystemStarter(this.os, this.props);
 
-    await systemStarter.start(SYSTEM_DIR, ioSet);
+
+
+    //this.starter = await this.startSolid(SolidStarter, ioSet);
+
+    // const systemStarter = new SystemStarter(this.os, this.props);
+    //
+    // await systemStarter.start(SYSTEM_DIR, ioSet);
   }
 
   /**
@@ -75,6 +78,16 @@ export default class StartRemoteDevelop extends StartBase {
     return ioSet;
   }
 
+  protected resolvePlatformMachine(): {platform: Platforms, machine: string} {
+    if (!this.remoteHostInfo) throw new  Error(`No remote host info`);
+
+    return {
+      platform: this.remoteHostInfo.platform,
+      machine: this.remoteHostInfo.machine,
+    };
+  }
+
+
   private parseIoSetString(ioSetString?: string): {host: string, port?: number} {
     if (!ioSetString) throw new Error(`IoSet host is required`);
 
@@ -86,17 +99,18 @@ export default class StartRemoteDevelop extends StartBase {
     };
   }
 
-  protected resolvePlatformMachine(): {platform: Platforms, machine: string} {
-    if (!this.remoteHostInfo) throw new  Error(`No remote host info`);
+  private async switchAppAndGetInfo(): Promise<HostInfo> {
+    const info: HostInfo = await this.httpApiClient.callMethod('info') as any;
 
-    return {
-      platform: this.remoteHostInfo.platform,
-      machine: this.remoteHostInfo.machine,
-    };
-  }
+    if (info.appType === 'ioServer') return info;
 
-  private joinHostPort(): string {
-    return compactUndefined([this.host, this.port]).join(':');
+    await this.httpApiClient.callMethod('switchToIoServer');
+
+    const ioServerInfo: HostInfo = await this.httpApiClient.callMethod('info') as any;
+
+    // TODO: call during 60 sec
+
+    return ioServerInfo;
   }
 
 }

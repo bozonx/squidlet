@@ -17,6 +17,9 @@ const httpClientIo = new HttpClient();
 
 
 export default class HttpApiClient {
+  readonly port: number;
+  readonly hostPort: string;
+
   private readonly logDebug: (msg: string) => void;
   private readonly client: HttpClientLogic;
   private readonly baseUrl: string;
@@ -30,9 +33,10 @@ export default class HttpApiClient {
       this.logDebug
     );
 
-    const resolvedPort = (port) ? port : this.loadDefaultPort();
+    this.port = (port) ? port : this.loadDefaultPort();
+    this.hostPort = `${host}:${this.port}`;
 
-    this.baseUrl = `http://${host}:${resolvedPort}/api`;
+    this.baseUrl = `http://${this.hostPort}/api`;
   }
 
 

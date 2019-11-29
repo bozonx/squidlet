@@ -63,8 +63,6 @@ export default abstract class StartBase implements Starter {
     const envSetTmpDir = path.join(this.props.buildWorkDir, ENV_BUILD_TMP_DIR);
     const {platform, machine} = this.resolvePlatformMachine();
 
-    await this.os.mkdirP(this.props.appWorkDir, { uid: this.props.uid, gid: this.props.gid });
-
     this._envBuilder = new EnvBuilder(
       this.resolveHostConfig(),
       appEnvSetDir,
