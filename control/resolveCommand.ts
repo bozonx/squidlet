@@ -14,7 +14,15 @@ const wsApiCall = new WsApiCall();
 async function startCommand(command: string, positionArgsRest: string[], args: {[index: string]: any}) {
   switch (command) {
     case 'start':
-      return (new CommandStart(positionArgsRest, args as any)).start();
+      if (args.prod) {
+        return (new CommandStart(positionArgsRest, args as any)).startProd();
+      }
+      else if (args.ioset) {
+        return (new CommandStart(positionArgsRest, args as any)).startDevRemote(args.ioset);
+      }
+      else {
+        return (new CommandStart(positionArgsRest, args as any)).startDevSrc();
+      }
     case 'io-server':
       return (new CommandStart(positionArgsRest, args as any)).startIoServer();
     case 'update':

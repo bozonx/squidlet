@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 import IoSet from '../../system/interfaces/IoSet';
-import LogLevel from '../../system/interfaces/LogLevel';
 import Platforms from '../../system/interfaces/Platforms';
 import systemConfig from '../../system/systemConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
@@ -11,22 +10,23 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
-import NodejsMachines from '../interfaces/NodejsMachines';
-import Props, {NoMachine} from './Props';
+import Props from './Props';
+import Starter from '../interfaces/Starter';
+import StarterProps from '../interfaces/StarterProps';
 
 
-interface StarterLike {
+interface AppStarter {
   destroy(): Promise<void>;
 }
 
 const DEV_BUILD_ROOT = 'dev';
 
 
-export default abstract class StartBase {
+export default abstract class StartBase implements Starter {
   protected readonly os: Os = new Os();
   protected readonly groupConfig: GroupConfigParser;
   protected readonly props: Props;
-  protected starter?: StarterLike;
+  protected starter?: AppStarter;
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
   }
@@ -39,28 +39,19 @@ export default abstract class StartBase {
   protected abstract async makeIoSet(): Promise<IoSet>;
 
 
-  constructor(
-    configPath: string,
-    argForce?: boolean,
-    argLogLevel?: LogLevel,
-    argMachine?: NodejsMachines | NoMachine,
-    argHostName?: string,
-    argWorkDir?: string,
-    argUser?: string,
-    argGroup?: string,
-  ) {
-    this.groupConfig = new GroupConfigParser(this.os, configPath);
+  constructor(starterProps: StarterProps) {
+    this.groupConfig = new GroupConfigParser(this.os, starterProps.configPath);
     this.props = new Props(
       this.os,
       this.groupConfig,
       DEV_BUILD_ROOT,
-      argForce,
-      argLogLevel,
-      argMachine,
-      argHostName,
-      argWorkDir,
-      argUser,
-      argGroup,
+      starterProps.argForce,
+      starterProps.argLogLevel,
+      starterProps.argMachine,
+      starterProps.argHostName,
+      starterProps.argWorkDir,
+      starterProps.argUser,
+      starterProps.argGroup,
     );
   }
 
