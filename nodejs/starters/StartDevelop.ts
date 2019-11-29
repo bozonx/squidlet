@@ -16,6 +16,7 @@ export default class StartDevelop extends StartBase {
   async start() {
     await super.start();
 
+    // TODO: may be move to base
     const ioSet: IoSet = await this.makeIoSet();
 
     this.starter = await this.startSolid(SolidStarter, ioSet);
