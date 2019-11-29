@@ -5,6 +5,7 @@ import LogLevel from './interfaces/LogLevel';
 import StorageIo from './interfaces/io/StorageIo';
 import SysIo from './interfaces/io/SysIo';
 import ConsoleLogger from './ConsoleLogger';
+import {APP_DESTROY_TIMEOUT_SEC} from './constants';
 
 
 /**
@@ -46,7 +47,46 @@ export default class SolidStarter {
     this.started = true;
   }
 
-  async destroy(): Promise<void> {
+  destroy(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        reject(`App destroy timeout has been exceeded.`);
+      }, APP_DESTROY_TIMEOUT_SEC * 1000);
+
+      this.doDestroy()
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+
+  private async configureIoSet(
+    processExit: (code: number) => void,
+    workDir?: string,
+    uid?: number,
+    gid?: number,
+  ) {
+    // get Storage IO
+    const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
+    const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
+    // set uid, git and workDir to Storage IO
+    await storageIo.configure({ uid, gid, workDir });
+    // make destroy before process.exit
+    await sysIo.configure({
+      exit: (code: number) => {
+        this.destroy()
+          .then(() => processExit(code))
+          .catch((e: Error) => {
+            if (!this.consoleLogger) throw new Error('No consoleLogger');
+
+            this.consoleLogger.error(e);
+            processExit(code);
+          });
+      }
+    });
+  }
+
+  private async doDestroy() {
     if (!this.app) throw new Error('No app');
     if (!this.consoleLogger) throw new Error('No consoleLogger');
 
@@ -65,41 +105,11 @@ export default class SolidStarter {
     catch (e) {
       this.consoleLogger.error(e);
     }
-
-    delete this.ioSet;
-    delete this.app;
-    delete this.consoleLogger;
-  }
-
-
-  private async configureIoSet(
-    processExit: (code: number) => void,
-    workDir?: string,
-    uid?: number,
-    gid?: number,
-  ) {
-    // get Storage IO
-    const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
-    const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
-    // set uid, git and workDir to Storage IO
-    await storageIo.configure({ uid, gid, workDir });
-    // make destroy before process.exit
-
-    // TODO: может не нужен exit так как при нормальном destroy должно все отработать ?
-    // TODO: или вынести выше в колбэк
-
-    await sysIo.configure({
-      exit: (code: number) => {
-        this.destroy()
-          .then(() => processExit(code))
-          .catch((e: Error) => {
-            if (!this.consoleLogger) throw new Error('No consoleLogger');
-
-            this.consoleLogger.error(e);
-            processExit(code);
-          });
-      }
-    });
+    finally {
+      delete this.ioSet;
+      delete this.app;
+      delete this.consoleLogger;
+    }
   }
 
 }

@@ -3,7 +3,7 @@ import System from './System';
 import IoServer from './ioServer/IoServer';
 import {AppType} from './interfaces/AppType';
 import Logger from './interfaces/Logger';
-import {APP_DESTROY_TIMEOUT_SEC, START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
+import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
 import LogLevel from './interfaces/LogLevel';
 import HostConfig from './interfaces/HostConfig';
 import StorageIo from './interfaces/io/StorageIo';
@@ -12,6 +12,9 @@ import systemConfig from './systemConfig';
 import ConsoleLogger from './ConsoleLogger';
 
 
+/**
+ * It switches between System and IoServer
+ */
 export default class AppStarter {
   private ioSet: IoSet;
   private readonly hostConfigOverride?: HostConfig;
@@ -26,27 +29,23 @@ export default class AppStarter {
     this.logger = logger;
   }
 
-  destroy = (): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      const app = (this.system) ? this.system : this.ioServer;
+  destroy = async (): Promise<void> => {
+    const app = (this.system) ? this.system : this.ioServer;
 
-      if (!app) return reject('No app');
+    if (!app) throw new Error('No app');
 
-      setTimeout(() => {
-        reject(`App destroy timeout has been exceeded.`);
-      }, APP_DESTROY_TIMEOUT_SEC * 1000);
-
-      app.destroy()
-        .then(() => {
-          delete this.ioSet;
-          delete this.system;
-          delete this.ioServer;
-          delete this.logger;
-
-          resolve();
-        })
-        .catch(reject);
-    });
+    try {
+      await app.destroy();
+    }
+    catch (e) {
+      throw e;
+    }
+    finally {
+      delete this.ioSet;
+      delete this.system;
+      delete this.ioServer;
+      delete this.logger;
+    }
   }
 
 
