@@ -10,7 +10,7 @@ const config: HostConfigConfig = {
   rcResponseTimoutSec: 30,
   queueJobTimeoutSec: 120,
   rebootDelaySec: 5,
-
+  //appSwitchLock: false,
   // default params for connections
   // connections: {
   //   i2c: {

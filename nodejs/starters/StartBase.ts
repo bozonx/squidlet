@@ -115,7 +115,8 @@ export default abstract class StartBase {
   protected async startSolid(
     SolidStarterClass: new (ioSet: IoSet) => SolidStarter,
     ioSet: IoSet,
-    ioServerMode: boolean = false
+    ioServerMode?: boolean,
+    lockIoServer?: boolean
   ): Promise<SolidStarter> {
     const solidStarter: SolidStarter = new SolidStarterClass(ioSet);
     const hostConfigOverride: HostConfig = {
@@ -133,6 +134,7 @@ export default abstract class StartBase {
       this.props.gid,
       this.props.argLogLevel,
       ioServerMode,
+      lockIoServer
     );
 
     return solidStarter;

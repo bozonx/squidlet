@@ -28,6 +28,17 @@ export default class SolidStarter {
   }
 
 
+  /**
+   * Start app or IoServer
+   * @param processExit
+   * @param hostConfigOverride
+   * @param workDir
+   * @param uid
+   * @param gid
+   * @param logLevel
+   * @param ioServerMode
+   * @param lockIoServer - disallow switch to App from IoServer
+   */
   async start(
     processExit: (code: number) => void,
     hostConfigOverride?: HostConfig,
@@ -35,14 +46,15 @@ export default class SolidStarter {
     uid?: number,
     gid?: number,
     logLevel?: LogLevel,
-    ioServerMode?: boolean
+    ioServerMode?: boolean,
+    lockIoServer?: boolean
   ) {
     this.consoleLogger = new ConsoleLogger(logLevel);
     this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
 
     this.ioSet.init && await this.ioSet.init();
     await this.configureIoSet(processExit, workDir, uid, gid);
-    await this.app.start(ioServerMode);
+    await this.app.start(ioServerMode, lockIoServer);
 
     this.started = true;
   }

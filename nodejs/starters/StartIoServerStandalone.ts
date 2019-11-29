@@ -11,14 +11,13 @@ export default class StartIoServerStandalone extends StartDevelop {
 
     const ioSet: IoSet = await this.makeIoSet();
 
-    this.starter = await this.startSolid(SolidStarter, ioSet, true);
+    this.starter = await this.startSolid(SolidStarter, ioSet, true, true);
   }
 
   /**
    * Remove useless props from host config such as entities definitions.
    */
   protected resolveHostConfig(): PreHostConfig {
-    // TODO: add appSwitchLock
     return omitObj(
       this.props.hostConfig,
       'plugins',
