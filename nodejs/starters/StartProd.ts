@@ -15,6 +15,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import LogLevel from '../../system/interfaces/LogLevel';
 
 
+// TODO: extend StartBase
 export default class StartProd {
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;

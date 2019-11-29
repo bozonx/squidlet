@@ -2,7 +2,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import {SYSTEM_DIR} from '../../shared/helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
 import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
-import StartDevelopBase from './StartDevelopBase';
+import StartBase from './StartBase';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
@@ -10,7 +10,7 @@ import {compactUndefined} from '../../system/lib/arrays';
 import HttpApiClient from '../../shared/HttpApiClient';
 
 
-export default class StartRemoteDevelop extends StartDevelopBase {
+export default class StartRemoteDevelop extends StartBase {
   //private readonly argIoSet: string;
   private remoteHostInfo?: HostInfo;
   private readonly host: string;

@@ -1,10 +1,10 @@
 import IoSet from '../../system/interfaces/IoSet';
-import StartDevelopBase from './StartDevelopBase';
+import StartBase from './StartBase';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
 import SolidStarter from '../../system/SolidStarter';
 
 
-export default class StartDevelop extends StartDevelopBase {
+export default class StartDevelop extends StartBase {
   async init() {
     await super.init();
 

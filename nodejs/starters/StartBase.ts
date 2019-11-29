@@ -22,7 +22,7 @@ interface StarterLike {
 const DEV_BUILD_ROOT = 'dev';
 
 
-export default abstract class StartDevelopBase {
+export default abstract class StartBase {
   protected readonly os: Os = new Os();
   protected readonly groupConfig: GroupConfigParser;
   protected readonly props: Props;

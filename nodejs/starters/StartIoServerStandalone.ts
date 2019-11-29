@@ -5,11 +5,11 @@ import StorageIo from '../../system/interfaces/io/StorageIo';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
-import StartDevelopBase from './StartDevelopBase';
+import StartBase from './StartBase';
 import ConsoleLogger from '../../system/ConsoleLogger';
 
 
-export default class StartIoServerStandalone extends StartDevelopBase {
+export default class StartIoServerStandalone extends StartBase {
   private ioSet?: IoSet;
 
 
