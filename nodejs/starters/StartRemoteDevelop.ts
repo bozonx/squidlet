@@ -13,6 +13,8 @@ import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../system/constants';
 
 
 const SENDER_RESEND_INTERVAL_SEC = 1;
+const SENDER_REPEATS = 10;
+const SENDER_REPEATS_INTERVAL_SEC = 2;
 
 
 export default class StartRemoteDevelop extends StartBase {
@@ -116,17 +118,31 @@ export default class StartRemoteDevelop extends StartBase {
 
     await this.httpApiClient.callMethod('switchToIoServer');
 
-    // TODO: общий таймаут
+    for (let i = 0; i < SENDER_REPEATS; i++) {
+      let result: HostInfo | undefined;
 
-    return this.sender.send<HostInfo>('info', this.senderHandler);
-  }
+      await new Promise<void>((resolve, reject) => {
+        //if (i >= SENDER_REPEATS -1)
+        setTimeout(() => {
+          this.sender.send<HostInfo>('info', this.httpApiClient.callMethod('info') as any)
+            .then((hostInfo: HostInfo) => {
+              // just end cycle if app hasn't been switched
+              if (hostInfo.appType === 'ioServer') return resolve();
 
-  private senderHandler = async () => {
-    const hostInfo: HostInfo = this.httpApiClient.callMethod('info') as any;
+              result = hostInfo;
 
-    if (hostInfo.appType !== 'ioServer') return hostInfo;
-    // TODO: может небольшой таймаут - 2-3 сек
-    return this.sender.send<HostInfo>('info', this.senderHandler);
+              resolve();
+            })
+            .catch((e) => resolve);
+        }, SENDER_REPEATS_INTERVAL_SEC * 1000);
+      });
+      // exit cycle if there is a result
+      if (result) return result;
+
+      console.info(`App hasn't been switched, try again`);
+    }
+
+    throw new Error(`App hasn't been switched during timeout`);
   }
 
 }
