@@ -27,8 +27,11 @@ export default class SolidStarter {
     this.ioSet = ioSet;
   }
 
-  async init() {
+  async init(hostConfigOverride?: HostConfig, logLevel?: LogLevel) {
+    this.consoleLogger = new ConsoleLogger(logLevel);
+    this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
 
+    this.ioSet.init && await this.ioSet.init();
   }
 
   destroy(): Promise<void> {
@@ -46,42 +49,26 @@ export default class SolidStarter {
 
   /**
    * Start app or IoServer
-   * @param processExit
-   * @param hostConfigOverride
-   * @param workDir
-   * @param uid
-   * @param gid
-   * @param logLevel
    * @param ioServerMode
    * @param lockIoServer - disallow switch to App from IoServer
    */
-  async start(
-    processExit: (code: number) => void,
-    hostConfigOverride?: HostConfig,
-    workDir?: string,
-    uid?: number,
-    gid?: number,
-    logLevel?: LogLevel,
-    ioServerMode?: boolean,
-    lockIoServer?: boolean
-  ) {
-    this.consoleLogger = new ConsoleLogger(logLevel);
-    this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
+  async start(ioServerMode?: boolean, lockIoServer?: boolean) {
+    if (!this.app) throw new Error(`No app`);
 
-    this.ioSet.init && await this.ioSet.init();
-    await this.configureIoSet(processExit, workDir, uid, gid);
     await this.app.start(ioServerMode, lockIoServer);
 
     this.started = true;
   }
 
-
-  private async configureIoSet(
-    processExit: (code: number) => void,
-    workDir?: string,
-    uid?: number,
-    gid?: number,
-  ) {
+  /**
+   * Configure local Storage IO and Sys IO.
+   * Don't call it if remote IO set is used.
+   * @param processExit
+   * @param workDir
+   * @param uid
+   * @param gid
+   */
+  async configureIoSet(processExit: (code: number) => void, workDir?: string, uid?: number, gid?: number) {
     // get Storage IO
     const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
     const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
