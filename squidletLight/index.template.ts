@@ -11,6 +11,6 @@ import * as servicesMainFiles from './servicesMainFiles';
 const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
 
 
-export default function instantiateStarter (): Main {
+export default function instantiateMain (): Main {
   return new Main(ioSet);
 }

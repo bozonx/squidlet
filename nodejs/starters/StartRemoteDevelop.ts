@@ -8,6 +8,11 @@ import HostInfo from '../../system/interfaces/HostInfo';
 import HttpApiClient from '../../shared/HttpApiClient';
 import Main from '../../system/Main';
 import HostConfig from '../../system/interfaces/HostConfig';
+import Sender from '../../system/lib/Sender';
+import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../system/constants';
+
+
+const SENDER_RESEND_INTERVAL_SEC = 1;
 
 
 export default class StartRemoteDevelop extends StartBase {
@@ -15,6 +20,7 @@ export default class StartRemoteDevelop extends StartBase {
   private readonly host: string;
   private readonly port?: number;
   private readonly httpApiClient: HttpApiClient;
+  private readonly sender: Sender;
 
 
   constructor(configPath: string, logLevel?: LogLevel, hostName?: string, argIoSet?: string) {
@@ -31,12 +37,16 @@ export default class StartRemoteDevelop extends StartBase {
     this.host = host;
     this.port = port;
     this.httpApiClient = new HttpApiClient(console.log, this.host, this.port);
+    this.sender = new Sender(
+      WAIT_RESPONSE_TIMEOUT_SEC,
+      SENDER_RESEND_INTERVAL_SEC,
+      console.log,
+      console.warn
+    );
   }
 
   async init() {
     this.remoteHostInfo = await this.switchAppAndGetInfo();
-
-    // TODO: appWorkDir, следовательно appEnvSetDir - должен быть в build dir и вообще он не нужен
 
     await super.init();
 
@@ -106,11 +116,17 @@ export default class StartRemoteDevelop extends StartBase {
 
     await this.httpApiClient.callMethod('switchToIoServer');
 
-    const ioServerInfo: HostInfo = await this.httpApiClient.callMethod('info') as any;
+    // TODO: общий таймаут
 
-    // TODO: call during 60 sec
+    return this.sender.send<HostInfo>('info', this.senderHandler);
+  }
 
-    return ioServerInfo;
+  private senderHandler = async () => {
+    const hostInfo: HostInfo = this.httpApiClient.callMethod('info') as any;
+
+    if (hostInfo.appType !== 'ioServer') return hostInfo;
+    // TODO: может небольшой таймаут - 2-3 сек
+    return this.sender.send<HostInfo>('info', this.senderHandler);
   }
 
 }

@@ -112,9 +112,9 @@ export default class Props {
   }
 
   private resolveWorkDir(): string {
-    if (this.appWorkDir) {
+    if (this.argWorkDir) {
       // if it set as an argument - make it absolute
-      return path.resolve(process.cwd(), this.appWorkDir);
+      return path.resolve(process.cwd(), this.argWorkDir);
     }
 
     return path.join(
