@@ -1,5 +1,5 @@
 import IoSetBuiltin from '${REPO_ROOT}/squidletLight/IoSetBuiltin';
-import SolidStarter from '${REPO_ROOT}/system/SolidStarter';
+import Main from '${REPO_ROOT}/system/Main';
 import IoSet from '${REPO_ROOT}/system/interfaces/IoSet';
 import envSet from './envSet';
 import * as ios from './ios';
@@ -11,6 +11,6 @@ import * as servicesMainFiles from './servicesMainFiles';
 const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMainFiles, servicesMainFiles);
 
 
-export default function instantiateStarter (): SolidStarter {
-  return new SolidStarter(ioSet);
+export default function instantiateStarter (): Main {
+  return new Main(ioSet);
 }

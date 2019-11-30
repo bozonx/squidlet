@@ -12,7 +12,7 @@ import {APP_DESTROY_TIMEOUT_SEC} from './constants';
  * Starter for builds where local IoSet is used.
  * It manages ioSet object and system
  */
-export default class SolidStarter {
+export default class Main {
   get hasBeenStarted(): boolean {
     return this.started;
   }

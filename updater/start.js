@@ -4,7 +4,7 @@ const squidletIndex = '/app/data/envSet/bundle/bundle.js';
 const updaterIndex = '/app/bundle.js';
 
 let stat;
-let instantiateStarter;
+let instantiateMain;
 let appType = 'app';
 const env = process.env;
 
@@ -15,14 +15,14 @@ catch (e) {
 }
 
 if (stat && stat.isFile()) {
-  instantiateStarter = require(squidletIndex);
+  instantiateMain = require(squidletIndex);
 }
 else {
-  instantiateStarter = require(updaterIndex);
+  instantiateMain = require(updaterIndex);
   appType = 'updater';
 }
 
-const starter = instantiateStarter();
+const main = instantiateMain();
 const hostConfigOverride = {
   appType,
   mqtt: {
@@ -31,21 +31,24 @@ const hostConfigOverride = {
   },
 };
 
-starter.start(
-  (code) => process.exit(code),
-  hostConfigOverride,
-  '/app/data',
-  (env.PUID) ? Number(env.PUID) : undefined,
-  (env.PGID) ? Number(env.PGID) : undefined,
-  process.env.LOG_LEVEL || undefined,
-  process.env.IOSERVER_MODE === 'true',
-)
+async function start() {
+  await main.init(hostConfigOverride, process.env.LOG_LEVEL || undefined);
+  await main.configureIoSet(
+    (code) => process.exit(code),
+    '/app/data',
+    (env.PUID) ? Number(env.PUID) : undefined,
+    (env.PGID) ? Number(env.PGID) : undefined
+  );
+  await main.start(process.env.IOSERVER_MODE === 'true')
+}
+
+start()
   .catch(console.error);
 
 async function gracefullyShutdown() {
-  if (starter.hasBeenStarted) {
+  if (main.hasBeenStarted) {
     try {
-      await starter.destroy();
+      await main.destroy();
     }
     catch (e) {
       console.error(e);

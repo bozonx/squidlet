@@ -1,7 +1,7 @@
 import IoSet from '../../system/interfaces/IoSet';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import {omitObj} from '../../system/lib/objects';
-import SolidStarter from '../../system/SolidStarter';
+import Main from '../../system/Main';
 import StartDevelop from './StartDevelop';
 
 
@@ -11,7 +11,7 @@ export default class StartIoServerStandalone extends StartDevelop {
 
     const ioSet: IoSet = await this.makeIoSet();
 
-    this.starter = await this.startSolid(SolidStarter, ioSet, true, true);
+    this.main = await this.startMain(Main, ioSet, true, true);
   }
 
   /**

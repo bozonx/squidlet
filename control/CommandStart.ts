@@ -50,7 +50,6 @@ export default class CommandStart {
    * Start in common develop mode. All the IOs and entities will be load from local ts files.
    */
   startDevSrc(): Promise<void> {
-    // develop with local io set
     const starter = new StartDevelop(this.configPath, this.starterProps);
 
     return this.startApp(starter);

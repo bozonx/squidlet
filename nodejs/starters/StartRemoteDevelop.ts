@@ -1,5 +1,4 @@
 import IoSet from '../../system/interfaces/IoSet';
-import {SYSTEM_DIR} from '../../shared/helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
 import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
 import StartBase from './StartBase';
@@ -7,7 +6,8 @@ import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
 import HttpApiClient from '../../shared/HttpApiClient';
-import SolidStarter from '../../system/SolidStarter';
+import Main from '../../system/Main';
+import HostConfig from '../../system/interfaces/HostConfig';
 
 
 export default class StartRemoteDevelop extends StartBase {
@@ -52,11 +52,13 @@ export default class StartRemoteDevelop extends StartBase {
 
     const ioSet: IoSet = await this.makeIoSet();
 
-    this.starter = await this.startSolid(SolidStarter, ioSet);
+    this.main = new Main(ioSet);
+    const hostConfigOverride: HostConfig = {} as HostConfig;
 
-    // const systemStarter = new SystemStarter(this.os, this.props);
-    //
-    // await systemStarter.start(SYSTEM_DIR, ioSet);
+    console.info(`===> Starting app`);
+
+    await this.main.init(hostConfigOverride, this.props.argLogLevel);
+    await this.main.start(false);
   }
 
   /**

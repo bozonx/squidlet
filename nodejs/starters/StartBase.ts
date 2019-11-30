@@ -4,7 +4,7 @@ import IoSet from '../../system/interfaces/IoSet';
 import Platforms from '../../system/interfaces/Platforms';
 import systemConfig from '../../system/systemConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
-import SolidStarter from '../../system/SolidStarter';
+import Main from '../../system/Main';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from '../../shared/Os';
@@ -15,10 +15,7 @@ import Starter from '../interfaces/Starter';
 import StarterProps from '../interfaces/StarterProps';
 
 
-interface AppStarter {
-  destroy(): Promise<void>;
-}
-
+// TODO: review. prod же тоже может быть
 const DEV_BUILD_ROOT = 'dev';
 
 
@@ -26,7 +23,7 @@ export default abstract class StartBase implements Starter {
   protected readonly os: Os = new Os();
   protected readonly groupConfig: GroupConfigParser;
   protected readonly props: Props;
-  protected starter?: AppStarter;
+  protected main?: Main;
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
   }
@@ -80,9 +77,9 @@ export default abstract class StartBase implements Starter {
   }
 
   destroy = async () => {
-    if (!this.starter) throw new Error(`Starter hasn't been initialized yet`);
+    if (!this.main) throw new Error(`Main hasn't been initialized yet`);
 
-    await this.starter.destroy();
+    await this.main.destroy();
   }
 
 
@@ -101,13 +98,13 @@ export default abstract class StartBase implements Starter {
     };
   }
 
-  protected async startSolid(
-    SolidStarterClass: new (ioSet: IoSet) => SolidStarter,
+  protected async startMain(
+    MainClass: new (ioSet: IoSet) => Main,
     ioSet: IoSet,
     ioServerMode?: boolean,
     lockIoServer?: boolean
-  ): Promise<SolidStarter> {
-    const solidStarter: SolidStarter = new SolidStarterClass(ioSet);
+  ): Promise<Main> {
+    const main: Main = new MainClass(ioSet);
     const hostConfigOverride: HostConfig = {
       // TODO: resolve appType ???? или он зарезолвится ниже ???
       //appType: 'app',
@@ -115,18 +112,16 @@ export default abstract class StartBase implements Starter {
 
     console.info(`===> Starting app`);
 
-    await solidStarter.start(
+    await main.init(hostConfigOverride, this.props.argLogLevel);
+    await main.configureIoSet(
       (code: number) => this.os.processExit(code),
-      hostConfigOverride,
       this.props.appWorkDir,
       this.props.uid,
       this.props.gid,
-      this.props.argLogLevel,
-      ioServerMode,
-      lockIoServer
     );
+    await main.start(ioServerMode, lockIoServer);
 
-    return solidStarter;
+    return main;
   }
 
 }
@@ -137,10 +132,6 @@ export default abstract class StartBase implements Starter {
 //  * It installs modules into root node_modules dir of squidlet repository.
 //  */
 // protected async installModules() {
-//
-//   // TODO: review
-//   // TODO: why REPO_ROOT ????
-//
 //   const dependencies = this.envBuilder.configManager.dependencies;
 //
 //   if (!dependencies || isEmptyObject(dependencies)) return;

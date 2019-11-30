@@ -44,7 +44,7 @@ export default class HttpApiClient {
     apiMethodName: string,
     ...args: any[]
   ): Promise<T> {
-    const url = `${this.baseUrl}/${apiMethodName}/${this.prepareArgsString(args)}`;
+    const url: string = `${this.baseUrl}/${apiMethodName}/${this.prepareArgsString(args)}`;
     const request: HttpDriverRequest = {
       url,
       method: 'get',

@@ -1,7 +1,7 @@
 import IoSet from '../../system/interfaces/IoSet';
 import StartBase from './StartBase';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
-import SolidStarter from '../../system/SolidStarter';
+import Main from '../../system/Main';
 
 
 export default class StartDevelop extends StartBase {
@@ -21,7 +21,7 @@ export default class StartDevelop extends StartBase {
     // TODO: may be move to base
     const ioSet: IoSet = await this.makeIoSet();
 
-    this.starter = await this.startSolid(SolidStarter, ioSet);
+    this.main = await this.startMain(Main, ioSet);
   }
 
 
