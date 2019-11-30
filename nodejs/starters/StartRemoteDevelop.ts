@@ -52,9 +52,7 @@ export default class StartRemoteDevelop extends StartBase {
 
     const ioSet: IoSet = await this.makeIoSet();
 
-
-
-    //this.starter = await this.startSolid(SolidStarter, ioSet);
+    this.starter = await this.startSolid(SolidStarter, ioSet);
 
     // const systemStarter = new SystemStarter(this.os, this.props);
     //

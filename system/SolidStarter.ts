@@ -27,6 +27,22 @@ export default class SolidStarter {
     this.ioSet = ioSet;
   }
 
+  async init() {
+
+  }
+
+  destroy(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        reject(`App destroy timeout has been exceeded.`);
+      }, APP_DESTROY_TIMEOUT_SEC * 1000);
+
+      this.doDestroy()
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
 
   /**
    * Start app or IoServer
@@ -57,18 +73,6 @@ export default class SolidStarter {
     await this.app.start(ioServerMode, lockIoServer);
 
     this.started = true;
-  }
-
-  destroy(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        reject(`App destroy timeout has been exceeded.`);
-      }, APP_DESTROY_TIMEOUT_SEC * 1000);
-
-      this.doDestroy()
-        .then(resolve)
-        .catch(reject);
-    });
   }
 
 
