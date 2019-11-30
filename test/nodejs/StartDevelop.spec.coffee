@@ -18,7 +18,7 @@ describe 'nodejs.StartDevelop', ->
       tmpDir: 'tmoDir'
       platform: 'nodejs'
       hostId: @argHostName
-      force: false
+      #force: false
       hostConfig: @hostConfog
     }
     @argIoset = 'localhost:8080'

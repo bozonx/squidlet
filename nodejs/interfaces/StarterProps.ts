@@ -4,7 +4,7 @@ import {NoMachine} from '../starters/Props';
 
 
 export default interface StarterProps {
-  force?: boolean;
+  //force?: boolean;
   logLevel?: LogLevel;
   machine?: NodejsMachines | NoMachine;
   hostName?: string;

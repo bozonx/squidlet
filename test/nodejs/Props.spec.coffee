@@ -28,7 +28,7 @@ describe 'nodejs.Props', ->
     assert.equal(@props.platform, 'nodejs')
     assert.equal(@props.hostId, @hostId)
     #assert.equal(@props.destroyTimeoutSec, 60)
-    assert.isTrue(@props.force)
+    #assert.isTrue(@props.force)
     assert.equal(@props.hostConfig, @hostConfig)
     assert.equal(@props.machine, @machine)
 

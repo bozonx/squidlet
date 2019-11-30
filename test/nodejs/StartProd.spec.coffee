@@ -18,7 +18,7 @@ describe 'nodejs.StartProd', ->
       tmpDir: 'tmoDir'
       platform: 'nodejs'
       hostId: @argHostName
-      force: false
+      #force: false
       hostConfig: @hostConfig
     }
 
@@ -79,41 +79,41 @@ describe 'nodejs.StartProd', ->
     sinon.assert.calledOnce(startProd.systemStarter.start)
     sinon.assert.calledWith(startProd.systemStarter.start, 'envSetDir/system/System')
 
-  it 'installModules - not force and node_modules exists - do nothing', ->
-    startProd = @newInstance()
-
-    startProd.os.exists = () => Promise.resolve(true)
-
-    await startProd.installModules()
-
-    sinon.assert.notCalled(startProd.prodBuild.buildPackageJson)
-
-  it 'installModules - not force and node_modules doesnt exist', ->
-    startProd = @newInstance()
-
-    startProd.os.exists = () => Promise.resolve(false)
-    startProd.makeSystemSymLink = sinon.stub().returns(Promise.resolve())
-
-    await startProd.installModules()
-
-    sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
-    sinon.assert.calledWith(startProd.prodBuild.buildPackageJson, {dep: '1.2.3'})
-    sinon.assert.calledOnce(startProd.runNpmInstall)
-    sinon.assert.calledOnce(startProd.makeSystemSymLink)
-
-
-  it 'installModules - force', ->
-    startProd = @newInstance()
-
-    startProd.props.force = true
-    startProd.os.exists = () => Promise.resolve(true)
-    startProd.makeSystemSymLink = sinon.stub().returns(Promise.resolve())
-
-    await startProd.installModules()
-
-    sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
-    sinon.assert.calledOnce(startProd.runNpmInstall)
-    sinon.assert.calledOnce(startProd.makeSystemSymLink)
+#  it 'installModules - not force and node_modules exists - do nothing', ->
+#    startProd = @newInstance()
+#
+#    startProd.os.exists = () => Promise.resolve(true)
+#
+#    await startProd.installModules()
+#
+#    sinon.assert.notCalled(startProd.prodBuild.buildPackageJson)
+#
+#  it 'installModules - not force and node_modules doesnt exist', ->
+#    startProd = @newInstance()
+#
+#    startProd.os.exists = () => Promise.resolve(false)
+#    startProd.makeSystemSymLink = sinon.stub().returns(Promise.resolve())
+#
+#    await startProd.installModules()
+#
+#    sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
+#    sinon.assert.calledWith(startProd.prodBuild.buildPackageJson, {dep: '1.2.3'})
+#    sinon.assert.calledOnce(startProd.runNpmInstall)
+#    sinon.assert.calledOnce(startProd.makeSystemSymLink)
+#
+#
+#  it 'installModules - force', ->
+#    startProd = @newInstance()
+#
+#    startProd.props.force = true
+#    startProd.os.exists = () => Promise.resolve(true)
+#    startProd.makeSystemSymLink = sinon.stub().returns(Promise.resolve())
+#
+#    await startProd.installModules()
+#
+#    sinon.assert.calledOnce(startProd.prodBuild.buildPackageJson)
+#    sinon.assert.calledOnce(startProd.runNpmInstall)
+#    sinon.assert.calledOnce(startProd.makeSystemSymLink)
 
   it 'makeSystemSymLink', ->
     startProd = @newInstance()

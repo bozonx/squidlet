@@ -29,7 +29,7 @@ export default class StartProd {
 
   constructor(
     configPath: string,
-    argForce?: boolean,
+    //argForce?: boolean,
     argLogLevel?: LogLevel,
     argMachine?: NodejsMachines,
     argHostName?: string,
@@ -42,7 +42,7 @@ export default class StartProd {
       this.os,
       this.groupConfig,
       'prod',
-      argForce,
+      //argForce,
       argLogLevel,
       argMachine,
       argHostName,

@@ -42,7 +42,7 @@ export default abstract class StartBase implements Starter {
       this.os,
       this.groupConfig,
       DEV_BUILD_ROOT,
-      starterProps.force,
+      //starterProps.force,
       starterProps.logLevel,
       starterProps.machine,
       starterProps.hostName,

@@ -21,7 +21,7 @@ export default class Props {
   hostId: string = '';
   uid?: number;
   gid?: number;
-  readonly force: boolean;
+  //readonly force: boolean;
   readonly argLogLevel?: LogLevel;
   machine?: NodejsMachines;
   get hostConfig(): PreHostConfig {
@@ -44,7 +44,7 @@ export default class Props {
     os: Os,
     groupConfig: GroupConfigParser,
     buildWorkDirRoot: string,
-    argForce?: boolean,
+    //argForce?: boolean,
     argLogLevel?: LogLevel,
     argMachine?: NodejsMachines | NoMachine,
     argHostName?: string,
@@ -56,7 +56,7 @@ export default class Props {
     this.os = os;
     this.groupConfig = groupConfig;
     this.buildWorkDirRoot = buildWorkDirRoot;
-    this.force = Boolean(argForce);
+    //this.force = Boolean(argForce);
     this.argLogLevel = argLogLevel;
     this.argMachine = argMachine;
     this.argHostName = argHostName;

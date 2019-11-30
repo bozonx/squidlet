@@ -9,7 +9,7 @@ describe 'nodejs.ProdBuild', ->
       envSetDir: 'envSetDir'
       tmpDir: 'tmpDir'
       platform: 'nodejs'
-      force: false
+      #force: false
     }
     @prodBuild = new ProdBuild(new Os(), @props)
 

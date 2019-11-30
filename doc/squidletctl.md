@@ -28,15 +28,13 @@ Example:
  
 ### Start production host
 
-Sys and entities are rebuilt each time you start prod build. Node modules are installed
-only first time or if `--force` parameter is set.
+Sys and entities are rebuilt each time you start prod build.
 
     squidletctl start
       --prod=true
       [--machine=x86 | arm | rpi]
       [--work-dir]
       [--name]
-      [--force=true]
       [--log-level=debug|info|warn|error]
       [--user=username]
       [--group=groupname]
@@ -48,7 +46,6 @@ only first time or if `--force` parameter is set.
       [--machine=x86 | arm | rpi]
       [--work-dir]
       [--name]
-      [--force=true]
       [--log-level=debug|info|warn|error]
       [--user=username]
       [--group=groupname]
@@ -74,7 +71,6 @@ Config is optional, if it does not includes io definitions you don't have to spe
       [--machine=x86 | arm | rpi]
       [--work-dir]
       [--name]
-      [--force=true]
       [--log-level=debug|info|warn|error]
       [--user=username]
       [--group=groupname]
@@ -85,22 +81,14 @@ Config is optional, if it does not includes io definitions you don't have to spe
 * --machine can be x86, arm or rpi. It tries recognize it automatically if this argument isn't set
 * --prod=true - if set production version will be used instead. By default is development.
 * --work-dir - set working dir for host where envset, data and tmp dirs will be placed.
-  By default it uses $SQUIDLET_ROOT dir instead "build" of repository.
 * --name uses only if group config is specified
   and selects a host config from group config
-* --force - it runs `npm install` anyway
 * --log-level - log level which will be used. It overrides a log level specified in a host config.
 * --user - owner of files which will be written. It can be a user name or uid. It is optional
 * --group - group of files which will be written, It can be a group name or uid. It is optional
 * ./groupOrHostConfig.yaml - it is path to host config yaml file of group config.
   If group config is specified you should specify a host name (--name argument)
   instead the first host will be taken.
-
-### Environment variables
-
-* SQUIDLET_ROOT is an env variable points to root where hosts' files and builds are placed.
-  By default isn't set.
-
 
 ## Call device's action
 
