@@ -1,12 +1,12 @@
 {
   "name": "squidlet-updater",
-  "version": "5.4.0",
+  "version": "${VERSION}",
   "description": "Prod container for squidlet",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
   "license": "MIT",
   "scripts": {
-    "start": "node start.js"
+    "start": "node ../updater/start.js"
   },
   "dependencies": {
     "axios": "*",
