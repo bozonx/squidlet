@@ -51,6 +51,7 @@ export default class AppStarter {
 
   async start(startIoServerFirst: boolean = false, lockIoServer: boolean = false) {
     let startIoServer: boolean = startIoServerFirst;
+    let fileContent: AppType | undefined;
     const storageIo: StorageIo = await this.ioSet.getIo<StorageIo>('Storage');
     const startAppTypeFileName: string = pathJoin(
       systemConfig.rootDirs.tmp,
@@ -59,7 +60,7 @@ export default class AppStarter {
     const fileExists: boolean = await storageIo.exists(startAppTypeFileName);
 
     if (fileExists) {
-      const fileContent: AppType = await storageIo.readFile(startAppTypeFileName) as AppType;
+      fileContent = await storageIo.readFile(startAppTypeFileName) as AppType;
 
       startIoServer = fileContent === 'ioServer';
     }
@@ -68,13 +69,19 @@ export default class AppStarter {
       await this.startIoServer(lockIoServer);
     }
     else {
-      await this.startSystem();
+      await this.startSystem(fileContent);
     }
   }
 
 
-  private startSystem = async () => {
-    this.system = new System(this.ioSet, this.hostConfigOverride);
+  private startSystem = async (specifiedAppType?: AppType) => {
+    const hostConfigOverride: HostConfig = { ...this.hostConfigOverride } as any;
+
+    if (specifiedAppType) {
+      hostConfigOverride.appType = specifiedAppType;
+    }
+
+    this.system = new System(this.ioSet, hostConfigOverride);
 
     this.system.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
       this.logger[level](message);

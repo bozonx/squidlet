@@ -5,8 +5,13 @@ const updaterIndex = '/app/bundle.js';
 
 let stat;
 let instantiateMain;
-let appType = 'app';
 const env = process.env;
+const hostConfigOverride = {
+  mqtt: {
+    host: env.MQTT_BROKER_HOST || undefined,
+    port: (env.MQTT_BROKER_PORT) ? Number(env.MQTT_BROKER_PORT) : undefined,
+  },
+};
 
 try {
   stat = fs.statSync(squidletIndex);
@@ -19,17 +24,10 @@ if (stat && stat.isFile()) {
 }
 else {
   instantiateMain = require(updaterIndex);
-  appType = 'updater';
+  hostConfigOverride.appType = 'updater';
 }
 
 const main = instantiateMain();
-const hostConfigOverride = {
-  appType,
-  mqtt: {
-    host: env.MQTT_BROKER_HOST || undefined,
-    port: (env.MQTT_BROKER_PORT) ? Number(env.MQTT_BROKER_PORT) : undefined,
-  },
-};
 
 async function start() {
   await main.init(hostConfigOverride, process.env.LOG_LEVEL || undefined);

@@ -9,8 +9,7 @@ import {APP_DESTROY_TIMEOUT_SEC} from './constants';
 
 
 /**
- * Starter for builds where local IoSet is used.
- * It manages ioSet object and system
+ * It manages ioSet object and system starter
  */
 export default class Main {
   get hasBeenStarted(): boolean {
