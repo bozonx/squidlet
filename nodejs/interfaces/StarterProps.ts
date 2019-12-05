@@ -1,6 +1,6 @@
 import LogLevel from '../../system/interfaces/LogLevel';
 import NodejsMachines from './NodejsMachines';
-import {NoMachine} from '../starters/Props';
+import {NoMachine} from '../starters/StartBase';
 
 
 export default interface StarterProps {

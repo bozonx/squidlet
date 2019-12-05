@@ -19,6 +19,10 @@ import {getOsMachine} from '../../shared/helpers/resolveMachine';
 import {resolveUid, resolveGid} from '../../shared/helpers/resolveUserGroup';
 
 
+// TODO: maybe remove and use false instead of it
+export type NoMachine = 'noMachine';
+
+
 export default abstract class StartBase implements Starter {
   protected abstract buildRoot: string;
 

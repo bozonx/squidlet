@@ -7,7 +7,8 @@ import BuildIo from '../../shared/envSetBuild/BuildIo';
 import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
 import Os from '../../shared/Os';
 import PackageJson from '../../shared/interfaces/PackageJson';
-import Props from './Props';
+// TODO: don't use props
+import Props from '../../__old/nodejs/Props';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 
 

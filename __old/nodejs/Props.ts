@@ -6,7 +6,7 @@ import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import GroupConfigParser from '../../shared/GroupConfigParser';
 import {APP_WORK_DIR, BUILD_WORK_DIR, REPO_BUILD_DIR} from '../../shared/constants';
 import {getOsMachine, REPO_ROOT} from '../../shared/helpers';
-import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
+import NodejsMachines, {nodejsSupportedMachines} from '../../nodejs/interfaces/NodejsMachines';
 import {isKindOfNumber} from '../../system/lib/common';
 import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 

@@ -8,7 +8,7 @@ import systemConfig from '../../system/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import Props from './Props';
+import Props from '../../__old/nodejs/Props';
 import ProdBuild from './ProdBuild';
 import IoSetLocal from '../../system/IoSetLocal';
 import IoSet from '../../system/interfaces/IoSet';

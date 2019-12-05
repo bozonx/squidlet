@@ -1,4 +1,4 @@
-Props = require('../../nodejs/starters/Props').default
+Props = require('../../__old/nodejs/Props').default
 
 
 describe 'nodejs.Props', ->
