@@ -11,7 +11,7 @@ import {isKindOfNumber} from '../../system/lib/common';
 import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 
 
-export type NoMachine = 'noMachine';
+//export type NoMachine = 'noMachine';
 
 
 export default class Props {
@@ -31,7 +31,7 @@ export default class Props {
 
   private readonly os: Os;
   private readonly buildWorkDirRoot: string = '';
-  private readonly argMachine?: NodejsMachines | NoMachine;
+  //private readonly argMachine?: NodejsMachines | NoMachine;
   private readonly argHostName?: string;
   private readonly argWorkDir?: string;
   private readonly groupConfig: GroupConfigParser;
@@ -46,7 +46,7 @@ export default class Props {
     buildWorkDirRoot: string,
     //argForce?: boolean,
     argLogLevel?: LogLevel,
-    argMachine?: NodejsMachines | NoMachine,
+    //argMachine?: NodejsMachines | NoMachine,
     argHostName?: string,
     argWorkDir?: string,
     // TODO: test
@@ -87,7 +87,7 @@ export default class Props {
       BUILD_WORK_DIR
     );
 
-    this.appWorkDir = this.resolveWorkDir();
+    this.appWorkDir = this.resolveAppWorkDir();
   }
 
 
@@ -111,7 +111,7 @@ export default class Props {
     return this.getOsMachine();
   }
 
-  private resolveWorkDir(): string {
+  private resolveAppWorkDir(): string {
     if (this.argWorkDir) {
       // if it set as an argument - make it absolute
       return path.resolve(process.cwd(), this.argWorkDir);
