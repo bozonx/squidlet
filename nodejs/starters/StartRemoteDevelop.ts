@@ -18,6 +18,8 @@ const SENDER_REPEATS_INTERVAL_SEC = 2;
 
 
 export default class StartRemoteDevelop extends StartBase {
+  protected buildRoot = 'remote';
+
   private remoteHostInfo?: HostInfo;
   private readonly host: string;
   private readonly port?: number;
@@ -69,7 +71,7 @@ export default class StartRemoteDevelop extends StartBase {
 
     console.info(`===> Starting app`);
 
-    await this.main.init(hostConfigOverride, this.props.argLogLevel);
+    await this.main.init(hostConfigOverride, this.starterProps.logLevel);
     await this.main.start(false);
   }
 

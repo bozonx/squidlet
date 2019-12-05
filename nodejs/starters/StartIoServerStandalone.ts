@@ -6,6 +6,9 @@ import StartDevelop from './StartDevelop';
 
 
 export default class StartIoServerStandalone extends StartDevelop {
+  protected buildRoot = 'ioServer';
+
+
   async start() {
     await super.start();
 
@@ -19,7 +22,7 @@ export default class StartIoServerStandalone extends StartDevelop {
    */
   protected resolveHostConfig(): PreHostConfig {
     return omitObj(
-      this.props.hostConfig,
+      this.hostConfig,
       'plugins',
       'devices',
       'drivers',

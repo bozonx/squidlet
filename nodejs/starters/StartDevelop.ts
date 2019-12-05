@@ -5,13 +5,16 @@ import Main from '../../system/Main';
 
 
 export default class StartDevelop extends StartBase {
+  protected buildRoot = 'dev';
+
+
   async init() {
     await super.init();
 
-    await this.os.mkdirP(this.props.appWorkDir, { uid: this.props.uid, gid: this.props.gid });
+    await this.os.mkdirP(this.appWorkDir, { uid: this.uid, gid: this.gid });
 
-    console.info(`Using app work dir ${this.props.appWorkDir} and build dir ${this.props.buildWorkDir}`);
-    console.info(`Using host "${this.props.hostConfig.id}" on machine "${this.props.machine}", platform "${this.props.platform}"`);
+    console.info(`Using app work dir ${this.appWorkDir} and build dir ${this.buildWorkDir}`);
+    console.info(`Using host "${this.hostConfig.id}" on machine "${this.machine}", platform "${this.platform}"`);
   }
 
 
