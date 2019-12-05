@@ -18,7 +18,6 @@ export default class IoServer {
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
-  private readonly lockIoServer: boolean;
   private _wsServer?: WsServerLogic;
   private ioConnection?: IoServerConnection;
   private httpApi?: IoServerHttpApi;
@@ -37,14 +36,12 @@ export default class IoServer {
     ioSet: IoSet,
     logDebug: (msg: string) => void,
     logInfo: (msg: string) => void,
-    logError: (msg: string) => void,
-    lockIoServer: boolean
+    logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
     this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
-    this.lockIoServer = lockIoServer;
   }
 
   async start() {
@@ -115,8 +112,7 @@ export default class IoServer {
       this.hostConfig,
       this.logDebug,
       this.logInfo,
-      this.logError,
-      this.lockIoServer
+      this.logError
     );
 
     await this.httpApi.init();

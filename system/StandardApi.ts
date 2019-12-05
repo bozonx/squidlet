@@ -95,8 +95,12 @@ export default class StandardApi {
 
 
   async switchToIoServer() {
-    if (!this.context.config.ioServer) {
+    if (this.context.config.lockAppSwitch) {
       throw new Error(`Switching to IO-server isn't allowed it config`);
+    }
+
+    if (!this.context.config.ioServer) {
+      throw new Error(`IoServer params aren't set int the host config`);
     }
 
     this.context.log.info(`Switching to IO server`);

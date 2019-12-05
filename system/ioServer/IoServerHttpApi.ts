@@ -24,7 +24,6 @@ export default class IoServerHttpApi {
   private readonly logDebug: (msg: string) => void;
   private readonly logInfo: (msg: string) => void;
   private readonly logError: (msg: string) => void;
-  private readonly lockIoServer: boolean;
   private _httpServer?: HttpServerLogic;
 
   private get httpServer(): HttpServerLogic {
@@ -37,15 +36,13 @@ export default class IoServerHttpApi {
     hostConfig: HostConfig,
     logDebug: (msg: string) => void,
     logInfo: (msg: string) => void,
-    logError: (msg: string) => void,
-    lockIoServer: boolean
+    logError: (msg: string) => void
   ) {
     this.ioSet = ioSet;
     this.hostConfig = hostConfig;
     this.logDebug = logDebug;
     this.logInfo = logInfo;
     this.logError = logError;
-    this.lockIoServer = lockIoServer;
   }
 
   async init() {
@@ -112,7 +109,7 @@ export default class IoServerHttpApi {
   }
 
   private async apiSwitchToApp(): Promise<HttpApiBody> {
-    if (this.lockIoServer) {
+    if (this.hostConfig.lockAppSwitch) {
       throw new Error(`Switching to App is not allowed!`);
     }
 
