@@ -9,23 +9,39 @@ import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from '../../shared/Os';
 import GroupConfigParser from '../../shared/GroupConfigParser';
-import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
-import Props from './Props';
+import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../shared/constants';
 import Starter from '../interfaces/Starter';
 import StarterProps from '../interfaces/StarterProps';
-
-
-// TODO: review. prod же тоже может быть
-const DEV_BUILD_ROOT = 'dev';
+import {LOG_LEVELS} from '../../system/interfaces/LogLevel';
+import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
+import {REPO_ROOT} from '../../shared/helpers';
+import {getOsMachine} from '../../shared/helpers/resolveMachine';
+import {resolveUid, resolveGid} from '../../shared/helpers/resolveUserGroup';
 
 
 export default abstract class StartBase implements Starter {
+  protected abstract buildRoot: string;
+
   protected readonly os: Os = new Os();
   protected readonly groupConfig: GroupConfigParser;
-  protected readonly props: Props;
+  protected readonly starterProps: StarterProps;
   protected main?: Main;
+  protected appWorkDir: string = '';
+  protected buildWorkDir: string = '';
+  protected uid?: number;
+  protected gid?: number;
+  protected platform: Platforms = 'nodejs';
+  protected machine?: NodejsMachines;
+
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
+  }
+
+  protected get hostConfig(): PreHostConfig {
+    return this.groupConfig.getHostConfig(this.starterProps.hostName);
+  }
+  protected get hostId(): string {
+    return this.hostConfig.id as any;
   }
 
   private _envBuilder?: EnvBuilder;
@@ -37,27 +53,23 @@ export default abstract class StartBase implements Starter {
 
 
   constructor(configPath: string, starterProps: StarterProps) {
+    this.starterProps = starterProps;
     this.groupConfig = new GroupConfigParser(this.os, configPath);
-    this.props = new Props(
-      this.os,
-      this.groupConfig,
-      DEV_BUILD_ROOT,
-      //starterProps.force,
-      starterProps.logLevel,
-      starterProps.machine,
-      starterProps.hostName,
-      starterProps.workDir,
-      starterProps.user,
-      starterProps.group,
-    );
+
+    this.validate();
   }
 
   async init() {
     await this.groupConfig.init();
-    await this.props.resolve();
 
-    const appEnvSetDir = path.join(this.props.appWorkDir, systemConfig.rootDirs.envSet);
-    const envSetTmpDir = path.join(this.props.buildWorkDir, ENV_BUILD_TMP_DIR);
+    this.machine = await this.resolveMachine();
+    this.buildWorkDir = this.resolveBuildWorkDir();
+    this.appWorkDir = this.resolveAppWorkDir();
+    this.uid = await this.resolveUid();
+    this.gid = await this.resolveGid();
+
+    const appEnvSetDir = path.join(this.appWorkDir, systemConfig.rootDirs.envSet);
+    const envSetTmpDir = path.join(this.buildWorkDir, ENV_BUILD_TMP_DIR);
     const {platform, machine} = this.resolvePlatformMachine();
 
     this._envBuilder = new EnvBuilder(
@@ -66,7 +78,7 @@ export default abstract class StartBase implements Starter {
       envSetTmpDir,
       platform,
       machine,
-      { uid: this.props.uid, gid: this.props.gid }
+      { uid: this.uid, gid: this.gid }
     );
   }
 
@@ -84,17 +96,17 @@ export default abstract class StartBase implements Starter {
 
 
   protected resolveHostConfig(): PreHostConfig {
-    return this.props.hostConfig;
+    return this.hostConfig;
   }
 
   protected resolvePlatformMachine(): {platform: Platforms, machine: string} {
-    if (!this.props.machine) {
+    if (!this.machine) {
       throw new Error(`No defined machine`);
     }
 
     return {
-      platform: this.props.platform,
-      machine: this.props.machine,
+      platform: this.platform,
+      machine: this.machine,
     };
   }
 
@@ -112,16 +124,77 @@ export default abstract class StartBase implements Starter {
 
     console.info(`===> Starting app`);
 
-    await main.init(hostConfigOverride, this.props.argLogLevel);
+    await main.init(hostConfigOverride, this.starterProps.logLevel);
     await main.configureIoSet(
       (code: number) => this.os.processExit(code),
-      this.props.appWorkDir,
-      this.props.uid,
-      this.props.gid,
+      this.appWorkDir,
+      this.uid,
+      this.gid,
     );
     await main.start(ioServerMode, lockIoServer);
 
     return main;
+  }
+
+  private validate() {
+    if (this.starterProps.group && !this.starterProps.user) {
+      throw new Error(`The "--user" param hasn't been set`);
+    }
+
+    if (this.starterProps.logLevel && !LOG_LEVELS.includes(this.starterProps.logLevel)) {
+      throw new Error(`Invalid "log-level" param: ${this.starterProps.logLevel}`);
+    }
+  }
+
+  private async resolveMachine(): Promise<NodejsMachines | undefined> {
+    if (this.starterProps.machine === 'noMachine') return;
+
+    if (this.starterProps.machine) {
+      if (!nodejsSupportedMachines.includes(this.starterProps.machine)) {
+        throw new Error(`Unsupported machine type "${this.starterProps.machine}"`);
+      }
+
+      return this.starterProps.machine;
+    }
+
+    return this.getOsMachine();
+  }
+
+  private resolveAppWorkDir(): string {
+    if (this.starterProps.workDir) {
+      // if it set as an argument - make it absolute
+      return path.resolve(process.cwd(), this.starterProps.workDir);
+    }
+
+    return path.join(
+      REPO_ROOT,
+      REPO_BUILD_DIR,
+      this.buildRoot,
+      this.hostId,
+      APP_WORK_DIR
+    );
+  }
+
+  protected resolveBuildWorkDir(): string {
+    return path.join(
+      REPO_ROOT,
+      REPO_BUILD_DIR,
+      this.buildRoot,
+      this.hostId,
+      BUILD_WORK_DIR
+    );
+  }
+
+  private getOsMachine(): Promise<NodejsMachines> {
+    return getOsMachine(this.os);
+  }
+
+  private resolveUid(): Promise<number | undefined> {
+    return resolveUid(this.os, this.starterProps.user);
+  }
+
+  private resolveGid(): Promise<number | undefined> {
+    return resolveGid(this.os, this.starterProps.group);
   }
 
 }

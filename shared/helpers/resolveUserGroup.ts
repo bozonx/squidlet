@@ -9,7 +9,7 @@ import {isKindOfNumber} from '../../system/lib/common';
  * @param os
  * @param argUser - user name or uid
  */
-async function resolveUid(os: Os, argUser?: string | number): Promise<number | undefined> {
+export async function resolveUid(os: Os, argUser?: string | number): Promise<number | undefined> {
   if (!argUser) {
     return;
   }
@@ -25,7 +25,7 @@ async function resolveUid(os: Os, argUser?: string | number): Promise<number | u
  * @param os
  * @param argGroup - group name or gid
  */
-async function resolveGid(os: Os, argGroup?: string | number): Promise<number | undefined> {
+export async function resolveGid(os: Os, argGroup?: string | number): Promise<number | undefined> {
   if (!argGroup) {
     return;
   }
@@ -36,7 +36,7 @@ async function resolveGid(os: Os, argGroup?: string | number): Promise<number | 
   return getIdResult(os, 'g', argGroup);
 }
 
-async function getIdResult(os: Os, userOrGroup: 'u' | 'g', name: string | number): Promise<number> {
+export async function getIdResult(os: Os, userOrGroup: 'u' | 'g', name: string | number): Promise<number> {
   const cmd = `id -${userOrGroup} ${name}`;
   const result: SpawnCmdResult = await os.spawnCmd(cmd);
 
