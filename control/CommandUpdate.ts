@@ -8,7 +8,7 @@ import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';
 import Platforms from '../system/interfaces/Platforms';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
-import {REPO_ROOT} from '../shared/helpers';
+import {REPO_ROOT} from '../shared/helpers/helpers';
 
 
 export default class CommandUpdate {

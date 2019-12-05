@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import Os from '../../shared/Os';
-import {REPO_ROOT} from '../../shared/helpers';
+import {REPO_ROOT} from '../../shared/helpers/helpers';
 import Platforms from '../../system/interfaces/Platforms';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';

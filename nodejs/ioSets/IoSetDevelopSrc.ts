@@ -6,7 +6,7 @@ import IoItem from '../../system/interfaces/IoItem';
 import Os from '../../shared/Os';
 import StorageEnvMemoryWrapper from '../../shared/StorageEnvMemoryWrapper';
 import StorageIo from '../../system/interfaces/io/StorageIo';
-import {getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers';
+import {getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers/helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 

@@ -1,7 +1,7 @@
 import WsApiClient from '../shared/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {Dictionary} from '../system/interfaces/Types';
-import {listenScriptEnd} from '../shared/helpers';
+import {listenScriptEnd} from '../shared/helpers/helpers';
 import {consoleError} from '../system/lib/helpers';
 
 

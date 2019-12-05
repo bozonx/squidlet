@@ -14,7 +14,7 @@ import Starter from '../interfaces/Starter';
 import StarterProps from '../interfaces/StarterProps';
 import {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
-import {REPO_ROOT} from '../../shared/helpers';
+import {REPO_ROOT} from '../../shared/helpers/helpers';
 import {getOsMachine} from '../../shared/helpers/resolveMachine';
 import {resolveUid, resolveGid} from '../../shared/helpers/resolveUserGroup';
 

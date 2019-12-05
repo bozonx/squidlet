@@ -1,6 +1,6 @@
 import * as path from 'path';
 import PluginEnv from '../hostEnvBuilder/entities/PluginEnv';
-import {makeListOfNamesFromPaths} from '../shared/helpers';
+import {makeListOfNamesFromPaths} from '../shared/helpers/helpers';
 
 const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');

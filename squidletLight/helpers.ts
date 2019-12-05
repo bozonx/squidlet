@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 
-import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT} from '../shared/helpers';
+import {getFileNameOfPath, removeExtFromFileName, REPO_ROOT} from '../shared/helpers/helpers';
 import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import {callPromised} from '../system/lib/common';

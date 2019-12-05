@@ -6,7 +6,7 @@ import modulesTree from '../buildToJs/modulesTree';
 import minimize from '../buildToJs/minimize';
 import Os from '../Os';
 import {LEGACY_DIR, MODERN_DIR, TREE_DIR} from '../constants';
-import {SYSTEM_DIR} from '../helpers';
+import {SYSTEM_DIR} from '../helpers/helpers';
 
 
 const systemSrc = path.resolve(SYSTEM_DIR);

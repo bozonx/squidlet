@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import IoItem from '../../system/interfaces/IoItem';
-import {SYSTEM_DIR} from '../../shared/helpers';
+import {SYSTEM_DIR} from '../../shared/helpers/helpers';
 import IoClient from '../../shared/IoClient';
 import {consoleError} from '../../system/lib/helpers';
 

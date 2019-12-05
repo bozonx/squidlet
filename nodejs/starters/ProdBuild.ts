@@ -4,7 +4,7 @@ import _template = require('lodash/template');
 import systemConfig from '../../system/systemConfig';
 import BuildSystem from '../../shared/envSetBuild/BuildSystem';
 import BuildIo from '../../shared/envSetBuild/BuildIo';
-import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers';
+import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers/helpers';
 import Os from '../../shared/Os';
 import PackageJson from '../../shared/interfaces/PackageJson';
 // TODO: don't use props

@@ -6,7 +6,7 @@ import StorageIo from '../system/interfaces/io/StorageIo';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement, trimCharStart} from '../system/lib/strings';
 import systemConfig from '../system/systemConfig';
-import {getFileNameOfPath} from './helpers';
+import {getFileNameOfPath} from './helpers/helpers';
 
 
 /**

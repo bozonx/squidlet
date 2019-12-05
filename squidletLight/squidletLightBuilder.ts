@@ -6,7 +6,7 @@ import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
 import LogLevel from '../system/interfaces/LogLevel';
 import {makeBundleCheckSum, resolveOutputDir} from './helpers';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
-import {REPO_ROOT} from '../shared/helpers';
+import {REPO_ROOT} from '../shared/helpers/helpers';
 
 
 export const SQUIDLET_LIGHT_WORK_DIR = 'light';

@@ -6,7 +6,7 @@ import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../system/interfaces/Platforms';
-import {getFileNameOfPath, loadMachineConfigInPlatformDir, resolvePlatformDir} from '../helpers';
+import {getFileNameOfPath, loadMachineConfigInPlatformDir, resolvePlatformDir} from '../helpers/helpers';
 import {
   IO_SET_INDEX_FILE,
   LEGACY_DIR,

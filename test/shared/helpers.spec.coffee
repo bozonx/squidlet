@@ -1,4 +1,4 @@
-helpers = require('../../shared/helpers')
+helpers = require('../../shared/helpers/helpers')
 
 
 describe 'shared.helpers', ->

@@ -11,7 +11,7 @@ import {
   loadMachineConfigInPlatformDir,
   makeListOfNamesFromPaths,
   resolvePlatformDir
-} from '../../shared/helpers';
+} from '../../shared/helpers/helpers';
 import {IoDefinitions} from '../../system/interfaces/IoItem';
 import validateHostConfig from './validateHostConfig';
 import hostDefaultConfig from '../configs/hostDefaultConfig';

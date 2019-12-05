@@ -4,7 +4,7 @@ import Os from '../../shared/Os';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
-import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DIR} from '../../shared/helpers';
+import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DIR} from '../../shared/helpers/helpers';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import LogLevel from '../../system/interfaces/LogLevel';
 import {AppType} from '../../system/interfaces/AppType';
