@@ -92,6 +92,10 @@ export default class Props {
 
 
   private validate() {
+    if (this.argGroup && !this.argUser) {
+      throw new Error(`The "user" argument hasn't been set`);
+    }
+
     if (this.argLogLevel && !LOG_LEVELS.includes(this.argLogLevel)) {
       throw new Error(`Invalid "log-level" param: ${this.argLogLevel}`);
     }
@@ -128,45 +132,6 @@ export default class Props {
 
   private getOsMachine(): Promise<NodejsMachines> {
     return getOsMachine(this.os);
-  }
-
-  // TODO: test
-  private async resolveUser(): Promise<number | undefined> {
-    if (!this.argUser) {
-      return;
-    }
-    else if (isKindOfNumber(this.argUser)) {
-      return parseInt(this.argUser as any);
-    }
-
-    return this.getIdResult('u', this.argUser);
-  }
-
-  // TODO: test
-  private async resolveGroup(): Promise<number | undefined> {
-    if (this.argGroup && !this.argUser) {
-      throw new Error(`The "user" argument hasn't been set`);
-    }
-    else if (!this.argGroup) {
-      return;
-    }
-    else if (isKindOfNumber(this.argGroup)) {
-      return parseInt(this.argGroup as any);
-    }
-
-    return this.getIdResult('g', this.argGroup);
-  }
-
-  // TODO: test
-  private async getIdResult(userOrGroup: 'u' | 'g', name: string | number): Promise<number> {
-    const cmd = `id -${userOrGroup} ${name}`;
-    const result: SpawnCmdResult = await this.os.spawnCmd(cmd);
-
-    if (result.status) {
-      throw new Error(`Can't resolve id "${cmd}": status ${result.status} ${result.stderr.join(', ')}`);
-    }
-
-    return parseInt( result.stdout.join('').trim() );
   }
 
 }
