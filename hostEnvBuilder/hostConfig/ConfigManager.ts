@@ -104,7 +104,7 @@ export default class ConfigManager {
   }
 
   private finalizeHostConfig(normalizedConfig: PreHostConfig): HostConfig {
-    // TODO: review
+    // set default appType here
     const appType: AppType = 'app';
 
     return {

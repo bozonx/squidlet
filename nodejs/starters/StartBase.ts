@@ -121,14 +121,14 @@ export default abstract class StartBase implements Starter {
     lockIoServer?: boolean
   ): Promise<Main> {
     const main: Main = new MainClass(ioSet);
-    const hostConfigOverride: HostConfig = {
-      // TODO: resolve appType ???? или он зарезолвится ниже ???
-      //appType: 'app',
-    } as HostConfig;
+    // const hostConfigOverride: HostConfig = {
+    //   // TODO: resolve appType ???? или он зарезолвится ниже ???
+    //   //appType: 'app',
+    // } as HostConfig;
 
     console.info(`===> Starting app`);
 
-    await main.init(hostConfigOverride, this.starterProps.logLevel);
+    await main.init(undefined, this.starterProps.logLevel);
     await main.configureIoSet(
       (code: number) => this.os.processExit(code),
       this.appWorkDir,
