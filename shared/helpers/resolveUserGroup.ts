@@ -1,4 +1,4 @@
-import Os, {SpawnCmdResult} from '../Os';
+import Os, {SpawnCmdResult} from './Os';
 import {isKindOfNumber} from '../../system/lib/common';
 
 

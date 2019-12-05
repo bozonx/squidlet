@@ -1,15 +1,15 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import HttpClient from '../nodejs/ios/HttpClient';
-import HttpClientLogic from '../entities/drivers/HttpClient/HttpClientLogic';
-import {ENCODE} from '../system/lib/constants';
+import HttpClient from '../../nodejs/ios/HttpClient';
+import HttpClientLogic from '../../entities/drivers/HttpClient/HttpClientLogic';
+import {ENCODE} from '../../system/lib/constants';
 import * as yaml from 'js-yaml';
-import {collectPropsDefaults} from '../system/lib/helpers';
-import {HttpDriverRequest} from '../entities/drivers/HttpServer/HttpServerLogic';
-import {HttpApiBody} from '../entities/services/HttpApi/HttpApi';
-import {JsonTypes} from '../system/interfaces/Types';
-import {HttpResponse} from '../system/interfaces/Http';
+import {collectPropsDefaults} from '../../system/lib/helpers';
+import {HttpDriverRequest} from '../../entities/drivers/HttpServer/HttpServerLogic';
+import {HttpApiBody} from '../../entities/services/HttpApi/HttpApi';
+import {JsonTypes} from '../../system/interfaces/Types';
+import {HttpResponse} from '../../system/interfaces/Http';
 
 
 const httpApiManifestPath = path.resolve(__dirname, '../entities/services/HttpApi/manifest.yaml');

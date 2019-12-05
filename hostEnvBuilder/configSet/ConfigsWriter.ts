@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import Os from '../../shared/Os';
+import Os from '../../shared/helpers/Os';
 import ConfigsSet from './ConfigsSet';
 import HostConfigSet from '../interfaces/HostConfigSet';
 import {OwnerOptions} from '../../shared/interfaces/OnwerOptions';

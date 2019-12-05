@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import Os from '../../shared/Os';
+import Os from '../../shared/helpers/Os';
 import {REPO_ROOT} from '../../shared/helpers/helpers';
 import Platforms from '../../system/interfaces/Platforms';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';

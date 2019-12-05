@@ -1,4 +1,4 @@
-import HttpApiClient from '../shared/HttpApiClient';
+import HttpApiClient from '../shared/helpers/HttpApiClient';
 
 
 export default class HttpApiCall {

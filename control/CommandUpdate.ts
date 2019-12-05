@@ -1,8 +1,8 @@
 import * as path from 'path';
 
-import Os from '../shared/Os';
+import Os from '../shared/helpers/Os';
 import squidletLightBuilder, {SQUIDLET_LIGHT_WORK_DIR} from '../squidletLight/squidletLightBuilder';
-import WsApiClient from '../shared/WsApiClient';
+import WsApiClient from '../shared/helpers/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';

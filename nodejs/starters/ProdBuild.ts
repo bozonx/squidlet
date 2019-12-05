@@ -5,7 +5,7 @@ import systemConfig from '../../system/systemConfig';
 import BuildSystem from '../../shared/envSetBuild/BuildSystem';
 import BuildIo from '../../shared/envSetBuild/BuildIo';
 import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers/helpers';
-import Os from '../../shared/Os';
+import Os from '../../shared/helpers/Os';
 import PackageJson from '../../shared/interfaces/PackageJson';
 // TODO: don't use props
 import Props from '../../__old/nodejs/Props';

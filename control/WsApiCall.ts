@@ -1,4 +1,4 @@
-import WsApiClient from '../shared/WsApiClient';
+import WsApiClient from '../shared/helpers/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {Dictionary} from '../system/interfaces/Types';
 import {listenScriptEnd} from '../shared/helpers/helpers';

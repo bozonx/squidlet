@@ -7,10 +7,10 @@ import * as yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
-import {StatsSimplified} from '../system/interfaces/io/StorageIo';
-import {callPromised} from '../system/lib/common';
-import {ENCODE} from '../system/lib/constants';
-import {OwnerOptions} from './interfaces/OnwerOptions';
+import {StatsSimplified} from '../../system/interfaces/io/StorageIo';
+import {callPromised} from '../../system/lib/common';
+import {ENCODE} from '../../system/lib/constants';
+import {OwnerOptions} from '../interfaces/OnwerOptions';
 
 
 export interface SpawnCmdResult {

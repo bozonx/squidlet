@@ -5,7 +5,7 @@ import StartBase from './StartBase';
 import {IOSET_STRING_DELIMITER} from '../../shared/constants';
 import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
-import HttpApiClient from '../../shared/HttpApiClient';
+import HttpApiClient from '../../shared/helpers/HttpApiClient';
 import Main from '../../system/Main';
 import HostConfig from '../../system/interfaces/HostConfig';
 import Sender from '../../system/lib/Sender';

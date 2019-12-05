@@ -3,7 +3,7 @@ import _defaultsDeep = require('lodash/defaultsDeep');
 import PreHostConfig from '../interfaces/PreHostConfig';
 import HostConfig from '../../system/interfaces/HostConfig';
 import MachineConfig from '../interfaces/MachineConfig';
-import Os from '../../shared/Os';
+import Os from '../../shared/helpers/Os';
 import PreEntities from '../interfaces/PreEntities';
 import normalizeHostConfig from './normalizeHostConfig';
 import {

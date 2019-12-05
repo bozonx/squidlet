@@ -1,11 +1,11 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
-import {isPlainObject} from '../system/lib/objects';
-import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
+import {isPlainObject} from '../../system/lib/objects';
+import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from './Os';
-import GroupConfig from './interfaces/GroupConfig';
-import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
+import GroupConfig from '../interfaces/GroupConfig';
+import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 
 
 export default class GroupConfigParser {

@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import Os from '../Os';
+import Os from '../helpers/Os';
 import compileTs from '../buildToJs/compileTs';
 import compileJs from '../buildToJs/compileJs';
 import minimize from '../buildToJs/minimize';

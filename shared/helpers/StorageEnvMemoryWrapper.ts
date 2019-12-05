@@ -1,12 +1,12 @@
 import * as path from 'path';
 
-import {EntityTypePlural} from '../system/interfaces/EntityTypes';
-import ManifestBase from '../system/interfaces/ManifestBase';
-import StorageIo from '../system/interfaces/io/StorageIo';
-import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-import {splitFirstElement, trimCharStart} from '../system/lib/strings';
-import systemConfig from '../system/systemConfig';
-import {getFileNameOfPath} from './helpers/helpers';
+import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
+import ManifestBase from '../../system/interfaces/ManifestBase';
+import StorageIo from '../../system/interfaces/io/StorageIo';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import {splitFirstElement, trimCharStart} from '../../system/lib/strings';
+import systemConfig from '../../system/systemConfig';
+import {getFileNameOfPath} from './helpers';
 
 
 /**

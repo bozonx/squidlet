@@ -2,8 +2,8 @@
 
 import * as path from 'path';
 
-import Os from '../../shared/Os';
-import GroupConfigParser from '../../shared/GroupConfigParser';
+import Os from '../../shared/helpers/Os';
+import GroupConfigParser from '../../shared/helpers/GroupConfigParser';
 import systemConfig from '../../system/systemConfig';
 import NodejsMachines from '../interfaces/NodejsMachines';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import Platforms from '../../system/interfaces/Platforms';
-import Os from '../../shared/Os';
+import Os from '../../shared/helpers/Os';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';

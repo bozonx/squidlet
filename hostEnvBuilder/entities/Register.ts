@@ -7,7 +7,7 @@ import PreServiceManifest from '../interfaces/PreServiceManifest';
 import Plugin from '../interfaces/Plugin';
 import PluginEnv from './PluginEnv';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import Os from '../../shared/Os';
+import Os from '../../shared/helpers/Os';
 import systemConfig from '../configs/systemConfig';
 import {EntityType} from '../../system/interfaces/EntityTypes';
 import validateManifest from '../hostConfig/validateManifests';

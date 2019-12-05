@@ -1,5 +1,5 @@
 import NodejsMachines from '../../nodejs/interfaces/NodejsMachines';
-import Os, {SpawnCmdResult} from '../Os';
+import Os, {SpawnCmdResult} from './Os';
 
 
 // TODO: test
