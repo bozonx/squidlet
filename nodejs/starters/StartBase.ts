@@ -36,6 +36,7 @@ export default abstract class StartBase implements Starter {
   protected gid?: number;
   protected platform: Platforms = 'nodejs';
   protected machine?: NodejsMachines;
+  protected lockAppSwitch?: boolean;
 
   protected get envBuilder(): EnvBuilder {
     return this._envBuilder as any;
@@ -117,25 +118,25 @@ export default abstract class StartBase implements Starter {
   protected async startMain(
     MainClass: new (ioSet: IoSet) => Main,
     ioSet: IoSet,
-    ioServerMode?: boolean,
-    lockIoServer?: boolean
+    ioServerMode?: boolean
   ): Promise<Main> {
     const main: Main = new MainClass(ioSet);
-    // const hostConfigOverride: HostConfig = {
-    //   // TODO: resolve appType ???? или он зарезолвится ниже ???
-    //   //appType: 'app',
-    // } as HostConfig;
+    const hostConfigOverride: HostConfig = {
+      lockAppSwitch: this.lockAppSwitch,
+    } as HostConfig;
+
+    // TODO: add lock ioServer
 
     console.info(`===> Starting app`);
 
-    await main.init(undefined, this.starterProps.logLevel);
+    await main.init(hostConfigOverride, this.starterProps.logLevel);
     await main.configureIoSet(
       (code: number) => this.os.processExit(code),
       this.appWorkDir,
       this.uid,
       this.gid,
     );
-    await main.start(ioServerMode, lockIoServer);
+    await main.start(ioServerMode);
 
     return main;
   }

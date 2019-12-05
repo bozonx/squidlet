@@ -19,6 +19,7 @@ const SENDER_REPEATS_INTERVAL_SEC = 2;
 
 export default class StartRemoteDevelop extends StartBase {
   protected buildRoot = 'remote';
+  protected lockAppSwitch = true;
 
   private remoteHostInfo?: HostInfo;
   private readonly host: string;
@@ -67,7 +68,9 @@ export default class StartRemoteDevelop extends StartBase {
     const ioSet: IoSet = await this.makeIoSet();
 
     this.main = new Main(ioSet);
-    const hostConfigOverride: HostConfig = {} as HostConfig;
+    const hostConfigOverride: HostConfig = {
+      lockAppSwitch: this.lockAppSwitch,
+    } as HostConfig;
 
     console.info(`===> Starting app`);
 

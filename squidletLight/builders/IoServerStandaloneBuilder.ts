@@ -45,9 +45,8 @@ export class IoServerStandaloneBuilder {
 
 
   async build() {
-    // TODO: удаляет все вместе с родительской директорией, но лучше чтобы только содержимое
-    //await this.os.rimraf(this.workDir);
     await this.os.mkdirP(this.tmpDir);
+    await this.os.rimraf(`${this.tmpDir}/*`);
 
     const indexFilePath = path.join(this.tmpDir, 'index.ts');
     const indexFileStr: string = this.makeIndexFile();

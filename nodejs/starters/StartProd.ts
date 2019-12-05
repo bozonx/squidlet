@@ -101,6 +101,7 @@ export default class StartProd {
     // build io
     await this.prodBuild.buildIos();
 
+    // TODO: pass workDir
     const ioSet: IoSet = new IoSetLocal();
 
     //await this.systemStarter.start(this.getPathToProdSystemDir(), ioSet);

@@ -49,12 +49,11 @@ export default class Main {
   /**
    * Start app or IoServer
    * @param ioServerMode
-   * @param lockIoServer - disallow switch to App from IoServer
    */
-  async start(ioServerMode?: boolean, lockIoServer?: boolean) {
+  async start(ioServerMode?: boolean) {
     if (!this.app) throw new Error(`No app`);
 
-    await this.app.start(ioServerMode, lockIoServer);
+    await this.app.start(ioServerMode);
 
     this.started = true;
   }

@@ -16,7 +16,7 @@ export default class IoSetLocal implements IoSet {
    * It will be called on system start
    */
   async init(): Promise<void> {
-    // TODO: лучше чтобы работало через Storage так как там задан workDir
+    // TODO: use workDir
     const pathToIoSetIndex = pathJoin(
       '/',
       systemConfig.rootDirs.envSet,

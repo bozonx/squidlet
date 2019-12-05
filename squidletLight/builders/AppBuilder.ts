@@ -59,8 +59,8 @@ export default class AppBuilder {
 
 
   async build() {
-    // TODO: удаляет все вместе с родительской директорией, но лучше чтобы только содержимое
     await this.os.mkdirP(this.tmpDir);
+    await this.os.rimraf(`${this.tmpDir}/*`);
 
     console.info(`===> collect env set`);
     await this.envBuilder.collect();

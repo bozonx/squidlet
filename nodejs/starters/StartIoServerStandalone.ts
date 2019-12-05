@@ -7,6 +7,7 @@ import StartDevelop from './StartDevelop';
 
 export default class StartIoServerStandalone extends StartDevelop {
   protected buildRoot = 'ioServer';
+  protected lockAppSwitch = true;
 
 
   async start() {
@@ -14,7 +15,7 @@ export default class StartIoServerStandalone extends StartDevelop {
 
     const ioSet: IoSet = await this.makeIoSet();
 
-    this.main = await this.startMain(Main, ioSet, true, true);
+    this.main = await this.startMain(Main, ioSet, true);
   }
 
   /**

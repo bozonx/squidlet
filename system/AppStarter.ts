@@ -49,7 +49,7 @@ export default class AppStarter {
   }
 
 
-  async start(startIoServerFirst: boolean = false, lockIoServer: boolean = false) {
+  async start(startIoServerFirst: boolean = false) {
     let startIoServer: boolean = startIoServerFirst;
     let fileContent: AppType | undefined;
     const storageIo: StorageIo = await this.ioSet.getIo<StorageIo>('Storage');
@@ -66,7 +66,7 @@ export default class AppStarter {
     }
 
     if (startIoServer) {
-      await this.startIoServer(lockIoServer);
+      await this.startIoServer();
     }
     else {
       await this.startSystem(fileContent);
@@ -90,13 +90,12 @@ export default class AppStarter {
     await this.system.start();
   }
 
-  private startIoServer = async (lockIoServer: boolean) => {
+  private startIoServer = async () => {
     this.ioServer = new IoServer(
       this.ioSet,
       this.logger.debug,
       this.logger.info,
-      this.logger.error,
-      lockIoServer
+      this.logger.error
     );
 
     await this.ioServer.start();
