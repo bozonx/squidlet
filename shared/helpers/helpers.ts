@@ -10,7 +10,7 @@ import {callPromised} from '../../system/lib/common';
 import {ENCODE} from '../../system/lib/constants';
 
 
-export const REPO_ROOT = path.resolve(__dirname, '../');
+export const REPO_ROOT = path.resolve(__dirname, '../../');
 export const SYSTEM_DIR = path.join(REPO_ROOT, 'system');
 export const SQUIDLET_PACKAGE_JSON_PATH = path.join(REPO_ROOT, 'package.json');
 
@@ -46,8 +46,9 @@ export function getFileNameOfPath(pathToIo: string): string {
   return parsed.name;
 }
 
+// TODO: don't use any more
 export function resolvePlatformDir(platform: Platforms): string {
-  return path.resolve(__dirname, `../${platform}`);
+  return path.resolve(__dirname, `../../${platform}`);
 }
 
 export function loadMachineConfigInPlatformDir(os: Os, platformDir: string, machine: string): MachineConfig {

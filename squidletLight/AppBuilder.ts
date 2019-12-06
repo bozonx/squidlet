@@ -142,7 +142,7 @@ export default class AppBuilder {
   }
 
   private async makeIndexFile(): Promise<string> {
-    const fileContentPath = path.join(__dirname, '../', INDEX_FILE_TPL_FILE_NAME);
+    const fileContentPath = path.join(__dirname, INDEX_FILE_TPL_FILE_NAME);
     const fileContent: string = await this.os.getFileContent(fileContentPath);
     const relativeRepoRoot = path.relative( this.tmpDir, REPO_ROOT );
 
@@ -155,7 +155,7 @@ export default class AppBuilder {
   }
 
   private async makePackageJson(): Promise<string> {
-    const fileContentPath = path.join(__dirname, '../', PACKAGE_JSON_TPL_FILE_NAME);
+    const fileContentPath = path.join(__dirname, PACKAGE_JSON_TPL_FILE_NAME);
     const fileContent: string = await this.os.getFileContent(fileContentPath);
 
     return _.template(fileContent)({ VERSION: squidletPackageJson.version });
