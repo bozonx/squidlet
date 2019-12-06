@@ -11,7 +11,6 @@ import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
-//import squidletPackageJson from '../../package.json';
 
 const squidletPackageJson = require('../../package.json');
 
@@ -25,6 +24,7 @@ const PACKAGE_JSON_TPL_FILE_NAME = 'package.template.json';
 
 export default class AppBuilder {
   private readonly tmpDir: string;
+  // TODO: почему не dir ????
   private readonly outputPath: string;
   private readonly platform: Platforms;
   private readonly machine: string;
@@ -69,30 +69,25 @@ export default class AppBuilder {
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
-    const indexFilePath = path.join(this.tmpDir, 'index.ts');
     const indexFileStr: string = await this.makeIndexFile();
-    const packageJsonPath = path.join(this.tmpDir, 'package.json');
     const packageJsonStr: string = await this.makePackageJson();
-    const iosFilePath: string = path.join(this.tmpDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
-    const envSetPath: string = path.join(this.tmpDir, 'envSet.ts');
     const envSetStr: string = await prepareEnvSetString(this.envBuilder.generateProdEnvSet());
-    const devicesFilePath: string = path.join(this.tmpDir, `${DEVICES_MAIN_FILES}.ts`);
     const devicesFileStr: string = await this.makeEntitiesMainFilesString('devices');
-    const driversFilePath: string = path.join(this.tmpDir, `${DRIVERS_MAIN_FILES}.ts`);
     const driversFileStr: string = await this.makeEntitiesMainFilesString('drivers');
-    const servicesFilePath: string = path.join(this.tmpDir, `${SERViCES_MAIN_FILES}.ts`);
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
-    await this.os.writeFile(indexFilePath, indexFileStr);
-    await this.os.writeFile(packageJsonPath, packageJsonStr);
-    await this.os.writeFile(iosFilePath, iosFileStr);
-    await this.os.writeFile(envSetPath, envSetStr);
-    await this.os.writeFile(devicesFilePath, devicesFileStr);
-    await this.os.writeFile(driversFilePath, driversFileStr);
-    await this.os.writeFile(servicesFilePath, servicesFileStr);
+    await this.os.writeFile(path.join(this.tmpDir, 'index.ts'), indexFileStr);
+    await this.os.writeFile(path.join(this.tmpDir, 'ios.ts'), iosFileStr);
+    await this.os.writeFile(path.join(this.tmpDir, 'envSet.ts'), envSetStr);
+    await this.os.writeFile(path.join(this.tmpDir, `${DEVICES_MAIN_FILES}.ts`), devicesFileStr);
+    await this.os.writeFile(path.join(this.tmpDir, `${DRIVERS_MAIN_FILES}.ts`), driversFileStr);
+    await this.os.writeFile(path.join(this.tmpDir, `${SERViCES_MAIN_FILES}.ts`), servicesFileStr);
     // make bundle
     await rollupBuild(this.outputPath, this.tmpDir, this.minimize);
+    // make package.json
+    // TODO: нужно указать outputDir
+    await this.os.writeFile(path.join(this.outputPath, 'package.json'), packageJsonStr);
   }
 
 
