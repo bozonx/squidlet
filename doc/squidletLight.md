@@ -16,7 +16,7 @@ Required params:
 
 Optional Params:
 
-* --output - path to output dir where will be placed `bundle.js` and `bundle.sum`
+* --output-dir - path to output dir where `bundle.js`m `bundle.sum` and `package.json` will be placed
 * --minimize=true - default is true
 * --io-server=false - build IO server standalone instead of full app. Default is false
 * --log-level - Set log level for logger. debug|info|warn|error. By default not set.

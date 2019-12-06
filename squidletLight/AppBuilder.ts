@@ -8,9 +8,16 @@ import Platforms from '../system/interfaces/Platforms';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
 import {EntityTypePlural} from '../system/interfaces/EntityTypes';
-import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from './helpers';
+import {
+  makeExportString,
+  rollupBuild,
+  prepareIoClassesString,
+  prepareEnvSetString,
+  makeBundleCheckSum
+} from './helpers';
 import LogLevel from '../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR} from '../shared/constants';
+import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
 
 const squidletPackageJson = require('../package.json');
 
@@ -24,8 +31,7 @@ const PACKAGE_JSON_TPL_FILE_NAME = 'package.template.json';
 
 export default class AppBuilder {
   private readonly tmpDir: string;
-  // TODO: почему не dir ????
-  private readonly outputPath: string;
+  private readonly outputDir: string;
   private readonly platform: Platforms;
   private readonly machine: string;
   private readonly minimize: boolean;
@@ -37,7 +43,7 @@ export default class AppBuilder {
 
   constructor(
     tmpDir: string,
-    outputPath: string,
+    outputDir: string,
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
@@ -46,7 +52,7 @@ export default class AppBuilder {
     ioServer?: boolean
   ) {
     this.tmpDir = tmpDir;
-    this.outputPath = outputPath;
+    this.outputDir = outputDir;
     this.platform = platform;
     this.machine = machine;
     this.minimize = minimize;
@@ -66,12 +72,16 @@ export default class AppBuilder {
 
 
   async build() {
+
     await this.os.mkdirP(this.tmpDir);
     await this.os.rimraf(`${this.tmpDir}/*`);
+    await this.os.mkdirP(this.outputDir);
+    await this.os.rimraf(`${this.outputDir}/*`);
 
     console.info(`===> collect env set`);
     await this.envBuilder.collect();
 
+    const bundlePath: string = path.join(this.outputDir, BUNDLE_FILE_NAME);
     const indexFileStr: string = await this.makeIndexFile();
     const packageJsonStr: string = await this.makePackageJson();
     const iosFileStr: string = await this.prepareIoClassesString();
@@ -87,10 +97,11 @@ export default class AppBuilder {
     await this.os.writeFile(path.join(this.tmpDir, `${DRIVERS_MAIN_FILES}.ts`), driversFileStr);
     await this.os.writeFile(path.join(this.tmpDir, `${SERViCES_MAIN_FILES}.ts`), servicesFileStr);
     // make bundle
-    await rollupBuild(this.outputPath, this.tmpDir, this.minimize);
+    await rollupBuild(bundlePath, this.tmpDir, this.minimize);
     // make package.json
-    // TODO: нужно указать outputDir
-    await this.os.writeFile(path.join(this.outputPath, 'package.json'), packageJsonStr);
+    await this.os.writeFile(path.join(this.outputDir, 'package.json'), packageJsonStr);
+    // make check sum
+    await makeBundleCheckSum(bundlePath, path.join(this.outputDir, BUNDLE_SUM_FILE_NAME));
   }
 
 

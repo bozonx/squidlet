@@ -14,9 +14,9 @@ const IO_SERVER_DEFAULT_HOST_CONFIG_PATH = path.join(__dirname, 'ioServerHostCon
 
 
 export default async function squidletLightBuilder (
-  argOutputDir?: string,
   platform?: Platforms,
   machine?: string,
+  argOutputDir?: string,
   minimize?: boolean,
   ioServer?: boolean,
   logLevel?: LogLevel,
@@ -25,8 +25,6 @@ export default async function squidletLightBuilder (
   const workDir: string = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
   const tmpDir: string = path.join(workDir, TMP_SUB_DIR);
   const outputDir: string = resolveOutputDir(workDir, argOutputDir);
-  const bundlePath: string = path.join(outputDir, BUNDLE_FILE_NAME);
-  const checkSumPath: string = path.join(outputDir, BUNDLE_SUM_FILE_NAME);
 
   if (!platform) {
     console.error(`--platform is required`);
@@ -44,7 +42,7 @@ export default async function squidletLightBuilder (
   // build app with app switcher
   const builder = new AppBuilder(
     tmpDir,
-    bundlePath,
+    outputDir,
     platform,
     machine,
     hostConfigPath || IO_SERVER_DEFAULT_HOST_CONFIG_PATH,
@@ -54,5 +52,4 @@ export default async function squidletLightBuilder (
   );
 
   await builder.build();
-  await makeBundleCheckSum(bundlePath, checkSumPath);
 }
