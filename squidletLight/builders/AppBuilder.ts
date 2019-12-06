@@ -11,12 +11,16 @@ import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
 import LogLevel from '../../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
+//import squidletPackageJson from '../../package.json';
+
+const squidletPackageJson = require('../../package.json');
 
 
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
 const DRIVERS_MAIN_FILES = 'driversMainFiles';
 const SERViCES_MAIN_FILES = 'servicesMainFiles';
 const INDEX_FILE_TPL_FILE_NAME = 'index.template.ts';
+const PACKAGE_JSON_TPL_FILE_NAME = 'package.template.json';
 
 
 export default class AppBuilder {
@@ -67,6 +71,8 @@ export default class AppBuilder {
 
     const indexFilePath = path.join(this.tmpDir, 'index.ts');
     const indexFileStr: string = await this.makeIndexFile();
+    const packageJsonPath = path.join(this.tmpDir, 'package.json');
+    const packageJsonStr: string = await this.makePackageJson();
     const iosFilePath: string = path.join(this.tmpDir, 'ios.ts');
     const iosFileStr: string = await this.prepareIoClassesString();
     const envSetPath: string = path.join(this.tmpDir, 'envSet.ts');
@@ -79,6 +85,7 @@ export default class AppBuilder {
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
     await this.os.writeFile(indexFilePath, indexFileStr);
+    await this.os.writeFile(packageJsonPath, packageJsonStr);
     await this.os.writeFile(iosFilePath, iosFileStr);
     await this.os.writeFile(envSetPath, envSetStr);
     await this.os.writeFile(devicesFilePath, devicesFileStr);
@@ -89,15 +96,7 @@ export default class AppBuilder {
   }
 
 
-  private async makeIndexFile(): Promise<string> {
-    const fileContentPath = path.join(__dirname, '../', INDEX_FILE_TPL_FILE_NAME);
-    const fileContent: string = await this.os.getFileContent(fileContentPath);
-    const relativeRepoRoot = path.relative( this.tmpDir, REPO_ROOT );
-
-    return _.template(fileContent)({ REPO_ROOT: relativeRepoRoot });
-  }
-
-  prepareIoClassesString(): string {
+  private prepareIoClassesString(): string {
     const platformDir = this.envBuilder.configManager.machinePlatformDir;
     const machineIosList = this.envBuilder.configManager.machineConfig.ios;
 
@@ -122,6 +121,21 @@ export default class AppBuilder {
     if (!exportsStr) return 'export default {};\n';
 
     return exportsStr;
+  }
+
+  private async makeIndexFile(): Promise<string> {
+    const fileContentPath = path.join(__dirname, '../', INDEX_FILE_TPL_FILE_NAME);
+    const fileContent: string = await this.os.getFileContent(fileContentPath);
+    const relativeRepoRoot = path.relative( this.tmpDir, REPO_ROOT );
+
+    return _.template(fileContent)({ REPO_ROOT: relativeRepoRoot });
+  }
+
+  protected async makePackageJson(): Promise<string> {
+    const fileContentPath = path.join(__dirname, '../', PACKAGE_JSON_TPL_FILE_NAME);
+    const fileContent: string = await this.os.getFileContent(fileContentPath);
+
+    return _.template(fileContent)({ VERSION: squidletPackageJson.version });
   }
 
 }
