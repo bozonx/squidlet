@@ -1,12 +1,8 @@
 import * as path from 'path';
-import * as fs from 'fs';
-import * as crypto from 'crypto';
 
 import {getFileNameOfPath, removeExtFromFileName} from '../shared/helpers/helpers';
 import rollupToOneFile from '../shared/buildToJs/rollupToOneFile';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-import {callPromised} from '../system/lib/common';
-import {ENCODE} from '../system/lib/constants';
 
 
 export function prepareIoClassesString(
@@ -62,14 +58,13 @@ export async function rollupBuild(outputPath: string, tmpDir: string, minimize: 
   );
 }
 
-export async function makeBundleCheckSum(bundlePath: string, sumFilePath: string) {
-  const bundleContent: string = await callPromised(fs.readFile, bundlePath);
-  const sum: string = crypto
-    .createHash('md5')
-    .update(bundleContent, ENCODE)
-    .digest('hex');
+export function resolveOutputDir(tmpDir: string, output?: string): string {
+  if (output) {
+    // if it set as an argument - make it absolute
+    return path.resolve(process.cwd(), output);
+  }
 
-  await callPromised(fs.writeFile, sumFilePath, sum, ENCODE);
+  return tmpDir;
 }
 
 // export function resolveWorkDir(): string {
@@ -80,12 +75,3 @@ export async function makeBundleCheckSum(bundlePath: string, sumFilePath: string
 //
 //   return path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
 // }
-
-export function resolveOutputDir(tmpDir: string, output?: string): string {
-  if (output) {
-    // if it set as an argument - make it absolute
-    return path.resolve(process.cwd(), output);
-  }
-
-  return tmpDir;
-}

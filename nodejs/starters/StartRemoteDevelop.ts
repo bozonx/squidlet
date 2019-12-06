@@ -7,9 +7,9 @@ import Platforms from '../../system/interfaces/Platforms';
 import HostInfo from '../../system/interfaces/HostInfo';
 import HttpApiClient from '../../shared/helpers/HttpApiClient';
 import Main from '../../system/Main';
-import HostConfig from '../../system/interfaces/HostConfig';
 import Sender from '../../system/lib/Sender';
 import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../system/constants';
+import ConsoleLoggerColorful from '../../shared/helpers/ConsoleLoggerColorful';
 
 
 const SENDER_RESEND_INTERVAL_SEC = 1;
@@ -66,16 +66,14 @@ export default class StartRemoteDevelop extends StartBase {
     await super.start();
 
     const ioSet: IoSet = await this.makeIoSet();
+    const logger = new ConsoleLoggerColorful(this.starterProps.logLevel);
 
-    this.main = new Main(ioSet);
-    const hostConfigOverride: HostConfig = {
-      lockAppSwitch: this.lockAppSwitch,
-    } as HostConfig;
+    this.main = new Main(ioSet, logger, undefined, false, this.lockAppSwitch);
 
     console.info(`===> Starting app`);
 
-    await this.main.init(hostConfigOverride, this.starterProps.logLevel);
-    await this.main.start(false);
+    await this.main.init();
+    await this.main.start();
   }
 
   /**

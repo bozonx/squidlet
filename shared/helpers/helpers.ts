@@ -1,9 +1,13 @@
 import * as path from 'path';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../../nodejs/interfaces/NodejsMachines';
+import {callPromised} from '../../system/lib/common';
+import {ENCODE} from '../../system/lib/constants';
 
 
 export const REPO_ROOT = path.resolve(__dirname, '../');
@@ -96,6 +100,16 @@ export function removeExtFromFileName(filename: string): string {
   if (splat.length <= 1) return filename;
 
   return splat.slice(0, -1).join('.');
+}
+
+export async function makeFileCheckSum(filePath: string, sumFilePath: string) {
+  const bundleContent: string = await callPromised(fs.readFile, filePath);
+  const sum: string = crypto
+    .createHash('md5')
+    .update(bundleContent, ENCODE)
+    .digest('hex');
+
+  await callPromised(fs.writeFile, sumFilePath, sum, ENCODE);
 }
 
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {

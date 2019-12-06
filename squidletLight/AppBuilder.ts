@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
 import Os from '../shared/helpers/Os';
-import {REPO_ROOT} from '../shared/helpers/helpers';
+import {makeFileCheckSum, REPO_ROOT} from '../shared/helpers/helpers';
 import Platforms from '../system/interfaces/Platforms';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
@@ -13,7 +13,7 @@ import {
   rollupBuild,
   prepareIoClassesString,
   prepareEnvSetString,
-  makeBundleCheckSum, resolveOutputDir
+  resolveOutputDir
 } from './helpers';
 import LogLevel from '../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../shared/constants';
@@ -104,7 +104,7 @@ export default class AppBuilder {
     await rollupBuild(bundlePath, this.tmpDir, this.minimize);
 
     console.info(`===> Make check sum`);
-    await makeBundleCheckSum(bundlePath, path.join(this.outputDir, BUNDLE_SUM_FILE_NAME));
+    await makeFileCheckSum(bundlePath, path.join(this.outputDir, BUNDLE_SUM_FILE_NAME));
 
     console.info(`===> Make package.json`);
     await this.os.writeFile(path.join(this.outputDir, 'package.json'), packageJsonStr);
