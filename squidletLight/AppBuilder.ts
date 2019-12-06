@@ -1,18 +1,18 @@
 import * as path from 'path';
 import * as _ from 'lodash';
 
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import Os from '../../shared/helpers/Os';
-import {REPO_ROOT} from '../../shared/helpers/helpers';
-import Platforms from '../../system/interfaces/Platforms';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import HostEntitySet from '../../hostEnvBuilder/interfaces/HostEntitySet';
-import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
-import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../helpers';
-import LogLevel from '../../system/interfaces/LogLevel';
-import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
+import EnvBuilder from '../hostEnvBuilder/EnvBuilder';
+import Os from '../shared/helpers/Os';
+import {REPO_ROOT} from '../shared/helpers/helpers';
+import Platforms from '../system/interfaces/Platforms';
+import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
+import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
+import {EntityTypePlural} from '../system/interfaces/EntityTypes';
+import {makeExportString, rollupBuild, prepareIoClassesString, prepareEnvSetString} from './helpers';
+import LogLevel from '../system/interfaces/LogLevel';
+import {ENV_BUILD_TMP_DIR} from '../shared/constants';
 
-const squidletPackageJson = require('../../package.json');
+const squidletPackageJson = require('../package.json');
 
 
 const DEVICES_MAIN_FILES = 'devicesMainFiles';

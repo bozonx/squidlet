@@ -21,12 +21,12 @@ import {resolveUid, resolveGid} from '../../shared/helpers/resolveUserGroup';
 
 // TODO: maybe remove and use false instead of it
 export type NoMachine = 'noMachine';
-export type MainClassType = new (
-  ioSet: IoSet,
-  hostConfigOverride?: HostConfig,
-  logLevel?: LogLevel,
-  ioServerMode?: boolean
-) => Main;
+// export type MainClassType = new (
+//   ioSet: IoSet,
+//   hostConfigOverride?: HostConfig,
+//   logLevel?: LogLevel,
+//   ioServerMode?: boolean
+// ) => Main;
 
 
 export default abstract class StartBase implements Starter {
@@ -122,7 +122,7 @@ export default abstract class StartBase implements Starter {
   }
 
   protected async startMain(
-    MainClass: MainClassType,
+    MainClass: typeof Main,
     ioSet: IoSet,
     ioServerMode?: boolean
   ): Promise<Main> {
@@ -130,8 +130,6 @@ export default abstract class StartBase implements Starter {
       lockAppSwitch: this.lockAppSwitch,
     } as HostConfig;
     const main: Main = new MainClass(ioSet, hostConfigOverride, this.starterProps.logLevel, ioServerMode);
-
-    // TODO: add lock ioServer
 
     console.info(`===> Starting app`);
 

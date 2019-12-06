@@ -1,8 +1,8 @@
 import * as path from 'path';
 
-import AppBuilder from './builders/AppBuilder';
+import AppBuilder from './AppBuilder';
 import Platforms from '../system/interfaces/Platforms';
-import {IoServerStandaloneBuilder} from './builders/IoServerStandaloneBuilder';
+import {IoServerStandaloneBuilder} from './IoServerStandaloneBuilder';
 import LogLevel from '../system/interfaces/LogLevel';
 import {makeBundleCheckSum, resolveOutputDir} from './helpers';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
@@ -41,20 +41,20 @@ export default async function squidletLightBuilder (
     return process.exit(2);
   }
 
-  if (ioServer) {
-    // build io server standalone
-    const builder = new IoServerStandaloneBuilder(
-      tmpDir,
-      bundlePath,
-      platform,
-      machine,
-      hostConfigPath,
-      minimize,
-      logLevel
-    );
-
-    return await builder.build();
-  }
+  // if (ioServer) {
+  //   // build io server standalone
+  //   const builder = new IoServerStandaloneBuilder(
+  //     tmpDir,
+  //     bundlePath,
+  //     platform,
+  //     machine,
+  //     hostConfigPath,
+  //     minimize,
+  //     logLevel
+  //   );
+  //
+  //   return await builder.build();
+  // }
 
   // build app with app switcher
   const builder = new AppBuilder(
