@@ -11,4 +11,4 @@ RUN npm install;
 
 VOLUME ["/app/data"]
 EXPOSE 8087/tcp 8088/tcp 8089/tcp
-CMD [ "node", "updater/start.js" ]
+CMD [ "node", "start.js" ]

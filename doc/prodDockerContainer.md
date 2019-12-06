@@ -1,3 +1,4 @@
+# Build and start production docker image.
 
 ### Build image
 
