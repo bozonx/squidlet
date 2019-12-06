@@ -13,7 +13,7 @@ import {
   rollupBuild,
   prepareIoClassesString,
   prepareEnvSetString,
-  makeBundleCheckSum
+  makeBundleCheckSum, resolveOutputDir
 } from './helpers';
 import LogLevel from '../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR} from '../shared/constants';
@@ -22,6 +22,8 @@ import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updat
 const squidletPackageJson = require('../package.json');
 
 
+const SQUIDLET_LIGHT_WORK_DIR = 'light';
+const TMP_SUB_DIR = 'tmp';
 const DEVICES_MAIN_FILES = 'devicesMainFiles';
 const DRIVERS_MAIN_FILES = 'driversMainFiles';
 const SERViCES_MAIN_FILES = 'servicesMainFiles';
@@ -42,15 +44,18 @@ export default class AppBuilder {
 
 
   constructor(
-    tmpDir: string,
-    outputDir: string,
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
+    argOutputDir?: string,
     minimize: boolean = true,
     logLevel?: LogLevel,
     ioServer?: boolean
   ) {
+    const workDir: string = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
+    const tmpDir: string = path.join(workDir, TMP_SUB_DIR);
+    const outputDir: string = resolveOutputDir(workDir, argOutputDir);
+
     this.tmpDir = tmpDir;
     this.outputDir = outputDir;
     this.platform = platform;
@@ -145,7 +150,7 @@ export default class AppBuilder {
     });
   }
 
-  protected async makePackageJson(): Promise<string> {
+  private async makePackageJson(): Promise<string> {
     const fileContentPath = path.join(__dirname, '../', PACKAGE_JSON_TPL_FILE_NAME);
     const fileContent: string = await this.os.getFileContent(fileContentPath);
 

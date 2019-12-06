@@ -1,11 +1,11 @@
 import * as path from 'path';
 
-import AppBuilder from './AppBuilder';
-import Platforms from '../system/interfaces/Platforms';
-import LogLevel from '../system/interfaces/LogLevel';
-import {makeBundleCheckSum, resolveOutputDir} from './helpers';
-import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
-import {REPO_ROOT} from '../shared/helpers/helpers';
+import AppBuilder from '../../squidletLight/AppBuilder';
+import Platforms from '../../system/interfaces/Platforms';
+import LogLevel from '../../system/interfaces/LogLevel';
+import {makeBundleCheckSum, resolveOutputDir} from '../../squidletLight/helpers';
+import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../../entities/services/Updater/Updater';
+import {REPO_ROOT} from '../../shared/helpers/helpers';
 
 
 export const SQUIDLET_LIGHT_WORK_DIR = 'light';
