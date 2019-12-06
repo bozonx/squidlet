@@ -5,9 +5,6 @@
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
   "license": "MIT",
-  "scripts": {
-    "start": "node ../updater/start.js"
-  },
   "dependencies": {
     "axios": "*",
     "mqtt": "*",
