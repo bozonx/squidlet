@@ -16,7 +16,7 @@ import {
   makeBundleCheckSum, resolveOutputDir
 } from './helpers';
 import LogLevel from '../system/interfaces/LogLevel';
-import {ENV_BUILD_TMP_DIR} from '../shared/constants';
+import {ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../shared/constants';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
 
 const squidletPackageJson = require('../package.json');
@@ -52,12 +52,10 @@ export default class AppBuilder {
     logLevel?: LogLevel,
     ioServer?: boolean
   ) {
-    const workDir: string = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
-    const tmpDir: string = path.join(workDir, TMP_SUB_DIR);
-    const outputDir: string = resolveOutputDir(workDir, argOutputDir);
+    const workDir: string = path.join(REPO_ROOT, REPO_BUILD_DIR, SQUIDLET_LIGHT_WORK_DIR);
 
-    this.tmpDir = tmpDir;
-    this.outputDir = outputDir;
+    this.tmpDir = path.join(workDir, TMP_SUB_DIR);
+    this.outputDir = resolveOutputDir(workDir, argOutputDir);
     this.platform = platform;
     this.machine = machine;
     this.minimize = minimize;
@@ -68,7 +66,7 @@ export default class AppBuilder {
 
     this.envBuilder = new EnvBuilder(
       hostConfigPath,
-      tmpDir,
+      this.tmpDir,
       envBuilderTmpDir,
       this.platform,
       this.machine,
@@ -77,7 +75,6 @@ export default class AppBuilder {
 
 
   async build() {
-
     await this.os.mkdirP(this.tmpDir);
     await this.os.rimraf(`${this.tmpDir}/*`);
     await this.os.mkdirP(this.outputDir);
@@ -95,18 +92,22 @@ export default class AppBuilder {
     const driversFileStr: string = await this.makeEntitiesMainFilesString('drivers');
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
+    console.info(`===> Write ts files inti tmp dir`);
     await this.os.writeFile(path.join(this.tmpDir, 'index.ts'), indexFileStr);
     await this.os.writeFile(path.join(this.tmpDir, 'ios.ts'), iosFileStr);
     await this.os.writeFile(path.join(this.tmpDir, 'envSet.ts'), envSetStr);
     await this.os.writeFile(path.join(this.tmpDir, `${DEVICES_MAIN_FILES}.ts`), devicesFileStr);
     await this.os.writeFile(path.join(this.tmpDir, `${DRIVERS_MAIN_FILES}.ts`), driversFileStr);
     await this.os.writeFile(path.join(this.tmpDir, `${SERViCES_MAIN_FILES}.ts`), servicesFileStr);
-    // make bundle
+
+    console.info(`===> Make bundle`);
     await rollupBuild(bundlePath, this.tmpDir, this.minimize);
-    // make package.json
-    await this.os.writeFile(path.join(this.outputDir, 'package.json'), packageJsonStr);
-    // make check sum
+
+    console.info(`===> Make check sum`);
     await makeBundleCheckSum(bundlePath, path.join(this.outputDir, BUNDLE_SUM_FILE_NAME));
+
+    console.info(`===> Make package.json`);
+    await this.os.writeFile(path.join(this.outputDir, 'package.json'), packageJsonStr);
   }
 
 
