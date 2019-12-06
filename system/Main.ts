@@ -17,18 +17,30 @@ export default class Main {
   }
 
   private ioSet: IoSet;
+  private readonly hostConfigOverride?: HostConfig;
+  private readonly logLevel?: LogLevel;
+  private readonly ioServerMode?: boolean;
   private app?: AppStarter;
   private consoleLogger?: ConsoleLogger;
   private started: boolean = false;
 
 
-  constructor(ioSet: IoSet) {
+  constructor(
+    ioSet: IoSet,
+    hostConfigOverride?: HostConfig,
+    logLevel?: LogLevel,
+    ioServerMode?: boolean
+    // TODO: можно добавить lockAppSwitch
+  ) {
     this.ioSet = ioSet;
+    this.hostConfigOverride = hostConfigOverride;
+    this.logLevel = logLevel;
+    this.ioServerMode = ioServerMode;
   }
 
-  async init(hostConfigOverride?: HostConfig, logLevel?: LogLevel) {
-    this.consoleLogger = new ConsoleLogger(logLevel);
-    this.app = new AppStarter(this.ioSet, hostConfigOverride, this.consoleLogger);
+  async init() {
+    this.consoleLogger = new ConsoleLogger(this.logLevel);
+    this.app = new AppStarter(this.ioSet, this.hostConfigOverride, this.consoleLogger);
 
     this.ioSet.init && await this.ioSet.init();
   }
@@ -50,10 +62,10 @@ export default class Main {
    * Start app or IoServer
    * @param ioServerMode
    */
-  async start(ioServerMode?: boolean) {
+  async start() {
     if (!this.app) throw new Error(`No app`);
 
-    await this.app.start(ioServerMode);
+    await this.app.start(this.ioServerMode);
 
     this.started = true;
   }

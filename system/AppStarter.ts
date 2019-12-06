@@ -49,6 +49,7 @@ export default class AppStarter {
   }
 
 
+  // TODO: может лучше в консруктор передать startIoServerFirst
   async start(startIoServerFirst: boolean = false) {
     let startIoServer: boolean = startIoServerFirst;
     let fileContent: AppType | undefined;

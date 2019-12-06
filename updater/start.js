@@ -27,17 +27,21 @@ else {
   hostConfigOverride.appType = 'updater';
 }
 
-const main = instantiateMain();
+const main = instantiateMain(
+  hostConfigOverride,
+  process.env.LOG_LEVEL || undefined,
+  process.env.IOSERVER_MODE === 'true'
+);
 
 async function start() {
-  await main.init(hostConfigOverride, process.env.LOG_LEVEL || undefined);
+  await main.init();
   await main.configureIoSet(
     (code) => process.exit(code),
     '/app/data',
     (env.PUID) ? Number(env.PUID) : undefined,
     (env.PGID) ? Number(env.PGID) : undefined
   );
-  await main.start(process.env.IOSERVER_MODE === 'true')
+  await main.start()
 }
 
 start()
