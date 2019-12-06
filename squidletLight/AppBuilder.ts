@@ -31,6 +31,9 @@ const INDEX_FILE_TPL_FILE_NAME = 'index.template.ts';
 const PACKAGE_JSON_TPL_FILE_NAME = 'package.template.json';
 
 
+export const DEFAULT_WORK_DIR = path.join(REPO_ROOT, REPO_BUILD_DIR, SQUIDLET_LIGHT_WORK_DIR);
+
+
 export default class AppBuilder {
   private readonly tmpDir: string;
   private readonly outputDir: string;
@@ -52,7 +55,7 @@ export default class AppBuilder {
     logLevel?: LogLevel,
     ioServer?: boolean
   ) {
-    const workDir: string = path.join(REPO_ROOT, REPO_BUILD_DIR, SQUIDLET_LIGHT_WORK_DIR);
+    const workDir: string = DEFAULT_WORK_DIR;
 
     this.tmpDir = path.join(workDir, TMP_SUB_DIR);
     this.outputDir = resolveOutputDir(workDir, argOutputDir);

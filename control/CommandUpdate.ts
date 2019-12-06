@@ -7,7 +7,7 @@ import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';
 import Platforms from '../system/interfaces/Platforms';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
-import {REPO_ROOT} from '../shared/helpers/helpers';
+import AppBuilder, {DEFAULT_WORK_DIR} from '../squidletLight/AppBuilder';
 
 
 export default class CommandUpdate {
@@ -28,7 +28,7 @@ export default class CommandUpdate {
 
     await this.buildBundle(infoResult.platform, infoResult.machine);
 
-    const workDir: string = path.join(REPO_ROOT, 'build', SQUIDLET_LIGHT_WORK_DIR);
+    const workDir: string = DEFAULT_WORK_DIR;
     const bundleContent = await this.os.getFileContent(path.join(workDir, BUNDLE_FILE_NAME));
     const sumContent = await this.os.getFileContent(path.join(workDir, BUNDLE_SUM_FILE_NAME));
     // upload bundle and check sum
@@ -41,15 +41,17 @@ export default class CommandUpdate {
 
 
   private async buildBundle(platform: Platforms, machine: string) {
-    await squidletLightBuilder(
-      undefined,
+    const builder = new AppBuilder(
       platform,
       machine,
-      this.args.minimize !== 'false',
-      this.args.ioServer === 'true',
+      this.hostConfigPath,
       undefined,
-      this.hostConfigPath
+      this.args.minimize !== 'false',
+      undefined,
+      this.args.ioServer === 'true',
     );
+
+    await builder.build();
   }
 
   private async makeClient(host?: string, port?: string): Promise<WsApiClient> {
