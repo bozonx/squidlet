@@ -1,13 +1,13 @@
 import * as path from 'path';
-import Platforms from '../system/interfaces/Platforms';
-import Os from '../shared/helpers/Os';
-import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
-import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
-import {rollupBuild, prepareIoClassesString, prepareEnvSetString} from './helpers';
-import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DIR} from '../shared/helpers/helpers';
-import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
-import LogLevel from '../system/interfaces/LogLevel';
-import {AppType} from '../system/interfaces/AppType';
+import Platforms from '../../system/interfaces/Platforms';
+import Os from '../../shared/helpers/Os';
+import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
+import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import {rollupBuild, prepareIoClassesString, prepareEnvSetString} from '../../squidletLight/helpers';
+import {loadMachineConfigInPlatformDir, REPO_ROOT, resolvePlatformDir, SYSTEM_DIR} from '../../shared/helpers/helpers';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import LogLevel from '../../system/interfaces/LogLevel';
+import {AppType} from '../../system/interfaces/AppType';
 
 
 export const IO_SERVER_FILE_NAME = 'IoServer';
