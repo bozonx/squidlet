@@ -10,6 +10,7 @@ import {REPO_ROOT} from '../shared/helpers/helpers';
 
 export const SQUIDLET_LIGHT_WORK_DIR = 'light';
 const TMP_SUB_DIR = 'tmp';
+const IO_SERVER_DEFAULT_HOST_CONFIG_PATH = path.join(__dirname, 'ioServerHostConfig.yaml');
 
 
 export default async function squidletLightBuilder (
@@ -35,8 +36,7 @@ export default async function squidletLightBuilder (
     console.error(`--machine is required`);
     return process.exit(2);
   }
-  // TODO: необязателен для ioServer
-  else if (!hostConfigPath) {
+  else if (!ioServer && !hostConfigPath) {
     console.error(`host config is required`);
     return process.exit(2);
   }
@@ -47,7 +47,7 @@ export default async function squidletLightBuilder (
     bundlePath,
     platform,
     machine,
-    hostConfigPath,
+    hostConfigPath || IO_SERVER_DEFAULT_HOST_CONFIG_PATH,
     minimize,
     logLevel,
     ioServer

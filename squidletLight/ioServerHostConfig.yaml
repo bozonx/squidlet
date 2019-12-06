@@ -1,0 +1,6 @@
+id: ioServer
+
+#httpApi:
+#  host: 0.0.0.0
+ioServer:
+  host: 0.0.0.0
