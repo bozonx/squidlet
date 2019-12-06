@@ -3,6 +3,7 @@ import Main from '${REPO_ROOT}/system/Main';
 import IoSet from '${REPO_ROOT}/system/interfaces/IoSet';
 import HostConfig from '${REPO_ROOT}/system/interfaces/HostConfig';
 import LogLevel from '${REPO_ROOT}/system/interfaces/LogLevel';
+import ConsoleLogger from '${REPO_ROOT}/system/ConsoleLogger';
 import envSet from './envSet';
 import * as ios from './ios';
 import * as devicesMainFiles from './devicesMainFiles';
@@ -15,8 +16,10 @@ const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMain
 
 export default function instantiateMain (
   hostConfigOverride?: HostConfig,
-  logLevel?: LogLevel,
-  ioServerMode?: boolean
+  logLevel: LogLevel = ${LOG_LEVEL},
+  ioServerMode: boolean = ${IO_SERVER_MODE}
 ): Main {
-  return new Main(ioSet, hostConfigOverride, logLevel, ioServerMode);
+  const consoleLogger = new ConsoleLogger(logLevel);
+
+  return new Main(ioSet, consoleLogger, hostConfigOverride, ioServerMode, ${LOCK_APP_SWITCH});
 }

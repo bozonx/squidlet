@@ -3,7 +3,6 @@ import * as path from 'path';
 import IoSet from '../../system/interfaces/IoSet';
 import Platforms from '../../system/interfaces/Platforms';
 import systemConfig from '../../system/systemConfig';
-import HostConfig from '../../system/interfaces/HostConfig';
 import Main from '../../system/Main';
 import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
@@ -12,21 +11,16 @@ import GroupConfigParser from '../../shared/helpers/GroupConfigParser';
 import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../shared/constants';
 import Starter from '../interfaces/Starter';
 import StarterProps from '../interfaces/StarterProps';
-import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
+import {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
 import {REPO_ROOT} from '../../shared/helpers/helpers';
 import {getOsMachine} from '../../shared/helpers/resolveMachine';
 import {resolveUid, resolveGid} from '../../shared/helpers/resolveUserGroup';
+import ConsoleLoggerColorful from '../../shared/helpers/ConsoleLoggerColorful';
 
 
 // TODO: maybe remove and use false instead of it
 export type NoMachine = 'noMachine';
-// export type MainClassType = new (
-//   ioSet: IoSet,
-//   hostConfigOverride?: HostConfig,
-//   logLevel?: LogLevel,
-//   ioServerMode?: boolean
-// ) => Main;
 
 
 export default abstract class StartBase implements Starter {
@@ -126,10 +120,14 @@ export default abstract class StartBase implements Starter {
     ioSet: IoSet,
     ioServerMode?: boolean
   ): Promise<Main> {
-    const hostConfigOverride: HostConfig = {
-      lockAppSwitch: this.lockAppSwitch,
-    } as HostConfig;
-    const main: Main = new MainClass(ioSet, hostConfigOverride, this.starterProps.logLevel, ioServerMode);
+    const logger = new ConsoleLoggerColorful(this.starterProps.logLevel);
+    const main: Main = new MainClass(
+      ioSet,
+      logger,
+      undefined,
+      ioServerMode,
+      this.lockAppSwitch
+    );
 
     console.info(`===> Starting app`);
 

@@ -1,11 +1,10 @@
 import AppStarter from './AppStarter';
 import IoSet from './interfaces/IoSet';
 import HostConfig from './interfaces/HostConfig';
-import LogLevel from './interfaces/LogLevel';
 import StorageIo from './interfaces/io/StorageIo';
 import SysIo from './interfaces/io/SysIo';
-import ConsoleLogger from './ConsoleLogger';
 import {APP_DESTROY_TIMEOUT_SEC} from './constants';
+import Logger from './interfaces/Logger';
 
 
 /**
@@ -17,30 +16,33 @@ export default class Main {
   }
 
   private ioSet: IoSet;
-  private readonly hostConfigOverride?: HostConfig;
-  private readonly logLevel?: LogLevel;
+  private hostConfigOverride?: HostConfig;
+  private logger: Logger;
   private readonly ioServerMode?: boolean;
   private app?: AppStarter;
-  private consoleLogger?: ConsoleLogger;
   private started: boolean = false;
 
 
   constructor(
     ioSet: IoSet,
+    logger: Logger,
     hostConfigOverride?: HostConfig,
-    logLevel?: LogLevel,
-    ioServerMode?: boolean
-    // TODO: можно добавить lockAppSwitch
+    ioServerMode?: boolean,
+    lockAppSwitch?: boolean
   ) {
     this.ioSet = ioSet;
-    this.hostConfigOverride = hostConfigOverride;
-    this.logLevel = logLevel;
+    this.hostConfigOverride = {
+      lockAppSwitch,
+      ...hostConfigOverride,
+    } as HostConfig;
+    this.logger = logger;
     this.ioServerMode = ioServerMode;
   }
 
   async init() {
-    this.consoleLogger = new ConsoleLogger(this.logLevel);
-    this.app = new AppStarter(this.ioSet, this.hostConfigOverride, this.consoleLogger);
+    this.app = new AppStarter(this.ioSet, this.hostConfigOverride, this.logger);
+
+    delete this.hostConfigOverride;
 
     this.ioSet.init && await this.ioSet.init();
   }
@@ -60,7 +62,6 @@ export default class Main {
 
   /**
    * Start app or IoServer
-   * @param ioServerMode
    */
   async start() {
     if (!this.app) throw new Error(`No app`);
@@ -90,9 +91,7 @@ export default class Main {
         this.destroy()
           .then(() => processExit(code))
           .catch((e: Error) => {
-            if (!this.consoleLogger) throw new Error('No consoleLogger');
-
-            this.consoleLogger.error(e);
+            this.logger.error(String(e));
             processExit(code);
           });
       }
@@ -101,27 +100,26 @@ export default class Main {
 
   private async doDestroy() {
     if (!this.app) throw new Error('No app');
-    if (!this.consoleLogger) throw new Error('No consoleLogger');
 
     try {
       await this.app.destroy();
     }
     catch (e) {
-      this.consoleLogger.error(e);
+      this.logger.error(e);
     }
 
-    this.consoleLogger.info(`... destroying IoSet`);
+    this.logger.info(`... destroying IoSet`);
 
     try {
       await this.ioSet.destroy();
     }
     catch (e) {
-      this.consoleLogger.error(e);
+      this.logger.error(e);
     }
     finally {
       delete this.ioSet;
       delete this.app;
-      delete this.consoleLogger;
+      delete this.logger;
     }
   }
 

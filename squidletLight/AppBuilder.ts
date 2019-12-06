@@ -30,6 +30,7 @@ export default class AppBuilder {
   private readonly machine: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
+  private readonly ioServer?: boolean;
   private readonly os: Os = new Os();
   private readonly envBuilder: EnvBuilder;
 
@@ -41,7 +42,8 @@ export default class AppBuilder {
     machine: string,
     hostConfigPath: string,
     minimize: boolean = true,
-    logLevel?: LogLevel
+    logLevel?: LogLevel,
+    ioServer?: boolean
   ) {
     this.tmpDir = tmpDir;
     this.outputPath = outputPath;
@@ -49,6 +51,7 @@ export default class AppBuilder {
     this.machine = machine;
     this.minimize = minimize;
     this.logLevel = logLevel;
+    this.ioServer = ioServer;
 
     const envBuilderTmpDir = path.join(this.tmpDir, ENV_BUILD_TMP_DIR);
 
@@ -123,7 +126,12 @@ export default class AppBuilder {
     const fileContent: string = await this.os.getFileContent(fileContentPath);
     const relativeRepoRoot = path.relative( this.tmpDir, REPO_ROOT );
 
-    return _.template(fileContent)({ REPO_ROOT: relativeRepoRoot });
+    return _.template(fileContent)({
+      REPO_ROOT: relativeRepoRoot,
+      LOG_LEVEL: this.logLevel,
+      IO_SERVER_MODE: this.ioServer,
+      LOCK_APP_SWITCH: this.ioServer,
+    });
   }
 
   protected async makePackageJson(): Promise<string> {
