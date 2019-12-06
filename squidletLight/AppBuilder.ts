@@ -148,9 +148,9 @@ export default class AppBuilder {
 
     return _.template(fileContent)({
       REPO_ROOT: relativeRepoRoot,
-      LOG_LEVEL: this.logLevel,
-      IO_SERVER_MODE: this.ioServer,
-      LOCK_APP_SWITCH: this.ioServer,
+      LOG_LEVEL: this.logLevel || 'undefined',
+      IO_SERVER_MODE: this.ioServer || 'undefined',
+      LOCK_APP_SWITCH: this.ioServer || 'undefined',
     });
   }
 
