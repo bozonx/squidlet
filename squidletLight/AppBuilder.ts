@@ -95,7 +95,7 @@ export default class AppBuilder {
     const driversFileStr: string = await this.makeEntitiesMainFilesString('drivers');
     const servicesFileStr: string = await this.makeEntitiesMainFilesString('services');
 
-    console.info(`===> Write ts files inti tmp dir`);
+    console.info(`===> Write ts files into tmp dir`);
     await this.os.writeFile(path.join(this.tmpDir, 'index.ts'), indexFileStr);
     await this.os.writeFile(path.join(this.tmpDir, 'ios.ts'), iosFileStr);
     await this.os.writeFile(path.join(this.tmpDir, 'envSet.ts'), envSetStr);
