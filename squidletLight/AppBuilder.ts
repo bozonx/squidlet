@@ -78,10 +78,10 @@ export default class AppBuilder {
 
 
   async build() {
-    await this.os.mkdirP(this.tmpDir);
+    await this.os.rimraf(`${this.outputDir}/*`);
     await this.os.rimraf(`${this.tmpDir}/*`);
     await this.os.mkdirP(this.outputDir);
-    await this.os.rimraf(`${this.outputDir}/*`);
+    await this.os.mkdirP(this.tmpDir);
 
     console.info(`===> collect env set`);
     await this.envBuilder.collect();

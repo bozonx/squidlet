@@ -25,7 +25,7 @@ export default function instantiateMain (
     ioSet,
     consoleLogger,
     hostConfigOverride,
-    ioServerMode || ${IO_SERVER_MODE},
+    (typeof ioServerMode === 'undefined') ? ${IO_SERVER_MODE} : ioServerMode,
     ${LOCK_APP_SWITCH}
   );
 }
