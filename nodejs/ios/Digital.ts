@@ -1,35 +1,89 @@
-// @ts-ignore
-import {Gpio} from 'pigpio';
+/*
+ * It uses a pigpiod daemon.
+ *
+ * Control pigpiod:
+ *
+ * Run in foreground
+ *     sudo pigpiod -g
+ *
+ * start a daemon
+ *     sudo pigpiod
+ *
+ * stop a daemon
+ *     sudo killall pigpiod
+ */
 
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
-import DebounceCall from 'system/lib/debounceCall/DebounceCall';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
-import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
+import DigitalIo from '../../system/interfaces/io/DigitalIo';
 
 
-type GpioHandler = (level: number) => void;
+const pigpio = require('pigpio-client').pigpio({
+  //host: '0.0.0.0'
+  //timeout: 1,
+});
 
-const INTERRUPT_EVENT_NAME = 'interrupt';
-const ALERT_EVENT_NAME = 'alert';
+// import DigitalIo, {
+//   Edge,
+//   DigitalPinMode,
+//   WatchHandler,
+//   DigitalInputMode
+// } from '../../system/interfaces/io/DigitalIo';
+// import DebounceCall from '../../system/helpers/DebounceCall';
+// import {callPromised} from '../../system/helpers/helpers';
+
+
+type GpioHandler = (level: number, tick: number) => void;
+
+interface Listener {
+  pin: number;
+  handler: GpioHandler;
+}
+
+const CONNECTION_TIMEOUT = 60000;
+let wasConnected = false;
+const connectionPromise = new Promise((resolve, reject) => {
+  console.log(`... Connecting to pigpiod daemon`);
+
+  pigpio.once('connected', (info: {[index: string]: string}) => {
+    // display information on pigpio and connection status
+    console.log('SUCCESS: has been connected successfully to the pigpio daemon');
+
+    wasConnected = true;
+    resolve();
+  });
+
+  // Errors are emitted unless you provide API with callback.
+  pigpio.on('error', (err: {message: string})=> {
+    console.error('Application received error: ', err.message); // or err.stack
+
+    if (!wasConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
+  });
+
+  pigpio.on('disconnected', (reason: string) => {
+    console.log('App received disconnected event, reason: ', reason);
+    console.log('App reconnecting in 1 sec');
+    setTimeout( pigpio.connect, 1000, {host: 'raspberryHostIP'});
+  });
+
+  setTimeout(() => {
+    if (wasConnected) return;
+    reject(`Can't connect to pigpiod, timeout has been exceeded`);
+  }, CONNECTION_TIMEOUT);
+});
+
+
+// TODO: все выводы в log выводить в системный логгер (возможно через события)
 
 
 export default class Digital implements DigitalIo {
-  private readonly pinInstances: {[index: string]: Gpio} = {};
-  private readonly events = new IndexedEventEmitter<ChangeHandler>();
-  // pin change listeners by
-  private readonly pinListeners: {[index: string]: GpioHandler} = {};
-  // resistor constant of pins by id
-  private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
+  private readonly pinInstances: {[index: string]: any} = {};
+  private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
-  private readonly throttleCall: ThrottleCall = new ThrottleCall();
+  // debounce times by pin number
+  private debounceTimes: {[index: string]: number | undefined} = {};
 
 
-  async destroy(): Promise<void> {
-    await this.clearAll();
-
-    this.events.destroy();
-    this.debounceCall.destroy();
+  async init() {
+    await connectionPromise;
   }
 
 
@@ -37,256 +91,146 @@ export default class Digital implements DigitalIo {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
-    if (this.pinInstances[pin]) {
-      throw new Error(
-        `Digital IO setupInput(): Pin ${pin} has been set up before. ` +
-        `You should to call \`clearPin(${pin})\` and after that try again.`
-      );
+  async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
+    // save debounce time
+    this.debounceTimes[pin] = debounce;
+
+    // TODO: edge - this.resolveEdge(edge),
+
+    const pinInstance = pigpio.gpio(pin);
+    this.pinInstances[pin] = pinInstance;
+    await callPromised(pinInstance.modeSet, 'input');
+
+    if (inputMode === 'input_pullup') {
+      await callPromised(pinInstance.pullUpDown, 2);
+    }
+    else if (inputMode === 'input_pulldown') {
+      await callPromised(pinInstance.pullUpDown, 1);
     }
 
-    const pullUpDown: number = this.convertInputResistorMode(inputMode);
-    // make a new instance of Gpio
-    this.pinInstances[pin] = new Gpio(pin, {
-      pullUpDown,
-      mode: Gpio.INPUT,
-    });
-    this.resistors[pin] = inputMode;
 
-    // try to use "interrupt" event because "alert" event emits too many changes.
-    // But not all the pins can have an interruption, in this case better to use the "alert" event.
-    try {
-      this.pinInstances[pin].enableInterrupt(this.resolveEdge(edge));
+    // Returns a numbr - 0 for input
+    console.log('--------- mode', await callPromised(this.pinInstances[pin].modeGet));
 
-      this.pinListeners[pin] = (level: number) => this.handlePinChange(pin, level, debounce);
-
-      // start listen pin changes
-      this.pinInstances[pin].on(INTERRUPT_EVENT_NAME, this.pinListeners[pin]);
-    }
-    catch (e) {
-      this.pinInstances[pin].enableAlert();
-      // use own edge handler because alert mode doesn't have edge
-      this.pinListeners[pin] = (level: number) => this.handlePinChange(pin, level, debounce, edge);
-      // start listen pin changes
-      this.pinInstances[pin].on(ALERT_EVENT_NAME, this.pinListeners[pin]);
-    }
   }
 
   /**
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
-    if (this.pinInstances[pin]) {
-      throw new Error(
-        `Digital IO setupOutput(): Pin ${pin} has been set up before. ` +
-        `You should to call \`clearPin(${pin})\` and after that try again.`
-      );
-    }
-
-    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
-
-    this.pinInstances[pin] = new Gpio(pin, {
-      pullUpDown,
-      mode: Gpio.OUTPUT,
-    });
-    this.resistors[pin] = outputMode;
+  async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
+    this.pinInstances[pin] = pigpio.gpio(pin);
+    await callPromised(this.pinInstances[pin].modeSet, 'output');
 
     // set initial value if is set
-    if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
+    if (typeof initialValue !== 'undefined') await callPromised(this.write, pin, initialValue);
   }
 
-  async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    return this.resolvePinDirection(pin);
-  }
+  /**
+   * Get pin mode.
+   * It throws an error if pin hasn't configured before
+   */
+  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
+    const pinInstance = this.getPinInstance('getPinMode', pin);
+    const modeConst: number = await callPromised(pinInstance.modeGet);
 
-  async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    return this.resistors[pin];
+    if (modeConst === 0) {
+      return 'input';
+
+      // TODO: add support of input_pullup and input_pulldown
+    }
+    else {
+
+      // TODO: which const in output ????
+
+      return 'output';
+    }
   }
 
   async read(pin: number): Promise<boolean> {
-    return this.simpleRead(pin);
+    const pinInstance = this.getPinInstance('read', pin);
+
+    // returns 0 or 1
+    const result: number = await callPromised(pinInstance.read);
+
+    return Boolean(result);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
-    const pinDirection: PinDirection | undefined = this.resolvePinDirection(pin);
-
-    if (typeof pinDirection === 'undefined') {
-      throw new Error(`Digital.write: pin ${pin} hasn't been set up yet`);
-    }
-    else if (pinDirection !== PinDirection.output) {
-      throw new Error(`Digital.write: pin ${pin}: writing is allowed only for output pins`);
-    }
-
     const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
 
-    pinInstance.digitalWrite(numValue);
+    return callPromised(pinInstance.write, numValue);
   }
 
-  async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-    return this.events.addListener(pin, handler);
-  }
+  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
+    const pinInstance = this.getPinInstance('setWatch', pin);
 
-  async removeListener(handlerIndex: number): Promise<void> {
-    this.events.removeListener(handlerIndex);
-  }
+    const handlerWrapper: GpioHandler = (level: number, tick: number) => {
+      const value: boolean = Boolean(level);
 
-  async clearPin(pin: number): Promise<void> {
-    delete this.resistors[pin];
-    this.events.removeAllListeners(pin);
-
-    if (!this.pinInstances[pin]) {
-      delete this.pinListeners[pin];
-
-      return;
-    }
-
-    // remove listeners. It won't rise error event the listener hasn't been registered before.
-    if (this.pinListeners[pin]) {
-      this.pinInstances[pin].removeListener(INTERRUPT_EVENT_NAME, this.pinListeners[pin]);
-      this.pinInstances[pin].removeListener(ALERT_EVENT_NAME, this.pinListeners[pin]);
-    }
-
-    // it won't throw the error event interrupt or alert haven't been configured before.
-    this.pinInstances[pin].disableInterrupt();
-    this.pinInstances[pin].disableAlert();
-    this.debounceCall.clear(pin);
-
-    delete this.pinListeners[pin];
-    delete this.pinInstances[pin];
-  }
-
-  async clearAll(): Promise<void> {
-    for (let index in this.pinInstances) {
-      await this.clearPin(parseInt(index));
-    }
-  }
-
-
-  private handlePinChange(pin: number, numLevel: number, debounce: number, edge?: Edge) {
-    const level: boolean = Boolean(numLevel);
-
-    // don't handle edge which is not suitable to edge that has been set up
-    if (typeof edge !== 'undefined') {
-      if (edge === Edge.rising && !level) {
-        return;
+      // if undefined or 0 - call handler immediately
+      if (!this.debounceTimes[pin]) {
+        handler(value);
       }
-      else if (edge === Edge.falling && level) {
-        return;
-      }
-    }
-
-    // if undefined or 0 - call handler immediately
-    if (!debounce) {
-      return this.events.emit(pin, level);
-    }
-    // use throttle instead of debounce if rising or falling edge is set
-    else if (edge === Edge.rising || edge === Edge.falling) {
-      this.throttleCall.invoke(() => {
-        this.events.emit(pin, level);
-      }, debounce, pin)
-        .catch((e) => {
-          // TODO: call IO's logError()
-          console.error(e);
+      else {
+        // wait for debounce and read current level
+        this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
+          const realLevel = await this.read(pin);
+          handler(realLevel);
         });
+      }
+    };
 
-      return;
-    }
-    // else edge both and debounce is set
-    // wait for debounce and read current level and emit an event
-    this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
-      .catch((e) => {
-        // TODO: call IO's logError()
-        console.error(e);
-      });
+    // register
+    this.alertListeners.push({ pin, handler: handlerWrapper });
+    // start listen
+    pinInstance.notify(handlerWrapper);
+
+    // return an index
+    return this.alertListeners.length - 1;
   }
 
-  private handleEndOfDebounce(pin: number) {
-    let realLevel: boolean;
-
-    try {
-      realLevel = this.simpleRead(pin);
-    }
-    catch (e) {
-      // TODO: call IO's logError()
-      return console.error(e);
+  async clearWatch(id: number): Promise<void> {
+    if (typeof id === 'undefined') {
+      throw new Error(`You have to specify a watch id`);
     }
 
-    this.events.emit(pin, realLevel);
+    // it has been removed recently
+    if (!this.alertListeners[id]) return;
+
+    const {pin, handler} = this.alertListeners[id];
+    const pinInstance = this.getPinInstance('clearWatch', pin);
+
+    pinInstance.endNotify(handler);
+
+    delete this.alertListeners[id];
   }
 
-  private convertInputResistorMode(resistorMode: InputResistorMode): number {
-    switch (resistorMode) {
-      case (InputResistorMode.none):
-        return Gpio.PUD_OFF;
-      case (InputResistorMode.pullup):
-        return Gpio.PUD_UP;
-      case (InputResistorMode.pulldown):
-        return Gpio.PUD_DOWN;
-      default:
-        throw new Error(`Unknown mode "${resistorMode}"`);
+  async clearAllWatches(): Promise<void> {
+    for (let index in this.alertListeners) {
+      await this.clearWatch(parseInt(index));
     }
   }
 
-  private convertOutputResistorMode(resistorMode: OutputResistorMode): number {
-    switch (resistorMode) {
-      case (OutputResistorMode.none):
-        return Gpio.PUD_OFF;
 
-      case (OutputResistorMode.opendrain):
-        //throw new Error(`Open-drain mode isn't supported`);
-        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
-        return Gpio.PUD_UP;
-      default:
-        throw new Error(`Unknown mode "${resistorMode}"`);
-    }
-  }
+  // private resolveEdge(edge?: Edge): number {
+  //   if (edge === 'rising') {
+  //     return Gpio.RISING_EDGE;
+  //   }
+  //   else if (edge === 'falling') {
+  //     return Gpio.FALLING_EDGE;
+  //   }
+  //
+  //   return Gpio.EITHER_EDGE;
+  // }
 
-  private resolveEdge(edge: Edge): number {
-    if (edge === Edge.rising) {
-      return Gpio.RISING_EDGE;
-    }
-    else if (edge === Edge.falling) {
-      return Gpio.FALLING_EDGE;
-    }
-
-    return Gpio.EITHER_EDGE;
-  }
-
-  private resolvePinDirection(pin: number): PinDirection | undefined {
-    let pinInstance: Gpio;
-
-    try {
-      pinInstance = this.getPinInstance('resolvePinDirection', pin);
-    }
-    catch (e) {
-      // if instance of pin hasn't been created yet = undefined
-      return;
-    }
-
-    // it returns input or output. Input by default.
-    const modeConst: number = pinInstance.getMode();
-
-    if (modeConst === Gpio.OUTPUT) {
-      return PinDirection.output;
-    }
-
-    return PinDirection.input;
-  }
-
-  private getPinInstance(methodWhichAsk: string, pin: number): Gpio {
+  private getPinInstance(methodWhichAsk: string, pin: number): any {
     if (!this.pinInstances[pin]) {
-      throw new Error(`Nodejs Digital io ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
+      throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
 
     return this.pinInstances[pin];
-  }
-
-  private simpleRead(pin: number): boolean {
-    const pinInstance = this.getPinInstance('simpleRead', pin);
-
-    return Boolean(pinInstance.digitalRead());
   }
 
 }
