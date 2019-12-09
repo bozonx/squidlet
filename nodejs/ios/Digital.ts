@@ -19,7 +19,6 @@ import ThrottleCall from '../../system/lib/debounceCall/ThrottleCall';
 import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
 import {callPromised} from '../../system/lib/common';
 import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
-import {Gpio} from 'pigpio';
 
 
 const pigpio = require('pigpio-client').pigpio({
@@ -27,22 +26,8 @@ const pigpio = require('pigpio-client').pigpio({
   //timeout: 1,
 });
 
-// import DigitalIo, {
-//   Edge,
-//   DigitalPinMode,
-//   WatchHandler,
-//   DigitalInputMode
-// } from '../../system/interfaces/io/DigitalIo';
-// import DebounceCall from '../../system/helpers/DebounceCall';
-// import {callPromised} from '../../system/helpers/helpers';
-
 
 type GpioHandler = (level: number, tick: number) => void;
-
-interface Listener {
-  pin: number;
-  handler: GpioHandler;
-}
 
 const CONNECTION_TIMEOUT = 60000;
 let wasConnected = false;
@@ -101,6 +86,8 @@ export default class Digital implements DigitalIo {
 
   destroy(): Promise<void> {
     // TODO: destroy
+
+    // TODO: use gpio.endNotify(cb)
   }
 
 
@@ -121,23 +108,20 @@ export default class Digital implements DigitalIo {
       );
     }
 
+    const pullUpDown: number = this.convertInputResistorMode(inputMode);
+
     // save debounce time
-    this.debounceTimes[pin] = debounce;
+    //this.debounceTimes[pin] = debounce;
 
-    // TODO: edge - this.resolveEdge(edge),
+    this.pinInstances[pin] = pigpio.gpio(pin);
 
-    const pinInstance = pigpio.gpio(pin);
-    this.pinInstances[pin] = pinInstance;
-    await callPromised(pinInstance.modeSet, 'input');
-    await callPromised(this.pinInstances[pin].pullUpDown, this.convertInputResistorMode(inputMode));
+    await callPromised(this.pinInstances[pin].modeSet, 'input');
+    await callPromised(this.pinInstances[pin].pullUpDown, pullUpDown);
 
-    if (inputMode === 'input_pullup') {
-      await callPromised(pinInstance.pullUpDown, 2);
-    }
-    else if (inputMode === 'input_pulldown') {
-      await callPromised(pinInstance.pullUpDown, 1);
-    }
+    this.pinListeners[pin] = (level: number, tick: number) =>
+      this.handlePinChange(pin, level, tick, debounce, edge);
 
+    this.pinInstances[pin].notify(this.pinListeners[pin]);
 
     // Returns a numbr - 0 for input
     //console.log('--------- mode', await callPromised(this.pinInstances[pin].modeGet));
@@ -197,12 +181,7 @@ export default class Digital implements DigitalIo {
   }
 
   async read(pin: number): Promise<boolean> {
-    const pinInstance = this.getPinInstance('read', pin);
-
-    // returns 0 or 1
-    const result: number = await callPromised(pinInstance.read);
-
-    return Boolean(result);
+    return this.simpleRead(pin);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
@@ -272,6 +251,66 @@ export default class Digital implements DigitalIo {
     }
   }
 
+
+  private handlePinChange(pin: number, numLevel: number, tick: number, debounce: number, edge: Edge) {
+    const level: boolean = Boolean(numLevel);
+
+    // don't handle edge which is not suitable to edge that has been set up
+    if (edge === Edge.rising && !level) {
+      return;
+    }
+    else if (edge === Edge.falling && level) {
+      return;
+    }
+
+    // if undefined or 0 - call handler immediately
+    if (!debounce) {
+      return this.events.emit(pin, level);
+    }
+    // use throttle instead of debounce if rising or falling edge is set
+    else if (edge === Edge.rising || edge === Edge.falling) {
+      this.throttleCall.invoke(() => {
+        this.events.emit(pin, level);
+      }, debounce, pin)
+        .catch((e) => {
+          // TODO: call IO's logError()
+          console.error(e);
+        });
+
+      return;
+    }
+    // else edge both and debounce is set
+    // wait for debounce and read current level and emit an event
+    // TODO: вернет promise
+    this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
+      .catch((e) => {
+        // TODO: call IO's logError()
+        console.error(e);
+      });
+  }
+
+  private async handleEndOfDebounce(pin: number) {
+    let realLevel: boolean;
+
+    try {
+      realLevel = await this.simpleRead(pin);
+    }
+    catch (e) {
+      // TODO: call IO's logError()
+      return console.error(e);
+    }
+
+    this.events.emit(pin, realLevel);
+  }
+
+  private async simpleRead(pin: number): Promise<boolean> {
+    const pinInstance = this.getPinInstance('simpleRead', pin);
+
+    // returns 0 or 1
+    const result: number = await callPromised(pinInstance.read);
+
+    return Boolean(result);
+  }
 
   // private resolveEdge(edge?: Edge): number {
   //   if (edge === 'rising') {
