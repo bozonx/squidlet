@@ -17,7 +17,7 @@ const ALERT_EVENT_NAME = 'alert';
 export default class DigitalPigpio implements DigitalIo {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
-  // pin change listeners by
+  // pin change listeners by pin
   private readonly pinListeners: {[index: string]: GpioHandler} = {};
   // resistor constant of pins by id
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
@@ -220,10 +220,10 @@ export default class DigitalPigpio implements DigitalIo {
     switch (resistorMode) {
       case (InputResistorMode.none):
         return Gpio.PUD_OFF;
-      case (InputResistorMode.pullup):
-        return Gpio.PUD_UP;
       case (InputResistorMode.pulldown):
         return Gpio.PUD_DOWN;
+      case (InputResistorMode.pullup):
+        return Gpio.PUD_UP;
       default:
         throw new Error(`Unknown mode "${resistorMode}"`);
     }

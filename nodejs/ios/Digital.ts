@@ -13,7 +13,13 @@
  *     sudo killall pigpiod
  */
 
-import DigitalIo from '../../system/interfaces/io/DigitalIo';
+import DigitalIo, {ChangeHandler} from '../../system/interfaces/io/DigitalIo';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../system/interfaces/gpioTypes';
+import ThrottleCall from '../../system/lib/debounceCall/ThrottleCall';
+import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
+import {callPromised} from '../../system/lib/common';
+import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
+import {Gpio} from 'pigpio';
 
 
 const pigpio = require('pigpio-client').pigpio({
@@ -75,15 +81,31 @@ const connectionPromise = new Promise((resolve, reject) => {
 
 
 export default class Digital implements DigitalIo {
+  // TODO: add type ???
   private readonly pinInstances: {[index: string]: any} = {};
-  private readonly alertListeners: Listener[] = [];
-  private readonly debounceCall: DebounceCall = new DebounceCall();
+  private readonly events = new IndexedEventEmitter<ChangeHandler>();
+  // pin change listeners by pin
+  private readonly pinListeners: {[index: string]: GpioHandler} = {};
   // debounce times by pin number
-  private debounceTimes: {[index: string]: number | undefined} = {};
+  //private debounceTimes: {[index: string]: number | undefined} = {};
+
+  private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
+  private readonly debounceCall: DebounceCall = new DebounceCall();
+  private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
   async init() {
-    await connectionPromise;
+    // TODO: make connection
+    //await connectionPromise;
+  }
+
+  destroy(): Promise<void> {
+    // TODO: destroy
+  }
+
+
+  async configure(definition: any): Promise<void> {
+    // TODO: save config
   }
 
 
@@ -91,7 +113,14 @@ export default class Digital implements DigitalIo {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
+  async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
+    if (this.pinInstances[pin]) {
+      throw new Error(
+        `Digital IO setupInput(): Pin ${pin} has been set up before. ` +
+        `You should to call \`clearPin(${pin})\` and after that try again.`
+      );
+    }
+
     // save debounce time
     this.debounceTimes[pin] = debounce;
 
@@ -100,6 +129,7 @@ export default class Digital implements DigitalIo {
     const pinInstance = pigpio.gpio(pin);
     this.pinInstances[pin] = pinInstance;
     await callPromised(pinInstance.modeSet, 'input');
+    await callPromised(this.pinInstances[pin].pullUpDown, this.convertInputResistorMode(inputMode));
 
     if (inputMode === 'input_pullup') {
       await callPromised(pinInstance.pullUpDown, 2);
@@ -110,27 +140,38 @@ export default class Digital implements DigitalIo {
 
 
     // Returns a numbr - 0 for input
-    console.log('--------- mode', await callPromised(this.pinInstances[pin].modeGet));
-
+    //console.log('--------- mode', await callPromised(this.pinInstances[pin].modeGet));
   }
 
   /**
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
+  async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
+    if (this.pinInstances[pin]) {
+      throw new Error(
+        `Digital IO setupOutput(): Pin ${pin} has been set up before. ` +
+        `You should to call \`clearPin(${pin})\` and after that try again.`
+      );
+    }
+
     this.pinInstances[pin] = pigpio.gpio(pin);
     await callPromised(this.pinInstances[pin].modeSet, 'output');
+    await callPromised(this.pinInstances[pin].pullUpDown, this.convertOutputResistorMode(outputMode));
 
     // set initial value if is set
     if (typeof initialValue !== 'undefined') await callPromised(this.write, pin, initialValue);
+  }
+
+  async getPinDirection(pin: number): Promise<PinDirection | undefined> {
+    // TODO: add - use modeGet
   }
 
   /**
    * Get pin mode.
    * It throws an error if pin hasn't configured before
    */
-  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
+  async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
     const pinInstance = this.getPinInstance('getPinMode', pin);
     const modeConst: number = await callPromised(pinInstance.modeGet);
 
@@ -157,59 +198,69 @@ export default class Digital implements DigitalIo {
   }
 
   async write(pin: number, value: boolean): Promise<void> {
+    // TODO: add checks ????
+
     const pinInstance = this.getPinInstance('write', pin);
     const numValue = (value) ? 1 : 0;
 
     return callPromised(pinInstance.write, numValue);
   }
 
-  async setWatch(pin: number, handler: WatchHandler): Promise<number> {
-    const pinInstance = this.getPinInstance('setWatch', pin);
+  async onChange(pin: number, handler: ChangeHandler): Promise<number> {
+    return this.events.addListener(pin, handler);
 
-    const handlerWrapper: GpioHandler = (level: number, tick: number) => {
-      const value: boolean = Boolean(level);
-
-      // if undefined or 0 - call handler immediately
-      if (!this.debounceTimes[pin]) {
-        handler(value);
-      }
-      else {
-        // wait for debounce and read current level
-        this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
-          const realLevel = await this.read(pin);
-          handler(realLevel);
-        });
-      }
-    };
-
-    // register
-    this.alertListeners.push({ pin, handler: handlerWrapper });
-    // start listen
-    pinInstance.notify(handlerWrapper);
-
-    // return an index
-    return this.alertListeners.length - 1;
+    // const pinInstance = this.getPinInstance('setWatch', pin);
+    //
+    // const handlerWrapper: GpioHandler = (level: number, tick: number) => {
+    //   const value: boolean = Boolean(level);
+    //
+    //   // if undefined or 0 - call handler immediately
+    //   if (!this.debounceTimes[pin]) {
+    //     handler(value);
+    //   }
+    //   else {
+    //     // wait for debounce and read current level
+    //     this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
+    //       const realLevel = await this.read(pin);
+    //       handler(realLevel);
+    //     });
+    //   }
+    // };
+    //
+    // // register
+    // this.alertListeners.push({ pin, handler: handlerWrapper });
+    // // start listen
+    // pinInstance.notify(handlerWrapper);
+    //
+    // // return an index
+    // return this.alertListeners.length - 1;
   }
 
-  async clearWatch(id: number): Promise<void> {
-    if (typeof id === 'undefined') {
-      throw new Error(`You have to specify a watch id`);
-    }
+  async removeListener(handlerIndex: number): Promise<void> {
+    this.events.removeListener(handlerIndex);
 
-    // it has been removed recently
-    if (!this.alertListeners[id]) return;
-
-    const {pin, handler} = this.alertListeners[id];
-    const pinInstance = this.getPinInstance('clearWatch', pin);
-
-    pinInstance.endNotify(handler);
-
-    delete this.alertListeners[id];
+    // if (typeof id === 'undefined') {
+    //   throw new Error(`You have to specify a watch id`);
+    // }
+    //
+    // // it has been removed recently
+    // if (!this.alertListeners[id]) return;
+    //
+    // const {pin, handler} = this.alertListeners[id];
+    // const pinInstance = this.getPinInstance('clearWatch', pin);
+    //
+    // pinInstance.endNotify(handler);
+    //
+    // delete this.alertListeners[id];
   }
 
-  async clearAllWatches(): Promise<void> {
-    for (let index in this.alertListeners) {
-      await this.clearWatch(parseInt(index));
+  async clearPin(pin: number): Promise<void> {
+    // TODO: add
+  }
+
+  async clearAll(): Promise<void> {
+    for (let index in this.pinInstances) {
+      await this.clearPin(parseInt(index));
     }
   }
 
@@ -224,6 +275,33 @@ export default class Digital implements DigitalIo {
   //
   //   return Gpio.EITHER_EDGE;
   // }
+
+  private convertInputResistorMode(resistorMode: InputResistorMode): number {
+    switch (resistorMode) {
+      case (InputResistorMode.none):
+        return 0;
+      case (InputResistorMode.pulldown):
+        return 1;
+      case (InputResistorMode.pullup):
+        return 2;
+      default:
+        throw new Error(`Unknown mode "${resistorMode}"`);
+    }
+  }
+
+  private convertOutputResistorMode(resistorMode: OutputResistorMode): number {
+    switch (resistorMode) {
+      case (OutputResistorMode.none):
+        return 0;
+
+      case (OutputResistorMode.opendrain):
+        //throw new Error(`Open-drain mode isn't supported`);
+        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
+        return 2;
+      default:
+        throw new Error(`Unknown mode "${resistorMode}"`);
+    }
+  }
 
   private getPinInstance(methodWhichAsk: string, pin: number): any {
     if (!this.pinInstances[pin]) {
