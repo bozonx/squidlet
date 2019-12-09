@@ -155,16 +155,37 @@ export default class Digital implements DigitalIo {
       );
     }
 
+    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
+    // make instance
     this.pinInstances[pin] = pigpio.gpio(pin);
+    // save resistor mode
+    this.resistors[pin] = outputMode;
+    // make setup
     await callPromised(this.pinInstances[pin].modeSet, 'output');
-    await callPromised(this.pinInstances[pin].pullUpDown, this.convertOutputResistorMode(outputMode));
-
-    // set initial value if is set
-    if (typeof initialValue !== 'undefined') await callPromised(this.write, pin, initialValue);
+    await callPromised(this.pinInstances[pin].pullUpDown, pullUpDown);
+    // set initial value if it defined
+    if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
     // TODO: add - use modeGet
+
+    return;
+
+    // const pinInstance = this.getPinInstance('getPinMode', pin);
+    // const modeConst: number = await callPromised(pinInstance.modeGet);
+    //
+    // if (modeConst === 0) {
+    //   return 'input';
+    //
+    //   // TODO: add support of input_pullup and input_pulldown
+    // }
+    // else {
+    //
+    //   // TODO: which const in output ????
+    //
+    //   return 'output';
+    // }
   }
 
   /**
@@ -172,20 +193,7 @@ export default class Digital implements DigitalIo {
    * It throws an error if pin hasn't configured before
    */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    const pinInstance = this.getPinInstance('getPinMode', pin);
-    const modeConst: number = await callPromised(pinInstance.modeGet);
-
-    if (modeConst === 0) {
-      return 'input';
-
-      // TODO: add support of input_pullup and input_pulldown
-    }
-    else {
-
-      // TODO: which const in output ????
-
-      return 'output';
-    }
+    return this.resistors[pin];
   }
 
   async read(pin: number): Promise<boolean> {

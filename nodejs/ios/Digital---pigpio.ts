@@ -85,14 +85,14 @@ export default class DigitalPigpio implements DigitalIo {
     }
 
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
-
+    // make instance and setup it
     this.pinInstances[pin] = new Gpio(pin, {
       pullUpDown,
       mode: Gpio.OUTPUT,
     });
+    // save resistor mode
     this.resistors[pin] = outputMode;
-
-    // set initial value if is set
+    // set initial value if it defined
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
 
