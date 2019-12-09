@@ -48,3 +48,16 @@
       -v /dev/mem:/dev/mem \
       --device=/dev/ttyUSB0
       bozonx/squidlet:x86
+
+    docker rm -f squidlet; docker run --name squidlet -ti \
+      -p 18087:8087 \
+      -p 18088:8088 \
+      -p 18089:8089 \
+      -e PUID=1000 \
+      -e PGID=1000 \
+      -e LOG_LEVEL=debug \
+      --privileged \
+      -v /sys/class/gpio:/sys/class/gpio \
+      -v /dev/mem:/dev/mem \
+      --device=/dev/ttyUSB0 \
+      bozonx/squidlet:rpi
