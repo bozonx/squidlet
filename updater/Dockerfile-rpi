@@ -7,18 +7,8 @@ ENV PUID=1000 PGID=1000 LOG_LEVEL="" MQTT_BROKER_HOST="" MQTT_BROKER_PORT="" IOS
 
 WORKDIR /app
 
-#RUN apt-get install -y build-essential; \
-#  wget https://github.com/joan2937/pigpio/archive/master.zip; \
-#  unzip master.zip; \
-#  cd pigpio-master; \
-#  make; \
-#  make install; \
-#  cd ..; \
-#  rm master.zip; \
-#  sudo rm -rf pigpio-master;
-
 RUN npm install;
-#RUN npm install pigpio i2c-bus;
+RUN npm install i2c-bus;
 
 VOLUME ["/app/data"]
 EXPOSE 8087/tcp 8088/tcp 8089/tcp

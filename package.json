@@ -29,6 +29,7 @@
     "lodash": "^4.17.15",
     "mqtt": "^3.0.0",
     "mqtt-packet": "^6.3.0",
+    "pigpio-client": "^1.4.0",
     "serialport": "^8.0.5",
     "shelljs": "^0.8.3",
     "ws": "^7.2.0",
