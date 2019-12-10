@@ -19,7 +19,7 @@ export class PigpioClient {
   }
 
   get connected(): boolean {
-    return this.hasBeenConnected;
+    return this.connectionPromised.isResolved();
   }
 
   get connectionPromise(): Promise<void> {
@@ -29,7 +29,6 @@ export class PigpioClient {
   private logInfo: (msg: string) => void;
   private logDebug: (msg: string) => void;
   private logError: (msg: string | Error) => void;
-  private hasBeenConnected = false;
   private clientOptions: PigpioOptions = DEFAULT_OPTIONS;
   private client: any;
   private connectionPromised = new Promised<void>();
@@ -75,10 +74,10 @@ export class PigpioClient {
 
   async destroy(): Promise<void> {
     await callPromised(this.client.end);
+    this.connectionPromised.destroy();
 
-    // TODO: destroy
-
-    // TODO: use gpio.endNotify(cb)
+    delete this.connectionPromised;
+    delete this.client;
   }
 
 
@@ -95,7 +94,7 @@ export class PigpioClient {
       });
 
       // setTimeout(() => {
-      //   if (this.hasBeenConnected) return;
+      //   if (this.connected) return;
       //   reject(`Can't connect to pigpiod, timeout has been exceeded`);
       // }, CONNECTION_TIMEOUT_MS);
     });
@@ -104,16 +103,24 @@ export class PigpioClient {
   private handleConnected = (info: PigpioInfo): void => {
     this.logInfo('Pigpio client has been connected successfully to the pigpio daemon');
     this.logDebug(`pigpio connection info: ${JSON.stringify(info)}`);
-    this.hasBeenConnected = true;
-    // TODO: resolve promise
+    this.connectionPromised.resolve();
   }
 
   private handleDisconnect = (reason: string): void => {
-    this.hasBeenConnected = false;
-    // TODO: renew Promise ????
     this.logDebug(`Pigpio client received disconnected event, reason: ${reason}`);
+
+    // means destroyed
+    if (!this.client) return;
+
     this.logInfo(`Pigpio client reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
-    // TODO: если был вызван destroy то не нужно делать переконнект
+
+    // renew promised if need
+    if (this.connectionPromised.isFulfilled()) {
+      this.connectionPromised.destroy();
+
+      this.connectionPromised = new Promised<void>();
+    }
+
     setTimeout( this.client.connect, RECONNECT_TIMEOUT_SEC * 1000, this.clientOptions);
   }
 
