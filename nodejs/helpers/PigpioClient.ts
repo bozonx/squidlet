@@ -2,6 +2,7 @@ import {callPromised} from '../../system/lib/common';
 import PigpioWrapper, {PigpioInfo, PigpioOptions} from './PigpioWrapper';
 import Promised from '../../system/lib/Promised';
 import {compactUndefined} from '../../system/lib/arrays';
+import Logger from '../../system/interfaces/Logger';
 
 const pigpioClient = require('pigpio-client');
 
@@ -9,7 +10,8 @@ const pigpioClient = require('pigpio-client');
 //const CONNECTION_TIMEOUT_MS = 60000;
 const RECONNECT_TIMEOUT_SEC = 1;
 const DEFAULT_OPTIONS = {
-  host: 'localhost'
+  host: 'localhost',
+  timeout: 0,
 };
 let client: PigpioClient | undefined;
 
@@ -27,45 +29,43 @@ export class PigpioClient {
     return this.connectionPromised.promise;
   }
 
-  private logInfo: (msg: string) => void;
-  private logDebug: (msg: string) => void;
-  private logError: (msg: string | Error) => void;
+  private logger: Logger;
   private clientOptions: PigpioOptions = DEFAULT_OPTIONS;
   private client: any;
   private connectionPromised = new Promised<void>();
   private hasBeenInited: boolean = false;
 
 
-  constructor(
-    logInfo: (msg: string) => void,
-    logDebug: (msg: string) => void,
-    logError: (msg: string | Error) => void
-  ) {
-    this.logInfo = logInfo;
-    this.logDebug = logDebug;
-    this.logError = logError;
+  constructor(logger: Logger) {
+    this.logger = logger;
   }
 
 
   init(clientOptions: PigpioOptions): Promise<void>{
-    if (this.inited) throw new Error(`Disallowed to init more then one time`);
+    if (this.inited) {
+      this.logger.warn(`PigpioClient: Disallowed to init more then one time`);
+
+      return Promise.resolve();
+    }
 
     this.clientOptions = {
       ...this.clientOptions,
       ...clientOptions,
     };
 
+    console.log(111111111111, this.clientOptions)
+
     this.client = pigpioClient.pigpio(this.clientOptions);
     this.hasBeenInited = true;
 
-    this.logInfo(
+    this.logger.info(
       `... Connecting to pigpiod daemon: ` +
       `${compactUndefined([this.clientOptions.host, this.clientOptions.port]).join(':')}`
     );
 
     // Errors are emitted unless you provide API with callback.
     this.client.on('error', (err: {message: string})=> {
-      this.logError(`Pigpio client: ${err.message}`);
+      this.logger.error(`Pigpio client: ${err.message}`);
       //if (!this.hasBeenConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
     });
 
@@ -103,18 +103,18 @@ export class PigpioClient {
   }
 
   private handleConnected = (info: PigpioInfo): void => {
-    this.logInfo('Pigpio client has been connected successfully to the pigpio daemon');
-    this.logDebug(`pigpio connection info: ${JSON.stringify(info)}`);
+    this.logger.info('Pigpio client has been connected successfully to the pigpio daemon');
+    this.logger.debug(`pigpio connection info: ${JSON.stringify(info)}`);
     this.connectionPromised.resolve();
   }
 
   private handleDisconnect = (reason: string): void => {
-    this.logDebug(`Pigpio client received disconnected event, reason: ${reason}`);
+    this.logger.debug(`Pigpio client received disconnected event, reason: ${reason}`);
 
     // means destroyed
     if (!this.client) return;
 
-    this.logInfo(`Pigpio client reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
+    this.logger.info(`Pigpio client reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
 
     // renew promised if need
     if (this.connectionPromised.isFulfilled()) {
@@ -129,13 +129,9 @@ export class PigpioClient {
 }
 
 
-export default function instantiatePigpioClient(
-  logInfo: (msg: string) => void,
-  logDebug: (msg: string) => void,
-  logError: (msg: string | Error) => void
-): PigpioClient {
+export default function instantiatePigpioClient(logger: Logger): PigpioClient {
   if (!client) {
-    client = new PigpioClient(logInfo, logDebug, logError);
+    client = new PigpioClient(logger);
   }
 
   return client;

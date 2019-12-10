@@ -26,7 +26,12 @@ export default class Digital implements DigitalIo {
 
 
   constructor() {
-    this.pigpioClient = instantiatePigpioClient(console.info, console.log, console.error);
+    this.pigpioClient = instantiatePigpioClient({
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+      debug: console.log,
+    });
   }
 
   async destroy(): Promise<void> {
@@ -37,7 +42,9 @@ export default class Digital implements DigitalIo {
   }
 
   async configure(clientOptions: PigpioOptions): Promise<void> {
-    await this.pigpioClient.init(clientOptions);
+    // make init but don't wait while it has been finished
+    this.pigpioClient.init(clientOptions)
+      .catch(console.error);
   }
 
 
