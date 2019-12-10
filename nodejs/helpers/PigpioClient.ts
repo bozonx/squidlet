@@ -53,8 +53,6 @@ export class PigpioClient {
       ...clientOptions,
     };
 
-    console.log(111111111111, this.clientOptions)
-
     this.client = pigpioClient.pigpio(this.clientOptions);
     this.hasBeenInited = true;
 
@@ -65,7 +63,7 @@ export class PigpioClient {
 
     // Errors are emitted unless you provide API with callback.
     this.client.on('error', (err: {message: string})=> {
-      this.logger.error(`Pigpio client: ${err.message}`);
+      this.logger.error(`PigpioClient: ${err.message}`);
       //if (!this.hasBeenConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
     });
 
@@ -103,18 +101,18 @@ export class PigpioClient {
   }
 
   private handleConnected = (info: PigpioInfo): void => {
-    this.logger.info('Pigpio client has been connected successfully to the pigpio daemon');
-    this.logger.debug(`pigpio connection info: ${JSON.stringify(info)}`);
+    this.logger.info('PigpioClient has been connected successfully to the pigpio daemon');
+    this.logger.debug(`PigpioClient connection info: ${JSON.stringify(info)}`);
     this.connectionPromised.resolve();
   }
 
   private handleDisconnect = (reason: string): void => {
-    this.logger.debug(`Pigpio client received disconnected event, reason: ${reason}`);
+    this.logger.debug(`PigpioClient received disconnected event, reason: ${reason}`);
 
     // means destroyed
     if (!this.client) return;
 
-    this.logger.info(`Pigpio client reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
+    this.logger.info(`PigpioClient reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
 
     // renew promised if need
     if (this.connectionPromised.isFulfilled()) {
@@ -123,7 +121,24 @@ export class PigpioClient {
       this.connectionPromised = new Promised<void>();
     }
 
-    setTimeout( this.client.connect, RECONNECT_TIMEOUT_SEC * 1000, this.clientOptions);
+    setTimeout(() => {
+      this.reconnect()
+        .catch(this.logger.error);
+    }, RECONNECT_TIMEOUT_SEC * 1000);
+  }
+
+  private reconnect = async () => {
+    try {
+      await callPromised(this.client.connect, this.clientOptions);
+    }
+    catch (e) {
+      this.logger.debug(`PigpioClient: Can't reconect: ${e}`);
+
+      setTimeout(() => {
+        this.reconnect()
+          .catch(this.logger.error);
+      }, RECONNECT_TIMEOUT_SEC * 1000);
+    }
   }
 
 }
