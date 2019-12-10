@@ -25,10 +25,10 @@ export default class Digital implements DigitalIo {
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
+  // TODO: review может всетаки сделать init()
   constructor() {
     this.pigpioClient = instantiatePigpioClient();
   }
-
 
   async destroy(): Promise<void> {
     this.debounceCall.destroy();
@@ -36,7 +36,6 @@ export default class Digital implements DigitalIo {
     await this.pigpioClient.destroy();
     this.events.destroy();
   }
-
 
   async configure(clientOptions: PigpioOptions): Promise<void> {
     await this.pigpioClient.init(clientOptions);

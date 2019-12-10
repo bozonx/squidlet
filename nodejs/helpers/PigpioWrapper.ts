@@ -9,6 +9,11 @@ export interface PigpioOptions {
   timeout?: number;
 }
 
+export interface PigpioInfo {
+  // TODO: make it !!!!
+  [index: string]: any;
+}
+
 
 /**
  * Wrapper of pigpio-client's gpio to use promises.
