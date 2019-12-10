@@ -6,96 +6,32 @@ import DigitalIo, {ChangeHandler} from '../../system/interfaces/io/DigitalIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../system/interfaces/gpioTypes';
 import ThrottleCall from '../../system/lib/debounceCall/ThrottleCall';
 import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
-import {callPromised} from '../../system/lib/common';
 import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
+import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
+import PigpioWrapper, {PigpioHandler, PigpioOptions} from '../helpers/PigpioWrapper';
 
-const pigpioClient = require('pigpio-client');
-
-
-interface ClientOptions {
-  host?: string;
-  port?: number;
-  timeout?: number;
-}
-
-
-type GpioHandler = (level: number, tick: number) => void;
-
-const CONNECTION_TIMEOUT = 60000;
 
 // TODO: все выводы в log выводить в системный логгер (возможно через события)
 
 
 export default class Digital implements DigitalIo {
-  private wasConnected = false;
-  private clientOptions: ClientOptions = {
-    host: 'localhost',
-  };
-  private client: any;
-  // TODO: add type ???
-  private readonly pinInstances: {[index: string]: any} = {};
+  private pigpioClient: PigpioClient;
+  private readonly pinInstances: {[index: string]: PigpioWrapper} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   // pin change listeners by pin
-  private readonly pinListeners: {[index: string]: GpioHandler} = {};
-  // debounce times by pin number
-  //private debounceTimes: {[index: string]: number | undefined} = {};
-
+  private readonly pinListeners: {[index: string]: PigpioHandler} = {};
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
   constructor() {
-    // TODO; remove
-    this.init();
+    this.pigpioClient = instantiatePigpioClient();
   }
 
-
-  init(): Promise<void> {
-    this.client = pigpioClient.pigpio(this.clientOptions);
-
-    return new Promise<void>((resolve, reject) => {
-      console.log(`... Connecting to pigpiod daemon`);
-
-      this.client.once('connected', (info: {[index: string]: string}) => {
-        // display information on pigpio and connection status
-        console.log('SUCCESS: Pigpio client has been connected successfully to the pigpio daemon');
-        console.log(`pigpio connection info: ${JSON.stringify(info)}`);
-
-        // this.client.getInfo((aa: any, dd: any) => {
-        //   console.log('----------------- info', aa, dd );
-        // });
-
-        this.wasConnected = true;
-        resolve();
-      });
-
-      // Errors are emitted unless you provide API with callback.
-      this.client.on('error', (err: {message: string})=> {
-        console.error('Pigpio client received error: ', err.message); // or err.stack
-
-        if (!this.wasConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
-      });
-
-      this.client.on('disconnected', (reason: string) => {
-        console.log('Pigpio client received disconnected event, reason: ', reason);
-        console.log('Pigpio client reconnecting in 1 sec');
-        // TODO: нужно ли делать reconnect ???
-        //setTimeout( this.client.connect, 1000, {host: 'raspberryHostIP'});
-      });
-
-      // TODO: review
-      setTimeout(() => {
-        if (this.wasConnected) return;
-        reject(`Can't connect to pigpiod, timeout has been exceeded`);
-      }, CONNECTION_TIMEOUT);
-    });
-  }
 
   async destroy(): Promise<void> {
-    await callPromised(this.client.end);
-
-
+    await this.pigpioClient.destroy();
 
     // TODO: destroy
 
@@ -103,9 +39,8 @@ export default class Digital implements DigitalIo {
   }
 
 
-  async configure(clientOptions: ClientOptions): Promise<void> {
-    // TODO: merge props
-    this.clientOptions = clientOptions;
+  async configure(clientOptions: PigpioOptions): Promise<void> {
+    await this.pigpioClient.init(clientOptions);
   }
 
 
@@ -123,13 +58,10 @@ export default class Digital implements DigitalIo {
 
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
 
-    // save debounce time
-    //this.debounceTimes[pin] = debounce;
+    this.pinInstances[pin] = this.pigpioClient.makePinInstance(pin);
 
-    this.pinInstances[pin] = this.client.gpio(pin);
-
-    await callPromised(this.pinInstances[pin].modeSet, 'input');
-    await callPromised(this.pinInstances[pin].pullUpDown, pullUpDown);
+    await this.pinInstances[pin].modeSet('input');
+    await this.pinInstances[pin].pullUpDown(pullUpDown);
 
     this.pinListeners[pin] = (level: number, tick: number) =>
       this.handlePinChange(pin, level, tick, debounce, edge);
@@ -151,18 +83,18 @@ export default class Digital implements DigitalIo {
 
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
     // make instance
-    this.pinInstances[pin] = this.client.gpio(pin);
+    this.pinInstances[pin] = this.pigpioClient.makePinInstance(pin);
     // save resistor mode
     this.resistors[pin] = outputMode;
     // make setup
-    await callPromised(this.pinInstances[pin].modeSet, 'output');
-    await callPromised(this.pinInstances[pin].pullUpDown, pullUpDown);
+    await this.pinInstances[pin].modeSet('output');
+    await this.pinInstances[pin].pullUpDown(pullUpDown);
     // set initial value if it defined
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    const modeNum: number = await callPromised(this.pinInstances[pin].modeGet);
+    const modeNum: number = await this.pinInstances[pin].modeGet();
 
     if (modeNum === 0) {
       return PinDirection.input;
@@ -187,9 +119,9 @@ export default class Digital implements DigitalIo {
     // TODO: add checks ????
 
     const pinInstance = this.getPinInstance('write', pin);
-    const numValue = (value) ? 1 : 0;
+    const numValue: number = (value) ? 1 : 0;
 
-    return callPromised(pinInstance.write, numValue);
+    return pinInstance.write(numValue);
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
@@ -306,7 +238,7 @@ export default class Digital implements DigitalIo {
     const pinInstance = this.getPinInstance('simpleRead', pin);
 
     // returns 0 or 1
-    const result: number = await callPromised(pinInstance.read);
+    const result: number = await pinInstance.read();
 
     return Boolean(result);
   }
@@ -349,7 +281,7 @@ export default class Digital implements DigitalIo {
     }
   }
 
-  private getPinInstance(methodWhichAsk: string, pin: number): any {
+  private getPinInstance(methodWhichAsk: string, pin: number): PigpioWrapper {
     if (!this.pinInstances[pin]) {
       throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
     }
