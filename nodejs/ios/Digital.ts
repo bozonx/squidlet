@@ -122,7 +122,6 @@ export default class Digital implements DigitalIo {
 
   async write(pin: number, value: boolean): Promise<void> {
     if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
-    // TODO: add checks ????
 
     const pinInstance = this.getPinInstance('write', pin);
     const numValue: number = (value) ? 1 : 0;
@@ -132,57 +131,27 @@ export default class Digital implements DigitalIo {
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
     return this.events.addListener(pin, handler);
-
-    // const pinInstance = this.getPinInstance('setWatch', pin);
-    //
-    // const handlerWrapper: GpioHandler = (level: number, tick: number) => {
-    //   const value: boolean = Boolean(level);
-    //
-    //   // if undefined or 0 - call handler immediately
-    //   if (!this.debounceTimes[pin]) {
-    //     handler(value);
-    //   }
-    //   else {
-    //     // wait for debounce and read current level
-    //     this.debounceCall.invoke(pin, this.debounceTimes[pin], async () => {
-    //       const realLevel = await this.read(pin);
-    //       handler(realLevel);
-    //     });
-    //   }
-    // };
-    //
-    // // register
-    // this.alertListeners.push({ pin, handler: handlerWrapper });
-    // // start listen
-    // pinInstance.notify(handlerWrapper);
-    //
-    // // return an index
-    // return this.alertListeners.length - 1;
   }
 
   async removeListener(handlerIndex: number): Promise<void> {
     this.events.removeListener(handlerIndex);
-
-    // if (typeof id === 'undefined') {
-    //   throw new Error(`You have to specify a watch id`);
-    // }
-    //
-    // // it has been removed recently
-    // if (!this.alertListeners[id]) return;
-    //
-    // const {pin, handler} = this.alertListeners[id];
-    // const pinInstance = this.getPinInstance('clearWatch', pin);
-    //
-    // pinInstance.endNotify(handler);
-    //
-    // delete this.alertListeners[id];
   }
 
   async clearPin(pin: number): Promise<void> {
-    // TODO: add
-    // TODO: use gpio.endNotify(cb)
+    const pinInstance = this.getPinInstance('simpleRead', pin);
 
-    //if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
+    delete this.resistors[pin];
+
+    this.events.removeAllListeners(pin);
+    this.debounceCall.clear(pin);
+    this.throttleCall.clear(pin);
+
+    if (!this.pinListeners) return;
+
+    pinInstance.endNotify(this.pinListeners[pin]);
+
+    delete this.pinListeners[pin];
+    delete this.pinInstances[pin];
   }
 
   async clearAll(): Promise<void> {
@@ -213,7 +182,6 @@ export default class Digital implements DigitalIo {
         this.events.emit(pin, level);
       }, debounce, pin)
         .catch((e) => {
-          // TODO: call IO's logError()
           console.error(e);
         });
 
@@ -224,7 +192,6 @@ export default class Digital implements DigitalIo {
     // TODO: вернет promise
     this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
       .catch((e) => {
-        // TODO: call IO's logError()
         console.error(e);
       });
   }
@@ -236,7 +203,6 @@ export default class Digital implements DigitalIo {
       realLevel = await this.simpleRead(pin);
     }
     catch (e) {
-      // TODO: call IO's logError()
       return console.error(e);
     }
 

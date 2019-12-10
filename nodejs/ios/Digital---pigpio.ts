@@ -134,6 +134,7 @@ export default class DigitalPigpio implements DigitalIo {
 
   async clearPin(pin: number): Promise<void> {
     delete this.resistors[pin];
+
     this.events.removeAllListeners(pin);
 
     if (!this.pinInstances[pin]) {
@@ -152,6 +153,7 @@ export default class DigitalPigpio implements DigitalIo {
     this.pinInstances[pin].disableInterrupt();
     this.pinInstances[pin].disableAlert();
     this.debounceCall.clear(pin);
+    this.throttleCall.clear(pin);
 
     delete this.pinListeners[pin];
     delete this.pinInstances[pin];

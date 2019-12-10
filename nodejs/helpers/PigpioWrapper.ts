@@ -49,16 +49,20 @@ export default class PigpioWrapper {
     return callPromised(this.gpio.pullUpDown, pullUpDown);
   }
 
-  notify(cb: PigpioHandler) {
-    this.gpio.notify(cb);
-  }
-
   read(): Promise<number> {
     return callPromised(this.gpio.read);
   }
 
   write(value: number): Promise<void> {
     return callPromised(this.gpio.write, value);
+  }
+
+  notify(cb: PigpioHandler) {
+    this.gpio.notify(cb);
+  }
+
+  endNotify(cb: PigpioHandler) {
+    this.gpio.endNotify(cb);
   }
 
 }
