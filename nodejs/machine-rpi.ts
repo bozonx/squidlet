@@ -35,6 +35,9 @@ const machineConfig: MachineConfig = {
           }
         }
       },
+      Digital: {
+        host: 'localhost'
+      },
     },
     // dependencies: {
     //   //'i2c-bus': '*',

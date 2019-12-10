@@ -37,9 +37,6 @@ export default class Digital implements DigitalIo {
   }
 
   async configure(clientOptions: PigpioOptions): Promise<void> {
-
-    console.log(1111111111, clientOptions)
-    // TODO: если не будет ничего указанно в конфиге то вообще не выполнится !!!
     await this.pigpioClient.init(clientOptions);
   }
 
@@ -55,6 +52,8 @@ export default class Digital implements DigitalIo {
         `You should to call \`clearPin(${pin})\` and after that try again.`
       );
     }
+
+    await this.pigpioClient.connectionPromise;
 
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
 
@@ -81,6 +80,8 @@ export default class Digital implements DigitalIo {
       );
     }
 
+    await this.pigpioClient.connectionPromise;
+
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
     // make instance
     this.pinInstances[pin] = this.pigpioClient.makePinInstance(pin);
@@ -94,6 +95,8 @@ export default class Digital implements DigitalIo {
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
+    if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
+
     const modeNum: number = await this.pinInstances[pin].modeGet();
 
     if (modeNum === 0) {
@@ -112,10 +115,13 @@ export default class Digital implements DigitalIo {
   }
 
   async read(pin: number): Promise<boolean> {
+    if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
+
     return this.simpleRead(pin);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
+    if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
     // TODO: add checks ????
 
     const pinInstance = this.getPinInstance('write', pin);
@@ -175,6 +181,8 @@ export default class Digital implements DigitalIo {
   async clearPin(pin: number): Promise<void> {
     // TODO: add
     // TODO: use gpio.endNotify(cb)
+
+    //if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
   }
 
   async clearAll(): Promise<void> {

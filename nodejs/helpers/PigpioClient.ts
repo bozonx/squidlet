@@ -1,6 +1,7 @@
 import {callPromised} from '../../system/lib/common';
 import PigpioWrapper, {PigpioInfo, PigpioOptions} from './PigpioWrapper';
 import Promised from '../../system/lib/Promised';
+import {compactUndefined} from '../../system/lib/arrays';
 
 const pigpioClient = require('pigpio-client');
 
@@ -58,7 +59,8 @@ export class PigpioClient {
     this.hasBeenInited = true;
 
     this.logInfo(
-      `... Connecting to pigpiod daemon: ${this.clientOptions.host}:${this.clientOptions.port}`
+      `... Connecting to pigpiod daemon: ` +
+      `${compactUndefined([this.clientOptions.host, this.clientOptions.port]).join(':')}`
     );
 
     // Errors are emitted unless you provide API with callback.

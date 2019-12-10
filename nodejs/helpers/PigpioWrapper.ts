@@ -10,8 +10,18 @@ export interface PigpioOptions {
 }
 
 export interface PigpioInfo {
-  // TODO: make it !!!!
-  [index: string]: any;
+  host: string;
+  // default is 8888
+  port: number;
+  timeout: number;
+  pipelining: boolean;
+  commandSocket: boolean;
+  notificationSocket: boolean;
+  pigpioVersion: number;
+  hwVersion: number;
+  hardware_type: number;
+  userGpioMask: number;
+  version: string;
 }
 
 
