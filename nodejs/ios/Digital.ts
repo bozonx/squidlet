@@ -25,9 +25,8 @@ export default class Digital implements DigitalIo {
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
-  // TODO: review может всетаки сделать init()
   constructor() {
-    this.pigpioClient = instantiatePigpioClient();
+    this.pigpioClient = instantiatePigpioClient(console.info, console.log, console.error);
   }
 
   async destroy(): Promise<void> {
@@ -38,6 +37,9 @@ export default class Digital implements DigitalIo {
   }
 
   async configure(clientOptions: PigpioOptions): Promise<void> {
+
+    console.log(1111111111, clientOptions)
+    // TODO: если не будет ничего указанно в конфиге то вообще не выполнится !!!
     await this.pigpioClient.init(clientOptions);
   }
 

@@ -10,6 +10,7 @@ const RECONNECT_TIMEOUT_SEC = 1;
 const DEFAULT_OPTIONS = {
   host: 'localhost'
 };
+let client: PigpioClient | undefined;
 
 
 export class PigpioClient {
@@ -118,7 +119,15 @@ export class PigpioClient {
 
 }
 
-// TODO: это нужно ????
-// export default function instantiatePigpioClient(): PigpioClient {
-//   return new PigpioClient();
-// }
+
+export default function instantiatePigpioClient(
+  logInfo: (msg: string) => void,
+  logDebug: (msg: string) => void,
+  logError: (msg: string | Error) => void
+): PigpioClient {
+  if (!client) {
+    client = new PigpioClient(logInfo, logDebug, logError);
+  }
+
+  return client;
+}
