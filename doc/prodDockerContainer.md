@@ -74,3 +74,10 @@
  *
  * stop a daemon
  *     sudo killall pigpiod
+ 
+## Pigpio docker container
+
+    docker run -it --cap-add=SYS_ADMIN --privileged --device /dev/mem sourit/pi-gpio /bin/sh
+    
+    
+    # docker run --privileged -u root -v /sys:/sys -v /dev/mem:/dev/mem ...

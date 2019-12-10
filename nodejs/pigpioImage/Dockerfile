@@ -1,17 +1,16 @@
-FROM resin/raspberry-pi3-buildpack-deps:jessie-scm
+FROM resin/raspberry-pi-alpine:latest
 
-RUN apt-get update \
- && apt-get install build-essential
+# Install Python
+RUN apk --update --no-cache add python3 python3-dev musl-dev
+RUN pip3 install --upgrade pip
+RUN pip3 install watchdog
 
-RUN git clone https://github.com/joan2937/pigpio \
- && cd pigpio \
- && make install prefix=/tmp/pigpio CFLAGS=-DEMBEDDED_IN_VM
+# Install pigpio
+RUN apk --update --no-cache add git make gcc
+RUN git clone https://github.com/joan2937/pigpio.git && \
+    cd ./pigpio && \
+    make && \
+    make install DESTDIR=/ install
 
-#-------
-
-FROM resin/raspberry-pi3-openjdk:8-jre
-
-COPY --from=0 /tmp/pigpio/lib/* /usr/local/lib/
-
-RUN ldconfig \
- && ldconfig -p | grep pigpio
+EXPOSE 8888
+CMD ["/usr/bin/svscan", "/etc/svscan/"]
