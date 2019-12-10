@@ -60,10 +60,14 @@ export class PigpioClient {
   }
 
   async destroy(): Promise<void> {
-    await callPromised(this.client.end);
+    this.clearListeners();
     this.connectionPromised.destroy();
 
     delete this.connectionPromised;
+
+    // TODO: может зависнуть
+    await callPromised(this.client.end);
+
     delete this.client;
   }
 
@@ -74,7 +78,10 @@ export class PigpioClient {
 
 
   private handleConnected = (info: PigpioInfo): void => {
-    this.logger.info('PigpioClient has been connected successfully to the pigpio daemon');
+    this.logger.info(
+      `PigpioClient has been connected successfully to the pigpio daemon ` +
+      `${info.host}:${info.port}, pigpioVersion: ${info.pigpioVersion}`
+    );
     this.logger.debug(`PigpioClient connection info: ${JSON.stringify(info)}`);
     this.connectionPromised.resolve();
   }
@@ -94,29 +101,36 @@ export class PigpioClient {
       this.connectionPromised = new Promised<void>();
     }
 
-    setTimeout(() => {
-      this.reconnect()
-        .catch(this.logger.error);
-    }, RECONNECT_TIMEOUT_SEC * 1000);
+    setTimeout(this.reconnect, RECONNECT_TIMEOUT_SEC * 1000);
   }
 
   private handleError = (err: {message: string}) => {
+    console.log(111111111111, err)
+
     this.logger.error(`PigpioClient: ${err.message}`);
-    //if (!this.hasBeenConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
+
+    // means destroyed
+    if (!this.client) return;
+
+    if (err.message && err.message.match(/Unable to connect/)) {
+      this.reconnect();
+    }
   }
 
-  private reconnect = async () => {
-    this.client.removeListener('error', this.handleError);
-    this.client.removeListener('disconnected', this.handleDisconnect);
-    this.client.removeListener('connected', this.handleConnected);
+  private reconnect = () => {
+    // means destroyed
+    if (!this.client) return;
 
-    try {
-      //await callPromised(this.client.connect, this.clientOptions);
-      await callPromised(this.client.end);
-    }
-    catch (e) {
-      this.logger.warn(`PigpioClient: catch error executing clien.end(): ${e}`);
-    }
+    this.clearListeners();
+
+    // TODO: нужено ли запускать end ????
+    // try {
+    //   //await callPromised(this.client.connect, this.clientOptions);
+    //   await callPromised(this.client.end);
+    // }
+    // catch (e) {
+    //   this.logger.warn(`PigpioClient: catch error executing clien.end(): ${e}`);
+    // }
 
     this.connect();
 
@@ -134,11 +148,15 @@ export class PigpioClient {
       `${compactUndefined([this.clientOptions.host, this.clientOptions.port]).join(':')}`
     );
 
-    this.client = pigpioClient.pigpio(this.clientOptions);
+    try {
+      this.client = pigpioClient.pigpio(this.clientOptions);
+    }
+    catch (e) {
+      console.log(222222222, e);
+    }
 
     // Errors are emitted unless you provide API with callback.
     this.client.on('error', this.handleError);
-    // TODO: why once ????
     this.client.once('connected', this.handleConnected);
     this.client.once('disconnected', this.handleDisconnect);
 
@@ -146,6 +164,12 @@ export class PigpioClient {
     //   if (this.connected) return;
     //   reject(`Can't connect to pigpiod, timeout has been exceeded`);
     // }, CONNECTION_TIMEOUT_MS);
+  }
+
+  private clearListeners() {
+    this.client.removeListener('error', this.handleError);
+    this.client.removeListener('disconnected', this.handleDisconnect);
+    this.client.removeListener('connected', this.handleConnected);
   }
 
 }
