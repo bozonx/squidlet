@@ -15,12 +15,12 @@ import PigpioWrapper, {PigpioHandler, PigpioOptions} from '../helpers/PigpioWrap
 
 
 export default class Digital implements DigitalIo {
-  private pigpioClient: PigpioClient;
+  private readonly pigpioClient: PigpioClient;
   private readonly pinInstances: {[index: string]: PigpioWrapper} = {};
-  private readonly events = new IndexedEventEmitter<ChangeHandler>();
   // pin change listeners by pin
   private readonly pinListeners: {[index: string]: PigpioHandler} = {};
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
+  private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
@@ -31,11 +31,10 @@ export default class Digital implements DigitalIo {
 
 
   async destroy(): Promise<void> {
+    this.debounceCall.destroy();
+    this.throttleCall.destroy();
     await this.pigpioClient.destroy();
-
-    // TODO: destroy
-
-    // TODO: use gpio.endNotify(cb)
+    this.events.destroy();
   }
 
 
@@ -174,6 +173,7 @@ export default class Digital implements DigitalIo {
 
   async clearPin(pin: number): Promise<void> {
     // TODO: add
+    // TODO: use gpio.endNotify(cb)
   }
 
   async clearAll(): Promise<void> {
@@ -242,17 +242,6 @@ export default class Digital implements DigitalIo {
 
     return Boolean(result);
   }
-
-  // private resolveEdge(edge?: Edge): number {
-  //   if (edge === 'rising') {
-  //     return Gpio.RISING_EDGE;
-  //   }
-  //   else if (edge === 'falling') {
-  //     return Gpio.FALLING_EDGE;
-  //   }
-  //
-  //   return Gpio.EITHER_EDGE;
-  // }
 
   private convertInputResistorMode(resistorMode: InputResistorMode): number {
     switch (resistorMode) {

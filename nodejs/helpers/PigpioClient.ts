@@ -79,6 +79,7 @@ export class PigpioClient {
 
 }
 
+// TODO: это нужно ????
 export default function instantiatePigpioClient(): PigpioClient {
-
+  return new PigpioClient();
 }
