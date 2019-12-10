@@ -61,3 +61,16 @@
       -v /dev/mem:/dev/mem \
       --device=/dev/ttyUSB0 \
       bozonx/squidlet:rpi
+
+## Pigpiod
+
+ * Control pigpiod:
+ *
+ * Run in foreground
+ *     sudo pigpiod -g
+ *
+ * start a daemon
+ *     sudo pigpiod
+ *
+ * stop a daemon
+ *     sudo killall pigpiod

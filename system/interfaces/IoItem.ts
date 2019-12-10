@@ -12,6 +12,6 @@ export default interface IoItem {
    * It can be called several times if app switches to ioServer and app and so on.
    */
   configure?: (definition: any) => Promise<void>;
-  init?: () => Promise<void>;
+  //init?: () => Promise<void>;
   destroy?: () => Promise<void>;
 }

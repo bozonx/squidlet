@@ -1,16 +1,5 @@
 /*
- * It uses a pigpiod daemon.
- *
- * Control pigpiod:
- *
- * Run in foreground
- *     sudo pigpiod -g
- *
- * start a daemon
- *     sudo pigpiod
- *
- * stop a daemon
- *     sudo killall pigpiod
+ * It uses a pigpiod daemon via websocket.
  */
 
 import DigitalIo, {ChangeHandler} from '../../system/interfaces/io/DigitalIo';
@@ -20,15 +9,14 @@ import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
 import {callPromised} from '../../system/lib/common';
 import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
 
+const pigpioClient = require('pigpio-client');
+
 
 interface ClientOptions {
   host?: string;
   port?: number;
   timeout?: number;
 }
-
-
-const pigpioClient = require('pigpio-client');
 
 
 type GpioHandler = (level: number, tick: number) => void;
@@ -40,8 +28,10 @@ const CONNECTION_TIMEOUT = 60000;
 
 export default class Digital implements DigitalIo {
   private wasConnected = false;
-  private clientOptions?: ClientOptions;
-  private pigpio: any;
+  private clientOptions: ClientOptions = {
+    host: 'localhost',
+  };
+  private client: any;
   // TODO: add type ???
   private readonly pinInstances: {[index: string]: any} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
@@ -55,33 +45,43 @@ export default class Digital implements DigitalIo {
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
+  constructor() {
+    // TODO; remove
+    this.init();
+  }
+
+
   init(): Promise<void> {
-    this.pigpio = pigpioClient.pigpio(this.clientOptions);
+    this.client = pigpioClient.pigpio(this.clientOptions);
 
     return new Promise<void>((resolve, reject) => {
       console.log(`... Connecting to pigpiod daemon`);
 
-      this.pigpio.once('connected', (info: {[index: string]: string}) => {
+      this.client.once('connected', (info: {[index: string]: string}) => {
         // display information on pigpio and connection status
         console.log('SUCCESS: Pigpio client has been connected successfully to the pigpio daemon');
-        console.log(`pigpio connection info: ${info}`);
+        console.log(`pigpio connection info: ${JSON.stringify(info)}`);
+
+        // this.client.getInfo((aa: any, dd: any) => {
+        //   console.log('----------------- info', aa, dd );
+        // });
 
         this.wasConnected = true;
         resolve();
       });
 
       // Errors are emitted unless you provide API with callback.
-      this.pigpio.on('error', (err: {message: string})=> {
+      this.client.on('error', (err: {message: string})=> {
         console.error('Pigpio client received error: ', err.message); // or err.stack
 
         if (!this.wasConnected) reject(`Can't connect: ${JSON.stringify(err)}`);
       });
 
-      this.pigpio.on('disconnected', (reason: string) => {
+      this.client.on('disconnected', (reason: string) => {
         console.log('Pigpio client received disconnected event, reason: ', reason);
         console.log('Pigpio client reconnecting in 1 sec');
         // TODO: нужно ли делать reconnect ???
-        //setTimeout( this.pigpio.connect, 1000, {host: 'raspberryHostIP'});
+        //setTimeout( this.client.connect, 1000, {host: 'raspberryHostIP'});
       });
 
       // TODO: review
@@ -93,7 +93,7 @@ export default class Digital implements DigitalIo {
   }
 
   async destroy(): Promise<void> {
-    await callPromised(this.pigpio.end);
+    await callPromised(this.client.end);
 
 
 
@@ -104,6 +104,7 @@ export default class Digital implements DigitalIo {
 
 
   async configure(clientOptions: ClientOptions): Promise<void> {
+    // TODO: merge props
     this.clientOptions = clientOptions;
   }
 
@@ -125,7 +126,7 @@ export default class Digital implements DigitalIo {
     // save debounce time
     //this.debounceTimes[pin] = debounce;
 
-    this.pinInstances[pin] = this.pigpio.gpio(pin);
+    this.pinInstances[pin] = this.client.gpio(pin);
 
     await callPromised(this.pinInstances[pin].modeSet, 'input');
     await callPromised(this.pinInstances[pin].pullUpDown, pullUpDown);
@@ -134,9 +135,6 @@ export default class Digital implements DigitalIo {
       this.handlePinChange(pin, level, tick, debounce, edge);
 
     this.pinInstances[pin].notify(this.pinListeners[pin]);
-
-    // Returns a numbr - 0 for input
-    //console.log('--------- mode', await callPromised(this.pinInstances[pin].modeGet));
   }
 
   /**
@@ -153,7 +151,7 @@ export default class Digital implements DigitalIo {
 
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
     // make instance
-    this.pinInstances[pin] = this.pigpio.gpio(pin);
+    this.pinInstances[pin] = this.client.gpio(pin);
     // save resistor mode
     this.resistors[pin] = outputMode;
     // make setup
@@ -164,24 +162,13 @@ export default class Digital implements DigitalIo {
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    // TODO: add - use modeGet
+    const modeNum: number = await callPromised(this.pinInstances[pin].modeGet);
 
-    return;
+    if (modeNum === 0) {
+      return PinDirection.input;
+    }
 
-    // const pinInstance = this.getPinInstance('getPinMode', pin);
-    // const modeConst: number = await callPromised(pinInstance.modeGet);
-    //
-    // if (modeConst === 0) {
-    //   return 'input';
-    //
-    //   // TODO: add support of input_pullup and input_pulldown
-    // }
-    // else {
-    //
-    //   // TODO: which const in output ????
-    //
-    //   return 'output';
-    // }
+    return PinDirection.output;
   }
 
   /**
