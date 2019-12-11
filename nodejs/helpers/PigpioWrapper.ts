@@ -29,40 +29,40 @@ export interface PigpioInfo {
  * Wrapper of pigpio-client's gpio to use promises.
  */
 export default class PigpioWrapper {
-  private getGpio: () => any;
+  private gpio: any;
 
 
-  constructor(getGpio: () => any) {
-    this.getGpio = getGpio;
+  constructor(gpio: any) {
+    this.gpio = gpio;
   }
 
 
   modeSet(mode: 'input' | 'output'): Promise<void> {
-    return callPromised(this.getGpio().modeSet, mode);
+    return callPromised(this.gpio.modeSet, mode);
   }
 
   modeGet(): Promise<number> {
-    return callPromised(this.getGpio().modeGet);
+    return callPromised(this.gpio.modeGet);
   }
 
   pullUpDown(pullUpDown: number): Promise<void> {
-    return callPromised(this.getGpio().pullUpDown, pullUpDown);
+    return callPromised(this.gpio.pullUpDown, pullUpDown);
   }
 
   read(): Promise<number> {
-    return callPromised(this.getGpio().read);
+    return callPromised(this.gpio.read);
   }
 
   write(value: number): Promise<void> {
-    return callPromised(this.getGpio().write, value);
+    return callPromised(this.gpio.write, value);
   }
 
   notify(cb: PigpioHandler) {
-    this.getGpio().notify(cb);
+    this.gpio.notify(cb);
   }
 
   endNotify(cb: PigpioHandler) {
-    this.getGpio().endNotify(cb);
+    this.gpio.endNotify(cb);
   }
 
 }
