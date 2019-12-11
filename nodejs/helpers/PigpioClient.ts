@@ -35,6 +35,7 @@ export class PigpioClient {
   private hasBeenInited: boolean = false;
   // timeout to wait between trying of connect
   private connectionTimeout?: NodeJS.Timeout;
+  private readonly pinInstances: {[index: string]: PigpioWrapper} = {};
 
 
   constructor(logger: Logger) {
@@ -74,8 +75,30 @@ export class PigpioClient {
   }
 
 
+  isPinInitialized(pin: number): boolean {
+    return Boolean(this.pinInstances[pin]);
+  }
+
+  getPinInitialized(pin: number): PigpioWrapper | undefined {
+    return this.pinInstances[pin];
+  }
+
   makePinInstance(pin: number): PigpioWrapper {
-    return new PigpioWrapper(() => this.client.gpio(pin));
+    if (this.pinInstances[pin]) {
+      throw new Error(`PigpioClient: pin has been already instantiated`);
+    }
+
+    this.pinInstances[pin] = new PigpioWrapper(this.client.gpio(pin));
+
+    return this.pinInstances[pin];
+  }
+
+  clearPin(pin: number) {
+    delete this.pinInstances[pin];
+  }
+
+  getInstantiatedPinList(): string[] {
+    return Object.keys(this.pinInstances);
   }
 
 
@@ -87,6 +110,7 @@ export class PigpioClient {
       `${info.host}:${info.port}, pigpioVersion: ${info.pigpioVersion}`
     );
     this.logger.debug(`PigpioClient connection info: ${JSON.stringify(info)}`);
+    this.renewInstances();
     this.connectionPromised.resolve();
   }
 
@@ -145,9 +169,9 @@ export class PigpioClient {
   private doReconnect = () => {
     this.logger.info(`PigpioClient reconnecting`);
     // TODO: check if ws connected or not otherwise it won't ever be called.
-    this.client.end((e: Error) => {
-      if (e) this.logger.warn(`PigpioClient error on end: ${e}`);
-    });
+    // this.client.end((e: Error) => {
+    //   if (e) this.logger.warn(`PigpioClient error on end: ${e}`);
+    // });
     this.clearListeners();
     this.connect();
   }
@@ -158,6 +182,12 @@ export class PigpioClient {
     this.client.removeListener('error', this.handleError);
     this.client.removeListener('disconnected', this.handleDisconnect);
     this.client.removeListener('connected', this.handleConnected);
+  }
+
+  private renewInstances() {
+    for (let pin of Object.keys(this.pinInstances)) {
+      this.pinInstances[pin].$renew(this.client.gpio(Number(pin)));
+    }
   }
 
 }

@@ -1,4 +1,5 @@
 import {callPromised} from '../../system/lib/common';
+import {removeItemFromArray} from '../../system/lib/arrays';
 
 
 export type PigpioHandler = (level: number, tick: number) => void;
@@ -30,12 +31,25 @@ export interface PigpioInfo {
  */
 export default class PigpioWrapper {
   private gpio: any;
+  private listeners: PigpioHandler[] = [];
 
 
   constructor(gpio: any) {
     this.gpio = gpio;
   }
 
+  $renew(gpio: any) {
+    // TODO: make it on disconnect
+    // for (let cb of this.listeners) {
+    //   this.gpio.endNotify(cb);
+    // }
+
+    this.gpio = gpio;
+
+    for (let cb of this.listeners) {
+      this.gpio.notify(cb);
+    }
+  }
 
   modeSet(mode: 'input' | 'output'): Promise<void> {
     return callPromised(this.gpio.modeSet, mode);
@@ -58,11 +72,14 @@ export default class PigpioWrapper {
   }
 
   notify(cb: PigpioHandler) {
+    this.listeners.push(cb);
     this.gpio.notify(cb);
   }
 
   endNotify(cb: PigpioHandler) {
     this.gpio.endNotify(cb);
+
+    this.listeners = removeItemFromArray(this.listeners, cb);
   }
 
 }
