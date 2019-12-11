@@ -13,7 +13,7 @@ import {makeUniqId} from '../../system/lib/uniqId';
 import {WsCloseStatus} from '../../system/interfaces/io/WebSocketClientIo';
 
 
-const wsApiManifestPath = path.resolve(__dirname, '../entities/services/WsApi/manifest.yaml');
+const wsApiManifestPath = path.resolve(__dirname, '../../entities/services/WsApi/manifest.yaml');
 const wsClientIo = new WebSocketClient();
 
 
