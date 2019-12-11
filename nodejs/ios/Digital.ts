@@ -15,7 +15,7 @@ import PigpioWrapper, {PigpioHandler, PigpioOptions} from '../helpers/PigpioWrap
 
 
 export default class Digital implements DigitalIo {
-  private readonly pigpioClient: PigpioClient;
+  private readonly client: PigpioClient;
   // pin change listeners by pin
   private readonly pinListeners: {[index: string]: PigpioHandler} = {};
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
@@ -25,7 +25,7 @@ export default class Digital implements DigitalIo {
 
 
   constructor() {
-    this.pigpioClient = instantiatePigpioClient({
+    this.client = instantiatePigpioClient({
       info: console.info,
       warn: console.warn,
       error: console.error,
@@ -36,13 +36,13 @@ export default class Digital implements DigitalIo {
   async destroy(): Promise<void> {
     this.debounceCall.destroy();
     this.throttleCall.destroy();
-    await this.pigpioClient.destroy();
+    await this.client.destroy();
     this.events.destroy();
   }
 
   async configure(clientOptions: PigpioOptions): Promise<void> {
     // make init but don't wait while it has been finished
-    this.pigpioClient.init(clientOptions);
+    this.client.init(clientOptions);
   }
 
 
@@ -51,17 +51,17 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
-    if (this.pigpioClient.isPinInitialized(pin)) {
+    if (this.client.isPinInitialized(pin)) {
       throw new Error(
         `Digital IO setupInput(): Pin ${pin} has been set up before. ` +
         `You should to call \`clearPin(${pin})\` and after that try again.`
       );
     }
 
-    await this.pigpioClient.connectionPromise;
+    await this.client.connectionPromise;
 
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
-    const pinInstances = this.pigpioClient.makePinInstance(pin);
+    const pinInstances = this.client.makePinInstance(pin);
 
     await pinInstances.modeSet('input');
     await pinInstances.pullUpDown(pullUpDown);
@@ -77,18 +77,18 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
-    if (this.pigpioClient.isPinInitialized(pin)) {
+    if (this.client.isPinInitialized(pin)) {
       throw new Error(
         `Digital IO setupOutput(): Pin ${pin} has been set up before. ` +
         `You should to call \`clearPin(${pin})\` and after that try again.`
       );
     }
 
-    await this.pigpioClient.connectionPromise;
+    await this.client.connectionPromise;
 
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
     // make instance
-    const pinInstances = this.pigpioClient.makePinInstance(pin);
+    const pinInstances = this.client.makePinInstance(pin);
     // save resistor mode
     this.resistors[pin] = outputMode;
     // make setup
@@ -99,7 +99,7 @@ export default class Digital implements DigitalIo {
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
+    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
 
     const pinInstance = this.getPinInstance('getPinDirection', pin);
 
@@ -121,13 +121,13 @@ export default class Digital implements DigitalIo {
   }
 
   async read(pin: number): Promise<boolean> {
-    if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
+    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
 
     return this.simpleRead(pin);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
-    if (!this.pigpioClient.connected) throw new Error(`Pigpio client hasn't been connected`);
+    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
 
     const pinInstance = this.getPinInstance('write', pin);
     const numValue: number = (value) ? 1 : 0;
@@ -158,11 +158,11 @@ export default class Digital implements DigitalIo {
 
     delete this.pinListeners[pin];
 
-    this.pigpioClient.clearPin(pin);
+    this.client.clearPin(pin);
   }
 
   async clearAll(): Promise<void> {
-    for (let pin of this.pigpioClient.getInstantiatedPinList()) {
+    for (let pin of this.client.getInstantiatedPinList()) {
       await this.clearPin(parseInt(pin));
     }
   }
@@ -253,7 +253,7 @@ export default class Digital implements DigitalIo {
   }
 
   private getPinInstance(methodWhichAsk: string, pin: number): PigpioWrapper {
-    const instance: PigpioWrapper | undefined = this.pigpioClient.getPinInitialized(pin);
+    const instance: PigpioWrapper | undefined = this.client.getPinInitialized(pin);
 
     if (!instance) {
       throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
