@@ -49,12 +49,16 @@ export default class Updater extends ServiceBase<Props> {
    * Upload while bundle which is contains system, entities and config.
    */
   private updateBundle = async (bundleContent: string, hashSum: string) => {
+    this.log.info(`Updater: Received income update. Check sum: ${hashSum}. Will be written to ${bundleRootDir}`);
+
     const bundlePath = pathJoin(bundleRootDir, BUNDLE_FILE_NAME);
     const bundleSumPath = pathJoin(bundleRootDir, BUNDLE_SUM_FILE_NAME);
 
     await this.rotateBundle();
 
+    this.log.debug(`Updater: write ${bundlePath}`);
     await this.storage.writeFile(bundlePath, bundleContent);
+    this.log.debug(`Updater: write ${bundleSumPath}`);
     await this.storage.writeFile(bundleSumPath, hashSum);
   }
 
