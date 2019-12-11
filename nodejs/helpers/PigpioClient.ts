@@ -75,7 +75,7 @@ export class PigpioClient {
 
 
   makePinInstance(pin: number): PigpioWrapper {
-    return new PigpioWrapper(this.client.gpio(pin));
+    return new PigpioWrapper(() => this.client.gpio(pin));
   }
 
 
@@ -110,10 +110,7 @@ export class PigpioClient {
 
     this.logger.info(`PigpioClient reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
 
-    setTimeout(() => {
-      this.clearListeners();
-      this.connect();
-    }, RECONNECT_TIMEOUT_SEC * 1000);
+    setTimeout(this.doReconnect, RECONNECT_TIMEOUT_SEC * 1000);
   }
 
   private handleError = (err: {message: string}) => {
@@ -130,24 +127,29 @@ export class PigpioClient {
 
     try {
       this.client = pigpioClient.pigpio(this.clientOptions);
-
-      this.client.on('error', this.handleError);
-      this.client.once('connected', this.handleConnected);
-      this.client.once('disconnected', this.handleDisconnect);
     }
     catch (e) {
       this.logger.error(e);
+      this.doReconnect();
+
+      return;
     }
-    finally {
-      this.connectionTimeout = setTimeout(() => {
-        this.logger.info(`PigpioClient reconnecting on timeout`);
-        this.client.end((e: Error) => {
-          if (e) this.logger.warn(`PigpioClient error on end: ${e}`);
-        });
-        this.clearListeners();
-        this.connect();
-      }, CONNECTION_TRY_TIMEOUT_SEC * 1000);
-    }
+
+    this.client.on('error', this.handleError);
+    this.client.once('connected', this.handleConnected);
+    this.client.once('disconnected', this.handleDisconnect);
+
+    this.connectionTimeout = setTimeout(this.doReconnect, CONNECTION_TRY_TIMEOUT_SEC * 1000);
+  }
+
+  private doReconnect = () => {
+    this.logger.info(`PigpioClient reconnecting`);
+    // TODO: check if ws connected or not otherwise it won't ever be called.
+    this.client.end((e: Error) => {
+      if (e) this.logger.warn(`PigpioClient error on end: ${e}`);
+    });
+    this.clearListeners();
+    this.connect();
   }
 
   private clearListeners() {
