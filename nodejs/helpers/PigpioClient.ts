@@ -7,12 +7,12 @@ import Logger from '../../system/interfaces/Logger';
 const pigpioClient = require('pigpio-client');
 
 
-//const CONNECTION_TIMEOUT_MS = 60000;
+const CONNECTION_TRY_TIMEOUT_SEC = 20;
 const RECONNECT_TIMEOUT_SEC = 1;
 const DEFAULT_OPTIONS = {
   host: 'localhost',
 };
-let client: PigpioClient | undefined;
+let instance: PigpioClient | undefined;
 
 
 export class PigpioClient {
@@ -33,6 +33,8 @@ export class PigpioClient {
   private client: any;
   private connectionPromised = new Promised<void>();
   private hasBeenInited: boolean = false;
+  // timeout to wait between trying of connect
+  private connectionTimeout?: NodeJS.Timeout;
 
 
   constructor(logger: Logger) {
@@ -78,6 +80,8 @@ export class PigpioClient {
 
 
   private handleConnected = (info: PigpioInfo): void => {
+    if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
+
     this.logger.info(
       `PigpioClient has been connected successfully to the pigpio daemon ` +
       `${info.host}:${info.port}, pigpioVersion: ${info.pigpioVersion}`
@@ -87,12 +91,12 @@ export class PigpioClient {
   }
 
   private handleDisconnect = (reason: string): void => {
+    if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
+
     this.logger.debug(`PigpioClient received disconnected event, reason: ${reason}`);
 
     // means destroyed
     if (!this.client) return;
-
-    this.logger.info(`PigpioClient reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
 
     // renew promised if need
     if (this.connectionPromised.isFulfilled()) {
@@ -101,48 +105,24 @@ export class PigpioClient {
       this.connectionPromised = new Promised<void>();
     }
 
-    setTimeout(this.reconnect, RECONNECT_TIMEOUT_SEC * 1000);
+    // means destroyed
+    if (!this.client) return;
+
+    this.logger.info(`PigpioClient reconnecting in ${RECONNECT_TIMEOUT_SEC} sec`);
+
+    setTimeout(() => {
+      this.clearListeners();
+      this.connect();
+    }, RECONNECT_TIMEOUT_SEC * 1000);
   }
 
   private handleError = (err: {message: string}) => {
-    console.log(111111111111, err)
-
     this.logger.error(`PigpioClient: ${err.message}`);
-
-    // means destroyed
-    if (!this.client) return;
-
-    if (err.message && err.message.match(/Unable to connect/)) {
-      this.reconnect();
-    }
-  }
-
-  private reconnect = () => {
-    // means destroyed
-    if (!this.client) return;
-
-    this.clearListeners();
-
-    // TODO: нужено ли запускать end ????
-    // try {
-    //   //await callPromised(this.client.connect, this.clientOptions);
-    //   await callPromised(this.client.end);
-    // }
-    // catch (e) {
-    //   this.logger.warn(`PigpioClient: catch error executing clien.end(): ${e}`);
-    // }
-
-    this.connect();
-
-    // this.logger.debug(`PigpioClient: Can't reconect: ${e}`);
-    //
-    // setTimeout(() => {
-    //   this.reconnect()
-    //     .catch(this.logger.error);
-    // }, RECONNECT_TIMEOUT_SEC * 1000);
   }
 
   private connect() {
+    if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
+
     this.logger.info(
       `... Connecting to pigpiod daemon: ` +
       `${compactUndefined([this.clientOptions.host, this.clientOptions.port]).join(':')}`
@@ -150,23 +130,29 @@ export class PigpioClient {
 
     try {
       this.client = pigpioClient.pigpio(this.clientOptions);
+
+      this.client.on('error', this.handleError);
+      this.client.once('connected', this.handleConnected);
+      this.client.once('disconnected', this.handleDisconnect);
     }
     catch (e) {
-      console.log(222222222, e);
+      this.logger.error(e);
     }
-
-    // Errors are emitted unless you provide API with callback.
-    this.client.on('error', this.handleError);
-    this.client.once('connected', this.handleConnected);
-    this.client.once('disconnected', this.handleDisconnect);
-
-    // setTimeout(() => {
-    //   if (this.connected) return;
-    //   reject(`Can't connect to pigpiod, timeout has been exceeded`);
-    // }, CONNECTION_TIMEOUT_MS);
+    finally {
+      this.connectionTimeout = setTimeout(() => {
+        this.logger.info(`PigpioClient reconnecting on timeout`);
+        this.client.end((e: Error) => {
+          if (e) this.logger.warn(`PigpioClient error on end: ${e}`);
+        });
+        this.clearListeners();
+        this.connect();
+      }, CONNECTION_TRY_TIMEOUT_SEC * 1000);
+    }
   }
 
   private clearListeners() {
+    if (!this.client) return;
+
     this.client.removeListener('error', this.handleError);
     this.client.removeListener('disconnected', this.handleDisconnect);
     this.client.removeListener('connected', this.handleConnected);
@@ -176,9 +162,9 @@ export class PigpioClient {
 
 
 export default function instantiatePigpioClient(logger: Logger): PigpioClient {
-  if (!client) {
-    client = new PigpioClient(logger);
+  if (!instance) {
+    instance = new PigpioClient(logger);
   }
 
-  return client;
+  return instance;
 }
