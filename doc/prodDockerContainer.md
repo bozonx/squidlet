@@ -2,7 +2,9 @@
 
 ### Build image
 
-    yarn buildImage
+    yarn buildProdImage-x86
+    yarn buildProdImage-rpi
+    yarn buildProdImage-arm
 
 ### Run image on x86 machine
 
@@ -16,7 +18,6 @@
       -e LOG_LEVEL=info \
       -e MQTT_BROKER_HOST='localhost' \
       -e MQTT_BROKER_PORT=1234 \
-      --privileged \
       --device=/dev/ttyUSB0 \
       bozonx/squidlet:x86
 
@@ -27,7 +28,6 @@
       -e PUID=1000 \
       -e PGID=1000 \
       -e LOG_LEVEL=debug \
-      --privileged \
       --device=/dev/ttyUSB0 \
       bozonx/squidlet:x86
 
@@ -43,9 +43,6 @@
       -e LOG_LEVEL=info \
       -e MQTT_BROKER_HOST='localhost' \
       -e MQTT_BROKER_PORT=1234 \
-      --privileged \
-      -v /sys/class/gpio:/sys/class/gpio \
-      -v /dev/mem:/dev/mem \
       --device=/dev/ttyUSB0
       bozonx/squidlet:x86
 
@@ -53,31 +50,47 @@
       -p 18087:8087 \
       -p 18088:8088 \
       -p 18089:8089 \
-      -e PUID=1000 \
-      -e PGID=1000 \
       -e LOG_LEVEL=debug \
-      --privileged \
-      -v /sys/class/gpio:/sys/class/gpio \
-      -v /dev/mem:/dev/mem \
-      --device=/dev/ttyUSB0 \
       bozonx/squidlet:rpi
 
 ## Pigpiod
 
- * Control pigpiod:
- *
- * Run in foreground
- *     sudo pigpiod -g
- *
- * start a daemon
- *     sudo pigpiod
- *
- * stop a daemon
- *     sudo killall pigpiod
- 
-## Pigpio docker container
+Prefer the docker's way.
 
-    docker run -it --cap-add=SYS_ADMIN --privileged --device /dev/mem sourit/pi-gpio /bin/sh
-    
-    
-    # docker run --privileged -u root -v /sys:/sys -v /dev/mem:/dev/mem ...
+### Pigpio docker container
+
+Build/update the image
+
+    yarn buildPigpio
+
+Start
+
+    docker rm -f pigpio; docker run --name pigpio -it -p 8888:8888 --privileged --device /dev/mem bozonx/pigpio
+
+If you have problems try the next params:
+
+    -cap-add=SYS_ADMIN
+    -v /sys/class/gpio:/sys/class/gpio
+
+### Install on system
+
+    sudo apt-get install pigpio
+
+#### Control pigpiod daemon
+
+Run in foreground
+
+    sudo pigpiod -g
+ 
+Start as daemon
+
+    sudo pigpiod
+
+Stop a daemon
+
+    sudo killall pigpiod
+
+Or use systemd service `pigpiod`
+
+    sudo systemctl enable pigpiod
+    sudo systemctl start pigpiod

@@ -13,4 +13,4 @@ RUN git clone https://github.com/joan2937/pigpio.git && \
     make install DESTDIR=/ install
 
 EXPOSE 8888
-CMD ["/usr/bin/svscan", "/etc/svscan/"]
+CMD ["/usr/local/bin/pigpiod", "-g"]
