@@ -68,8 +68,9 @@ export class PigpioClient {
 
     delete this.connectionPromised;
 
-    // TODO: может зависнуть
-    await callPromised(this.client.end);
+    this.client.end((e?: Error) => {
+      if (e) this.logger.warn(`PigpioClient error on end: ${e}`);
+    });
 
     delete this.client;
   }
@@ -79,18 +80,16 @@ export class PigpioClient {
     return Boolean(this.pinInstances[pin]);
   }
 
-  getPinInitialized(pin: number): PigpioWrapper | undefined {
+  getPinInstance(pin: number): PigpioWrapper | undefined {
     return this.pinInstances[pin];
   }
 
-  makePinInstance(pin: number): PigpioWrapper {
+  makePinInstance(pin: number) {
     if (this.pinInstances[pin]) {
       throw new Error(`PigpioClient: pin has been already instantiated`);
     }
 
     this.pinInstances[pin] = new PigpioWrapper(this.client.gpio(pin));
-
-    return this.pinInstances[pin];
   }
 
   clearPin(pin: number) {

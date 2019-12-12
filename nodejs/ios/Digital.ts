@@ -57,18 +57,20 @@ export default class Digital implements DigitalIo {
     }
     // wait for connection
     await this.client.connectionPromise;
+    // make instance
+    this.client.makePinInstance(pin);
 
+    const pinInstance = this.getPinInstance('setupInput', pin);
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
-    const pinInstances = this.client.makePinInstance(pin);
-
+    // make setup
     await Promise.all([
-      pinInstances.modeSet('input'),
-      pinInstances.pullUpDown(pullUpDown),
+      pinInstance.modeSet('input'),
+      pinInstance.pullUpDown(pullUpDown),
     ]);
 
     const handler = (level: number, tick: number) => this.handlePinChange(pin, level, tick, debounce, edge);
 
-    pinInstances.notify(handler);
+    pinInstance.notify(handler);
   }
 
   /**
@@ -84,16 +86,17 @@ export default class Digital implements DigitalIo {
     }
     // wait for connection
     await this.client.connectionPromise;
-
-    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
     // make instance
-    const pinInstances = this.client.makePinInstance(pin);
+    this.client.makePinInstance(pin);
+
+    const pinInstance = this.getPinInstance('setupOutput', pin);
+    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
     // save resistor mode
     this.resistors[pin] = outputMode;
     // make setup
     await Promise.all([
-      pinInstances.modeSet('output'),
-      pinInstances.pullUpDown(pullUpDown),
+      pinInstance.modeSet('output'),
+      pinInstance.pullUpDown(pullUpDown),
     ]);
     // set initial value if it defined
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
@@ -245,7 +248,7 @@ export default class Digital implements DigitalIo {
   }
 
   private getPinInstance(methodWhichAsk: string, pin: number): PigpioWrapper {
-    const instance: PigpioWrapper | undefined = this.client.getPinInitialized(pin);
+    const instance: PigpioWrapper | undefined = this.client.getPinInstance(pin);
 
     if (!instance) {
       throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
