@@ -52,7 +52,6 @@ export default class PigpioWrapper {
   }
 
   $renew(gpio: any) {
-
     this.gpio = gpio;
 
     for (let cb of this.listeners) {
@@ -61,34 +60,49 @@ export default class PigpioWrapper {
   }
 
   modeSet(mode: 'input' | 'output'): Promise<void> {
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
     return callPromised(this.gpio.modeSet, mode);
   }
 
   modeGet(): Promise<number> {
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
     return callPromised(this.gpio.modeGet);
   }
 
   pullUpDown(pullUpDown: number): Promise<void> {
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
     return callPromised(this.gpio.pullUpDown, pullUpDown);
   }
 
   read(): Promise<number> {
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
     return callPromised(this.gpio.read);
   }
 
   write(value: number): Promise<void> {
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
     return callPromised(this.gpio.write, value);
   }
 
   notify(cb: PigpioHandler) {
     this.listeners.push(cb);
+
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
     this.gpio.notify(cb);
   }
 
   endNotify(cb: PigpioHandler) {
-    this.gpio.endNotify(cb);
-
     this.listeners = removeItemFromArray(this.listeners, cb);
+
+    if (!this.gpio) throw new Error(`Pigpio hasn't been connected`);
+
+    this.gpio.endNotify(cb);
   }
 
 }
