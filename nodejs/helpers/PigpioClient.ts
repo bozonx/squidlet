@@ -6,6 +6,14 @@ import Logger from '../../system/interfaces/Logger';
 const pigpioClient = require('pigpio-client');
 
 
+interface Client {
+  gpio(pin: number): any;
+  end(cb?: () => void): void;
+  on(eventName: string, cb: (...p: any[]) => void): void;
+  once(eventName: string, cb: (...p: any[]) => void): void;
+  removeListener(eventName: string, cb: (...p: any[]) => void): void;
+}
+
 const RECONNECT_TIMEOUT_SEC = 20;
 const DEFAULT_OPTIONS = {
   host: 'localhost',
@@ -28,7 +36,7 @@ export class PigpioClient {
 
   private logger: Logger;
   private clientOptions: PigpioOptions = DEFAULT_OPTIONS;
-  private client: any;
+  private client?: Client;
   private connectionPromised = new Promised<void>();
   private hasBeenInited: boolean = false;
   // timeout to wait between trying of connect
@@ -66,7 +74,7 @@ export class PigpioClient {
 
     delete this.connectionPromised;
 
-    this.client.end();
+    this.client && this.client.end();
 
     delete this.client;
   }
@@ -83,6 +91,10 @@ export class PigpioClient {
   makePinInstance(pin: number) {
     if (this.pinInstances[pin]) {
       throw new Error(`PigpioClient: pin has been already instantiated`);
+    }
+
+    if (!this.client) {
+      throw new Error(`PigpioClient: Client hasn't been connected`);
     }
 
     this.pinInstances[pin] = new PigpioWrapper(this.client.gpio(pin));
@@ -122,7 +134,7 @@ export class PigpioClient {
 
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
 
-    // means destroyed
+    // means not connected
     if (!this.client) return;
 
     // remove listeners
@@ -161,7 +173,7 @@ export class PigpioClient {
     );
 
     try {
-      this.client = pigpioClient.pigpio(this.clientOptions);
+      this.client = pigpioClient.pigpio(this.clientOptions) as Client;
     }
     catch (e) {
       this.logger.error(e);
@@ -179,7 +191,7 @@ export class PigpioClient {
 
   private doReconnect = () => {
     this.logger.info(`PigpioClient reconnecting`);
-    this.client.end();
+    this.client && this.client.end();
     this.clearListeners();
     this.connect();
   }
@@ -193,6 +205,10 @@ export class PigpioClient {
   }
 
   private renewInstances() {
+    if (!this.client) {
+      throw new Error(`PigpioClient: Client hasn't been connected`);
+    }
+
     for (let pin of Object.keys(this.pinInstances)) {
       this.pinInstances[pin].$renew(this.client.gpio(Number(pin)));
     }
