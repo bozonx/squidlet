@@ -130,22 +130,15 @@ export class PigpioClient {
    * It rises once only if client has already connected.
    */
   private handleDisconnect = (reason: string): void => {
-    this.logger.debug(`PigpioClient received disconnected event, reason: ${reason}`);
+    this.logger.debug(`PigpioClient disconnected: ${reason}`);
 
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
 
-    // means not connected
-    if (!this.client) return;
+    delete this.client;
 
-    // remove listeners
-    try {
-      for (let pin of Object.keys(this.pinInstances)) {
-        // TODO: better to do destroy ???
-        this.pinInstances[pin].$removeListeners();
-      }
-    }
-    catch (e) {
-      this.logger.warn(`PigpioClient: error on remove listeners: ${e}`);
+    // remove listeners and gpio instance
+    for (let pin of Object.keys(this.pinInstances)) {
+      this.pinInstances[pin].$clear();
     }
 
     // renew promised if need

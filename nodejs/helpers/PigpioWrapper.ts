@@ -39,16 +39,21 @@ export default class PigpioWrapper {
   }
 
   destroy() {
-    this.$removeListeners();
+    this.$clear();
     delete this.listeners;
-    delete this.gpio;
   }
 
-  $removeListeners() {
-    // TODO: make it on disconnect
-    for (let cb of this.listeners) {
-      this.gpio.endNotify(cb);
+  $clear() {
+    try {
+      for (let cb of this.listeners) {
+        this.gpio.endNotify(cb);
+      }
     }
+    catch (e) {
+      // do noting on error
+    }
+
+    delete this.gpio;
   }
 
   $renew(gpio: any) {
