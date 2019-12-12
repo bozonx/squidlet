@@ -94,6 +94,8 @@ export class PigpioClient {
   }
 
   clearPin(pin: number) {
+    this.pinInstances[pin].destroy();
+
     delete this.pinInstances[pin];
   }
 

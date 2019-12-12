@@ -8,7 +8,7 @@ import ThrottleCall from '../../system/lib/debounceCall/ThrottleCall';
 import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
 import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
-import PigpioWrapper, {PigpioHandler, PigpioOptions} from '../helpers/PigpioWrapper';
+import PigpioWrapper, {PigpioOptions} from '../helpers/PigpioWrapper';
 
 
 // TODO: все выводы в log выводить в системный логгер (возможно через события)
@@ -16,8 +16,6 @@ import PigpioWrapper, {PigpioHandler, PigpioOptions} from '../helpers/PigpioWrap
 
 export default class Digital implements DigitalIo {
   private readonly client: PigpioClient;
-  // pin change listeners by pin
-  private readonly pinListeners: {[index: string]: PigpioHandler} = {};
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounceCall: DebounceCall = new DebounceCall();
@@ -57,19 +55,20 @@ export default class Digital implements DigitalIo {
         `You should to call \`clearPin(${pin})\` and after that try again.`
       );
     }
-
+    // wait for connection
     await this.client.connectionPromise;
 
     const pullUpDown: number = this.convertInputResistorMode(inputMode);
     const pinInstances = this.client.makePinInstance(pin);
 
-    await pinInstances.modeSet('input');
-    await pinInstances.pullUpDown(pullUpDown);
+    await Promise.all([
+      pinInstances.modeSet('input'),
+      pinInstances.pullUpDown(pullUpDown),
+    ]);
 
-    this.pinListeners[pin] = (level: number, tick: number) =>
-      this.handlePinChange(pin, level, tick, debounce, edge);
+    const handler = (level: number, tick: number) => this.handlePinChange(pin, level, tick, debounce, edge);
 
-    pinInstances.notify(this.pinListeners[pin]);
+    pinInstances.notify(handler);
   }
 
   /**
@@ -83,7 +82,7 @@ export default class Digital implements DigitalIo {
         `You should to call \`clearPin(${pin})\` and after that try again.`
       );
     }
-
+    // wait for connection
     await this.client.connectionPromise;
 
     const pullUpDown: number = this.convertOutputResistorMode(outputMode);
@@ -92,8 +91,10 @@ export default class Digital implements DigitalIo {
     // save resistor mode
     this.resistors[pin] = outputMode;
     // make setup
-    await pinInstances.modeSet('output');
-    await pinInstances.pullUpDown(pullUpDown);
+    await Promise.all([
+      pinInstances.modeSet('output'),
+      pinInstances.pullUpDown(pullUpDown),
+    ]);
     // set initial value if it defined
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
@@ -144,20 +145,11 @@ export default class Digital implements DigitalIo {
   }
 
   async clearPin(pin: number): Promise<void> {
-    const pinInstance = this.getPinInstance('simpleRead', pin);
-
     delete this.resistors[pin];
 
     this.events.removeAllListeners(pin);
     this.debounceCall.clear(pin);
     this.throttleCall.clear(pin);
-
-    if (!this.pinListeners) return;
-
-    pinInstance.endNotify(this.pinListeners[pin]);
-
-    delete this.pinListeners[pin];
-
     this.client.clearPin(pin);
   }
 
@@ -196,7 +188,7 @@ export default class Digital implements DigitalIo {
     }
     // else edge both and debounce is set
     // wait for debounce and read current level and emit an event
-    // TODO: вернет promise
+    // TODO: handleEndOfDebounce will return a promise
     this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
       .catch((e) => {
         console.error(e);
