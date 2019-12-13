@@ -6,7 +6,7 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';
 import Platforms from '../system/interfaces/Platforms';
-import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
+import {BUNDLE_CHUNK_SIZE_BYTES, BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
 import AppBuilder, {DEFAULT_WORK_DIR} from '../squidletLight/AppBuilder';
 
 
@@ -23,22 +23,33 @@ export default class CommandUpdate {
 
 
   async start() {
-    const apiClient = await this.makeClient(this.args.host, this.args.port);
+    const apiClient: WsApiClient = await this.makeClient(this.args.host, this.args.port);
     const infoResult: HostInfo =  await apiClient.callMethod('info');
 
     await this.buildBundle(infoResult.platform, infoResult.machine);
-
-    const workDir: string = DEFAULT_WORK_DIR;
-    const bundleContent = await this.os.getFileContent(path.join(workDir, BUNDLE_FILE_NAME));
-    const sumContent = await this.os.getFileContent(path.join(workDir, BUNDLE_SUM_FILE_NAME));
-    // upload bundle and check sum
-    await apiClient.callMethod('updater.updateBundle', bundleContent, sumContent);
+    await this.makeBundleTransaction(apiClient);
     // restart the host
     await apiClient.callMethod('exit', 0);
 
     await apiClient.close();
   }
 
+  private async makeBundleTransaction(apiClient: WsApiClient) {
+    const workDir: string = DEFAULT_WORK_DIR;
+    const bundleContent = await this.os.getFileContent(path.join(workDir, BUNDLE_FILE_NAME));
+    const sumContent = await this.os.getFileContent(path.join(workDir, BUNDLE_SUM_FILE_NAME));
+    // upload bundle and check sum
+    await this.sendBundleChunks(apiClient, bundleContent);
+    await apiClient.callMethod('updater.writeSum', sumContent);
+  }
+
+  private async sendBundleChunks(apiClient: WsApiClient, bundleContent: string) {
+    const chunk: string = bundleContent.slice(0, BUNDLE_CHUNK_SIZE_BYTES);
+    // TODO: use slice to read chunks
+    // TODO: hasNext
+    // TODO: обрабатывать ошибку
+    await apiClient.callMethod('updater.writeBundleChunk', bundleContent);
+  }
 
   private async buildBundle(platform: Platforms, machine: string) {
     const builder = new AppBuilder(
