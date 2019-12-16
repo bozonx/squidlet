@@ -42,17 +42,28 @@ export default class CommandUpdate {
     const workDir: string = DEFAULT_WORK_DIR;
     const bundleContent = await this.os.getFileContent(path.join(workDir, BUNDLE_FILE_NAME));
     const sumContent = await this.os.getFileContent(path.join(workDir, BUNDLE_SUM_FILE_NAME));
+    // start transaction
+    const transactionId: number = await apiClient.callMethod(
+      'updater.startBundleTransaction',
+      bundleContent.length
+    );
     // upload bundle and check sum
-    await this.sendBundleChunks(apiClient, bundleContent);
-    await apiClient.callMethod('updater.writeSum', sumContent);
+    await this.sendBundleChunks(apiClient, transactionId, bundleContent);
+    await apiClient.callMethod('updater.finishBundleTransaction', transactionId, sumContent);
   }
 
-  private async sendBundleChunks(apiClient: WsApiClient, bundleContent: string) {
-    const chunk: string = bundleContent.slice(0, BUNDLE_CHUNK_SIZE_BYTES);
-    // TODO: use slice to read chunks
-    // TODO: hasNext
-    // TODO: обрабатывать ошибку
-    await apiClient.callMethod('updater.writeBundleChunk', bundleContent);
+  private async sendBundleChunks(apiClient: WsApiClient, transactionId: number, bundleContent: string) {
+    let sentLength: number = 0;
+    let chunkNum: number = -1;
+
+    do {
+      const chunk: string = bundleContent.slice(sentLength, BUNDLE_CHUNK_SIZE_BYTES);
+
+      chunkNum++;
+      sentLength += chunk.length;
+
+      await apiClient.callMethod('updater.writeBundleChunk', transactionId, bundleContent, chunkNum);
+    } while (bundleContent.length < sentLength);
   }
 
   private async buildBundle(platform: Platforms, machine: string) {

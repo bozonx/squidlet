@@ -57,9 +57,8 @@ export default class BundleUpdate {
    * Start bundle update transaction and return transaction id.
    */
   startBundleTransaction = async (bundleLength: number): Promise<number> => {
-    if (typeof this.currentBundleTransactionId !== 'undefined') {
-      await this.revertBundle();
-    }
+    // revert bundle in case there is current uploading
+    await this.revertBundle();
 
     this.uploadingBundleLength = bundleLength;
 
