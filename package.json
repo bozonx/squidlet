@@ -14,9 +14,9 @@
     "buildProdImage-x86": "updater/buildProdImage.sh x86",
     "buildProdImage-rpi": "updater/buildProdImage.sh rpi",
     "buildProdImage-arm": "updater/buildProdImage.sh arm",
-    "buildUpdater-x86": "./squidletLight/squidletLight.sh --output-dir=./build/updater-x86 --machine=x86 --platform=nodejs ./updater/updaterHostConfig.yaml",
-    "buildUpdater-rpi": "./squidletLight/squidletLight.sh --output-dir=./build/updater-rpi --machine=rpi --platform=nodejs ./updater/updaterHostConfig.yaml",
-    "buildUpdater-arm": "./squidletLight/squidletLight.sh --output-dir=./build/updater-arm --machine=arm --platform=nodejs ./updater/updaterHostConfig.yaml",
+    "buildUpdater-x86": "./squidletLight/squidletLight.sh --output-dir=./build/updater-x86 --machine=x86 --platform=nodejs $@ ./updater/updaterHostConfig.yaml",
+    "buildUpdater-rpi": "./squidletLight/squidletLight.sh --output-dir=./build/updater-rpi --machine=rpi --platform=nodejs $@ ./updater/updaterHostConfig.yaml",
+    "buildUpdater-arm": "./squidletLight/squidletLight.sh --output-dir=./build/updater-arm --machine=arm --platform=nodejs $@ ./updater/updaterHostConfig.yaml",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json",
     "postinstall": "cd node_modules && ln -s ../system ./"

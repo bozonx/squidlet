@@ -2,9 +2,9 @@
 
 ### Build image
 
-    yarn buildProdImage-x86
-    yarn buildProdImage-rpi
-    yarn buildProdImage-arm
+    yarn buildProdImage-x86 [--minimize=false]
+    yarn buildProdImage-rpi [--minimize=false]
+    yarn buildProdImage-arm [--minimize=false]
 
 ### Run image on x86 machine
 
@@ -28,7 +28,6 @@
       -e PUID=1000 \
       -e PGID=1000 \
       -e LOG_LEVEL=debug \
-      --device=/dev/ttyUSB0 \
       bozonx/squidlet:x86
 
 ### Run image on Raspberry pi like machine
@@ -50,6 +49,7 @@
       -p 18087:8087 \
       -p 18088:8088 \
       -p 18089:8089 \
+      -v /home/pi/workdirs/squidlet:/data \
       -e LOG_LEVEL=debug \
       bozonx/squidlet:rpi
 

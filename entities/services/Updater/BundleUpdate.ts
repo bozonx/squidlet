@@ -7,8 +7,7 @@ import StorageIo from 'system/interfaces/io/StorageIo';
 let transactionLastId: number = 0;
 export const BUNDLE_FILE_NAME = 'bundle.js';
 export const BUNDLE_SUM_FILE_NAME = 'bundle.sum';
-// size of chunk. Default is 16kb.
-// 16384, 32768, 8192
+// size of chunk. Default is 32kb.
 export const BUNDLE_CHUNK_SIZE_BYTES = 32768;
 const BUNDLE_ROOT_DIR = pathJoin(systemConfig.rootDirs.envSet, 'bundle');
 const BUNDLE_PREV_DIR = pathJoin(BUNDLE_ROOT_DIR, 'prev');
