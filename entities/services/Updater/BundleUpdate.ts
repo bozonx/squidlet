@@ -12,6 +12,7 @@ export const BUNDLE_CHUNK_SIZE_BYTES = 32768;
 const BUNDLE_ROOT_DIR = pathJoin(systemConfig.rootDirs.envSet, 'bundle');
 const BUNDLE_PREV_DIR = pathJoin(BUNDLE_ROOT_DIR, 'prev');
 const BUNDLE_TMP_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, 'bundle.tmp.js');
+const BUNDLE_PATH = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_FILE_NAME);
 const BUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_SUM_FILE_NAME);
 
 
@@ -123,16 +124,12 @@ export default class BundleUpdate {
   }
 
 
-  // TODO: review
   private async rotateBundle() {
-    const bundlePath = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_FILE_NAME);
-    const BUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_SUM_FILE_NAME);
     const prevBundlePath = pathJoin(BUNDLE_PREV_DIR, BUNDLE_FILE_NAME);
     const prevBUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_PREV_DIR, BUNDLE_SUM_FILE_NAME);
-    const currentBundleExits = await this.storage.exists(bundlePath);
+    const currentBundleExits = await this.storage.exists(BUNDLE_PATH);
     const currentBundleSumExits = await this.storage.exists(BUNDLE_SUM_FILE_PATH);
-
-    // TODO: move received tmp bundle to normal position
+    let needToMoveCurrentBundle: boolean = true;
 
     // remove prev version
     if (await this.storage.exists(prevBundlePath)) await this.storage.unlink(prevBundlePath);
@@ -140,25 +137,28 @@ export default class BundleUpdate {
 
     if (!currentBundleExits && !currentBundleSumExits) {
       // do nothing if there aren't current bundle
-      return;
+      needToMoveCurrentBundle = false;
     }
     else if (currentBundleExits && !currentBundleSumExits) {
       // something wrong - remove useless file and do nothing
       this.context.log.warn(`Updater: current bundle exists but sum file doesn't`);
-      await this.storage.unlink(bundlePath);
-
-      return;
+      await this.storage.unlink(BUNDLE_PATH);
+      needToMoveCurrentBundle = false;
     }
     else if (!currentBundleExits && currentBundleSumExits) {
       // something wrong - remove useless file and do nothing
       this.context.log.warn(`Updater: sum of current bundle exists but the bundle doesn't`);
       await this.storage.unlink(BUNDLE_SUM_FILE_PATH);
-
-      return;
+      needToMoveCurrentBundle = false;
     }
-    // move bundle files
-    await this.storage.rename(bundlePath, prevBundlePath);
-    await this.storage.rename(BUNDLE_SUM_FILE_PATH, prevBUNDLE_SUM_FILE_PATH);
+
+    if (needToMoveCurrentBundle) {
+      // move current bundle files
+      await this.storage.rename(BUNDLE_PATH, prevBundlePath);
+      await this.storage.rename(BUNDLE_SUM_FILE_PATH, prevBUNDLE_SUM_FILE_PATH);
+    }
+
+    await this.storage.rename(BUNDLE_TMP_FILE_PATH, BUNDLE_PATH);
   }
 
   private makeNewTransactonId(): number {
