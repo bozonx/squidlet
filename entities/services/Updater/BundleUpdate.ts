@@ -20,7 +20,7 @@ export default class BundleUpdate {
   private readonly storage: StorageIo;
   private currentBundleTransactionId?: number;
   private uploadingBundleLength?: number;
-  private receiveChunksLength?: number;
+  private receivedChunksLength?: number;
 
 
   constructor(context: Context, storage: StorageIo) {
@@ -77,15 +77,15 @@ export default class BundleUpdate {
 
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
     }
-    else if (this.uploadingBundleLength !== this.receiveChunksLength) {
+    else if (this.uploadingBundleLength !== this.receivedChunksLength) {
       await this.revertBundle();
 
-      throw new Error(`Bad received bundle: bad length ${this.receiveChunksLength} bun it has to be ${this.uploadingBundleLength}`);
+      throw new Error(`Bad received bundle: bad length ${this.receivedChunksLength} bun it has to be ${this.uploadingBundleLength}`);
     }
 
     delete this.currentBundleTransactionId;
     delete this.uploadingBundleLength;
-    delete this.receiveChunksLength;
+    delete this.receivedChunksLength;
 
     // success:
     this.context.log.info(`Updater: Received bundle check sum. ${hashSum}. Will be written to ${BUNDLE_ROOT_DIR}`);
@@ -98,25 +98,28 @@ export default class BundleUpdate {
    * Upload while bundle which is contains system, entities and config.
    */
   writeBundleChunk = async (transactionId: number, bundleChunk: string, chunkNum: number) => {
-    // TODO: update timeout before each chunk
-    // TODO: write chunks to tmp file name
-    // TODO: следить за порядком
+    const expectedChunkNum = this.expectedChunkNum();
 
     if (transactionId !== this.currentBundleTransactionId) {
+      await this.revertBundle();
+
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
+    }
+    else if (chunkNum !== expectedChunkNum) {
+      await this.revertBundle();
+
+      throw new Error(`Bad chunk num: ${chunkNum} but expected ${expectedChunkNum}`);
     }
 
     this.context.log.info(`Updater: Received bundle chunk. Will be written to ${BUNDLE_ROOT_DIR}`);
+    this.context.log.debug(`Updater: append chunk to ${BUNDLE_TMP_FILE_PATH}`);
+    // TODO: check how it works
+    await this.storage.appendFile(BUNDLE_TMP_FILE_PATH, bundleChunk);
 
-    // TODO: check hasNext
+    // TODO: если произошла ошибка то нужно откатить всю тразнакцию
+    // TODO: update timeout before each chunk
 
-    const bundlePath = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_FILE_NAME);
-
-    this.context.log.debug(`Updater: write ${bundlePath}`);
-    // TODO: use append
-    await this.storage.writeFile(bundlePath, bundleChunk);
-
-    delete this.currentBundleTransactionId;
+    this.receivedChunksLength = (this.receivedChunksLength || 0) + bundleChunk.length;
   }
 
 
@@ -164,13 +167,17 @@ export default class BundleUpdate {
     return transactionLastId;
   }
 
+  private expectedChunkNum(): number {
+    // TODO: calc
+  }
+
   private async revertBundle() {
     // TODO: remove partly received bundle
     // TODO: remove timeout
 
     delete this.currentBundleTransactionId;
     delete this.uploadingBundleLength;
-    delete this.receiveChunksLength;
+    delete this.receivedChunksLength;
   }
 
 }
