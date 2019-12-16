@@ -13,12 +13,15 @@ export const BUNDLE_SUM_FILE_NAME = 'bundle.sum';
 export const BUNDLE_CHUNK_SIZE_BYTES = 32768;
 const bundleRootDir = pathJoin(systemConfig.rootDirs.envSet, BUNDLE_SUB_DIR);
 const bundlePrevDir = pathJoin(bundleRootDir, BUNDLE_PREV_DIR);
+const bundleSumPath = pathJoin(bundleRootDir, BUNDLE_SUM_FILE_NAME);
 
 
 export default class BundleUpdate {
   private readonly context: Context;
   private readonly storage: StorageIo;
   private currentBundleTransactionId?: number;
+  private uploadingBundleLength?: number;
+  private receiveChunksLength?: number;
 
 
   constructor(context: Context, storage: StorageIo) {
@@ -53,10 +56,12 @@ export default class BundleUpdate {
   /**
    * Start bundle update transaction and return transaction id.
    */
-  startBundleTransaction = async (): Promise<number> => {
+  startBundleTransaction = async (bundleLength: number): Promise<number> => {
     if (typeof this.currentBundleTransactionId !== 'undefined') {
       await this.revertBundle();
     }
+
+    this.uploadingBundleLength = bundleLength;
 
     const transactionId: number =  this.makeNewTransactonId();
 
@@ -73,23 +78,30 @@ export default class BundleUpdate {
 
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
     }
+    else if (this.uploadingBundleLength !== this.receiveChunksLength) {
+      await this.revertBundle();
 
-    await this.rotateBundle();
+      throw new Error(`Bad received bundle: bad length ${this.receiveChunksLength} bun it has to be ${this.uploadingBundleLength}`);
+    }
 
+    delete this.currentBundleTransactionId;
+    delete this.uploadingBundleLength;
+    delete this.receiveChunksLength;
+
+    // success:
     this.context.log.info(`Updater: Received bundle check sum. ${hashSum}. Will be written to ${bundleRootDir}`);
-
-    const bundleSumPath = pathJoin(bundleRootDir, BUNDLE_SUM_FILE_NAME);
-
-    this.context.log.debug(`Updater: write ${bundleSumPath}`);
-
+    await this.rotateBundle();
+    this.context.log.debug(`Updater: write bundle sum ${bundleSumPath}`);
     await this.storage.writeFile(bundleSumPath, hashSum);
   }
 
   /**
    * Upload while bundle which is contains system, entities and config.
    */
-  writeBundleChunk = async (transactionId: number, bundleChunk: string, hasNext: boolean) => {
+  writeBundleChunk = async (transactionId: number, bundleChunk: string, chunkNum: number) => {
+    // TODO: update timeout before each chunk
     // TODO: write chunks to tmp file name
+    // TODO: следить за порядком
 
     if (transactionId !== this.currentBundleTransactionId) {
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
@@ -157,6 +169,9 @@ export default class BundleUpdate {
     // TODO: remove partly received bundle
     // TODO: remove timeout
 
+    delete this.currentBundleTransactionId;
+    delete this.uploadingBundleLength;
+    delete this.receiveChunksLength;
   }
 
 }
