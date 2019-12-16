@@ -43,12 +43,15 @@ export default class CommandUpdate {
     const bundleContent = await this.os.getFileContent(path.join(workDir, BUNDLE_FILE_NAME));
     const sumContent = await this.os.getFileContent(path.join(workDir, BUNDLE_SUM_FILE_NAME));
     // start transaction
+    console.log(`Starting transaction`);
     const transactionId: number = await apiClient.callMethod(
       'updater.startBundleTransaction',
       bundleContent.length
     );
     // upload bundle and check sum
+    console.log(`Sending bundle divided to chunks by ${Math.round(BUNDLE_CHUNK_SIZE_BYTES / 1024)}kb`);
     await this.sendBundleChunks(apiClient, transactionId, bundleContent);
+    console.log(`Ending transaction`);
     await apiClient.callMethod('updater.finishBundleTransaction', transactionId, sumContent);
   }
 
@@ -59,6 +62,8 @@ export default class CommandUpdate {
       const chunk: string = bundleContent.slice(sentLength, BUNDLE_CHUNK_SIZE_BYTES);
 
       sentLength += chunk.length;
+
+      console.log(`... send chunk ${chunkNum}. ${Math.round(sentLength/ 1024)}kb of ${Math.round(bundleContent.length / 1024)}kb`);
 
       await apiClient.callMethod('updater.writeBundleChunk', transactionId, bundleContent, chunkNum);
     }

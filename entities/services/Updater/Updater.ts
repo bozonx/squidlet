@@ -24,14 +24,14 @@ export default class Updater extends ServiceBase<Props> {
 
 
   init = async () => {
-    this.context.system.apiManager.registerEndpoint('updater', this.updaterApi);
-  }
+    const updaterApi = {
+      startBundleTransaction: this.bundleUpdate.startBundleTransaction,
+      finishBundleTransaction: this.bundleUpdate.finishBundleTransaction,
+      writeBundleChunk: this.bundleUpdate.writeBundleChunk,
+      getBundleHashSum: this.bundleUpdate.getBundleHashSum,
+    };
 
-  private updaterApi = {
-    startBundleTransaction: this.bundleUpdate.startBundleTransaction,
-    finishBundleTransaction: this.bundleUpdate.finishBundleTransaction,
-    writeBundleChunk: this.bundleUpdate.writeBundleChunk,
-    getBundleHashSum: this.bundleUpdate.getBundleHashSum,
-  };
+    this.context.system.apiManager.registerEndpoint('updater', updaterApi);
+  }
 
 }
