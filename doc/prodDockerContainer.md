@@ -51,6 +51,13 @@
       -p 18089:8089 \
       -v /home/pi/workdirs/squidlet:/data \
       -e LOG_LEVEL=debug \
+      --privileged \
+      --device /dev/mem \
+      --device /dev/i2c-1 \
+      --cap-add=SYS_ADMIN \
+      -v /sys/class/gpio:/sys/class/gpio \
+      -v /dev/mem:/dev/mem \
+      -v /dev/i2c-1:/dev/i2c-1 \
       bozonx/squidlet:rpi
 
 ## Pigpiod
@@ -69,8 +76,9 @@ Start
 
 If you have problems try the next params:
 
-    -cap-add=SYS_ADMIN
+    --cap-add=SYS_ADMIN
     -v /sys/class/gpio:/sys/class/gpio
+    -v /dev/mem:/dev/mem
 
 ### Install on system
 

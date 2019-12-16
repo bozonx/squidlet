@@ -8,6 +8,7 @@ ENV PUID=1000 PGID=1000 LOG_LEVEL="" MQTT_BROKER_HOST="" MQTT_BROKER_PORT="" IOS
 WORKDIR /app
 
 RUN npm install;
+RUN npm install serialport;
 
 VOLUME ["/app/data"]
 EXPOSE 8087/tcp 8088/tcp 8089/tcp

@@ -10,7 +10,6 @@
     "mqtt": "*",
     "mqtt-packet": "*",
     "pigpio-client": "*",
-    "serialport": "*",
     "ws": "*"
   }
 }
