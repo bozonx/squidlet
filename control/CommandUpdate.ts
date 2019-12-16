@@ -6,8 +6,12 @@ import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';
 import Platforms from '../system/interfaces/Platforms';
-import {BUNDLE_CHUNK_SIZE_BYTES, BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
 import AppBuilder, {DEFAULT_WORK_DIR} from '../squidletLight/AppBuilder';
+import {
+  BUNDLE_CHUNK_SIZE_BYTES,
+  BUNDLE_FILE_NAME,
+  BUNDLE_SUM_FILE_NAME
+} from '../entities/services/Updater/BundleUpdate';
 
 
 export default class CommandUpdate {

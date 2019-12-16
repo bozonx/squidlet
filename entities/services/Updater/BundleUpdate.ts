@@ -5,15 +5,14 @@ import StorageIo from '../../../system/interfaces/io/StorageIo';
 
 
 let transactionLastId: number = 0;
-const BUNDLE_SUB_DIR = 'bundle';
-const BUNDLE_PREV_DIR = 'prev';
 export const BUNDLE_FILE_NAME = 'bundle.js';
 export const BUNDLE_SUM_FILE_NAME = 'bundle.sum';
 // size of chunk. Default is 32kb.
 export const BUNDLE_CHUNK_SIZE_BYTES = 32768;
-const bundleRootDir = pathJoin(systemConfig.rootDirs.envSet, BUNDLE_SUB_DIR);
-const bundlePrevDir = pathJoin(bundleRootDir, BUNDLE_PREV_DIR);
-const bundleSumPath = pathJoin(bundleRootDir, BUNDLE_SUM_FILE_NAME);
+const BUNDLE_ROOT_DIR = pathJoin(systemConfig.rootDirs.envSet, 'bundle');
+const BUNDLE_PREV_DIR = pathJoin(BUNDLE_ROOT_DIR, 'prev');
+const BUNDLE_TMP_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, 'bundle.tmp.js');
+const BUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_SUM_FILE_NAME);
 
 
 export default class BundleUpdate {
@@ -33,8 +32,8 @@ export default class BundleUpdate {
   async init() {
     // make sub dir
     try {
-      await this.storage.mkdir(bundleRootDir);
-      await this.storage.mkdir(bundlePrevDir);
+      await this.storage.mkdir(BUNDLE_ROOT_DIR);
+      await this.storage.mkdir(BUNDLE_PREV_DIR);
     }
     catch (e) {
     }
@@ -45,12 +44,12 @@ export default class BundleUpdate {
    * Return bundle's hash sum if it exists
    */
   getBundleHashSum = async (): Promise<string | undefined> => {
-    const bundleSumPath = pathJoin(bundleRootDir, BUNDLE_SUM_FILE_NAME);
-    const fileExits = await this.storage.exists(bundleSumPath);
+    const BUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_SUM_FILE_NAME);
+    const fileExits = await this.storage.exists(BUNDLE_SUM_FILE_PATH);
 
     if (!fileExits) return;
 
-    return await this.storage.readFile(bundleSumPath);
+    return await this.storage.readFile(BUNDLE_SUM_FILE_PATH);
   }
 
   /**
@@ -89,10 +88,10 @@ export default class BundleUpdate {
     delete this.receiveChunksLength;
 
     // success:
-    this.context.log.info(`Updater: Received bundle check sum. ${hashSum}. Will be written to ${bundleRootDir}`);
+    this.context.log.info(`Updater: Received bundle check sum. ${hashSum}. Will be written to ${BUNDLE_ROOT_DIR}`);
     await this.rotateBundle();
-    this.context.log.debug(`Updater: write bundle sum ${bundleSumPath}`);
-    await this.storage.writeFile(bundleSumPath, hashSum);
+    this.context.log.debug(`Updater: write bundle sum ${BUNDLE_SUM_FILE_PATH}`);
+    await this.storage.writeFile(BUNDLE_SUM_FILE_PATH, hashSum);
   }
 
   /**
@@ -107,11 +106,11 @@ export default class BundleUpdate {
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
     }
 
-    this.context.log.info(`Updater: Received bundle chunk. Will be written to ${bundleRootDir}`);
+    this.context.log.info(`Updater: Received bundle chunk. Will be written to ${BUNDLE_ROOT_DIR}`);
 
     // TODO: check hasNext
 
-    const bundlePath = pathJoin(bundleRootDir, BUNDLE_FILE_NAME);
+    const bundlePath = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_FILE_NAME);
 
     this.context.log.debug(`Updater: write ${bundlePath}`);
     // TODO: use append
@@ -123,18 +122,18 @@ export default class BundleUpdate {
 
   // TODO: review
   private async rotateBundle() {
-    const bundlePath = pathJoin(bundleRootDir, BUNDLE_FILE_NAME);
-    const bundleSumPath = pathJoin(bundleRootDir, BUNDLE_SUM_FILE_NAME);
-    const prevBundlePath = pathJoin(bundlePrevDir, BUNDLE_FILE_NAME);
-    const prevBundleSumPath = pathJoin(bundlePrevDir, BUNDLE_SUM_FILE_NAME);
+    const bundlePath = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_FILE_NAME);
+    const BUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, BUNDLE_SUM_FILE_NAME);
+    const prevBundlePath = pathJoin(BUNDLE_PREV_DIR, BUNDLE_FILE_NAME);
+    const prevBUNDLE_SUM_FILE_PATH = pathJoin(BUNDLE_PREV_DIR, BUNDLE_SUM_FILE_NAME);
     const currentBundleExits = await this.storage.exists(bundlePath);
-    const currentBundleSumExits = await this.storage.exists(bundleSumPath);
+    const currentBundleSumExits = await this.storage.exists(BUNDLE_SUM_FILE_PATH);
 
     // TODO: move received tmp bundle to normal position
 
     // remove prev version
     if (await this.storage.exists(prevBundlePath)) await this.storage.unlink(prevBundlePath);
-    if (await this.storage.exists(prevBundleSumPath)) await this.storage.unlink(prevBundleSumPath);
+    if (await this.storage.exists(prevBUNDLE_SUM_FILE_PATH)) await this.storage.unlink(prevBUNDLE_SUM_FILE_PATH);
 
     if (!currentBundleExits && !currentBundleSumExits) {
       // do nothing if there aren't current bundle
@@ -150,13 +149,13 @@ export default class BundleUpdate {
     else if (!currentBundleExits && currentBundleSumExits) {
       // something wrong - remove useless file and do nothing
       this.context.log.warn(`Updater: sum of current bundle exists but the bundle doesn't`);
-      await this.storage.unlink(bundleSumPath);
+      await this.storage.unlink(BUNDLE_SUM_FILE_PATH);
 
       return;
     }
     // move bundle files
     await this.storage.rename(bundlePath, prevBundlePath);
-    await this.storage.rename(bundleSumPath, prevBundleSumPath);
+    await this.storage.rename(BUNDLE_SUM_FILE_PATH, prevBUNDLE_SUM_FILE_PATH);
   }
 
   private makeNewTransactonId(): number {
