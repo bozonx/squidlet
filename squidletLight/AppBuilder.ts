@@ -17,7 +17,7 @@ import {
 } from './helpers';
 import LogLevel from '../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../shared/constants';
-import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/Updater';
+import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/BundleUpdate';
 
 const squidletPackageJson = require('../package.json');
 

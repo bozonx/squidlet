@@ -54,16 +54,14 @@ export default class CommandUpdate {
 
   private async sendBundleChunks(apiClient: WsApiClient, transactionId: number, bundleContent: string) {
     let sentLength: number = 0;
-    let chunkNum: number = -1;
 
-    do {
+    for (let chunkNum = 0; bundleContent.length < sentLength; chunkNum++) {
       const chunk: string = bundleContent.slice(sentLength, BUNDLE_CHUNK_SIZE_BYTES);
 
-      chunkNum++;
       sentLength += chunk.length;
 
       await apiClient.callMethod('updater.writeBundleChunk', transactionId, bundleContent, chunkNum);
-    } while (bundleContent.length < sentLength);
+    }
   }
 
   private async buildBundle(platform: Platforms, machine: string) {
