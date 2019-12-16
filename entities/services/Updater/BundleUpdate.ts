@@ -7,8 +7,8 @@ import StorageIo from '../../../system/interfaces/io/StorageIo';
 let transactionLastId: number = 0;
 export const BUNDLE_FILE_NAME = 'bundle.js';
 export const BUNDLE_SUM_FILE_NAME = 'bundle.sum';
-// size of chunk. Default is 32kb.
-export const BUNDLE_CHUNK_SIZE_BYTES = 32768;
+// size of chunk. Default is 16kb.
+export const BUNDLE_CHUNK_SIZE_BYTES = 16384;
 const BUNDLE_ROOT_DIR = pathJoin(systemConfig.rootDirs.envSet, 'bundle');
 const BUNDLE_PREV_DIR = pathJoin(BUNDLE_ROOT_DIR, 'prev');
 const BUNDLE_TMP_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, 'bundle.tmp.js');
@@ -82,7 +82,7 @@ export default class BundleUpdate {
     else if (this.uploadingBundleLength !== this.receivedChunksLength) {
       await this.revertBundle();
 
-      throw new Error(`Bad received bundle: bad length ${this.receivedChunksLength} bun it has to be ${this.uploadingBundleLength}`);
+      throw new Error(`Bad received bundle: bad length ${this.receivedChunksLength} but it has to be ${this.uploadingBundleLength}`);
     }
 
     delete this.currentBundleTransactionId;

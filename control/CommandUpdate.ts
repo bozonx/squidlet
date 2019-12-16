@@ -58,7 +58,7 @@ export default class CommandUpdate {
   private async sendBundleChunks(apiClient: WsApiClient, transactionId: number, bundleContent: string) {
     let sentLength: number = 0;
 
-    for (let chunkNum = 0; bundleContent.length < sentLength; chunkNum++) {
+    for (let chunkNum = 0; sentLength < bundleContent.length; chunkNum++) {
       const chunk: string = bundleContent.slice(sentLength, BUNDLE_CHUNK_SIZE_BYTES);
 
       sentLength += chunk.length;
