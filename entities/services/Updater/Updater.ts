@@ -51,16 +51,14 @@ export default class Updater extends ServiceBase<Props> {
   }
 
   /**
-   * Start update transaction and return transaction id.
+   * Start bundle update transaction and return transaction id.
    */
   private startBundleTransaction = async (): Promise<number> => {
-    await this.rotateBundle();
+    if (typeof this.currentBundleTransactionId !== 'undefined') {
+      await this.revertBundle();
+    }
 
     const transactionId: number =  this.makeNewTransactonId();
-
-    if (typeof this.currentBundleTransactionId !== 'undefined') {
-      // TODO: откатить транзакцию и начать новую
-    }
 
     // TODO: start timeout
 
@@ -70,12 +68,13 @@ export default class Updater extends ServiceBase<Props> {
   }
 
   private finishBundleTransaction = async (transactionId: number, hashSum: string) => {
-    // TODO: check sum
-
     if (transactionId !== this.currentBundleTransactionId) {
-      // TODO: откатить транзакцию
+      await this.revertBundle();
+
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
     }
+
+    await this.rotateBundle();
 
     this.log.info(`Updater: Received bundle check sum. ${hashSum}. Will be written to ${bundleRootDir}`);
 
@@ -90,6 +89,8 @@ export default class Updater extends ServiceBase<Props> {
    * Upload while bundle which is contains system, entities and config.
    */
   private writeBundleChunk = async (transactionId: number, bundleChunk: string, hasNext: boolean) => {
+    // TODO: write chunks to tmp file name
+
     if (transactionId !== this.currentBundleTransactionId) {
       throw new Error(`Bad transactionId: ${transactionId}, current is ${this.currentBundleTransactionId}`);
     }
@@ -115,6 +116,12 @@ export default class Updater extends ServiceBase<Props> {
   };
 
 
+  private async revertBundle() {
+    // TODO: remove partly received bundle
+    // TODO: remove timeout
+
+  }
+
   // TODO: review
   private async rotateBundle() {
     const bundlePath = pathJoin(bundleRootDir, BUNDLE_FILE_NAME);
@@ -123,6 +130,8 @@ export default class Updater extends ServiceBase<Props> {
     const prevBundleSumPath = pathJoin(bundlePrevDir, BUNDLE_SUM_FILE_NAME);
     const currentBundleExits = await this.storage.exists(bundlePath);
     const currentBundleSumExits = await this.storage.exists(bundleSumPath);
+
+    // TODO: move received tmp bundle to normal position
 
     // remove prev version
     if (await this.storage.exists(prevBundlePath)) await this.storage.unlink(prevBundlePath);
