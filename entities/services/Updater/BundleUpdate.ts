@@ -168,16 +168,25 @@ export default class BundleUpdate {
   }
 
   private expectedChunkNum(): number {
-    // TODO: calc
+    // something wrong
+    if (typeof this.uploadingBundleLength === 'undefined') return -1;
+    else if (!this.receivedChunksLength) return 0;
+
+    const receivedChunks = Math.ceil(this.receivedChunksLength / BUNDLE_CHUNK_SIZE_BYTES);
+
+    return receivedChunks + 1;
   }
 
   private async revertBundle() {
-    // TODO: remove partly received bundle
     // TODO: remove timeout
 
     delete this.currentBundleTransactionId;
     delete this.uploadingBundleLength;
     delete this.receivedChunksLength;
+
+    if (await this.storage.exists(BUNDLE_TMP_FILE_PATH)) {
+      await this.storage.unlink(BUNDLE_TMP_FILE_PATH);
+    }
   }
 
 }
