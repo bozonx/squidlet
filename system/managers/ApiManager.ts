@@ -9,6 +9,8 @@ import StandardApi from '../StandardApi';
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
 
+const MAX_ARG_PRING_LENGTH = 32;
+
 
 /**
  * RemoteCall StandardApi for acting remotely via ws or mqtt or others services.
@@ -68,7 +70,7 @@ export default class ApiManager {
   }
 
   callApi = async (methodName: string, args: any[]): Promise<any> => {
-    this.context.log.debug(`ApiManager: called api method: ${methodName}(${args.join(', ')})`);
+    this.context.log.debug(`ApiManager: called api method: ${methodName}(${this.prepareArgsToPrint(args)})`);
 
     if (!methodName) throw new Error(`No methodName`);
 
@@ -107,6 +109,26 @@ export default class ApiManager {
       this.context.log.error,
       makeUniqId
     );
+  }
+
+  private prepareArgsToPrint(args: any[]): string {
+    const result: string[] = [];
+
+    for (let arg of args) {
+      if (typeof arg === 'string') {
+        if (arg.length > MAX_ARG_PRING_LENGTH) {
+          result.push(`${arg.slice(0, MAX_ARG_PRING_LENGTH)}...`);
+        }
+        else {
+          result.push(arg);
+        }
+      }
+      else {
+        result.push(arg);
+      }
+    }
+
+    return result.join(', ');
   }
 
 }
