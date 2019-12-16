@@ -49,7 +49,10 @@ export default class CommandUpdate {
       bundleContent.length
     );
     // upload bundle and check sum
-    console.log(`Sending bundle divided to chunks by ${Math.round(BUNDLE_CHUNK_SIZE_BYTES / 1024)}kb`);
+    console.log(
+      `Sending bundle of ${Math.round(bundleContent.length / 1024)} ` +
+      `divided to chunks by ${Math.round(BUNDLE_CHUNK_SIZE_BYTES / 1024)}kb`
+    );
     await this.sendBundleChunks(apiClient, transactionId, bundleContent);
     console.log(`Ending transaction`);
     await apiClient.callMethod('updater.finishBundleTransaction', transactionId, sumContent);
@@ -59,13 +62,16 @@ export default class CommandUpdate {
     let sentLength: number = 0;
 
     for (let chunkNum = 0; sentLength < bundleContent.length; chunkNum++) {
-      const chunk: string = bundleContent.slice(sentLength, BUNDLE_CHUNK_SIZE_BYTES);
+      const chunk: string = bundleContent.slice(sentLength, sentLength + BUNDLE_CHUNK_SIZE_BYTES);
 
       sentLength += chunk.length;
 
-      console.log(`... send chunk ${chunkNum}. ${Math.round(sentLength/ 1024)}kb of ${Math.round(bundleContent.length / 1024)}kb`);
+      console.log(
+        `... sending chunk ${chunkNum}. ${Math.round(sentLength / 1024)}kb` +
+        ` of ${Math.round(bundleContent.length / 1024)}kb`
+      );
 
-      await apiClient.callMethod('updater.writeBundleChunk', transactionId, bundleContent, chunkNum);
+      await apiClient.callMethod('updater.writeBundleChunk', transactionId, chunk, chunkNum);
     }
   }
 

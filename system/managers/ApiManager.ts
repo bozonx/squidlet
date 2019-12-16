@@ -9,7 +9,7 @@ import StandardApi from '../StandardApi';
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
 
-const MAX_ARG_PRING_LENGTH = 32;
+const MAX_ARG_PRINT_LENGTH = 32;
 
 
 /**
@@ -116,8 +116,8 @@ export default class ApiManager {
 
     for (let arg of args) {
       if (typeof arg === 'string') {
-        if (arg.length > MAX_ARG_PRING_LENGTH) {
-          result.push(`${arg.slice(0, MAX_ARG_PRING_LENGTH)}...`);
+        if (arg.length > MAX_ARG_PRINT_LENGTH) {
+          result.push(`${arg.slice(0, MAX_ARG_PRINT_LENGTH)}...`);
         }
         else {
           result.push(arg);

@@ -1,14 +1,15 @@
 import {pathJoin} from 'system/lib/paths';
 import systemConfig from 'system/systemConfig';
 import Context from 'system/Context';
-import StorageIo from '../../../system/interfaces/io/StorageIo';
+import StorageIo from 'system/interfaces/io/StorageIo';
 
 
 let transactionLastId: number = 0;
 export const BUNDLE_FILE_NAME = 'bundle.js';
 export const BUNDLE_SUM_FILE_NAME = 'bundle.sum';
 // size of chunk. Default is 16kb.
-export const BUNDLE_CHUNK_SIZE_BYTES = 16384;
+// 16384, 32768, 8192
+export const BUNDLE_CHUNK_SIZE_BYTES = 32768;
 const BUNDLE_ROOT_DIR = pathJoin(systemConfig.rootDirs.envSet, 'bundle');
 const BUNDLE_PREV_DIR = pathJoin(BUNDLE_ROOT_DIR, 'prev');
 const BUNDLE_TMP_FILE_PATH = pathJoin(BUNDLE_ROOT_DIR, 'bundle.tmp.js');
@@ -114,11 +115,17 @@ export default class BundleUpdate {
     }
 
     this.context.log.info(`Updater: Received bundle chunk. Will be written to ${BUNDLE_ROOT_DIR}`);
-    this.context.log.debug(`Updater: append chunk to ${BUNDLE_TMP_FILE_PATH}`);
-    // TODO: check how it works
-    await this.storage.appendFile(BUNDLE_TMP_FILE_PATH, bundleChunk);
+    this.context.log.debug(`Updater: appending chunk to ${BUNDLE_TMP_FILE_PATH}`);
 
-    // TODO: если произошла ошибка то нужно откатить всю тразнакцию
+    try {
+      await this.storage.appendFile(BUNDLE_TMP_FILE_PATH, bundleChunk);
+    }
+    catch (e) {
+      await this.revertBundle();
+
+      throw e;
+    }
+
     // TODO: update timeout before each chunk
 
     this.receivedChunksLength = (this.receivedChunksLength || 0) + bundleChunk.length;
@@ -168,6 +175,10 @@ export default class BundleUpdate {
     return transactionLastId;
   }
 
+  /**
+   * Get number of chunk which is expected.
+   * Number starts from 0.
+   */
   private expectedChunkNum(): number {
     // something wrong
     if (typeof this.uploadingBundleLength === 'undefined') return -1;
@@ -175,7 +186,7 @@ export default class BundleUpdate {
 
     const receivedChunks = Math.ceil(this.receivedChunksLength / BUNDLE_CHUNK_SIZE_BYTES);
 
-    return receivedChunks + 1;
+    return receivedChunks;
   }
 
   private async revertBundle() {
