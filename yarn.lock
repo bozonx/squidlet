@@ -604,13 +604,6 @@
     "@types/vinyl-fs" "*"
     chokidar "^2.1.2"
 
-"@types/i2c-bus@^1.0.27":
-  version "1.0.27"
-  resolved "https://registry.yarnpkg.com/@types/i2c-bus/-/i2c-bus-1.0.27.tgz#942e7d8d0607ede3889d8d549a5929ec479e3ab8"
-  integrity sha512-0ReDk5T1BkBN0FB9wQj5nHBGct7tv/iWBsHl3INDwli8E0sEeK5ZhXuoEEt1Sa+Px299XGWsHDummS2UjP7/LA==
-  dependencies:
-    "@types/node" "*"
-
 "@types/js-yaml@^3.12.1":
   version "3.12.1"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.1.tgz#5c6f4a1eabca84792fbd916f0cb40847f123c656"
@@ -2749,14 +2742,6 @@ hosted-git-info@^2.1.4:
   version "2.8.5"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.5.tgz#759cfcf2c4d156ade59b0b2dfabddc42a6b9c70c"
   integrity sha512-kssjab8CvdXfcXMXVcvsXum4Hwdq9XGtRD3TteMEvEbq0LXyiNQr6AprqKqfeaDXze7SxWvRxdpwE6ku7ikLkg==
-
-i2c-bus@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/i2c-bus/-/i2c-bus-5.1.0.tgz#7d667d225c09017cf044f75fc593d5ea3e0f4ea6"
-  integrity sha512-u/q1fuZ5xrG77y3uo1rAANycboXsRNjneN+6jXRNMT2yRNpanVkbAP+IArwgsPRCHaY/zKxw7x5G8Y2fSPNseA==
-  dependencies:
-    bindings "^1.5.0"
-    nan "^2.14.0"
 
 iconv-lite@^0.4.17, iconv-lite@^0.4.4:
   version "0.4.24"

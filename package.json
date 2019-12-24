@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "i2c-bus": "^5.1.0",
     "immutable": "^4.0.0-rc.12",
     "js-yaml": "^3.13.1",
     "jsmodbus": "^4.0.0",
@@ -61,7 +60,6 @@
     "@types/dependency-tree": "^6.1.0",
     "@types/gulp": "^4.0.6",
     "@types/gulp-babel": "^6.1.29",
-    "@types/i2c-bus": "^1.0.27",
     "@types/js-yaml": "^3.12.1",
     "@types/lodash": "^4.14.149",
     "@types/node": "^12.12.14",

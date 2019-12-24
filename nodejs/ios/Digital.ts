@@ -8,7 +8,7 @@ import ThrottleCall from '../../system/lib/debounceCall/ThrottleCall';
 import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
 import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
-import PigpioWrapper, {PigpioOptions} from '../helpers/PigpioWrapper';
+import PigpioPinWrapper, {PigpioOptions} from '../helpers/PigpioPinWrapper';
 
 
 // TODO: все выводы в log выводить в системный логгер (возможно через события)
@@ -247,8 +247,8 @@ export default class Digital implements DigitalIo {
     }
   }
 
-  private getPinInstance(methodWhichAsk: string, pin: number): PigpioWrapper {
-    const instance: PigpioWrapper | undefined = this.client.getPinInstance(pin);
+  private getPinInstance(methodWhichAsk: string, pin: number): PigpioPinWrapper {
+    const instance: PigpioPinWrapper | undefined = this.client.getPinInstance(pin);
 
     if (!instance) {
       throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);

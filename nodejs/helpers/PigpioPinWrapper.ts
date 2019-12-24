@@ -29,7 +29,7 @@ export interface PigpioInfo {
 /**
  * Wrapper of pigpio-client's gpio to use promises.
  */
-export default class PigpioWrapper {
+export default class PigpioPinWrapper {
   private gpio: any;
   private listeners: PigpioHandler[] = [];
 

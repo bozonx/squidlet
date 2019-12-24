@@ -39,10 +39,6 @@ const machineConfig: MachineConfig = {
         host: 'localhost'
       },
     },
-    // dependencies: {
-    //   //'i2c-bus': '*',
-    //   'pigpio': '*',
-    // },
   }
 };
 

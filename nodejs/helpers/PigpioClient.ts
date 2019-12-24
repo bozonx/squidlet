@@ -1,4 +1,4 @@
-import PigpioWrapper, {PigpioInfo, PigpioOptions} from './PigpioWrapper';
+import PigpioPinWrapper, {PigpioInfo, PigpioOptions} from './PigpioPinWrapper';
 import Promised from '../../system/lib/Promised';
 import {compactUndefined} from '../../system/lib/arrays';
 import Logger from '../../system/interfaces/Logger';
@@ -47,7 +47,7 @@ export class PigpioClient {
   private hasBeenInited: boolean = false;
   // timeout to wait between trying of connect
   private connectionTimeout?: NodeJS.Timeout;
-  private readonly pinInstances: {[index: string]: PigpioWrapper} = {};
+  private readonly pinInstances: {[index: string]: PigpioPinWrapper} = {};
 
 
   constructor(logger: Logger) {
@@ -56,11 +56,7 @@ export class PigpioClient {
 
 
   init(clientOptions: PigpioOptions): void{
-    if (this.inited) {
-      this.logger.warn(`PigpioClient: Disallowed to init more then one time`);
-
-      return;
-    }
+    if (this.inited) return;
 
     this.clientOptions = {
       ...this.clientOptions,
@@ -75,6 +71,8 @@ export class PigpioClient {
   }
 
   async destroy(): Promise<void> {
+    if (!this.client) return;
+
     this.clearListeners();
     this.connectionPromised.destroy();
 
@@ -90,7 +88,7 @@ export class PigpioClient {
     return Boolean(this.pinInstances[pin]);
   }
 
-  getPinInstance(pin: number): PigpioWrapper | undefined {
+  getPinInstance(pin: number): PigpioPinWrapper | undefined {
     return this.pinInstances[pin];
   }
 
@@ -103,7 +101,7 @@ export class PigpioClient {
       throw new Error(`PigpioClient: Client hasn't been connected`);
     }
 
-    this.pinInstances[pin] = new PigpioWrapper(this.client.gpio(pin));
+    this.pinInstances[pin] = new PigpioPinWrapper(this.client.gpio(pin));
   }
 
   clearPin(pin: number) {

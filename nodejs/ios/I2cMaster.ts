@@ -1,9 +1,9 @@
-import {I2cBus, openSync} from 'i2c-bus';
-
 import I2cMasterIo, {I2cMasterBusLike, I2cParams} from 'system/interfaces/io/I2cMasterIo';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import I2cMasterIoBase from 'system/lib/base/I2cMasterIoBase';
 import {callPromised} from 'system/lib/common';
+import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
+import {PigpioOptions} from '../helpers/PigpioPinWrapper';
 
 
 /**
@@ -11,6 +11,31 @@ import {callPromised} from 'system/lib/common';
  * It doesn't support setting clock. You should set it in your OS.
  */
 export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
+  private readonly client: PigpioClient;
+
+
+  constructor() {
+    super();
+
+    this.client = instantiatePigpioClient({
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+      debug: console.log,
+    });
+  }
+
+
+  async destroy(): Promise<void> {
+    await this.client.destroy();
+  }
+
+  async configure(clientOptions: PigpioOptions): Promise<void> {
+    // make init but don't wait while it has been finished
+    this.client.init(clientOptions);
+  }
+
+
   protected async createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike> {
     if (typeof params.bus === 'undefined') {
       throw new Error(`Can't create a connection to I2C master bus number ${busNum}: no "bus" param`);
