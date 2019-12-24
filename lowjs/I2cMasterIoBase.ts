@@ -1,4 +1,7 @@
-import {defaultI2cParams, I2cDefinition, I2cMasterBusLike, I2cParams} from '../../interfaces/io/I2cMasterIo';
+
+// TODO: remove ???
+
+import {defaultI2cParams, I2cDefinition, I2cMasterBusLike, I2cParams} from '../system/interfaces/io/I2cMasterIo';
 
 
 let preDefinedBusesParams: {[index: string]: I2cParams} = {};

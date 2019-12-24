@@ -3,7 +3,7 @@ const i2c = require('i2c');
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
-import I2cMasterIoBase from 'system/lib/base/I2cMasterIoBase';
+import I2cMasterIoBase from 'lowjs/I2cMasterIoBase';
 import {I2cMasterBusLike, I2cParams} from 'system/interfaces/io/I2cMasterIo';
 
 

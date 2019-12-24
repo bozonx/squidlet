@@ -50,11 +50,23 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
   async destroyBus(busNum: string | number): Promise<void> {
-    // TODO: что если произошла ошибка
-    // TODO: нужно закрытьт все соединения с адресами
-    await this.client.i2cClose(busInstanceId);
+    const promises: Promise<void>[] = [];
 
-    this.openedBuses[busInstanceId] = undefined;
+    for (let index of Object.keys(this.openedAddresses)) {
+      if (index.indexOf(String(busNum)) !== 0) continue;
+
+      promises.push(this.client.i2cClose(this.openedAddresses[index]));
+
+      delete this.openedAddresses[index];
+    }
+
+
+    try {
+      await Promise.all(promises);
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
 
@@ -63,7 +75,7 @@ export default class I2cMaster implements I2cMasterIo {
       throw new Error(`busNum has to be a number`);
     }
 
-    const index: string = `${busNum}-${addrHex}`;
+    const index: string = `${busNum}${addrHex}`;
 
     if (typeof this.openedAddresses[index] !== 'undefined') return this.openedAddresses[index];
 
