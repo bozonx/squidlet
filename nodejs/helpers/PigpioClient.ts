@@ -3,6 +3,7 @@ import Promised from '../../system/lib/Promised';
 import {compactUndefined} from '../../system/lib/arrays';
 import Logger from '../../system/interfaces/Logger';
 
+
 const pigpioClient = require('pigpio-client');
 
 const I2CO = 54;
@@ -115,7 +116,7 @@ export class PigpioClient {
   }
 
   /**
-   * Open i2c bus and returns busConnectionId
+   * Open i2c bus and returns addressConnectionId
    */
   i2cOpen(bus: number, address: number): Promise<number> {
     if (!this.client) {
@@ -127,28 +128,56 @@ export class PigpioClient {
     return this.client.request(I2CO, bus, address, 4, undefined, flags);
   }
 
-  i2cClose(busConnectionId: number): Promise<void> {
+  i2cClose(addressConnectionId: number): Promise<void> {
     if (!this.client) return Promise.resolve();
 
-    return this.client.request(I2CC, busConnectionId, 0, 0);
+    return this.client.request(I2CC, addressConnectionId, 0, 0);
   }
 
-  i2cWriteDevice(busConnectionId: number, data: Uint8Array) {
-    if (!this.client) {
-      throw new Error(`PigpioClient: Client hasn't been connected`);
-    }
+  i2cWriteDevice(addressConnectionId: number, data: Uint8Array) {
+    //return this.client.request(I2CWD, addressConnectionId, 0, data.length, undefined, data);
+    return new Promise<void>((resolve, reject) => {
+      if (!this.client) {
+        return reject(`PigpioClient: Client hasn't been connected`);
+      }
 
-    return this.client.request(I2CWD, busConnectionId, 0, data.length, undefined, data);
+      const callback = (err: Error, bytesWritten: number) => {
+        if (err) return reject(err);
+
+        if (data && data.length !== bytesWritten) {
+          return reject(new Error(
+            `Wrong number of bytes has been written. Tried to write ${data.length}, but eventually written ${bytesWritten}`
+          ));
+        }
+
+        resolve();
+      };
+
+      this.client.request(I2CWD, addressConnectionId, 0, data.length, callback, data);
+    });
   }
 
-  i2cReadDevice(busConnectionId: number, count: number) {
-    if (!this.client) {
-      throw new Error(`PigpioClient: Client hasn't been connected`);
-    }
+  i2cReadDevice(addressConnectionId: number, count: number): Promise<Uint8Array> {
+    //return this.client.request(I2CRD, addressConnectionId, count, 0);
+    return new Promise<Uint8Array>((resolve, reject) => {
+      if (!this.client) {
+        throw new Error(`PigpioClient: Client hasn't been connected`);
+      }
 
-    // TODO: check received data in cb
+      const callback = (err: Error, bytesRead: number, result: Uint8Array) => {
+        if (err) return reject(err);
 
-    return this.client.request(I2CRD, busConnectionId, count, 0);
+        if (count !== bytesRead) {
+          return reject(new Error(
+            `Wrong number of bytes has been read. Sent ${count}, but eventually read ${bytesRead}`
+          ));
+        }
+
+        resolve(result);
+      };
+
+      this.client.request(I2CRD, addressConnectionId, count, 0, callback);
+    });
   }
 
 

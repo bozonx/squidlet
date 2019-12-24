@@ -1,7 +1,4 @@
-import I2cMasterIo, {I2cMasterBusLike, I2cParams} from 'system/interfaces/io/I2cMasterIo';
-import {convertBufferToUint8Array} from 'system/lib/buffer';
-import I2cMasterIoBase from 'system/lib/base/I2cMasterIoBase';
-import {callPromised} from 'system/lib/common';
+import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
 import {PigpioOptions} from '../helpers/PigpioPinWrapper';
 
@@ -10,13 +7,13 @@ import {PigpioOptions} from '../helpers/PigpioPinWrapper';
  * It's raspberry pi implementation of I2C master.
  * It doesn't support setting clock. You should set it in your OS.
  */
-export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
+export default class I2cMaster implements I2cMasterIo {
   private readonly client: PigpioClient;
+  // { `busNum-addressNum`: [ addressConnectionId ] }
+  private openedAddresses: {[index: string]: number} = {};
 
 
   constructor() {
-    super();
-
     this.client = instantiatePigpioClient({
       info: console.info,
       warn: console.warn,
@@ -30,63 +27,65 @@ export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {
     await this.client.destroy();
   }
 
+  // TODO: review
   async configure(clientOptions: PigpioOptions): Promise<void> {
     // make init but don't wait while it has been finished
     this.client.init(clientOptions);
   }
 
+  // async openBus(busNum: string | number): Promise<number> {
+  //   // TODO: как это связать с настроящим busInstanceId ????
+  //   const busInstanceId: number = this.openedBuses.length;
+  //
+  //   this.openedBuses.push(busNum);
+  //
+  //   return busInstanceId;
+  // }
 
-  protected async createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike> {
-    if (typeof params.bus === 'undefined') {
-      throw new Error(`Can't create a connection to I2C master bus number ${busNum}: no "bus" param`);
+  // async isBusOpened(busInstanceId: number): Promise<boolean> {
+  //   // TODO: check on the server side
+  //   return typeof this.openedBuses[busInstanceId] !== 'undefined';
+  // }
+
+  async i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void> {
+    const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
+
+    // TODO: если произошка  ошибка err.code: 'PI_BAD_HANDLE' - то переконнектиться и повторить 1 раз
+
+    return this.client.i2cWriteDevice(addressConnectionId, data);
+  }
+
+  async i2cReadDevice(busNum: string | number, addrHex: number, count: number): Promise<Uint8Array> {
+    const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
+
+    // TODO: если произошка  ошибка err.code: 'PI_BAD_HANDLE' - то переконнектиться и повторить 1 раз
+
+    return this.client.i2cReadDevice(addressConnectionId, count);
+  }
+
+  async destroyBus(busNum: string | number): Promise<void> {
+    // TODO: что если произошла ошибка
+    // TODO: нужно закрытьт все соединения с адресами
+    await this.client.i2cClose(busInstanceId);
+
+    this.openedBuses[busInstanceId] = undefined;
+  }
+
+
+  private async resolveAddressConnectionId(busNum: string | number, addrHex: number): Promise<number> {
+    if (typeof busNum !== 'number') {
+      throw new Error(`busNum has to be a number`);
     }
 
-    const i2cBus: I2cBus = openSync(Number(params.bus));
+    const index: string = `${busNum}-${addrHex}`;
 
-    return {
-      read: async (addrHex: number, quantity: number): Promise<Uint8Array> => {
-        const bufferToRead = Buffer.alloc(quantity);
+    if (typeof this.openedAddresses[index] !== 'undefined') return this.openedAddresses[index];
 
-        return new Promise((resolve, reject) => {
-          const callback = (err: Error, bytesRead: number, resultBuffer: Buffer) => {
-            if (err) return reject(err);
+    const addressConnectionId: number = await this.client.i2cOpen(busNum, addrHex);
 
-            if (quantity !== bytesRead) {
-              return reject(new Error(
-                `Wrong number of bytes has been read. Sent ${quantity}, but eventually read ${bytesRead}`
-              ));
-            }
+    this.openedAddresses[index] = addressConnectionId;
 
-            // convert to Uint8Array
-            const uIntArr: Uint8Array = convertBufferToUint8Array(resultBuffer);
-
-            resolve(uIntArr);
-          };
-
-          i2cBus.i2cRead(addrHex, quantity, bufferToRead, callback);
-        });
-      },
-      write: async (addrHex: number, data: Uint8Array): Promise<void> => {
-        const buffer = Buffer.from(data);
-
-        return new Promise((resolve, reject) => {
-          const callback = (err: Error, bytesWritten: number) => {
-            if (err) return reject(err);
-
-            if (data && data.length !== bytesWritten) {
-              return reject(new Error(
-                `Wrong number of bytes has been written. Tried to write ${data.length}, but eventually written ${bytesWritten}`
-              ));
-            }
-
-            resolve();
-          };
-
-          i2cBus.i2cWrite(addrHex, buffer.length, buffer, callback);
-        });
-      },
-      destroy: () => callPromised(i2cBus.close.bind(i2cBus)),
-    };
+    return addressConnectionId;
   }
 
 }

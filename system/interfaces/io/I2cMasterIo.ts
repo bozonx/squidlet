@@ -31,10 +31,10 @@ export const defaultI2cParams: I2cParams = {
 export const Methods = [
   'configure',
   'destroy',
-  'newBus',
+  //'newBus',
+  'i2cWriteDevice',
+  'i2cReadDevice',
   'destroyBus',
-  'writeTo',
-  'readFrom',
 ];
 
 
@@ -43,16 +43,13 @@ export default interface I2cMasterIo extends IoItem {
   destroy(): Promise<void>;
 
   /**
-   * New bus instance
+   * Open a new bus or use previously instantiated one.
+   * @busNum - number or name of bus in config.
    */
-  newBus(busNum: number | undefined, paramsOverride: I2cParams): Promise<number>;
-
-  /**
-   * Destroy bus instance
-   */
-  destroyBus(portNum: number): Promise<void>;
-
+  //openBus(busNum: string | number): Promise<number>;
+  //isBusOpened(busInstanceId: number): Promise<boolean>;
   // TODO: можно ли чтобы data была undefined?
-  writeTo(busNum: number, addrHex: number, data: Uint8Array): Promise<void>;
-  readFrom(busNum: number, addrHex: number, quantity: number): Promise<Uint8Array>;
+  i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void>;
+  i2cReadDevice(busNum: string | number, addrHex: number, count: number): Promise<Uint8Array>;
+  destroyBus(busNum: string | number): Promise<void>;
 }
