@@ -33,20 +33,6 @@ export default class I2cMaster implements I2cMasterIo {
     this.client.init(clientOptions);
   }
 
-  // async openBus(busNum: string | number): Promise<number> {
-  //   // TODO: как это связать с настроящим busInstanceId ????
-  //   const busInstanceId: number = this.openedBuses.length;
-  //
-  //   this.openedBuses.push(busNum);
-  //
-  //   return busInstanceId;
-  // }
-
-  // async isBusOpened(busInstanceId: number): Promise<boolean> {
-  //   // TODO: check on the server side
-  //   return typeof this.openedBuses[busInstanceId] !== 'undefined';
-  // }
-
   async i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void> {
     const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
 

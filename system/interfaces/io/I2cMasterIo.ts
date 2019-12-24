@@ -1,9 +1,9 @@
 import IoItem from '../IoItem';
 
 
-export interface I2cParams {
+export interface I2cBusParams {
   // bus number on raspberry pi like hosts
-  bus?: string | number;
+  //bus?: string | number;
   // SDA pin on micro-controller
   pinSDA?: number;
   // SCL pin on micro-controller
@@ -13,7 +13,7 @@ export interface I2cParams {
 }
 
 export interface I2cDefinition {
-  buses: {[index: string]: I2cParams};
+  buses: {[index: string]: I2cBusParams};
 }
 
 // low level instance interface
@@ -24,14 +24,13 @@ export interface I2cMasterBusLike {
 }
 
 
-export const defaultI2cParams: I2cParams = {
+export const defaultI2cParams: I2cBusParams = {
   clockHz: 100000,
 };
 
 export const Methods = [
   'configure',
   'destroy',
-  //'newBus',
   'i2cWriteDevice',
   'i2cReadDevice',
   'destroyBus',
@@ -41,14 +40,6 @@ export const Methods = [
 export default interface I2cMasterIo extends IoItem {
   configure(newDefinition: I2cDefinition): Promise<void>;
   destroy(): Promise<void>;
-
-  /**
-   * Open a new bus or use previously instantiated one.
-   * @busNum - number or name of bus in config.
-   */
-  //openBus(busNum: string | number): Promise<number>;
-  //isBusOpened(busInstanceId: number): Promise<boolean>;
-  // TODO: можно ли чтобы data была undefined?
   i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void>;
   i2cReadDevice(busNum: string | number, addrHex: number, count: number): Promise<Uint8Array>;
   destroyBus(busNum: string | number): Promise<void>;
