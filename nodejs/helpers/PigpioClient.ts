@@ -5,6 +5,11 @@ import Logger from '../../system/interfaces/Logger';
 
 const pigpioClient = require('pigpio-client');
 
+const I2CO = 54;
+const I2CC = 55;
+const I2CRD = 56;
+const I2CWD = 57;
+
 
 interface Client {
   gpio(pin: number): any;
@@ -108,6 +113,25 @@ export class PigpioClient {
 
   getInstantiatedPinList(): string[] {
     return Object.keys(this.pinInstances);
+  }
+
+  /**
+   * Open i2c bus and returns busConnectionId
+   */
+  i2cOpen(bus: number, address: number): Promise<number> {
+
+  }
+
+  i2cClose(busConnectionId: number): Promise<void> {
+
+  }
+
+  i2cWriteDevice(busConnectionId: number) {
+
+  }
+
+  i2cReadDevice(busConnectionId: number, count: number) {
+
   }
 
 

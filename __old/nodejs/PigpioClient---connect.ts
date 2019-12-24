@@ -1,5 +1,5 @@
 import {callPromised} from '../../system/lib/common';
-import PigpioWrapper, {PigpioInfo, PigpioOptions} from './PigpioWrapper';
+import PigpioWrapper, {PigpioInfo, PigpioOptions} from '../../nodejs/helpers/PigpioWrapper';
 import Promised from '../../system/lib/Promised';
 import {compactUndefined} from '../../system/lib/arrays';
 import Logger from '../../system/interfaces/Logger';
