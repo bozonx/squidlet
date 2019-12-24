@@ -17,6 +17,7 @@ interface Client {
   on(eventName: string, cb: (...p: any[]) => void): void;
   once(eventName: string, cb: (...p: any[]) => void): void;
   removeListener(eventName: string, cb: (...p: any[]) => void): void;
+  request(command: number, ...p: any[]): Promise<any>;
 }
 
 const RECONNECT_TIMEOUT_SEC = 20;
@@ -119,19 +120,37 @@ export class PigpioClient {
    * Open i2c bus and returns busConnectionId
    */
   i2cOpen(bus: number, address: number): Promise<number> {
+    if (!this.client) {
+      throw new Error(`PigpioClient: Client hasn't been connected`);
+    }
 
+    const flags = new Uint8Array(4);
+
+    return this.client.request(I2CO, bus, address, 4, undefined, flags);
   }
 
   i2cClose(busConnectionId: number): Promise<void> {
+    if (!this.client) return Promise.resolve();
 
+    return this.client.request(I2CC, busConnectionId, 0, 0);
   }
 
-  i2cWriteDevice(busConnectionId: number) {
+  i2cWriteDevice(busConnectionId: number, data: Uint8Array) {
+    if (!this.client) {
+      throw new Error(`PigpioClient: Client hasn't been connected`);
+    }
 
+    return this.client.request(I2CWD, busConnectionId, 0, data.length, undefined, data);
   }
 
   i2cReadDevice(busConnectionId: number, count: number) {
+    if (!this.client) {
+      throw new Error(`PigpioClient: Client hasn't been connected`);
+    }
 
+    // TODO: check received data in cb
+
+    return this.client.request(I2CRD, busConnectionId, count, 0);
   }
 
 
