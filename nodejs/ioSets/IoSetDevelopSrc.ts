@@ -40,8 +40,8 @@ export default class IoSetDevelopSrc implements IoSet {
     const platformDir: string = resolvePlatformDir(this.envBuilder.configManager.platform);
     const machineConfig: MachineConfig = this.envBuilder.configManager.machineConfig;
 
-    for (let ioPath of machineConfig.ios) {
-      this.instantiateIo(ioPath, platformDir);
+    for (let ioName of Object.keys(machineConfig.ios)) {
+      this.instantiateIo(machineConfig.ios[ioName], platformDir);
     }
   }
 

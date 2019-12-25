@@ -2,18 +2,18 @@ import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
-  ios: [
-    './ios/Mqtt.ts',
-    './ios/Storage.ts',
-    './ios/WebSocketClient.ts',
-    './ios/WebSocketServer.ts',
-    './ios/Sys.ts',
-    './ios/HttpClient.ts',
-    './ios/HttpServer.ts',
+  ios: {
+    Mqtt: './ios/Mqtt.ts',
+    Storage: './ios/Storage.ts',
+    WebSocketClient: './ios/WebSocketClient.ts',
+    WebSocketServer: './ios/WebSocketServer.ts',
+    Sys: './ios/Sys.ts',
+    HttpClient: './ios/HttpClient.ts',
+    HttpServer: './ios/HttpServer.ts',
 
-    './ios/Digital.ts',
+    Digital: './ios/Digital.ts',
     //'./ios/Serial.ts',
-    './ios/I2cMaster.ts',
+    I2cMaster: './ios/I2cMaster.ts',
     //'I2cSlave',
     //'Pwm',
     //'Spi',
@@ -21,7 +21,7 @@ const machineConfig: MachineConfig = {
     //'Bluetooth',
     //'Adc',
     //'Dac',
-  ],
+  },
   // iosSupportFiles: [
   //   './ios/helpers.js',
   // ],
@@ -35,7 +35,7 @@ const machineConfig: MachineConfig = {
           }
         }
       },
-      Digital: {
+      PigpioClient: {
         host: 'localhost'
       },
     },

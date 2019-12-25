@@ -2,7 +2,7 @@ import PreHostConfig from './PreHostConfig';
 
 
 export default interface MachineConfig {
-  ios: string[];
+  ios: {[index: string]: string};
   //iosSupportFiles?: string[];
   hostConfig: PreHostConfig;
 }

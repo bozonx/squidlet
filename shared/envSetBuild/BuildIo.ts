@@ -70,10 +70,10 @@ export default class BuildIo {
     await this.os.mkdirP(usedIosDir, this.ownerOptions);
 
     // copy specified ios
-    for (let devPath of machineConfig.ios) {
-      const absFilePath: string = path.resolve(platformDir, devPath);
+    for (let ioName of Object.keys(machineConfig.ios)) {
+      const absFilePath: string = path.resolve(platformDir, machineConfig.ios[ioName]);
       const srcFile: string = await this.resolveFileTargetPath(absFilePath);
-      const dstFile: string = path.join(usedIosDir, path.basename(devPath));
+      const dstFile: string = path.join(usedIosDir, path.basename(machineConfig.ios[ioName]));
 
       await this.os.copyFile(srcFile, dstFile, this.ownerOptions);
     }
@@ -121,8 +121,8 @@ export default class BuildIo {
     const indexFilePath: string = path.join(this.iosBuildDir, IO_SET_INDEX_FILE);
     const ios: string[] = [];
 
-    for (let devPath of machineConfig.ios) {
-      const devName: string = getFileNameOfPath(devPath);
+    for (let ioName of Object.keys(machineConfig.ios)) {
+      const devName: string = getFileNameOfPath(machineConfig.ios[ioName]);
       const ioString = `${devName}: require("./${devName}").default`;
 
       ios.push(ioString);

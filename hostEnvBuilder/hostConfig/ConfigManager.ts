@@ -9,7 +9,6 @@ import normalizeHostConfig from './normalizeHostConfig';
 import {
   appendArray,
   loadMachineConfigInPlatformDir,
-  makeListOfNamesFromPaths,
   resolvePlatformDir
 } from '../../shared/helpers/helpers';
 import {IoDefinitions} from '../../system/interfaces/IoItem';
@@ -87,7 +86,7 @@ export default class ConfigManager {
 
 
   getMachineIos(): string[] {
-    return makeListOfNamesFromPaths(this.machineConfig.ios);
+    return Object.keys(this.machineConfig.ios);
   }
 
 

@@ -6,17 +6,16 @@ import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 
 
 export function prepareIoClassesString(
-  machineIosList: string[],
+  machineIos: {[index: string]: string},
   platformDir: string,
   tmpDir: string
 ): string {
   let exportsStr = '';
 
-  for (let ioPath of machineIosList) {
-    const ioName: string = getFileNameOfPath(ioPath);
+  for (let ioName of Object.keys(machineIos)) {
     const ioRelPath: string = path.relative(
       tmpDir,
-      path.resolve(platformDir, ioPath)
+      path.resolve(platformDir, machineIos[ioName])
     );
 
     exportsStr += makeExportString(ioName, ioRelPath);
