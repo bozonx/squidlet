@@ -11,6 +11,8 @@ const I2CC = 55;
 const I2CRD = 56;
 const I2CWD = 57;
 
+export const BAD_HANDLE_CODE = 'PI_BAD_HANDLE';
+
 
 interface Client {
   gpio(pin: number): any;
