@@ -2,45 +2,42 @@
  * It uses a pigpiod daemon via websocket.
  */
 
-import DigitalIo, {ChangeHandler} from '../../system/interfaces/io/DigitalIo';
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../system/interfaces/gpioTypes';
-import ThrottleCall from '../../system/lib/debounceCall/ThrottleCall';
-import DebounceCall from '../../system/lib/debounceCall/DebounceCall';
-import IndexedEventEmitter from '../../system/lib/IndexedEventEmitter';
-import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
-import PigpioPinWrapper, {PigpioOptions} from '../helpers/PigpioPinWrapper';
-
-
-// TODO: все выводы в log выводить в системный логгер (возможно через события)
+import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
+import DebounceCall from 'system/lib/debounceCall/DebounceCall';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import IoManager from 'system/managers/IoManager';
+import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
+import PigpioClient from './PigpioClient';
 
 
 export default class Digital implements DigitalIo {
-  private readonly client: PigpioClient;
+  private _client?: PigpioClient;
+  private _ioManager?: IoManager;
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
+  private get client(): PigpioClient {
+    return this._client as any;
+  }
 
-  constructor() {
-    this.client = instantiatePigpioClient({
-      info: console.info,
-      warn: console.warn,
-      error: console.error,
-      debug: console.log,
-    });
+  private get ioManager(): IoManager {
+    return this._ioManager as any;
+  }
+
+
+  async init(ioManager: IoManager): Promise<void> {
+    this._ioManager = ioManager;
+    this._client = ioManager.getIo<PigpioClient>('PigpioClient');
   }
 
   async destroy(): Promise<void> {
     this.debounceCall.destroy();
     this.throttleCall.destroy();
-    await this.client.destroy();
     this.events.destroy();
-  }
-
-  async init(clientOptions: PigpioOptions): Promise<void> {
-    // make init but don't wait while it has been finished
-    this.client.init(clientOptions);
   }
 
 
@@ -184,7 +181,7 @@ export default class Digital implements DigitalIo {
         this.events.emit(pin, level);
       }, debounce, pin)
         .catch((e) => {
-          console.error(e);
+          this.ioManager.log.error(e);
         });
 
       return;
@@ -194,7 +191,7 @@ export default class Digital implements DigitalIo {
     // TODO: handleEndOfDebounce will return a promise
     this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
       .catch((e) => {
-        console.error(e);
+        this.ioManager.log.error(e);
       });
   }
 
@@ -205,7 +202,7 @@ export default class Digital implements DigitalIo {
       realLevel = await this.simpleRead(pin);
     }
     catch (e) {
-      return console.error(e);
+      return this.ioManager.log.error(e);
     }
 
     this.events.emit(pin, realLevel);

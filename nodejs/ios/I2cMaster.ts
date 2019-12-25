@@ -1,5 +1,4 @@
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
-import instantiatePigpioClient, {PigpioClient} from '../helpers/PigpioClient';
 import {PigpioOptions} from '../helpers/PigpioPinWrapper';
 
 

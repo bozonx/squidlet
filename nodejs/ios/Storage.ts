@@ -6,8 +6,8 @@ import StorageIo, {StatsSimplified, ConfigParams} from 'system/interfaces/io/Sto
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {ENCODE} from 'system/lib/constants';
-import {trimCharEnd} from '../../system/lib/strings';
-import {PATH_SEP} from '../../system/lib/paths';
+import {trimCharEnd} from 'system/lib/strings';
+import {PATH_SEP} from 'system/lib/paths';
 
 
 let config: ConfigParams | undefined;
