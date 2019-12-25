@@ -70,7 +70,8 @@ export default interface SerialIo extends IoItem {
    * Pre define props of port.
    * These props will be used when the "newPort" method will be called.
    */
-  init(ioManager: IoManager, definition: SerialDefinition): Promise<void>;
+  init(ioManager: IoManager): Promise<void>;
+  configure(definition: SerialDefinition): Promise<void>;
   destroy(): Promise<void>;
   /**
    * Create a new port and wait while it opens.

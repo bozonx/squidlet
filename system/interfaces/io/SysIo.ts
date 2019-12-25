@@ -1,10 +1,10 @@
 import IoItem from '../IoItem';
 import SysInfo from '../SysInfo';
-import IoManager from '../../managers/IoManager';
 
 
 export const Methods = [
-  'restart',
+  'configure',
+  'exit',
   'reboot',
   'shutdown',
   'info',
@@ -16,7 +16,9 @@ export interface SysConfig {
 
 
 export default interface SysIo extends IoItem {
-  init(ioManager: IoManager, props: SysConfig): Promise<void>;
+  /**
+   * Setup props before init
+   */
   configure(props: SysConfig): Promise<void>;
 
   /**

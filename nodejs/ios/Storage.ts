@@ -16,7 +16,7 @@ let config: ConfigParams | undefined;
 export default class Storage implements StorageIo {
   //private readonly os = new Os();
 
-  async init(configParams: ConfigParams): Promise<void> {
+  async configure(configParams: ConfigParams): Promise<void> {
     // remove trailing slash if set
     const resolvedWorkDir: string | undefined = (configParams.workDir)
       ? trimCharEnd(configParams.workDir, PATH_SEP)

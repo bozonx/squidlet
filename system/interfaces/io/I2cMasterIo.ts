@@ -31,6 +31,7 @@ export const defaultI2cParams: I2cBusParams = {
 
 export const Methods = [
   'init',
+  'configure',
   'destroy',
   'i2cWriteDevice',
   'i2cReadDevice',
@@ -39,7 +40,8 @@ export const Methods = [
 
 
 export default interface I2cMasterIo extends IoItem {
-  init(ioManager: IoManager, definition: I2cDefinition): Promise<void>;
+  init(ioManager: IoManager): Promise<void>;
+  configure(definition: I2cDefinition): Promise<void>;
   destroy(): Promise<void>;
   i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void>;
   i2cReadDevice(busNum: string | number, addrHex: number, count: number): Promise<Uint8Array>;

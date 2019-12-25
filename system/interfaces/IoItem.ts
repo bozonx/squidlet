@@ -8,8 +8,15 @@ export interface IoDefinitions {
 
 export default interface IoItem {
   /**
-   * Initialize io Item. It isn't allowed to call it more than once.
+   * Initialize io Item at System initialization time. It isn't allowed to call it more than once.
    */
-  init?: (ioManager: IoManager, definition?: any) => Promise<void>;
+  init?: (ioManager: IoManager) => Promise<void>;
+
+  /**
+   * Setup props before init.
+   * It allowed to call it move once.
+   */
+  configure?: (definition?: any) => Promise<void>;
+
   destroy?: () => Promise<void>;
 }

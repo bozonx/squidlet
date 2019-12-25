@@ -2,15 +2,15 @@ import * as childProcess from 'child_process';
 import {ExecException} from 'child_process';
 
 import SysIo from 'system/interfaces/io/SysIo';
-import SysInfo from '../../system/interfaces/SysInfo';
-import {SysConfig} from '../../system/interfaces/io/SysIo';
+import SysInfo from 'system/interfaces/SysInfo';
+import {SysConfig} from 'system/interfaces/io/SysIo';
 
 
 let config: SysConfig | undefined;
 
 
 export default class Sys implements SysIo {
-  async init(configParams: SysConfig): Promise<void> {
+  async configure(configParams: SysConfig): Promise<void> {
     config = {
       ...config,
       ...configParams,

@@ -9,10 +9,10 @@ export interface WifiParams {
 
 
 export const Methods = [
-  'init',
+  'configure',
 ];
 
 
 export default interface WifiIo extends IoItem {
-  init(ioManager: IoManager, params: WifiParams): Promise<void>;
+  configure(params: WifiParams): Promise<void>;
 }
