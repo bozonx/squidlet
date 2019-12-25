@@ -1,4 +1,5 @@
 import IoItem from '../IoItem';
+import IoManager from '../../managers/IoManager';
 
 
 export interface StatsSimplified {
@@ -20,7 +21,7 @@ export interface ConfigParams {
 
 
 export const Methods = [
-  'configure',
+  'init',
   'appendFile',
   'mkdir',
   'readdir',
@@ -42,6 +43,7 @@ export const Methods = [
  * But actually it joins these paths with workDir and result will be like /workdir/envSet/...
  */
 export default interface StorageIo extends IoItem {
+  init(ioManager: IoManager, configParams: ConfigParams): Promise<void>;
   configure(configParams: ConfigParams): Promise<void>;
 
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void>;

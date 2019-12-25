@@ -1,4 +1,6 @@
 import IoItem from '../IoItem';
+import IoManager from '../../managers/IoManager';
+
 
 export interface WifiParams {
   ssid?: string;
@@ -7,10 +9,10 @@ export interface WifiParams {
 
 
 export const Methods = [
-  'configure',
+  'init',
 ];
 
 
 export default interface WifiIo extends IoItem {
-  configure(params: WifiParams): Promise<void>;
+  init(ioManager: IoManager, params: WifiParams): Promise<void>;
 }

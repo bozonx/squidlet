@@ -11,6 +11,7 @@ const machineConfig: MachineConfig = {
     HttpClient: './ios/HttpClient.ts',
     HttpServer: './ios/HttpServer.ts',
 
+    PigpioClient: './ios/PigpioClient.ts',
     Digital: './ios/Digital.ts',
     Serial: './ios/Serial.ts',
     I2cMaster: './ios/I2cMaster.ts',

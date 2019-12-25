@@ -10,7 +10,7 @@ let config: SysConfig | undefined;
 
 
 export default class Sys implements SysIo {
-  async configure(configParams: SysConfig): Promise<void> {
+  async init(configParams: SysConfig): Promise<void> {
     config = {
       ...config,
       ...configParams,

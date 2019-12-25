@@ -41,7 +41,7 @@ export default abstract class SerialIoBase {
   protected abstract convertIncomeBinaryData(data: any): Uint8Array;
 
 
-  async configure(newDefinition: SerialDefinition) {
+  async init(newDefinition: SerialDefinition) {
     preDefinedPortsParams = newDefinition.ports;
   }
 

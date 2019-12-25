@@ -169,14 +169,15 @@ export default class IoServer {
   }
 
   private async configureIoSet() {
-    const ioParams = await this.loadConfig<IoDefinitions>(
+    const ioDefinitions = await this.loadConfig<IoDefinitions>(
       systemConfig.fileNames.iosDefinitions
     );
 
-    for (let ioName of Object.keys(ioParams)) {
+    for (let ioName of Object.keys(this.ioSet.getNames())) {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      ioItem.configure && await ioItem.configure(ioParams[ioName]);
+      this.logDebug(`initialize io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
+      ioItem.init && await ioItem.init(ioDefinitions[ioName]);
     }
   }
 

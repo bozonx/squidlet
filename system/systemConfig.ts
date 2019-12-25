@@ -42,7 +42,7 @@ const systemConfig = {
     driversDefinitions: 'driversDefinitions.json',
     // definitions of services like {serviceId: ServiceDefinition}
     servicesDefinitions: 'servicesDefinitions.json',
-    // params which will be sent to dev.configure()
+    // params which will be sent to io.init()
     iosDefinitions: 'iosDefinitions.json',
   },
 };

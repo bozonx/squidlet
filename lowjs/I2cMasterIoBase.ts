@@ -15,7 +15,7 @@ export default abstract class I2cMasterIoBase {
   protected abstract createConnection(busNum: number, params: I2cParams): Promise<I2cMasterBusLike>;
 
 
-  async configure(newDefinition: I2cDefinition) {
+  async init(newDefinition: I2cDefinition) {
     preDefinedBusesParams = newDefinition.buses;
   }
 

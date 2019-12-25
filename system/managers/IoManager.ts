@@ -2,10 +2,15 @@ import IoSet from '../interfaces/IoSet';
 import IoItem, {IoDefinitions} from '../interfaces/IoItem';
 import Context from '../Context';
 import systemConfig from '../systemConfig';
+import Logger from '../interfaces/Logger';
 
 
 export default class IoManager {
   readonly ioSet: IoSet;
+
+  get log(): Logger {
+    return this.context.log;
+  }
 
   private readonly context: Context;
 
@@ -34,16 +39,16 @@ export default class IoManager {
       systemConfig.fileNames.iosDefinitions
     );
 
-    // configure ios that have a definition
-    for (let ioName of Object.keys(ioDefinitions)) {
+    // init ios that have a definition
+    for (let ioName of this.ioSet.getNames()) {
       // get io or throw an error
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
       // do nothing if it doesn't have a configure() method
-      if (!ioItem.configure) continue;
+      if (!ioItem.init) continue;
 
-      this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
-      await ioItem.configure(ioDefinitions[ioName]);
+      this.context.log.debug(`IoManager: initialize io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
+      await ioItem.init(this, ioDefinitions[ioName]);
     }
   }
 

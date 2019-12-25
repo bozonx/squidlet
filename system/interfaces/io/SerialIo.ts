@@ -1,4 +1,5 @@
 import IoItem from '../IoItem';
+import IoManager from '../../managers/IoManager';
 
 
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
@@ -43,7 +44,7 @@ export const defaultSerialParams: SerialParams = {
 };
 
 export const Methods = [
-  'configure',
+  'init',
   'newPort',
   'destroy',
   'destroyPort',
@@ -69,7 +70,7 @@ export default interface SerialIo extends IoItem {
    * Pre define props of port.
    * These props will be used when the "newPort" method will be called.
    */
-  configure(newDefinition: SerialDefinition): Promise<void>;
+  init(ioManager: IoManager, definition: SerialDefinition): Promise<void>;
   destroy(): Promise<void>;
   /**
    * Create a new port and wait while it opens.

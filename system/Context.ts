@@ -11,7 +11,6 @@ import DriverBase from './base/DriverBase';
 import ServiceBase from './base/ServiceBase';
 import systemConfig from './systemConfig';
 import {mergeDeepObjects} from './lib/objects';
-import PreHostConfig from '../hostEnvBuilder/interfaces/PreHostConfig';
 
 
 export default class Context {

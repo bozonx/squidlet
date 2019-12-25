@@ -28,7 +28,7 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
   // TODO: review
-  async configure(clientOptions: PigpioOptions): Promise<void> {
+  async init(clientOptions: PigpioOptions): Promise<void> {
     // make init but don't wait while it has been finished
     this.client.init(clientOptions);
   }

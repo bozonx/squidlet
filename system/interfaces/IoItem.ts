@@ -1,6 +1,6 @@
-/**
- * It's params which will pass to configure method on init time
- */
+import IoManager from '../managers/IoManager';
+
+
 export interface IoDefinitions {
   [index: string]: {[index: string]: any};
 }
@@ -8,10 +8,8 @@ export interface IoDefinitions {
 
 export default interface IoItem {
   /**
-   * Configure io Item.
-   * It can be called several times if app switches to ioServer and app and so on.
+   * Initialize io Item. It isn't allowed to call it more than once.
    */
-  configure?: (definition: any) => Promise<void>;
-  //init?: () => Promise<void>;
+  init?: (ioManager: IoManager, definition?: any) => Promise<void>;
   destroy?: () => Promise<void>;
 }
