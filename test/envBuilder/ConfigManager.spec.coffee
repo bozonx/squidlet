@@ -25,9 +25,9 @@ describe 'envBuilder.ConfigManager', ->
     }
     @machineConfig = {
       ios: ['./Storage.ts']
-      iosSupportFiles: [
-        './helper.js'
-      ]
+#      iosSupportFiles: [
+#        './helper.js'
+#      ]
       hostConfig: {
         config: {
           platformParam: 1
