@@ -34,7 +34,7 @@ let instance: PigpioClient | undefined;
 
 export default class PigpioClient implements IoItem {
   get inited(): boolean {
-    return this.hasBeenInited;
+    return Boolean(this._ioManager);
   }
 
   get connected(): boolean {
@@ -49,7 +49,6 @@ export default class PigpioClient implements IoItem {
   private clientOptions: PigpioOptions = DEFAULT_OPTIONS;
   private client?: Client;
   private connectionPromised = new Promised<void>();
-  private hasBeenInited: boolean = false;
   // timeout to wait between trying of connect
   private connectionTimeout?: NodeJS.Timeout;
   private readonly pinInstances: {[index: string]: PigpioPinWrapper} = {};
@@ -61,21 +60,17 @@ export default class PigpioClient implements IoItem {
 
   async init(ioManager: IoManager): Promise<void> {
     this._ioManager = ioManager;
+
+    this.connect();
   }
 
   async configure(clientOptions: PigpioOptions): Promise<void> {
-    if (this.inited) return;
-
     this.clientOptions = {
       ...this.clientOptions,
       ...clientOptions,
       // do not use timeout. Because client's reconnect works weirdly.
       timeout: 0,
     };
-
-    this.hasBeenInited = true;
-
-    this.connect();
   }
 
   async destroy(): Promise<void> {

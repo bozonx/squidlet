@@ -176,8 +176,15 @@ export default class IoServer {
     for (let ioName of Object.keys(this.ioSet.getNames())) {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      this.logDebug(`initialize io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
-      ioItem.init && await ioItem.init(ioDefinitions[ioName]);
+      if (ioItem.configure) {
+        this.logDebug(`configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
+        await ioItem.configure(ioDefinitions[ioName]);
+      }
+
+      if (ioItem.init) {
+        this.logDebug(`initialize io "${ioName}"`);
+        await ioItem.init(this);
+      }
     }
   }
 

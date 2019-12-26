@@ -44,11 +44,15 @@ export default class IoManager {
       // get io or throw an error
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      // do nothing if it doesn't have a configure() method
-      if (!ioItem.init) continue;
+      if (ioItem.configure) {
+        this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
+        await ioItem.configure(ioDefinitions[ioName]);
+      }
 
-      this.context.log.debug(`IoManager: initialize io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
-      await ioItem.init(this, ioDefinitions[ioName]);
+      if (ioItem.init) {
+        this.context.log.debug(`IoManager: initialize io "${ioName}"`);
+        await ioItem.init(this);
+      }
     }
   }
 

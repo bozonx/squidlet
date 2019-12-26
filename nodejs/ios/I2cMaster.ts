@@ -1,5 +1,7 @@
 import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
+import IoManager from 'system/managers/IoManager';
 import {PigpioOptions} from '../helpers/PigpioPinWrapper';
+import PigpioClient from './PigpioClient';
 
 
 /**
@@ -7,30 +9,36 @@ import {PigpioOptions} from '../helpers/PigpioPinWrapper';
  * It doesn't support setting clock. You should set it in your OS.
  */
 export default class I2cMaster implements I2cMasterIo {
-  private readonly client: PigpioClient;
+  private _client?: PigpioClient;
+  private _ioManager?: IoManager;
   // { `busNum-addressNum`: [ addressConnectionId ] }
   private openedAddresses: {[index: string]: number} = {};
 
-
-  constructor() {
-    this.client = instantiatePigpioClient({
-      info: console.info,
-      warn: console.warn,
-      error: console.error,
-      debug: console.log,
-    });
+  private get client(): PigpioClient {
+    return this._client as any;
   }
 
+  private get ioManager(): IoManager {
+    return this._ioManager as any;
+  }
+
+
+  async init(ioManager: IoManager): Promise<void> {
+    this._ioManager = ioManager;
+    this._client = ioManager.getIo<PigpioClient>('PigpioClient');
+  }
+
+  // TODO: review
+  async configure(clientOptions: PigpioOptions): Promise<void> {
+    // make init but don't wait while it has been finished
+    this.client.init(clientOptions);
+  }
 
   async destroy(): Promise<void> {
     await this.client.destroy();
   }
 
-  // TODO: review
-  async init(clientOptions: PigpioOptions): Promise<void> {
-    // make init but don't wait while it has been finished
-    this.client.init(clientOptions);
-  }
+
 
   async i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void> {
     const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
