@@ -1,7 +1,6 @@
-import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
+import I2cMasterIo, {I2cDefinition} from 'system/interfaces/io/I2cMasterIo';
 import IoManager from 'system/managers/IoManager';
-import {PigpioOptions} from '../helpers/PigpioPinWrapper';
-import PigpioClient from './PigpioClient';
+import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
 
 
 /**
@@ -10,50 +9,58 @@ import PigpioClient from './PigpioClient';
  */
 export default class I2cMaster implements I2cMasterIo {
   private _client?: PigpioClient;
-  private _ioManager?: IoManager;
-  // { `busNum-addressNum`: [ addressConnectionId ] }
+  private definition?: I2cDefinition;
+  // { `${busNum}${addressNum}`: addressConnectionId }
   private openedAddresses: {[index: string]: number} = {};
 
   private get client(): PigpioClient {
     return this._client as any;
   }
 
-  private get ioManager(): IoManager {
-    return this._ioManager as any;
-  }
-
 
   async init(ioManager: IoManager): Promise<void> {
-    this._ioManager = ioManager;
     this._client = ioManager.getIo<PigpioClient>('PigpioClient');
   }
 
-  // TODO: review
-  async configure(clientOptions: PigpioOptions): Promise<void> {
-    // make init but don't wait while it has been finished
-    this.client.init(clientOptions);
+
+  async configure(definition: I2cDefinition): Promise<void> {
+    this.definition = definition;
   }
 
   async destroy(): Promise<void> {
-    await this.client.destroy();
   }
-
 
 
   async i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void> {
     const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
 
-    // TODO: если произошка  ошибка err.code: 'PI_BAD_HANDLE' - то переконнектиться и повторить 1 раз
+    try {
+      await this.client.i2cWriteDevice(addressConnectionId, data);
+    }
+    catch (e) {
+      if (e.code === BAD_HANDLE_CODE) {
+        await this.handleBadHandle(busNum, addrHex);
+        await this.client.i2cWriteDevice(addressConnectionId, data);
+      }
 
-    return this.client.i2cWriteDevice(addressConnectionId, data);
+      throw e;
+    }
   }
 
   async i2cReadDevice(busNum: string | number, addrHex: number, count: number): Promise<Uint8Array> {
     const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
 
-    // TODO: если произошка  ошибка err.code: 'PI_BAD_HANDLE' - то переконнектиться и повторить 1 раз
+    try {
+      return await this.client.i2cReadDevice(addressConnectionId, count);
+    }
+    catch (e) {
+      if (e.code === BAD_HANDLE_CODE) {
+        await this.handleBadHandle(busNum, addrHex);
+        return await this.client.i2cReadDevice(addressConnectionId, count);
+      }
 
-    return this.client.i2cReadDevice(addressConnectionId, count);
+      throw e;
+    }
   }
 
   async destroyBus(busNum: string | number): Promise<void> {
@@ -67,7 +74,6 @@ export default class I2cMaster implements I2cMasterIo {
       delete this.openedAddresses[index];
     }
 
-
     try {
       await Promise.all(promises);
     }
@@ -77,16 +83,20 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
 
-  private async resolveAddressConnectionId(busNum: string | number, addrHex: number): Promise<number> {
-    if (typeof busNum !== 'number') {
-      throw new Error(`busNum has to be a number`);
-    }
+  private async handleBadHandle(busNum: string | number, addrHex: number) {
+    const index: string = `${busNum}${addrHex}`;
 
+    delete this.openedAddresses[index];
+
+    this.openedAddresses[index] = await this.client.i2cOpen(parseInt(busNum as any), addrHex);
+  }
+
+  private async resolveAddressConnectionId(busNum: string | number, addrHex: number): Promise<number> {
     const index: string = `${busNum}${addrHex}`;
 
     if (typeof this.openedAddresses[index] !== 'undefined') return this.openedAddresses[index];
-
-    const addressConnectionId: number = await this.client.i2cOpen(busNum, addrHex);
+    // open a new connection
+    const addressConnectionId: number = await this.client.i2cOpen(parseInt(busNum as any), addrHex);
 
     this.openedAddresses[index] = addressConnectionId;
 

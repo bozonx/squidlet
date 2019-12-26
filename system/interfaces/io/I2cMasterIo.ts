@@ -14,6 +14,7 @@ export interface I2cBusParams {
 }
 
 export interface I2cDefinition {
+  // bus params by bus num|name
   buses: {[index: string]: I2cBusParams};
 }
 
