@@ -6,18 +6,7 @@ ios:
   - I2cMaster
 
 props:
+  # name or number of i2c bus
   busNum:
-    type: number
+    type: number | string
     required: true
-  # bus number on raspberry pi like hosts
-  bus:
-    type: string | number
-  # SDA pin on micro-controller
-  pinSDA:
-    type: number
-  # SCL pin on micro-controller
-  pinSCL:
-    type: number
-  # bus frequency. Only micro-controllers are supported. Default is 100000
-  clockHz:
-    type: number

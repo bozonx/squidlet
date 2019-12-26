@@ -1,13 +1,12 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import I2cMasterIo, {I2cParams} from 'system/interfaces/io/I2cMasterIo';
+import I2cMasterIo, {I2cBusParams} from 'system/interfaces/io/I2cMasterIo';
 import { addFirstItemUint8Arr } from 'system/lib/binaryHelpers';
 import DriverBase from 'system/base/DriverBase';
 import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
-import {omitObj} from '../../../system/lib/objects';
 
 
-export interface I2cMasterProps extends I2cParams {
-  busNum: number;
+export interface I2cMasterProps extends I2cBusParams {
+  busNum: number | string;
 }
 
 
@@ -19,9 +18,6 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
 
   init = async () => {
     this.depsInstances.i2cMaster = this.context.getIo('I2cMaster');
-
-    // TODO: review
-    await this.i2cMasterIo.newBus(this.props.busNum, omitObj(this.props, 'busNum') as any);
   }
 
 
@@ -36,7 +32,7 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
     }
 
     // read from bus
-    const result = await this.i2cMasterIo.readFrom(this.props.busNum, addressHex, length);
+    const result: Uint8Array = await this.i2cMasterIo.i2cReadDevice(this.props.busNum, addressHex, length);
 
     this.log.debug(`I2cMaster driver read. busNum ${this.props.busNum}, addrHex: ${addressHex}, result: ${JSON.stringify(result)}`);
 
@@ -61,17 +57,15 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
       dataToWrite = addFirstItemUint8Arr(data, functionHex);
     }
 
-    // TODO: выяснить поддерживается ли запись без данных
-
     this.log.debug(`I2cMaster driver write. busNum ${this.props.busNum}, addrHex: ${addressHex}, data: ${JSON.stringify(dataToWrite)}`);
 
-    await this.i2cMasterIo.writeTo(this.props.busNum, addressHex, dataToWrite);
+    await this.i2cMasterIo.i2cWriteDevice(this.props.busNum, addressHex, dataToWrite);
   }
 
   /**
    * Write and read from the same data address.
    */
-  request = async(addressHex: number, functionHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> => {
+  transfer = async(addressHex: number, functionHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> => {
     await this.write(addressHex, functionHex, dataToSend);
 
     return this.read(addressHex, functionHex, readLength);
@@ -83,10 +77,4 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
 export default class Factory extends DriverFactoryBase<I2cMaster, I2cMasterProps> {
   protected SubDriverClass = I2cMaster;
   protected instanceId = (props: I2cMasterProps) => String(props.busNum);
-
-  // async getInstance(props: I2cMasterProps): Promise<I2cMaster> {
-  //   const resolvedProps = (typeof props.busNum === 'undefined') ? {} : { busNum: String(props.busNum) };
-  //
-  //   return super.getInstance(resolvedProps);
-  // }
 }
