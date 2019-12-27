@@ -24,7 +24,10 @@ export default class I2cMaster implements I2cMasterIo {
 
 
   async configure(definition: I2cDefinition): Promise<void> {
-    this.definition = definition;
+    this.definition = {
+      ...this.definition,
+      ...definition,
+    };
   }
 
   async destroy(): Promise<void> {
@@ -83,6 +86,9 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
 
+  /**
+   * Reconnect if handle doesn't exist (pigpiod has been restarted)
+   */
   private async handleBadHandle(busNum: string | number, addrHex: number) {
     const index: string = `${busNum}${addrHex}`;
 
@@ -91,6 +97,9 @@ export default class I2cMaster implements I2cMasterIo {
     this.openedAddresses[index] = await this.client.i2cOpen(parseInt(busNum as any), addrHex);
   }
 
+  /**
+   * Open a connection or return existent
+   */
   private async resolveAddressConnectionId(busNum: string | number, addrHex: number): Promise<number> {
     const index: string = `${busNum}${addrHex}`;
 
