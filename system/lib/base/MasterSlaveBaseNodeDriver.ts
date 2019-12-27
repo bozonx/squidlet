@@ -8,13 +8,15 @@ import {isEqual} from '../common';
 
 
 // type of feedback - polling or interruption
-//export type FeedbackType = 'poll' | 'int';
+export type FeedbackType = 'poll' | 'int';
 export type Handler = (functionStr: number | string | undefined, data: Uint8Array) => void;
 export type ErrorHandler = (functionStr: number | string | undefined, err: Error) => void;
 
 export interface PollProps {
+  // TODO: должен быть только number чтобы его можно было найти
   // function address e.g "5a" or "33" or 27. Undefined means do poll without specifying a data address
   function?: string | number;
+  // data length to read at poll
   dataLength?: number;
   interval?: number;
 }
@@ -23,10 +25,11 @@ export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
+  feedback?: FeedbackType;
   // TODO: why array ????
-  poll?: PollProps[];
-  // TODO: зачем нужно если можно определить тип по int и poll ????
-  //feedback?: FeedbackType;
+  // parameters of functions to poll or read
+  poll: PollProps[];
+  // TODO: does it need ?
   // Default poll interval. By default is 1000
   pollInterval: number;
 }
@@ -46,12 +49,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * * write() - write an empty
    * * write(undefined, data) - write only data
    */
-  abstract write(functionStr?: string | number, data?: Uint8Array): Promise<void>;
-  abstract read(functionStr?: string | number, length?: number): Promise<Uint8Array>;
-  abstract request(functionStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
+  abstract write(functionHex?: number, data?: Uint8Array): Promise<void>;
+  abstract read(functionHex?: number, length?: number): Promise<Uint8Array>;
+  abstract transfer(functionStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
   protected abstract doPoll(functionStr: string | number | undefined): Promise<Uint8Array>;
   protected abstract setupFeedback(): void;
 
+  // TODO: события объединить
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly pollErrorEvents = new IndexedEvents<ErrorHandler>();
   protected readonly polling: Polling = new Polling();
@@ -151,7 +155,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   /**
    * Poll all the defined polling to data addresses
    */
-  protected pollAllFunctionNumbers = async () => {
+  protected pollAllFunctions = async () => {
     for (let item of this.props.poll) {
       try {
         await this.doPoll(item.function);
@@ -182,6 +186,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
+  // TODO: review
   protected updateLastPollData(functionStr: number | string | undefined, data: Uint8Array) {
     const pollProps = this.getPollProps(functionStr);
     const resolvedDataAddr: string = this.resolvefunctionStr(functionStr);
@@ -210,6 +215,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * If functionStr is undefined then item with function = undefined will be found.
    */
   protected getPollProps(functionStr: string | number | undefined): PollProps | undefined {
+
+    // TODO: review
+
     return findObj<PollProps>(this.props.poll, (item: PollProps) => {
       return item.function === functionStr;
     });

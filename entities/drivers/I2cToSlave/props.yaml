@@ -10,8 +10,8 @@ int:
   type: object
 poll:
   type: object[]
-#feedback:
-#  type: '"poll" | "int"'
+feedback:
+  type: '"poll" | "int"'
 # default polling interval in ms
 pollInterval:
   type: number
