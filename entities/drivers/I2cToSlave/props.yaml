@@ -1,6 +1,5 @@
 busNum:
-  type: number
-  default: 0
+  type: number | string
 address:
   type: string | number
   required: true
@@ -11,8 +10,8 @@ int:
   type: object
 poll:
   type: object[]
-feedback:
-  type: '"poll" | "int"'
+#feedback:
+#  type: '"poll" | "int"'
 # default polling interval in ms
 pollInterval:
   type: number

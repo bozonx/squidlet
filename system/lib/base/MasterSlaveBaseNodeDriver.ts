@@ -2,14 +2,13 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
-//import {ImpulseInputProps} from '../drivers/Binary/ImpulseInput.driver';
 import {findObj} from '../objects';
 import {hexStringToHexNum} from '../binaryHelpers';
 import {isEqual} from '../common';
 
 
 // type of feedback - polling or interruption
-export type FeedbackType = 'poll' | 'int';
+//export type FeedbackType = 'poll' | 'int';
 export type Handler = (functionStr: number | string | undefined, data: Uint8Array) => void;
 export type ErrorHandler = (functionStr: number | string | undefined, err: Error) => void;
 
@@ -24,10 +23,10 @@ export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
-  // TODO: почему poll обязательный???
-  poll: PollProps[];
+  // TODO: why array ????
+  poll?: PollProps[];
   // TODO: зачем нужно если можно определить тип по int и poll ????
-  feedback?: FeedbackType;
+  //feedback?: FeedbackType;
   // Default poll interval. By default is 1000
   pollInterval: number;
 }

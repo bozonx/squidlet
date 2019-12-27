@@ -76,5 +76,6 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
 
 export default class Factory extends DriverFactoryBase<I2cMaster, I2cMasterProps> {
   protected SubDriverClass = I2cMaster;
-  protected instanceId = (props: I2cMasterProps) => String(props.busNum);
+  protected instanceId = (props: I2cMasterProps) =>
+    String((typeof props.busNum === 'undefined') ? -1 : props.busNum)
 }

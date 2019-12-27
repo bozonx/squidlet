@@ -9,4 +9,3 @@ props:
   # name or number of i2c bus
   busNum:
     type: number | string
-    required: true

@@ -179,6 +179,6 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 export default class Factory extends DriverFactoryBase<I2cToSlave, I2cToSlaveDriverProps> {
   protected SubDriverClass = I2cToSlave;
   protected instanceId = (props: I2cToSlaveDriverProps): string => {
-    return `${props.busNum}-${props.address}`;
+    return `${(typeof props.busNum === 'undefined') ? -1 : props.busNum}-${props.address}`;
   }
 }
