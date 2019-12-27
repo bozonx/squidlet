@@ -1,6 +1,7 @@
 import I2cMasterIo, {I2cDefinition} from 'system/interfaces/io/I2cMasterIo';
 import IoManager from 'system/managers/IoManager';
 import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
+import {isKindOfNumber} from '../../system/lib/common';
 
 
 /**
@@ -34,7 +35,11 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
 
-  async i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void> {
+  async i2cWriteDevice(
+    busNum: string | number | undefined,
+    addrHex: number,
+    data: Uint8Array
+  ): Promise<void> {
     const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
 
     try {
@@ -50,7 +55,11 @@ export default class I2cMaster implements I2cMasterIo {
     }
   }
 
-  async i2cReadDevice(busNum: string | number, addrHex: number, count: number): Promise<Uint8Array> {
+  async i2cReadDevice(
+    busNum: string | number | undefined,
+    addrHex: number,
+    count: number
+  ): Promise<Uint8Array> {
     const addressConnectionId: number = await this.resolveAddressConnectionId(busNum, addrHex);
 
     try {
@@ -89,27 +98,46 @@ export default class I2cMaster implements I2cMasterIo {
   /**
    * Reconnect if handle doesn't exist (pigpiod has been restarted)
    */
-  private async handleBadHandle(busNum: string | number, addrHex: number) {
-    const index: string = `${busNum}${addrHex}`;
+  private async handleBadHandle(busNum: string | number | undefined, addrHex: number) {
+    const resolvedBusNum: number = this.resolveBusNum(busNum);
+    const index: string = `${resolvedBusNum}${addrHex}`;
 
     delete this.openedAddresses[index];
 
-    this.openedAddresses[index] = await this.client.i2cOpen(parseInt(busNum as any), addrHex);
+    this.openedAddresses[index] = await this.client.i2cOpen(resolvedBusNum, addrHex);
   }
 
   /**
    * Open a connection or return existent
    */
-  private async resolveAddressConnectionId(busNum: string | number, addrHex: number): Promise<number> {
-    const index: string = `${busNum}${addrHex}`;
+  private async resolveAddressConnectionId(
+    busNum: string | number | undefined,
+    addrHex: number
+  ): Promise<number> {
+    const resolvedBusNum: number = this.resolveBusNum(busNum);
+    const index: string = `${resolvedBusNum}${addrHex}`;
 
     if (typeof this.openedAddresses[index] !== 'undefined') return this.openedAddresses[index];
     // open a new connection
-    const addressConnectionId: number = await this.client.i2cOpen(parseInt(busNum as any), addrHex);
+    const addressConnectionId: number = await this.client.i2cOpen(resolvedBusNum, addrHex);
 
     this.openedAddresses[index] = addressConnectionId;
 
     return addressConnectionId;
+  }
+
+  private resolveBusNum(specifiedBusNum: string | number | undefined): number {
+    if (typeof specifiedBusNum === 'undefined') {
+      if (!this.definition) throw new Error(`No definition`);
+      if (typeof this.definition.defaultBus === 'undefined') throw new Error(`No defaultBus`);
+
+      return parseInt(this.definition.defaultBus as any);
+    }
+    else {
+      if (!isKindOfNumber(specifiedBusNum)) throw new Error(`busNum has to be a number`);
+
+      return parseInt(specifiedBusNum as any);
+    }
   }
 
 }

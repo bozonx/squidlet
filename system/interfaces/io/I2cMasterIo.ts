@@ -16,6 +16,8 @@ export interface I2cBusParams {
 export interface I2cDefinition {
   // bus params by bus num|name
   buses: {[index: string]: I2cBusParams};
+  // Bus num which is set if bus isn't specified in methods props
+  defaultBus?: string | number;
 }
 
 // low level instance interface

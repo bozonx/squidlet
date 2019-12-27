@@ -27,11 +27,7 @@ const machineConfig: MachineConfig = {
   hostConfig: {
     ios: {
       I2cMaster: {
-        buses: {
-          0: {
-            bus: 1,
-          }
-        }
+        defaultBus: 1,
       },
       PigpioClient: {
         host: 'localhost'
