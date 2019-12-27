@@ -10,7 +10,7 @@ import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
 export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
   busNum: number;
   // it can be i2c address as a string like '5a' or number equivalent - 90
-  address: string | number;
+  address: string;
 }
 
 
@@ -55,7 +55,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     await this.sender.send<void>(senderId, this.i2cMaster.write, this.addressHex, functionHex, data);
   }
 
-  async read(functionHex?: string | number, length?: number): Promise<Uint8Array> {
+  async read(functionHex?: number, length?: number): Promise<Uint8Array> {
     //const functionHex: number | undefined = this.makeFunctionHex(functionHex);
     const resolvedLength: number = this.resolveReadLength(functionHex, length);
     const senderId = this.makeSenderId(functionHex, 'read', resolvedLength);
@@ -77,7 +77,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
    * Write and read from the same data address.
    */
   async transfer(
-    functionHex?: string | number,
+    functionHex?: number,
     dataToSend?: Uint8Array,
     readLength?: number
   ): Promise<Uint8Array> {
@@ -102,7 +102,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   /**
    * Read data once and rise an data event
    */
-  protected async doPoll(functionHex?: string | number): Promise<Uint8Array> {
+  protected async doPoll(functionHex?: number): Promise<Uint8Array> {
     //const functionHex: number | undefined = this.makeFunctionHex(functionHex);
     const resolvedLength: number = this.resolveReadLength(functionHex);
     const senderId = this.makeSenderId(functionHex, 'doPoll');
@@ -130,15 +130,16 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       }
 
       this.impulseInput.onChange(this.pollAllFunctions);
+
+      return;
     }
     // start polling if feedback is poll
     this.startPolls();
-
     // else don't use feedback at all
   }
 
 
-  private resolveReadLength(functionHex?: string | number, readLength?: number): number {
+  private resolveReadLength(functionHex?: number, readLength?: number): number {
     if (typeof readLength !== 'undefined') {
       return readLength;
     }
@@ -155,11 +156,12 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return pollProps.dataLength;
   }
 
-  // TODO: review
-  private makeSenderId(functionHex: string | number | undefined, method: string, ...params: (string | number)[]) {
-    const resolvedDataAddr: string = this.resolvefunctionHex(functionHex);
+  private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
+    const resolvedDataAddr: string = this.resolvefunctionStr(functionHex);
 
-    return [this.props.busNum, this.props.address, resolvedDataAddr, method, ...params].join();
+    const busNum = (typeof this.props.busNum === 'undefined') ? -1 : this.props.busNum;
+
+    return [busNum, this.props.address, resolvedDataAddr, method, ...params].join();
   }
 
 

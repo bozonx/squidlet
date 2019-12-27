@@ -34,36 +34,33 @@ export interface MasterSlaveBaseProps {
   pollInterval: number;
 }
 
-export const UNDEFINED_DATA_ADDRESS = 'default';
+export const UNDEFINED_DATA_ADDRESS = '!';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
-
-  // TODO: почему называется functionStr ????
-
-
   /**
    * Write data to slave.
-   * * write(functionStr, data) - write data to data address
-   * * write(functionStr) - write just 1 byte - data address
+   * * write(functionHex, data) - write data to data address
+   * * write(functionHex) - write just 1 byte - data address
    * * write() - write an empty
    * * write(undefined, data) - write only data
    */
   abstract write(functionHex?: number, data?: Uint8Array): Promise<void>;
   abstract read(functionHex?: number, length?: number): Promise<Uint8Array>;
-  abstract transfer(functionStr?: string | number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
-  protected abstract doPoll(functionStr: string | number | undefined): Promise<Uint8Array>;
+  abstract transfer(functionHex?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
+  protected abstract doPoll(functionHex?: number): Promise<Uint8Array>;
   protected abstract setupFeedback(): void;
 
   // TODO: события объединить
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly pollErrorEvents = new IndexedEvents<ErrorHandler>();
   protected readonly polling: Polling = new Polling();
+  protected readonly sender: Sender = this.newSender();
 
+  // TODO: does it really need???
   // last received data by polling by function number
   // it needs to decide to rise change event or not
   private pollLastData: {[index: string]: Uint8Array} = {};
-  protected readonly sender: Sender = this.newSender();
 
 
   // TODO: reivew
@@ -89,6 +86,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // destroy = () => {
   // }
 
+  // TODO: review
   /**
    * Start feedback manually.
    * It will do the first poll and then start listening for int or do poll according props.
@@ -100,16 +98,19 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
+  // TODO: review
   getLastData(functionStr: string | number | undefined): Uint8Array | undefined {
     const resolvedDataAddr: string = this.resolvefunctionStr(functionStr);
 
     return this.pollLastData[resolvedDataAddr];
   }
 
+  // TODO: review
   hasFeedback(): boolean {
     return Boolean(this.props.int || this.props.poll);
   }
 
+  // TODO: review
   /**
    * Poll once immediately. And restart current poll if it was specified.
    * Data address and length you have to specify in poll prop.
@@ -130,6 +131,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
+  // TODO: review
   /**
    * Listen to data which received by polling or interruption.
    */
@@ -152,6 +154,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollErrorEvents.removeListener(handlerIndex);
   }
 
+  // TODO: review
   /**
    * Poll all the defined polling to data addresses
    */
@@ -168,6 +171,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
+  // TODO: review
   protected startPolls() {
     if (this.props.feedback !== 'poll') return;
 
@@ -176,6 +180,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
+  // TODO: review
   protected stopPollings() {
     if (this.props.feedback !== 'poll') return;
 
@@ -204,6 +209,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollEvents.emit(resolvedDataAddr, data);
   }
 
+  // TODO: review
   protected makeFunctionHex(functionStr: string | number | undefined): number | undefined {
     if (typeof functionStr === 'undefined') return;
 
@@ -214,22 +220,24 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Find poll props line {function, length, interval}
    * If functionStr is undefined then item with function = undefined will be found.
    */
-  protected getPollProps(functionStr: string | number | undefined): PollProps | undefined {
+  protected getPollProps(functionStr?: number): PollProps | undefined {
 
     // TODO: review
+    // TODO: нужно заранее преобразовать номера ф-й в hex
 
     return findObj<PollProps>(this.props.poll, (item: PollProps) => {
       return item.function === functionStr;
     });
   }
 
-  protected resolvefunctionStr(functionStr: number | string | undefined): string {
-    if (typeof functionStr === 'undefined') return UNDEFINED_DATA_ADDRESS;
+  protected resolvefunctionStr(functionHex?: number): string {
+    if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
 
-    return String(functionStr);
+    return functionHex.toString(16);
   }
 
 
+  // TODO: review
   private startPollingOnFunctionNumber(functionStr: number | string | undefined) {
     const pollProps: PollProps | undefined = this.getPollProps(functionStr);
 
