@@ -1,8 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import {omitObj} from 'system/lib/objects';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
-
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps, PollProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
 import {I2cMaster} from '../I2cMaster/I2cMaster';
 import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
 
@@ -144,7 +143,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       return readLength;
     }
 
-    const pollProps = this.getPollProps(functionHex);
+    const pollProps: PollProps | undefined = this.getPollProps(functionHex);
 
     if (!pollProps) {
       throw new Error(`Can't find poll props of dataAddress "${functionHex}"`);

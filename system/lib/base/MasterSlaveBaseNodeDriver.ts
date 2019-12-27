@@ -9,13 +9,14 @@ import {isEqual} from '../common';
 
 // type of feedback - polling or interruption
 export type FeedbackType = 'poll' | 'int';
-export type Handler = (functionStr: number | string | undefined, data: Uint8Array) => void;
-export type ErrorHandler = (functionStr: number | string | undefined, err: Error) => void;
+export type Handler = (functionHex: number | undefined, data: Uint8Array) => void;
+// TODO: review
+export type ErrorHandler = (functionHex: number | undefined, err: Error) => void;
 
 export interface PollProps {
   // TODO: должен быть только number чтобы его можно было найти
   // function address e.g "5a" or "33" or 27. Undefined means do poll without specifying a data address
-  function?: string | number;
+  //function?: string | number;
   // data length to read at poll
   dataLength?: number;
   interval?: number;
@@ -26,15 +27,14 @@ export interface MasterSlaveBaseProps {
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
   feedback?: FeedbackType;
-  // TODO: why array ????
-  // parameters of functions to poll or read
-  poll: PollProps[];
+  // parameters of functions to poll or read like { '0x5c': { dataLength: 1 } }
+  poll: {[index: string]: PollProps};
   // TODO: does it need ?
   // Default poll interval. By default is 1000
   pollInterval: number;
 }
 
-export const UNDEFINED_DATA_ADDRESS = '!';
+const UNDEFINED_DATA_ADDRESS = '!';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
@@ -224,6 +224,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
     // TODO: review
     // TODO: нужно заранее преобразовать номера ф-й в hex
+    // TODO: найти тот объект где functionStr = undefined
 
     return findObj<PollProps>(this.props.poll, (item: PollProps) => {
       return item.function === functionStr;
