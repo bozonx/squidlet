@@ -40,8 +40,8 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
         'address',
         'int',
         'poll',
-        //'feedback',
-        'pollInterval'
+        'feedback',
+        'defaultPollIntervalMs'
       )
     );
 
@@ -166,7 +166,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
   private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
-    const resolvedDataAddr: string = this.resolveFunctionStr(functionHex);
+    const resolvedDataAddr: string = this.functionHexToStr(functionHex);
 
     const busNum = (typeof this.props.busNum === 'undefined') ? -1 : this.props.busNum;
 

@@ -3,6 +3,8 @@ import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
 import {hexStringToHexNum, isEqualUint8Array} from '../binaryHelpers';
+import Context from '../../Context';
+import EntityDefinition from '../../interfaces/EntityDefinition';
 
 
 // type of feedback - polling or interruption
@@ -19,13 +21,12 @@ export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
-  feedback?: FeedbackType;
   // TODO: rename to readProps etc or functionRead or just functions
   // parameters of functions to poll or read like { '0x5c': { dataLength: 1 } }
   poll: {[index: string]: PollProps};
-  // TODO: does it need ?
+  feedback?: FeedbackType;
   // Default poll interval. By default is 1000
-  pollInterval: number;
+  defaultPollIntervalMs: number;
 }
 
 export const UNDEFINED_DATA_ADDRESS = '*';
@@ -59,6 +60,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // it needs to decide to rise change event or not
   private pollLastData: {[index: string]: Uint8Array} = {};
 
+
+  constructor(context: Context, definition: EntityDefinition) {
+    super(context, definition);
+  }
 
   async init() {
     // listen to errors which happen on polling
@@ -141,7 +146,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       const functionHex: number | undefined = this.functionStrToHex(functionStr);
       const pollProps: PollProps = this.props.poll[functionStr];
       const pollInterval: number = (typeof pollProps.interval === 'undefined')
-        ? this.props.pollInterval
+        ? this.props.defaultPollIntervalMs
         : pollProps.interval;
 
       this.polling.start(() => this.doPoll(functionHex), pollInterval, functionStr);

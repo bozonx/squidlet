@@ -14,7 +14,7 @@ const config: HostConfigConfig = {
   // default params for connections
   // connections: {
   //   i2c: {
-  //     pollInterval: 100,
+  //     defaultPollIntervalMs: 100,
   //   }
   // },
   // network: {

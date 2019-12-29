@@ -10,7 +10,7 @@ analogPinsCount:
   required: true
 
 # I2cNode driver (i2c, serial, etc)
-pollInterval:
+defaultPollIntervalMs:
   default: 100
 
 ### Connection params

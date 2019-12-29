@@ -23,4 +23,4 @@ props:
   # int: {}
   # poll: {}
   # feedback: {}
-  # pollInterval: {}
+  # defaultPollIntervalMs: {}

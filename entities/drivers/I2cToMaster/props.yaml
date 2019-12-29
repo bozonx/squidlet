@@ -13,6 +13,6 @@ poll:
 feedback:
   type: '"poll" | "int"'
 # default polling interval in ms
-pollInterval:
+defaultPollIntervalMs:
   type: number
   default: 1000
