@@ -10,8 +10,7 @@ import {isEqual} from '../common';
 // type of feedback - polling or interruption
 export type FeedbackType = 'poll' | 'int';
 export type Handler = (functionHex: number | undefined, data: Uint8Array) => void;
-// TODO: review
-export type ErrorHandler = (functionHex: number | undefined, err: Error) => void;
+//export type ErrorHandler = (functionHex: number | undefined, err: Error) => void;
 
 export interface PollProps {
   // TODO: должен быть только number чтобы его можно было найти
@@ -65,7 +64,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   // TODO: does it really need???
   // last received data by polling by function number
   // it needs to decide to rise change event or not
-  private pollLastData: {[index: string]: Uint8Array} = {};
+  //private pollLastData: {[index: string]: Uint8Array} = {};
 
 
   async init() {
@@ -90,7 +89,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     return Boolean(this.props.feedback);
   }
 
-  // TODO: review
   /**
    * Poll once immediately. And restart current poll if it was specified.
    * Data address and length you have to specify in poll prop.
@@ -104,14 +102,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       );
     }
 
-    for (let item of this.props.poll) {
-      const resolvedDataAddr: string = this.resolveFunctionStr(item.function);
-
-      await this.polling.restart(resolvedDataAddr);
+    // TODO: why not use pollAllFunctions ????
+    // read all the read functions
+    for (let functionStr of Object.keys(this.props.poll)) {
+      // TODO: why use polling - if feedback int - maybe not to use it - just request
+      await this.polling.restart(functionStr);
     }
   }
 
-  // TODO: review
   /**
    * Listen to data which received by polling or interruption.
    */
@@ -128,35 +126,30 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Poll all the defined polling to data addresses
    */
   protected pollAllFunctions = async () => {
-    for (let item of this.props.poll) {
+    for (let functionStr of Object.keys(this.props.poll)) {
       try {
-        await this.doPoll(item.function);
+        await this.doPoll(functionStr);
       }
       catch (err) {
-        const resolvedFunctionStr: string = this.resolveFunctionStr(item.function);
-
-        this.log.error(`Error occur on functionNum ${resolvedFunctionStr}, ${err}`);
+        this.log.error(`Error occur on functionNum ${functionStr}, ${err}`);
       }
     }
   }
 
   // TODO: review
-  protected startPolls() {
+  protected startPollIntervals() {
     if (this.props.feedback !== 'poll') return;
 
-    for (let item of this.props.poll) {
-      this.startPollingOnFunctionNumber(item.function);
+    for (let functionStr of Object.keys(this.props.poll)) {
+      this.startPollingOnFunctionNumber(functionStr);
     }
   }
 
-  // TODO: review
-  protected stopPollings() {
+  protected stopPollIntervals() {
     if (this.props.feedback !== 'poll') return;
 
-    for (let item of this.props.poll) {
-      const resolvedDataAddr: string = this.resolveFunctionStr(item.function);
-
-      this.polling.stop(resolvedDataAddr);
+    for (let functionStr of Object.keys(this.props.poll)) {
+      this.polling.stop(functionStr);
     }
   }
 
@@ -208,7 +201,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 
   // TODO: review
-  private startPollingOnFunctionNumber(functionStr: number | string | undefined) {
+  private startPollingOnFunctionNumber(functionStr: string) {
     const pollProps: PollProps | undefined = this.getPollProps(functionStr);
 
     if (!pollProps) {

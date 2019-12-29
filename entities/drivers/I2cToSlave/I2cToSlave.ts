@@ -101,11 +101,11 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
   // TODO: review
-  setupFeedback(): void {
+  startFeedback(): void {
     if (this.props.feedback === 'int') {
       if (!this.impulseInput) {
         throw new Error(
-          `MasterSlaveBaseNodeDriver.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
+          `MasterSlaveBaseNodeDriver.startFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
         );
       }
 
@@ -114,12 +114,19 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       return;
     }
     // start polling if feedback is poll
-    this.startPolls();
+    this.startPollIntervals();
     // else don't use feedback at all
   }
 
+  stopFeedBack() {
+    if (this.props.feedback === 'int') {
+      // TODO: remove listener
+    }
 
-  // TODO: why not public ???
+    this.stopPollIntervals();
+  }
+
+
   /**
    * Read data once and rise an data event
    */
