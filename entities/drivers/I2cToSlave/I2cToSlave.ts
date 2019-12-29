@@ -154,6 +154,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       return readLength;
     }
 
+    // TODO: review
     const pollProps: PollProps | undefined = this.getPollProps(functionHex);
 
     if (!pollProps) {

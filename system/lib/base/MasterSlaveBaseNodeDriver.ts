@@ -2,9 +2,6 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
-import {findObj} from '../objects';
-import {hexStringToHexNum} from '../binaryHelpers';
-import {isEqual} from '../common';
 
 
 // type of feedback - polling or interruption
@@ -34,7 +31,7 @@ export interface MasterSlaveBaseProps {
   pollInterval: number;
 }
 
-const UNDEFINED_DATA_ADDRESS = '*';
+export const UNDEFINED_DATA_ADDRESS = '*';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
@@ -55,7 +52,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    */
   startFeedback?(): void;
 
-  protected abstract doPoll(functionHex?: number): Promise<Uint8Array>;
+  protected abstract doPoll(functionStr: string): Promise<Uint8Array>;
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly polling: Polling = new Polling();
@@ -136,12 +133,19 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
-  // TODO: review
+  /**
+   * Start poll intervals if feedback is poll.
+   */
   protected startPollIntervals() {
     if (this.props.feedback !== 'poll') return;
 
     for (let functionStr of Object.keys(this.props.poll)) {
-      this.startPollingOnFunctionNumber(functionStr);
+      const pollProps: PollProps = this.props.poll[functionStr];
+      const pollInterval: number = (typeof pollProps.interval === 'undefined')
+        ? this.props.pollInterval
+        : pollProps.interval;
+
+      this.polling.start(() => this.doPoll(functionStr), pollInterval, functionStr);
     }
   }
 
@@ -153,77 +157,52 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
-  // TODO: review
-  protected updateLastPollData(functionStr: number | string | undefined, data: Uint8Array) {
-    const pollProps = this.getPollProps(functionStr);
-    const resolvedDataAddr: string = this.resolveFunctionStr(functionStr);
-
-    // do nothing if it isn't polling data address
-    if (typeof functionStr === 'undefined' || !pollProps) return;
-
-    // TODO: don't use isEqual
-    // if data is equal to previous data - do nothing
-    if (isEqual(this.pollLastData[resolvedDataAddr], data)) return;
-
-    // save data
-    this.pollLastData[resolvedDataAddr] = data;
-    // finally rise an event
-    this.pollEvents.emit(resolvedDataAddr, data);
-  }
-
-  // TODO: review
-  protected makeFunctionHex(functionStr: string | number | undefined): number | undefined {
-    if (typeof functionStr === 'undefined') return;
-
-    return hexStringToHexNum(functionStr);
-  }
-
-  /**
-   * Find poll props line {function, length, interval}
-   * If functionStr is undefined then item with function = undefined will be found.
-   */
-  protected getPollProps(functionStr?: number): PollProps | undefined {
-
-    // TODO: review
-    // TODO: нужно заранее преобразовать номера ф-й в hex
-    // TODO: найти тот объект где functionStr = undefined
-
-    return findObj<PollProps>(this.props.poll, (item: PollProps) => {
-      return item.function === functionStr;
-    });
-  }
-
-  protected resolveFunctionStr(functionHex?: number): string {
-    if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
-
-    return functionHex.toString(16);
-  }
-
-
-  // TODO: review
-  private startPollingOnFunctionNumber(functionStr: string) {
-    const pollProps: PollProps | undefined = this.getPollProps(functionStr);
-
-    if (!pollProps) {
-      throw new Error(`MasterSlaveBaseNodeDriver.startPolling: Can't find poll props of data address "${functionStr}"`);
-    }
-
-    const pollInterval: number = (typeof pollProps.interval === 'undefined')
-      ? this.props.pollInterval
-      : pollProps.interval;
-    const resolvedDataAddr: string = this.resolveFunctionStr(functionStr);
-
-    // TODO: может выполнять pollAllFunctionNumbers? тогда не получится указать pollInterval на каждый полинг
-
-    this.polling.start(
-      () => this.doPoll(functionStr),
-      pollInterval,
-      resolvedDataAddr
-    );
-  }
-
 }
 
+
+// protected makeFunctionHex(functionStr: string | number | undefined): number | undefined {
+//   if (typeof functionStr === 'undefined') return;
+//
+//   return hexStringToHexNum(functionStr);
+// }
+
+// protected updateLastPollData(functionStr: number | string | undefined, data: Uint8Array) {
+//   const pollProps = this.getPollProps(functionStr);
+//   const resolvedDataAddr: string = this.resolveFunctionStr(functionStr);
+//
+//   // do nothing if it isn't polling data address
+//   if (typeof functionStr === 'undefined' || !pollProps) return;
+//
+//   // TODO: don't use isEqual
+//   // if data is equal to previous data - do nothing
+//   if (isEqual(this.pollLastData[resolvedDataAddr], data)) return;
+//
+//   // save data
+//   this.pollLastData[resolvedDataAddr] = data;
+//   // finally rise an event
+//   this.pollEvents.emit(resolvedDataAddr, data);
+// }
+
+// protected resolveFunctionStr(functionHex?: number): string {
+//   if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
+//
+//   return functionHex.toString(16);
+// }
+
+// /**
+//  * Find poll props line {function, length, interval}
+//  * If functionStr is undefined then item with function = undefined will be found.
+//  */
+// protected getPollProps(functionStr?: number): PollProps | undefined {
+//
+//   // TODO: review
+//   // TODO: нужно заранее преобразовать номера ф-й в hex
+//   // TODO: найти тот объект где functionStr = undefined
+//
+//   return findObj<PollProps>(this.props.poll, (item: PollProps) => {
+//     return item.function === functionStr;
+//   });
+// }
 
 // TODO: review - наверное лучше запускать вручную
 // protected appDidInit = async () => {
