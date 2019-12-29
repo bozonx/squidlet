@@ -2,7 +2,7 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
-import {hexStringToHexNum, isEqualUint8Array, toHexString} from '../binaryHelpers';
+import {hexStringToHexNum, isEqualUint8Array, normalizeHexString} from '../binaryHelpers';
 import Context from '../../Context';
 import EntityDefinition from '../../interfaces/EntityDefinition';
 
@@ -21,7 +21,6 @@ export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
-  // TODO: rename to readProps etc or functionRead or just functions
   // parameters of functions to poll or read like { '0x5c': { dataLength: 1 } }
   poll: {[index: string]: PollProps};
   feedback?: FeedbackType;
@@ -33,6 +32,9 @@ export const UNDEFINED_DATA_ADDRESS = '*';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
+  /**
+   * Normalize functions address string.
+   */
   static transformDefinition(definition: EntityDefinition): EntityDefinition {
     const poll: {[index: string]: PollProps} = {};
 
@@ -43,7 +45,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         continue;
       }
 
-      poll[toHexString(index)] = definition.props.poll[index];
+      poll[normalizeHexString(index)] = definition.props.poll[index];
     }
 
     return {
@@ -66,12 +68,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   abstract write(functionHex?: number, data?: Uint8Array): Promise<void>;
   abstract read(functionHex?: number, length?: number): Promise<Uint8Array>;
   abstract transfer(functionHex?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
-
-  /**
-   * Start feedback manually.
-   * It will do the first poll and then start listening for int or do poll according props.
-   */
-  startFeedback?(): void;
 
   protected abstract doPoll(functionHex?: number): Promise<Uint8Array>;
 
@@ -116,19 +112,33 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * It rejects promise on error
    */
   async pollOnce(): Promise<void> {
-    if (!this.props.feedback) {
+    if (this.props.feedback === 'int') {
+      this.pollAllFunctions();
+    }
+    else if (this.props.feedback === 'poll') {
+      // restart polling - it will make a new request and restart interval
+      for (let functionStr of Object.keys(this.props.poll)) {
+        await this.polling.restart(functionStr);
+      }
+    }
+    else {
       throw new Error(
         `MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured. `
         + `Props are "${JSON.stringify(this.props)}"`
       );
     }
 
-    // TODO: why not use pollAllFunctions ????
-    // read all the read functions
-    for (let functionStr of Object.keys(this.props.poll)) {
-      // TODO: why use polling - if feedback int - maybe not to use it - just request
-      await this.polling.restart(functionStr);
-    }
+  }
+
+  /**
+   * Start feedback manually.
+   * It will do the first poll and then start listening for int or do poll according props.
+   * Override this method to start "int" listening.
+   */
+  startFeedback(): void {
+    // start polling if feedback is poll
+    this.startPollIntervals();
+    // else don't use feedback at all
   }
 
   /**
@@ -142,9 +152,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollEvents.removeListener(handlerIndex);
   }
 
-  // TODO: review
+
   /**
-   * Poll all the defined polling to data addresses
+   * Poll all the defined polling to data addresses by turns and don't stop on errors.
    */
   protected pollAllFunctions = async () => {
     for (let functionStr of Object.keys(this.props.poll)) {
@@ -217,44 +227,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 }
 
 
-
-
-
-// /**
-//  * Find poll props line {function, length, interval}
-//  * If functionStr is undefined then item with function = undefined will be found.
-//  */
-// protected getPollProps(functionStr?: number): PollProps | undefined {
-//
-//   // TODO: review
-//   // TODO: нужно заранее преобразовать номера ф-й в hex
-//   // TODO: найти тот объект где functionStr = undefined
-//
-//   return findObj<PollProps>(this.props.poll, (item: PollProps) => {
-//     return item.function === functionStr;
-//   });
-// }
-
-// TODO: review - наверное лучше запускать вручную
-// protected appDidInit = async () => {
-//   // start polling or int listeners after app is initialized
-//   this.setupFeedback();
-// }
-
-// TODO: review
 // getLastData(functionStr: string | number | undefined): Uint8Array | undefined {
 //   const resolvedDataAddr: string = this.resolveFunctionStr(functionStr);
 //
 //   return this.pollLastData[resolvedDataAddr];
-// }
-
-// /**
-//  * Listen to errors which take place while polling or interruption is in progress
-//  */
-// addPollErrorListener(handler: ErrorHandler): number {
-//   return this.pollErrorEvents.addListener(handler);
-// }
-//
-// removePollErrorListener(handlerIndex: number): void {
-//   this.pollErrorEvents.removeListener(handlerIndex);
 // }

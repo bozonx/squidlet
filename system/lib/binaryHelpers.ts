@@ -122,23 +122,18 @@ export function hexStringToHexNum(hexString: string | number | undefined): numbe
 
 // TODO: test
 /**
- * Normalize hex value
- * * undefined => ''
- * * 47 => '0x2f'
+ * Normalize hex string value
  * * "2f" => '0x2f'
  * * "0x2f" => '0x2f'
  */
-export function normalizeHexString(value?: string | number): string {
-  if (typeof value === 'undefined') {
-    return '';
+export function normalizeHexString(value: string): string {
+  if (!value) {
+    throw new Error(`Value isn't defined`);
   }
-  else if (typeof value === 'number') {
-    return value.toString(16);
-  }
-  // strings
+
   const toNum: number = parseInt(value, 16);
 
-  if (Number.isNaN(toNum)) throw new Error(`Value not number`);
+  if (Number.isNaN(toNum)) throw new Error(`Value is not number`);
 
   return toNum.toString(16);
 }

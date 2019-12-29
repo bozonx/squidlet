@@ -98,7 +98,6 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return result;
   }
 
-  // TODO: review
   startFeedback(): void {
     if (this.props.feedback === 'int') {
       if (!this.impulseInput) {
@@ -111,9 +110,8 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
       return;
     }
-    // start polling if feedback is poll
-    this.startPollIntervals();
-    // else don't use feedback at all
+
+    super.startFeedback();
   }
 
   stopFeedBack() {

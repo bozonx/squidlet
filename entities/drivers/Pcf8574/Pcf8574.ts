@@ -64,10 +64,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
       'I2cToSlave',
       {
         ...omitObj(this.props, 'writeBufferMs'),
-        // TODO: review
-        poll: [
-          {length: DATA_LENGTH}
-        ],
+        poll: {
+          '*': { dataLength: DATA_LENGTH },
+        },
       }
     );
 
@@ -304,11 +303,6 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private startFeedback() {
     // if I2C driver doesn't have feedback then it doesn't need to be setup
     if (!this.i2cDriver.hasFeedback()) return;
-
-    // TODO: review - почему бы это не сделать в самом i2cDriver ?
-    this.i2cDriver.addPollErrorListener((functionStr: number | string | undefined, err: Error) => {
-      this.log.error(String(err));
-    });
 
     this.i2cDriver.addListener(this.handleIcStateChange);
     // make first request and start handle feedback
