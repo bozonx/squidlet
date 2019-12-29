@@ -2,7 +2,7 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
-import {hexStringToHexNum, isEqualUint8Array} from '../binaryHelpers';
+import {hexStringToHexNum, isEqualUint8Array, toHexString} from '../binaryHelpers';
 import Context from '../../Context';
 import EntityDefinition from '../../interfaces/EntityDefinition';
 
@@ -33,6 +33,29 @@ export const UNDEFINED_DATA_ADDRESS = '*';
 
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
+  static transformDefinition(definition: EntityDefinition): EntityDefinition {
+    const poll: {[index: string]: PollProps} = {};
+
+    for (let index of Object.keys(definition.props.poll)) {
+      if (index === UNDEFINED_DATA_ADDRESS) {
+        poll[index] = definition.props.poll[index];
+
+        continue;
+      }
+
+      poll[toHexString(index)] = definition.props.poll[index];
+    }
+
+    return {
+      ...definition,
+      props: {
+        ...definition.props,
+        poll,
+      }
+    };
+  }
+
+
   /**
    * Write data to slave.
    * * write(functionHex, data) - write data to data address
@@ -62,7 +85,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 
   constructor(context: Context, definition: EntityDefinition) {
-    super(context, definition);
+    super(context, MasterSlaveBaseNodeDriver.transformDefinition(definition));
   }
 
   async init() {
@@ -183,7 +206,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   /**
-   * Convert like 47 => "2c"
+   * Convert like 47 => "2f"
    */
   protected functionHexToStr(functionHex?: number): string {
     if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;

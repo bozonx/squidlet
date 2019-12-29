@@ -120,6 +120,29 @@ export function hexStringToHexNum(hexString: string | number | undefined): numbe
   return parseInt(String(hexString), 16);
 }
 
+// TODO: test
+/**
+ * Normalize hex value
+ * * undefined => ''
+ * * 47 => '0x2f'
+ * * "2f" => '0x2f'
+ * * "0x2f" => '0x2f'
+ */
+export function normalizeHexString(value?: string | number): string {
+  if (typeof value === 'undefined') {
+    return '';
+  }
+  else if (typeof value === 'number') {
+    return value.toString(16);
+  }
+  // strings
+  const toNum: number = parseInt(value, 16);
+
+  if (Number.isNaN(toNum)) throw new Error(`Value not number`);
+
+  return toNum.toString(16);
+}
+
 /**
  * Converts byte as a number (255) to binary string "11111111", (4 > "00000100").
  * Number are always 8.
