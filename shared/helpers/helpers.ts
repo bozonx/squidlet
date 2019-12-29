@@ -56,14 +56,6 @@ export function loadMachineConfigInPlatformDir(os: Os, platformDir: string, mach
   return os.require(machineConfigPath).default;
 }
 
-/**
- * Make list of io names from list of io paths.
- * E.g ['/path/to/file1.ts', '/path/file2'] -> ['file1', 'file2']
- */
-export function makeListOfNamesFromPaths(paths: string[]): string[] {
-  return paths.map((item) => getFileNameOfPath(item));
-}
-
 
 // TODO: test
 
@@ -111,6 +103,14 @@ export async function makeFileCheckSum(filePath: string, sumFilePath: string) {
 
   await callPromised(fs.writeFile, sumFilePath, sum, ENCODE);
 }
+
+// /**
+//  * Make list of io names from list of io paths.
+//  * E.g ['/path/to/file1.ts', '/path/file2'] -> ['file1', 'file2']
+//  */
+// export function makeListOfNamesFromPaths(paths: string[]): string[] {
+//   return paths.map((item) => getFileNameOfPath(item));
+// }
 
 // export function loadMachineConfig(platform: Platforms, machine: string): MachineConfig {
 //   const platformDir: string = resolvePlatformDir(platform);

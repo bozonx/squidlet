@@ -1,6 +1,5 @@
 import * as path from 'path';
 import PluginEnv from '../hostEnvBuilder/entities/PluginEnv';
-import {makeListOfNamesFromPaths} from '../shared/helpers/helpers';
 
 const systemEntitiesRoot = '../entities';
 const devicesRoot = path.resolve(__dirname, systemEntitiesRoot, 'devices');
@@ -55,7 +54,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
 
   // add used on host drivers related on ios
   env.afterRegistering(async () => {
-    const machineIos: string[] = makeListOfNamesFromPaths(env.getMachineConfig().ios);
+    const machineIos: string[] = Object.keys(env.getMachineConfig().ios);
 
     // TODO: review
 

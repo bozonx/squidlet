@@ -76,11 +76,11 @@ describe 'shared.helpers', ->
     assert.equal(helpers.resolveMachineByOsAndArch('Raspbian', 'arm'), 'rpi')
     assert.throws(() => helpers.resolveMachineByOsAndArch('Raspbian', 'unknown'))
 
-  it "makeListOfNamesFromPaths", ->
-    assert.deepEqual(
-      helpers.makeListOfNamesFromPaths(['/path/to/file1.ts', '/path/file2']),
-      ['file1', 'file2']
-    )
+#  it "makeListOfNamesFromPaths", ->
+#    assert.deepEqual(
+#      helpers.makeListOfNamesFromPaths(['/path/to/file1.ts', '/path/file2']),
+#      ['file1', 'file2']
+#    )
 
 #  it "runCmd", ->
 #    os = {
