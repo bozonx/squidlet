@@ -15,6 +15,7 @@ export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
 
 export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps> {
   private impulseInput?: ImpulseInput;
+  private impulseHandlerIndex?: number;
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
 
@@ -50,14 +51,12 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
 
   async write(functionHex?: number, data?: Uint8Array): Promise<void> {
-    //const functionHex: number | undefined = this.makeFunctionHex(functionHex);
     const senderId = this.makeSenderId(functionHex, 'write');
 
     await this.sender.send<void>(senderId, this.i2cMaster.write, this.addressHex, functionHex, data);
   }
 
   async read(functionHex?: number, length?: number): Promise<Uint8Array> {
-    //const functionHex: number | undefined = this.makeFunctionHex(functionHex);
     const resolvedLength: number = this.resolveReadLength(functionHex, length);
     const senderId = this.makeSenderId(functionHex, 'read', resolvedLength);
     // send data and wait
@@ -108,7 +107,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
         );
       }
 
-      this.impulseInput.onChange(this.pollAllFunctions);
+      this.impulseHandlerIndex = this.impulseInput.onChange(this.pollAllFunctions);
 
       return;
     }
@@ -119,7 +118,9 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
   stopFeedBack() {
     if (this.props.feedback === 'int') {
-      // TODO: remove listener
+      if (!this.impulseHandlerIndex) return;
+
+      this.impulseInput && this.impulseInput.removeListener(this.impulseHandlerIndex);
     }
 
     this.stopPollIntervals();
@@ -152,8 +153,8 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       return readLength;
     }
 
-    // TODO: review
-    const pollProps: PollProps | undefined = this.getPollProps(functionHex);
+    const functionStr: string = this.functionHexToStr(functionHex);
+    const pollProps: PollProps | undefined = this.props.poll[functionStr];
 
     if (!pollProps) {
       throw new Error(`Can't find poll props of dataAddress "${functionHex}"`);
@@ -172,14 +173,6 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
     return [busNum, this.props.address, resolvedDataAddr, method, ...params].join();
   }
-
-
-  // protected validateProps = (props: I2cToSlaveDriverProps): string | undefined => {
-  //
-  //   // TODO; validate poll props
-  //
-  //   return;
-  // }
 
 }
 

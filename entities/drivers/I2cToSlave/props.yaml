@@ -9,7 +9,7 @@ address:
 int:
   type: object
 poll:
-  type: object[]
+  type: object
 feedback:
   type: '"poll" | "int"'
 # default polling interval in ms
