@@ -24,6 +24,8 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
 
   init = async () => {
+    super.init();
+
     if (this.props.int) {
       this.impulseInput = await this.context.getSubDriver<ImpulseInput>(
         'ImpulseInput',
@@ -98,6 +100,26 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return result;
   }
 
+  // TODO: review
+  setupFeedback(): void {
+    if (this.props.feedback === 'int') {
+      if (!this.impulseInput) {
+        throw new Error(
+          `MasterSlaveBaseNodeDriver.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
+        );
+      }
+
+      this.impulseInput.onChange(this.pollAllFunctions);
+
+      return;
+    }
+    // start polling if feedback is poll
+    this.startPolls();
+    // else don't use feedback at all
+  }
+
+
+  // TODO: why not public ???
   /**
    * Read data once and rise an data event
    */
@@ -119,24 +141,6 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return data;
   }
 
-  // TODO: review
-  protected setupFeedback(): void {
-    if (this.props.feedback === 'int') {
-      if (!this.impulseInput) {
-        throw new Error(
-          `MasterSlaveBaseNodeDriver.setupFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
-        );
-      }
-
-      this.impulseInput.onChange(this.pollAllFunctions);
-
-      return;
-    }
-    // start polling if feedback is poll
-    this.startPolls();
-    // else don't use feedback at all
-  }
-
 
   private resolveReadLength(functionHex?: number, readLength?: number): number {
     if (typeof readLength !== 'undefined') {
@@ -156,7 +160,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
   private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
-    const resolvedDataAddr: string = this.resolvefunctionStr(functionHex);
+    const resolvedDataAddr: string = this.resolveFunctionStr(functionHex);
 
     const busNum = (typeof this.props.busNum === 'undefined') ? -1 : this.props.busNum;
 

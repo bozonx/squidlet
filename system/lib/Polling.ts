@@ -25,8 +25,12 @@ export default class Polling {
   //private pollIntervalTimerId: number = NO_INTERVAL;
   private readonly currentPolls: {[index: string]: CurrentPoll} = {};
 
-  constructor() {
+
+  destroy() {
+    this.events.destroy();
+    // TODO: add
   }
+
 
   isInProgress(uniqId: string | undefined): boolean {
     const id = this.resolveId(uniqId);
