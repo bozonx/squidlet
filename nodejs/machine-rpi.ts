@@ -13,7 +13,7 @@ const machineConfig: MachineConfig = {
 
     PigpioClient: './ios/PigpioClient.ts',
     Digital: './ios/Digital.ts',
-    Serial: './ios/Serial.ts',
+    //Serial: './ios/Serial.ts',
     I2cMaster: './ios/I2cMaster.ts',
     //'Pwm',
     //'Spi',

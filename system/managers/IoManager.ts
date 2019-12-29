@@ -44,7 +44,7 @@ export default class IoManager {
       // get io or throw an error
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      if (ioItem.configure) {
+      if (ioItem.configure && ioDefinitions[ioName]) {
         this.context.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
         await ioItem.configure(ioDefinitions[ioName]);
       }
