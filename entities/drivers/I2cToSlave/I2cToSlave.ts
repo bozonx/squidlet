@@ -69,7 +69,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       resolvedLength
     );
 
-    this.updateLastPollData(functionHex, result);
+    this.handlePoll(functionStr, result);
 
     return result;
   }
@@ -95,7 +95,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       resolvedLength
     );
 
-    this.updateLastPollData(functionHex, result);
+    this.handlePoll(functionStr, result);
 
     return result;
   }
@@ -143,7 +143,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       resolvedLength
     );
 
-    this.updateLastPollData(functionHex, data);
+    this.handlePoll(functionStr, data);
 
     return data;
   }

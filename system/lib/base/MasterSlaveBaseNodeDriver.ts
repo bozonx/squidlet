@@ -2,6 +2,7 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
+import {hexStringToHexNum, isEqualUint8Array} from '../binaryHelpers';
 
 
 // type of feedback - polling or interruption
@@ -58,10 +59,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected readonly polling: Polling = new Polling();
   protected readonly sender: Sender = this.newSender();
 
-  // TODO: does it really need???
-  // last received data by polling by function number
+  // last received data by polling by function number.
   // it needs to decide to rise change event or not
-  //private pollLastData: {[index: string]: Uint8Array} = {};
+  private pollLastData: {[index: string]: Uint8Array} = {};
 
 
   async init() {
@@ -157,37 +157,38 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
+  protected handlePoll(functionStr: string, incomeData: Uint8Array) {
+    const functionHex: number = this.functionStrToHex(functionStr);
+
+    // do nothing if it isn't polling data address
+    if (typeof functionHex === 'undefined' || !this.props.poll[functionStr]) return;
+
+    // if data is equal to previous data - do nothing
+    if (isEqualUint8Array(this.pollLastData[functionStr], incomeData)) return;
+
+    // save data
+    this.pollLastData[functionStr] = incomeData;
+    // finally rise an event
+    this.pollEvents.emit(functionHex, incomeData);
+  }
+
+  protected functionStrToHex(functionStr: string): number | undefined {
+    if (functionStr === UNDEFINED_DATA_ADDRESS) return;
+
+    return hexStringToHexNum(functionStr);
+  }
+
+  protected functionHexToStr(functionHex?: number): string {
+    if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
+
+    return functionHex.toString(16);
+  }
+
 }
 
 
-// protected makeFunctionHex(functionStr: string | number | undefined): number | undefined {
-//   if (typeof functionStr === 'undefined') return;
-//
-//   return hexStringToHexNum(functionStr);
-// }
 
-// protected updateLastPollData(functionStr: number | string | undefined, data: Uint8Array) {
-//   const pollProps = this.getPollProps(functionStr);
-//   const resolvedDataAddr: string = this.resolveFunctionStr(functionStr);
-//
-//   // do nothing if it isn't polling data address
-//   if (typeof functionStr === 'undefined' || !pollProps) return;
-//
-//   // TODO: don't use isEqual
-//   // if data is equal to previous data - do nothing
-//   if (isEqual(this.pollLastData[resolvedDataAddr], data)) return;
-//
-//   // save data
-//   this.pollLastData[resolvedDataAddr] = data;
-//   // finally rise an event
-//   this.pollEvents.emit(resolvedDataAddr, data);
-// }
 
-// protected resolveFunctionStr(functionHex?: number): string {
-//   if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
-//
-//   return functionHex.toString(16);
-// }
 
 // /**
 //  * Find poll props line {function, length, interval}
