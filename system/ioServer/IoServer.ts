@@ -10,14 +10,14 @@ import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
 
 import IoServerConnection from './IoServerConnection';
 import IoServerHttpApi from './IoServerHttpApi';
+import IoContext from '../interfaces/IoContext';
+import Logger from '../interfaces/Logger';
 
 
 export default class IoServer {
   private readonly ioSet: IoSet;
   private _hostConfig?: HostConfig;
-  private readonly logDebug: (msg: string) => void;
-  private readonly logInfo: (msg: string) => void;
-  private readonly logError: (msg: string) => void;
+  private readonly log: Logger;
   private _wsServer?: WsServerLogic;
   private ioConnection?: IoServerConnection;
   private httpApi?: IoServerHttpApi;
@@ -31,34 +31,26 @@ export default class IoServer {
   }
 
 
-  constructor(
-    // initialized ioSet
-    ioSet: IoSet,
-    logDebug: (msg: string) => void,
-    logInfo: (msg: string) => void,
-    logError: (msg: string) => void
-  ) {
+  constructor(ioSet: IoSet, logger: Logger) {
     this.ioSet = ioSet;
-    this.logDebug = logDebug;
-    this.logInfo = logInfo;
-    this.logError = logError;
+    this.log = logger;
   }
 
   async start() {
     this._hostConfig = await this.loadConfig<HostConfig>(systemConfig.fileNames.hostConfig);
 
-    this.logInfo('--> Configuring Io');
+    this.log.info('--> Configuring Io');
     await this.configureIoSet();
 
-    this.logInfo('--> Initializing websocket and http servers');
+    this.log.info('--> Initializing websocket and http servers');
     await this.startHttpApi();
     await this.initWsIoServer();
 
-    this.logInfo('===> IoServer initialization has been finished');
+    this.log.info('===> IoServer initialization has been finished');
   }
 
   destroy = async () => {
-    this.logInfo('... destroying IoServer');
+    this.log.info('... destroying IoServer');
     this.httpApi && await this.httpApi.init();
     this.ioConnection && await this.ioConnection.destroy();
     await this.wsServer.destroy();
@@ -71,7 +63,7 @@ export default class IoServer {
     if (this.ioConnection) {
       const msg = `Only one connection is allowed`;
 
-      this.logError(msg);
+      this.log.error(msg);
       await this.wsServer.closeConnection(connectionId, 1, msg);
 
       return;
@@ -82,8 +74,8 @@ export default class IoServer {
       this.ioSet,
       this.hostConfig,
       this.wsServer.send,
-      this.logDebug,
-      this.logError
+      this.log.debug,
+      this.log.error
     );
 
     // stop IoServer's http api server to not to busy the port
@@ -93,7 +85,7 @@ export default class IoServer {
 
     this.ioConnection.setReadyState();
 
-    this.logInfo(`New IO client has been connected`);
+    this.log.info(`New IO client has been connected`);
   }
 
   private handleIoClientCloseConnection = async () => {
@@ -101,8 +93,8 @@ export default class IoServer {
 
     delete this.ioConnection;
 
-    this.logInfo(`IO client has been disconnected`);
-    this.logInfo(`Starting own http api`);
+    this.log.info(`IO client has been disconnected`);
+    this.log.info(`Starting own http api`);
     await this.startHttpApi();
   }
 
@@ -110,9 +102,9 @@ export default class IoServer {
     this.httpApi = new IoServerHttpApi(
       this.ioSet,
       this.hostConfig,
-      this.logDebug,
-      this.logInfo,
-      this.logError
+      this.log.debug,
+      this.log.info,
+      this.log.error
     );
 
     await this.httpApi.init();
@@ -142,29 +134,29 @@ export default class IoServer {
     this._wsServer = new WsServerLogic(
       wsServerIo,
       props,
-      () => this.logError(`Websocket server has been closed`),
-      this.logDebug,
-      this.logInfo,
-      this.logError,
+      () => this.log.error(`Websocket server has been closed`),
+      this.log.debug,
+      this.log.info,
+      this.log.error,
     );
 
     await this.wsServer.init();
 
     this.wsServer.onMessage((connectionId: string, data: string | Uint8Array) => {
       if (!this.ioConnection) {
-        return this.logError(`IoServer.onMessage: no ioConnection`);
+        return this.log.error(`IoServer.onMessage: no ioConnection`);
       }
 
       this.ioConnection.incomeMessage(connectionId, data)
-        .catch(this.logError);
+        .catch(this.log.error);
     });
     this.wsServer.onConnection((connectionId: string) => {
       this.handleNewIoClientConnection(connectionId)
-        .catch(this.logError);
+        .catch(this.log.error);
     });
     this.wsServer.onConnectionClose(() => {
       this.handleIoClientCloseConnection()
-        .catch(this.logError);
+        .catch(this.log.error);
     });
   }
 
@@ -172,20 +164,33 @@ export default class IoServer {
     const ioDefinitions = await this.loadConfig<IoDefinitions>(
       systemConfig.fileNames.iosDefinitions
     );
+    const ioContext: IoContext = this.makeIoContext();
 
     for (let ioName of Object.keys(this.ioSet.getNames())) {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
       if (ioItem.configure) {
-        this.logDebug(`configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
+        this.log.debug(`configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
         await ioItem.configure(ioDefinitions[ioName]);
       }
 
       if (ioItem.init) {
-        this.logDebug(`initialize io "${ioName}"`);
-        await ioItem.init(this);
+        this.log.debug(`initialize io "${ioName}"`);
+        await ioItem.init(ioContext);
       }
     }
+  }
+
+  private makeIoContext(): IoContext {
+    return {
+      log: this.log,
+      getIo: <T extends IoItem>(ioName: string): T => {
+        return this.ioSet.getIo<T>(ioName);
+      },
+      getNames: (): string[] => {
+        return this.ioSet.getNames();
+      }
+    };
   }
 
 }

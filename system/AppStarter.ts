@@ -92,12 +92,7 @@ export default class AppStarter {
   }
 
   private startIoServer = async () => {
-    this.ioServer = new IoServer(
-      this.ioSet,
-      this.logger.debug,
-      this.logger.info,
-      this.logger.error
-    );
+    this.ioServer = new IoServer( this.ioSet, this.logger );
 
     await this.ioServer.start();
   }
