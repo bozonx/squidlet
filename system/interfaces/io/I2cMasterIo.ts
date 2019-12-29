@@ -1,5 +1,5 @@
 import IoItem from '../IoItem';
-import IoManager from '../../managers/IoManager';
+import IoContext from '../IoContext';
 
 
 export interface I2cBusParams {
@@ -43,7 +43,7 @@ export const Methods = [
 
 
 export default interface I2cMasterIo extends IoItem {
-  init(ioManager: IoManager): Promise<void>;
+  init(ioContext: IoContext): Promise<void>;
   configure(definition: I2cDefinition): Promise<void>;
   destroy(): Promise<void>;
   i2cWriteDevice(busNum: string | number, addrHex: number, data: Uint8Array): Promise<void>;

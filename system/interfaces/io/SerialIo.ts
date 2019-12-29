@@ -1,5 +1,5 @@
 import IoItem from '../IoItem';
-import IoManager from '../../managers/IoManager';
+import IoContext from '../IoContext';
 
 
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
@@ -70,7 +70,7 @@ export default interface SerialIo extends IoItem {
    * Pre define props of port.
    * These props will be used when the "newPort" method will be called.
    */
-  init(ioManager: IoManager): Promise<void>;
+  init(ioManager: IoContext): Promise<void>;
   configure(definition: SerialDefinition): Promise<void>;
   destroy(): Promise<void>;
   /**

@@ -1,7 +1,7 @@
 import I2cMasterIo, {I2cDefinition} from 'system/interfaces/io/I2cMasterIo';
-import IoManager from 'system/managers/IoManager';
+import {isKindOfNumber} from 'system/lib/common';
+import IoContext from 'system/interfaces/IoContext';
 import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
-import {isKindOfNumber} from '../../system/lib/common';
 
 
 /**
@@ -19,8 +19,8 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
 
-  async init(ioManager: IoManager): Promise<void> {
-    this._client = ioManager.getIo<PigpioClient>('PigpioClient');
+  async init(ioContext: IoContext): Promise<void> {
+    this._client = ioContext.getIo<PigpioClient>('PigpioClient');
   }
 
 

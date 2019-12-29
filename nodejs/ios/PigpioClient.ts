@@ -4,7 +4,7 @@ const pigpioClient = require('pigpio-client');
 import IoItem from 'system/interfaces/IoItem';
 import Promised from 'system/lib/Promised';
 import {compactUndefined} from 'system/lib/arrays';
-import IoManager from 'system/managers/IoManager';
+import IoContext from 'system/interfaces/IoContext';
 import PigpioPinWrapper, {PigpioInfo, PigpioOptions} from '../helpers/PigpioPinWrapper';
 
 
@@ -34,7 +34,7 @@ let instance: PigpioClient | undefined;
 
 export default class PigpioClient implements IoItem {
   get inited(): boolean {
-    return Boolean(this._ioManager);
+    return Boolean(this._ioContext);
   }
 
   get connected(): boolean {
@@ -45,7 +45,7 @@ export default class PigpioClient implements IoItem {
     return this.connectionPromised.promise;
   }
 
-  private _ioManager?: IoManager;
+  private _ioContext?: IoContext;
   private clientOptions: PigpioOptions = DEFAULT_OPTIONS;
   private client?: Client;
   private connectionPromised = new Promised<void>();
@@ -53,13 +53,13 @@ export default class PigpioClient implements IoItem {
   private connectionTimeout?: NodeJS.Timeout;
   private readonly pinInstances: {[index: string]: PigpioPinWrapper} = {};
 
-  private get ioManager(): IoManager {
-    return this._ioManager as any;
+  private get ioContext(): IoContext {
+    return this._ioContext as any;
   }
 
 
-  async init(ioManager: IoManager): Promise<void> {
-    this._ioManager = ioManager;
+  async init(ioContext: IoContext): Promise<void> {
+    this._ioContext = ioContext;
 
     this.connect();
   }
@@ -189,11 +189,11 @@ export default class PigpioClient implements IoItem {
   private handleConnected = (info: PigpioInfo): void => {
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
 
-    this.ioManager.log.info(
+    this.ioContext.log.info(
       `PigpioClient has been connected successfully to the pigpio daemon ` +
       `${info.host}:${info.port}, pigpioVersion: ${info.pigpioVersion}`
     );
-    this.ioManager.log.debug(`PigpioClient connection info: ${JSON.stringify(info)}`);
+    this.ioContext.log.debug(`PigpioClient connection info: ${JSON.stringify(info)}`);
     this.renewInstances();
     this.connectionPromised.resolve();
   }
@@ -202,7 +202,7 @@ export default class PigpioClient implements IoItem {
    * It rises once only if client has already connected.
    */
   private handleDisconnect = (reason: string): void => {
-    this.ioManager.log.debug(`PigpioClient disconnected: ${reason}`);
+    this.ioContext.log.debug(`PigpioClient disconnected: ${reason}`);
 
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
 
@@ -220,19 +220,19 @@ export default class PigpioClient implements IoItem {
       this.connectionPromised = new Promised<void>();
     }
 
-    this.ioManager.log.info(`PigpioClient reconnecting after disconnect in ${RECONNECT_TIMEOUT_SEC} sec`);
+    this.ioContext.log.info(`PigpioClient reconnecting after disconnect in ${RECONNECT_TIMEOUT_SEC} sec`);
 
     setTimeout(this.doReconnect, RECONNECT_TIMEOUT_SEC * 1000);
   }
 
   private handleError = (err: {message: string}) => {
-    this.ioManager.log.error(`PigpioClient: ${err.message}`);
+    this.ioContext.log.error(`PigpioClient: ${err.message}`);
   }
 
   private connect() {
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
 
-    this.ioManager.log.info(
+    this.ioContext.log.info(
       `... Connecting to pigpiod daemon: ` +
       `${compactUndefined([this.clientOptions.host, this.clientOptions.port]).join(':')}`
     );
@@ -241,7 +241,7 @@ export default class PigpioClient implements IoItem {
       this.client = pigpioClient.pigpio(this.clientOptions) as Client;
     }
     catch (e) {
-      this.ioManager.log.error(e);
+      this.ioContext.log.error(e);
       this.doReconnect();
 
       return;
@@ -255,7 +255,7 @@ export default class PigpioClient implements IoItem {
   }
 
   private doReconnect = () => {
-    this.ioManager.log.info(`PigpioClient reconnecting`);
+    this.ioContext.log.info(`PigpioClient reconnecting`);
     this.client && this.client.end();
     this.clearListeners();
     this.connect();

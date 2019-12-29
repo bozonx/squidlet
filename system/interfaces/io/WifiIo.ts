@@ -1,5 +1,4 @@
 import IoItem from '../IoItem';
-import IoManager from '../../managers/IoManager';
 
 
 export interface WifiParams {

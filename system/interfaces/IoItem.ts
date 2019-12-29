@@ -1,4 +1,4 @@
-import IoManager from '../managers/IoManager';
+import IoContext from './IoContext';
 
 
 export interface IoDefinitions {
@@ -10,7 +10,7 @@ export default interface IoItem {
   /**
    * Initialize io Item at System initialization time. It isn't allowed to call it more than once.
    */
-  init?: (ioManager: IoManager) => Promise<void>;
+  init?: (ioContext: IoContext) => Promise<void>;
 
   /**
    * Setup props before init.

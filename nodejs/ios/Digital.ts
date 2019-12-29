@@ -7,14 +7,14 @@ import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/
 import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import IoManager from 'system/managers/IoManager';
+import IoContext from 'system/interfaces/IoContext';
 import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
 import PigpioClient from './PigpioClient';
 
 
 export default class Digital implements DigitalIo {
   private _client?: PigpioClient;
-  private _ioManager?: IoManager;
+  private _ioContext?: IoContext;
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounceCall: DebounceCall = new DebounceCall();
@@ -24,14 +24,14 @@ export default class Digital implements DigitalIo {
     return this._client as any;
   }
 
-  private get ioManager(): IoManager {
-    return this._ioManager as any;
+  private get ioContext(): IoContext {
+    return this._ioContext as any;
   }
 
 
-  async init(ioManager: IoManager): Promise<void> {
-    this._ioManager = ioManager;
-    this._client = ioManager.getIo<PigpioClient>('PigpioClient');
+  async init(ioContext: IoContext): Promise<void> {
+    this._ioContext = ioContext;
+    this._client = ioContext.getIo<PigpioClient>('PigpioClient');
   }
 
   async destroy(): Promise<void> {
@@ -181,7 +181,7 @@ export default class Digital implements DigitalIo {
         this.events.emit(pin, level);
       }, debounce, pin)
         .catch((e) => {
-          this.ioManager.log.error(e);
+          this.ioContext.log.error(e);
         });
 
       return;
@@ -191,7 +191,7 @@ export default class Digital implements DigitalIo {
     // TODO: handleEndOfDebounce will return a promise
     this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
       .catch((e) => {
-        this.ioManager.log.error(e);
+        this.ioContext.log.error(e);
       });
   }
 
@@ -202,7 +202,7 @@ export default class Digital implements DigitalIo {
       realLevel = await this.simpleRead(pin);
     }
     catch (e) {
-      return this.ioManager.log.error(e);
+      return this.ioContext.log.error(e);
     }
 
     this.events.emit(pin, realLevel);
