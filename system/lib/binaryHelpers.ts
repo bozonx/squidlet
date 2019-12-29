@@ -124,6 +124,7 @@ export function hexStringToHexNum(hexString: string | number | undefined): numbe
 /**
  * Normalize hex string value
  * * "2f" => '0x2f'
+ * * "f" => '0x0f'
  * * "0x2f" => '0x2f'
  */
 export function normalizeHexString(value: string): string {
@@ -135,7 +136,13 @@ export function normalizeHexString(value: string): string {
 
   if (Number.isNaN(toNum)) throw new Error(`Value is not number`);
 
-  return toNum.toString(16);
+  const str: string = toNum.toString(16);
+
+  if (str.length === 1) {
+    return `0x0${str}`;
+  }
+
+  return `0x${str}`;
 }
 
 /**
