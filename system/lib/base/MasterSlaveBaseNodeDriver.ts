@@ -8,12 +8,8 @@ import {hexStringToHexNum, isEqualUint8Array} from '../binaryHelpers';
 // type of feedback - polling or interruption
 export type FeedbackType = 'poll' | 'int';
 export type Handler = (functionHex: number | undefined, data: Uint8Array) => void;
-//export type ErrorHandler = (functionHex: number | undefined, err: Error) => void;
 
 export interface PollProps {
-  // TODO: должен быть только number чтобы его можно было найти
-  // function address e.g "5a" or "33" or 27. Undefined means do poll without specifying a data address
-  //function?: string | number;
   // data length to read at poll
   dataLength?: number;
   interval?: number;
@@ -53,7 +49,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    */
   startFeedback?(): void;
 
-  protected abstract doPoll(functionStr: string): Promise<Uint8Array>;
+  protected abstract doPoll(functionHex?: number): Promise<Uint8Array>;
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly polling: Polling = new Polling();
@@ -124,8 +120,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    */
   protected pollAllFunctions = async () => {
     for (let functionStr of Object.keys(this.props.poll)) {
+      const functionHex: number | undefined = this.functionStrToHex(functionStr);
+
       try {
-        await this.doPoll(functionStr);
+        await this.doPoll(functionHex);
       }
       catch (err) {
         this.log.error(`Error occur on functionNum ${functionStr}, ${err}`);
@@ -140,12 +138,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let functionStr of Object.keys(this.props.poll)) {
+      const functionHex: number | undefined = this.functionStrToHex(functionStr);
       const pollProps: PollProps = this.props.poll[functionStr];
       const pollInterval: number = (typeof pollProps.interval === 'undefined')
         ? this.props.pollInterval
         : pollProps.interval;
 
-      this.polling.start(() => this.doPoll(functionStr), pollInterval, functionStr);
+      this.polling.start(() => this.doPoll(functionHex), pollInterval, functionStr);
     }
   }
 
@@ -157,14 +156,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
-  protected handlePoll(functionStr: string, incomeData: Uint8Array) {
-    const functionHex: number = this.functionStrToHex(functionStr);
+  protected handlePoll(functionHex: number | undefined, incomeData: Uint8Array) {
+    const functionStr: string = this.functionHexToStr(functionHex);
 
-    // do nothing if it isn't polling data address
-    if (typeof functionHex === 'undefined' || !this.props.poll[functionStr]) return;
-
-    // if data is equal to previous data - do nothing
-    if (isEqualUint8Array(this.pollLastData[functionStr], incomeData)) return;
+    // do nothing if it isn't polling data address or data is equal to previous data
+    if (
+      !this.props.poll[functionStr]
+      || isEqualUint8Array(this.pollLastData[functionStr], incomeData)
+    ) return;
 
     // save data
     this.pollLastData[functionStr] = incomeData;
@@ -178,6 +177,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     return hexStringToHexNum(functionStr);
   }
 
+  /**
+   * Convert like 47 => "2c"
+   */
   protected functionHexToStr(functionHex?: number): string {
     if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
 
