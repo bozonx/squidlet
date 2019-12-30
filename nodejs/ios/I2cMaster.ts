@@ -1,6 +1,7 @@
 import I2cMasterIo, {I2cDefinition} from 'system/interfaces/io/I2cMasterIo';
 import {isKindOfNumber} from 'system/lib/common';
 import IoContext from 'system/interfaces/IoContext';
+import Promised from 'system/lib/Promised';
 import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
 
 
@@ -11,6 +12,7 @@ import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
 export default class I2cMaster implements I2cMasterIo {
   private _client?: PigpioClient;
   private definition?: I2cDefinition;
+  private openConnectionPromised: {[index: string]: Promised<void>} = {};
   // { `${busNum}${addressNum}`: addressConnectionId }
   private openedAddresses: {[index: string]: number} = {};
 
@@ -49,6 +51,8 @@ export default class I2cMaster implements I2cMasterIo {
       if (e.code === BAD_HANDLE_CODE) {
         await this.handleBadHandle(busNum, addrHex);
         await this.client.i2cWriteDevice(addressConnectionId, data);
+
+        return;
       }
 
       throw e;
@@ -118,10 +122,26 @@ export default class I2cMaster implements I2cMasterIo {
     const index: string = `${resolvedBusNum}${addrHex}`;
 
     if (typeof this.openedAddresses[index] !== 'undefined') return this.openedAddresses[index];
+
+    if (this.openConnectionPromised[index]) {
+      if (!this.openConnectionPromised[index].isFulfilled()) {
+        await this.openConnectionPromised[index];
+      }
+
+      return this.openedAddresses[index];
+    }
+    else {
+      this.openConnectionPromised[index] = new Promised<void>();
+    }
+
+    // TODO: remove promised
+
     // open a new connection
     const addressConnectionId: number = await this.client.i2cOpen(resolvedBusNum, addrHex);
 
     this.openedAddresses[index] = addressConnectionId;
+
+    this.openConnectionPromised[index].resolve();
 
     return addressConnectionId;
   }

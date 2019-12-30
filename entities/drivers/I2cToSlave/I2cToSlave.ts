@@ -46,7 +46,13 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       )
     );
 
-    this.addressHex = hexStringToHexNum(String(this.props.address));
+    // TODO: review
+    if (typeof this.props.address === 'string') {
+      this.addressHex = hexStringToHexNum(String(this.props.address));
+    }
+    else {
+      this.addressHex = this.props.address;
+    }
   }
 
 

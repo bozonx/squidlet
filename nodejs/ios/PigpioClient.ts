@@ -1,4 +1,6 @@
 //import pigpioClient from 'pigpio-client';
+import {normalizeHexString} from '../../system/lib/binaryHelpers';
+
 const pigpioClient = require('pigpio-client');
 
 import IoItem from 'system/interfaces/IoItem';
@@ -127,6 +129,10 @@ export default class PigpioClient implements IoItem {
 
     const flags = new Uint8Array(4);
 
+    this.ioContext.log.debug(
+      `PigpioClient.i2cOpen: bus ${bus}, address ${normalizeHexString(address.toString(16))}`
+    );
+
     return this.client.request(I2CO, bus, address, 4, undefined, flags);
   }
 
@@ -144,6 +150,7 @@ export default class PigpioClient implements IoItem {
       }
 
       const callback = (err: Error, bytesWritten: number) => {
+
         if (err) return reject(err);
 
         if (data && data.length !== bytesWritten) {
