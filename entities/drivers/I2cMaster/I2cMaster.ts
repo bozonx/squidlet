@@ -1,6 +1,6 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import I2cMasterIo, {I2cBusParams} from 'system/interfaces/io/I2cMasterIo';
-import { addFirstItemUint8Arr } from 'system/lib/binaryHelpers';
+import {addFirstItemUint8Arr, normalizeHexString} from 'system/lib/binaryHelpers';
 import DriverBase from 'system/base/DriverBase';
 import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
 
@@ -57,7 +57,7 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
       dataToWrite = addFirstItemUint8Arr(data, functionHex);
     }
 
-    this.log.debug(`I2cMaster driver write. busNum ${this.props.busNum}, addrHex: ${addressHex}, data: ${JSON.stringify(dataToWrite)}`);
+    this.log.debug(`I2cMaster driver write. busNum ${this.props.busNum}, addr: ${normalizeHexString(addressHex.toString(16))}, data: ${JSON.stringify(dataToWrite)}`);
 
     await this.i2cMasterIo.i2cWriteDevice(this.props.busNum, addressHex, dataToWrite);
   }
