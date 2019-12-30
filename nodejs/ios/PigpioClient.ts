@@ -150,14 +150,13 @@ export default class PigpioClient implements IoItem {
       }
 
       const callback = (err: Error, bytesWritten: number) => {
-
         if (err) return reject(err);
 
-        if (data && data.length !== bytesWritten) {
-          return reject(new Error(
-            `Wrong number of bytes has been written. Tried to write ${data.length}, but eventually written ${bytesWritten}`
-          ));
-        }
+        // if (data && data.length !== bytesWritten) {
+        //   return reject(new Error(
+        //     `Wrong number of bytes has been written. Tried to write ${data.length}, but eventually written ${bytesWritten}`
+        //   ));
+        // }
 
         resolve();
       };
