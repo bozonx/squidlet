@@ -1,3 +1,4 @@
+import * as path from 'path';
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
@@ -16,6 +17,12 @@ export default class GroupConfigParser {
   private hostDefaults?: {[index: string]: any};
   get hosts(): {[index: string]: PreHostConfig} {
     return this.preHostsConfigs;
+  }
+
+  get groupConfigDir(): string | undefined {
+    if (!this.groupConfigPath) return;
+
+    return path.dirname(path.resolve(process.cwd(), this.groupConfigPath));
   }
 
 
@@ -44,7 +51,7 @@ export default class GroupConfigParser {
       this.validateHostConfig(preHostConfig);
 
       this.plugins = preHostConfig.plugins;
-      this.hosts[preHostConfig.id as string] = preHostConfig;
+      this.hosts[preHostConfig.id as string] = this.prepareHostConfig(preHostConfig);
     }
   }
 
@@ -116,7 +123,22 @@ export default class GroupConfigParser {
       ...this.plugins || [],
     ]);
 
-    return preparedHostConfig;
+    return this.prepareHostConfig(preparedHostConfig);
+  }
+
+  private prepareHostConfig(hostConfig: PreHostConfig): PreHostConfig {
+    const groupConfigDir: string | undefined = this.groupConfigDir;
+
+    return {
+      ...hostConfig,
+      plugins: (hostConfig.plugins || []).map((item) => {
+        if (!groupConfigDir) {
+          throw new Error(`Can't resolve plugin paths because of there isn't a groupConfigPath`);
+        }
+
+        return path.resolve(groupConfigDir, item);
+      })
+    };
   }
 
   private validateGroupConfig(preGroupConfig: GroupConfig) {
