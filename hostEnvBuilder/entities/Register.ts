@@ -57,7 +57,7 @@ export default class Register {
         throw new Error(`You have to specify an absolute path of "${plugin}"`);
       }
 
-      const pluginFunction: Plugin = this.require(plugin);
+      const pluginFunction: Plugin = this.require(plugin).default;
 
       this.plugins.push(pluginFunction);
     }

@@ -62,6 +62,17 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
   return result;
 }
 
+// TODO: test
+export function stringToUint8Array(str: string): Uint8Array {
+  const result = new Uint8Array(str.length);
+
+  for (let i = 0; i < str.length; i++) {
+    result[i] = str.charCodeAt(i);
+  }
+
+  return result;
+}
+
 /**
  * Converts hex like "ffff" to array of bytes [ 255, 255 ]
  */

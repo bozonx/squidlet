@@ -36,6 +36,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Normalize functions address string.
    */
   static transformDefinition(definition: EntityDefinition): EntityDefinition {
+    if (!definition.props.poll) return definition;
+
     const poll: {[index: string]: PollProps} = {};
 
     for (let index of Object.keys(definition.props.poll)) {
