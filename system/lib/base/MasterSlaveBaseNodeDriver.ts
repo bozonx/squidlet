@@ -87,6 +87,8 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   async init() {
+    if (!this.props.poll) return;
+
     // listen to errors which happen on polling
     for (let functionStr of Object.keys(this.props.poll)) {
       this.polling.addListener((err: Error) => {

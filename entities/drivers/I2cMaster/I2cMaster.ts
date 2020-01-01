@@ -65,7 +65,12 @@ export class I2cMaster extends DriverBase<I2cMasterProps> {
   /**
    * Write and read from the same data address.
    */
-  transfer = async(addressHex: number, functionHex: number | undefined, dataToSend: Uint8Array | undefined, readLength: number): Promise<Uint8Array> => {
+  transfer = async(
+    addressHex: number,
+    functionHex: number | undefined,
+    dataToSend: Uint8Array | undefined,
+    readLength: number
+  ): Promise<Uint8Array> => {
     await this.write(addressHex, functionHex, dataToSend);
 
     return this.read(addressHex, functionHex, readLength);
