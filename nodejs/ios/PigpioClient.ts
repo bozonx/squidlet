@@ -175,13 +175,17 @@ export default class PigpioClient implements IoItem {
       const callback = (err: Error, bytesRead: number, result: Uint8Array) => {
         if (err) return reject(err);
 
+        // TODO: поидее должен всегда возвращаться Uint8Array а не number
+        // result can be a number
+        const resolvedResult: Uint8Array = (result instanceof Uint8Array) ? result : new Uint8Array([result]);
+
         if (count !== bytesRead) {
           return reject(new Error(
             `Wrong number of bytes has been read. Sent ${count}, but eventually read ${bytesRead}`
           ));
         }
 
-        resolve(result);
+        resolve(resolvedResult);
       };
 
       this.client.request(I2CRD, addressConnectionId, count, 0, callback);

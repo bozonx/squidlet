@@ -199,6 +199,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   protected handlePoll(functionHex: number | undefined, incomeData: Uint8Array) {
+    // TODO: может поднять событие для "*"
+    if (!this.props.poll) return;
+
     const functionStr: string = this.functionHexToStr(functionHex);
 
     // do nothing if it isn't polling data address or data is equal to previous data
