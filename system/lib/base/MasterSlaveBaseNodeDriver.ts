@@ -4,9 +4,7 @@ import Polling from '../Polling';
 import Sender from '../Sender';
 import {
   hexNumToString,
-  hexStringToHexNum,
   isEqualUint8Array,
-  normalizeHexString,
   stringToUint8Array
 } from '../binaryHelpers';
 import Context from '../../Context';
@@ -64,6 +62,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       let request: Uint8Array;
       let requestStr: string = String(item.request);
 
+      // TODO: better to make helper
       if (typeof item.request === 'number') {
         request = new Uint8Array([item.request]);
         requestStr = hexNumToString(item.request);
@@ -111,7 +110,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly polling: Polling = new Polling();
-  protected readonly sender: Sender = this.newSender();
+  protected readonly sender: Sender;
 
   // last received data by polling by function number.
   // it needs to decide to rise change event or not
@@ -120,6 +119,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   constructor(context: Context, definition: EntityDefinition) {
     super(context, MasterSlaveBaseNodeDriver.transformDefinition(definition));
+
+    this.sender = new Sender(
+      this.context.config.config.requestTimeoutSec,
+      this.context.config.config.senderResendTimeout,
+      this.context.log.debug,
+      this.context.log.warn
+    );
   }
 
   async init() {
@@ -149,6 +155,13 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   hasFeedback(): boolean {
     return Boolean(this.props.feedback);
+  }
+
+  async transfer(request: Uint8Array, readLength: number): Promise<Uint8Array> {
+    // write request
+    await this.write(request);
+    // read result
+    return this.read(readLength);
   }
 
   /**
@@ -210,9 +223,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected pollAllFunctions = async () => {
     for (let indexStr in this.props.poll) {
       try {
-        // const indexNum: number = parseInt(indexStr);
-        //
-        // this.handlePoll(await this.doPoll(indexNum), indexNum);
         await this.doPoll(parseInt(indexStr));
       }
       catch (err) {
@@ -247,7 +257,21 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     }
   }
 
-  protected handlePoll(incomeData: Uint8Array, pollIndex: number) {
+  protected async doPoll(pollIndex: number): Promise<void> {
+    if (!this.props.poll) throw new Error(`No poll in props`);
+
+    const pollProps = this.props.poll[pollIndex] as PollProps;
+    const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
+      ? this.props.defaultPollIntervalMs
+      : pollProps.resultLength;
+
+    // write request and read result
+    const result: Uint8Array = await this.transfer(pollProps.request, resolvedLength);
+
+    this.handleIncomeData(result, pollIndex);
+  }
+
+  protected handleIncomeData(incomeData: Uint8Array, pollIndex: number) {
     if (!this.props.poll) return;
     // do nothing if it isn't polling data address or data is equal to previous data
     if (
@@ -259,27 +283,6 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollLastData[pollIndex] = incomeData;
     // finally rise an event
     this.pollEvents.emit(incomeData, this.props.poll[pollIndex] as PollProps);
-  }
-
-  protected doPoll(pollIndex: number): Promise<Uint8Array> {
-    if (!this.props.poll) throw new Error(`No poll in props`);
-
-    const pollProps = this.props.poll[pollIndex] as PollProps;
-    const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
-      ? this.props.defaultPollIntervalMs
-      : pollProps.resultLength;
-
-    // TODO: add handlePoll
-
-    // write request and read result
-    return this.transfer(pollProps.request, resolvedLength);
-  }
-
-  async transfer(request: Uint8Array, readLength: number): Promise<Uint8Array> {
-    // write request
-    await this.write(request);
-    // read result
-    return this.read(readLength);
   }
 
 }
