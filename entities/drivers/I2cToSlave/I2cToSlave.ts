@@ -1,15 +1,14 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {hexStringToHexNum} from 'system/lib/binaryHelpers';
-import {omitObj} from 'system/lib/objects';
-import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps, PollProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
-import {I2cMaster} from '../I2cMaster/I2cMaster';
+import {hexNumToString, hexStringToHexNum} from 'system/lib/binaryHelpers';
+import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
+import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
 
 
 export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
   busNum: number;
   // it can be i2c address as a string like '0x5a' or number equivalent - 90
-  address: string;
+  address: string | number;
 }
 
 
@@ -19,7 +18,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
   private addressHex: number = -1;
 
-  private get i2cMaster(): I2cMaster {
+  private get i2cMasterIo(): I2cMasterIo {
     return this.depsInstances.i2cMaster;
   }
 
@@ -34,44 +33,47 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       );
     }
 
-    this.depsInstances.i2cMaster = await this.context.getSubDriver(
-      'I2cMaster',
-      omitObj(
-        this.props,
-        'address',
-        'int',
-        'poll',
-        'feedback',
-        'defaultPollIntervalMs'
-      )
-    );
+    this.depsInstances.i2cMaster = this.context.getIo('I2cMaster');
 
     if (typeof this.props.address === 'string') {
       this.addressHex = hexStringToHexNum(String(this.props.address));
     }
-    else {
+    else if (typeof this.props.address === 'number') {
       this.addressHex = this.props.address;
     }
   }
 
 
   write(data: Uint8Array): Promise<void> {
-    //const senderId = this.makeSenderId(functionHex, 'write');
+    this.log.debug(
+      `I2cMaster driver write. busNum ${this.props.busNum}, ` +
+      `addr: ${hexNumToString(this.addressHex)}, data: ${JSON.stringify(data)}`
+    );
 
-    return this.sender.send<void>(undefined, this.i2cMaster.write, this.addressHex, undefined, data);
+    return this.sender.send<void>(
+      undefined,
+      this.i2cMasterIo.i2cWriteDevice,
+      this.props.busNum,
+      this.addressHex,
+      data
+    );
   }
 
-  read(length: number): Promise<Uint8Array> {
-    //const senderId = this.makeSenderId(functionHex, 'read', resolvedLength);
-    // send data and wait
-    return this.sender.send<Uint8Array>(
+  async read(length: number): Promise<Uint8Array> {
+    const result: Uint8Array = await this.sender.send<Uint8Array>(
       undefined,
-      // TODO: не должен делать write
-      this.i2cMaster.read,
+      this.i2cMasterIo.i2cReadDevice,
+      this.props.busNum,
       this.addressHex,
-      undefined,
       length
     );
+
+    this.log.debug(
+      `I2cMaster driver read. busNum ${this.props.busNum}, ` +
+      `addrHex: ${hexNumToString(this.addressHex)}, result: ${JSON.stringify(result)}`
+    );
+
+    return result;
   }
 
   startFeedback(): void {
