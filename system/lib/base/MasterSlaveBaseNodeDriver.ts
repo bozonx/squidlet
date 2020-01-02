@@ -38,7 +38,7 @@ export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
-  poll: PollProps[];
+  poll: PollPreProps[];
   feedback?: FeedbackType;
   // Default poll interval. By default is 1000
   defaultPollIntervalMs: number;
@@ -57,11 +57,11 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   static transformDefinition(definition: EntityDefinition): EntityDefinition {
     if (!definition.props.poll) return definition;
 
-    const definitionPoll: PollProps[] = definition.props.poll;
+    const definitionPoll: PollPreProps[] = definition.props.poll;
     const poll: PollProps[] = [];
 
     for (let item of definitionPoll) {
-      let request: Uint8Array = item.request;
+      let request: Uint8Array;
       let requestStr: string = String(item.request);
 
       if (typeof item.request === 'number') {
@@ -71,9 +71,15 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       else if (typeof item.request === 'string') {
         request = new Uint8Array(stringToUint8Array(item.request));
       }
+      else if (item.request instanceof Uint8Array) {
+        request = item.request;
+      }
       else if (Array.isArray(item.request)) {
         request = new Uint8Array(item.request);
         requestStr = JSON.stringify(item.request);
+      }
+      else {
+        throw new Error(`Unknown type of poll request`);
       }
 
       poll.push({
@@ -126,8 +132,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     for (let indexStr in this.props.poll) {
       this.polling.addListener((err: Error | undefined) => {
         if (err) {
+          const pollProps = this.props.poll[indexStr] as PollProps;
+
           this.log.error(
-            `MasterSlaveBaseNodeDriver: Error on request "${this.props.poll[indexStr].request}". ` +
+            `MasterSlaveBaseNodeDriver: Error on request "${pollProps.requestStr}". ` +
             `Props are "${JSON.stringify(this.props)}": ${String(err)}`
           );
         }
@@ -200,12 +208,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * Poll all the defined polling to data addresses by turns and don't stop on errors.
    */
   protected pollAllFunctions = async () => {
-    for (let index in this.props.poll) {
+    for (let indexStr in this.props.poll) {
       try {
-        await this.doPoll(parseInt(index));
+        await this.doPoll(parseInt(indexStr));
       }
       catch (err) {
-        this.log.error(`Error occur on request ${this.props.poll[index].request}, ${err}`);
+        const pollProps = this.props.poll[indexStr] as PollProps;
+
+        this.log.error(`Error occur on request ${pollProps.requestStr}, ${err}`);
       }
     }
   }
@@ -217,7 +227,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (this.props.feedback !== 'poll') return;
 
     for (let indexStr in this.props.poll) {
-      const pollProps: PollProps = this.props.poll[indexStr];
+      const pollProps = this.props.poll[indexStr] as PollProps;
       const pollInterval: number = (typeof pollProps.interval === 'undefined')
         ? this.props.defaultPollIntervalMs
         : pollProps.interval;
@@ -245,7 +255,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // save data
     this.pollLastData[pollIndex] = incomeData;
     // finally rise an event
-    this.pollEvents.emit(incomeData, this.props.poll[pollIndex]);
+    this.pollEvents.emit(incomeData, this.props.poll[pollIndex] as PollProps);
   }
 
 }
