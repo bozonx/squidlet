@@ -12,20 +12,24 @@ import EntityDefinition from '../../interfaces/EntityDefinition';
 
 
 export interface PollPreProps {
+  // TODO: может быть undefined
   // data to write before read or function number to read from
   request: Uint8Array | string | number;
+  requestCb?: () => Promise<Uint8Array>;
   // length of result which will be read. If isn't set then `defaultPollIntervalMs` will be used.
   resultLength?: number;
-  // poll interval if polling is used
-  interval?: number;
+  // poll interval if polling is used in ms
+  intervalMs?: number;
 }
 
 export interface PollProps {
+  // TODO: может быть undefined
   request: Uint8Array;
+  requestCb?: () => Promise<Uint8Array>;
   // string variant of request. Useful for print into messages.
   requestStr: string;
   resultLength?: number;
-  interval?: number;
+  intervalMs?: number;
 }
 
 // type of feedback - polling or interruption
@@ -241,9 +245,9 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
     for (let indexStr in this.props.poll) {
       const pollProps = this.props.poll[indexStr] as PollProps;
-      const pollInterval: number = (typeof pollProps.interval === 'undefined')
+      const pollInterval: number = (typeof pollProps.intervalMs === 'undefined')
         ? this.props.defaultPollIntervalMs
-        : pollProps.interval;
+        : pollProps.intervalMs;
 
       this.polling.start(() => this.doPoll(parseInt(indexStr)), pollInterval, indexStr);
     }
@@ -274,7 +278,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected handleIncomeData(incomeData: Uint8Array, pollIndex: number) {
     if (!this.props.poll) return;
     // do nothing if it isn't polling data address or data is equal to previous data
-    if (
+    else if (
       !this.props.poll[pollIndex]
       || isEqualUint8Array(this.pollLastData[pollIndex], incomeData)
     ) return;

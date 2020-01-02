@@ -12,7 +12,6 @@ import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
 import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
 import InitIcLogic from 'system/lib/logic/InitIcLogic';
-
 import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
 
 
@@ -42,8 +41,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private _expanderOutput?: DigitalPortExpanderOutputLogic;
   private _expanderInput?: DigitalPortExpanderInputLogic;
 
-  private get i2cDriver(): I2cToSlave {
-    return this.depsInstances.i2cDriver;
+  private get i2c(): I2cToSlave {
+    return this.depsInstances.i2c;
   }
 
   private get initIcLogic(): InitIcLogic {
@@ -60,13 +59,17 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
 
   init = async () => {
-    this.depsInstances.i2cDriver = await this.context.getSubDriver(
+    this.depsInstances.i2c = await this.context.getSubDriver(
       'I2cToSlave',
       {
         ...omitObj(this.props, 'writeBufferMs'),
-        poll: {
-          '*': { dataLength: DATA_LENGTH },
-        },
+        poll: [
+          {
+            // TODO: don't use it
+            request: new Uint8Array(0),
+            resultLength: DATA_LENGTH
+          },
+        ],
       }
     );
 
@@ -212,7 +215,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     // it is no need to do poll while initialization time because it will be done after initialization
     if (!this.initIcLogic.wasInitialized) return Promise.resolve();
 
-    return this.i2cDriver.pollOnce();
+    return this.i2c.pollOnce();
   }
 
   /**
@@ -223,7 +226,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   async read(pin: number): Promise<boolean> {
     this.checkPinRange(pin);
 
-    if (this.i2cDriver.hasFeedback() && this.directions[pin] == PinDirection.input) {
+    if (this.i2c.hasFeedback() && this.directions[pin] == PinDirection.input) {
       await this.pollOnce();
     }
 
@@ -302,14 +305,14 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   private startFeedback() {
     // if I2C driver doesn't have feedback then it doesn't need to be setup
-    if (!this.i2cDriver.hasFeedback()) return;
+    if (!this.i2c.hasFeedback()) return;
 
-    this.i2cDriver.addListener(this.handleIcStateChange);
+    this.i2c.addListener(this.handleIcStateChange);
     // make first request and start handle feedback
-    this.i2cDriver.startFeedback();
+    this.i2c.startFeedback();
   }
 
-  private handleIcStateChange = (functionStr: number | string | undefined, data: Uint8Array) => {
+  private handleIcStateChange = (data: Uint8Array) => {
     if (!data || data.length !== DATA_LENGTH) {
       return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
     }
@@ -345,7 +348,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
     // fill data
     dataToSend[0] = preparedState;
 
-    return this.i2cDriver.write(undefined, dataToSend);
+    return this.i2c.write(dataToSend);
   }
 
   private checkPinRange(pin: number) {

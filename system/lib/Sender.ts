@@ -64,6 +64,8 @@ class SenderRequest {
     this.sendCb(...this.sendParams)
       .then(this.success)
       .catch((err: Error) => {
+        this.logDebug(`Sender ${this.id}: ${err}`);
+
         if (new Date().getTime() >= this.startedTimeStamp + this.timeoutMs) {
           // stop trying and call reject
           this.reject(err);
@@ -72,6 +74,7 @@ class SenderRequest {
         }
 
         setTimeout(() => {
+          // TODO: нужно вывести информативное сообщение
           this.logDebug(`--> resending - ${this.id}`);
 
           // try another one

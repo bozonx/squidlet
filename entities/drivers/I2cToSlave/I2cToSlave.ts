@@ -52,20 +52,18 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 
     return this.sender.send<void>(
       undefined,
-      this.i2cMasterIo.i2cWriteDevice,
-      this.props.busNum,
-      this.addressHex,
-      data
+      (): Promise<void> => {
+        return this.i2cMasterIo.i2cWriteDevice(this.props.busNum, this.addressHex, data);
+      }
     );
   }
 
   async read(length: number): Promise<Uint8Array> {
     const result: Uint8Array = await this.sender.send<Uint8Array>(
       undefined,
-      this.i2cMasterIo.i2cReadDevice,
-      this.props.busNum,
-      this.addressHex,
-      length
+      (): Promise<Uint8Array> => {
+        return this.i2cMasterIo.i2cReadDevice(this.props.busNum, this.addressHex, length);
+      }
     );
 
     this.log.debug(
