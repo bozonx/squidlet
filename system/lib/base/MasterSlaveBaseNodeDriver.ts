@@ -2,7 +2,7 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
-import {hexStringToHexNum, isEqualUint8Array, normalizeHexString} from '../binaryHelpers';
+import {hexStringToHexNum, isEqualUint8Array, normalizeHexString, stringToUint8Array} from '../binaryHelpers';
 import Context from '../../Context';
 import EntityDefinition from '../../interfaces/EntityDefinition';
 
@@ -12,6 +12,9 @@ export type FeedbackType = 'poll' | 'int';
 export type Handler = (functionHex: number | undefined, data: Uint8Array) => void;
 
 export interface PollProps {
+  functionHex?: number;
+  // if need send something before read
+  send?: Uint8Array;
   // data length to read at poll
   dataLength?: number;
   interval?: number;
@@ -22,7 +25,7 @@ export interface MasterSlaveBaseProps {
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
   // parameters of functions to poll or read like { '0x5c': { dataLength: 1 } }
-  poll: {[index: string]: PollProps};
+  poll: PollProps[];
   feedback?: FeedbackType;
   // Default poll interval. By default is 1000
   defaultPollIntervalMs: number;
@@ -31,6 +34,8 @@ export interface MasterSlaveBaseProps {
 export const UNDEFINED_DATA_ADDRESS = '*';
 
 
+// TODO: add validation that PollProps has to have one of functionHex of send.
+
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
   /**
    * Normalize functions address string.
@@ -38,16 +43,27 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   static transformDefinition(definition: EntityDefinition): EntityDefinition {
     if (!definition.props.poll) return definition;
 
-    const poll: {[index: string]: PollProps} = {};
+    const defenitionPoll: PollProps[] = definition.props.poll;
+    const poll: PollProps[] = [];
 
-    for (let index of Object.keys(definition.props.poll)) {
-      if (index === UNDEFINED_DATA_ADDRESS) {
-        poll[index] = definition.props.poll[index];
+    for (let item of defenitionPoll) {
+      let send: Uint8Array | undefined = item.send;
 
-        continue;
+      if (typeof item.send === 'number') {
+        send = new Uint8Array([item.send]);
+      }
+      else if (typeof item.send === 'string') {
+        send = new Uint8Array(stringToUint8Array(item.send));
+      }
+      else if (Array.isArray(item.send)) {
+        send = new Uint8Array(item.send);
       }
 
-      poll[normalizeHexString(index)] = definition.props.poll[index];
+      poll.push({
+        ...item,
+        functionHex: (item.functionHex) ? hexStringToHexNum(item.functionHex) : undefined,
+        send,
+      });
     }
 
     return {

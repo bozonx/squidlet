@@ -126,7 +126,9 @@ export function int16ToHexString(hexNum: number): string {
  * undefined -> 0
  */
 export function hexStringToHexNum(hexString: string | number | undefined): number {
-  if (typeof hexString === 'undefined' || hexString === '') return 0;
+  // TODO: test and check this - number
+  if (typeof hexString === 'number') return hexString;
+  else if (typeof hexString === 'undefined' || hexString === '') return 0;
 
   return parseInt(String(hexString), 16);
 }
