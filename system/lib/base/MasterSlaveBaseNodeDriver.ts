@@ -107,10 +107,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * * write(undefined, data) - write only data
    */
   abstract write(data: Uint8Array): Promise<void>;
-  abstract read(length?: number): Promise<Uint8Array>;
-  abstract transfer(dataToSend: Uint8Array, readLength?: number): Promise<Uint8Array>;
-
-  protected abstract doPoll(pollIndex: number): Promise<Uint8Array>;
+  abstract read(length: number): Promise<Uint8Array>;
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly polling: Polling = new Polling();
@@ -131,14 +128,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // listen to errors which happen on polling
     for (let indexStr in this.props.poll) {
       this.polling.addListener((err: Error | undefined) => {
-        if (err) {
-          const pollProps = this.props.poll[indexStr] as PollProps;
+        if (!err) return;
 
-          this.log.error(
-            `MasterSlaveBaseNodeDriver: Error on request "${pollProps.requestStr}". ` +
-            `Props are "${JSON.stringify(this.props)}": ${String(err)}`
-          );
-        }
+        const pollProps = this.props.poll[indexStr] as PollProps;
+
+        this.log.error(
+          `MasterSlaveBaseNodeDriver: Error on request "${pollProps.requestStr}". ` +
+          `Props are "${JSON.stringify(this.props)}": ${String(err)}`
+        );
       }, indexStr);
     }
   }
@@ -191,6 +188,10 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     // else don't use feedback at all
   }
 
+  stopFeedBack(): void {
+    this.stopPollIntervals();
+  }
+
   /**
    * Listen to data which received by polling or interruption.
    */
@@ -203,13 +204,15 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
-  // TODO: review
   /**
    * Poll all the defined polling to data addresses by turns and don't stop on errors.
    */
   protected pollAllFunctions = async () => {
     for (let indexStr in this.props.poll) {
       try {
+        // const indexNum: number = parseInt(indexStr);
+        //
+        // this.handlePoll(await this.doPoll(indexNum), indexNum);
         await this.doPoll(parseInt(indexStr));
       }
       catch (err) {
@@ -258,8 +261,51 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     this.pollEvents.emit(incomeData, this.props.poll[pollIndex] as PollProps);
   }
 
+  protected doPoll(pollIndex: number): Promise<Uint8Array> {
+    if (!this.props.poll) throw new Error(`No poll in props`);
+
+    const pollProps = this.props.poll[pollIndex] as PollProps;
+    const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
+      ? this.props.defaultPollIntervalMs
+      : pollProps.resultLength;
+
+    // TODO: add handlePoll
+
+    // write request and read result
+    return this.transfer(pollProps.request, resolvedLength);
+  }
+
+  async transfer(request: Uint8Array, readLength: number): Promise<Uint8Array> {
+    // write request
+    await this.write(request);
+    // read result
+    return this.read(readLength);
+  }
+
 }
 
+// protected resolvePollIndex(request: Uint8Array): number | undefined {
+// }
+
+// private resolveReadLength(request: Uint8Array, readLength?: number): number {
+//   if (typeof readLength !== 'undefined') {
+//     return readLength;
+//   }
+//
+//   const pollIndex: number | undefined = this.resolveReadLength(request);
+//
+//   if (typeof pollIndex === 'undefined') {
+//     throw new Error(`Can't find poll props of request "${JSON.stringify(request)}"`);
+//   }
+//
+//   const pollProps = this.props.poll[pollIndex] as PollProps;
+//
+//   if (!pollProps.resultLength) {
+//     throw new Error(`I2cToSlaveDriver: Can't resolve length of data of requst "${JSON.stringify(request)}"`);
+//   }
+//
+//   return pollProps.resultLength;
+// }
 
 // protected functionStrToHex(functionStr: string): number | undefined {
 //   if (functionStr === UNDEFINED_DATA_ADDRESS) return;
