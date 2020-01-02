@@ -8,7 +8,7 @@ import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
 
 export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
   busNum: number;
-  // it can be i2c address as a string like '5a' or number equivalent - 90
+  // it can be i2c address as a string like '0x5a' or number equivalent - 90
   address: string;
 }
 
@@ -46,7 +46,6 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       )
     );
 
-    // TODO: review
     if (typeof this.props.address === 'string') {
       this.addressHex = hexStringToHexNum(String(this.props.address));
     }
@@ -56,13 +55,15 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
 
-  async write(functionHex?: number, data?: Uint8Array): Promise<void> {
+  // TODO: review
+  async write(data: Uint8Array): Promise<void> {
     const senderId = this.makeSenderId(functionHex, 'write');
 
-    await this.sender.send<void>(senderId, this.i2cMaster.write, this.addressHex, functionHex, data);
+    await this.sender.send<void>(senderId, this.i2cMaster.write, this.addressHex, undefined, data);
   }
 
-  async read(functionHex?: number, length?: number): Promise<Uint8Array> {
+  // TODO: review
+  async read(length?: number): Promise<Uint8Array> {
     const resolvedLength: number = this.resolveReadLength(functionHex, length);
     const senderId = this.makeSenderId(functionHex, 'read', resolvedLength);
     // send data and wait
@@ -70,7 +71,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       senderId,
       this.i2cMaster.read,
       this.addressHex,
-      functionHex,
+      undefined,
       resolvedLength
     );
 
@@ -79,14 +80,11 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return result;
   }
 
+  // TODO: review
   /**
    * Write and read from the same data address.
    */
-  async transfer(
-    functionHex?: number,
-    dataToSend?: Uint8Array,
-    readLength?: number
-  ): Promise<Uint8Array> {
+  async transfer(dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array> {
     const resolvedLength: number = this.resolveReadLength(functionHex, readLength);
     const senderId = this.makeSenderId(functionHex, 'request', resolvedLength);
     // make request
@@ -104,6 +102,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return result;
   }
 
+  // TODO: review
   startFeedback(): void {
     if (this.props.feedback === 'int') {
       if (!this.impulseInput) {
@@ -125,12 +124,14 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
       if (!this.impulseHandlerIndex) return;
 
       this.impulseInput && this.impulseInput.removeListener(this.impulseHandlerIndex);
+
+      return;
     }
 
     this.stopPollIntervals();
   }
 
-
+  // TODO: review
   /**
    * Read data once and rise an data event
    */
@@ -152,6 +153,7 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
   }
 
 
+  // TODO: review
   private resolveReadLength(functionHex?: number, readLength?: number): number {
     if (typeof readLength !== 'undefined') {
       return readLength;
@@ -170,9 +172,12 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
     return pollProps.dataLength;
   }
 
+  // TODO: review
   private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
     const resolvedDataAddr: string = this.functionHexToStr(functionHex);
 
+    // TODO: bus num and address не нужно так как инстанс драйвера привязан к конкретному bus и address
+    //       any way see Sender
     const busNum = (typeof this.props.busNum === 'undefined') ? -1 : this.props.busNum;
 
     return [busNum, this.props.address, resolvedDataAddr, method, ...params].join();

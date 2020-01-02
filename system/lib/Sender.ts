@@ -110,6 +110,10 @@ export default class Sender {
     this.logWarn = logWarn;
   }
 
+  destroy() {
+    // TODO: add
+  }
+
 
   async send<T>(id: string, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
 

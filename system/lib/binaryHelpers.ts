@@ -134,6 +134,20 @@ export function hexStringToHexNum(hexString: string | number | undefined): numbe
 }
 
 // TODO: test
+export function hexNumToString(hexNum?: number): string {
+  if (typeof hexNum === 'undefined') return '0x00';
+  else if (typeof hexNum !== 'number') throw new Error(`Incorrect type of hexNum`);
+
+  const str: string = hexNum.toString(16);
+
+  if (str.length === 1) {
+    return `0x0${str}`;
+  }
+
+  return `0x${str}`;
+}
+
+// TODO: test
 /**
  * Normalize hex string value
  * * "2f" => '0x2f'
@@ -149,13 +163,7 @@ export function normalizeHexString(value: string): string {
 
   if (Number.isNaN(toNum)) throw new Error(`Value is not number`);
 
-  const str: string = toNum.toString(16);
-
-  if (str.length === 1) {
-    return `0x0${str}`;
-  }
-
-  return `0x${str}`;
+  return hexNumToString(toNum);
 }
 
 /**

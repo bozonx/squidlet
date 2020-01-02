@@ -9,7 +9,7 @@ enum CURRENT_POLL_ENUM {
   pollInterval,
 }
 
-type PollHandler = (err: Error, result: any) => void;
+type PollHandler = (err: Error | undefined, result: any) => void;
 type MethodWhichPoll = () => Promise<any>;
 type MethodWrapper = () => void;
 // [ intervalId, methodWhichPoll, MethodWrapper, pollInterval ]
@@ -57,7 +57,7 @@ export default class Polling {
       methodWhichWillPoll()
       // TODO: don't use null
       // TODO: add types
-        .then((result) => this.events.emit(id, null, result))
+        .then((result) => this.events.emit(id, undefined, result))
         .catch((e) => this.events.emit(id, e));
     };
 

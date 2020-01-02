@@ -2,29 +2,42 @@ import DriverBase from '../../base/DriverBase';
 import IndexedEvents from '../IndexedEvents';
 import Polling from '../Polling';
 import Sender from '../Sender';
-import {hexStringToHexNum, isEqualUint8Array, normalizeHexString, stringToUint8Array} from '../binaryHelpers';
+import {
+  hexNumToString,
+  hexStringToHexNum,
+  isEqualUint8Array,
+  normalizeHexString,
+  stringToUint8Array
+} from '../binaryHelpers';
 import Context from '../../Context';
 import EntityDefinition from '../../interfaces/EntityDefinition';
 
 
-// type of feedback - polling or interruption
-export type FeedbackType = 'poll' | 'int';
-export type Handler = (functionHex: number | undefined, data: Uint8Array) => void;
-
-export interface PollProps {
-  functionHex?: number;
-  // if need send something before read
-  send?: Uint8Array;
-  // data length to read at poll
-  dataLength?: number;
+export interface PollPreProps {
+  // data to write before read or function number to read from
+  request: Uint8Array | string | number;
+  // length of result which will be read. If isn't set then `defaultPollIntervalMs` will be used.
+  resultLength?: number;
+  // poll interval if polling is used
   interval?: number;
 }
+
+export interface PollProps {
+  request: Uint8Array;
+  // string variant of request. Useful for print into messages.
+  requestStr: string;
+  resultLength?: number;
+  interval?: number;
+}
+
+// type of feedback - polling or interruption
+export type FeedbackType = 'poll' | 'int';
+export type Handler = (data: Uint8Array, pollProps: PollProps) => void;
 
 export interface MasterSlaveBaseProps {
   // if you have one interrupt pin you can specify in there
   //int?: ImpulseInputProps;
   int?: {[index: string]: any};
-  // parameters of functions to poll or read like { '0x5c': { dataLength: 1 } }
   poll: PollProps[];
   feedback?: FeedbackType;
   // Default poll interval. By default is 1000
@@ -34,7 +47,8 @@ export interface MasterSlaveBaseProps {
 export const UNDEFINED_DATA_ADDRESS = '*';
 
 
-// TODO: add validation that PollProps has to have one of functionHex of send.
+// TODO: validate that props has to have feedback and poll together or no one or them
+// TODO: validate poll props
 
 export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBaseProps> extends DriverBase<T> {
   /**
@@ -43,26 +57,29 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   static transformDefinition(definition: EntityDefinition): EntityDefinition {
     if (!definition.props.poll) return definition;
 
-    const defenitionPoll: PollProps[] = definition.props.poll;
+    const definitionPoll: PollProps[] = definition.props.poll;
     const poll: PollProps[] = [];
 
-    for (let item of defenitionPoll) {
-      let send: Uint8Array | undefined = item.send;
+    for (let item of definitionPoll) {
+      let request: Uint8Array = item.request;
+      let requestStr: string = String(item.request);
 
-      if (typeof item.send === 'number') {
-        send = new Uint8Array([item.send]);
+      if (typeof item.request === 'number') {
+        request = new Uint8Array([item.request]);
+        requestStr = hexNumToString(item.request);
       }
-      else if (typeof item.send === 'string') {
-        send = new Uint8Array(stringToUint8Array(item.send));
+      else if (typeof item.request === 'string') {
+        request = new Uint8Array(stringToUint8Array(item.request));
       }
-      else if (Array.isArray(item.send)) {
-        send = new Uint8Array(item.send);
+      else if (Array.isArray(item.request)) {
+        request = new Uint8Array(item.request);
+        requestStr = JSON.stringify(item.request);
       }
 
       poll.push({
         ...item,
-        functionHex: (item.functionHex) ? hexStringToHexNum(item.functionHex) : undefined,
-        send,
+        request,
+        requestStr,
       });
     }
 
@@ -83,11 +100,11 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * * write() - write an empty
    * * write(undefined, data) - write only data
    */
-  abstract write(functionHex?: number, data?: Uint8Array): Promise<void>;
-  abstract read(functionHex?: number, length?: number): Promise<Uint8Array>;
-  abstract transfer(functionHex?: number, dataToSend?: Uint8Array, readLength?: number): Promise<Uint8Array>;
+  abstract write(data: Uint8Array): Promise<void>;
+  abstract read(length?: number): Promise<Uint8Array>;
+  abstract transfer(dataToSend: Uint8Array, readLength?: number): Promise<Uint8Array>;
 
-  protected abstract doPoll(functionHex?: number): Promise<Uint8Array>;
+  protected abstract doPoll(pollIndex: number): Promise<Uint8Array>;
 
   protected readonly pollEvents = new IndexedEvents<Handler>();
   protected readonly polling: Polling = new Polling();
@@ -95,7 +112,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
   // last received data by polling by function number.
   // it needs to decide to rise change event or not
-  private pollLastData: {[index: string]: Uint8Array} = {};
+  private pollLastData: Uint8Array[] = [];
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -106,19 +123,22 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (!this.props.poll) return;
 
     // listen to errors which happen on polling
-    for (let functionStr of Object.keys(this.props.poll)) {
-      this.polling.addListener((err: Error) => {
-        this.log.error(
-          `MasterSlaveBaseNodeDriver: Error on polling to function "${functionStr}". ` +
-          `Props are "${JSON.stringify(this.props)}": ${String(err)}`
-        );
-      }, functionStr);
+    for (let indexStr in this.props.poll) {
+      this.polling.addListener((err: Error | undefined) => {
+        if (err) {
+          this.log.error(
+            `MasterSlaveBaseNodeDriver: Error on request "${this.props.poll[indexStr].request}". ` +
+            `Props are "${JSON.stringify(this.props)}": ${String(err)}`
+          );
+        }
+      }, indexStr);
     }
   }
 
   destroy = async () => {
     this.pollEvents.destroy();
     this.polling.destroy();
+    this.sender.destroy();
   }
 
 
@@ -132,18 +152,20 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
    * It rejects promise on error
    */
   async pollOnce(): Promise<void> {
+    if (!this.props.poll) throw new Error(`MasterSlaveBaseNodeDriver.pollOnce: no poll in props`);
+
     if (this.props.feedback === 'int') {
       this.pollAllFunctions();
     }
     else if (this.props.feedback === 'poll') {
       // restart polling - it will make a new request and restart interval
-      for (let functionStr of Object.keys(this.props.poll)) {
-        await this.polling.restart(functionStr);
+      for (let indexStr in this.props.poll) {
+        await this.polling.restart(indexStr);
       }
     }
     else {
       throw new Error(
-        `MasterSlaveBaseNodeDriver.poll: Feedback hasn't been configured. `
+        `MasterSlaveBaseNodeDriver.pollOnce: Feedback hasn't been configured. `
         + `Props are "${JSON.stringify(this.props)}"`
       );
     }
@@ -173,18 +195,17 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
 
+  // TODO: review
   /**
    * Poll all the defined polling to data addresses by turns and don't stop on errors.
    */
   protected pollAllFunctions = async () => {
-    for (let functionStr of Object.keys(this.props.poll)) {
-      const functionHex: number | undefined = this.functionStrToHex(functionStr);
-
+    for (let index in this.props.poll) {
       try {
-        await this.doPoll(functionHex);
+        await this.doPoll(parseInt(index));
       }
       catch (err) {
-        this.log.error(`Error occur on functionNum ${functionStr}, ${err}`);
+        this.log.error(`Error occur on request ${this.props.poll[index].request}, ${err}`);
       }
     }
   }
@@ -195,60 +216,55 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   protected startPollIntervals() {
     if (this.props.feedback !== 'poll') return;
 
-    for (let functionStr of Object.keys(this.props.poll)) {
-      const functionHex: number | undefined = this.functionStrToHex(functionStr);
-      const pollProps: PollProps = this.props.poll[functionStr];
+    for (let indexStr in this.props.poll) {
+      const pollProps: PollProps = this.props.poll[indexStr];
       const pollInterval: number = (typeof pollProps.interval === 'undefined')
         ? this.props.defaultPollIntervalMs
         : pollProps.interval;
 
-      this.polling.start(() => this.doPoll(functionHex), pollInterval, functionStr);
+      this.polling.start(() => this.doPoll(parseInt(indexStr)), pollInterval, indexStr);
     }
   }
 
   protected stopPollIntervals() {
-    if (this.props.feedback !== 'poll') return;
+    if (this.props.feedback !== 'poll' || !this.props.poll) return;
 
-    for (let functionStr of Object.keys(this.props.poll)) {
-      this.polling.stop(functionStr);
+    for (let indexStr in this.props.poll) {
+      this.polling.stop(indexStr);
     }
   }
 
-  protected handlePoll(functionHex: number | undefined, incomeData: Uint8Array) {
-    // TODO: может поднять событие для "*"
+  protected handlePoll(incomeData: Uint8Array, pollIndex: number) {
     if (!this.props.poll) return;
-
-    const functionStr: string = this.functionHexToStr(functionHex);
-
     // do nothing if it isn't polling data address or data is equal to previous data
     if (
-      !this.props.poll[functionStr]
-      || isEqualUint8Array(this.pollLastData[functionStr], incomeData)
+      !this.props.poll[pollIndex]
+      || isEqualUint8Array(this.pollLastData[pollIndex], incomeData)
     ) return;
 
     // save data
-    this.pollLastData[functionStr] = incomeData;
+    this.pollLastData[pollIndex] = incomeData;
     // finally rise an event
-    this.pollEvents.emit(functionHex, incomeData);
-  }
-
-  protected functionStrToHex(functionStr: string): number | undefined {
-    if (functionStr === UNDEFINED_DATA_ADDRESS) return;
-
-    return hexStringToHexNum(functionStr);
-  }
-
-  /**
-   * Convert like 47 => "2f"
-   */
-  protected functionHexToStr(functionHex?: number): string {
-    if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
-
-    return functionHex.toString(16);
+    this.pollEvents.emit(incomeData, this.props.poll[pollIndex]);
   }
 
 }
 
+
+// protected functionStrToHex(functionStr: string): number | undefined {
+//   if (functionStr === UNDEFINED_DATA_ADDRESS) return;
+//
+//   return hexStringToHexNum(functionStr);
+// }
+//
+// /**
+//  * Convert like 47 => "2f"
+//  */
+// protected functionHexToStr(functionHex?: number): string {
+//   if (typeof functionHex === 'undefined') return UNDEFINED_DATA_ADDRESS;
+//
+//   return functionHex.toString(16);
+// }
 
 // getLastData(functionStr: string | number | undefined): Uint8Array | undefined {
 //   const resolvedDataAddr: string = this.resolveFunctionStr(functionStr);
