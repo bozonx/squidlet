@@ -1,8 +1,8 @@
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import I2cMasterIo, {I2cBusParams} from 'system/interfaces/io/I2cMasterIo';
-import {addFirstItemUint8Arr, normalizeHexString} from 'system/lib/binaryHelpers';
-import DriverBase from 'system/base/DriverBase';
-import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
+import DriverFactoryBase from 'base/DriverFactoryBase';
+import I2cMasterIo, {I2cBusParams} from 'interfaces/io/I2cMasterIo';
+import {addFirstItemUint8Arr, normalizeHexString} from 'lib/binaryHelpers';
+import DriverBase from 'base/DriverBase';
+import {FUNCTION_NUMBER_LENGTH} from 'lib/constants';
 
 
 export interface I2cMasterProps extends I2cBusParams {

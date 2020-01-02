@@ -3,7 +3,9 @@ main: I2cToSlave.ts
 system: true
 
 drivers:
-  - I2cMaster
   - ImpulseInput
+
+ios:
+  - I2cMaster
 
 props: props.yaml
