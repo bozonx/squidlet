@@ -1,3 +1,4 @@
+let idCounter: number = 0;
 
 
 class SenderRequest {
@@ -115,28 +116,28 @@ export default class Sender {
   }
 
 
-  async send<T>(id: string, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
-
+  async send<T>(id: string | undefined, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
+    const resolvedId: string = this.resolveId(id);
     // TODO: review
 
-    if (this.requests[id]) {
-      this.addToQueue(id, sendCb, params);
+    if (this.requests[resolvedId]) {
+      this.addToQueue(resolvedId, sendCb, params);
     }
     else {
       // make new request
-      this.startNewRequest(id, sendCb, params);
+      this.startNewRequest(resolvedId, sendCb, params);
     }
 
     try {
-      const result: any = await this.requests[id].promise;
-      this.logDebug(`==> Request successfully finished ${id}`);
+      const result: any = await this.requests[resolvedId].promise;
+      this.logDebug(`==> Request successfully finished ${resolvedId}`);
 
-      delete this.requests[id];
+      delete this.requests[resolvedId];
 
       return result;
     }
     catch (err) {
-      delete this.requests[id];
+      delete this.requests[resolvedId];
 
       throw err;
     }
@@ -178,6 +179,16 @@ export default class Sender {
     //
     //   throw err;
     // }
+  }
+
+  protected resolveId(id?: string): string {
+    if (typeof id !== 'undefined') return String(id);
+
+    const newId = idCounter;
+
+    idCounter++;
+
+    return String(newId);
   }
 
 }
