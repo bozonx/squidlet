@@ -12,9 +12,8 @@ import EntityDefinition from '../../interfaces/EntityDefinition';
 
 
 export interface PollPreProps {
-  // TODO: может быть undefined
   // data to write before read or function number to read from
-  request: Uint8Array | string | number;
+  request?: Uint8Array | string | number;
   requestCb?: () => Promise<Uint8Array>;
   // length of result which will be read. If isn't set then `defaultPollIntervalMs` will be used.
   resultLength?: number;
@@ -23,11 +22,10 @@ export interface PollPreProps {
 }
 
 export interface PollProps {
-  // TODO: может быть undefined
-  request: Uint8Array;
+  request?: Uint8Array;
   requestCb?: () => Promise<Uint8Array>;
   // string variant of request. Useful for print into messages.
-  requestStr: string;
+  requestStr?: string;
   resultLength?: number;
   intervalMs?: number;
 }
@@ -63,23 +61,27 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     const poll: PollProps[] = [];
 
     for (let item of definitionPoll) {
-      let request: Uint8Array;
-      let requestStr: string = String(item.request);
+      let request: Uint8Array | undefined;
+      let requestStr: string | undefined;
 
-      // TODO: better to make helper
       if (typeof item.request === 'number') {
         request = new Uint8Array([item.request]);
         requestStr = hexNumToString(item.request);
       }
       else if (typeof item.request === 'string') {
         request = new Uint8Array(stringToUint8Array(item.request));
+        requestStr = item.request;
       }
       else if (item.request instanceof Uint8Array) {
         request = item.request;
+        requestStr = JSON.stringify(item.request);
       }
       else if (Array.isArray(item.request)) {
         request = new Uint8Array(item.request);
         requestStr = JSON.stringify(item.request);
+      }
+      else if (typeof item.request === 'undefined') {
+        // do nothing
       }
       else {
         throw new Error(`Unknown type of poll request`);
@@ -143,7 +145,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         const pollProps = this.props.poll[indexStr] as PollProps;
 
         this.log.error(
-          `MasterSlaveBaseNodeDriver: Error on request "${pollProps.requestStr}". ` +
+          `MasterSlaveBaseNodeDriver: Error on request "${pollProps.requestStr || indexStr}". ` +
           `Props are "${JSON.stringify(this.props)}": ${String(err)}`
         );
       }, indexStr);
@@ -232,7 +234,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       catch (err) {
         const pollProps = this.props.poll[indexStr] as PollProps;
 
-        this.log.error(`Error occur on request ${pollProps.requestStr}, ${err}`);
+        this.log.error(`Error occur on request ${pollProps.requestStr || indexStr}, ${err}`);
       }
     }
   }
@@ -265,12 +267,22 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
     if (!this.props.poll) throw new Error(`No poll in props`);
 
     const pollProps = this.props.poll[pollIndex] as PollProps;
-    const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
-      ? this.props.defaultPollIntervalMs
-      : pollProps.resultLength;
+    let result: Uint8Array;
 
-    // write request and read result
-    const result: Uint8Array = await this.transfer(pollProps.request, resolvedLength);
+    if (pollProps.requestCb) {
+      result = await pollProps.requestCb();
+    }
+    else if (pollProps.request) {
+      const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
+        ? this.props.defaultPollIntervalMs
+        : pollProps.resultLength;
+
+      // write request and read result
+      result = await this.transfer(pollProps.request, resolvedLength);
+    }
+    else {
+      throw new Error(`Can't resolve request of ${JSON.stringify(pollProps)}`);
+    }
 
     this.handleIncomeData(result, pollIndex);
   }

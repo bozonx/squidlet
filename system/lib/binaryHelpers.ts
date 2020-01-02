@@ -154,9 +154,9 @@ export function hexNumToString(hexNum?: number): string {
  * * "f" => '0x0f'
  * * "0x2f" => '0x2f'
  */
-export function normalizeHexString(value: string): string {
-  if (!value) {
-    throw new Error(`Value isn't defined`);
+export function normalizeHexString(value: string | number): string {
+  if (typeof value === 'undefined' || typeof value === 'number') {
+    return hexNumToString(value);
   }
 
   const toNum: number = parseInt(value, 16);

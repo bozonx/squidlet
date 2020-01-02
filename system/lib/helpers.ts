@@ -4,6 +4,12 @@ import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
 import {JsonTypes, Primitives} from '../interfaces/Types';
 
 
+export function waitMs(ms: number): Promise<void> {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 /**
  * Join topic paths using special path separator
  */

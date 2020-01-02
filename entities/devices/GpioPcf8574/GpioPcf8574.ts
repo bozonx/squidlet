@@ -5,6 +5,7 @@ import {Edge} from 'system/interfaces/gpioTypes';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {omitObj} from 'system/lib/objects';
 import {stringifyPinMode} from 'system/lib/digitalHelpers';
+import {normalizeHexString} from 'system/lib/binaryHelpers';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
 
@@ -33,7 +34,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
   }
 
   protected async devicesDidInit() {
-    this.log.debug(`GpioPcf8574: init IC: ${this.props.address}`);
+    this.log.debug(`GpioPcf8574: init IC: ${normalizeHexString(this.props.address)}`);
     // initialize IC after app did init
     // don't wait while ic is initialized
     this.expander.initIc();
