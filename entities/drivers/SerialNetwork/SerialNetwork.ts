@@ -1,20 +1,21 @@
 import NetworkDriver, {
   IncomeRequestHandler,
+  IncomeResponseHandler,
   NetworkDriverProps,
   NetworkRequest,
-  ReceiveHandler
+  NetworkResponse,
 } from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
 import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
+import Promised from 'system/lib/Promised';
+import {makeUniqNumber} from 'system/lib/uniqId';
 import {Serial} from '../Serial/Serial';
 
 
 export interface SerialNetworkProps extends NetworkDriverProps {
-  // wait for data transfer ends on send and request methods
-  //requestTimeout: number;
 }
 
 
@@ -32,51 +33,47 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
   }
 
 
-  async request(register: number, data?: Uint8Array): Promise<NetworkRequest> {
-    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
-    // TODO: таймаут соединения - use sendoer
-    // TODO: review
+  async request(register: number, body: Uint8Array): Promise<NetworkRequest> {
+    const promised = new Promised();
+    const requestId: number = makeUniqNumber();
+    const request: NetworkRequest = {
+      requestId,
+      body,
+    };
 
-    return new Promise<NetworkRequest>(async (resolve, reject) => {
-      let failed = false;
-      // failed or resolved
-      let fulfilled = false;
+    this.sendRequest(register, request)
+      .catch((e: Error) => {
+        if (promised.isFulfilled()) return;
 
-      // TODO: игнорировать если будет таймаут
-      this.sendRequest(register, data)
-        .catch((e) => {
-
-          failed = true;
-          reject(e);
-        });
-
-      // listen for response
-      const listenIndex = this.onIncome(register, (request: NetworkRequest) => {
-        // do nothing if filed
-        if (failed) return;
-
-        fulfilled = true;
-
-        if (receivedDataAddressStr !== dataAddressStr) return;
-
-        resolve(data);
-
-        // TODO: remove listenIndex
+        promised.reject(e);
       });
 
-      setTimeout(() => {
-        if (failed) return;
+    // listen for response
+    const listenIndex = this.onResponse(register, (response: NetworkResponse) => {
+      // do nothing if filed or resolved
+      if (promised.isFulfilled()) return;
+      // process only ours request
+      else if (response.requestId !== requestId) return;
 
-        if (!fulfilled) {
-          failed = true;
-          reject(`SerialDuplexDriver.request: Timeout of request has been reached of dataAddress "${dataAddressStr}"`);
-        }
+      this.removeListener(listenIndex);
 
-      }, this.props.requestTimeout);
+      promised.resolve(response);
     });
+
+    setTimeout(() => {
+      if (promised.isFulfilled()) return;
+
+      this.removeListener(listenIndex);
+
+      promised.reject(
+        new Error(`SerialNetwork.request: Timeout of request has been exceeded of register "${register}"`)
+      );
+    }, this.props.requestTimeoutSec * 1000);
+
+    return promised.promise;
   }
 
-  onIncome(register: number, handler: IncomeRequestHandler): number {
+  onRequest(register: number, handler: IncomeRequestHandler): number {
     const wrapper = (data: Uint8Array) => {
       if (!data.length) {
         return this.env.log.error(`SerialDuplexDriver: Received event without a dataAddress`);
@@ -91,6 +88,10 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     return this.serialDev.on(this.props.uartNum, 'data', wrapper);
   }
 
+  onResponse(register: number, handler: IncomeResponseHandler): number {
+    // TODO: add !!!!
+  }
+
   removeListener(handlerIndex: number): void {
     // TODO: add !!!!
     //this.serialDev.removeListener(handlerIndex);
@@ -98,10 +99,9 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
 
 
   // TODO: review
-  private sendRequest(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
-    if (typeof dataAddressStr === 'undefined') {
-      throw new Error(`SerialDuplexDriver.send: You have to specify a "dataAddress" param`);
-    }
+  private sendRequest(register: number, request: NetworkRequest): Promise<void> {
+    // TODO: может use sendoer для переотправки запроса
+    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
 
     let dataToWrite: Uint8Array;
     const dataAddrHex: number = hexStringToHexNum(dataAddressStr);

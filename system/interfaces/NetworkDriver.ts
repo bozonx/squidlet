@@ -17,9 +17,12 @@ export interface NetworkResponse {
 
 export interface NetworkDriverProps {
   busId: number | string;
+  // wait seconds for data transfer ends
+  requestTimeoutSec: number;
 }
 
 export type IncomeRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;
+export type IncomeResponseHandler = (request: NetworkResponse) => void;
 
 
 export default interface NetworkDriver {
@@ -28,18 +31,23 @@ export default interface NetworkDriver {
    * On the other side you should listen to this address and send data to the same address on this side.
    * An error will be risen only if request hasn't been sent or on response timeout.
    */
-  request(register: number, data?: Uint8Array): Promise<NetworkRequest>;
+  request(register: number, body: Uint8Array): Promise<NetworkRequest>;
 
   /**
    * Handle income request at specified register.
    * You have to generate a response
    */
-  onIncome(register: number, handler: IncomeRequestHandler): number;
+  onRequest(register: number, handler: IncomeRequestHandler): number;
+
+  /**
+   * Handle income response from remote node
+   */
+  onResponse(register: number, handler: IncomeResponseHandler): number;
 
   // TODO: может выделить отправку ответа в отдельный метод????
 
   /**
-   * Remove listener that has been set by `onIncome`
+   * Remove listener that has been set by `onRequest` or `onResponse`
    */
   removeListener(handlerIndex: number): void;
 }
