@@ -12,17 +12,32 @@ import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import Promised from 'system/lib/Promised';
 import {makeUniqNumber} from 'system/lib/uniqId';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Serial} from '../Serial/Serial';
 
 
 export interface SerialNetworkProps extends NetworkDriverProps {
 }
 
+enum COMMANDS {
+  request = 254,
+  response,
+}
+
+enum MESSAGE_POSITION {
+  command,
+  register,
+  requestId,
+}
+
 
 export class SerialNetwork extends DriverBase<SerialNetworkProps> implements NetworkDriver {
+  private events = new IndexedEventEmitter();
+
   private get serial(): Serial {
     return this.depsInstances.serial as any;
   }
+
 
   init = async () => {
     this.depsInstances.serial = this.context.getSubDriver('Serial', {
@@ -49,7 +64,7 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
       });
 
     // listen for response
-    const listenIndex = this.onResponse(register, (response: NetworkResponse) => {
+    const listenIndex = this.onIncomeResponse(register, (response: NetworkResponse) => {
       // do nothing if filed or resolved
       if (promised.isFulfilled()) return;
       // process only ours request
@@ -85,11 +100,7 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
       cb(dataAddress, onlyData);
     };
 
-    return this.serialDev.on(this.props.uartNum, 'data', wrapper);
-  }
-
-  onResponse(register: number, handler: IncomeResponseHandler): number {
-    // TODO: add !!!!
+    //return this.serialDev.on(this.props.uartNum, 'data', wrapper);
   }
 
   removeListener(handlerIndex: number): void {
@@ -97,6 +108,13 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     //this.serialDev.removeListener(handlerIndex);
   }
 
+
+  private onIncomeResponse(register: number, handler: IncomeResponseHandler): number {
+
+    // TODO: add !!!!
+
+    //this.serial.onMessage()
+  }
 
   // TODO: review
   private sendRequest(register: number, request: NetworkRequest): Promise<void> {
@@ -117,17 +135,40 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     return this.serialDev.write(this.props.uartNum, dataToWrite);
   }
 
+  /**
+   * Income message. Bytes:
+   * 0: 254 = income request, 255 = income response.
+   * 1: register
+   * 2...: serialized data in Uint8Array
+   * @param data
+   */
   private handleIncomeMessage(data: string | Uint8Array) {
+    if (!(data instanceof Uint8Array)) {
+      return this.log.error(`SerialNetwork: income data has to be Uint8Array`);
+    }
+    else if (data.length < 2) {
+      return this.log.error(`SerialNetwork: incorrect data length: ${data.length}`);
+    }
+    else if (
+      data[MESSAGE_POSITION.command] !== COMMANDS.request
+      && data[MESSAGE_POSITION.command] !== COMMANDS.response
+    ) {
+      // skip not ours commands
+      return;
+    }
+
+    const register: number = data[MESSAGE_POSITION.register];
+    const requestId: number = data[MESSAGE_POSITION.requestId];
+
 
   }
+
+  // TODO: сделать бесконечный requestId но толко с 256 значений
 
 }
 
 
-export default class Factory extends DriverFactoryBase<SerialNetwork, SerialDuplexProps> {
+export default class Factory extends DriverFactoryBase<SerialNetwork, SerialNetworkProps> {
   protected SubDriverClass = SerialNetwork;
-
-  protected instanceId = (props: SerialDuplexProps): string => {
-    return String(props.uartNum);
-  }
+  protected instanceId = (props: SerialNetworkProps): string => String(props.busId);
 }

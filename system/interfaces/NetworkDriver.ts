@@ -39,10 +39,10 @@ export default interface NetworkDriver {
    */
   onRequest(register: number, handler: IncomeRequestHandler): number;
 
-  /**
-   * Handle income response from remote node
-   */
-  onResponse(register: number, handler: IncomeResponseHandler): number;
+  // /**
+  //  * Handle income response from remote node
+  //  */
+  // onResponse(register: number, handler: IncomeResponseHandler): number;
 
   // TODO: может выделить отправку ответа в отдельный метод????
 
