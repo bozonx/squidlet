@@ -1,7 +1,7 @@
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import DriverBase from 'system/base/DriverBase';
-import {DigitalSubDriver, WatchHandler, DigitalInputMode} from 'system/interfaces/io/DigitalIo';
-import {lastItem} from 'system/lib/arrays';
+import DriverFactoryBase from 'base/DriverFactoryBase';
+import DriverBase from 'base/DriverBase';
+import {DigitalSubDriver, WatchHandler, DigitalInputMode} from 'interfaces/io/DigitalIo';
+import {lastItem} from 'lib/arrays';
 
 import {PortExpander} from '../PortExpander';
 

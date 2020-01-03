@@ -1,66 +1,68 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import SerialIo, {SerialParams} from 'system/interfaces/io/SerialIo';
-import {omitObj} from 'system/lib/objects';
+import SerialIo from 'system/interfaces/io/SerialIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
+import {SerialMessageHandler} from 'system/interfaces/io/SerialIo';
 
 
-export type MessageHandler = (data: string | Uint8Array) => void;
-interface Props extends SerialParams {
-  portNum: number;
+interface Props {
+  portNum: number | string;
 }
 
 
 export class Serial extends DriverBase<Props> {
-  private readonly messageEvents = new IndexedEvents<MessageHandler>();
+  private readonly messageEvents = new IndexedEvents<SerialMessageHandler>();
   private get serialIo(): SerialIo {
-    return this.context.getIo('Serial') as any;
+    return this.depsInstances.serialIo;
   }
-  private portNum: number = -1;
 
 
   init = async () => {
-    this.portNum = await this.serialIo.newPort(
-      this.props.portNum,
-      omitObj(this.props, 'portNum')
-    );
+    this.depsInstances.serialIo = this.context.getIo('Serial');
 
-    await this.serialIo.onError(this.portNum, this.log.error);
-    await this.serialIo.onData(this.portNum, this.handleData);
+    await this.serialIo.onError(this.props.portNum, this.handleError);
+    await this.serialIo.onData(this.props.portNum, this.handleData);
 
-    this.log.debug(`Serial driver: Connected to port number ${this.portNum}`);
+    this.log.debug(`Serial driver: Connected to port ${this.props.portNum}`);
   }
 
 
   destroy = async () => {
     this.messageEvents.destroy();
-    await this.serialIo.destroyPort(this.portNum);
+    await this.serialIo.destroyPort(this.props.portNum);
   }
 
 
-  onMessage(cb: MessageHandler): number {
+  onMessage(cb: SerialMessageHandler): number {
     return this.messageEvents.addListener(cb);
   }
 
   async write(data: Uint8Array) {
-    await this.serialIo.write(this.portNum, data);
+    await this.serialIo.write(this.props.portNum, data);
   }
 
   async print(data: string) {
-    return await this.serialIo.print(this.portNum, data);
+    return await this.serialIo.print(this.props.portNum, data);
   }
 
   async println(data: string) {
-    return await this.serialIo.print(this.portNum, data);
+    return await this.serialIo.print(this.props.portNum, data);
   }
 
-  removeMessageListener(handlerIndex: number) {
+  /**
+   * Remove message listener
+   */
+  removeListener(handlerIndex: number) {
     this.messageEvents.removeListener(handlerIndex);
   }
 
 
-  private handleData(data: string | Uint8Array) {
+  private handleData = (data: string | Uint8Array) => {
     this.messageEvents.emit(data);
+  }
+
+  private handleError = (err: string) => {
+    this.log.error(err);
   }
 
 }
@@ -68,7 +70,5 @@ export class Serial extends DriverBase<Props> {
 
 export default class Factory extends DriverFactoryBase<Serial, Props> {
   protected SubDriverClass = Serial;
-  protected instanceId = (props: Props): string => {
-    return String(props.portNum);
-  }
+  protected instanceId = (props: Props): string => String(props.portNum);
 }

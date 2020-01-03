@@ -1,5 +1,5 @@
-import {bytesToBits} from 'system/lib/binaryHelpers';
-import IndexedEvents from 'system/lib/IndexedEvents';
+import {bytesToBits} from 'lib/binaryHelpers';
+import IndexedEvents from 'lib/IndexedEvents';
 
 import {DigitalPinHandler} from './DigitalPins';
 import {AnalogPinHandler} from './AnalogPins';

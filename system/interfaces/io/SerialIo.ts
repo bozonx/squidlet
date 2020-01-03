@@ -3,6 +3,7 @@ import IoContext from '../IoContext';
 
 
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;
+export type SerialMessageHandler = (data: string | Uint8Array) => void;
 
 export enum SerialEvents {
   data,
@@ -26,6 +27,7 @@ export interface SerialParams {
 }
 
 export interface SerialDefinition {
+  // params of ports by portNum or port name
   ports: {[index: string]: SerialParams};
   // TODO: add default baudRate
 }
@@ -85,7 +87,7 @@ export default interface SerialIo extends IoItem {
 
   destroyPort(portNum: string | number): Promise<void>;
 
-  onData(portNum: string | number, handler: (data: string | Uint8Array) => void): Promise<number>;
+  onData(portNum: string | number, handler: SerialMessageHandler): Promise<number>;
   onError(portNum: string | number, handler: (err: string) => void): Promise<number>;
   removeListener(portNum: string | number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 

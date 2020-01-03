@@ -4,7 +4,7 @@ import {
   PortExpanderProps,
   PortExpanderConnection,
   PortExpander
-} from '../../drivers/PortExpander/PortExpander';
+} from '../../../__old/entities/PortExpander/PortExpander';
 
 
 interface Props extends PortExpanderProps {

@@ -1,7 +1,7 @@
-import {DigitalInputMode, DigitalPinMode} from 'system/interfaces/io/DigitalIo';
-import {bitsToBytes} from 'system/lib/binaryHelpers';
-import {getKeyOfObject} from 'system/lib/objects';
-import {makeSizedArray} from 'system/lib/arrays';
+import {DigitalInputMode, DigitalPinMode} from 'interfaces/io/DigitalIo';
+import {bitsToBytes} from 'lib/binaryHelpers';
+import {getKeyOfObject} from 'lib/objects';
+import {makeSizedArray} from 'lib/arrays';
 
 import {
   COMMANDS,
