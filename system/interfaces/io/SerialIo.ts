@@ -27,8 +27,10 @@ export interface SerialParams {
 
 export interface SerialDefinition {
   ports: {[index: string]: SerialParams};
+  // TODO: add default baudRate
 }
 
+// TODO: make wrapper with promises
 // low level instance
 export interface SerialPortLike {
   write(data: any, cb: (err: string) => void): void;
@@ -45,19 +47,20 @@ export const defaultSerialParams: SerialParams = {
 
 export const Methods = [
   'init',
-  'newPort',
+  'configure',
   'destroy',
+
+  //'newPort',
   'destroyPort',
 
   'onData',
   'onError',
+  'removeListener',
 
   'write',
   'print',
   'println',
-  'read',
-
-  'removeListener',
+  //'read',
 ];
 
 
@@ -73,28 +76,30 @@ export default interface SerialIo extends IoItem {
   init(ioManager: IoContext): Promise<void>;
   configure(definition: SerialDefinition): Promise<void>;
   destroy(): Promise<void>;
-  /**
-   * Create a new port and wait while it opens.
-   * If you don't specify a portNum then a new one will be created and this number will be returned.
-   */
-  newPort(portNum: number | undefined, paramsOverride: SerialParams): Promise<number>;
-  destroyPort(portNum: number): Promise<void>;
 
-  onData(portNum: number, handler: (data: string | Uint8Array) => void): Promise<number>;
-  onError(portNum: number, handler: (err: string) => void): Promise<number>;
+  // /**
+  //  * Create a new port and wait while it opens.
+  //  * If you don't specify a portNum then a new one will be created and this number will be returned.
+  //  */
+  // newPort(portNum: number | undefined, paramsOverride: SerialParams): Promise<number>;
+
+  destroyPort(portNum: string | number): Promise<void>;
+
+  onData(portNum: string | number, handler: (data: string | Uint8Array) => void): Promise<number>;
+  onError(portNum: string | number, handler: (err: string) => void): Promise<number>;
+  removeListener(portNum: string | number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 
   // write binary data
-  write(portNum: number, data: Uint8Array): Promise<void>;
+  write(portNum: string | number, data: Uint8Array): Promise<void>;
   // Print to the serial port - without a line break
-  print(portNum: number, data: string): Promise<void>;
+  print(portNum: string | number, data: string): Promise<void>;
   // Print a line to the serial port with a newline (\r\n) at the end of it.
-  println(portNum: number, data: string): Promise<void>;
+  println(portNum: string | number, data: string): Promise<void>;
   // /**
   //  * Return a string or binary data or undefined containing characters that have been received
   //  * @param portNum
   //  * @param length - The number of characters to read, or undefined/0 for all available
   //  */
-  // read(portNum: number, length?: number): Promise<string | Uint8Array>;
+  // read(portNum: string | number, length?: number): Promise<string | Uint8Array>;
 
-  removeListener(portNum: number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 }

@@ -1,14 +1,24 @@
-import * as SerialPort from 'serialport';
-import {OpenOptions} from 'serialport';
-
-import SerialIo, {SerialParams, SerialPortLike} from 'system/interfaces/io/SerialIo';
+import {SerialParams, SerialPortLike} from 'system/interfaces/io/SerialIo';
 import {omitObj} from 'system/lib/objects';
 import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import SerialIoBase from 'system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import IoContext from 'system/interfaces/IoContext';
+import PigpioClient from './PigpioClient';
 
 
-export default class Serial extends SerialIoBase implements SerialIo {
+export default class Serial extends SerialIoBase {
+  private _client?: PigpioClient;
+
+  private get client(): PigpioClient {
+    return this._client as any;
+  }
+
+  async init(ioContext: IoContext): Promise<void> {
+    this._client = ioContext.getIo<PigpioClient>('PigpioClient');
+  }
+
+
   protected createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike> {
     return new Promise<SerialPortLike>((resolve, reject) => {
       if (!params.dev) {

@@ -34,6 +34,10 @@ export default class I2cMaster implements I2cMasterIo {
   }
 
   async destroy(): Promise<void> {
+    delete this._client;
+    delete this.definition;
+    delete this.openConnectionPromised;
+    delete this.openedAddresses;
   }
 
 
