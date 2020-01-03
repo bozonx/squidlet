@@ -15,7 +15,11 @@ export interface NetworkResponse {
   body: Uint8Array | string;
 }
 
-export type IncomeRequestHandler = (register: number, request: NetworkRequest) => Promise<NetworkResponse>;
+export interface NetworkDriverProps {
+  busId: number | string;
+}
+
+export type IncomeRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;
 
 
 export default interface NetworkDriver {
@@ -34,5 +38,8 @@ export default interface NetworkDriver {
 
   // TODO: может выделить отправку ответа в отдельный метод????
 
+  /**
+   * Remove listener that has been set by `onIncome`
+   */
   removeListener(handlerIndex: number): void;
 }

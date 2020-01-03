@@ -1,12 +1,11 @@
 name: SerialNetwork
 main: SerialNetwork.ts
-system: true
 
-ios:
+drivers:
   - Serial
 
 props:
-  # Number of system UART interface starts from 0
-  uartNum:
-    type: number
+  # Id of bus which is configured at Serial IO params.
+  busId:
+    type: number | string
     required: true

@@ -1,61 +1,57 @@
-import NetworkDriver, {ReceiveHandler} from 'system/interfaces/NetworkDriver';
+import NetworkDriver, {
+  IncomeRequestHandler,
+  NetworkDriverProps,
+  NetworkRequest,
+  ReceiveHandler
+} from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
-import SerialIo from 'system/interfaces/io/SerialIo';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
 import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
+import {Serial} from '../Serial/Serial';
 
 
-export interface SerialDuplexProps {
-  uartNum: number;
+export interface SerialNetworkProps extends NetworkDriverProps {
   // wait for data transfer ends on send and request methods
-  requestTimeout: number;
+  //requestTimeout: number;
 }
 
 
-export class SerialNetwork extends DriverBase<SerialDuplexProps> implements NetworkDriver {
-  // TODO: упростить
-  private get serialDev(): SerialIo {
-    return this.depsInstances.serialDev as any;
+export class SerialNetwork extends DriverBase<SerialNetworkProps> implements NetworkDriver {
+  private get serial(): Serial {
+    return this.depsInstances.serial as any;
   }
 
   init = async () => {
-    this.depsInstances.serialDev = this.env.getIo('Serial');
+    this.depsInstances.serial = this.context.getSubDriver('Serial', {
+      portNum: this.props.busId,
+    });
+
+    this.serial.onMessage(this.handleIncomeMessage);
   }
 
 
-  // TODO: add queue - запретить посылать данные (или посылать другие requests) пока ждем ответ или добавить свой маркер
-
-
-  async send(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
-
+  async request(register: number, data?: Uint8Array): Promise<NetworkRequest> {
+    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
     // TODO: таймаут соединения - use sendoer
-
-    await this.sendData(dataAddressStr, data);
-  }
-
-  async request(dataAddressStr: number | string, data?: Uint8Array): Promise<Uint8Array> {
-
     // TODO: review
 
-    if (typeof dataAddressStr === 'undefined') {
-      throw new Error(`SerialDuplexDriver.request: You have to specify a "dataAddress" param`);
-    }
-
-    return new Promise<Uint8Array>(async (resolve, reject) => {
+    return new Promise<NetworkRequest>(async (resolve, reject) => {
       let failed = false;
+      // failed or resolved
       let fulfilled = false;
 
-      // TODO: тоже ждать таймаут - лучше наверное тогда вызвать this.send()
-      this.sendData(dataAddressStr, data)
+      // TODO: игнорировать если будет таймаут
+      this.sendRequest(register, data)
         .catch((e) => {
+
           failed = true;
           reject(e);
         });
 
       // listen for response
-      const listenIndex = this.onReceive((receivedDataAddressStr: number | string | undefined, data: Uint8Array) => {
+      const listenIndex = this.onIncome(register, (request: NetworkRequest) => {
         // do nothing if filed
         if (failed) return;
 
@@ -64,6 +60,8 @@ export class SerialNetwork extends DriverBase<SerialDuplexProps> implements Netw
         if (receivedDataAddressStr !== dataAddressStr) return;
 
         resolve(data);
+
+        // TODO: remove listenIndex
       });
 
       setTimeout(() => {
@@ -78,7 +76,7 @@ export class SerialNetwork extends DriverBase<SerialDuplexProps> implements Netw
     });
   }
 
-  onReceive(cb: ReceiveHandler): number {
+  onIncome(register: number, handler: IncomeRequestHandler): number {
     const wrapper = (data: Uint8Array) => {
       if (!data.length) {
         return this.env.log.error(`SerialDuplexDriver: Received event without a dataAddress`);
@@ -94,11 +92,13 @@ export class SerialNetwork extends DriverBase<SerialDuplexProps> implements Netw
   }
 
   removeListener(handlerIndex: number): void {
-    this.serialDev.removeListener(handlerIndex);
+    // TODO: add !!!!
+    //this.serialDev.removeListener(handlerIndex);
   }
 
 
-  private sendData(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
+  // TODO: review
+  private sendRequest(dataAddressStr: number | string, data?: Uint8Array): Promise<void> {
     if (typeof dataAddressStr === 'undefined') {
       throw new Error(`SerialDuplexDriver.send: You have to specify a "dataAddress" param`);
     }
@@ -115,6 +115,10 @@ export class SerialNetwork extends DriverBase<SerialDuplexProps> implements Netw
     }
 
     return this.serialDev.write(this.props.uartNum, dataToWrite);
+  }
+
+  private handleIncomeMessage(data: string | Uint8Array) {
+
   }
 
 }
