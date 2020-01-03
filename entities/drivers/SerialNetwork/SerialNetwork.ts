@@ -7,7 +7,13 @@ import NetworkDriver, {
 } from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {addFirstItemUint8Arr, hexNumToString, uint8ToNum, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
+import {
+  addFirstItemUint8Arr, concatUint8Arr,
+  hexNumToString,
+  numToUint8Word,
+  uint8ToNum,
+  withoutFirstItemUint8Arr
+} from 'system/lib/binaryHelpers';
 import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import Promised from 'system/lib/Promised';
@@ -127,11 +133,25 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
 
   // TODO: review
   private sendRequest(register: number, request: NetworkRequest): Promise<void> {
+    // TODO: test by hard
     // TODO: может use sendoer для переотправки запроса
     // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
 
-    let dataToWrite: Uint8Array;
-    const dataAddrHex: number = hexStringToHexNum(dataAddressStr);
+    const dataToWrite: Uint8Array = new Uint8Array(REQUEST_PAYLOAD_START + request.body.length);
+    const requestIdUint: Uint8Array = numToUint8Word(request.requestId);
+
+    dataToWrite[MESSAGE_POSITION.command] = COMMANDS.request;
+    dataToWrite[MESSAGE_POSITION.register] = register;
+    dataToWrite[MESSAGE_POSITION.requestIdStart] = requestIdUint[0];
+    dataToWrite[MESSAGE_POSITION.requestIdEnd] = requestIdUint[1];
+
+    // for (let i = 0; i < request.body.length; i++) {
+    //   dataToWrite[REQUEST_PAYLOAD_START + 0] = request.body[i];
+    // }
+
+    const dataToWrite: Uint8Array = concatUint8Arr(metaData, request.body);
+
+    //const dataAddrHex: number = hexStringToHexNum(dataAddressStr);
 
     if (typeof data === 'undefined') {
       dataToWrite = new Uint8Array(FUNCTION_NUMBER_LENGTH);
@@ -162,6 +182,8 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
       // skip not ours commands
       return;
     }
+
+    // TODO: test by hard
 
     const register: number = data[MESSAGE_POSITION.register];
     // requestId is 16 bit int

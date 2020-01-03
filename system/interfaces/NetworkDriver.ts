@@ -7,13 +7,13 @@ enum NetworkStatus {
 export interface NetworkRequest {
   // should be 16 bits
   requestId: number;
-  body: Uint8Array | string;
+  body: Uint8Array;
 }
 
 export interface NetworkResponse {
   requestId: number;
   status: NetworkStatus;
-  body: Uint8Array | string;
+  body: Uint8Array;
 }
 
 export interface NetworkDriverProps {
