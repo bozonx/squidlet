@@ -1,8 +1,8 @@
-import I2cSlaveIo from 'system/interfaces/io/I2cSlaveIo';
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'system/lib/binaryHelpers';
-import DriverBase from 'system/base/DriverBase';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import I2cSlaveIo from 'interfaces/io/I2cSlaveIo';
+import DriverFactoryBase from 'base/DriverFactoryBase';
+import { addFirstItemUint8Arr, withoutFirstItemUint8Arr } from 'lib/binaryHelpers';
+import DriverBase from 'base/DriverBase';
+import IndexedEventEmitter from 'lib/IndexedEventEmitter';
 
 
 // TODO: don't use null

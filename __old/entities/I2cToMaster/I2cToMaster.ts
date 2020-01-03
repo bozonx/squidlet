@@ -1,4 +1,4 @@
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
+import DriverFactoryBase from 'base/DriverFactoryBase';
 
 
 interface I2cToMasterProps {
