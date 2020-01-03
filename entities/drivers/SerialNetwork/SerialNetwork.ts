@@ -7,7 +7,7 @@ import NetworkDriver, {
 } from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
+import {addFirstItemUint8Arr, hexNumToString, uint8ToNum, withoutFirstItemUint8Arr} from 'system/lib/binaryHelpers';
 import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
 import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import Promised from 'system/lib/Promised';
@@ -19,6 +19,11 @@ import {Serial} from '../Serial/Serial';
 export interface SerialNetworkProps extends NetworkDriverProps {
 }
 
+enum EVENTS {
+  request,
+  response,
+}
+
 enum COMMANDS {
   request = 254,
   response,
@@ -27,8 +32,14 @@ enum COMMANDS {
 enum MESSAGE_POSITION {
   command,
   register,
-  requestId,
+  requestIdStart,
+  requestIdEnd,
+  responseStatusStart,
+  responseStatusEnd,
 }
+
+const REQUEST_PAYLOAD_START = 4;
+const RESPONSE_PAYLOAD_START = 6;
 
 
 export class SerialNetwork extends DriverBase<SerialNetworkProps> implements NetworkDriver {
@@ -104,16 +115,14 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
   }
 
   removeListener(handlerIndex: number): void {
-    // TODO: add !!!!
-    //this.serialDev.removeListener(handlerIndex);
+    this.events.removeListener(handlerIndex);
   }
 
 
   private onIncomeResponse(register: number, handler: IncomeResponseHandler): number {
+    const eventName: string = `${EVENTS.response}${hexNumToString(register)}`;
 
-    // TODO: add !!!!
-
-    //this.serial.onMessage()
+    return this.events.addListener(eventName, handler);
   }
 
   // TODO: review
@@ -136,17 +145,14 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
   }
 
   /**
-   * Income message. Bytes:
-   * 0: 254 = income request, 255 = income response.
-   * 1: register
-   * 2...: serialized data in Uint8Array
+   * Handle income message and deserialize it.
    * @param data
    */
   private handleIncomeMessage(data: string | Uint8Array) {
     if (!(data instanceof Uint8Array)) {
       return this.log.error(`SerialNetwork: income data has to be Uint8Array`);
     }
-    else if (data.length < 2) {
+    else if (data.length < REQUEST_PAYLOAD_START) {
       return this.log.error(`SerialNetwork: incorrect data length: ${data.length}`);
     }
     else if (
@@ -158,12 +164,40 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     }
 
     const register: number = data[MESSAGE_POSITION.register];
-    const requestId: number = data[MESSAGE_POSITION.requestId];
+    // requestId is 16 bit int
+    const requestId: number = uint8ToNum(
+      data.slice(MESSAGE_POSITION.requestIdStart, MESSAGE_POSITION.requestIdEnd + 1)
+    );
 
+    if (data[MESSAGE_POSITION.command] === COMMANDS.request) {
+      const body: Uint8Array = data.slice(REQUEST_PAYLOAD_START);
+      const request: NetworkRequest = {
+        requestId,
+        body,
+      };
+      const eventName: string = `${EVENTS.request}${hexNumToString(register)}`;
 
+      this.events.emit(eventName, request);
+    }
+    else {
+      // response
+      // status is 16 bit int
+      const status: number = uint8ToNum(
+        data.slice(MESSAGE_POSITION.responseStatusStart, MESSAGE_POSITION.responseStatusEnd + 1)
+      );
+      const body: Uint8Array = data.slice(RESPONSE_PAYLOAD_START);
+      const response: NetworkResponse = {
+        requestId,
+        status,
+        body,
+      };
+      const eventName: string = `${EVENTS.response}${hexNumToString(register)}`;
+
+      this.events.emit(eventName, response);
+    }
   }
 
-  // TODO: сделать бесконечный requestId но толко с 256 значений
+  // TODO: сделать бесконечный requestId но толко с 65535 значений
 
 }
 

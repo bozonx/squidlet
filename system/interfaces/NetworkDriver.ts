@@ -5,6 +5,7 @@ enum NetworkStatus {
 }
 
 export interface NetworkRequest {
+  // should be 16 bits
   requestId: number;
   body: Uint8Array | string;
 }
@@ -30,6 +31,7 @@ export default interface NetworkDriver {
    * Send data and waiting of response.
    * On the other side you should listen to this address and send data to the same address on this side.
    * An error will be risen only if request hasn't been sent or on response timeout.
+   * Register is 8 bits.
    */
   request(register: number, body: Uint8Array): Promise<NetworkRequest>;
 
