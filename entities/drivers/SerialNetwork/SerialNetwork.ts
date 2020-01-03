@@ -8,14 +8,11 @@ import NetworkDriver, {
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {
-  addFirstItemUint8Arr, concatUint8Arr,
+  concatUint8Arr,
   hexNumToString,
   numToUint8Word,
   uint8ToNum,
-  withoutFirstItemUint8Arr
 } from 'system/lib/binaryHelpers';
-import {FUNCTION_NUMBER_LENGTH} from 'system/lib/constants';
-import {hexStringToHexNum} from 'system/lib/binaryHelpers';
 import Promised from 'system/lib/Promised';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
@@ -106,18 +103,29 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
   }
 
   onRequest(register: number, handler: IncomeRequestHandler): number {
-    const wrapper = (data: Uint8Array) => {
-      if (!data.length) {
-        return this.env.log.error(`SerialDuplexDriver: Received event without a dataAddress`);
-      }
+    const wrapper = (request: NetworkRequest) => {
+      handler(request)
+        .then((response: NetworkResponse) => {
+          // send response and don't wait for result
+          this.sendResponse(register, response)
+            .catch(this.log.error);
+        })
+        .catch((e) => {
+          const response: NetworkResponse = {
+            requestId: request.requestId,
+            status: 500,
+            // TODO: как отправить ошибку ???? может сделать отдельную комманду ????
+            body: new Uint8Array(0),
+          };
 
-      const dataAddress = data[0];
-      const onlyData: Uint8Array = withoutFirstItemUint8Arr(data);
-
-      cb(dataAddress, onlyData);
+          this.sendResponse(register, response)
+            .catch(this.log.error);
+        });
     };
 
-    //return this.serialDev.on(this.props.uartNum, 'data', wrapper);
+    const eventName: string = `${EVENTS.request}${hexNumToString(register)}`;
+
+    return this.events.addListener(eventName, wrapper);
   }
 
   removeListener(handlerIndex: number): void {
@@ -131,37 +139,47 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     return this.events.addListener(eventName, handler);
   }
 
-  // TODO: review
   private sendRequest(register: number, request: NetworkRequest): Promise<void> {
     // TODO: test by hard
-    // TODO: может use sendoer для переотправки запроса
-    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
+    // TODO: move to helper
 
-    const dataToWrite: Uint8Array = new Uint8Array(REQUEST_PAYLOAD_START + request.body.length);
     const requestIdUint: Uint8Array = numToUint8Word(request.requestId);
-
-    dataToWrite[MESSAGE_POSITION.command] = COMMANDS.request;
-    dataToWrite[MESSAGE_POSITION.register] = register;
-    dataToWrite[MESSAGE_POSITION.requestIdStart] = requestIdUint[0];
-    dataToWrite[MESSAGE_POSITION.requestIdEnd] = requestIdUint[1];
-
-    // for (let i = 0; i < request.body.length; i++) {
-    //   dataToWrite[REQUEST_PAYLOAD_START + 0] = request.body[i];
-    // }
-
+    const metaData: Uint8Array = new Uint8Array([
+      COMMANDS.request,
+      register,
+      requestIdUint[0],
+      requestIdUint[1]
+    ]);
     const dataToWrite: Uint8Array = concatUint8Arr(metaData, request.body);
 
-    //const dataAddrHex: number = hexStringToHexNum(dataAddressStr);
+    // TODO: может use sendoer для переотправки запроса
+    // TODO: либо может sender сделать в нижнем драйвере
+    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
 
-    if (typeof data === 'undefined') {
-      dataToWrite = new Uint8Array(FUNCTION_NUMBER_LENGTH);
-      dataToWrite[0] = dataAddrHex;
-    }
-    else {
-      dataToWrite = addFirstItemUint8Arr(data, dataAddrHex);
-    }
+    return this.serial.write(dataToWrite);
+  }
 
-    return this.serialDev.write(this.props.uartNum, dataToWrite);
+  private sendResponse(register: number, response: NetworkResponse): Promise<void> {
+    // TODO: test by hard
+    // TODO: move to helper
+
+    const requestIdUint: Uint8Array = numToUint8Word(response.requestId);
+    const statusUint: Uint8Array = numToUint8Word(response.status);
+    const metaData: Uint8Array = new Uint8Array([
+      COMMANDS.request,
+      register,
+      requestIdUint[0],
+      requestIdUint[1],
+      statusUint[0],
+      statusUint[1],
+    ]);
+    const dataToWrite: Uint8Array = concatUint8Arr(metaData, response.body);
+
+    // TODO: может use sendoer для переотправки запроса
+    // TODO: либо может sender сделать в нижнем драйвере
+    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
+
+    return this.serial.write(dataToWrite);
   }
 
   /**
@@ -183,6 +201,7 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
       return;
     }
 
+    // TODO: move to helper
     // TODO: test by hard
 
     const register: number = data[MESSAGE_POSITION.register];
