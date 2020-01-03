@@ -24,7 +24,7 @@ export interface PollPreProps {
 export interface PollProps {
   request?: Uint8Array;
   requestCb?: () => Promise<Uint8Array>;
-  // string variant of request. Useful for print into messages.
+  // string variant of request. Useful for print into messages. It will be generated in constructor
   requestStr?: string;
   resultLength?: number;
   intervalMs?: number;
@@ -43,8 +43,6 @@ export interface MasterSlaveBaseProps {
   // Default poll interval. By default is 1000
   defaultPollIntervalMs: number;
 }
-
-export const UNDEFINED_DATA_ADDRESS = '*';
 
 
 // TODO: validate that props has to have feedback and poll together or no one or them
@@ -303,9 +301,7 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
 
 }
 
-// protected resolvePollIndex(request: Uint8Array): number | undefined {
-// }
-
+//export const UNDEFINED_DATA_ADDRESS = '*';
 // private resolveReadLength(request: Uint8Array, readLength?: number): number {
 //   if (typeof readLength !== 'undefined') {
 //     return readLength;

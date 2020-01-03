@@ -1,4 +1,4 @@
-let idCounter: number = 0;
+import {makeUniqNumber} from './uniqId';
 
 
 class SenderRequest {
@@ -187,11 +187,7 @@ export default class Sender {
   protected resolveId(id?: string): string {
     if (typeof id !== 'undefined') return String(id);
 
-    const newId = idCounter;
-
-    idCounter++;
-
-    return String(newId);
+    return String(makeUniqNumber());
   }
 
 }
