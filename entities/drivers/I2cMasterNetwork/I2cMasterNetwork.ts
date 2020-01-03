@@ -13,7 +13,7 @@ export interface I2cDuplexProps extends MasterSlaveBaseProps {
 }
 
 
-export class I2cDuplex extends DriverBase<I2cDuplexProps> implements NetworkDriver {
+export class I2cMasterNetwork extends DriverBase<I2cDuplexProps> implements NetworkDriver {
   private get i2cDriver(): MasterSlaveBaseNodeDriver<I2cDuplexProps> {
     return this.depsInstances.i2cDriver;
   }
@@ -73,8 +73,8 @@ export class I2cDuplex extends DriverBase<I2cDuplexProps> implements NetworkDriv
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cDuplex, I2cDuplexProps> {
-  protected SubDriverClass = I2cDuplex;
+export default class Factory extends DriverFactoryBase<I2cMasterNetwork, I2cDuplexProps> {
+  protected SubDriverClass = I2cMasterNetwork;
   protected instanceId = (props: I2cDuplexProps): string => {
     return `${props.busNum || 'default'}-${props.address}`;
   }

@@ -28,16 +28,14 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'HttpServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'HttpServerRouter/manifest.yaml'));
   //await env.addDriver(path.join(driversRoot, 'I2cData/manifest.yaml'));
-  //await env.addDriver(path.join(driversRoot, 'I2cDuplex/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2cSlave/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2cToMaster/manifest.yaml'));
+  //await env.addDriver(path.join(driversRoot, 'I2cMasterNetwork/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cMaster/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'ImpulseInput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'ImpulseOutput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Mqtt/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/manifest.yaml'));
-  //await env.addDriver(path.join(driversRoot, 'SerialDuplex/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'SerialNetwork/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SharedStorage/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsClient/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServer/manifest.yaml'));
@@ -62,19 +60,19 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
     // }
 
     // if (machineIos.includes('Serial')) {
-    //   await env.addUsedEntity('driver', 'SerialDuplex');
+    //   await env.addUsedEntity('driver', 'SerialNetwork');
     // }
 
     if (machineIos.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');
       await env.addUsedEntity('driver', 'I2cMaster');
-      //await env.addUsedEntity('driver', 'I2cDuplex');
+      //await env.addUsedEntity('driver', 'I2cMasterNetwork');
     }
 
     // if (machineIos.includes('I2cSlave')) {
     //   //await env.addUsedEntity('drivers', 'I2cSlave');
     //   await env.addUsedEntity('driver', 'I2cToMaster');
-    //   //await env.addUsedEntity('driver', 'I2cDuplex');
+    //   //await env.addUsedEntity('driver', 'I2cMasterNetwork');
     // }
   });
 }

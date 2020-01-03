@@ -1,5 +1,0 @@
-name: I2cDuplex
-main: I2cDuplex.ts
-type: system
-
-props: props.yaml

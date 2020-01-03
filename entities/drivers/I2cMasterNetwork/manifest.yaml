@@ -1,0 +1,5 @@
+name: I2cMasterNetwork
+main: I2cMasterNetwork.ts
+type: system
+
+props: props.yaml

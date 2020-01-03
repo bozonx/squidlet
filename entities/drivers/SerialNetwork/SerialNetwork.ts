@@ -14,7 +14,7 @@ export interface SerialDuplexProps {
 }
 
 
-export class SerialDuplex extends DriverBase<SerialDuplexProps> implements NetworkDriver {
+export class SerialNetwork extends DriverBase<SerialDuplexProps> implements NetworkDriver {
   // TODO: упростить
   private get serialDev(): SerialIo {
     return this.depsInstances.serialDev as any;
@@ -120,8 +120,8 @@ export class SerialDuplex extends DriverBase<SerialDuplexProps> implements Netwo
 }
 
 
-export default class Factory extends DriverFactoryBase<SerialDuplex, SerialDuplexProps> {
-  protected SubDriverClass = SerialDuplex;
+export default class Factory extends DriverFactoryBase<SerialNetwork, SerialDuplexProps> {
+  protected SubDriverClass = SerialNetwork;
 
   protected instanceId = (props: SerialDuplexProps): string => {
     return String(props.uartNum);

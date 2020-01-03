@@ -1,5 +1,5 @@
-name: WsDuplexServer
-main: WsDuplexServer.ts
+name: WsServerNetwork
+main: WsServerNetwork.ts
 system: true
 
 drivers:

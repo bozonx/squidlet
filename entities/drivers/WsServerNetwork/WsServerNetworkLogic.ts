@@ -13,7 +13,7 @@ interface WsServerLogic {
 }
 
 
-export default class WsDuplexServerLogic implements NetworkDriver {
+export default class WsServerNetworkLogic implements NetworkDriver {
   private readonly connectionId: string;
   private readonly server: WsServerLogic;
   private readonly logError: (message: string) => void;

@@ -1,5 +1,5 @@
-name: SerialDuplex
-main: SerialDuplex.ts
+name: SerialNetwork
+main: SerialNetwork.ts
 system: true
 
 ios:

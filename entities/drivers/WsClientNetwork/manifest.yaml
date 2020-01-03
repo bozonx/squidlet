@@ -1,0 +1,5 @@
+name: WsClientNetwork
+main: WsClientNetwork.ts
+
+drivers:
+  - WsClient
