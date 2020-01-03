@@ -1,4 +1,4 @@
-import DuplexDriver, {ReceiveHandler} from '../../../system/interfaces/DuplexDriver';
+import NetworkDriver, {ReceiveHandler} from '../../../system/interfaces/NetworkDriver';
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from '../../../system/lib/binaryHelpers';
 import {OnMessageHandler} from '../../../system/interfaces/io/WebSocketClientIo';
 
@@ -13,7 +13,7 @@ interface WsServerLogic {
 }
 
 
-export default class WsDuplexServerLogic implements DuplexDriver {
+export default class WsDuplexServerLogic implements NetworkDriver {
   private readonly connectionId: string;
   private readonly server: WsServerLogic;
   private readonly logError: (message: string) => void;

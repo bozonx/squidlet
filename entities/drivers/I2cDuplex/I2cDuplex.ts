@@ -1,5 +1,5 @@
 import DriverBase from 'system/base/DriverBase';
-import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
+import NetworkDriver, {ReceiveHandler} from 'system/interfaces/NetworkDriver';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import MasterSlaveBaseNodeDriver, {MasterSlaveBaseProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
 
@@ -13,7 +13,7 @@ export interface I2cDuplexProps extends MasterSlaveBaseProps {
 }
 
 
-export class I2cDuplex extends DriverBase<I2cDuplexProps> implements DuplexDriver {
+export class I2cDuplex extends DriverBase<I2cDuplexProps> implements NetworkDriver {
   private get i2cDriver(): MasterSlaveBaseNodeDriver<I2cDuplexProps> {
     return this.depsInstances.i2cDriver;
   }

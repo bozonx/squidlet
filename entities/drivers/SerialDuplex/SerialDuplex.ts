@@ -1,4 +1,4 @@
-import DuplexDriver, {ReceiveHandler} from 'system/interfaces/DuplexDriver';
+import NetworkDriver, {ReceiveHandler} from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
 import SerialIo from 'system/interfaces/io/SerialIo';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
@@ -14,7 +14,7 @@ export interface SerialDuplexProps {
 }
 
 
-export class SerialDuplex extends DriverBase<SerialDuplexProps> implements DuplexDriver {
+export class SerialDuplex extends DriverBase<SerialDuplexProps> implements NetworkDriver {
   // TODO: упростить
   private get serialDev(): SerialIo {
     return this.depsInstances.serialDev as any;
