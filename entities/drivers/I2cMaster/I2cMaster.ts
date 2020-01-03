@@ -5,14 +5,14 @@ import I2cMasterIo from 'system/interfaces/io/I2cMasterIo';
 import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
 
 
-export interface I2cToSlaveDriverProps extends MasterSlaveBaseProps {
+export interface I2cMasterDriverProps extends MasterSlaveBaseProps {
   busNum: number;
   // it can be i2c address as a string like '0x5a' or number equivalent - 90
   address: string | number;
 }
 
 
-export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps> {
+export class I2cMaster extends MasterSlaveBaseNodeDriver<I2cMasterDriverProps> {
   private impulseInput?: ImpulseInput;
   private impulseHandlerIndex?: number;
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
@@ -115,9 +115,9 @@ export class I2cToSlave extends MasterSlaveBaseNodeDriver<I2cToSlaveDriverProps>
 }
 
 
-export default class Factory extends DriverFactoryBase<I2cToSlave, I2cToSlaveDriverProps> {
-  protected SubDriverClass = I2cToSlave;
-  protected instanceId = (props: I2cToSlaveDriverProps): string => {
+export default class Factory extends DriverFactoryBase<I2cMaster, I2cMasterDriverProps> {
+  protected SubDriverClass = I2cMaster;
+  protected instanceId = (props: I2cMasterDriverProps): string => {
     return `${(typeof props.busNum === 'undefined') ? -1 : props.busNum}-${props.address}`;
   }
 }

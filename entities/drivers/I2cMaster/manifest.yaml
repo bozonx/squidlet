@@ -1,5 +1,5 @@
-name: I2cToSlave
-main: I2cToSlave.ts
+name: I2cMaster
+main: I2cMaster.ts
 system: true
 
 drivers:

@@ -27,11 +27,11 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'HttpClient/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'HttpServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'HttpServerRouter/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2cData/manifest.yaml'));
+  //await env.addDriver(path.join(driversRoot, 'I2cData/manifest.yaml'));
   //await env.addDriver(path.join(driversRoot, 'I2cDuplex/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cSlave/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'I2cToMaster/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'I2cToSlave/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'I2cMaster/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'ImpulseInput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'ImpulseOutput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Mqtt/manifest.yaml'));
@@ -67,14 +67,14 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
 
     if (machineIos.includes('I2cMaster')) {
       //await env.addUsedEntity('drivers', 'I2cMaster');
-      await env.addUsedEntity('driver', 'I2cToSlave');
+      await env.addUsedEntity('driver', 'I2cMaster');
       //await env.addUsedEntity('driver', 'I2cDuplex');
     }
 
-    if (machineIos.includes('I2cSlave')) {
-      //await env.addUsedEntity('drivers', 'I2cSlave');
-      await env.addUsedEntity('driver', 'I2cToMaster');
-      //await env.addUsedEntity('driver', 'I2cDuplex');
-    }
+    // if (machineIos.includes('I2cSlave')) {
+    //   //await env.addUsedEntity('drivers', 'I2cSlave');
+    //   await env.addUsedEntity('driver', 'I2cToMaster');
+    //   //await env.addUsedEntity('driver', 'I2cDuplex');
+    // }
   });
 }

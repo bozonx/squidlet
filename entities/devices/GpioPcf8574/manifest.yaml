@@ -15,7 +15,7 @@ props:
     type: number
 
   ###### Other props
-  ### I2cToSlaveDriverProps
+  ### I2cMasterDriverProps
   # busNum: {}
   # address: {}
   #

@@ -2,15 +2,15 @@ name: Pcf8574
 main: Pcf8574.ts
 
 drivers:
-  - I2cToSlave
+  - I2cMaster
 
 props:
-  $base: 'drivers.I2cToSlave'
+  $base: 'drivers.I2cMaster'
 
   writeBufferMs:
     type: number
 
-  ### I2cToSlave driver props
+  ### I2cMaster driver props
   #busNum: {}
   #address: {}
   #int: {}

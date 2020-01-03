@@ -12,10 +12,10 @@ import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
 import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
 import InitIcLogic from 'system/lib/logic/InitIcLogic';
-import {I2cToSlave, I2cToSlaveDriverProps} from '../I2cToSlave/I2cToSlave';
+import {I2cMaster, I2cMasterDriverProps} from '../I2cMaster/I2cMaster';
 
 
-export interface Pcf8574ExpanderProps extends I2cToSlaveDriverProps {
+export interface Pcf8574ExpanderProps extends I2cMasterDriverProps {
   writeBufferMs?: number;
 }
 
@@ -41,7 +41,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   private _expanderOutput?: DigitalPortExpanderOutputLogic;
   private _expanderInput?: DigitalPortExpanderInputLogic;
 
-  private get i2c(): I2cToSlave {
+  private get i2c(): I2cMaster {
     return this.depsInstances.i2c;
   }
 
@@ -60,7 +60,7 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
 
   init = async () => {
     this.depsInstances.i2c = await this.context.getSubDriver(
-      'I2cToSlave',
+      'I2cMaster',
       {
         ...omitObj(this.props, 'writeBufferMs'),
         poll: [
