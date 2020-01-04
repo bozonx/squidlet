@@ -24,7 +24,12 @@ export class SerialNetwork extends NetworkDriverBase<SerialNetworkProps> impleme
         return this.log.error(`SerialNetwork: income data has to be Uint8Array`);
       }
 
-      this.incomeMessage(data);
+      try {
+        this.incomeMessage(data);
+      }
+      catch (e) {
+        this.log.error(e);
+      }
     });
   }
 

@@ -31,7 +31,6 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
   protected abstract write(data: Uint8Array): Promise<void>;
 
 
-
   async request(register: number, body: Uint8Array): Promise<NetworkRequest> {
     const promised = new Promised();
     const requestId: number = makeRequestId();
@@ -107,19 +106,11 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
   protected sendRequest(register: number, request: NetworkRequest): Promise<void> {
     const data: Uint8Array = serializeRequest(register, request);
 
-    // TODO: может use sendoer для переотправки запроса
-    // TODO: либо может sender сделать в нижнем драйвере
-    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
-
     return this.write(data);
   }
 
   protected sendResponse(register: number, response: NetworkResponse): Promise<void> {
     const data: Uint8Array = serializeResponse(register, response);
-
-    // TODO: может use sendoer для переотправки запроса
-    // TODO: либо может sender сделать в нижнем драйвере
-    // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
 
     return this.write(data);
   }
@@ -129,32 +120,33 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
    * @param data
    */
   protected incomeMessage(data: Uint8Array) {
-    if (data.length < REQUEST_PAYLOAD_START) {
-      return this.log.error(`SerialNetwork: incorrect data length: ${data.length}`);
-    }
-    else if (
-      data[MESSAGE_POSITION.command] !== COMMANDS.request
-      && data[MESSAGE_POSITION.command] !== COMMANDS.response
-    ) {
-      // skip not ours commands
+    if (!data.length || ![COMMANDS.request, COMMANDS.response].includes(data[MESSAGE_POSITION.command])) {
+      // skip not ours commands or empty data
       return;
+    }
+    else if (data.length < REQUEST_PAYLOAD_START) {
+      throw new Error(`NetworkDriverBase.incomeMessage: incorrect data length: ${data.length}`);
     }
 
     const register: number = data[MESSAGE_POSITION.register];
 
     if (data[MESSAGE_POSITION.command] === COMMANDS.request) {
       const request: NetworkRequest = deserializeRequest(data);
-      const eventName: string = `${EVENTS.request}${hexNumToString(register)}`;
+      const eventName: string = this.makeEventName(EVENTS.request, register);
 
       this.events.emit(eventName, request);
     }
     else {
       // response
       const response: NetworkResponse = deserializeResponse(data);
-      const eventName: string = `${EVENTS.response}${hexNumToString(register)}`;
+      const eventName: string = this.makeEventName(EVENTS.response, register);
 
       this.events.emit(eventName, response);
     }
+  }
+
+  protected makeEventName(eventName: EVENTS, register: number): string {
+    return `${EVENTS.request}${hexNumToString(register)}`;
   }
 
 }
