@@ -18,6 +18,7 @@ import Promised from 'system/lib/Promised';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Serial} from '../Serial/Serial';
+import {serializeRequest, serializeResponse} from '../../../system/lib/networkHelpers';
 
 
 export interface SerialNetworkProps extends NetworkDriverProps {
@@ -27,22 +28,6 @@ enum EVENTS {
   request,
   response,
 }
-
-enum COMMANDS {
-  request = 254,
-  response,
-}
-
-enum MESSAGE_POSITION {
-  command,
-  register,
-  requestIdStart,
-  requestIdEnd,
-  responseStatus,
-}
-
-const REQUEST_PAYLOAD_START = 4;
-const RESPONSE_PAYLOAD_START = 6;
 
 
 export class SerialNetwork extends DriverBase<SerialNetworkProps> implements NetworkDriver {
@@ -139,44 +124,23 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
   }
 
   private sendRequest(register: number, request: NetworkRequest): Promise<void> {
-    // TODO: test by hard
-    // TODO: move to helper
-
-    const requestIdUint: Uint8Array = numToUint8Word(request.requestId);
-    const metaData: Uint8Array = new Uint8Array([
-      COMMANDS.request,
-      register,
-      requestIdUint[0],
-      requestIdUint[1]
-    ]);
-    const dataToWrite: Uint8Array = concatUint8Arr(metaData, request.body);
+    const data: Uint8Array = serializeRequest(register, request);
 
     // TODO: может use sendoer для переотправки запроса
     // TODO: либо может sender сделать в нижнем драйвере
     // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
 
-    return this.serial.write(dataToWrite);
+    return this.serial.write(data);
   }
 
   private sendResponse(register: number, response: NetworkResponse): Promise<void> {
-    // TODO: test by hard
-    // TODO: move to helper
-
-    const requestIdUint: Uint8Array = numToUint8Word(response.requestId);
-    const metaData: Uint8Array = new Uint8Array([
-      COMMANDS.request,
-      register,
-      requestIdUint[0],
-      requestIdUint[1],
-      response.status,
-    ]);
-    const dataToWrite: Uint8Array = concatUint8Arr(metaData, response.body);
+    const data: Uint8Array = serializeResponse(register, response);
 
     // TODO: может use sendoer для переотправки запроса
     // TODO: либо может sender сделать в нижнем драйвере
     // TODO: можно посылать следующий запрос не дожидаясь пока придет ответ, но запросы должны идти по очереди
 
-    return this.serial.write(dataToWrite);
+    return this.serial.write(data);
   }
 
   /**
