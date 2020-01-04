@@ -1,6 +1,3 @@
-import {makeUniqNumber} from '../uniqId';
-
-type Timeout = NodeJS.Timeout;
 import DriverBase from '../../base/DriverBase';
 import NetworkDriver, {
   IncomeRequestHandler, IncomeResponseHandler,
@@ -10,7 +7,7 @@ import NetworkDriver, {
 } from '../../interfaces/NetworkDriver';
 import IndexedEventEmitter from '../IndexedEventEmitter';
 import {
-  COMMANDS, deserializeRequest, deserializeResponse,
+  COMMANDS, deserializeRequest, deserializeResponse, makeRequestId,
   MESSAGE_POSITION,
   REQUEST_PAYLOAD_START,
   serializeRequest,
@@ -19,6 +16,8 @@ import {
 import Promised from '../Promised';
 import {hexNumToString, stringToUint8Array} from '../binaryHelpers';
 
+
+type Timeout = NodeJS.Timeout;
 
 enum EVENTS {
   request,
@@ -35,8 +34,7 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
 
   async request(register: number, body: Uint8Array): Promise<NetworkRequest> {
     const promised = new Promised();
-    // TODO: make 16 bit number
-    const requestId: number = makeUniqNumber();
+    const requestId: number = makeRequestId();
     const request: NetworkRequest = { requestId, body };
     let timeout: Timeout | undefined;
 
@@ -126,7 +124,11 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
     return this.write(data);
   }
 
-  private handleIncomeMessage(data: Uint8Array) {
+  /**
+   * Handle income message and deserialize it.
+   * @param data
+   */
+  protected incomeMessage(data: Uint8Array) {
     if (data.length < REQUEST_PAYLOAD_START) {
       return this.log.error(`SerialNetwork: incorrect data length: ${data.length}`);
     }
@@ -154,7 +156,5 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
       this.events.emit(eventName, response);
     }
   }
-
-  // TODO: сделать бесконечный requestId но толко с 65535 значений
 
 }

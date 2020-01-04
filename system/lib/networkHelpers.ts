@@ -17,10 +17,26 @@ export enum MESSAGE_POSITION {
 
 export const REQUEST_PAYLOAD_START = 4;
 export const RESPONSE_PAYLOAD_START = 6;
+let counter: number = 0;
 
 
 // TODO: test by hard
 
+/**
+ * Generate unique request id which is from 0 to 65535.
+ * It increments a counter on each call.
+ * Counter is initialized with a random value.
+ */
+export function makeRequestId(): number {
+  if (counter >= 65535) {
+    counter = 0;
+  }
+  else {
+    counter++;
+  }
+
+  return counter;
+}
 
 export function serializeRequest(register: number, request: NetworkRequest): Uint8Array {
   const requestIdUint: Uint8Array = numToUint8Word(request.requestId);
