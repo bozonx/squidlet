@@ -1,3 +1,4 @@
+type Timeout = NodeJS.Timeout;
 import NetworkDriver, {
   IncomeRequestHandler,
   IncomeResponseHandler,
@@ -8,23 +9,19 @@ import NetworkDriver, {
 } from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {
-  concatUint8Arr,
-  hexNumToString,
-  numToUint8Word, stringToUint8Array,
-  uint8ToNum,
-} from 'system/lib/binaryHelpers';
+import { hexNumToString, stringToUint8Array } from 'system/lib/binaryHelpers';
 import Promised from 'system/lib/Promised';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {Serial} from '../Serial/Serial';
 import {
-  COMMANDS, deserializeRequest, deserializeResponse,
+  COMMANDS, deserializeRequest,
+  deserializeResponse,
   MESSAGE_POSITION,
   REQUEST_PAYLOAD_START,
   serializeRequest,
   serializeResponse
-} from '../../../system/lib/networkHelpers';
+} from 'system/lib/networkHelpers';
+import {Serial} from '../Serial/Serial';
 
 
 export interface SerialNetworkProps extends NetworkDriverProps {
@@ -55,32 +52,29 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
 
   async request(register: number, body: Uint8Array): Promise<NetworkRequest> {
     const promised = new Promised();
+    // TODO: make 16 bit number
     const requestId: number = makeUniqNumber();
-    const request: NetworkRequest = {
-      requestId,
-      body,
-    };
+    const request: NetworkRequest = { requestId, body };
+    let timeout: Timeout | undefined;
 
     this.sendRequest(register, request)
       .catch((e: Error) => {
-        if (promised.isFulfilled()) return;
-
-        promised.reject(e);
+        clearTimeout(timeout as any);
+        !promised.isFulfilled() && promised.reject(e);
       });
 
     // listen for response
     const listenIndex = this.onIncomeResponse(register, (response: NetworkResponse) => {
-      // do nothing if filed or resolved
-      if (promised.isFulfilled()) return;
-      // process only ours request
-      else if (response.requestId !== requestId) return;
+      // do nothing if filed or resolved. process only ours request
+      if (promised.isFulfilled() || response.requestId !== requestId) return;
 
       this.removeListener(listenIndex);
+      clearTimeout(timeout as any);
 
       promised.resolve(response);
     });
 
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       if (promised.isFulfilled()) return;
 
       this.removeListener(listenIndex);
@@ -88,6 +82,7 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
       promised.reject(
         new Error(`SerialNetwork.request: Timeout of request has been exceeded of register "${register}"`)
       );
+      // TODO: может лучше взять из основного конфига
     }, this.props.requestTimeoutSec * 1000);
 
     return promised.promise;
