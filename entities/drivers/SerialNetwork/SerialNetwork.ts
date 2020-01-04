@@ -18,7 +18,13 @@ import Promised from 'system/lib/Promised';
 import {makeUniqNumber} from 'system/lib/uniqId';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Serial} from '../Serial/Serial';
-import {serializeRequest, serializeResponse} from '../../../system/lib/networkHelpers';
+import {
+  COMMANDS, deserializeRequest, deserializeResponse,
+  MESSAGE_POSITION,
+  REQUEST_PAYLOAD_START,
+  serializeRequest,
+  serializeResponse
+} from '../../../system/lib/networkHelpers';
 
 
 export interface SerialNetworkProps extends NetworkDriverProps {
@@ -162,35 +168,17 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
       return;
     }
 
-    // TODO: move to helper
-    // TODO: test by hard
-    // TODO: если статус 1 - то преобразовать body в error string
-
     const register: number = data[MESSAGE_POSITION.register];
-    // requestId is 16 bit int
-    const requestId: number = uint8ToNum(
-      data.slice(MESSAGE_POSITION.requestIdStart, MESSAGE_POSITION.requestIdEnd + 1)
-    );
 
     if (data[MESSAGE_POSITION.command] === COMMANDS.request) {
-      const body: Uint8Array = data.slice(REQUEST_PAYLOAD_START);
-      const request: NetworkRequest = {
-        requestId,
-        body,
-      };
+      const request: NetworkRequest = deserializeRequest(data);
       const eventName: string = `${EVENTS.request}${hexNumToString(register)}`;
 
       this.events.emit(eventName, request);
     }
     else {
       // response
-      const status: number = data[MESSAGE_POSITION.responseStatus];
-      const body: Uint8Array = data.slice(RESPONSE_PAYLOAD_START);
-      const response: NetworkResponse = {
-        requestId,
-        status,
-        body,
-      };
+      const response: NetworkResponse = deserializeResponse(data);
       const eventName: string = `${EVENTS.response}${hexNumToString(register)}`;
 
       this.events.emit(eventName, response);

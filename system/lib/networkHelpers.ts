@@ -1,5 +1,5 @@
 import {NetworkRequest, NetworkResponse} from '../interfaces/NetworkDriver';
-import {concatUint8Arr, numToUint8Word} from './binaryHelpers';
+import {concatUint8Arr, numToUint8Word, uint8ToNum} from './binaryHelpers';
 
 
 export enum COMMANDS {
@@ -35,7 +35,16 @@ export function serializeRequest(register: number, request: NetworkRequest): Uin
 }
 
 export function deserializeRequest(data: Uint8Array): NetworkRequest {
+  // requestId is 16 bit int
+  const requestId: number = uint8ToNum(
+    data.slice(MESSAGE_POSITION.requestIdStart, MESSAGE_POSITION.requestIdEnd + 1)
+  );
+  const body: Uint8Array = data.slice(REQUEST_PAYLOAD_START);
 
+  return {
+    requestId,
+    body,
+  };
 }
 
 export function serializeResponse(register: number, response: NetworkResponse): Uint8Array {
@@ -48,9 +57,24 @@ export function serializeResponse(register: number, response: NetworkResponse): 
     response.status,
   ]);
 
+  // TODO: если статус 1 - то преобразовать body в error string
+
   return concatUint8Arr(metaData, response.body);
 }
 
 export function deserializeResponse(data: Uint8Array): NetworkResponse {
+  // requestId is 16 bit int
+  const requestId: number = uint8ToNum(
+    data.slice(MESSAGE_POSITION.requestIdStart, MESSAGE_POSITION.requestIdEnd + 1)
+  );
+  const status: number = data[MESSAGE_POSITION.responseStatus];
+  const body: Uint8Array = data.slice(RESPONSE_PAYLOAD_START);
 
+  // TODO: если статус 1 - то преобразовать body в error string
+
+  return {
+    requestId,
+    status,
+    body,
+  };
 }
