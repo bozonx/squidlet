@@ -22,7 +22,7 @@ export interface NetworkResponse {
 export interface NetworkDriverProps {
   busId: number | string;
   // wait seconds for data transfer ends
-  requestTimeoutSec: number;
+  //requestTimeoutSec: number;
 }
 
 export type IncomeRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;

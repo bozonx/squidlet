@@ -9,5 +9,5 @@ props:
   busId:
     type: number | string
     required: true
-  requestTimeoutSec:
-    type: number
+#  requestTimeoutSec:
+#    type: number
