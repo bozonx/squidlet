@@ -1,7 +1,9 @@
-enum NetworkStatus {
-  ok = 200,
-  badRequest = 400,
-  serverError = 500,
+export enum NetworkStatus {
+  ok = 0,
+  // body contains a error string
+  errorMessage,
+  badRequest = 1,
+  serverError = 2,
 }
 
 export interface NetworkRequest {
@@ -13,7 +15,8 @@ export interface NetworkRequest {
 export interface NetworkResponse {
   requestId: number;
   status: NetworkStatus;
-  body: Uint8Array;
+  body?: Uint8Array;
+  error?: string;
 }
 
 export interface NetworkDriverProps {

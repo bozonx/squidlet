@@ -4,13 +4,14 @@ import NetworkDriver, {
   NetworkDriverProps,
   NetworkRequest,
   NetworkResponse,
+  NetworkStatus,
 } from 'system/interfaces/NetworkDriver';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {
   concatUint8Arr,
   hexNumToString,
-  numToUint8Word,
+  numToUint8Word, stringToUint8Array,
   uint8ToNum,
 } from 'system/lib/binaryHelpers';
 import Promised from 'system/lib/Promised';
@@ -37,8 +38,7 @@ enum MESSAGE_POSITION {
   register,
   requestIdStart,
   requestIdEnd,
-  responseStatusStart,
-  responseStatusEnd,
+  responseStatus,
 }
 
 const REQUEST_PAYLOAD_START = 4;
@@ -113,9 +113,8 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
         .catch((e) => {
           const response: NetworkResponse = {
             requestId: request.requestId,
-            status: 500,
-            // TODO: как отправить ошибку ???? может сделать отдельную комманду ????
-            body: new Uint8Array(0),
+            status: NetworkStatus.errorMessage,
+            body: new Uint8Array(stringToUint8Array(String(e))),
           };
 
           this.sendResponse(register, response)
@@ -164,14 +163,12 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     // TODO: move to helper
 
     const requestIdUint: Uint8Array = numToUint8Word(response.requestId);
-    const statusUint: Uint8Array = numToUint8Word(response.status);
     const metaData: Uint8Array = new Uint8Array([
       COMMANDS.request,
       register,
       requestIdUint[0],
       requestIdUint[1],
-      statusUint[0],
-      statusUint[1],
+      response.status,
     ]);
     const dataToWrite: Uint8Array = concatUint8Arr(metaData, response.body);
 
@@ -203,6 +200,7 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
 
     // TODO: move to helper
     // TODO: test by hard
+    // TODO: если статус 1 - то преобразовать body в error string
 
     const register: number = data[MESSAGE_POSITION.register];
     // requestId is 16 bit int
@@ -222,10 +220,7 @@ export class SerialNetwork extends DriverBase<SerialNetworkProps> implements Net
     }
     else {
       // response
-      // status is 16 bit int
-      const status: number = uint8ToNum(
-        data.slice(MESSAGE_POSITION.responseStatusStart, MESSAGE_POSITION.responseStatusEnd + 1)
-      );
+      const status: number = data[MESSAGE_POSITION.responseStatus];
       const body: Uint8Array = data.slice(RESPONSE_PAYLOAD_START);
       const response: NetworkResponse = {
         requestId,
