@@ -1,0 +1,4 @@
+# config of interfaces
+interfaces:
+  type: object[]
+  required: true

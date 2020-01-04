@@ -2,8 +2,8 @@ export enum NetworkStatus {
   ok = 0,
   // body contains a error string
   errorMessage,
-  badRequest = 1,
-  serverError = 2,
+  // badRequest = 1,
+  // serverError = 2,
 }
 
 export interface NetworkRequest {

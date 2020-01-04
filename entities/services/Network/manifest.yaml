@@ -1,0 +1,7 @@
+name: Network
+main: Network.ts
+system: true
+
+#drivers:
+
+props: props.yaml
