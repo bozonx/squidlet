@@ -46,18 +46,11 @@
       bozonx/squidlet:x86
 
     docker rm -f squidlet; docker run --name squidlet -ti \
-      -p 18087:8087 \
-      -p 18088:8088 \
-      -p 18089:8089 \
+      -p 8087:8087 \
+      -p 8088:8088 \
+      -p 8089:8089 \
       -v /home/pi/workdirs/squidlet:/data \
       -e LOG_LEVEL=debug \
-      --privileged \
-      --device /dev/mem \
-      --device /dev/i2c-1 \
-      --cap-add=SYS_ADMIN \
-      -v /sys/class/gpio:/sys/class/gpio \
-      -v /dev/mem:/dev/mem \
-      -v /dev/i2c-1:/dev/i2c-1 \
       bozonx/squidlet:rpi
 
 ## Pigpiod

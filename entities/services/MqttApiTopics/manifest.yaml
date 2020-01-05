@@ -7,3 +7,6 @@ drivers:
 
 props:
   $base: 'drivers.Mqtt'
+  # Prefix of each request. Usually it's unique id or token.
+  prefix:
+    type: string

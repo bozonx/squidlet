@@ -31,13 +31,14 @@ export const TOPIC_SEPARATOR = '/';
  * * blockIo true|false
  */
 export default class ApiTopicsLogic {
-  private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
   private readonly context: Context;
+  private prefix?: string;
+  private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
 
 
-  constructor(context: Context) {
-    // TODO: вместо context использовать только то что нужно
+  constructor(context: Context, prefix?: string) {
     this.context = context;
+    this.prefix = prefix;
   }
 
   init() {
@@ -54,6 +55,9 @@ export default class ApiTopicsLogic {
    * Call this when you have received an income message
    */
   incomeMessage = async (fullTopic: string, data: string) => {
+    // skip not apiTopic's messages
+    if (!this.isSupportedTopic(fullTopic)) return;
+
     const [topicType, body] = this.parseTopic(fullTopic);
 
     switch (topicType) {
@@ -79,12 +83,36 @@ export default class ApiTopicsLogic {
     this.outcomeEvents.removeListener(handlerIndex);
   }
 
-  isSupportedTopic(topic: string): boolean {
+  /**
+   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
+   */
+  getSubscribeTopics(): string[] {
+    // TODO: так же вызов api
+    // TODO: add prefix
+    const topics: string[] = [];
+    const devicesIds: string[] = this.context.system.devicesManager.getIds();
+
+    for (let deviceId of devicesIds) {
+      const device = this.context.system.devicesManager.getDevice(deviceId);
+
+      for (let actionName of device.getActionsList()) {
+        const deviceActionTopic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);
+        const deviceType: TopicType = 'device';
+        const topic: string = combineTopic(TOPIC_TYPE_SEPARATOR, deviceType, deviceActionTopic);
+
+        topics.push(topic);
+      }
+    }
+
+    return topics;
+  }
+
+
+  private isSupportedTopic(topic: string): boolean {
     const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
 
     return topicTypes.includes(splat[0]);
   }
-
 
   private handleStateChange = (category: number, stateName: string, changedParams: string[]) => {
     try {

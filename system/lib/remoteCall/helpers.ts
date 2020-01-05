@@ -15,8 +15,7 @@ export function waitForResponse(
 
       wasFulfilled = true;
       events.removeListener(handlerIndex);
-      // TODO: check message
-      reject(`Remote dev set request timeout has been exceeded.`);
+      reject(`RemoteCall: waitForResponse timeout has been exceeded.`);
     }, responseTimoutSec * 1000);
 
     const handler = (payload: {error?: string, result: any} | undefined) => {

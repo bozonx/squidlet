@@ -1,16 +1,20 @@
 import ServiceBase from 'system/base/ServiceBase';
-import {combineTopic} from 'system/lib/helpers';
-
+import {omitObj} from 'system/lib/objects';
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
-import ApiTopicsLogic, {TOPIC_SEPARATOR, TOPIC_TYPE_SEPARATOR, TopicType} from './ApiTopicsLogic';
+import ApiTopicsLogic from './ApiTopicsLogic';
 
 
-export default class MqttApiTopics extends ServiceBase<MqttProps> {
-  get apiTopicsLogic(): ApiTopicsLogic {
-    return this._apiTopicsLogic as any;
+interface Props extends MqttProps {
+  prefix?: string;
+}
+
+
+export default class MqttApiTopics extends ServiceBase<Props> {
+  get logic(): ApiTopicsLogic {
+    return this._logic as any;
   }
 
-  private _apiTopicsLogic?: ApiTopicsLogic;
+  private _logic?: ApiTopicsLogic;
 
   private get mqtt(): Mqtt {
     return this.depsInstances.mqtt;
@@ -18,32 +22,32 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
 
 
   init = async () => {
-    this._apiTopicsLogic = new ApiTopicsLogic(this.context);
-    this.apiTopicsLogic.init();
-    this.depsInstances.mqtt = await this.context.getSubDriver('Mqtt', this.props);
+    this._logic = new ApiTopicsLogic(this.context, this.props.prefix);
+    this.logic.init();
+    // TODO: здесь в init наверное будет ожидание соединения ????
+    this.depsInstances.mqtt = await this.context.getSubDriver('Mqtt', {
+      ...omitObj(this.props, 'prefix'),
+    });
 
     // listen to income messages from mqtt broker
     this.mqtt.onMessage(this.handleIncomeMessages);
     // listen to outcome messages and pass them to mqtt
-    this.apiTopicsLogic.onOutcome(this.handleOutcomeMessages);
+    this.logic.onOutcome(this.handleOutcomeMessages);
   }
 
   protected async devicesDidInit() {
     this.log.debug(`MqttApiTopics: subscribe to devices`);
-
-    // TODO: проверить
 
     this.mqtt.connectedPromise
       .then(() => {
         this.subscribeToDevices()
           .catch(this.log.error);
       })
-      // TODO: что будет если будет ошибка ????
       .catch(this.log.error);
   }
 
   destroy = async () => {
-    await this.apiTopicsLogic.destroy();
+    await this.logic.destroy();
   }
 
 
@@ -51,14 +55,11 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
-    // skip not apiTopic's messages
-    if (!this.apiTopicsLogic.isSupportedTopic(topic)) return;
-
     if (typeof data !== 'string') {
       throw new Error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
     }
 
-    await this.apiTopicsLogic.incomeMessage(topic, data);
+    await this.logic.incomeMessage(topic, data);
   });
 
   /**
@@ -71,39 +72,18 @@ export default class MqttApiTopics extends ServiceBase<MqttProps> {
   /**
    * Subscribe to all the device's actions calls on broker
    */
-  private subscribeToDevices = async () => {
-    this.log.info(`--> Register MQTT subscribers of devices actions`);
+  private subscribeToDevices = () => {
+    this.log.info(`--> MqttApiTopics: Register MQTT subscribers of devices actions`);
 
-    const devicesActionsTopics: string[] = this.getDevicesActionTopics();
+    const promises: Promise<void>[] = [];
 
-    for (let topic of devicesActionsTopics) {
-      this.log.debug(`MQTT subscribe: ${topic}`);
+    for (let topic of this.logic.getSubscribeTopics()) {
+      this.log.debug(`MqttApiTopics subscribe: ${topic}`);
 
-      await this.mqtt.subscribe(topic);
-    }
-  }
-
-  // TODO: move to logic
-  /**
-   * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
-   */
-  private getDevicesActionTopics(): string[] {
-    const topics: string[] = [];
-    const devicesIds: string[] = this.context.system.devicesManager.getIds();
-
-    for (let deviceId of devicesIds) {
-      const device = this.context.system.devicesManager.getDevice(deviceId);
-
-      for (let actionName of device.getActionsList()) {
-        const deviceActionTopic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);
-        const deviceType: TopicType = 'device';
-        const topic: string = combineTopic(TOPIC_TYPE_SEPARATOR, deviceType, deviceActionTopic);
-
-        topics.push(topic);
-      }
+      promises.push(this.mqtt.subscribe(topic));
     }
 
-    return topics;
+    return Promise.all(promises);
   }
 
 }

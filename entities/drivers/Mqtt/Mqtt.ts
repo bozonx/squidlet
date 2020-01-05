@@ -14,6 +14,9 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
+
+  // TODO: проверить что будет переподключаться до бесконечности
+
   // on first time connect or reconnect
   get connectedPromise(): Promise<void> {
     if (!this.connectionId || !this.openPromise) {
