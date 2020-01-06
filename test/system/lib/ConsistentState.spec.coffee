@@ -2,7 +2,7 @@ ConsistentState = require('../../../system/lib/ConsistentState').default;
 Promised = require('../../../system/lib/Promised').default;
 
 
-describe.only 'system.lib.ConsistentState', ->
+describe 'system.lib.ConsistentState', ->
   beforeEach ->
     @stateObj = {}
     @logError = sinon.spy()
