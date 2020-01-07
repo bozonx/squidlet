@@ -85,7 +85,6 @@ export default class ApiTopicsLogic {
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
   getTopicsToSubscribe(): string[] {
-    // TODO: так же вызов api
     const topics: string[] = [];
     const actionType: TopicType = 'action';
     const apiType: TopicType = 'api';
@@ -180,10 +179,10 @@ export default class ApiTopicsLogic {
   private publishDeviceState(
     topicType: TopicType,
     category: number,
-    stateName: string,
+    deviceId: string,
     changedParams: string[]
   ) {
-    const state: Dictionary | undefined = this.context.state.getState(category, stateName);
+    const state: Dictionary | undefined = this.context.state.getState(category, deviceId);
 
     // if state == undefined means state hasn't been registered
     if (!state) return;
@@ -193,28 +192,12 @@ export default class ApiTopicsLogic {
       const resolvedParamName: string | undefined = (paramName === DEFAULT_DEVICE_STATUS)
         ? undefined
         : paramName;
-
-      // TODO: prefix
-
-      const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, resolvedParamName);
+      const topic: string = combineTopic(TOPIC_SEPARATOR, this.prefix, topicType, deviceId, resolvedParamName);
       const value: string = JSON.stringify(state[paramName]);
 
-      this.emitOutcomeMsg(topicType, topicBody, value);
+      this.context.log.debug(`MqttApiTopics outcome: ${topic} - ${JSON.stringify(value)}`);
+      this.outcomeEvents.emit(topic, value);
     }
   }
 
-  private emitOutcomeMsg(topicType: TopicType, topicBody: string, value?: string) {
-    const topic = combineTopic(TOPIC_SEPARATOR, topicType, topicBody);
-
-    this.context.log.debug(`MqttApiTopics outcome: ${topic} - ${JSON.stringify(value)}`);
-    this.outcomeEvents.emit(topic, value);
-  }
-
 }
-
-
-// private isSupportedTopic(topic: string): boolean {
-//   const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
-//
-//   return topicTypes.includes(splat[0]);
-// }

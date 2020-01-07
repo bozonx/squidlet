@@ -1,6 +1,20 @@
-import {cloneDeepArray} from './arrays';
-import {isEqual} from './common';
+import {cloneDeepArray, removeItemFromArray} from './arrays';
 
+
+// TODO: test
+/**
+ * Get all the class members include prototype's exclude "constructor".
+ */
+export function getAllTheClassMembers(obj: Object, exclude: string[] = []): string[] {
+  const props: string[] = [
+    ...Object.getOwnPropertyNames(obj),
+    // TODO: maybe make getting prototypes recursive ?
+    ...Object.getOwnPropertyNames(Object.getPrototypeOf(obj)),
+  ];
+
+  // TODO: optimize
+  return props.filter((item: string) => !['constructor', ...exclude].includes(item));
+}
 
 /**
  * Check is object is empty.

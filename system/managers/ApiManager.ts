@@ -5,6 +5,7 @@ import RemoteCallMessage from '../interfaces/RemoteCallMessage';
 import {makeUniqId} from '../lib/uniqId';
 import {METHOD_DELIMITER} from '../constants';
 import StandardApi from '../StandardApi';
+import {getAllTheClassMembers} from '../lib/objects';
 
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;
@@ -100,8 +101,18 @@ export default class ApiManager {
     this.endPoints[endPointName] = representObject;
   }
 
+  // TODO: check how it works
+  /**
+   * Get api's method names include namespaces (namespace.methodName)
+   */
   getMethodNames(): string[] {
-    // TODO: add
+    let result: string[] = getAllTheClassMembers(this.standardApi, ['destroy']);
+
+    for (let namespace of Object.keys(this.endPoints)) {
+      result = result.concat(getAllTheClassMembers(this.endPoints[namespace]));
+    }
+
+    return result;
   }
 
 
