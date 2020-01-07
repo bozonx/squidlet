@@ -36,6 +36,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
   }
 
   protected async devicesDidInit() {
+    // TODO: async не нужне
     this.log.debug(`MqttApiTopics: subscribe to devices`);
 
     this.mqtt.connectedPromise
@@ -55,9 +56,12 @@ export default class MqttApiTopics extends ServiceBase<Props> {
    * Processing income messages from broker
    */
   private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
+    // TODO: async не нужне
     if (typeof data !== 'string') {
       throw new Error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
     }
+
+    // TODO: проверить может ли быть data undefined????
 
     await this.logic.incomeMessage(topic, data);
   });
@@ -65,7 +69,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
   /**
    * Publish outcome messages to broker
    */
-  private handleOutcomeMessages = async (topic: string, data: string) => {
+  private handleOutcomeMessages = (topic: string, data: string): Promise<void> => {
     return this.mqtt.publish(topic, data);
   }
 
@@ -77,7 +81,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
 
     const promises: Promise<void>[] = [];
 
-    for (let topic of this.logic.getSubscribeTopics()) {
+    for (let topic of this.logic.getTopicsToSubscribe()) {
       this.log.debug(`MqttApiTopics subscribe: ${topic}`);
 
       promises.push(this.mqtt.subscribe(topic));

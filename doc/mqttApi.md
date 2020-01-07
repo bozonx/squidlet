@@ -14,7 +14,7 @@ or deeper into namespace `[prefix/]api/namespace.methodName`
 Call action
     
 Topic `[prefix/]action/roomName.deviceName/actionName` data `param1,param2`
-    
+
 Subscribe to device status
 Default status:
 
@@ -31,3 +31,10 @@ Config
 
 ## Arguments of api methods and actions
 
+
+## Calling api methods
+
+By specific of MQTT protocol you should not use methods which uses callbacks. Like `listenDeviceStatus`,
+`listenDeviceConfig`, `listenState` and `listenLog`. Methods such `removeStateListener` and
+`removeLogListener` are also useless.
+And you won't receive a returned value of method.

@@ -7,30 +7,20 @@ import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 import Context from 'system/Context';
 
 
-export type TopicType = 'device' | 'api';
-type DeviceStateType = 'status' | 'config';
-type OutcomeHandler = (topic: string, data: string) => void;
+type OutcomeHandler = (topic: string, data?: string) => void;
+type TopicType = 'api' | 'action' | 'status' | 'config';
 
-const topicTypes = ['device', 'api'];
-const allowedApiMethodsToCall = [
-  'setDeviceConfig',
-  'switchToIoServer',
-  'setAutomationRuleActive',
-  'republishWholeState',
-  'reboot',
-];
-//export const TOPIC_TYPE_SEPARATOR = '|';
-export const TOPIC_SEPARATOR = '/';
+const TOPIC_SEPARATOR = '/';
+const topicTypes = ['api', 'action', 'status', 'config'];
 
 
 /**
- * Types of topics
- * device - means call device action
- * api - call specific api
+ * Call api method or manage devices via simple MQTT string api.
+ * See doc `doc/mqttApi.md` for details.
  */
 export default class ApiTopicsLogic {
   private readonly context: Context;
-  private prefix?: string;
+  private readonly prefix?: string;
   private readonly outcomeEvents = new IndexedEvents<OutcomeHandler>();
 
 
@@ -52,24 +42,23 @@ export default class ApiTopicsLogic {
   /**
    * Call this when you have received an income message
    */
-  incomeMessage = async (fullTopic: string, data: string) => {
-    // skip not apiTopic's messages
-    if (!this.isSupportedTopic(fullTopic)) return;
+  incomeMessage = (fullTopic: string, data: string): Promise<void> => {
+    // TODO: выбрасывает ошибку - обработать
+    const [prefix, topicType, body] = this.parseTopic(fullTopic);
 
-    const [topicType, body] = this.parseTopic(fullTopic);
+    // skip not ours prefix
+    if (prefix !== this.prefix) return Promise.resolve();
 
-    // TODO: support можно не указывать device
     switch (topicType) {
-      case 'device':
-        // TODO: support prefix
+      case 'action':
         const [deviceId, actionName] = splitFirstElement(body, TOPIC_SEPARATOR);
 
-        await this.callAction(deviceId, actionName, data);
-        break;
+        return this.callAction(deviceId, actionName, data);
       case 'api':
-        await this.callApi(body, data);
-        break;
+        return this.callApi(body, data);
     }
+    // skip others
+    return Promise.resolve();
   }
 
   /**
@@ -79,14 +68,18 @@ export default class ApiTopicsLogic {
     return this.outcomeEvents.addListener(cb);
   }
 
-  removeOutcomeListener(handlerIndex: number) {
+  /**
+   * Remove outcome listener
+   */
+  removeListener(handlerIndex: number) {
     this.outcomeEvents.removeListener(handlerIndex);
   }
 
   /**
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
-  getSubscribeTopics(): string[] {
+  getTopicsToSubscribe(): string[] {
+    // TODO: review
     // TODO: так же вызов api
     // TODO: add prefix
     const topics: string[] = [];
@@ -108,14 +101,6 @@ export default class ApiTopicsLogic {
   }
 
 
-  // TODO: support of  prefix
-  // TODO: skip if not ours prefix
-  private isSupportedTopic(topic: string): boolean {
-    const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
-
-    return topicTypes.includes(splat[0]);
-  }
-
   private handleStateChange = (category: number, stateName: string, changedParams: string[]) => {
     try {
       // send outcome all the devices status and config changes
@@ -131,38 +116,36 @@ export default class ApiTopicsLogic {
     }
   }
 
-  private async callApi(apiMethodName: string, data: string): Promise<void> {
-    if (!allowedApiMethodsToCall.includes(apiMethodName)) {
-      return this.context.log.warn(`Restricted or unsupported api method has been called "${apiMethodName}"`);
-    }
-
-    this.context.log.debug(`ApiTopicsLogic income call api method "${apiMethodName}": ${data}`);
+  private callApi(apiMethodName: string, data: string): Promise<void> {
+    this.context.log.debug(`MqttApiTopics income call api method "${apiMethodName}": ${data}`);
 
     const args: (JsonTypes | undefined)[] = parseArgs(data);
 
-    await this.context.system.apiManager.callApi(apiMethodName, args);
+    return this.context.system.apiManager.callApi(apiMethodName, args);
   }
 
-  private async callAction(deviceId: string, actionName?: string, data?: string) {
+  private callAction(deviceId: string, actionName?: string, data?: string) {
     if (!actionName) {
-      throw new Error(`ApiTopicsLogic.action: no actionName: "${deviceId}"`);
+      throw new Error(`MqttApiTopics.callAction: no actionName: "${deviceId}"`);
     }
 
-    // income string-type api message - call device action
-    this.context.log.debug(`ApiTopicsLogic income action call of device ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${data}`);
+    this.context.log.debug(`MqttApiTopics income action device call ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${data}`);
 
     const args: (JsonTypes | undefined)[] = parseArgs(data);
 
-    await this.context.system.apiManager.callApi('action', [deviceId, actionName, ...args]);
+    return this.context.system.apiManager.callApi('action', [deviceId, actionName, ...args]);
   }
 
+  // TODO: review
   /**
-   * Parse topic to topicType and topicBody.
+   * Parse topic to [prefix, topicType, topicBody].
    */
-  private parseTopic(topic: string): [TopicType, string] {
-    const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
+  private parseTopic(topic: string): [(string | undefined), TopicType, string] {
 
     // TODO: support prefix
+    // TODO: нужно ли выбрасывать ошибку???
+
+    const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
 
     if (!topicTypes.includes(splat[0])) {
       throw new Error(`Invalid topic "${topic}": unknown type`);
@@ -177,31 +160,42 @@ export default class ApiTopicsLogic {
     ];
   }
 
+  // TODO: review
   private publishDeviceState(
-    stateType: DeviceStateType,
+    topicType: TopicType,
     category: number,
     stateName: string,
     changedParams: string[]
   ) {
-    const topicType: TopicType = 'device';
     const state: Dictionary | undefined = this.context.state.getState(category, stateName);
 
+    // if state == undefined means state hasn't been registered
     if (!state) return;
 
     for (let paramName of changedParams) {
-      const resolvedParamName: string | undefined = (paramName === DEFAULT_DEVICE_STATUS) ? undefined : paramName;
-      const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, stateType, resolvedParamName);
-      const data: string = JSON.stringify(state[paramName]);
+      // if default then don't use param name
+      const resolvedParamName: string | undefined = (paramName === DEFAULT_DEVICE_STATUS)
+        ? undefined
+        : paramName;
+      const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, resolvedParamName);
+      const value: string = JSON.stringify(state[paramName]);
 
-      this.emitOutcomeMsg(topicType, topicBody, data);
+      this.emitOutcomeMsg(topicType, topicBody, value);
     }
   }
 
-  private emitOutcomeMsg(topicType: TopicType, topicBody: string, data: string) {
-    const topic = combineTopic(TOPIC_TYPE_SEPARATOR, topicType, topicBody);
+  private emitOutcomeMsg(topicType: TopicType, topicBody: string, value?: string) {
+    const topic = combineTopic(TOPIC_SEPARATOR, topicType, topicBody);
 
-    this.context.log.debug(`ApiTopicsLogic outcome: ${topic} - ${JSON.stringify(data)}`);
-    this.outcomeEvents.emit(topic, data);
+    this.context.log.debug(`MqttApiTopics outcome: ${topic} - ${JSON.stringify(value)}`);
+    this.outcomeEvents.emit(topic, value);
   }
 
 }
+
+
+// private isSupportedTopic(topic: string): boolean {
+//   const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
+//
+//   return topicTypes.includes(splat[0]);
+// }
