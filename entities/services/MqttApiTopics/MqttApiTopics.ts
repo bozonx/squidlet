@@ -55,7 +55,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
   /**
    * Processing income messages from broker
    */
-  private handleIncomeMessages = this.wrapErrors(async (topic: string, data: string | Uint8Array) => {
+  private handleIncomeMessages = this.wrapErrors(async (topic: string, data?: string | Uint8Array) => {
     // TODO: async не нужне
     if (typeof data !== 'string') {
       throw new Error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
@@ -64,8 +64,6 @@ export default class MqttApiTopics extends ServiceBase<Props> {
       throw new Error(`MqttApiTopics: topic has to be a string`);
     }
 
-    // TODO: проверить может ли быть data undefined????
-
     await this.logic.incomeMessage(topic, data);
   });
 
@@ -73,9 +71,6 @@ export default class MqttApiTopics extends ServiceBase<Props> {
    * Publish outcome messages to broker
    */
   private handleOutcomeMessages = (topic: string, data?: string): void => {
-
-    // TODO: проверить может ли быть data undefined????
-
     this.mqtt.publish(topic, data)
       .catch((e: Error) => this.log.error(e));
   }

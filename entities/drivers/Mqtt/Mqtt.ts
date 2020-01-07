@@ -6,7 +6,7 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
 
 
-type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
+type MqttMessageHandler = (topic: string, data?: string | Uint8Array) => void;
 
 export interface MqttProps {
   url: string;
@@ -44,7 +44,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
 
-    await this.mqttIo.onMessage((connectionId: string, topic: string, data: string | Uint8Array) => {
+    await this.mqttIo.onMessage((connectionId: string, topic: string, data?: string | Uint8Array) => {
       if (connectionId !== this.connectionId) return;
 
       this.messageEvents.emit(topic, data);
@@ -103,7 +103,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.mqttIo.isConnected(this.connectionId);
   }
 
-  async publish(topic: string, data: string | Uint8Array): Promise<void> {
+  async publish(topic: string, data?: string | Uint8Array): Promise<void> {
     await this.connectedPromise;
 
     if (!this.connectionId) {
