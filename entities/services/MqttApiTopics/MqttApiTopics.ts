@@ -84,7 +84,7 @@ export default class MqttApiTopics extends ServiceBase<Props> {
    * Subscribe to all the device's actions calls on broker
    */
   private subscribeToDevices = () => {
-    this.log.info(`--> MqttApiTopics: Register MQTT subscribers of devices actions`);
+    this.log.info(`--> MqttApiTopics: Register MQTT subscribers of devices actions and api methods`);
 
     const promises: Promise<void>[] = [];
 

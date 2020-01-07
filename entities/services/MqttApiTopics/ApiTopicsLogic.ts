@@ -1,4 +1,3 @@
-import {splitFirstElement} from 'system/lib/strings';
 import {combineTopic, parseArgs} from 'system/lib/helpers';
 import {Dictionary, JsonTypes} from 'system/interfaces/Types';
 import {StateCategories} from 'system/interfaces/States';
@@ -86,22 +85,27 @@ export default class ApiTopicsLogic {
    * Get topics of all the device's actions like ['room1/place2/deviceId.actionName', ...]
    */
   getTopicsToSubscribe(): string[] {
-    // TODO: review
     // TODO: так же вызов api
-    // TODO: add prefix
     const topics: string[] = [];
+    const actionType: TopicType = 'action';
+    const apiType: TopicType = 'api';
     const devicesIds: string[] = this.context.system.devicesManager.getIds();
+    const methodNames: string[] = this.context.system.apiManager.getMethodNames();
 
     for (let deviceId of devicesIds) {
       const device = this.context.system.devicesManager.getDevice(deviceId);
 
       for (let actionName of device.getActionsList()) {
-        const deviceActionTopic: string = combineTopic(TOPIC_SEPARATOR, deviceId, actionName);
-        const deviceType: TopicType = 'device';
-        const topic: string = combineTopic(TOPIC_TYPE_SEPARATOR, deviceType, deviceActionTopic);
+        const topic: string = combineTopic(TOPIC_SEPARATOR, this.prefix, actionType, deviceId, actionName);
 
         topics.push(topic);
       }
+    }
+
+    for (let methodName of methodNames) {
+      const topic: string = combineTopic(TOPIC_SEPARATOR, this.prefix, apiType, methodName);
+
+      topics.push(topic);
     }
 
     return topics;
@@ -189,6 +193,9 @@ export default class ApiTopicsLogic {
       const resolvedParamName: string | undefined = (paramName === DEFAULT_DEVICE_STATUS)
         ? undefined
         : paramName;
+
+      // TODO: prefix
+
       const topicBody = combineTopic(TOPIC_SEPARATOR, stateName, resolvedParamName);
       const value: string = JSON.stringify(state[paramName]);
 

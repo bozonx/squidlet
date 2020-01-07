@@ -100,6 +100,10 @@ export default class ApiManager {
     this.endPoints[endPointName] = representObject;
   }
 
+  getMethodNames(): string[] {
+    // TODO: add
+  }
+
 
   private makeNewSession(sessionId: string) {
     this.remoteCalls[sessionId] = new RemoteCall(

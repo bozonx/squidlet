@@ -10,13 +10,14 @@ export function waitMs(ms: number): Promise<void> {
   });
 }
 
+// TODO: check tests
 /**
  * Join topic paths using special path separator
  */
-export function combineTopic(topicSeparator: string, basePath: string, ...subPaths: Array<string | undefined>): string {
-  if (!subPaths.length) return basePath;
+export function combineTopic(topicSeparator: string, ...subPaths: (string | undefined)[]): string {
+  if (!subPaths.length) return '';
 
-  return [ basePath, ...compactUndefined(subPaths) ].join(topicSeparator);
+  return [ ...compactUndefined(subPaths) ].join(topicSeparator);
 }
 
 /**
