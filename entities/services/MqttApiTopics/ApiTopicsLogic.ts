@@ -41,7 +41,7 @@ export default class ApiTopicsLogic {
   /**
    * Call this when you have received an income message
    */
-  incomeMessage = (fullTopic: string, data: string): Promise<void> => {
+  incomeMessage = (fullTopic: string, data?: string): Promise<void> => {
     let prefix: string | undefined;
     let topicType: TopicType;
     let bodyParts: string[];
@@ -126,7 +126,7 @@ export default class ApiTopicsLogic {
     }
   }
 
-  private callApi(apiMethodName: string, data: string): Promise<void> {
+  private callApi(apiMethodName: string, data?: string): Promise<void> {
     this.context.log.debug(`MqttApiTopics income call api method "${apiMethodName}": ${data}`);
 
     const args: (JsonTypes | undefined)[] = parseArgs(data);
