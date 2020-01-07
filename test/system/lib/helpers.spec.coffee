@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe.only 'system.lib.helpers', ->
+describe 'system.lib.helpers', ->
   it 'combineTopic', ->
     assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
     assert.equal(helpers.combineTopic('/', 'first', undefined, 'third'), 'first/third')

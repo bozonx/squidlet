@@ -28,3 +28,9 @@ describe.only 'services.MqttApiTopics.ApiTopicsLogic', ->
 
     sinon.assert.calledOnce(@apiManager.callApi)
     sinon.assert.calledWith(@apiManager.callApi, 'methodName', [1, 'param1', true, [5, "str"]])
+
+  it 'incomeMessage - call action', ->
+    @logic.incomeMessage('prfx/action/deviceId/actionName', '1,param1')
+
+    sinon.assert.calledOnce(@apiManager.callApi)
+    sinon.assert.calledWith(@apiManager.callApi, 'action', ['deviceId', 'actionName', 1, 'param1'])
