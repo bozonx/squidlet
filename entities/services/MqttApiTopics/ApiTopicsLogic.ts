@@ -43,19 +43,26 @@ export default class ApiTopicsLogic {
    * Call this when you have received an income message
    */
   incomeMessage = (fullTopic: string, data: string): Promise<void> => {
-    // TODO: выбрасывает ошибку - обработать
-    const [prefix, topicType, body] = this.parseTopic(fullTopic);
+    let prefix: string | undefined;
+    let topicType: TopicType;
+    let bodyParts: string[];
+
+    try {
+      [prefix, topicType, ...bodyParts] = this.parseTopic(fullTopic);
+    }
+    catch (e) {
+      // do nothing because it isn't ours topic.
+      return Promise.resolve();
+    }
 
     // skip not ours prefix
     if (prefix !== this.prefix) return Promise.resolve();
 
     switch (topicType) {
       case 'action':
-        const [deviceId, actionName] = splitFirstElement(body, TOPIC_SEPARATOR);
-
-        return this.callAction(deviceId, actionName, data);
+        return this.callAction(bodyParts[0], bodyParts[1], data);
       case 'api':
-        return this.callApi(body, data);
+        return this.callApi(bodyParts[0], data);
     }
     // skip others
     return Promise.resolve();
@@ -136,31 +143,36 @@ export default class ApiTopicsLogic {
     return this.context.system.apiManager.callApi('action', [deviceId, actionName, ...args]);
   }
 
-  // TODO: review
   /**
-   * Parse topic to [prefix, topicType, topicBody].
+   * Parse topic to [prefix, topicType, ...topicBody].
    */
-  private parseTopic(topic: string): [(string | undefined), TopicType, string] {
+  private parseTopic(topic: string): [(string | undefined), TopicType, ...string[]] {
+    const splat: string[] = topic.split(TOPIC_SEPARATOR);
+    let prefix: string | undefined;
+    let topicType: TopicType;
+    let bodyParts: string[];
 
-    // TODO: support prefix
-    // TODO: нужно ли выбрасывать ошибку???
-
-    const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
-
-    if (!topicTypes.includes(splat[0])) {
-      throw new Error(`Invalid topic "${topic}": unknown type`);
-    }
-    else if (!splat[1]) {
+    if (splat.length < 2) {
       throw new Error(`Invalid topic "${topic}": Doesn't have the body`);
     }
+    else if (topicTypes.includes(splat[0])) {
+      // topic without prefix
+      topicType = splat[0] as TopicType;
+      bodyParts = splat.slice(1);
+    }
+    else if (topicTypes.includes(splat[1])) {
+      // topic with prefix
+      prefix = splat[0];
+      topicType = splat[1] as TopicType;
+      bodyParts = splat.slice(2);
+    }
+    else {
+      throw new Error(`Invalid topic "${topic}": unknown type`);
+    }
 
-    return [
-      splat[0] as TopicType,
-      splat[1],
-    ];
+    return [ prefix, topicType, ...bodyParts ];
   }
 
-  // TODO: review
   private publishDeviceState(
     topicType: TopicType,
     category: number,

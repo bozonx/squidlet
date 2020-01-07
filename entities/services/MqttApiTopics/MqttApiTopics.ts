@@ -60,6 +60,9 @@ export default class MqttApiTopics extends ServiceBase<Props> {
     if (typeof data !== 'string') {
       throw new Error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
     }
+    else if (typeof topic !== 'string') {
+      throw new Error(`MqttApiTopics: topic has to be a string`);
+    }
 
     // TODO: проверить может ли быть data undefined????
 
@@ -69,8 +72,12 @@ export default class MqttApiTopics extends ServiceBase<Props> {
   /**
    * Publish outcome messages to broker
    */
-  private handleOutcomeMessages = (topic: string, data: string): Promise<void> => {
-    return this.mqtt.publish(topic, data);
+  private handleOutcomeMessages = (topic: string, data?: string): void => {
+
+    // TODO: проверить может ли быть data undefined????
+
+    this.mqtt.publish(topic, data)
+      .catch((e: Error) => this.log.error(e));
   }
 
   /**
