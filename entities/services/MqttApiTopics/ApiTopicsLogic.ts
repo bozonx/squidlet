@@ -19,7 +19,7 @@ const allowedApiMethodsToCall = [
   'republishWholeState',
   'reboot',
 ];
-export const TOPIC_TYPE_SEPARATOR = '|';
+//export const TOPIC_TYPE_SEPARATOR = '|';
 export const TOPIC_SEPARATOR = '/';
 
 
@@ -27,8 +27,6 @@ export const TOPIC_SEPARATOR = '/';
  * Types of topics
  * device - means call device action
  * api - call specific api
- * * republishWholeState - publish while device etc states
- * * blockIo true|false
  */
 export default class ApiTopicsLogic {
   private readonly context: Context;
@@ -42,7 +40,7 @@ export default class ApiTopicsLogic {
   }
 
   init() {
-    // listen to outcome messages from api and send them to mqtt broker
+    // listen to outcome messages from devices state and send them to mqtt broker
     this.context.state.onChange(this.handleStateChange);
   }
 
@@ -60,11 +58,13 @@ export default class ApiTopicsLogic {
 
     const [topicType, body] = this.parseTopic(fullTopic);
 
+    // TODO: support можно не указывать device
     switch (topicType) {
       case 'device':
+        // TODO: support prefix
         const [deviceId, actionName] = splitFirstElement(body, TOPIC_SEPARATOR);
 
-        await this.action(deviceId, actionName, data);
+        await this.callAction(deviceId, actionName, data);
         break;
       case 'api':
         await this.callApi(body, data);
@@ -108,6 +108,8 @@ export default class ApiTopicsLogic {
   }
 
 
+  // TODO: support of  prefix
+  // TODO: skip if not ours prefix
   private isSupportedTopic(topic: string): boolean {
     const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
 
@@ -141,7 +143,7 @@ export default class ApiTopicsLogic {
     await this.context.system.apiManager.callApi(apiMethodName, args);
   }
 
-  private async action(deviceId: string, actionName?: string, data?: string) {
+  private async callAction(deviceId: string, actionName?: string, data?: string) {
     if (!actionName) {
       throw new Error(`ApiTopicsLogic.action: no actionName: "${deviceId}"`);
     }
@@ -159,6 +161,8 @@ export default class ApiTopicsLogic {
    */
   private parseTopic(topic: string): [TopicType, string] {
     const splat = splitFirstElement(topic, TOPIC_TYPE_SEPARATOR);
+
+    // TODO: support prefix
 
     if (!topicTypes.includes(splat[0])) {
       throw new Error(`Invalid topic "${topic}": unknown type`);
