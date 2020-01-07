@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/helpers')
 
 
-describe 'system.lib.helpers', ->
+describe.only 'system.lib.helpers', ->
   it 'combineTopic', ->
     assert.equal(helpers.combineTopic('/', 'first', 'second', 'third'), 'first/second/third')
     assert.equal(helpers.combineTopic('/', 'first', undefined, 'third'), 'first/third')
@@ -43,6 +43,11 @@ describe 'system.lib.helpers', ->
     assert.deepEqual(helpers.parseArgs('{a: 5, b: undefined, c: true}, 5'), [{a: 5, c: true}, 5])
     assert.deepEqual(helpers.parseArgs('{a: {b: "bb"}}'), [{a: {b: 'bb'}}])
     assert.deepEqual(helpers.parseArgs('"bedroom.light1","turn",1'), ['bedroom.light1', 'turn', 1])
+    # simplified strings
+    assert.deepEqual(
+      helpers.parseArgs('1,param1,true, [5, "str"]'),
+      [1, 'param1', true, [5, "str"]]
+    )
 
 #  it 'splitTopicId', ->
 #    assert.deepEqual(helpers.splitTopicId('/', 'id/sub/deeper'), [ 'id', 'sub/deeper' ])

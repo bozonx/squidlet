@@ -24,7 +24,7 @@ describe.only 'services.MqttApiTopics.ApiTopicsLogic', ->
     sinon.assert.calledWith(@apiManager.callApi, 'reboot', [])
 
   it 'incomeMessage - api with params', ->
-    @logic.incomeMessage('prfx/api/methodName', '1,param1,true')
+    @logic.incomeMessage('prfx/api/methodName', '1,param1,true, [5, "str"]')
 
     sinon.assert.calledOnce(@apiManager.callApi)
-    sinon.assert.calledWith(@apiManager.callApi, 'methodName', [1, 'param1', true])
+    sinon.assert.calledWith(@apiManager.callApi, 'methodName', [1, 'param1', true, [5, "str"]])

@@ -71,7 +71,24 @@ export function parseArgs(data?: Primitives): (JsonTypes | undefined)[] {
 
   const safeJson: string = data
     .replace(/undefined/, `"${undefinedReplace}"`)
-    .replace(/({|,)\s*(.+?)\s*:/g, '$1 "$2":');
+    // add quotes to keys of object
+    .replace(/({|,)\s*(.+?)\s*:/g, '$1 "$2":')
+    // replace strings without quotes
+    .split(`,`)
+    .map((item: string) => {
+      // TODO: it works badly with arrays and objects!!!!!
+      const trimmed: string = item.trim();
+
+      if (
+        trimmed.match(/^[\]}]?true|false|null|undefined|NaN[\]}]?$/)
+        || !trimmed.match(/^[a-zA-Z]/)
+      ) {
+        return item;
+      }
+
+      return `"${trimmed}"`;
+    })
+    .join(',');
 
   return JSON.parse(`[${safeJson}]`, (key: string, value: any) => {
     if (value === undefinedReplace) return undefined;
