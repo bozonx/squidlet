@@ -75,7 +75,7 @@ export function serializeResponse(register: number, response: NetworkResponse): 
 
   // TODO: если статус 1 - то преобразовать body в error string
 
-  return concatUint8Arr(metaData, response.body);
+  return concatUint8Arr(metaData, response.body || new Uint8Array(0));
 }
 
 export function deserializeResponse(data: Uint8Array): NetworkResponse {

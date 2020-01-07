@@ -193,11 +193,17 @@ export default class ApiTopicsLogic {
         ? undefined
         : paramName;
       const topic: string = combineTopic(TOPIC_SEPARATOR, this.prefix, topicType, deviceId, resolvedParamName);
-      const value: string = JSON.stringify(state[paramName]);
+      const value: string = this.preparePublishValue(state[paramName]);
 
       this.context.log.debug(`MqttApiTopics outcome: ${topic} - ${JSON.stringify(value)}`);
       this.outcomeEvents.emit(topic, value);
     }
+  }
+
+  private preparePublishValue(value: JsonTypes | undefined): string {
+    if (typeof value === 'string') return value;
+
+    return JSON.stringify(value);
   }
 
 }
