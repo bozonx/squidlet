@@ -30,7 +30,7 @@ describe 'system.lib.helpers', ->
     assert.equal(helpers.convertEntityTypeToPlural('service'), 'services')
     assert.equal(helpers.convertEntityTypeToPlural('device'), 'devices')
 
-  it.only 'parseArgs', ->
+  it 'parseArgs', ->
     assert.deepEqual(helpers.parseArgs(), [])
     assert.deepEqual(helpers.parseArgs(''), [])
     assert.deepEqual(helpers.parseArgs(5), [5])

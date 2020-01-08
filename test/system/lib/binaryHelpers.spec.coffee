@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/binaryHelpers')
 
 
-describe 'system.lib.binaryHelpers', ->
+describe.only 'system.lib.binaryHelpers', ->
   it 'isEqualUint8Array', ->
     assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([]), new Uint8Array([])))
     assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([1,2,3]), new Uint8Array([1,2,3])))
@@ -115,6 +115,21 @@ describe 'system.lib.binaryHelpers', ->
       new Uint8Array([1, 2, 3, 4, 5, 6])
     )
 
+  it 'combine2numberToByte and extract2NumbersFromByte', ->
+    assert.equal(helpers.combine2numberToByte(15,15), 255)
+    assert.equal(helpers.combine2numberToByte(0,0), 0)
+    assert.equal(helpers.combine2numberToByte(1,1), 17)
+    assert.equal(helpers.combine2numberToByte(3,3), 51)
+    assert.deepEqual(helpers.extract2NumbersFromByte(0), [0, 0])
+    assert.deepEqual(helpers.extract2NumbersFromByte(255), [15, 15])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(1,2)), [1, 2])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(5,14)), [5, 14])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(0,12)), [0, 12])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(8,0)), [8, 0])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(9,1)), [9, 1])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(7,6)), [7, 6])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(4,3)), [4, 3])
+    assert.deepEqual(helpers.extract2NumbersFromByte(helpers.combine2numberToByte(10,11)), [10, 11])
 
 #  it 'isUint8Array', ->
 #    uint = new Uint8Array(1)

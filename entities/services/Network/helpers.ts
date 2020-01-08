@@ -6,7 +6,7 @@ import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 
 const METADATA_LENGTH = 2;
 
-enum POSTIONS {
+enum POSITIONS {
   messageType,
   lengths,
 }
@@ -33,7 +33,7 @@ export function serializeMessage(message: NetworkMessage): Uint8Array {
 
 // TODO: test
 export function deserializeMessage(data: Uint8Array): NetworkMessage {
-  const [toLength, fromLength] = extract2NumbersFromByte(data[POSTIONS.lengths]);
+  const [toLength, fromLength] = extract2NumbersFromByte(data[POSITIONS.lengths]);
   const payloadStart: number = METADATA_LENGTH + toLength + fromLength;
   const from: string = uint8ArrayToAscii(data.slice(METADATA_LENGTH + toLength, payloadStart));
   const payload: RemoteCallMessage = deserializeJson(data.slice(payloadStart));
@@ -46,7 +46,7 @@ export function deserializeMessage(data: Uint8Array): NetworkMessage {
   return {
     to,
     from,
-    messageType: data[POSTIONS.messageType],
+    messageType: data[POSITIONS.messageType],
     payload,
   };
 }

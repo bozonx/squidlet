@@ -1,7 +1,7 @@
 ApiTopicsLogic = require('../../../../entities/services/MqttApiTopics/ApiTopicsLogic').default
 
 
-describe.only 'services.MqttApiTopics.ApiTopicsLogic', ->
+describe 'services.MqttApiTopics.ApiTopicsLogic', ->
   beforeEach ->
     @apiManager = {
       callApi: sinon.stub().returns(Promise.resolve())
