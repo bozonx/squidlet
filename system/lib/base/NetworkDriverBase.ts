@@ -31,20 +31,20 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
   protected abstract write(data: Uint8Array): Promise<void>;
 
 
-  async request(register: number, body: Uint8Array): Promise<NetworkRequest> {
+  async request(port: number, body: Uint8Array): Promise<NetworkRequest> {
     const promised = new Promised();
     const requestId: number = makeRequestId();
     const request: NetworkRequest = { requestId, body };
     let timeout: Timeout | undefined;
 
-    this.sendRequest(register, request)
+    this.sendRequest(port, request)
       .catch((e: Error) => {
         clearTimeout(timeout as any);
         !promised.isFulfilled() && promised.reject(e);
       });
 
     // listen for response
-    const listenIndex = this.onIncomeResponse(register, (response: NetworkResponse) => {
+    const listenIndex = this.onIncomeResponse(port, (response: NetworkResponse) => {
       // do nothing if filed or resolved. process only ours request
       if (promised.isFulfilled() || response.requestId !== requestId) return;
 
@@ -60,19 +60,19 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
       this.removeListener(listenIndex);
 
       promised.reject(
-        new Error(`SerialNetwork.request: Timeout of request has been exceeded of register "${register}"`)
+        new Error(`SerialNetwork.request: Timeout of request has been exceeded of port "${port}"`)
       );
     }, this.config.config.requestTimeoutSec * 1000);
 
     return promised.promise;
   }
 
-  onRequest(register: number, handler: IncomeRequestHandler): number {
+  onRequest(port: number, handler: IncomeRequestHandler): number {
     const wrapper = (request: NetworkRequest) => {
       handler(request)
         .then((response: NetworkResponse) => {
           // send response and don't wait for result
-          this.sendResponse(register, response)
+          this.sendResponse(port, response)
             .catch(this.log.error);
         })
         .catch((e) => {
@@ -82,12 +82,12 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
             body: new Uint8Array(stringToUint8Array(String(e))),
           };
 
-          this.sendResponse(register, response)
+          this.sendResponse(port, response)
             .catch(this.log.error);
         });
     };
 
-    const eventName: string = `${EVENTS.request}${hexNumToString(register)}`;
+    const eventName: string = `${EVENTS.request}${hexNumToString(port)}`;
 
     return this.events.addListener(eventName, wrapper);
   }

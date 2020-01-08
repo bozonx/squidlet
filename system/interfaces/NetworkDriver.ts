@@ -36,13 +36,13 @@ export default interface NetworkDriver {
    * An error will be risen only if request hasn't been sent or on response timeout.
    * Register is 8 bits.
    */
-  request(register: number, body: Uint8Array): Promise<NetworkRequest>;
+  request(port: number, body: Uint8Array): Promise<NetworkRequest>;
 
   /**
    * Handle income request at specified register.
    * You have to generate a response
    */
-  onRequest(register: number, handler: IncomeRequestHandler): number;
+  onRequest(port: number, handler: IncomeRequestHandler): number;
 
   // /**
   //  * Handle income response from remote node
