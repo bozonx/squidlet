@@ -1,9 +1,10 @@
 import ServiceBase from 'system/base/ServiceBase';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import Connections from './Connections';
 import Router from './Router';
-import NetworkMessage from './interfaces/NetworkMessage';
+import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 
 
 interface NetworkInterface {
@@ -18,10 +19,25 @@ interface Props {
   interfaces: NetworkInterface[];
 }
 
+// like [ hostId, networkDriverNum, busId ]
+type AddressDefinition = [string, NetworkDriver, number | string];
+
+// TODO: review
+enum NetworkDriver {
+  serial,
+  mqtt,
+  wsServer,
+  wsClient,
+  i2cMaster,
+  i2cSlave,
+}
+
 
 export default class Network extends ServiceBase<Props> {
   private readonly connections: Connections;
   private readonly router: Router;
+  // link between { sessionId: [ hostId, networkDriverNum, busId ] }
+  private sessionLinks: {[index: string]: AddressDefinition} = {};
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -33,12 +49,11 @@ export default class Network extends ServiceBase<Props> {
 
 
   init = async () => {
-    // TODO: десерилизовать полное сообщение с hostId и данными для RemoteCall
-    // TODO: слушать входищие сообщения драйверов и передавать на роутер
-    // TODO: то что на наш хост - выполнить
-
     this.router.init();
     this.router.onIncomeDestMessage(this.handleIncomeMessage);
+    this.context.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
+
+    // TODO: слушать что сессия сдохла и удалить связь с hostId
   }
 
   destroy = async () => {
@@ -47,8 +62,42 @@ export default class Network extends ServiceBase<Props> {
   }
 
 
-  private handleIncomeMessage(message: NetworkMessage) {
+  /**
+   * Call api method at remote host and return result
+   */
+  async callApi(toHostId: string, pathToMethod: string, args: any[]): Promise<any> {
+    const sessionId: string = this.resolveSessionId(toHostId);
 
+    // TODO: может лучше взять инстанс rc
+    return this.context.system.apiManager.callRemoteMethod(sessionId, pathToMethod, ...args);
+  }
+
+
+  private handleIncomeMessage(message: NetworkMessage) {
+    const sessionId: string = this.resolveSessionId(message.from);
+
+    this.context.system.apiManager.incomeRemoteCall(sessionId, message.payload)
+      .catch(this.log.error);
+  }
+
+  private handleOutcomeMessages(sessionId: string, rcMessage: RemoteCallMessage) {
+    // TODO: может и не найти - обработать ошибку или создать новую сессию???
+    const hostId: string = this.resolveHostId(sessionId);
+
+    this.router.send(hostId, MessageType.remoteCall, rcMessage)
+      .catch(this.log.error);
+  }
+
+  private resolveHostId(sessionId: string): string {
+    // TODO: add !!!!
+  }
+
+  /**
+   * Return existent session id or
+   */
+  private resolveSessionId(remoteHostId: string): string {
+    // TODO: принять driverName и busId
+    // TODO: port нужно добавлять ????
   }
 
 }

@@ -1,4 +1,5 @@
-import NetworkMessage from './interfaces/NetworkMessage';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
+import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 import Connections from './Connections';
 
 
@@ -19,6 +20,10 @@ export default class Router {
     // TODO: add
   }
 
+
+  send(hostId: string, messageType: MessageType.remoteCall, payload: RemoteCallMessage): Promise<void> {
+    // TODO: add
+  }
 
   /**
    * Listen only message which destination is current host or host hasn't been specified.

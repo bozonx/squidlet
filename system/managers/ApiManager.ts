@@ -62,6 +62,14 @@ export default class ApiManager {
     this.rcOutcomeEvents.addListener(cb);
   }
 
+  callRemoteMethod(sessionId: string, pathToMethod: string, ...args: any[]): Promise<any> {
+    if (!this.remoteCalls[sessionId]) {
+      this.makeNewSession(sessionId);
+    }
+
+    return this.remoteCalls[sessionId].callMethod(pathToMethod, ...args);
+  }
+
   /**
    * Call this method if session has just been closed
    */

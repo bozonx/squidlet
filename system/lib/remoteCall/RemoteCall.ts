@@ -53,6 +53,7 @@ export default class RemoteCall {
    * Call method on remote machine
    */
   async callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
+    // TODO: rename to callRemoteMethod
     const payload: CallMethodPayload = {
       method: pathToMethod,
       args: this.prepareArgsToSend(args),
