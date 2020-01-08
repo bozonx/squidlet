@@ -42,28 +42,13 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
+  // TODO: review
   init = async () => {
     this.openPromise = new Promised<void>();
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
-
-    await this.mqttIo.onMessage((connectionId: string, topic: string, data: string | Uint8Array) => {
-      if (connectionId !== this.connectionId) return;
-
-      // TODO: преобразовать bin в string
-
-      this.messageEvents.emit(topic, data);
-    });
-
-    await this.mqttIo.onClose((connectionId: string) => {
-      if (connectionId !== this.connectionId) return;
-
-      const msg = `Mqtt broker has closed a connection`;
-
-      this.openPromise && this.openPromise.reject(new Error(msg));
-
-      this.log.error(msg);
-    });
+    await this.mqttIo.onMessage(this.handleIncomeMessage);
+    await this.mqttIo.onClose(this.handleClose);
 
     // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
     //  - возможно это уже реализованно в самам mqtt
@@ -77,7 +62,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     await this.mqttIo.onError((connectionId: string, error: Error) => {
       if (connectionId !== this.connectionId) return;
 
-      this.log.error(`Mqtt connection "${connectionId}": ${error}`);
+      this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
     });
 
     this.connectionId = await this.mqttIo.newConnection(
@@ -160,18 +145,31 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.mqttIo.unsubscribe(this.connectionId, topic);
   }
 
-  async end(): Promise<void> {
-    return this.destroy();
-  }
-
   onMessage(cb: MqttMessageHandler): number {
     return this.messageEvents.addListener(cb);
   }
 
-  removeMessageListener(handlerId: number) {
-    if (!this.connectionId) return;
-
+  removeListener(handlerId: number) {
     this.messageEvents.removeListener(handlerId);
+  }
+
+
+  private handleIncomeMessage = (connectionId: string, topic: string, data: string | Uint8Array) => {
+    if (connectionId !== this.connectionId) return;
+
+    // TODO: преобразовать bin в string
+
+    this.messageEvents.emit(topic, data);
+  }
+
+  private handleClose = (connectionId: string) => {
+    if (connectionId !== this.connectionId) return;
+
+    const msg = `Mqtt broker has closed a connection`;
+
+    this.openPromise && this.openPromise.reject(new Error(msg));
+
+    this.log.error(msg);
   }
 
 }
