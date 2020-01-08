@@ -14,7 +14,6 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-
   // TODO: проверить что будет переподключаться до бесконечности
 
   // on first time connect or reconnect
@@ -31,9 +30,13 @@ export class Mqtt extends DriverBase<MqttProps> {
   // was previous open promise fulfilled
   //private wasPrevOpenFulfilled: boolean = false;
   private connectionId?: string;
+  // topics which are subscribed and income data of them is binary
+  private binarySubscribedTopics: {[index: string]: true} = {};
+
   private get mqttIo(): MqttIo {
     return this.context.getIo('Mqtt') as any;
   }
+
   private get closedMsg() {
     return `Connection "${this.props.url}" has been closed`;
   }
@@ -92,6 +95,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.openPromise && this.openPromise.destroy();
 
     delete this.openPromise;
+    delete this.binarySubscribedTopics;
 
     if (this.connectionId) {
       await this.mqttIo.end(this.connectionId);
@@ -125,6 +129,11 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.mqttIo.publish(this.connectionId, topic, preparedData);
   }
 
+  /**
+   * Subscribe to changed at brocker
+   * @param topic
+   * @param isBinary - means that income data will be binary.
+   */
   async subscribe(topic: string, isBinary: boolean = false): Promise<void> {
     await this.connectedPromise;
 
@@ -132,7 +141,23 @@ export class Mqtt extends DriverBase<MqttProps> {
       throw new Error(`Mqtt driver subscribe: ${this.closedMsg}`);
     }
 
+    if (isBinary) {
+      this.binarySubscribedTopics[topic] = true;
+    }
+
     return this.mqttIo.subscribe(this.connectionId, topic);
+  }
+
+  async unsubscribe(topic: string): Promise<void> {
+    await this.connectedPromise;
+
+    if (!this.connectionId) {
+      throw new Error(`Mqtt driver subscribe: ${this.closedMsg}`);
+    }
+
+    delete this.binarySubscribedTopics[topic];
+
+    return this.mqttIo.unsubscribe(this.connectionId, topic);
   }
 
   async end(): Promise<void> {
