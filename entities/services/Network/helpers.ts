@@ -1,22 +1,23 @@
-import {asciiToUint8Array, serializeJson} from 'system/lib/serialize';
-import {concatUint8Arr} from 'system/lib/binaryHelpers';
+import {asciiToUint8Array, deserializeJson, serializeJson, uint8ArrayToAscii} from 'system/lib/serialize';
+import {combine2numberToByte, concatUint8Arr, extract2NumbersFromByte} from 'system/lib/binaryHelpers';
 import NetworkMessage from './interfaces/NetworkMessage';
+import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 
 
 const METADATA_LENGTH = 2;
 
+enum POSTIONS {
+  messageType,
+  lengths,
+}
 
+
+// TODO: test
 export function serializeMessage(message: NetworkMessage): Uint8Array {
   const toLength: number = (message.to) ? message.to.length : 0;
   // TODO: может сделать упрощенную сериализацию чтобы были минимальные значения полей
   const payload: Uint8Array = serializeJson(message.payload);
-  // TODO: совместить 2 длины
-  const lengthsByte: number = 0;
-  //const fullLength: number = METADATA_LENGTH + toLength + message.from.length + payload.length;
-  const metaData: Uint8Array = new Uint8Array(METADATA_LENGTH);
-
-  metaData[0] = message.messageType;
-  metaData[1] = lengthsByte;
+  const lengthsByte: number = combine2numberToByte(toLength, message.from.length);
 
   return concatUint8Arr(
     // meta data
@@ -30,6 +31,22 @@ export function serializeMessage(message: NetworkMessage): Uint8Array {
   );
 }
 
+// TODO: test
 export function deserializeMessage(data: Uint8Array): NetworkMessage {
-  // TODO: add
+  const [toLength, fromLength] = extract2NumbersFromByte(data[POSTIONS.lengths]);
+  const payloadStart: number = METADATA_LENGTH + toLength + fromLength;
+  const from: string = uint8ArrayToAscii(data.slice(METADATA_LENGTH + toLength, payloadStart));
+  const payload: RemoteCallMessage = deserializeJson(data.slice(payloadStart));
+  let to: string | undefined;
+
+  if (toLength) {
+    to = uint8ArrayToAscii(data.slice(METADATA_LENGTH, toLength));
+  }
+
+  return {
+    to,
+    from,
+    messageType: data[POSTIONS.messageType],
+    payload,
+  };
 }
