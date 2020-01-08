@@ -1,19 +1,31 @@
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
+import Context from 'system/Context';
+import NetworkDriver, {NetworkResponse, NetworkStatus} from 'system/interfaces/NetworkDriver';
+import IndexedEvents from 'system/lib/IndexedEvents';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
-import Connections from './Connections';
+import {serializeMessage} from './helpers';
+import {NETWORK_PORT} from './Network';
+
+
+type MessageHandler = (message: NetworkMessage) => void;
 
 
 export default class Router {
-  private readonly connections: Connections;
+  private readonly context: Context;
+  private incomeMessagesEvents = new IndexedEvents<MessageHandler>();
+  // driver instances by index of props.interfaces
+  private connections: NetworkDriver[] = [];
 
 
-  constructor(connections: Connections) {
-    this.connections = connections;
+  constructor(context: Context) {
+    this.context = context;
   }
 
 
   init() {
-    // TODO: слушаем все доступные соединения
+    // TODO: инициализируем соединения
+    // TODO: навешать this.handleIncomeData
+    // TODO: сделать ответную сторрону для network drivers
   }
 
   destroy() {
@@ -21,19 +33,47 @@ export default class Router {
   }
 
 
-  send(hostId: string, messageType: MessageType.remoteCall, payload: RemoteCallMessage): Promise<void> {
-    // TODO: add
+  async send(hostId: string, messageType: MessageType.remoteCall, payload: RemoteCallMessage): Promise<void> {
+    // TODO: создать message
+    // TODO: сериализовать
+
+    const message: NetworkMessage = {
+      to: hostId,
+      from: this.context.id,
+      messageType,
+      payload
+    };
+    const data: Uint8Array = serializeMessage(message);
+    const connection: NetworkDriver = this.resolveConnection(hostId);
+
+    const result: NetworkResponse = await connection.request(NETWORK_PORT, data);
+
+    if (result.status === NetworkStatus.errorMessage) {
+      // TODO: где будет обработка error ?????
+      this.context.log.error(result.error);
+    }
   }
 
   /**
    * Listen only message which destination is current host or host hasn't been specified.
    */
-  onIncomeDestMessage(cb: (message: NetworkMessage) => void) {
-    // TODO: add
+  onIncomeDestMessage(cb: MessageHandler): number {
+    return this.incomeMessagesEvents.addListener(cb);
   }
 
-  // handleIncome(message: NetworkMessage) {
-  //
-  // }
+  removeListener(handlerIndex: number) {
+    this.incomeMessagesEvents.removeListener(handlerIndex);
+  }
+
+
+  private handleIncomeData() {
+    // TODO: add
+    // TODO: десериализовать
+    // TODO: сформировать сообщение
+  }
+
+  private resolveConnection(hostId: string): NetworkDriver {
+    // TODO: add
+  }
 
 }

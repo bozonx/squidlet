@@ -31,8 +31,8 @@ export default abstract class NetworkDriverBase<Props> extends DriverBase<Props>
   protected abstract write(data: Uint8Array): Promise<void>;
 
 
-  async request(port: number, body: Uint8Array): Promise<NetworkRequest> {
-    const promised = new Promised();
+  async request(port: number, body: Uint8Array): Promise<NetworkResponse> {
+    const promised = new Promised<NetworkResponse>();
     const requestId: number = makeRequestId();
     const request: NetworkRequest = { requestId, body };
     let timeout: Timeout | undefined;

@@ -36,7 +36,7 @@ export default interface NetworkDriver {
    * An error will be risen only if request hasn't been sent or on response timeout.
    * Register is 8 bits.
    */
-  request(port: number, body: Uint8Array): Promise<NetworkRequest>;
+  request(port: number, body: Uint8Array): Promise<NetworkResponse>;
 
   /**
    * Handle income request at specified register.

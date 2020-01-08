@@ -2,7 +2,6 @@ import ServiceBase from 'system/base/ServiceBase';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import Connections from './Connections';
 import Router from './Router';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 
@@ -32,9 +31,10 @@ enum NetworkDriver {
   i2cSlave,
 }
 
+export const NETWORK_PORT = 255;
+
 
 export default class Network extends ServiceBase<Props> {
-  private readonly connections: Connections;
   private readonly router: Router;
   // link between { sessionId: [ hostId, networkDriverNum, busId ] }
   private sessionLinks: {[index: string]: AddressDefinition} = {};
@@ -43,8 +43,7 @@ export default class Network extends ServiceBase<Props> {
   constructor(context: Context, definition: EntityDefinition) {
     super(context, definition);
 
-    this.connections = new Connections();
-    this.router = new Router(this.connections);
+    this.router = new Router(this.context);
   }
 
 
@@ -58,7 +57,6 @@ export default class Network extends ServiceBase<Props> {
 
   destroy = async () => {
     this.router.destroy();
-    this.connections.destroy();
   }
 
 
@@ -68,7 +66,8 @@ export default class Network extends ServiceBase<Props> {
   async callApi(toHostId: string, pathToMethod: string, args: any[]): Promise<any> {
     const sessionId: string = this.resolveSessionId(toHostId);
 
-    // TODO: может лучше взять инстанс rc
+    // TODO: как бы избежать двойного преобразования sessionId?
+
     return this.context.system.apiManager.callRemoteMethod(sessionId, pathToMethod, ...args);
   }
 

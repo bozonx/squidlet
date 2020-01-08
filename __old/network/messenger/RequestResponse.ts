@@ -1,5 +1,5 @@
 import Messenger from './Messenger';
-import System from '../../../../../system/System';
+import System from '../../../system/System';
 import Request from './interfaces/Request';
 import Response from './interfaces/Response';
 

@@ -1,4 +1,4 @@
-import System from '../../../../system/System';
+import System from '../../system/System';
 import Request from './messenger/interfaces/Request';
 import Response from './messenger/interfaces/Response';
 import Message from './messenger/interfaces/Message';
