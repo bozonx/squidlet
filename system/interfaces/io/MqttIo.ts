@@ -52,7 +52,7 @@ export default interface MqttIo extends IoItem {
    * Data will be a string or empty string or Uint8Array or empty Uint8Array.
    */
   onMessage(cb: (connectionId: string, topic: string, data: Uint8Array) => void): Promise<number>;
-  onError(cb: (connectionId: string, err: Error) => void): Promise<number>;
+  onError(cb: (connectionId: string, err: string) => void): Promise<number>;
   removeListener(handlerId: number): Promise<void>;
 
   publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;

@@ -86,7 +86,7 @@ export default class Mqtt implements MqttIo {
     return this.events.addListener(MqttIoEvents.message, cb);
   }
 
-  async onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
+  async onError(cb: (connectionId: string, err: string) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.error, cb);
   }
 
@@ -156,7 +156,7 @@ export default class Mqtt implements MqttIo {
       //const contentType: string | undefined = packet.properties && packet.properties.contentType;
       this.handleIncomeMessage(connectionId, topic, data);
     });
-    connection.on('error', (err) => this.events.emit(MqttIoEvents.error, connectionId, err));
+    connection.on('error', (err: Error) => this.events.emit(MqttIoEvents.error, connectionId, String(err)));
     connection.on('connect', () => this.events.emit(MqttIoEvents.connect, connectionId));
     connection.on('close', () => this.events.emit(MqttIoEvents.close, connectionId));
 

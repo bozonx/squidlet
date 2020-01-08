@@ -26,8 +26,26 @@ export function stringToBase64(base64Str: string): string {
   return atob(base64Str);
 }
 
+// TODO: test
+export function uint8ArrayToAscii(uintArray: Uint8Array): string {
+  return String.fromCharCode.apply(undefined, uintArray as any);
+}
+
+// TODO: test
+export function asciiToUint8Array(str: string): Uint8Array {
+  const charList = str.split('');
+  const uintArray = [];
+
+  for (let i = 0; i < charList.length; i++) {
+    uintArray.push(charList[i].charCodeAt(0));
+  }
+
+  return new Uint8Array(uintArray);
+}
+
 // see https://stackoverflow.com/questions/17191945/conversion-between-utf-8-arraybuffer-and-string
 export function uint8ArrayToUtf8Text(uintArray: Uint8Array): string {
+  // TODO: use uint8ArrayToAscii
   const encodedString = String.fromCharCode.apply(undefined, uintArray as any);
 
   return decodeURIComponent(escape(stringToBase64(encodedString)));
@@ -39,6 +57,7 @@ export function uint8ArrayToUtf8Text(uintArray: Uint8Array): string {
 
 export function utf8TextToUint8Array(str: string): Uint8Array {
   const string = base64ToString(unescape(encodeURIComponent(str)));
+  // TODO: use asciiToUint8Array
   const charList = string.split('');
   const uintArray = [];
 

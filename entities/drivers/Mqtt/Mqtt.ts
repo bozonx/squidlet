@@ -4,13 +4,15 @@ import MqttIo from 'system/interfaces/io/MqttIo';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
-import {uint8ArrayToUtf8Text} from '../../../system/lib/serialize';
+import {uint8ArrayToAscii} from '../../../system/lib/serialize';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
 
 export interface MqttProps {
   url: string;
+  username?: string;
+  password?: string;
 }
 
 
@@ -60,7 +62,7 @@ export class Mqtt extends DriverBase<MqttProps> {
       this.openPromise && this.openPromise.resolve();
     });
 
-    await this.mqttIo.onError((connectionId: string, error: Error) => {
+    await this.mqttIo.onError((connectionId: string, error: string) => {
       if (connectionId !== this.connectionId) return;
 
       this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
@@ -115,7 +117,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   /**
-   * Subscribe to changed at brocker
+   * Subscribe to changes at broker
    * @param topic
    * @param isBinary - means that income data will be binary.
    */
@@ -160,11 +162,9 @@ export class Mqtt extends DriverBase<MqttProps> {
     let preparedData: string | Uint8Array = data;
 
     if (!this.binarySubscribedTopics[topic]) {
-      // make string
-      preparedData = uint8ArrayToUtf8Text(data);
+      // make ascii string
+      preparedData = (data.length) ? uint8ArrayToAscii(data) : '';
     }
-
-    console.log(11111111, preparedData)
 
     this.messageEvents.emit(topic, preparedData);
   }
