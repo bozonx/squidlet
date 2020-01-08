@@ -4,6 +4,7 @@ import MqttIo from 'system/interfaces/io/MqttIo';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
+import {uint8ArrayToText} from '../../../system/lib/serialize';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
@@ -98,7 +99,6 @@ export class Mqtt extends DriverBase<MqttProps> {
     let preparedData: string | Uint8Array;
 
     if (typeof data === 'undefined') {
-      // TODO: а что если должно быть string???
       preparedData = new Uint8Array(0);
     }
     else {
@@ -154,12 +154,19 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
-  private handleIncomeMessage = (connectionId: string, topic: string, data: string | Uint8Array) => {
+  private handleIncomeMessage = (connectionId: string, topic: string, data: Uint8Array) => {
     if (connectionId !== this.connectionId) return;
 
-    // TODO: преобразовать bin в string
+    let preparedData: string | Uint8Array = data;
 
-    this.messageEvents.emit(topic, data);
+    if (!this.binarySubscribedTopics[topic]) {
+      // make string
+      preparedData = uint8ArrayToText(data);
+    }
+
+    console.log(11111111, preparedData)
+
+    this.messageEvents.emit(topic, preparedData);
   }
 
   private handleClose = (connectionId: string) => {

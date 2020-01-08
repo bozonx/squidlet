@@ -9,13 +9,13 @@ import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 
 
-type MqttContentTypes = 'string' | 'binary';
+//type MqttContentTypes = 'string' | 'binary';
 
-interface MqttPacket {
-  properties: {
-    contentType: MqttContentTypes;
-  };
-}
+// interface MqttPacket {
+//   properties: {
+//     contentType: MqttContentTypes;
+//   };
+// }
 
 
 /**
@@ -82,7 +82,7 @@ export default class Mqtt implements MqttIo {
     return this.events.addListener(MqttIoEvents.close, cb);
   }
 
-  async onMessage(cb: (connectionId: string, topic: string, data: string | Uint8Array) => void): Promise<number> {
+  async onMessage(cb: (connectionId: string, topic: string, data: Uint8Array) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.message, cb);
   }
 
@@ -99,11 +99,11 @@ export default class Mqtt implements MqttIo {
       throw new Error(`Mqtt.publish: There isn't a connection "${connectionId}"`);
     }
 
-    let contentType: MqttContentTypes;
+    //let contentType: MqttContentTypes;
     let preparedData: string | Buffer;
 
     if (typeof data === 'string') {
-      contentType = 'string';
+      //contentType = 'string';
       preparedData = data;
     }
     // else if (typeof data === 'undefined') {
@@ -111,19 +111,20 @@ export default class Mqtt implements MqttIo {
     //   preparedData = new Buffer([]);
     // }
     else {
-      contentType = 'binary';
+      //contentType = 'binary';
       preparedData = new Buffer(data);
     }
 
-    const options = {
-      properties: {
-        contentType
-      }
-    };
+    // const options = {
+    //   properties: {
+    //     contentType
+    //   }
+    // };
 
     const client = this.connections[Number(connectionId)];
 
-    return callPromised(client.publish.bind(client), topic, preparedData, options);
+    return callPromised(client.publish.bind(client), topic, preparedData);
+    //return callPromised(client.publish.bind(client), topic, preparedData, options);
   }
 
   subscribe(connectionId: string, topic: string): Promise<void> {
@@ -150,11 +151,10 @@ export default class Mqtt implements MqttIo {
   private connectToServer(connectionId: string, url: string, options: MqttOptions): mqtt.MqttClient {
     const connection = mqtt.connect(url, options);
 
-    connection.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
-      // TODO: review
-      const contentType: string | undefined = packet.properties && packet.properties.contentType;
-
-      this.handleIncomeMessage(connectionId, topic, data, contentType);
+    //connection.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
+    connection.on('message', (topic: string, data: Buffer) => {
+      //const contentType: string | undefined = packet.properties && packet.properties.contentType;
+      this.handleIncomeMessage(connectionId, topic, data);
     });
     connection.on('error', (err) => this.events.emit(MqttIoEvents.error, connectionId, err));
     connection.on('connect', () => this.events.emit(MqttIoEvents.connect, connectionId));
@@ -170,18 +170,18 @@ export default class Mqtt implements MqttIo {
     connectionId: string,
     topic: string,
     data: Buffer,
-    contentTypeProperty: string | undefined
+    //contentTypeProperty: string | undefined
   ) => {
-    let preparedData: string | Uint8Array;
-    const binaryContentType: MqttContentTypes = 'binary';
+    let preparedData: Uint8Array = convertBufferToUint8Array(data);
+    //const binaryContentType: MqttContentTypes = 'binary';
 
-    if (contentTypeProperty === binaryContentType) {
-      preparedData = convertBufferToUint8Array(data);
-    }
-    else {
-      // not contentType or 'string'
-      preparedData = data.toString();
-    }
+    // if (contentTypeProperty === binaryContentType) {
+    //   preparedData = convertBufferToUint8Array(data);
+    // }
+    // else {
+    //   // not contentType or 'string'
+    //   preparedData = data.toString();
+    // }
 
     this.events.emit(MqttIoEvents.message, connectionId, topic, preparedData);
   }
