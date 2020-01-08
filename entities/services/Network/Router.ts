@@ -4,7 +4,7 @@ import NetworkDriver, {NetworkResponse, NetworkStatus} from 'system/interfaces/N
 import IndexedEvents from 'system/lib/IndexedEvents';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 import {serializeMessage} from './helpers';
-import {NETWORK_PORT} from './Network';
+import {NETWORK_PORT, NetworkProps} from './Network';
 
 
 type MessageHandler = (message: NetworkMessage) => void;
@@ -12,13 +12,15 @@ type MessageHandler = (message: NetworkMessage) => void;
 
 export default class Router {
   private readonly context: Context;
+  private readonly props: NetworkProps;
   private incomeMessagesEvents = new IndexedEvents<MessageHandler>();
   // driver instances by index of props.interfaces
   private connections: NetworkDriver[] = [];
 
 
-  constructor(context: Context) {
+  constructor(context: Context, props: NetworkProps) {
     this.context = context;
+    this.props = props;
   }
 
 
@@ -34,9 +36,6 @@ export default class Router {
 
 
   async send(hostId: string, messageType: MessageType.remoteCall, payload: RemoteCallMessage): Promise<void> {
-    // TODO: создать message
-    // TODO: сериализовать
-
     const message: NetworkMessage = {
       to: hostId,
       from: this.context.id,
@@ -49,8 +48,13 @@ export default class Router {
     const result: NetworkResponse = await connection.request(NETWORK_PORT, data);
 
     if (result.status === NetworkStatus.errorMessage) {
-      // TODO: где будет обработка error ?????
-      this.context.log.error(result.error);
+      // TODO: где будет обработка error на самом деле ?????
+      if (result.error) {
+        this.context.log.error(result.error);
+      }
+      else {
+        this.context.log.error(`Network Router: Unknown error`);
+      }
     }
   }
 

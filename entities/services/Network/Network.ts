@@ -14,7 +14,7 @@ interface NetworkInterface {
   [index: string]: any;
 }
 
-interface Props {
+export interface NetworkProps {
   interfaces: NetworkInterface[];
 }
 
@@ -34,7 +34,7 @@ enum NetworkDriver {
 export const NETWORK_PORT = 255;
 
 
-export default class Network extends ServiceBase<Props> {
+export default class Network extends ServiceBase<NetworkProps> {
   private readonly router: Router;
   // link between { sessionId: [ hostId, networkDriverNum, busId ] }
   private sessionLinks: {[index: string]: AddressDefinition} = {};
@@ -43,7 +43,7 @@ export default class Network extends ServiceBase<Props> {
   constructor(context: Context, definition: EntityDefinition) {
     super(context, definition);
 
-    this.router = new Router(this.context);
+    this.router = new Router(this.context, this.props);
   }
 
 
