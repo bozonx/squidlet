@@ -94,7 +94,7 @@ export default class Mqtt implements MqttIo {
     this.events.removeListener(handlerId);
   }
 
-  async publish(connectionId: string, topic: string, data?: string | Uint8Array): Promise<void> {
+  async publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void> {
     if (!this.connections[Number(connectionId)]) {
       throw new Error(`Mqtt.publish: There isn't a connection "${connectionId}"`);
     }
@@ -106,13 +106,10 @@ export default class Mqtt implements MqttIo {
       contentType = 'string';
       preparedData = data;
     }
-
-    // TODO: data может быть undefined ????? может и передавать undefined а не bufer
-
-    else if (typeof data === 'undefined') {
-      contentType = 'binary';
-      preparedData = new Buffer([]);
-    }
+    // else if (typeof data === 'undefined') {
+    //   contentType = 'binary';
+    //   preparedData = new Buffer([]);
+    // }
     else {
       contentType = 'binary';
       preparedData = new Buffer(data);

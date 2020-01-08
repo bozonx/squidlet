@@ -47,6 +47,8 @@ export class Mqtt extends DriverBase<MqttProps> {
     await this.mqttIo.onMessage((connectionId: string, topic: string, data: string | Uint8Array) => {
       if (connectionId !== this.connectionId) return;
 
+      // TODO: преобразовать bin в string
+
       this.messageEvents.emit(topic, data);
     });
 
@@ -104,16 +106,26 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   async publish(topic: string, data?: string | Uint8Array): Promise<void> {
+    let preparedData: string | Uint8Array;
+
+    if (typeof data === 'undefined') {
+      // TODO: а что если должно быть string???
+      preparedData = new Uint8Array(0);
+    }
+    else {
+      preparedData = data;
+    }
+
     await this.connectedPromise;
 
     if (!this.connectionId) {
       throw new Error(`Mqtt driver publish: ${this.closedMsg}`);
     }
 
-    return this.mqttIo.publish(this.connectionId, topic, data);
+    return this.mqttIo.publish(this.connectionId, topic, preparedData);
   }
 
-  async subscribe(topic: string): Promise<void> {
+  async subscribe(topic: string, isBinary: boolean = false): Promise<void> {
     await this.connectedPromise;
 
     if (!this.connectionId) {
