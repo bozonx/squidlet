@@ -349,7 +349,7 @@ export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
 }
 
 /**
- * Make 1 byte from 2 16 bit number.
+ * Make 1 byte from 2 4-bit number.
  */
 export function combine2numberToByte(one: number, two: number): number {
   const oneStr: string = padStart( one.toString(2), 4, '0' );
@@ -360,7 +360,7 @@ export function combine2numberToByte(one: number, two: number): number {
 }
 
 /**
- * Extract 2 16 bit numbers from byte which has been encoded by `combine2numberToByte`
+ * Extract 2 4-bit numbers from byte which has been encoded by `combine2numberToByte`
  */
 export function extract2NumbersFromByte(byte: number): [number, number] {
   const one: number = byte & 15;

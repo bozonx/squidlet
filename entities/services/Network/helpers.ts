@@ -8,6 +8,7 @@ const METADATA_LENGTH = 2;
 
 enum POSITIONS {
   messageType,
+  // one byte witch contains 4-bit lengths of "to" and "from" fields
   lengths,
 }
 

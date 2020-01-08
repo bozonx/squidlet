@@ -184,5 +184,5 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 export default class Factory extends DriverFactoryBase<Mqtt, MqttProps> {
   protected SubDriverClass = Mqtt;
-  protected instanceId = (props: MqttProps) => props.url;
+  protected instanceId = (props: MqttProps) => props.url + (props.username || '');
 }
