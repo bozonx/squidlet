@@ -55,6 +55,7 @@ export default class Router {
       messageType,
       payload
     };
+    // TODO: handle error
     const data: Uint8Array = serializeMessage(message);
     const connection: NetworkDriver = this.resolveConnection(hostId);
     const response: NetworkResponse = await connection.request(NETWORK_PORT, data);
@@ -84,6 +85,7 @@ export default class Router {
 
 
   private handleIncomeData = async (request: NetworkRequest): Promise<NetworkResponse> => {
+    // TODO: handle error
     const incomeMessage: NetworkMessage = deserializeMessage(request.body);
 
     if (!incomeMessage.to || incomeMessage.to === this.context.id) {
@@ -92,7 +94,7 @@ export default class Router {
     }
     else {
       // send further
-      // TODO: add
+      // TODO: add - вычислить ближайший хост для отправки
     }
 
     return {

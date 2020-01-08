@@ -1,7 +1,7 @@
 import {asciiToUint8Array, deserializeJson, serializeJson, uint8ArrayToAscii} from 'system/lib/serialize';
 import {combine2numberToByte, concatUint8Arr, extract2NumbersFromByte} from 'system/lib/binaryHelpers';
+import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import NetworkMessage from './interfaces/NetworkMessage';
-import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 
 
 const METADATA_LENGTH = 2;
@@ -12,10 +12,15 @@ enum POSITIONS {
 }
 
 
-// TODO: test
 export function serializeMessage(message: NetworkMessage): Uint8Array {
+  if (message.to && message.to.length > 16) {
+    throw new Error(`"to" field of network message is too long: ${message.to.length}`);
+  }
+  else if (message.from.length > 16) {
+    throw new Error(`"from" field of network message is too long: ${message.from.length}`);
+  }
+
   const toLength: number = (message.to) ? message.to.length : 0;
-  // TODO: может сделать упрощенную сериализацию чтобы были минимальные значения полей
   const payload: Uint8Array = serializeJson(message.payload);
   const lengthsByte: number = combine2numberToByte(toLength, message.from.length);
 
@@ -31,22 +36,30 @@ export function serializeMessage(message: NetworkMessage): Uint8Array {
   );
 }
 
-// TODO: test
 export function deserializeMessage(data: Uint8Array): NetworkMessage {
   const [toLength, fromLength] = extract2NumbersFromByte(data[POSITIONS.lengths]);
   const payloadStart: number = METADATA_LENGTH + toLength + fromLength;
   const from: string = uint8ArrayToAscii(data.slice(METADATA_LENGTH + toLength, payloadStart));
   const payload: RemoteCallMessage = deserializeJson(data.slice(payloadStart));
-  let to: string | undefined;
 
-  if (toLength) {
-    to = uint8ArrayToAscii(data.slice(METADATA_LENGTH, toLength));
-  }
-
-  return {
-    to,
+  const result: NetworkMessage = {
     from,
     messageType: data[POSITIONS.messageType],
     payload,
   };
+
+  if (toLength) {
+    result.to = uint8ArrayToAscii(data.slice(METADATA_LENGTH, METADATA_LENGTH + toLength));
+  }
+
+  return result;
+}
+
+/**
+ * Resolve:
+ * serial => SerialNetwork
+ * SerialNetwork => SerialNetwork
+ */
+export function resolveNetworkDriverName(shortName: string): string {
+  // TODO: add
 }
