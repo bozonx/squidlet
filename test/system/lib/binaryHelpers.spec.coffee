@@ -1,7 +1,7 @@
 helpers = require('../../../system/lib/binaryHelpers')
 
 
-describe.only 'system.lib.binaryHelpers', ->
+describe 'system.lib.binaryHelpers', ->
   it 'isEqualUint8Array', ->
     assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([]), new Uint8Array([])))
     assert.isTrue(helpers.isEqualUint8Array(new Uint8Array([1,2,3]), new Uint8Array([1,2,3])))
