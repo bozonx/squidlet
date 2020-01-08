@@ -10,7 +10,7 @@ interface NetworkInterface {
   // driver name like: 'SerialNetwork' etc
   driver: string;
   busId: string | number;
-  // props of driver
+  // props of network driver
   [index: string]: any;
 }
 
@@ -48,7 +48,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   init = async () => {
-    this.router.init();
+    await this.router.init();
     this.router.onIncomeDestMessage(this.handleIncomeMessage);
     this.context.system.apiManager.onOutcomeRemoteCall(this.handleOutcomeMessages);
 

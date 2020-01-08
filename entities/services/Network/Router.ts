@@ -1,9 +1,10 @@
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import Context from 'system/Context';
-import NetworkDriver, {NetworkResponse, NetworkStatus} from 'system/interfaces/NetworkDriver';
+import NetworkDriver, {NetworkRequest, NetworkResponse, NetworkStatus} from 'system/interfaces/NetworkDriver';
 import IndexedEvents from 'system/lib/IndexedEvents';
+import {omitObj} from 'system/lib/objects';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
-import {serializeMessage} from './helpers';
+import {deserializeMessage, serializeMessage} from './helpers';
 import {NETWORK_PORT, NetworkProps} from './Network';
 
 
@@ -24,18 +25,29 @@ export default class Router {
   }
 
 
-  init() {
-    // TODO: инициализируем соединения
-    // TODO: навешать this.handleIncomeData
-    // TODO: сделать ответную сторрону для network drivers
+  async init() {
+    if (!this.props.interfaces) return;
+
+    for (let index in this.props.interfaces) {
+      this.connections[index] = await this.context.getSubDriver<any>(
+        this.props.interfaces[index].driver,
+        omitObj(this.props, 'driver')
+      );
+      this.connections[index].onRequest(NETWORK_PORT, this.handleIncomeData);
+    }
   }
 
   destroy() {
-    // TODO: add
+    this.incomeMessagesEvents.destroy();
+    delete this.connections;
   }
 
 
-  async send(hostId: string, messageType: MessageType.remoteCall, payload: RemoteCallMessage): Promise<void> {
+  async send(
+    hostId: string,
+    messageType: MessageType.remoteCall,
+    payload: RemoteCallMessage | any
+  ): Promise<void> {
     const message: NetworkMessage = {
       to: hostId,
       from: this.context.id,
@@ -44,18 +56,18 @@ export default class Router {
     };
     const data: Uint8Array = serializeMessage(message);
     const connection: NetworkDriver = this.resolveConnection(hostId);
+    const response: NetworkResponse = await connection.request(NETWORK_PORT, data);
 
-    const result: NetworkResponse = await connection.request(NETWORK_PORT, data);
-
-    if (result.status === NetworkStatus.errorMessage) {
+    if (response.status === NetworkStatus.errorMessage) {
       // TODO: где будет обработка error на самом деле ?????
-      if (result.error) {
-        this.context.log.error(result.error);
+      if (response.error) {
+        this.context.log.error(response.error);
       }
       else {
-        this.context.log.error(`Network Router: Unknown error`);
+        this.context.log.error(`Network Router: empty error message from "${hostId}"`);
       }
     }
+    // ignore response body
   }
 
   /**
@@ -70,14 +82,27 @@ export default class Router {
   }
 
 
-  private handleIncomeData() {
-    // TODO: add
-    // TODO: десериализовать
-    // TODO: сформировать сообщение
+  private handleIncomeData = async (request: NetworkRequest): Promise<NetworkResponse> => {
+    const incomeMessage: NetworkMessage = deserializeMessage(request.body);
+
+    if (!incomeMessage.to || incomeMessage.to === this.context.id) {
+      // ours message
+      this.incomeMessagesEvents.emit(incomeMessage);
+    }
+    else {
+      // send further
+      // TODO: add
+    }
+
+    return {
+      requestId: request.requestId,
+      status: NetworkStatus.ok,
+    };
   }
 
   private resolveConnection(hostId: string): NetworkDriver {
     // TODO: add
+    // TODO: как зарезолвить если hostId может повторяться????
   }
 
 }

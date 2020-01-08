@@ -8,7 +8,8 @@ export enum MessageType {
 
 export default interface NetworkMessage {
   // recipient host id
-  to: string;
+  // If doesn't set means closest host
+  to?: string;
   // sender host id
   from: string;
   // type of message

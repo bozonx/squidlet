@@ -1,9 +1,7 @@
 export enum NetworkStatus {
   ok = 0,
-  // body contains a error string
+  // body contains an error string
   errorMessage,
-  // badRequest = 1,
-  // serverError = 2,
 }
 
 export interface NetworkRequest {
@@ -35,6 +33,7 @@ export default interface NetworkDriver {
    * On the other side you should listen to this address and send data to the same address on this side.
    * An error will be risen only if request hasn't been sent or on response timeout.
    * Register is 8 bits.
+   * Port is from 0 to 255 but don't use port 255 it is registered for network data transfer.
    */
   request(port: number, body: Uint8Array): Promise<NetworkResponse>;
 
@@ -43,13 +42,6 @@ export default interface NetworkDriver {
    * You have to generate a response
    */
   onRequest(port: number, handler: IncomeRequestHandler): number;
-
-  // /**
-  //  * Handle income response from remote node
-  //  */
-  // onResponse(register: number, handler: IncomeResponseHandler): number;
-
-  // TODO: может выделить отправку ответа в отдельный метод????
 
   /**
    * Remove listener that has been set by `onRequest` or `onResponse`
