@@ -1,8 +1,8 @@
 import MyAddress from '../../interfaces/MyAddress';
-import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../../../../system/base/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData';
-import { uint8ArrayToUtf8Text, utf8TextToUint8Array} from '../../../system/lib/serialize';
-import DriverBase from '../../../system/base/DriverBase';
+import { uint8ArrayToUtf8Text, utf8TextToUint8Array} from '../../../../../../system/lib/serialize';
+import DriverBase from '../../../../../../system/base/DriverBase';
 
 
 type ConnectionHandler = (error: Error | null, payload?: any) => void;
