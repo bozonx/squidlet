@@ -12,8 +12,18 @@ export function getAllTheClassMembers(obj: Object, exclude: string[] = []): stri
     ...Object.getOwnPropertyNames(Object.getPrototypeOf(obj)),
   ];
 
+  const excludeProps: string[] = [
+    'constructor',
+    '__defineGetter__',
+    '__defineSetter__',
+    '__lookupGetter__',
+    '__lookupSetter__',
+    '__proto__',
+    ...exclude
+  ];
+
   // TODO: optimize
-  return props.filter((item: string) => !['constructor', ...exclude].includes(item));
+  return props.filter((item: string) => !excludeProps.includes(item));
 }
 
 /**

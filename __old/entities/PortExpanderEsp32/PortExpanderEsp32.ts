@@ -1,10 +1,10 @@
-import DeviceBase from 'system/base/DeviceBase';
+import DeviceBase from 'base/DeviceBase';
 
 import {
   PortExpanderProps,
   PortExpanderConnection,
   PortExpander
-} from '../../../__old/entities/PortExpander/PortExpander';
+} from '../PortExpander/PortExpander';
 
 
 interface Props extends PortExpanderProps {
