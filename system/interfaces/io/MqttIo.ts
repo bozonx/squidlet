@@ -48,9 +48,10 @@ export default interface MqttIo extends IoItem {
   onConnect(cb: (connectionId: string) => void): Promise<number>;
   onClose(cb: (connectionId: string) => void): Promise<number>;
   /**
-   * Listen all the subscribed messages
+   * Listen all the subscribed messages.
+   * Data will be a string or empty string or Uint8Array or empty Uint8Array.
    */
-  onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number>;
+  onMessage(cb: (connectionId: string, topic: string, data: string | Uint8Array) => void): Promise<number>;
   onError(cb: (connectionId: string, err: Error) => void): Promise<number>;
   removeListener(handlerId: number): Promise<void>;
 

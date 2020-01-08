@@ -41,7 +41,7 @@ export default class ApiTopicsLogic {
   /**
    * Call this when you have received an income message
    */
-  incomeMessage = (fullTopic: string, data?: string): Promise<void> => {
+  incomeMessage = (fullTopic: string, data: string): Promise<void> => {
     let prefix: string | undefined;
     let topicType: TopicType;
     let bodyParts: string[];
@@ -126,22 +126,24 @@ export default class ApiTopicsLogic {
     }
   }
 
-  private callApi(apiMethodName: string, data?: string): Promise<void> {
-    this.context.log.debug(`MqttApiTopics income call api method "${apiMethodName}": ${data}`);
+  private callApi(apiMethodName: string, argsStr: string): Promise<void> {
+    this.context.log.debug(`MqttApiTopics income call api method "${apiMethodName}": ${argsStr}`);
 
-    const args: (JsonTypes | undefined)[] = parseArgs(data);
+    const args: (JsonTypes | undefined)[] = parseArgs(argsStr);
 
     return this.context.system.apiManager.callApi(apiMethodName, args);
   }
 
-  private callAction(deviceId: string, actionName?: string, data?: string) {
+  private callAction(deviceId: string, actionName: string, argsStr?: string) {
     if (!actionName) {
       throw new Error(`MqttApiTopics.callAction: no actionName: "${deviceId}"`);
     }
 
-    this.context.log.debug(`MqttApiTopics income action device call ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${data}`);
+    this.context.log.debug(
+      `MqttApiTopics income action device call ${deviceId}${TOPIC_SEPARATOR}${actionName}: ${argsStr}`
+    );
 
-    const args: (JsonTypes | undefined)[] = parseArgs(data);
+    const args: (JsonTypes | undefined)[] = parseArgs(argsStr);
 
     return this.context.system.apiManager.callApi('action', [deviceId, actionName, ...args]);
   }

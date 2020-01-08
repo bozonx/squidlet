@@ -82,10 +82,7 @@ export default class Mqtt implements MqttIo {
     return this.events.addListener(MqttIoEvents.close, cb);
   }
 
-  async onMessage(cb: (connectionId: string, topic: string, data?: string | Uint8Array) => void): Promise<number> {
-
-    // TODO: data может быть undefined
-
+  async onMessage(cb: (connectionId: string, topic: string, data: string | Uint8Array) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.message, cb);
   }
 
@@ -157,6 +154,7 @@ export default class Mqtt implements MqttIo {
     const connection = mqtt.connect(url, options);
 
     connection.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
+      // TODO: review
       const contentType: string | undefined = packet.properties && packet.properties.contentType;
 
       this.handleIncomeMessage(connectionId, topic, data, contentType);
@@ -168,6 +166,9 @@ export default class Mqtt implements MqttIo {
     return connection;
   }
 
+  /**
+   * If no data then Buffer will be empty.
+   */
   private handleIncomeMessage = (
     connectionId: string,
     topic: string,

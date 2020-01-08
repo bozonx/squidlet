@@ -62,6 +62,10 @@ export function parseArgs(data?: Primitives): (JsonTypes | undefined)[] {
   else if (typeof data === 'number' || typeof data === 'boolean') {
     return [data];
   }
+  else if (data === '') {
+    return [];
+  }
+  // null, NaN case
   else if (!data) {
     return [data];
   }

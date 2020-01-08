@@ -54,12 +54,9 @@ export default class MqttApiTopics extends ServiceBase<Props> {
   /**
    * Processing income messages from broker
    */
-  private handleIncomeMessages = (topic: string, data?: string | Uint8Array) => {
+  private handleIncomeMessages = (topic: string, data: string | Uint8Array) => {
     if (typeof data !== 'string') {
       return this.log.error(`MqttApiTopics incorrect data of topic "${topic}". It has to be a string`);
-    }
-    else if (typeof topic !== 'string') {
-      return this.log.error(`MqttApiTopics: topic has to be a string`);
     }
 
     this.logic.incomeMessage(topic, data)
