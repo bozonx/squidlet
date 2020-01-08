@@ -4,7 +4,7 @@ import MqttIo from 'system/interfaces/io/MqttIo';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
-import {uint8ArrayToText} from '../../../system/lib/serialize';
+import {uint8ArrayToUtf8Text} from '../../../system/lib/serialize';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
@@ -161,7 +161,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
     if (!this.binarySubscribedTopics[topic]) {
       // make string
-      preparedData = uint8ArrayToText(data);
+      preparedData = uint8ArrayToUtf8Text(data);
     }
 
     console.log(11111111, preparedData)

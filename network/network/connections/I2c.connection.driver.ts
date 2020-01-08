@@ -1,7 +1,7 @@
 import MyAddress from '../../interfaces/MyAddress';
 import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
 import { I2cDataDriver } from '../../drivers/I2c/I2cData';
-import { uint8ArrayToText, textToUint8Array} from '../../../system/lib/serialize';
+import { uint8ArrayToUtf8Text, utf8TextToUint8Array} from '../../../system/lib/serialize';
 import DriverBase from '../../../system/base/DriverBase';
 
 
@@ -41,7 +41,7 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
 
   async send(remoteAddress: string, payload: any): Promise<void> {
     const jsonString = JSON.stringify(payload);
-    const uint8Arr = textToUint8Array(jsonString);
+    const uint8Arr = utf8TextToUint8Array(jsonString);
 
     await this.i2cDataDriver.send(remoteAddress, this.dataMark, uint8Arr);
   }
@@ -51,7 +51,7 @@ export class I2cConnectionDriver extends DriverBase<I2cConnectionDriverProps> {
       if (error)  return handler(error);
       if (!payload) return handler(new Error(`Payload is undefined`));
 
-      const jsonString = uint8ArrayToText(payload);
+      const jsonString = uint8ArrayToUtf8Text(payload);
       const data = JSON.parse(jsonString);
 
       handler(null, data);

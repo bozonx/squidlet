@@ -147,7 +147,7 @@ export default abstract class SerialIoBase implements SerialIo {
       return '';
     }
     else if (typeof data === 'string') {
-      //return textToUint8Array(data);
+      //return utf8TextToUint8Array(data);
 
       return data;
     }

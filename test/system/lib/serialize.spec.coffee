@@ -8,11 +8,11 @@ describe 'system.lib.serialize', ->
   it 'stringToBase64', ->
     assert.equal(serialize.stringToBase64('c3RyINGB0YLRgNC+0LrQsA=='), 'str строка')
 
-  it 'uint8ArrayToText and textToUint8Array', ->
+  it 'uint8ArrayToUtf8Text and utf8TextToUint8Array', ->
     str = 'my строка'
-    encoded = serialize.textToUint8Array(str)
+    encoded = serialize.utf8TextToUint8Array(str)
 
-    assert.equal(serialize.uint8ArrayToText(encoded), str)
+    assert.equal(serialize.uint8ArrayToUtf8Text(encoded), str)
 
   it 'serializeJson and deserializeJson', ->
     jsonLength = 88

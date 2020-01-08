@@ -27,7 +27,7 @@ export function stringToBase64(base64Str: string): string {
 }
 
 // see https://stackoverflow.com/questions/17191945/conversion-between-utf-8-arraybuffer-and-string
-export function uint8ArrayToText(uintArray: Uint8Array): string {
+export function uint8ArrayToUtf8Text(uintArray: Uint8Array): string {
   const encodedString = String.fromCharCode.apply(undefined, uintArray as any);
 
   return decodeURIComponent(escape(stringToBase64(encodedString)));
@@ -37,7 +37,7 @@ export function uint8ArrayToText(uintArray: Uint8Array): string {
   // console.log(uint8array ,string )
 }
 
-export function textToUint8Array(str: string): Uint8Array {
+export function utf8TextToUint8Array(str: string): Uint8Array {
   const string = base64ToString(unescape(encodeURIComponent(str)));
   const charList = string.split('');
   const uintArray = [];
@@ -76,7 +76,7 @@ export function serializeJson(data: any): Uint8Array {
 
     return value;
   });
-  const jsonBin: Uint8Array = textToUint8Array(stringMsg);
+  const jsonBin: Uint8Array = utf8TextToUint8Array(stringMsg);
   // 4 bytes of json binary length
   const jsonLengthBin = int32ToUint8Arr(jsonBin.length);
 
@@ -100,7 +100,7 @@ export function deserializeJson(serialized: Uint8Array | any) {
   const jsonLength: number = uint8ToNum(binJsonLength);
   // 4 is 4 bytes of length 32 bit number
   const jsonBin: Uint8Array = serialized.subarray(4, 4 + jsonLength);
-  const jsonString: string = uint8ArrayToText(jsonBin);
+  const jsonString: string = uint8ArrayToUtf8Text(jsonBin);
   const binaryTail: Uint8Array = serialized.subarray(4 + jsonLength);
 
   return JSON.parse(jsonString, (key: string, value: any) => {
