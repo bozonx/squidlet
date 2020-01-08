@@ -2,3 +2,11 @@
 interfaces:
   type: object[]
   required: true
+
+closestHosts:
+  type: object
+  required: true
+
+networkMap:
+  type: object
+  required: true

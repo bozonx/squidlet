@@ -37,7 +37,7 @@ export interface PreHostConfigConfig {
 
 // raw host config specified in master config
 export default interface PreHostConfig {
-  // host unique id
+  // host unique id. 16 bytes
   id?: string;
   // platform?: Platforms;
   // machine?: string;

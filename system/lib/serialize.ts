@@ -33,6 +33,8 @@ export function uint8ArrayToAscii(uintArray: Uint8Array): string {
 
 // TODO: test
 export function asciiToUint8Array(str: string): Uint8Array {
+  if (!str) return new Uint8Array(0);
+
   const charList = str.split('');
   const uintArray = [];
 

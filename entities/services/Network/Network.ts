@@ -6,16 +6,21 @@ import Router from './Router';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 
 
-interface NetworkInterface {
+interface NodeProps {
   // driver name like: 'SerialNetwork' etc
   driver: string;
   busId: string | number;
+}
+
+interface NetworkInterface extends NodeProps {
   // props of network driver
   [index: string]: any;
 }
 
 export interface NetworkProps {
   interfaces: NetworkInterface[];
+  closestHosts: {[index: string]: NodeProps};
+  networkMap: {[index: string]: any};
 }
 
 // like [ hostId, networkDriverNum, busId ]

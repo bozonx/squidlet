@@ -30,6 +30,7 @@ export default class Router {
 
     for (let index in this.props.interfaces) {
       this.connections[index] = await this.context.getSubDriver<any>(
+        // TODO: сделать резолв имени драйвера
         this.props.interfaces[index].driver,
         omitObj(this.props, 'driver')
       );
