@@ -4,7 +4,7 @@ import MqttIo from 'system/interfaces/io/MqttIo';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
-import {uint8ArrayToAscii} from '../../../system/lib/serialize';
+import {uint8ArrayToAscii} from 'system/lib/serialize';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
@@ -17,9 +17,10 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  // TODO: проверить что будет переподключаться до бесконечности
-
-  // on first time connect or reconnect
+  // TODO: review
+  /**
+   * It represents that it has connectionId and IO is connected to broker
+   */
   get connectedPromise(): Promise<void> {
     if (!this.connectionId || !this.openPromise) {
       throw new Error(`Mqtt.connectedPromise: ${this.closedMsg}`);
@@ -45,8 +46,109 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
-  // TODO: review
   init = async () => {
+    this.openNewConnection();
+  }
+
+  destroy = async () => {
+    this.messageEvents.destroy();
+    this.openPromise && this.openPromise.destroy();
+
+    delete this.openPromise;
+    delete this.binarySubscribedTopics;
+
+    if (this.connectionId) {
+      this.mqttIo.end(this.connectionId)
+        .catch(this.log.error);
+    }
+  }
+
+
+  async isConnected(): Promise<boolean> {
+    if (!this.connectionId) return false;
+
+    return this.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));
+  }
+
+  async publish(topic: string, data?: string | Uint8Array): Promise<void> {
+    await this.connectedPromise;
+
+    const preparedData: string | Uint8Array = (typeof data === 'undefined')
+      ? new Uint8Array(0)
+      : data;
+
+    return this.doRequest<void>(
+      (connectionId: string) => this.mqttIo.publish(connectionId, topic, preparedData)
+    );
+  }
+
+  /**
+   * Subscribe to changes at broker
+   * @param topic
+   * @param isBinary - means that income data will be binary.
+   */
+  async subscribe(topic: string, isBinary: boolean = false): Promise<void> {
+    await this.connectedPromise;
+
+    if (isBinary) {
+      this.binarySubscribedTopics[topic] = true;
+    }
+
+    return this.doRequest<void>(
+      (connectionId: string) => this.mqttIo.subscribe(connectionId, topic)
+    );
+  }
+
+  async unsubscribe(topic: string): Promise<void> {
+    await this.connectedPromise;
+
+    delete this.binarySubscribedTopics[topic];
+
+    return this.doRequest<void>(
+      (connectionId: string) => this.mqttIo.unsubscribe(connectionId, topic)
+    );
+  }
+
+  onMessage(cb: MqttMessageHandler): number {
+    return this.messageEvents.addListener(cb);
+  }
+
+  removeListener(handlerId: number) {
+    this.messageEvents.removeListener(handlerId);
+  }
+
+
+  // TODO: review
+  private handleIncomeMessage = (connectionId: string, topic: string, data: Uint8Array) => {
+    if (connectionId !== this.connectionId) return;
+
+    let preparedData: string | Uint8Array = data;
+
+    if (!this.binarySubscribedTopics[topic]) {
+      // make ascii string
+      preparedData = (data.length) ? uint8ArrayToAscii(data) : '';
+    }
+
+    this.messageEvents.emit(topic, preparedData);
+  }
+
+  // TODO: review
+  private handleClose = (connectionId: string) => {
+    if (connectionId !== this.connectionId) return;
+
+    const msg = `Mqtt broker has closed a connection`;
+
+    this.openPromise && this.openPromise.reject(new Error(msg));
+
+    this.log.error(msg);
+  }
+
+  private doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
+    // TODO: лучше переподписаться на события заного, отписаться от старых
+    // TODO: см code 1001 и делать переконнект если указанно
+  }
+
+  private openNewConnection() {
     this.openPromise = new Promised<void>();
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
@@ -72,111 +174,6 @@ export class Mqtt extends DriverBase<MqttProps> {
       this.props.url,
       omitObj(this.props, 'url')
     );
-
-    // TODO: remove
-    // wait for connection established
-    await this.connectedPromise;
-  }
-
-  destroy = async () => {
-    this.messageEvents.destroy();
-    this.openPromise && this.openPromise.destroy();
-
-    delete this.openPromise;
-    delete this.binarySubscribedTopics;
-
-    if (this.connectionId) {
-      await this.mqttIo.end(this.connectionId);
-    }
-  }
-
-
-  async isConnected(): Promise<boolean> {
-    if (!this.connectionId) return false;
-
-    return this.mqttIo.isConnected(this.connectionId);
-  }
-
-  async publish(topic: string, data?: string | Uint8Array): Promise<void> {
-    let preparedData: string | Uint8Array;
-
-    if (typeof data === 'undefined') {
-      preparedData = new Uint8Array(0);
-    }
-    else {
-      preparedData = data;
-    }
-
-    await this.connectedPromise;
-
-    if (!this.connectionId) {
-      throw new Error(`Mqtt driver publish: ${this.closedMsg}`);
-    }
-
-    return this.mqttIo.publish(this.connectionId, topic, preparedData);
-  }
-
-  /**
-   * Subscribe to changes at broker
-   * @param topic
-   * @param isBinary - means that income data will be binary.
-   */
-  async subscribe(topic: string, isBinary: boolean = false): Promise<void> {
-    await this.connectedPromise;
-
-    if (!this.connectionId) {
-      throw new Error(`Mqtt driver subscribe: ${this.closedMsg}`);
-    }
-
-    if (isBinary) {
-      this.binarySubscribedTopics[topic] = true;
-    }
-
-    return this.mqttIo.subscribe(this.connectionId, topic);
-  }
-
-  async unsubscribe(topic: string): Promise<void> {
-    await this.connectedPromise;
-
-    if (!this.connectionId) {
-      throw new Error(`Mqtt driver subscribe: ${this.closedMsg}`);
-    }
-
-    delete this.binarySubscribedTopics[topic];
-
-    return this.mqttIo.unsubscribe(this.connectionId, topic);
-  }
-
-  onMessage(cb: MqttMessageHandler): number {
-    return this.messageEvents.addListener(cb);
-  }
-
-  removeListener(handlerId: number) {
-    this.messageEvents.removeListener(handlerId);
-  }
-
-
-  private handleIncomeMessage = (connectionId: string, topic: string, data: Uint8Array) => {
-    if (connectionId !== this.connectionId) return;
-
-    let preparedData: string | Uint8Array = data;
-
-    if (!this.binarySubscribedTopics[topic]) {
-      // make ascii string
-      preparedData = (data.length) ? uint8ArrayToAscii(data) : '';
-    }
-
-    this.messageEvents.emit(topic, preparedData);
-  }
-
-  private handleClose = (connectionId: string) => {
-    if (connectionId !== this.connectionId) return;
-
-    const msg = `Mqtt broker has closed a connection`;
-
-    this.openPromise && this.openPromise.reject(new Error(msg));
-
-    this.log.error(msg);
   }
 
 }

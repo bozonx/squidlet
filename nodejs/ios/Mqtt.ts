@@ -31,6 +31,8 @@ export default class Mqtt implements MqttIo {
 
     for (let connectionId in this.connections) {
       await this.end(connectionId);
+
+      // TODO: наверное поднять события onEnd
     }
   }
 
@@ -78,9 +80,12 @@ export default class Mqtt implements MqttIo {
     return this.events.addListener(MqttIoEvents.connect, cb);
   }
 
-  async onClose(cb: (connectionId: string) => void): Promise<number> {
+  // TODO: только когда удаляем connectionId и закрываем соединение
+  async onEnd(cb: (connectionId: string) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.close, cb);
   }
+
+  // TODO: add onDisconnect
 
   async onMessage(cb: (connectionId: string, topic: string, data: Uint8Array) => void): Promise<number> {
     return this.events.addListener(MqttIoEvents.message, cb);
@@ -96,7 +101,7 @@ export default class Mqtt implements MqttIo {
 
   async publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void> {
     if (!this.connections[Number(connectionId)]) {
-      throw new Error(`Mqtt.publish: There isn't a connection "${connectionId}"`);
+      throw new Error(`Mqtt.publish: code 1001: No connection "${connectionId}"`);
     }
 
     //let contentType: MqttContentTypes;

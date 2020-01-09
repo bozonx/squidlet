@@ -11,7 +11,8 @@ export const Methods = [
   'isDisconnected',
   'isReconnecting',
   'onConnect',
-  'onClose',
+  'onDisconnect',
+  'onEnd',
   'onMessage',
   'onError',
   'removeListener',
@@ -33,20 +34,52 @@ export interface MqttOptions {
   username?: string;
   password?: string;
   resubscribe?: boolean;
+  // TODO: check
+  reconnectPeriod?: number;
+  connectTimeout?: number;
 }
 
 export default interface MqttIo extends IoItem {
   destroy: () => Promise<void>;
+
+  /**
+   * It makes new connection to broker and returns connectionId
+   * @param url - broker url
+   * @param options - connection options
+   */
   newConnection(url: string, options: MqttOptions): Promise<string>;
+
+  /**
+   * Reconnect manually. It doesn't change the connectionId.
+   */
   reConnect(connectionId: string): Promise<void>;
+
+  /**
+   * Close connection and remove connectionId
+   */
   end(connectionId: string, force?: boolean): Promise<void>;
   isConnected(connectionId: string): Promise<boolean>;
   isDisconnecting(connectionId: string): Promise<boolean>;
   isDisconnected(connectionId: string): Promise<boolean>;
   isReconnecting(connectionId: string): Promise<boolean>;
 
+  /**
+   * It rises at first time connect or at reconnect
+   * @param cb
+   */
   onConnect(cb: (connectionId: string) => void): Promise<number>;
-  onClose(cb: (connectionId: string) => void): Promise<number>;
+
+  /**
+   * It rises when client is disconnected. It tries to reconnect.
+   * @param cb
+   */
+  onDisconnect(cb: (connectionId: string) => void): Promise<number>;
+
+  /**
+   * Means connection closed and connectionId is removed.
+   */
+  onEnd(cb: (connectionId: string) => void): Promise<number>;
+
   /**
    * Listen all the subscribed messages.
    * Data will be a string or empty string or Uint8Array or empty Uint8Array.
@@ -56,6 +89,7 @@ export default interface MqttIo extends IoItem {
   removeListener(handlerId: number): Promise<void>;
 
   publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;
+
   /**
    * Tell broker that you want to listen this topic.
    * And then use onMessage method
