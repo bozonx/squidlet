@@ -30,7 +30,7 @@ export default class StartIoServerStandalone extends StartDevelop {
       'services',
       'devicesDefaults',
       'automation',
-      'mqttApi',
+      'network',
       'wsApi',
       'httpApi',
       'updater',

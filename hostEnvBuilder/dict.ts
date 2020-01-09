@@ -1,6 +1,6 @@
 export const servicesShortcut: {[index: string]: string} = {
   automation: 'Automation',
-  mqttApi: 'MqttApi',
+  network: 'Network',
   wsApi: 'WsApi',
   httpApi: 'HttpApi',
   updater: 'Updater',

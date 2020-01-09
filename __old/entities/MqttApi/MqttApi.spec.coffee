@@ -1,4 +1,4 @@
-Mqtt = require('../../../entities/services/MqttApi/MqttApi').default
+Mqtt = require('./MqttApi').default
 
 
 describe 'services.Mqtt', ->

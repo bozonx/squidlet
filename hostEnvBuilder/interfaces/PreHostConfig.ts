@@ -67,8 +67,8 @@ export default interface PreHostConfig {
   automation?: {[index: string]: any};
   // shortcut for logger service
   //consoleLogger?: {[index: string]: any};
-  // shortcut for mqttApi service
-  mqttApi?: {[index: string]: any};
+  // shortcut for network service
+  network?: {[index: string]: any};
   wsApi?: {[index: string]: any};
   httpApi?: {[index: string]: any};
   updater?: {[index: string]: any};

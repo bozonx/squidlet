@@ -1,7 +1,7 @@
-import ServiceBase from 'system/base/ServiceBase';
-import {deserializeJson, serializeJson} from 'system/lib/serialize';
-import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
+import ServiceBase from 'base/ServiceBase';
+import {deserializeJson, serializeJson} from 'lib/serialize';
+import RemoteCallMessage from 'interfaces/RemoteCallMessage';
+import {Mqtt, MqttProps} from '../../../entities/drivers/Mqtt/Mqtt';
 
 
 const REMOTE_CALL_TOPIC = 'remoteCall';
