@@ -32,6 +32,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   private connectionId?: string;
   // topics which are subscribed and income data of them is binary
   private binarySubscribedTopics: {[index: string]: true} = {};
+  private ioHandlerIndexes: number[] = [];
 
   private get mqttIo(): MqttIo {
     return this.context.getIo('Mqtt') as any;
@@ -44,9 +45,11 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   destroy = async () => {
+    await this.removeIoListeners();
     this.messageEvents.destroy();
     this.openPromised.destroy();
 
+    delete this.ioHandlerIndexes;
     delete this.openPromised;
     delete this.binarySubscribedTopics;
 
@@ -132,6 +135,15 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.messageEvents.emit(topic, preparedData);
   }
 
+  private handleConnect = (connectionId: string) => {
+    if (connectionId !== this.connectionId) return;
+
+    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
+    //  - возможно это уже реализованно в самам mqtt
+    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
+    this.openPromised.resolve();
+  }
+
   private handleDisconnect = (connectionId: string) => {
     if (connectionId !== this.connectionId) return;
 
@@ -147,6 +159,9 @@ export class Mqtt extends DriverBase<MqttProps> {
 
   private handleEnd = (connectionId: string) => {
     // TODO: add
+    // TODO: remove old events
+    this.listenIoEvents()
+      .catch(this.log.error);
   }
 
   private doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
@@ -159,14 +174,16 @@ export class Mqtt extends DriverBase<MqttProps> {
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
 
+    // TODO: если не удалось подключиться?
+    this.listenIoEvents()
+      .catch(this.log.error);
+
     // TODO: если не удалось подписаться то продолжать это делать через несколько секунд
     this.establishConnection()
       .catch(this.log.error);
   }
 
   async establishConnection() {
-    // TODO: remove old events
-    await this.listenIoEvents();
 
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
@@ -174,29 +191,29 @@ export class Mqtt extends DriverBase<MqttProps> {
     );
   }
 
-  async listenIoEvents() {
-    // TODO: если не получилось сделать за раз - то отписаться
+  private async listenIoEvents() {
+    // TODO: если не получилось сделать за раз - то отписаться и попробовать заного???
 
-    const handlers: number[] = [];
+    await this.removeIoListeners();
 
-    handlers.push(await this.mqttIo.onMessage(this.handleIncomeMessage));
-    handlers.push(await this.mqttIo.onDisconnect(this.handleDisconnect));
-    handlers.push(await this.mqttIo.onEnd(this.handleEnd));
+    this.ioHandlerIndexes = [];
 
-    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
-    //  - возможно это уже реализованно в самам mqtt
-    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
-    handlers.push(await this.mqttIo.onConnect((connectionId: string) => {
-      if (connectionId !== this.connectionId) return;
-
-      this.openPromise && this.openPromise.resolve();
-    }));
-
-    handlers.push(await this.mqttIo.onError((connectionId: string, error: string) => {
+    this.ioHandlerIndexes.push(await this.mqttIo.onMessage(this.handleIncomeMessage));
+    this.ioHandlerIndexes.push(await this.mqttIo.onDisconnect(this.handleDisconnect));
+    this.ioHandlerIndexes.push(await this.mqttIo.onEnd(this.handleEnd));
+    this.ioHandlerIndexes.push(await this.mqttIo.onConnect(this.handleConnect));
+    this.ioHandlerIndexes.push(await this.mqttIo.onError((connectionId: string, error: string) => {
       if (connectionId !== this.connectionId) return;
 
       this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
     }));
+  }
+
+  private async removeIoListeners() {
+    // remove old events if exist
+    for (let handlerIndex of this.ioHandlerIndexes) {
+      await this.mqttIo.removeListener(handlerIndex);
+    }
   }
 
 }
