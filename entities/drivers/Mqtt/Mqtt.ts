@@ -17,20 +17,16 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  // TODO: review
   /**
-   * It represents that it has connectionId and IO is connected to broker
+   * It represents that it has connectionId and IO is connected to broker.
+   * On disconnect it will be recreated.
    */
   get connectedPromise(): Promise<void> {
-    if (!this.connectionId || !this.openPromise) {
-      throw new Error(`Mqtt.connectedPromise: ${this.closedMsg}`);
-    }
-
-    return this.openPromise.promise;
+    return this.openPromised.promise;
   }
 
   private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
-  private openPromise?: Promised<void>;
+  private openPromised = new Promised<void>();
   // was previous open promise fulfilled
   //private wasPrevOpenFulfilled: boolean = false;
   private connectionId?: string;
@@ -41,20 +37,17 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.context.getIo('Mqtt') as any;
   }
 
-  private get closedMsg() {
-    return `Connection "${this.props.url}" has been closed`;
-  }
-
 
   init = async () => {
+    // open a new connection and don't wait while it has been completed
     this.openNewConnection();
   }
 
   destroy = async () => {
     this.messageEvents.destroy();
-    this.openPromise && this.openPromise.destroy();
+    this.openPromised.destroy();
 
-    delete this.openPromise;
+    delete this.openPromised;
     delete this.binarySubscribedTopics;
 
     if (this.connectionId) {
@@ -67,10 +60,13 @@ export class Mqtt extends DriverBase<MqttProps> {
   async isConnected(): Promise<boolean> {
     if (!this.connectionId) return false;
 
+    // TODO: лучше ориентироваться на событие onConnect
+
     return this.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));
   }
 
   async publish(topic: string, data?: string | Uint8Array): Promise<void> {
+    // wait for connection for 60 sec and do request
     await this.connectedPromise;
 
     const preparedData: string | Uint8Array = (typeof data === 'undefined')
@@ -118,13 +114,17 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
-  // TODO: review
   private handleIncomeMessage = (connectionId: string, topic: string, data: Uint8Array) => {
+    // process only ours messages
     if (connectionId !== this.connectionId) return;
 
-    let preparedData: string | Uint8Array = data;
+    let preparedData: string | Uint8Array;
 
-    if (!this.binarySubscribedTopics[topic]) {
+    if (this.binarySubscribedTopics[topic]) {
+      // use binary as is
+      preparedData = data;
+    }
+    else {
       // make ascii string
       preparedData = (data.length) ? uint8ArrayToAscii(data) : '';
     }
@@ -132,15 +132,21 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.messageEvents.emit(topic, preparedData);
   }
 
-  // TODO: review
-  private handleClose = (connectionId: string) => {
+  private handleDisconnect = (connectionId: string) => {
     if (connectionId !== this.connectionId) return;
 
-    const msg = `Mqtt broker has closed a connection`;
+    // reject open promise if it hasn't been fulfilled
+    if (!this.openPromised.isFulfilled()) {
+      this.openPromised.reject(new Error(`Mqtt: Disconnected ${connectionId}`));
+    }
+    // make new open promise
+    this.openPromised = new Promised<void>();
 
-    this.openPromise && this.openPromise.reject(new Error(msg));
+    // TODO: what to do next ????
+  }
 
-    this.log.error(msg);
+  private handleEnd = (connectionId: string) => {
+    // TODO: add
   }
 
   private doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
@@ -149,31 +155,48 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   private openNewConnection() {
-    this.openPromise = new Promised<void>();
+    //this.openPromise = new Promised<void>();
 
     this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
-    await this.mqttIo.onMessage(this.handleIncomeMessage);
-    await this.mqttIo.onClose(this.handleClose);
 
-    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
-    //  - возможно это уже реализованно в самам mqtt
-    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
-    await this.mqttIo.onConnect((connectionId: string) => {
-      if (connectionId !== this.connectionId) return;
+    // TODO: если не удалось подписаться то продолжать это делать через несколько секунд
+    this.establishConnection()
+      .catch(this.log.error);
+  }
 
-      this.openPromise && this.openPromise.resolve();
-    });
-
-    await this.mqttIo.onError((connectionId: string, error: string) => {
-      if (connectionId !== this.connectionId) return;
-
-      this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
-    });
+  async establishConnection() {
+    // TODO: remove old events
+    await this.listenIoEvents();
 
     this.connectionId = await this.mqttIo.newConnection(
       this.props.url,
       omitObj(this.props, 'url')
     );
+  }
+
+  async listenIoEvents() {
+    // TODO: если не получилось сделать за раз - то отписаться
+
+    const handlers: number[] = [];
+
+    handlers.push(await this.mqttIo.onMessage(this.handleIncomeMessage));
+    handlers.push(await this.mqttIo.onDisconnect(this.handleDisconnect));
+    handlers.push(await this.mqttIo.onEnd(this.handleEnd));
+
+    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
+    //  - возможно это уже реализованно в самам mqtt
+    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
+    handlers.push(await this.mqttIo.onConnect((connectionId: string) => {
+      if (connectionId !== this.connectionId) return;
+
+      this.openPromise && this.openPromise.resolve();
+    }));
+
+    handlers.push(await this.mqttIo.onError((connectionId: string, error: string) => {
+      if (connectionId !== this.connectionId) return;
+
+      this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
+    }));
   }
 
 }
