@@ -5,6 +5,9 @@ import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Promised from 'system/lib/Promised';
 import {uint8ArrayToAscii} from 'system/lib/serialize';
+import IoConnectionManager from 'system/lib/IoConnectionManager';
+import Context from 'system/Context';
+import EntityDefinition from 'system/interfaces/EntityDefinition';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;
@@ -17,66 +20,74 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  /**
-   * It represents that it has connectionId and IO is connected to broker.
-   * On disconnect it will be recreated.
-   */
-  get connectedPromise(): Promise<void> {
-    return this.openPromised.promise;
-  }
+  // /**
+  //  * It represents that it has connectionId and IO is connected to broker.
+  //  * On disconnect it will be recreated.
+  //  */
+  // get connectedPromise(): Promise<void> {
+  //   return this.openPromised.promise;
+  // }
 
   private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
-  private openPromised = new Promised<void>();
+  //private openPromised = new Promised<void>();
   // was previous open promise fulfilled
   //private wasPrevOpenFulfilled: boolean = false;
-  private connectionId?: string;
+  //private connectionId?: string;
   // topics which are subscribed and income data of them is binary
   private binarySubscribedTopics: {[index: string]: true} = {};
-  private ioHandlerIndexes: number[] = [];
+  //private ioHandlerIndexes: number[] = [];
+  private connectionManager: IoConnectionManager;
 
   private get mqttIo(): MqttIo {
     return this.context.getIo('Mqtt') as any;
   }
 
 
+  constructor(context: Context, definition: EntityDefinition) {
+    super(context, definition);
+
+    this.connectionManager = new IoConnectionManager(this.context);
+  }
+
+
   init = async () => {
     // open a new connection and don't wait while it has been completed
-    this.openNewConnection();
+    this.connectionManager.openNewConnection();
   }
 
   destroy = async () => {
     await this.removeIoListeners();
     this.messageEvents.destroy();
-    this.openPromised.destroy();
+    this.connectionManager.destroy();
 
-    delete this.ioHandlerIndexes;
-    delete this.openPromised;
+    //delete this.ioHandlerIndexes;
+    //delete this.openPromised;
     delete this.binarySubscribedTopics;
 
-    if (this.connectionId) {
-      this.mqttIo.end(this.connectionId)
+    if (this.connectionManager.connectionId) {
+      this.mqttIo.end(this.connectionManager.connectionId)
         .catch(this.log.error);
     }
   }
 
 
   async isConnected(): Promise<boolean> {
-    if (!this.connectionId) return false;
+    if (!this.connectionManager.connectionId) return false;
 
     // TODO: лучше ориентироваться на событие onConnect
 
-    return this.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));
+    return this.connectionManager.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));
   }
 
   async publish(topic: string, data?: string | Uint8Array): Promise<void> {
     // wait for connection for 60 sec and do request
-    await this.connectedPromise;
+    await this.connectionManager.connectedPromise;
 
     const preparedData: string | Uint8Array = (typeof data === 'undefined')
       ? new Uint8Array(0)
       : data;
 
-    return this.doRequest<void>(
+    return this.connectionManager.doRequest<void>(
       (connectionId: string) => this.mqttIo.publish(connectionId, topic, preparedData)
     );
   }
@@ -87,23 +98,23 @@ export class Mqtt extends DriverBase<MqttProps> {
    * @param isBinary - means that income data will be binary.
    */
   async subscribe(topic: string, isBinary: boolean = false): Promise<void> {
-    await this.connectedPromise;
+    await this.connectionManager.connectedPromise;
 
     if (isBinary) {
       this.binarySubscribedTopics[topic] = true;
     }
 
-    return this.doRequest<void>(
+    return this.connectionManager.doRequest<void>(
       (connectionId: string) => this.mqttIo.subscribe(connectionId, topic)
     );
   }
 
   async unsubscribe(topic: string): Promise<void> {
-    await this.connectedPromise;
+    await this.connectionManager.connectedPromise;
 
     delete this.binarySubscribedTopics[topic];
 
-    return this.doRequest<void>(
+    return this.connectionManager.doRequest<void>(
       (connectionId: string) => this.mqttIo.unsubscribe(connectionId, topic)
     );
   }
@@ -119,7 +130,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
   private handleIncomeMessage = (connectionId: string, topic: string, data: Uint8Array) => {
     // process only ours messages
-    if (connectionId !== this.connectionId) return;
+    if (connectionId !== this.connectionManager.connectionId) return;
 
     let preparedData: string | Uint8Array;
 
@@ -136,7 +147,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   private handleConnect = (connectionId: string) => {
-    if (connectionId !== this.connectionId) return;
+    if (connectionId !== this.connectionManager.connectionId) return;
 
     // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
     //  - возможно это уже реализованно в самам mqtt
@@ -162,33 +173,6 @@ export class Mqtt extends DriverBase<MqttProps> {
     // TODO: remove old events
     this.listenIoEvents()
       .catch(this.log.error);
-  }
-
-  private doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
-    // TODO: лучше переподписаться на события заного, отписаться от старых
-    // TODO: см code 1001 и делать переконнект если указанно
-  }
-
-  private openNewConnection() {
-    //this.openPromise = new Promised<void>();
-
-    this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
-
-    // TODO: если не удалось подключиться?
-    this.listenIoEvents()
-      .catch(this.log.error);
-
-    // TODO: если не удалось подписаться то продолжать это делать через несколько секунд
-    this.establishConnection()
-      .catch(this.log.error);
-  }
-
-  async establishConnection() {
-
-    this.connectionId = await this.mqttIo.newConnection(
-      this.props.url,
-      omitObj(this.props, 'url')
-    );
   }
 
   private async listenIoEvents() {
