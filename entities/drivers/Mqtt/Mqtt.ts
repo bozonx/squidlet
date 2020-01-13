@@ -20,37 +20,36 @@ export interface MqttProps {
 
 
 export class Mqtt extends DriverBase<MqttProps> {
-  // /**
-  //  * It represents that it has connectionId and IO is connected to broker.
-  //  * On disconnect it will be recreated.
-  //  */
-  // get connectedPromise(): Promise<void> {
-  //   return this.openPromised.promise;
-  // }
+  /**
+   * It represents that it has connectionId and IO is connected to broker.
+   * On disconnect it will be recreated.
+   */
+  get connectedPromise(): Promise<void> {
+    return this.connectionManager.connectedPromise;
+  }
 
   private readonly messageEvents = new IndexedEvents<MqttMessageHandler>();
-  //private openPromised = new Promised<void>();
-  // was previous open promise fulfilled
-  //private wasPrevOpenFulfilled: boolean = false;
-  //private connectionId?: string;
   // topics which are subscribed and income data of them is binary
   private binarySubscribedTopics: {[index: string]: true} = {};
   //private ioHandlerIndexes: number[] = [];
-  private connectionManager: IoConnectionManager;
+  private readonly connectionManager: IoConnectionManager;
 
   private get mqttIo(): MqttIo {
-    return this.context.getIo('Mqtt') as any;
+    return this.depsInstances.mqttIo;
   }
 
 
   constructor(context: Context, definition: EntityDefinition) {
     super(context, definition);
 
-    this.connectionManager = new IoConnectionManager(this.context);
+    this.connectionManager = new IoConnectionManager(this.context, {
+      open: () => this.mqttIo.newConnection(this.props.url, omitObj(this.props, 'url')),
+    });
   }
 
 
   init = async () => {
+    this.depsInstances.mqttIo = this.context.getIo('Mqtt');
     // open a new connection and don't wait while it has been completed
     this.connectionManager.openNewConnection();
   }
@@ -60,8 +59,6 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.messageEvents.destroy();
     this.connectionManager.destroy();
 
-    //delete this.ioHandlerIndexes;
-    //delete this.openPromised;
     delete this.binarySubscribedTopics;
 
     if (this.connectionManager.connectionId) {
@@ -146,28 +143,6 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.messageEvents.emit(topic, preparedData);
   }
 
-  private handleConnect = (connectionId: string) => {
-    if (connectionId !== this.connectionManager.connectionId) return;
-
-    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
-    //  - возможно это уже реализованно в самам mqtt
-    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
-    this.openPromised.resolve();
-  }
-
-  private handleDisconnect = (connectionId: string) => {
-    if (connectionId !== this.connectionId) return;
-
-    // reject open promise if it hasn't been fulfilled
-    if (!this.openPromised.isFulfilled()) {
-      this.openPromised.reject(new Error(`Mqtt: Disconnected ${connectionId}`));
-    }
-    // make new open promise
-    this.openPromised = new Promised<void>();
-
-    // TODO: what to do next ????
-  }
-
   private handleEnd = (connectionId: string) => {
     // TODO: add
     // TODO: remove old events
@@ -175,29 +150,18 @@ export class Mqtt extends DriverBase<MqttProps> {
       .catch(this.log.error);
   }
 
-  private async listenIoEvents() {
-    // TODO: если не получилось сделать за раз - то отписаться и попробовать заного???
+  private listenIoEvents() {
+    return this.connectionManager.registerListeners([
+      () => this.mqttIo.onMessage(this.handleIncomeMessage),
+      () => this.mqttIo.onDisconnect(this.connectionManager.handleDisconnect),
+      () => this.mqttIo.onEnd(this.handleEnd),
+      () => this.mqttIo.onConnect(this.connectionManager.handleConnect),
+      () => this.mqttIo.onError((connectionId: string, error: string) => {
+        if (connectionId !== this.connectionId) return;
 
-    await this.removeIoListeners();
-
-    this.ioHandlerIndexes = [];
-
-    this.ioHandlerIndexes.push(await this.mqttIo.onMessage(this.handleIncomeMessage));
-    this.ioHandlerIndexes.push(await this.mqttIo.onDisconnect(this.handleDisconnect));
-    this.ioHandlerIndexes.push(await this.mqttIo.onEnd(this.handleEnd));
-    this.ioHandlerIndexes.push(await this.mqttIo.onConnect(this.handleConnect));
-    this.ioHandlerIndexes.push(await this.mqttIo.onError((connectionId: string, error: string) => {
-      if (connectionId !== this.connectionId) return;
-
-      this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
-    }));
-  }
-
-  private async removeIoListeners() {
-    // remove old events if exist
-    for (let handlerIndex of this.ioHandlerIndexes) {
-      await this.mqttIo.removeListener(handlerIndex);
-    }
+        this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
+      }),
+    ]);
   }
 
 }

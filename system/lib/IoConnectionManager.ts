@@ -3,7 +3,7 @@ import Context from '../Context';
 
 
 interface ControlledIo {
-  open: () => string;
+  open: () => Promise<string>;
 }
 
 
@@ -26,6 +26,10 @@ export default class IoConnectionManager {
     this.context = context;
   }
 
+  destroy() {
+    // TODO: add
+  }
+
 
   openNewConnection() {
     //this.openPromise = new Promised<void>();
@@ -41,6 +45,36 @@ export default class IoConnectionManager {
       .catch(this.log.error);
   }
 
+  async registerListeners(listeners: (() => Promise<number>)[]) {
+
+    // TODO: если не получилось сделать за раз - то отписаться и попробовать заного???
+
+    await this.removeIoListeners();
+
+  }
+
+  handleConnect = (connectionId: string) => {
+    if (connectionId !== this.connectionManager.connectionId) return;
+
+    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
+    //  - возможно это уже реализованно в самам mqtt
+    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
+    this.openPromised.resolve();
+  }
+
+  handleDisconnect = (connectionId: string) => {
+    if (connectionId !== this.connectionId) return;
+
+    // reject open promise if it hasn't been fulfilled
+    if (!this.openPromised.isFulfilled()) {
+      this.openPromised.reject(new Error(`Mqtt: Disconnected ${connectionId}`));
+    }
+    // make new open promise
+    this.openPromised = new Promised<void>();
+
+    // TODO: what to do next ????
+  }
+
   doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
     // TODO: лучше переподписаться на события заного, отписаться от старых
     // TODO: см code 1001 и делать переконнект если указанно
@@ -52,6 +86,13 @@ export default class IoConnectionManager {
       this.props.url,
       omitObj(this.props, 'url')
     );
+  }
+
+  private async removeIoListeners() {
+    // remove old events if exist
+    for (let handlerIndex of this.ioHandlerIndexes) {
+      await this.mqttIo.removeListener(handlerIndex);
+    }
   }
 
 }
