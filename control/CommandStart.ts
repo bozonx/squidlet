@@ -1,9 +1,9 @@
-import StartDevelop from '../nodejs/starters/StartDevelop';
-import StartIoServerStandalone from '../nodejs/starters/StartIoServerStandalone';
-import StartRemoteDevelop from '../nodejs/starters/StartRemoteDevelop';
+import StartDevelop from '../io/nodejs/starters/StartDevelop';
+import StartIoServerStandalone from '../io/nodejs/starters/StartIoServerStandalone';
+import StartRemoteDevelop from '../io/nodejs/starters/StartRemoteDevelop';
 import {listenScriptEnd} from '../shared/helpers/helpers';
-import Starter from '../nodejs/interfaces/Starter';
-import StarterProps from '../nodejs/interfaces/StarterProps';
+import Starter from '../io/nodejs/interfaces/Starter';
+import StarterProps from '../io/nodejs/interfaces/StarterProps';
 import {omitObj} from '../system/lib/objects';
 
 

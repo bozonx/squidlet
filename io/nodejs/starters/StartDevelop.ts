@@ -1,7 +1,7 @@
-import IoSet from '../../system/interfaces/IoSet';
+import IoSet from '../../../system/interfaces/IoSet';
 import StartBase from './StartBase';
 import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
-import Main from '../../system/Main';
+import Main from '../../../system/Main';
 
 
 export default class StartDevelop extends StartBase {

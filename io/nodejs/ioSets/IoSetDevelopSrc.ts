@@ -1,14 +1,14 @@
 import * as path from 'path';
 
-import IoSet from '../../system/interfaces/IoSet';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import IoItem from '../../system/interfaces/IoItem';
-import Os from '../../shared/helpers/Os';
-import StorageEnvMemoryWrapper from '../../shared/helpers/StorageEnvMemoryWrapper';
-import StorageIo from '../../system/interfaces/io/StorageIo';
-import {getFileNameOfPath, resolvePlatformDir} from '../../shared/helpers/helpers';
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
-import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
+import IoSet from '../../../system/interfaces/IoSet';
+import EnvBuilder from '../../../hostEnvBuilder/EnvBuilder';
+import IoItem from '../../../system/interfaces/IoItem';
+import Os from '../../../shared/helpers/Os';
+import StorageEnvMemoryWrapper from '../../../shared/helpers/StorageEnvMemoryWrapper';
+import StorageIo from '../../../system/interfaces/io/StorageIo';
+import {getFileNameOfPath, resolvePlatformDir} from '../../../shared/helpers/helpers';
+import MachineConfig from '../../../hostEnvBuilder/interfaces/MachineConfig';
+import HostEnvSet from '../../../hostEnvBuilder/interfaces/HostEnvSet';
 
 
 /**

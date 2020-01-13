@@ -1,4 +1,4 @@
-import ModBusMasterRs485Io from '../../system/interfaces/io/ModBusMasterRs485Io';
+import ModBusMasterRs485Io from '../../../system/interfaces/io/ModBusMasterRs485Io';
 
 // create a tcp modbus client
 const Modbus = require('jsmodbus')

@@ -1,4 +1,4 @@
-import LogLevel from '../../system/interfaces/LogLevel';
+import LogLevel from '../../../system/interfaces/LogLevel';
 import NodejsMachines from './NodejsMachines';
 import {NoMachine} from '../starters/StartBase';
 

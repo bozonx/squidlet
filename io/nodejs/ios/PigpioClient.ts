@@ -1,5 +1,5 @@
 //import pigpioClient from 'pigpio-client';
-import {normalizeHexString} from '../../system/lib/binaryHelpers';
+import {normalizeHexString} from '../../../system/lib/binaryHelpers';
 
 const pigpioClient = require('pigpio-client');
 

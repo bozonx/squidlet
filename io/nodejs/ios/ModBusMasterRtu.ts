@@ -1,4 +1,4 @@
-import ModBusMasterRs485Io from '../../system/interfaces/io/ModBusMasterRs485Io';
+import ModBusMasterRs485Io from '../../../system/interfaces/io/ModBusMasterRs485Io';
 
 // // create a tcp modbus client
 // const Modbus = require('jsmodbus')
@@ -8,7 +8,7 @@ import ModBusMasterRs485Io from '../../system/interfaces/io/ModBusMasterRs485Io'
 // }
 // const socket = new SerialPort("/dev/tty-usbserial1", options)
 // const client = new Modbus.client.RTU(socket, address)
-
+//
 
 export default class ModBusMasterRs485 implements ModBusMasterRs485Io {
 

@@ -1,22 +1,22 @@
 import * as path from 'path';
 
-import IoSet from '../../system/interfaces/IoSet';
-import Platforms from '../../system/interfaces/Platforms';
-import systemConfig from '../../system/systemConfig';
-import Main from '../../system/Main';
-import EnvBuilder from '../../hostEnvBuilder/EnvBuilder';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import Os from '../../shared/helpers/Os';
-import GroupConfigParser from '../../shared/helpers/GroupConfigParser';
-import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../shared/constants';
+import IoSet from '../../../system/interfaces/IoSet';
+import Platforms from '../../../system/interfaces/Platforms';
+import systemConfig from '../../../system/systemConfig';
+import Main from '../../../system/Main';
+import EnvBuilder from '../../../hostEnvBuilder/EnvBuilder';
+import PreHostConfig from '../../../hostEnvBuilder/interfaces/PreHostConfig';
+import Os from '../../../shared/helpers/Os';
+import GroupConfigParser from '../../../shared/helpers/GroupConfigParser';
+import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../../shared/constants';
 import Starter from '../interfaces/Starter';
 import StarterProps from '../interfaces/StarterProps';
-import {LOG_LEVELS} from '../../system/interfaces/LogLevel';
+import {LOG_LEVELS} from '../../../system/interfaces/LogLevel';
 import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
-import {REPO_ROOT} from '../../shared/helpers/helpers';
-import {getOsMachine} from '../../shared/helpers/resolveMachine';
-import {resolveUid, resolveGid} from '../../shared/helpers/resolveUserGroup';
-import ConsoleLoggerColorful from '../../shared/helpers/ConsoleLoggerColorful';
+import {REPO_ROOT} from '../../../shared/helpers/helpers';
+import {getOsMachine} from '../../../shared/helpers/resolveMachine';
+import {resolveUid, resolveGid} from '../../../shared/helpers/resolveUserGroup';
+import ConsoleLoggerColorful from '../../../shared/helpers/ConsoleLoggerColorful';
 
 
 // TODO: maybe remove and use false instead of it

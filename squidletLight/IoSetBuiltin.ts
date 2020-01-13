@@ -1,6 +1,6 @@
 import IoSet from '../system/interfaces/IoSet';
 import IoItem from '../system/interfaces/IoItem';
-import Storage from '../nodejs/ios/Storage';
+import Storage from '../io/nodejs/ios/Storage';
 import StorageEnvMemoryWrapper from '../shared/helpers/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import StorageIo from '../system/interfaces/io/StorageIo';

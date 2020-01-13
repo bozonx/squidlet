@@ -1,15 +1,15 @@
 import * as path from 'path';
 import _template = require('lodash/template');
 
-import systemConfig from '../../system/systemConfig';
-import BuildSystem from '../../shared/envSetBuild/BuildSystem';
-import BuildIo from '../../shared/envSetBuild/BuildIo';
-import {SQUIDLET_PACKAGE_JSON_PATH} from '../../shared/helpers/helpers';
-import Os from '../../shared/helpers/Os';
-import PackageJson from '../../shared/interfaces/PackageJson';
+import systemConfig from '../../../system/systemConfig';
+import BuildSystem from '../../../shared/envSetBuild/BuildSystem';
+import BuildIo from '../../../shared/envSetBuild/BuildIo';
+import {SQUIDLET_PACKAGE_JSON_PATH} from '../../../shared/helpers/helpers';
+import Os from '../../../shared/helpers/Os';
+import PackageJson from '../../../shared/interfaces/PackageJson';
 // TODO: don't use props
-import Props from '../../__old/nodejs/Props';
-import {ENV_BUILD_TMP_DIR} from '../../shared/constants';
+import Props from '../../../__old/nodejs/Props';
+import {ENV_BUILD_TMP_DIR} from '../../../shared/constants';
 
 
 export const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');

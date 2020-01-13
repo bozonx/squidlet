@@ -1,4 +1,4 @@
-import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
@@ -12,6 +12,7 @@ const machineConfig: MachineConfig = {
     HttpServer: './ios/HttpServer.ts',
 
     Serial: './ios/Serial-serialport.ts',
+
     //'Wifi',
     //'Bluetooth',
   },

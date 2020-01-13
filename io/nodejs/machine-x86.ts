@@ -1,4 +1,4 @@
-import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
@@ -11,28 +11,13 @@ const machineConfig: MachineConfig = {
     HttpClient: './ios/HttpClient.ts',
     HttpServer: './ios/HttpServer.ts',
 
-    PigpioClient: './ios/PigpioClient.ts',
-    Digital: './ios/Digital.ts',
-    //Serial: './ios/Serial.ts',
-    I2cMaster: './ios/I2cMaster.ts',
-    //'Pwm',
-    //'Spi',
-    //'Adc',
-    //'Dac',
+    Serial: './ios/Serial-serialport.ts',
     //'Wifi',
     //'Bluetooth',
   },
 
 
   hostConfig: {
-    ios: {
-      I2cMaster: {
-        defaultBus: 1,
-      },
-      PigpioClient: {
-        host: 'localhost'
-      },
-    },
   }
 };
 

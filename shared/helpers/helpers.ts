@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
-import NodejsMachines from '../../nodejs/interfaces/NodejsMachines';
+import NodejsMachines from '../../io/nodejs/interfaces/NodejsMachines';
 import {callPromised} from '../../system/lib/common';
 import {ENCODE} from '../../system/lib/constants';
 

@@ -1,5 +1,5 @@
-import {callPromised} from '../../system/lib/common';
-import {removeItemFromArray} from '../../system/lib/arrays';
+import {callPromised} from '../../../system/lib/common';
+import {removeItemFromArray} from '../../../system/lib/arrays';
 
 
 export type PigpioHandler = (level: number, tick: number) => void;

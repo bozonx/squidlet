@@ -1,7 +1,7 @@
-import IoSet from '../../system/interfaces/IoSet';
-import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
-import {omitObj} from '../../system/lib/objects';
-import Main from '../../system/Main';
+import IoSet from '../../../system/interfaces/IoSet';
+import PreHostConfig from '../../../hostEnvBuilder/interfaces/PreHostConfig';
+import {omitObj} from '../../../system/lib/objects';
+import Main from '../../../system/Main';
 import StartDevelop from './StartDevelop';
 
 
