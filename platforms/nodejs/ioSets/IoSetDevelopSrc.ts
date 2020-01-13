@@ -33,8 +33,8 @@ export default class IoSetDevelopSrc implements IoSet {
   }
 
   /**
-   * Collect io items instances.
-   * And replace Storage io with wrapper which actually gets configs and manifests from memory.
+   * Collect platforms items instances.
+   * And replace Storage platforms with wrapper which actually gets configs and manifests from memory.
    */
   async init(): Promise<void> {
     const platformDir: string = resolvePlatformDir(this.envBuilder.configManager.platform);

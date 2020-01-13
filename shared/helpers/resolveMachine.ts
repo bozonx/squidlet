@@ -1,4 +1,4 @@
-import NodejsMachines from '../../io/nodejs/interfaces/NodejsMachines';
+import NodejsMachines from '../../platforms/nodejs/interfaces/NodejsMachines';
 import Os, {SpawnCmdResult} from './Os';
 
 

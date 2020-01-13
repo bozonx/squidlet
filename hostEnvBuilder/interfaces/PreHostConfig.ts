@@ -3,7 +3,7 @@ import {IoDefinitions} from '../../system/interfaces/IoItem';
 
 // export interface IoSetConfig {
 //   type: IoSetTypes;
-//   // other io set params
+//   // other platforms set params
 //   [index: string]: any;
 // }
 

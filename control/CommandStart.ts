@@ -1,9 +1,9 @@
-import StartDevelop from '../io/nodejs/starters/StartDevelop';
-import StartIoServerStandalone from '../io/nodejs/starters/StartIoServerStandalone';
-import StartRemoteDevelop from '../io/nodejs/starters/StartRemoteDevelop';
+import StartDevelop from '../platforms/nodejs/starters/StartDevelop';
+import StartIoServerStandalone from '../platforms/nodejs/starters/StartIoServerStandalone';
+import StartRemoteDevelop from '../platforms/nodejs/starters/StartRemoteDevelop';
 import {listenScriptEnd} from '../shared/helpers/helpers';
-import Starter from '../io/nodejs/interfaces/Starter';
-import StarterProps from '../io/nodejs/interfaces/StarterProps';
+import Starter from '../platforms/nodejs/interfaces/Starter';
+import StarterProps from '../platforms/nodejs/interfaces/StarterProps';
 import {omitObj} from '../system/lib/objects';
 
 
@@ -56,7 +56,7 @@ export default class CommandStart {
   }
 
   /**
-   * Start development io server on nodejs
+   * Start development platforms server on nodejs
    */
   startIoServer(): Promise<void> {
     const starter = new StartIoServerStandalone(this.configPath, this.starterProps);

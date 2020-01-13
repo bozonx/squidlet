@@ -217,6 +217,6 @@ export default class WsApiCall {
 //
 //   await apiClient.callMethod('switchToIoServer');
 //
-//   console.info(`Switched to io server successfully`);
+//   console.info(`Switched to platforms server successfully`);
 //   await apiClient.close();
 // }

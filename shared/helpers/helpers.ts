@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
-import NodejsMachines from '../../io/nodejs/interfaces/NodejsMachines';
+import NodejsMachines from '../../platforms/nodejs/interfaces/NodejsMachines';
 import {callPromised} from '../../system/lib/common';
 import {ENCODE} from '../../system/lib/constants';
 
@@ -35,7 +35,7 @@ export function updateArray(arrToUpdate: any[], newValues: any[]): void {
 }
 
 /**
- * Make io name from io path without extension.
+ * Make platforms name from platforms path without extension.
  * E.g "/path/to/file.ts" -> "file"
  */
 export function getFileNameOfPath(pathToIo: string): string {
@@ -105,7 +105,7 @@ export async function makeFileCheckSum(filePath: string, sumFilePath: string) {
 }
 
 // /**
-//  * Make list of io names from list of io paths.
+//  * Make list of platforms names from list of platforms paths.
 //  * E.g ['/path/to/file1.ts', '/path/file2'] -> ['file1', 'file2']
 //  */
 // export function makeListOfNamesFromPaths(paths: string[]): string[] {

@@ -2,7 +2,7 @@ import RemoteCall from '../../system/lib/remoteCall/RemoteCall';
 import {deserializeJson, serializeJson} from '../../system/lib/serialize';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../../entities/drivers/WsClient/WsClientLogic';
-import WebSocketClient from '../../io/nodejs/ios/WebSocketClient';
+import WebSocketClient from '../../platforms/nodejs/ios/WebSocketClient';
 import {makeUniqId} from '../../system/lib/uniqId';
 import {WsCloseStatus} from '../../system/interfaces/io/WebSocketClientIo';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
@@ -65,7 +65,7 @@ export default class IoClient {
 
 
   /**
-   * Call remote io's method
+   * Call remote platforms's method
    */
   callIoMethod(ioName: string, methodName: string, ...args: any[]): Promise<any> {
     const pathToMethod = `${ioName}${METHOD_DELIMITER}${methodName}`;

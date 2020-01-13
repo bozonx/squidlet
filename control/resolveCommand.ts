@@ -23,7 +23,7 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       else {
         return (new CommandStart(positionArgsRest, args as any)).startDevSrc();
       }
-    case 'io-server':
+    case 'platforms-server':
       return (new CommandStart(positionArgsRest, args as any)).startIoServer();
     case 'update':
       return (new CommandUpdate(positionArgsRest, args)).start();

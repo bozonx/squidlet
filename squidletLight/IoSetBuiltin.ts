@@ -1,6 +1,6 @@
 import IoSet from '../system/interfaces/IoSet';
 import IoItem from '../system/interfaces/IoItem';
-import Storage from '../io/nodejs/ios/Storage';
+import Storage from '../platforms/nodejs/ios/Storage';
 import StorageEnvMemoryWrapper from '../shared/helpers/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import StorageIo from '../system/interfaces/io/StorageIo';
@@ -44,7 +44,7 @@ export default class IoSetBuiltin implements IoSet {
 
 
   /**
-   * Load ioSet index.js file where included all the used io on platform.
+   * Load ioSet index.js file where included all the used platforms on platform.
    * It will be called on system start
    */
   async init(): Promise<void> {

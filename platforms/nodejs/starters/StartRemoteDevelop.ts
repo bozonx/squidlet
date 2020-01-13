@@ -77,7 +77,7 @@ export default class StartRemoteDevelop extends StartBase {
   }
 
   /**
-   * Resolve which io set will be used and make instance of it and pass ioSet config.
+   * Resolve which platforms set will be used and make instance of it and pass ioSet config.
    */
   protected async makeIoSet(): Promise<IoSet> {
     if (!this.remoteHostInfo) throw new  Error(`No remote host info`);

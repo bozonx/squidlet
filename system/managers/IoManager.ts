@@ -41,7 +41,7 @@ export default class IoManager {
 
     // init ios that have a definition
     for (let ioName of this.ioSet.getNames()) {
-      // get io or throw an error
+      // get platforms or throw an error
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
       if (ioItem.configure && ioDefinitions[ioName]) {

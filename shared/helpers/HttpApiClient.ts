@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import HttpClient from '../../io/nodejs/ios/HttpClient';
+import HttpClient from '../../platforms/nodejs/ios/HttpClient';
 import HttpClientLogic from '../../entities/drivers/HttpClient/HttpClientLogic';
 import {ENCODE} from '../../system/lib/constants';
 import * as yaml from 'js-yaml';

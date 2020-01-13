@@ -1,4 +1,4 @@
-IoSetDevelopSrc = require('../../io/nodejs/ioSets/IoSetDevelopSrc').default
+IoSetDevelopSrc = require('../../platforms/nodejs/ioSets/IoSetDevelopSrc').default
 helpers = require('../../shared/helpers/helpers')
 
 
@@ -20,7 +20,7 @@ describe 'nodejs.IoSetDevelopSrc', ->
 
   it 'init', ->
     machineConfig = {
-      ios: ['./io/Storage.ts']
+      ios: ['./platforms/Storage.ts']
     }
 
     @ioSrc.os = {
@@ -34,8 +34,8 @@ describe 'nodejs.IoSetDevelopSrc', ->
     sinon.assert.calledOnce(@ioSrc.instantiateIo)
     sinon.assert.calledWith(@ioSrc.instantiateIo, machineConfig.ios[0], helpers.resolvePlatformDir('nodejs'))
 
-  it 'instantiateIo - common io', ->
-    ioPath = './io/Digital.ts'
+  it 'instantiateIo - common platforms', ->
+    ioPath = './platforms/Digital.ts'
     platformDir = helpers.resolvePlatformDir('nodejs')
     class DigitalClass
     @ioSrc.os = {
@@ -46,8 +46,8 @@ describe 'nodejs.IoSetDevelopSrc', ->
 
     assert.isTrue(@ioSrc.ioCollection['Digital'] instanceof DigitalClass)
 
-  it 'instantiateIo - Storage io - it uses storage wrapper', ->
-    ioPath = './io/Storage.ts'
+  it 'instantiateIo - Storage platforms - it uses storage wrapper', ->
+    ioPath = './platforms/Storage.ts'
     platformDir = helpers.resolvePlatformDir('nodejs')
     class StorageClass
     wrapperArg = undefined

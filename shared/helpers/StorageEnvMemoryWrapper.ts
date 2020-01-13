@@ -10,7 +10,7 @@ import {getFileNameOfPath} from './helpers';
 
 
 /**
- * It wraps a Storage io instance to load configs and manifests from memory.
+ * It wraps a Storage platforms instance to load configs and manifests from memory.
  * But other files it loads as an original Storage.
  */
 export default class StorageEnvMemoryWrapper {

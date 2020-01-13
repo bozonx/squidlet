@@ -49,7 +49,7 @@ export default class ProdBuild {
   }
 
   /**
-   * Build io files to workDir/io
+   * Build platforms files to workDir/platforms
    */
   async buildIos() {
     console.info(`===> Building io`);

@@ -98,7 +98,7 @@ export default class StartProd {
     await this.prodBuild.buildInitialSystem();
     // build config and entities
     await this.envBuilder.writeEnv();
-    // build io
+    // build platforms
     await this.prodBuild.buildIos();
 
     // TODO: pass workDir

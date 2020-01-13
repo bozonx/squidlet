@@ -8,7 +8,7 @@ export interface IoDefinitions {
 
 export default interface IoItem {
   /**
-   * Initialize io Item at System initialization time. It isn't allowed to call it more than once.
+   * Initialize platforms Item at System initialization time. It isn't allowed to call it more than once.
    */
   init?: (ioContext: IoContext) => Promise<void>;
 

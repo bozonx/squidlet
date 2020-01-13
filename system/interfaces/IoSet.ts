@@ -22,7 +22,7 @@ export default interface IoSet {
   getIo<T extends IoItem>(ioName: string): T;
 
   /**
-   * Get all the names of io items
+   * Get all the names of platforms items
    */
   getNames(): string[];
 

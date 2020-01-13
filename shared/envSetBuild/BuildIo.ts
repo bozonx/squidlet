@@ -98,7 +98,7 @@ export default class BuildIo {
   }
 
   /**
-   * Make index.js which requires all the io files.
+   * Make index.js which requires all the platforms files.
    */
   private async makeIoSetIndex(machineConfig: MachineConfig) {
     const indexFilePath: string = path.join(this.iosBuildDir, IO_SET_INDEX_FILE);

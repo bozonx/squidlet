@@ -3,7 +3,7 @@ export const ORIGINAL_DIR = 'original';
 export const MODERN_DIR = 'modern';
 export const LEGACY_DIR = 'legacy';
 export const TREE_DIR = 'tree';
-// main file name of io set
+// main file name of platforms set
 export const IO_SET_INDEX_FILE = 'index.js';
 
 export const ENV_BUILD_TMP_DIR = 'envBuildTmp';

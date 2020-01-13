@@ -12,7 +12,7 @@ export default class IoSetLocal implements IoSet {
 
 
   /**
-   * Load ioSet index.js file where included all the used io on platform.
+   * Load ioSet index.js file where included all the used platforms on platform.
    * It will be called on system start
    */
   async init(): Promise<void> {
@@ -23,7 +23,7 @@ export default class IoSetLocal implements IoSet {
       systemConfig.envSetDirs.ios,
     );
 
-    // Load io collection workDir/io/index.js
+    // Load platforms collection workDir/platforms/index.js
     const ioClasses = this.requireIoSetIndex(pathToIoSetIndex);
 
     // make dev instances
