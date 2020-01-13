@@ -1,4 +1,4 @@
-import MachineConfig from '../hostEnvBuilder/interfaces/MachineConfig';
+import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {

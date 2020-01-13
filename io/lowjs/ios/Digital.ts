@@ -1,4 +1,4 @@
-import {callPromised} from '../../system/lib/common';
+import {callPromised} from '../../../system/lib/common';
 
 const gpio = require('gpio');
 
