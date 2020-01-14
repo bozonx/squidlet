@@ -3,7 +3,6 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import MqttIo from 'system/interfaces/io/MqttIo';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import Promised from 'system/lib/Promised';
 import {uint8ArrayToAscii} from 'system/lib/serialize';
 import IoConnectionManager from 'system/lib/IoConnectionManager';
 import Context from 'system/Context';
@@ -52,12 +51,13 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.depsInstances.mqttIo = this.context.getIo('Mqtt');
     // open a new connection and don't wait while it has been completed
     this.connectionManager.openNewConnection();
+
+    // TODO: add listenIoEvents ???
   }
 
   destroy = async () => {
-    await this.removeIoListeners();
     this.messageEvents.destroy();
-    this.connectionManager.destroy();
+    await this.connectionManager.destroy();
 
     delete this.binarySubscribedTopics;
 
@@ -69,11 +69,10 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
   async isConnected(): Promise<boolean> {
-    if (!this.connectionManager.connectionId) return false;
+    return this.connectionManager.isConnected();
 
-    // TODO: лучше ориентироваться на событие onConnect
-
-    return this.connectionManager.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));
+    // if (!this.connectionManager.connectionId) return false;
+    // return this.connectionManager.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));
   }
 
   async publish(topic: string, data?: string | Uint8Array): Promise<void> {
@@ -125,10 +124,7 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
 
-  private handleIncomeMessage = (connectionId: string, topic: string, data: Uint8Array) => {
-    // process only ours messages
-    if (connectionId !== this.connectionManager.connectionId) return;
-
+  private handleIncomeMessage = (topic: string, data: Uint8Array) => {
     let preparedData: string | Uint8Array;
 
     if (this.binarySubscribedTopics[topic]) {
@@ -143,7 +139,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.messageEvents.emit(topic, preparedData);
   }
 
-  private handleEnd = (connectionId: string) => {
+  private handleEnd = () => {
     // TODO: add
     // TODO: remove old events
     this.listenIoEvents()
@@ -151,14 +147,19 @@ export class Mqtt extends DriverBase<MqttProps> {
   }
 
   private listenIoEvents() {
-    return this.connectionManager.registerListeners([
-      () => this.mqttIo.onMessage(this.handleIncomeMessage),
-      () => this.mqttIo.onDisconnect(this.connectionManager.handleDisconnect),
-      () => this.mqttIo.onEnd(this.handleEnd),
-      () => this.mqttIo.onConnect(this.connectionManager.handleConnect),
-      () => this.mqttIo.onError((connectionId: string, error: string) => {
-        if (connectionId !== this.connectionId) return;
+    // TODO: review - может не нужна ошибка? просто ожидать подключения
+    if (!this.connectionManager.connectionId) {
+      throw new Error(`No connection id`);
+    }
 
+    const connectionId: string = this.connectionManager.connectionId;
+
+    return this.connectionManager.registerListeners([
+      () => this.mqttIo.onMessage(connectionId, this.handleIncomeMessage),
+      () => this.mqttIo.onDisconnect(connectionId, this.connectionManager.handleDisconnect),
+      () => this.mqttIo.onEnd(connectionId, this.handleEnd),
+      () => this.mqttIo.onConnect(connectionId, this.connectionManager.handleConnect),
+      () => this.mqttIo.onError(connectionId, (error: string) => {
         this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
       }),
     ]);

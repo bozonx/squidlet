@@ -17,6 +17,7 @@ export default class IoConnectionManager {
   }
 
   private readonly context: Context;
+  private readonly controlledIo: ControlledIo;
   private openPromised = new Promised<void>();
   private ioHandlerIndexes: number[] = [];
   connectionId?: string;
@@ -24,12 +25,18 @@ export default class IoConnectionManager {
 
   constructor(context: Context, controlledIo: ControlledIo) {
     this.context = context;
+    this.controlledIo = controlledIo;
   }
 
-  destroy() {
+  async destroy() {
+    await this.removeIoListeners();
     // TODO: add
   }
 
+
+  isConnected(): Promise<boolean> {
+    // TODO: add
+  }
 
   openNewConnection() {
     //this.openPromise = new Promised<void>();
@@ -53,18 +60,14 @@ export default class IoConnectionManager {
 
   }
 
-  handleConnect = (connectionId: string) => {
-    if (connectionId !== this.connectionManager.connectionId) return;
-
+  handleConnect = () => {
     // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
     //  - возможно это уже реализованно в самам mqtt
     //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
     this.openPromised.resolve();
   }
 
-  handleDisconnect = (connectionId: string) => {
-    if (connectionId !== this.connectionId) return;
-
+  handleDisconnect = () => {
     // reject open promise if it hasn't been fulfilled
     if (!this.openPromised.isFulfilled()) {
       this.openPromised.reject(new Error(`Mqtt: Disconnected ${connectionId}`));

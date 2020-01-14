@@ -67,25 +67,25 @@ export default interface MqttIo extends IoItem {
    * It rises at first time connect or at reconnect
    * @param cb
    */
-  onConnect(cb: (connectionId: string) => void): Promise<number>;
+  onConnect(connectionId: string, cb: () => void): Promise<number>;
 
   /**
    * It rises when client is disconnected. It tries to reconnect.
    * @param cb
    */
-  onDisconnect(cb: (connectionId: string) => void): Promise<number>;
+  onDisconnect(connectionId: string, cb: () => void): Promise<number>;
 
   /**
    * Means connection closed and connectionId is removed.
    */
-  onEnd(cb: (connectionId: string) => void): Promise<number>;
+  onEnd(connectionId: string, cb: () => void): Promise<number>;
 
   /**
    * Listen all the subscribed messages.
    * Data will be a string or empty string or Uint8Array or empty Uint8Array.
    */
-  onMessage(cb: (connectionId: string, topic: string, data: Uint8Array) => void): Promise<number>;
-  onError(cb: (connectionId: string, err: string) => void): Promise<number>;
+  onMessage(connectionId: string, cb: (topic: string, data: Uint8Array) => void): Promise<number>;
+  onError(connectionId: string, cb: (err: string) => void): Promise<number>;
   removeListener(handlerId: number): Promise<void>;
 
   publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;

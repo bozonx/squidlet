@@ -42,6 +42,9 @@ export default class Mqtt implements MqttIo {
 
     this.connections.push( this.connectToServer(connectionId, url, options) );
 
+    // TODO: поднять событие как только будет подписка на событие onConnect.
+    //       либо это событие не поднимать в начале только на reconnect
+
     return connectionId;
   }
 
