@@ -39,17 +39,8 @@ export default class IoConnectionManager {
   }
 
   openNewConnection() {
-    //this.openPromise = new Promised<void>();
-
-    this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
-
-    // TODO: если не удалось подключиться?
-    this.listenIoEvents()
-      .catch(this.log.error);
-
-    // TODO: если не удалось подписаться то продолжать это делать через несколько секунд
     this.establishConnection()
-      .catch(this.log.error);
+      .catch(this.context.log.error);
   }
 
   async registerListeners(listeners: (() => Promise<number>)[]) {
@@ -83,12 +74,44 @@ export default class IoConnectionManager {
     // TODO: см code 1001 и делать переконнект если указанно
   }
 
-  private async establishConnection() {
 
-    this.connectionId = await this.mqttIo.newConnection(
-      this.props.url,
-      omitObj(this.props, 'url')
-    );
+  private async establishConnection() {
+    if (this.openPromised.isFulfilled()) {
+      this.openPromised = new Promised<void>();
+    }
+
+    // Timeout of one connection
+    const connectionTimeout = setTimeout(() => {
+      // TODO: подождать 3 сек
+      // TODO: запустить заного
+    }, this.context.config.config.connectionTimeoutSec);
+
+    // Timeout of round of reconnection
+    const roundTimeout = setTimeout(() => {
+      clearTimeout(connectionTimeout);
+      this.openPromised.reject(new Error(`Timeout of connection`));
+
+      this.openPromised = new Promised<void>();
+
+      // TODO: подождать 5 сек
+      // TODO: запустить заного все
+    }, this.context.config.config.requestTimeoutSec);
+
+    this.controlledIo.open()
+      .then((connectionId: string) => {
+        clearTimeout(connectionTimeout);
+        clearTimeout(roundTimeout);
+
+        this.connectionId = connectionId;
+
+        this.openPromised.resolve();
+        // TODO: подписаться на события - listenIoEvents
+      })
+      .catch(() => {
+        clearTimeout(connectionTimeout);
+
+        // TODO: запустить заного
+      });
   }
 
   private async removeIoListeners() {

@@ -9,6 +9,8 @@ export interface HostConfigConfig {
   //defaultConfigRepublishIntervalMs: number;
   // main timeout in seconds
   requestTimeoutSec: number;
+  // timeout of waiting for connection has been establish
+  connectionTimeoutSec: number;
   // resend timeout in seconds
   senderResendTimeout: number;
   // default response of remote call in seconds

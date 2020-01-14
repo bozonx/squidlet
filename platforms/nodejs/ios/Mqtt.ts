@@ -45,6 +45,9 @@ export default class Mqtt implements MqttIo {
     // TODO: поднять событие как только будет подписка на событие onConnect.
     //       либо это событие не поднимать в начале только на reconnect
 
+    // TODO: если после создания connectionId не навешалось ни одного события -
+    //       то можно его удалить через 120 сек
+
     return connectionId;
   }
 

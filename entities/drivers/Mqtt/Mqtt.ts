@@ -49,10 +49,11 @@ export class Mqtt extends DriverBase<MqttProps> {
 
   init = async () => {
     this.depsInstances.mqttIo = this.context.getIo('Mqtt');
+
+    this.log.info(`... Connecting to MQTT broker: ${this.props.url}`);
+
     // open a new connection and don't wait while it has been completed
     this.connectionManager.openNewConnection();
-
-    // TODO: add listenIoEvents ???
   }
 
   destroy = async () => {
