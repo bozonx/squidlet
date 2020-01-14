@@ -4,7 +4,7 @@ import MqttIo from 'system/interfaces/io/MqttIo';
 import {omitObj} from 'system/lib/objects';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {uint8ArrayToAscii} from 'system/lib/serialize';
-import IoConnectionManager from 'system/lib/IoConnectionManager';
+import IoConnectionManager from 'system/lib/logic/IoConnectionManager';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 

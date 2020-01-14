@@ -1,5 +1,5 @@
-import Promised from './Promised';
-import Context from '../Context';
+import Promised from '../Promised';
+import Context from '../../Context';
 
 
 interface ControlledIo {
