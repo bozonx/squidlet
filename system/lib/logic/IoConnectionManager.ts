@@ -95,6 +95,7 @@ export default class IoConnectionManager {
     // TODO: почему connectionTimeoutSec меньше чем requestTimeoutSec
     // Timeout of one connection
     this.connectionTimeout = setTimeout(() => {
+      // TODO: отменить текущее соединение
       // TODO: review
       setTimeout(() => this.establishNewConnection, DELAY_BETWEEN_TRIES_SEC * 1000);
     }, this.context.config.config.connectionTimeoutSec);
@@ -106,10 +107,11 @@ export default class IoConnectionManager {
 
     this._isConnected = false;
 
-    this.makeConnectionTry();
+    this.makeConnectionTry()
+      .catch(this.context.log.error);
   }
 
-  private makeConnectionTry() {
+  private async makeConnectionTry() {
     // // Timeout of round of reconnection
     // this.roundTimeout = setTimeout(() => {
     //   clearTimeout(this.connectionTimeout as Timeout);
@@ -122,23 +124,28 @@ export default class IoConnectionManager {
     //   // TODO: запустить заного все
     // }, this.context.config.config.requestTimeoutSec);
 
-    this.controlledIo.open()
-      .then((connectionId: string) => {
-        clearTimeout(this.connectionTimeout as Timeout);
-        //clearTimeout(this.roundTimeout as Timeout);
+    let connectionId: string;
 
-        this._connectionId = connectionId;
-        this._isConnected = true;
+    try {
+      connectionId = await this.controlledIo.open();
+    }
+    catch (e) {
+      clearTimeout(this.connectionTimeout as Timeout);
 
-        this.openPromised.resolve();
-        // TODO: подписаться на события - listenIoEvents
-      })
-      .catch(() => {
-        clearTimeout(this.connectionTimeout as Timeout);
+      setTimeout(() => this.makeConnectionTry, DELAY_BETWEEN_TRIES_SEC * 1000);
+      // TODO: запустить заного
 
-        setTimeout(() => this.makeConnectionTry, DELAY_BETWEEN_TRIES_SEC * 1000);
-        // TODO: запустить заного
-      });
+      return;
+    }
+
+    clearTimeout(this.connectionTimeout as Timeout);
+    //clearTimeout(this.roundTimeout as Timeout);
+
+    this._connectionId = connectionId;
+    this._isConnected = true;
+
+    this.openPromised.resolve();
+    // TODO: подписаться на события - listenIoEvents
   }
 
   private async removeIoListeners() {
