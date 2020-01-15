@@ -10,6 +10,7 @@ class SenderRequest {
   private startedTimeStamp: number = 0;
   private readonly sendCb: (...p: any[]) => any;
   private sendParams: any[] = [];
+  // TODO: use promised
   private resolve: (data: any) => void = () => {};
   private reject: (err: Error) => void = () => {};
   // if cb params was changed while request was in progress - it means the last cb will set to queue

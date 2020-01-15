@@ -3,14 +3,11 @@ import Context from '../../Context';
 import Sender from '../Sender';
 
 
-type Timeout = NodeJS.Timeout;
-
 interface ControlledIo {
   open: () => Promise<string>;
 }
 
-const DELAY_BETWEEN_TRIES_SEC = 3;
-const CONNECTION_SENDER_ID = 'connection';
+const CONNECTION_SENDER_ID = 'IoCm.connection';
 
 
 export default class IoConnectionManager {
@@ -94,7 +91,12 @@ export default class IoConnectionManager {
   }
 
 
-  private establishNewConnection() {
+  private async establishNewConnection(): Promise<void> {
+    if (this.connectionId) {
+      // TODO: отписаться от старых события
+      // TODO: сделать end старого connectionId
+    }
+
     // if connection request is in progress - do nothing
     if (this.sender.isInProcess(CONNECTION_SENDER_ID)) return;
 
@@ -104,24 +106,39 @@ export default class IoConnectionManager {
 
     this._isConnected = false;
 
-    // const senderCb = async (): Promise<void> => {
-    //   // TODO: send request
-    // };
+    try {
+      this._connectionId = await this.sender.send(CONNECTION_SENDER_ID, () => this.controlledIo.open());
+    }
+    catch (e) {
+      // it'll be called after whole cycle of reconnection
+      this.context.log.error(e);
 
-    this.sender.send(CONNECTION_SENDER_ID, this.makeConnectionTry)
-      .catch(this.context.log.error);
+      if (!this.openPromised.isFulfilled()) {
+        this.openPromised.reject(new Error(`ConnectionManager: can't connect`));
+      }
 
-    // TODO: слушать цикл переконнекта и реджектить промис
-    // TODO: отписаться от старых события
-    // TODO: сделать end старого connectionId
-  }
+      this.openPromised = new Promised<void>();
 
-  private makeConnectionTry = async (): Promise<void> => {
-    this._connectionId = await this.controlledIo.open();
+      // TODO: test that it'll be false on reconnect
+      if (this.sender.isInProcess(CONNECTION_SENDER_ID)) {
+        throw new Error(`Sender process hasn't been done`);
+      }
+
+      // start again
+      this.establishNewConnection()
+        .catch(this.context.log.error);
+
+      return;
+    }
+
     this._isConnected = true;
 
     this.openPromised.resolve();
-    // TODO: подписаться на события - listenIoEvents
+    this.sendHandlers();
+  }
+
+  private sendHandlers() {
+    // TODO: add
   }
 
   private async removeIoListeners() {
@@ -130,5 +147,9 @@ export default class IoConnectionManager {
       await this.mqttIo.removeListener(handlerIndex);
     }
   }
+
+  // private makeConnectionTry = async (): Promise<void> => {
+  //   this._connectionId = await this.controlledIo.open();
+  // }
 
 }
