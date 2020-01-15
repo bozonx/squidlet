@@ -2,9 +2,13 @@ import Promised from '../Promised';
 import Context from '../../Context';
 
 
+type Timeout = NodeJS.Timeout;
+
 interface ControlledIo {
   open: () => Promise<string>;
 }
+
+const DELAY_BETWEEN_TRIES_SEC = 3;
 
 
 export default class IoConnectionManager {
@@ -30,6 +34,8 @@ export default class IoConnectionManager {
   private ioHandlerIndexes: number[] = [];
   private _connectionId?: string;
   private _isConnected: boolean = false;
+  private connectionTimeout?: Timeout;
+  //private roundTimeout?: Timeout;
 
 
   constructor(context: Context, controlledIo: ControlledIo) {
@@ -83,33 +89,43 @@ export default class IoConnectionManager {
 
 
   private async establishNewConnection() {
+    // TODO: отписаться от старых события
+    // TODO: сделать end старого connectionId
+    // TODO: недопускать если уже идет соединение
+    // TODO: почему connectionTimeoutSec меньше чем requestTimeoutSec
+    // Timeout of one connection
+    this.connectionTimeout = setTimeout(() => {
+      // TODO: review
+      setTimeout(() => this.establishNewConnection, DELAY_BETWEEN_TRIES_SEC * 1000);
+    }, this.context.config.config.connectionTimeoutSec);
+
+
     if (this.openPromised.isFulfilled()) {
       this.openPromised = new Promised<void>();
     }
 
     this._isConnected = false;
 
-    // Timeout of one connection
-    const connectionTimeout = setTimeout(() => {
-      // TODO: подождать 3 сек
-      // TODO: запустить заного
-    }, this.context.config.config.connectionTimeoutSec);
+    this.makeConnectionTry();
+  }
 
-    // Timeout of round of reconnection
-    const roundTimeout = setTimeout(() => {
-      clearTimeout(connectionTimeout);
-      this.openPromised.reject(new Error(`Timeout of connection`));
-
-      this.openPromised = new Promised<void>();
-
-      // TODO: подождать 5 сек
-      // TODO: запустить заного все
-    }, this.context.config.config.requestTimeoutSec);
+  private makeConnectionTry() {
+    // // Timeout of round of reconnection
+    // this.roundTimeout = setTimeout(() => {
+    //   clearTimeout(this.connectionTimeout as Timeout);
+    //   this.openPromised.reject(new Error(`Timeout of connection`));
+    //
+    //   this.openPromised = new Promised<void>();
+    //
+    //   setTimeout(() => this.makeConnectionTry, DELAY_BETWEEN_TRIES_SEC * 1000);
+    //   // TODO: подождать 5 сек
+    //   // TODO: запустить заного все
+    // }, this.context.config.config.requestTimeoutSec);
 
     this.controlledIo.open()
       .then((connectionId: string) => {
-        clearTimeout(connectionTimeout);
-        clearTimeout(roundTimeout);
+        clearTimeout(this.connectionTimeout as Timeout);
+        //clearTimeout(this.roundTimeout as Timeout);
 
         this._connectionId = connectionId;
         this._isConnected = true;
@@ -118,8 +134,9 @@ export default class IoConnectionManager {
         // TODO: подписаться на события - listenIoEvents
       })
       .catch(() => {
-        clearTimeout(connectionTimeout);
+        clearTimeout(this.connectionTimeout as Timeout);
 
+        setTimeout(() => this.makeConnectionTry, DELAY_BETWEEN_TRIES_SEC * 1000);
         // TODO: запустить заного
       });
   }
