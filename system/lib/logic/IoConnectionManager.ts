@@ -1,5 +1,6 @@
 import Promised from '../Promised';
 import Context from '../../Context';
+import Sender from '../Sender';
 
 
 type Timeout = NodeJS.Timeout;
@@ -9,6 +10,7 @@ interface ControlledIo {
 }
 
 const DELAY_BETWEEN_TRIES_SEC = 3;
+const CONNECTION_SENDER_ID = 'connection';
 
 
 export default class IoConnectionManager {
@@ -30,17 +32,22 @@ export default class IoConnectionManager {
 
   private readonly context: Context;
   private readonly controlledIo: ControlledIo;
+  private readonly sender: Sender;
   private openPromised = new Promised<void>();
   private ioHandlerIndexes: number[] = [];
   private _connectionId?: string;
   private _isConnected: boolean = false;
-  private connectionTimeout?: Timeout;
-  //private roundTimeout?: Timeout;
 
 
   constructor(context: Context, controlledIo: ControlledIo) {
     this.context = context;
     this.controlledIo = controlledIo;
+    this.sender = new Sender(
+      this.context.config.config.requestTimeoutSec,
+      this.context.config.config.senderResendTimeout,
+      this.context.log.debug,
+      this.context.log.warn
+    );
   }
 
   async destroy() {
@@ -50,8 +57,7 @@ export default class IoConnectionManager {
 
 
   openNewConnection() {
-    this.establishNewConnection()
-      .catch(this.context.log.error);
+    this.establishNewConnection();
   }
 
   async registerListeners(listeners: (() => Promise<number>)[]) {
@@ -88,18 +94,9 @@ export default class IoConnectionManager {
   }
 
 
-  private async establishNewConnection() {
-    // TODO: отписаться от старых события
-    // TODO: сделать end старого connectionId
-    // TODO: недопускать если уже идет соединение
-    // TODO: почему connectionTimeoutSec меньше чем requestTimeoutSec
-    // Timeout of one connection
-    this.connectionTimeout = setTimeout(() => {
-      // TODO: отменить текущее соединение
-      // TODO: review
-      setTimeout(() => this.establishNewConnection, DELAY_BETWEEN_TRIES_SEC * 1000);
-    }, this.context.config.config.connectionTimeoutSec);
-
+  private establishNewConnection() {
+    // if connection request is in progress - do nothing
+    if (this.sender.isInProcess(CONNECTION_SENDER_ID)) return;
 
     if (this.openPromised.isFulfilled()) {
       this.openPromised = new Promised<void>();
@@ -107,41 +104,20 @@ export default class IoConnectionManager {
 
     this._isConnected = false;
 
-    this.makeConnectionTry()
+    // const senderCb = async (): Promise<void> => {
+    //   // TODO: send request
+    // };
+
+    this.sender.send(CONNECTION_SENDER_ID, this.makeConnectionTry)
       .catch(this.context.log.error);
+
+    // TODO: слушать цикл переконнекта и реджектить промис
+    // TODO: отписаться от старых события
+    // TODO: сделать end старого connectionId
   }
 
-  private async makeConnectionTry() {
-    // // Timeout of round of reconnection
-    // this.roundTimeout = setTimeout(() => {
-    //   clearTimeout(this.connectionTimeout as Timeout);
-    //   this.openPromised.reject(new Error(`Timeout of connection`));
-    //
-    //   this.openPromised = new Promised<void>();
-    //
-    //   setTimeout(() => this.makeConnectionTry, DELAY_BETWEEN_TRIES_SEC * 1000);
-    //   // TODO: подождать 5 сек
-    //   // TODO: запустить заного все
-    // }, this.context.config.config.requestTimeoutSec);
-
-    let connectionId: string;
-
-    try {
-      connectionId = await this.controlledIo.open();
-    }
-    catch (e) {
-      clearTimeout(this.connectionTimeout as Timeout);
-
-      setTimeout(() => this.makeConnectionTry, DELAY_BETWEEN_TRIES_SEC * 1000);
-      // TODO: запустить заного
-
-      return;
-    }
-
-    clearTimeout(this.connectionTimeout as Timeout);
-    //clearTimeout(this.roundTimeout as Timeout);
-
-    this._connectionId = connectionId;
+  private makeConnectionTry = async (): Promise<void> => {
+    this._connectionId = await this.controlledIo.open();
     this._isConnected = true;
 
     this.openPromised.resolve();

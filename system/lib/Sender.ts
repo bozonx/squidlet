@@ -119,6 +119,12 @@ export default class Sender {
   }
 
 
+  isInProcess(id: string | undefined): boolean {
+    const resolvedId: string = this.resolveId(id);
+
+    return Boolean(this.requests[resolvedId]);
+  }
+
   async send<T>(id: string | undefined, sendCb: (...p: any[]) => Promise<T>, ...params: any[]): Promise<T> {
     const resolvedId: string = this.resolveId(id);
     // TODO: review
