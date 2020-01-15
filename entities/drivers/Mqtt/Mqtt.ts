@@ -70,7 +70,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
 
   async isConnected(): Promise<boolean> {
-    return this.connectionManager.isConnected();
+    return this.connectionManager.isConnected;
 
     // if (!this.connectionManager.connectionId) return false;
     // return this.connectionManager.doRequest<boolean>((connectionId: string) => this.mqttIo.isConnected(connectionId));

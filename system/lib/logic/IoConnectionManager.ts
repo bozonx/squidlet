@@ -16,11 +16,20 @@ export default class IoConnectionManager {
     return this.openPromised.promise;
   }
 
+  get connectionId(): string | undefined {
+    return this._connectionId;
+  }
+
+  get isConnected(): boolean {
+    return this._isConnected;
+  }
+
   private readonly context: Context;
   private readonly controlledIo: ControlledIo;
   private openPromised = new Promised<void>();
   private ioHandlerIndexes: number[] = [];
-  connectionId?: string;
+  private _connectionId?: string;
+  private _isConnected: boolean = false;
 
 
   constructor(context: Context, controlledIo: ControlledIo) {
@@ -34,12 +43,8 @@ export default class IoConnectionManager {
   }
 
 
-  isConnected(): Promise<boolean> {
-    // TODO: add
-  }
-
   openNewConnection() {
-    this.establishConnection()
+    this.establishNewConnection()
       .catch(this.context.log.error);
   }
 
@@ -65,6 +70,8 @@ export default class IoConnectionManager {
     }
     // make new open promise
     this.openPromised = new Promised<void>();
+    this._isConnected = false;
+
 
     // TODO: what to do next ????
   }
@@ -75,10 +82,12 @@ export default class IoConnectionManager {
   }
 
 
-  private async establishConnection() {
+  private async establishNewConnection() {
     if (this.openPromised.isFulfilled()) {
       this.openPromised = new Promised<void>();
     }
+
+    this._isConnected = false;
 
     // Timeout of one connection
     const connectionTimeout = setTimeout(() => {
@@ -102,7 +111,8 @@ export default class IoConnectionManager {
         clearTimeout(connectionTimeout);
         clearTimeout(roundTimeout);
 
-        this.connectionId = connectionId;
+        this._connectionId = connectionId;
+        this._isConnected = true;
 
         this.openPromised.resolve();
         // TODO: подписаться на события - listenIoEvents
