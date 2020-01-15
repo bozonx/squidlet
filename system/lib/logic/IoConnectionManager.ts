@@ -5,6 +5,7 @@ import Sender from '../Sender';
 
 interface ControlledIo {
   open: () => Promise<string>;
+  removeListener: (handlerIndex: number) => Promise<void>;
 }
 
 const CONNECTION_SENDER_ID = 'IoCm.connection';
@@ -31,7 +32,8 @@ export default class IoConnectionManager {
   private readonly controlledIo: ControlledIo;
   private readonly sender: Sender;
   private openPromised = new Promised<void>();
-  private ioHandlerIndexes: number[] = [];
+  private listeners: (() => Promise<number>)[] = [];
+  private handlersIndexes: number[] = [];
   private _connectionId?: string;
   private _isConnected: boolean = false;
 
@@ -49,20 +51,25 @@ export default class IoConnectionManager {
 
   async destroy() {
     await this.removeIoListeners();
-    // TODO: add
+
+    this.sender.destroy();
+    this.openPromised.destroy();
+
+    delete this.openPromised;
+    delete this.listeners;
+    delete this.handlersIndexes;
   }
 
 
   openNewConnection() {
-    this.establishNewConnection();
+    this.establishNewConnection()
+      .catch(this.context.log.error);
   }
 
   async registerListeners(listeners: (() => Promise<number>)[]) {
-
-    // TODO: если не получилось сделать за раз - то отписаться и попробовать заного???
-
     await this.removeIoListeners();
 
+    this.listeners = listeners;
   }
 
   handleConnect = () => {
@@ -93,7 +100,8 @@ export default class IoConnectionManager {
 
   private async establishNewConnection(): Promise<void> {
     if (this.connectionId) {
-      // TODO: отписаться от старых события
+      // TODO: error tolerant
+      await this.removeIoListeners();
       // TODO: сделать end старого connectionId
     }
 
@@ -137,19 +145,23 @@ export default class IoConnectionManager {
     this.sendHandlers();
   }
 
-  private sendHandlers() {
-    // TODO: add
-  }
+  private async sendHandlers() {
+    // TODO: если не получилось сделать за раз - то отписаться и попробовать заного???
 
-  private async removeIoListeners() {
-    // remove old events if exist
-    for (let handlerIndex of this.ioHandlerIndexes) {
-      await this.mqttIo.removeListener(handlerIndex);
+    for (let listener of this.listeners) {
+      const handlerIndex: number = await listener();
+
+      this.handlersIndexes.push(handlerIndex);
     }
   }
 
-  // private makeConnectionTry = async (): Promise<void> => {
-  //   this._connectionId = await this.controlledIo.open();
-  // }
+  private async removeIoListeners() {
+    // TODO: make error tolerant
+
+    // remove old events if exist
+    for (let handlerIndex of this.handlersIndexes) {
+      await this.controlledIo.removeListener(handlerIndex);
+    }
+  }
 
 }

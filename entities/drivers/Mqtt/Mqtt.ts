@@ -43,6 +43,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
     this.connectionManager = new IoConnectionManager(this.context, {
       open: () => this.mqttIo.newConnection(this.props.url, omitObj(this.props, 'url')),
+      removeListener: (handlerIndex: number) => this.mqttIo.removeListener(handlerIndex),
     });
   }
 
