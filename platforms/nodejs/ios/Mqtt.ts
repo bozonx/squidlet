@@ -1,4 +1,6 @@
 // need to decrease of memory usage
+import IndexedEvents from '../../../system/lib/IndexedEvents';
+
 require('mqtt-packet').writeToStream.cacheNumbers = false;
 
 import * as mqtt from 'mqtt';
@@ -30,7 +32,7 @@ export default class Mqtt implements MqttIo {
     this.events.destroy();
 
     for (let connectionId in this.connections) {
-      await this.end(connectionId);
+      await this.close(connectionId);
 
       // TODO: наверное поднять события onEnd
     }
@@ -57,7 +59,7 @@ export default class Mqtt implements MqttIo {
     this.connections[Number(connectionId)].reconnect();
   }
 
-  async end(connectionId: string, force: boolean = false): Promise<void> {
+  async close(connectionId: string, force: boolean = false): Promise<void> {
     if (!this.connections[Number(connectionId)]) return;
 
     const client = this.connections[Number(connectionId)];
@@ -82,23 +84,25 @@ export default class Mqtt implements MqttIo {
   }
 
 
-  async onConnect(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(MqttIoEvents.connect, cb);
+  async onConnect(connectionId: string, cb: () => void): Promise<number> {
+    return this.events.addListener(this.makeEventName(MqttIoEvents.connect, connectionId), cb);
   }
 
   // TODO: только когда удаляем connectionId и закрываем соединение
-  async onEnd(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(MqttIoEvents.close, cb);
+  async onClose(connectionId: string, cb: () => void): Promise<number> {
+    return this.events.addListener(this.makeEventName(MqttIoEvents.close, connectionId), cb);
   }
 
-  // TODO: add onDisconnect
-
-  async onMessage(cb: (connectionId: string, topic: string, data: Uint8Array) => void): Promise<number> {
-    return this.events.addListener(MqttIoEvents.message, cb);
+  async onDisconnect(connectionId: string, cb: () => void): Promise<number> {
+    // TODO: add
   }
 
-  async onError(cb: (connectionId: string, err: string) => void): Promise<number> {
-    return this.events.addListener(MqttIoEvents.error, cb);
+  async onMessage(connectionId: string, cb: (topic: string, data: Uint8Array) => void): Promise<number> {
+    return this.events.addListener(this.makeEventName(MqttIoEvents.message, connectionId), cb);
+  }
+
+  async onError(connectionId: string, cb: (err: string) => void): Promise<number> {
+    return this.events.addListener(this.makeEventName(MqttIoEvents.error, connectionId), cb);
   }
 
   async removeListener(handlerId: number): Promise<void> {
@@ -167,9 +171,14 @@ export default class Mqtt implements MqttIo {
       //const contentType: string | undefined = packet.properties && packet.properties.contentType;
       this.handleIncomeMessage(connectionId, topic, data);
     });
-    connection.on('error', (err: Error) => this.events.emit(MqttIoEvents.error, connectionId, String(err)));
-    connection.on('connect', () => this.events.emit(MqttIoEvents.connect, connectionId));
-    connection.on('close', () => this.events.emit(MqttIoEvents.close, connectionId));
+    connection.on('error', (err: Error) =>
+      this.events.emit(this.makeEventName(MqttIoEvents.error, connectionId), String(err))
+    );
+    connection.on('connect',() =>
+      this.events.emit(this.makeEventName(MqttIoEvents.connect, connectionId))
+    );
+    connection.on('close',
+      () => this.events.emit(this.makeEventName(MqttIoEvents.close, connectionId)));
 
     return connection;
   }
@@ -194,7 +203,11 @@ export default class Mqtt implements MqttIo {
     //   preparedData = data.toString();
     // }
 
-    this.events.emit(MqttIoEvents.message, connectionId, topic, preparedData);
+    this.events.emit(this.makeEventName(MqttIoEvents.message, connectionId), topic, preparedData);
+  }
+
+  private makeEventName(eventNum: MqttIoEvents, connectionId: string): string {
+    return `${eventNum}-${connectionId}`
   }
 
 }
