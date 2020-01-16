@@ -154,14 +154,12 @@ export class Mqtt extends DriverBase<MqttProps> {
       throw new Error(`No connection id`);
     }
 
-    const connectionId: string = this.connectionManager.connectionId;
-
     return this.connectionManager.registerListeners([
-      () => this.mqttIo.onMessage(connectionId, this.handleIncomeMessage),
-      () => this.mqttIo.onDisconnect(connectionId, this.connectionManager.handleDisconnect),
-      () => this.mqttIo.onEnd(connectionId, this.handleEnd),
-      () => this.mqttIo.onConnect(connectionId, this.connectionManager.handleConnect),
-      () => this.mqttIo.onError(connectionId, (error: string) => {
+      (connectionId: string) => this.mqttIo.onMessage(connectionId, this.handleIncomeMessage),
+      (connectionId: string) => this.mqttIo.onDisconnect(connectionId, this.connectionManager.handleDisconnect),
+      (connectionId: string) => this.mqttIo.onEnd(connectionId, this.handleEnd),
+      (connectionId: string) => this.mqttIo.onConnect(connectionId, this.connectionManager.handleConnect),
+      (connectionId: string) => this.mqttIo.onError(connectionId, (error: string) => {
         this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);
       }),
     ]);

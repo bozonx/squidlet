@@ -8,7 +8,15 @@ interface ControlledIo {
   removeListener: (handlerIndex: number) => Promise<void>;
 }
 
+export interface IoError extends Error {
+  code: number;
+  message: string;
+}
+
 const CONNECTION_SENDER_ID = 'IoCm.connection';
+enum ERROR_CODES {
+  connectionIdLost= 1001,
+}
 
 
 export default class IoConnectionManager {
@@ -32,7 +40,7 @@ export default class IoConnectionManager {
   private readonly controlledIo: ControlledIo;
   private readonly sender: Sender;
   private openPromised = new Promised<void>();
-  private listeners: (() => Promise<number>)[] = [];
+  private listeners: ((connectionId: string) => Promise<number>)[] = [];
   private handlersIndexes: number[] = [];
   private _connectionId?: string;
   private _isConnected: boolean = false;
@@ -42,7 +50,7 @@ export default class IoConnectionManager {
     this.context = context;
     this.controlledIo = controlledIo;
     this.sender = new Sender(
-      this.context.config.config.requestTimeoutSec,
+      this.context.config.config.connectionTimeoutSec,
       this.context.config.config.senderResendTimeout,
       this.context.log.debug,
       this.context.log.warn
@@ -66,35 +74,47 @@ export default class IoConnectionManager {
       .catch(this.context.log.error);
   }
 
-  async registerListeners(listeners: (() => Promise<number>)[]) {
-    await this.removeIoListeners();
-
+  async registerListeners(listeners: ((connectionId: string) => Promise<number>)[]) {
     this.listeners = listeners;
   }
 
   handleConnect = () => {
-    // TODO: таймаут если не удалось соединиться за 60 сек - переконекчиваться
-    //  - возможно это уже реализованно в самам mqtt
-    //  - бесконечный цикл переконекта при первом подсоединении и при последующих обрывах связи
+    if (this.openPromised.isRejected()) {
+      this.openPromised = new Promised<void>();
+    }
+
     this.openPromised.resolve();
+
+    this._isConnected = true;
+
+    // TODO: остановить попытки переконнекта
   }
 
   handleDisconnect = () => {
     // reject open promise if it hasn't been fulfilled
     if (!this.openPromised.isFulfilled()) {
-      this.openPromised.reject(new Error(`Mqtt: Disconnected ${connectionId}`));
+      this.openPromised.reject(new Error(`Mqtt: Disconnected ${this.connectionId}`));
     }
     // make new open promise
     this.openPromised = new Promised<void>();
     this._isConnected = false;
 
-
-    // TODO: what to do next ????
+    // TODO: остановить попытки переконнекта (или начать заного)
   }
 
-  doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
-    // TODO: лучше переподписаться на события заного, отписаться от старых
-    // TODO: см code 1001 и делать переконнект если указанно
+  async doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {
+    if (!this.connectionId) throw new Error(`No connection id`);
+
+    try {
+      return await cb(this.connectionId);
+    }
+    catch (e) {
+      if (!this.isLostConnectError(e)) throw e;
+
+      // TODO: connect once and try again
+
+      return await cb(this.connectionId);
+    }
   }
 
 
@@ -103,6 +123,7 @@ export default class IoConnectionManager {
       // TODO: error tolerant
       await this.removeIoListeners();
       // TODO: сделать end старого connectionId
+      // TODO: удалить handlers indexes
     }
 
     // if connection request is in progress - do nothing
@@ -147,9 +168,13 @@ export default class IoConnectionManager {
 
   private async sendHandlers() {
     // TODO: если не получилось сделать за раз - то отписаться и попробовать заного???
+    // TODO: что будет в случае ошибки?
+    if (!this.connectionId) {
+      throw new Error(`No connection id`);
+    }
 
     for (let listener of this.listeners) {
-      const handlerIndex: number = await listener();
+      const handlerIndex: number = await listener(this.connectionId);
 
       this.handlersIndexes.push(handlerIndex);
     }
@@ -162,6 +187,14 @@ export default class IoConnectionManager {
     for (let handlerIndex of this.handlersIndexes) {
       await this.controlledIo.removeListener(handlerIndex);
     }
+  }
+
+  private isLostConnectError(e: Error | IoError) {
+    if (typeof e === 'object' && 'code' in e) {
+      return e.code === ERROR_CODES.connectionIdLost;
+    }
+
+    return Boolean(String(e).match(new RegExp(`code ${ERROR_CODES.connectionIdLost}`, 'i')));
   }
 
 }
