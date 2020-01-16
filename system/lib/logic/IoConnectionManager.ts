@@ -5,6 +5,7 @@ import Sender from '../Sender';
 
 interface ControlledIo {
   open: () => Promise<string>;
+  close: (connectionId: string) => Promise<void>;
   removeListener: (handlerIndex: number) => Promise<void>;
 }
 
@@ -58,7 +59,11 @@ export default class IoConnectionManager {
   }
 
   async destroy() {
-    await this.removeIoListeners();
+    try {
+      await this.removeIoListeners();
+    }
+    catch (e) {
+    }
 
     this.sender.destroy();
     this.openPromised.destroy();
@@ -120,10 +125,21 @@ export default class IoConnectionManager {
 
   private async establishNewConnection(): Promise<void> {
     if (this.connectionId) {
-      // TODO: error tolerant
-      await this.removeIoListeners();
-      // TODO: сделать end старого connectionId
-      // TODO: удалить handlers indexes
+      try {
+        await this.removeIoListeners();
+      }
+      catch (e) {
+        // error tolerant
+        this.context.log.warn(e);
+      }
+
+      try {
+        this.controlledIo.close(this.connectionId);
+      }
+      catch (e) {
+        // error tolerant
+        this.context.log.warn(e);
+      }
     }
 
     // if connection request is in progress - do nothing
@@ -181,12 +197,14 @@ export default class IoConnectionManager {
   }
 
   private async removeIoListeners() {
-    // TODO: make error tolerant
+    const promises: Promise<void>[] = [];
 
     // remove old events if exist
     for (let handlerIndex of this.handlersIndexes) {
-      await this.controlledIo.removeListener(handlerIndex);
+      promises.push(this.controlledIo.removeListener(handlerIndex));
     }
+
+    return Promise.all(promises);
   }
 
   private isLostConnectError(e: Error | IoError) {

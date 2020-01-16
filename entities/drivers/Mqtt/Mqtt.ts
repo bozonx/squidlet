@@ -43,6 +43,7 @@ export class Mqtt extends DriverBase<MqttProps> {
 
     this.connectionManager = new IoConnectionManager(this.context, {
       open: () => this.mqttIo.newConnection(this.props.url, omitObj(this.props, 'url')),
+      close: (connectionId: string) => this.mqttIo.close(connectionId),
       removeListener: (handlerIndex: number) => this.mqttIo.removeListener(handlerIndex),
     });
   }
@@ -141,7 +142,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     this.messageEvents.emit(topic, preparedData);
   }
 
-  private handleEnd = () => {
+  private handleClose = () => {
     // TODO: add
     // TODO: remove old events
     this.listenIoEvents()
@@ -157,7 +158,7 @@ export class Mqtt extends DriverBase<MqttProps> {
     return this.connectionManager.registerListeners([
       (connectionId: string) => this.mqttIo.onMessage(connectionId, this.handleIncomeMessage),
       (connectionId: string) => this.mqttIo.onDisconnect(connectionId, this.connectionManager.handleDisconnect),
-      (connectionId: string) => this.mqttIo.onEnd(connectionId, this.handleEnd),
+      (connectionId: string) => this.mqttIo.onClose(connectionId, this.handleClose),
       (connectionId: string) => this.mqttIo.onConnect(connectionId, this.connectionManager.handleConnect),
       (connectionId: string) => this.mqttIo.onError(connectionId, (error: string) => {
         this.log.error(`Mqtt driver. Connection id "${connectionId}": ${error}`);

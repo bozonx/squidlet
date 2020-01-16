@@ -57,7 +57,7 @@ export default interface MqttIo extends IoItem {
   /**
    * Close connection and remove connectionId
    */
-  end(connectionId: string, force?: boolean): Promise<void>;
+  close(connectionId: string, force?: boolean): Promise<void>;
   isConnected(connectionId: string): Promise<boolean>;
   isDisconnecting(connectionId: string): Promise<boolean>;
   isDisconnected(connectionId: string): Promise<boolean>;
@@ -78,7 +78,7 @@ export default interface MqttIo extends IoItem {
   /**
    * Means connection closed and connectionId is removed.
    */
-  onEnd(connectionId: string, cb: () => void): Promise<number>;
+  onClose(connectionId: string, cb: () => void): Promise<number>;
 
   /**
    * Listen all the subscribed messages.
