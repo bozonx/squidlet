@@ -34,8 +34,13 @@ export default class IoConnectionManager {
   }
 
   get isConnected(): boolean {
-    return this._isConnected;
+    return this.openPromised.isResolved();
   }
+
+  get isConnecting(): boolean {
+    return this.sender.isInProcess(CONNECTION_SENDER_ID);
+  }
+
 
   private readonly context: Context;
   private readonly controlledIo: ControlledIo;
@@ -44,7 +49,6 @@ export default class IoConnectionManager {
   private listeners: ((connectionId: string) => Promise<number>)[] = [];
   private handlersIndexes: number[] = [];
   private _connectionId?: string;
-  private _isConnected: boolean = false;
 
 
   constructor(context: Context, controlledIo: ControlledIo) {
@@ -90,7 +94,6 @@ export default class IoConnectionManager {
 
     this.openPromised.resolve();
 
-    this._isConnected = true;
 
     // TODO: остановить попытки переконнекта
   }
@@ -102,7 +105,6 @@ export default class IoConnectionManager {
     }
     // make new open promise
     this.openPromised = new Promised<void>();
-    this._isConnected = false;
 
     // TODO: остановить попытки переконнекта (или начать заного)
   }
@@ -116,70 +118,68 @@ export default class IoConnectionManager {
     catch (e) {
       if (!this.isLostConnectError(e)) throw e;
 
-      // TODO: connect once and try again
+      if (this.isConnecting) {
+        // if there is a connection tries - wait for 20 sec while connection is established
+        await this.connectedPromise;
+      }
+      else if (!this.isConnected) {
+        this._connectionId = await this.sender.send(CONNECTION_SENDER_ID, () => this.controlledIo.open());
 
-      return await cb(this.connectionId);
+        this.handleConnectionSuccess();
+      }
+      // if connection is established just do request
+      return cb(this.connectionId);
     }
   }
 
 
   private async establishNewConnection(): Promise<void> {
-    if (this.connectionId) {
-      try {
-        await this.removeIoListeners();
-      }
-      catch (e) {
-        // error tolerant
-        this.context.log.warn(e);
-      }
-
-      try {
-        this.controlledIo.close(this.connectionId);
-      }
-      catch (e) {
-        // error tolerant
-        this.context.log.warn(e);
-      }
-    }
-
     // if connection request is in progress - do nothing
-    if (this.sender.isInProcess(CONNECTION_SENDER_ID)) return;
+    if (this.isConnecting) return;
+
+    await this.finishOldConnection();
 
     if (this.openPromised.isFulfilled()) {
       this.openPromised = new Promised<void>();
     }
 
-    this._isConnected = false;
-
     try {
+      // try to send during 20 seconds
       this._connectionId = await this.sender.send(CONNECTION_SENDER_ID, () => this.controlledIo.open());
     }
     catch (e) {
       // it'll be called after whole cycle of reconnection
       this.context.log.error(e);
-
-      if (!this.openPromised.isFulfilled()) {
-        this.openPromised.reject(new Error(`ConnectionManager: can't connect`));
-      }
-
-      this.openPromised = new Promised<void>();
-
-      // TODO: test that it'll be false on reconnect
-      if (this.sender.isInProcess(CONNECTION_SENDER_ID)) {
-        throw new Error(`Sender process hasn't been done`);
-      }
-
-      // start again
-      this.establishNewConnection()
-        .catch(this.context.log.error);
+      this.handleConnectionTryFail();
 
       return;
     }
 
-    this._isConnected = true;
+    this.handleConnectionSuccess();
+  }
 
+  private handleConnectionSuccess() {
     this.openPromised.resolve();
-    this.sendHandlers();
+    // TODO: review - если не получилось подписаться
+    this.sendHandlers()
+      .catch(this.context.log.error);
+  }
+
+  private handleConnectionTryFail() {
+    if (!this.openPromised.isFulfilled()) {
+      this.openPromised.reject(new Error(`ConnectionManager: can't connect`));
+    }
+
+    this.openPromised = new Promised<void>();
+
+    // TODO: test that it'll be false on reconnect
+    if (this.sender.isInProcess(CONNECTION_SENDER_ID)) {
+      throw new Error(`Sender process hasn't been done`);
+    }
+
+    // start again
+    this.establishNewConnection()
+      .catch(this.context.log.error);
   }
 
   private async sendHandlers() {
@@ -213,6 +213,26 @@ export default class IoConnectionManager {
     }
 
     return Boolean(String(e).match(new RegExp(`code ${ERROR_CODES.connectionIdLost}`, 'i')));
+  }
+
+  private async finishOldConnection() {
+    if (!this.connectionId) return;
+
+    try {
+      await this.removeIoListeners();
+    }
+    catch (e) {
+      // error tolerant
+      this.context.log.warn(e);
+    }
+
+    try {
+      await this.controlledIo.close(this.connectionId);
+    }
+    catch (e) {
+      // error tolerant
+      this.context.log.warn(e);
+    }
   }
 
 }

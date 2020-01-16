@@ -19,6 +19,10 @@ import {convertBufferToUint8Array} from 'system/lib/buffer';
 //   };
 // }
 
+// TODO: add special errors on lost connection
+// TODO: может определять старые зависшие соединения - по таймауту последнего использования например -
+//       тогда если соединение оборвется то в connection manager оно всеравно создастся заного.
+
 
 /**
  * The same for rpi and x86
