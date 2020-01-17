@@ -51,11 +51,6 @@ export default interface MqttIo extends IoItem {
   newConnection(url: string, options: MqttOptions): Promise<string>;
 
   /**
-   * Reconnect manually. It doesn't change the connectionId.
-   */
-  reConnect(connectionId: string): Promise<void>;
-
-  /**
    * Close connection and remove connectionId
    */
   close(connectionId: string, force?: boolean): Promise<void>;
@@ -97,4 +92,11 @@ export default interface MqttIo extends IoItem {
    */
   subscribe(connectionId: string, topic: string): Promise<void>;
   unsubscribe(connectionId: string, topic: string): Promise<void>;
+
+
+  // /**
+  //  * Reconnect manually. It doesn't change the connectionId.
+  //  */
+  // reConnect(connectionId: string): Promise<void>;
+
 }

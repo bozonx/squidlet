@@ -9,6 +9,7 @@ import MqttIo, {MqttOptions, MqttIoEvents} from 'system/interfaces/io/MqttIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import {CError} from '../../../system/lib/CError';
 
 
 //type MqttContentTypes = 'string' | 'binary';
@@ -50,19 +51,11 @@ export default class Mqtt implements MqttIo {
 
     this.connections.push( this.connectToServer(connectionId, url, options) );
 
+    // TODO: похоже по логике тут нужно ожидать события onConnect ???
     // TODO: поднять событие как только будет подписка на событие onConnect.
     //       либо это событие не поднимать в начале только на reconnect
 
-    // TODO: если после создания connectionId не навешалось ни одного события -
-    //       то можно его удалить через 120 сек
-
     return connectionId;
-  }
-
-  async reConnect(connectionId: string): Promise<void> {
-    if (!this.connections[Number(connectionId)]) return;
-
-    this.connections[Number(connectionId)].reconnect();
   }
 
   async close(connectionId: string, force: boolean = false): Promise<void> {
@@ -94,7 +87,6 @@ export default class Mqtt implements MqttIo {
     return this.events.addListener(this.makeEventName(MqttIoEvents.connect, connectionId), cb);
   }
 
-  // TODO: только когда удаляем connectionId и закрываем соединение
   async onClose(connectionId: string, cb: () => void): Promise<number> {
     return this.events.addListener(this.makeEventName(MqttIoEvents.close, connectionId), cb);
   }
@@ -117,7 +109,7 @@ export default class Mqtt implements MqttIo {
 
   async publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void> {
     if (!this.connections[Number(connectionId)]) {
-      throw new Error(`Mqtt.publish: code 1001: No connection "${connectionId}"`);
+      throw new CError(1001, `Mqtt.publish: No connection "${connectionId}"`);
     }
 
     //let contentType: MqttContentTypes;
@@ -150,7 +142,7 @@ export default class Mqtt implements MqttIo {
 
   subscribe(connectionId: string, topic: string): Promise<void> {
     if (!this.connections[Number(connectionId)]) {
-      throw new Error(`Mqtt.subscribe: There isn't a connection "${connectionId}"`);
+      throw new CError(1001, `Mqtt.subscribe: No connection "${connectionId}"`);
     }
 
     const client = this.connections[Number(connectionId)];
@@ -160,7 +152,7 @@ export default class Mqtt implements MqttIo {
 
   unsubscribe(connectionId: string, topic: string): Promise<void> {
     if (!this.connections[Number(connectionId)]) {
-      throw new Error(`Mqtt.unsubscribe: There isn't a connection "${connectionId}"`);
+      throw new CError(1001, `Mqtt.unsubscribe: No connection "${connectionId}"`);
     }
 
     const client = this.connections[Number(connectionId)];
@@ -183,6 +175,7 @@ export default class Mqtt implements MqttIo {
     connection.on('connect',() =>
       this.events.emit(this.makeEventName(MqttIoEvents.connect, connectionId))
     );
+    // TODO: только когда удаляем connectionId и закрываем соединение
     connection.on('close',
       () => this.events.emit(this.makeEventName(MqttIoEvents.close, connectionId)));
 
@@ -219,3 +212,11 @@ export default class Mqtt implements MqttIo {
   }
 
 }
+
+
+// TODO: наверноене нужно -  при потере соединения просто делать close и заного соединяться
+// async reConnect(connectionId: string): Promise<void> {
+//   if (!this.connections[Number(connectionId)]) return;
+//
+//   this.connections[Number(connectionId)].reconnect();
+// }

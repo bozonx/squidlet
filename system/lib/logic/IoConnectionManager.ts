@@ -1,17 +1,13 @@
 import Promised from '../Promised';
 import Context from '../../Context';
 import Sender from '../Sender';
+import {CError} from '../CError';
 
 
 interface ControlledIo {
   open: () => Promise<string>;
   close: (connectionId: string) => Promise<void>;
   removeListener: (handlerIndex: number) => Promise<void>;
-}
-
-export interface IoError extends Error {
-  code: number;
-  message: string;
 }
 
 const CONNECTION_SENDER_ID = 'IoCm.connection';
@@ -207,7 +203,7 @@ export default class IoConnectionManager {
     return Promise.all(promises);
   }
 
-  private isLostConnectError(e: Error | IoError) {
+  private isLostConnectError(e: Error | CError) {
     if (typeof e === 'object' && 'code' in e) {
       return e.code === ERROR_CODES.connectionIdLost;
     }
