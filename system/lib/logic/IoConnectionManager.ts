@@ -16,7 +16,7 @@ export interface IoError extends Error {
 
 const CONNECTION_SENDER_ID = 'IoCm.connection';
 enum ERROR_CODES {
-  connectionIdLost= 1001,
+  connectionIdLost = 1001,
 }
 
 

@@ -25,6 +25,7 @@ export const Methods = [
 //export type MqttIoEvents = 'open' | 'close' | 'message' | 'error';
 export enum MqttIoEvents {
   connect,
+  disconnect,
   close,
   message,
   error

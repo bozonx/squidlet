@@ -22,6 +22,8 @@ import {convertBufferToUint8Array} from 'system/lib/buffer';
 // TODO: add special errors on lost connection
 // TODO: может определять старые зависшие соединения - по таймауту последнего использования например -
 //       тогда если соединение оборвется то в connection manager оно всеравно создастся заного.
+// TODO: подумать что будет с навешанными событиями через Remotecall ??? при потере соединения
+//       обработчики всеравно останутся и нельзя гарантированно сказать что обработчики уже не нужны
 
 
 /**
@@ -98,7 +100,7 @@ export default class Mqtt implements MqttIo {
   }
 
   async onDisconnect(connectionId: string, cb: () => void): Promise<number> {
-    // TODO: add
+    return this.events.addListener(this.makeEventName(MqttIoEvents.disconnect, connectionId), cb);
   }
 
   async onMessage(connectionId: string, cb: (topic: string, data: Uint8Array) => void): Promise<number> {
@@ -184,6 +186,8 @@ export default class Mqtt implements MqttIo {
     connection.on('close',
       () => this.events.emit(this.makeEventName(MqttIoEvents.close, connectionId)));
 
+    // TODO: add on disconnect event - MqttIoEvents.disconnect
+
     return connection;
   }
 
@@ -211,7 +215,7 @@ export default class Mqtt implements MqttIo {
   }
 
   private makeEventName(eventNum: MqttIoEvents, connectionId: string): string {
-    return `${eventNum}-${connectionId}`
+    return `${eventNum}-${connectionId}`;
   }
 
 }
