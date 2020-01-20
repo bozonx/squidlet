@@ -1,24 +1,23 @@
 // need to decrease of memory usage
-import IndexedEvents from '../../../system/lib/IndexedEvents';
-
-require('mqtt-packet').writeToStream.cacheNumbers = false;
-
 import * as mqtt from 'mqtt';
 
-import MqttIo, {MqttOptions, MqttIoEvents} from 'system/interfaces/io/MqttIo';
+import MqttIo, {MqttIoEvents, MqttOptions} from 'system/interfaces/io/MqttIo';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
-import {CError} from '../../../system/lib/CError';
+import {CError} from 'system/lib/CError';
+import {MqttClient} from 'mqtt/types/lib/client';
+
+require('mqtt-packet').writeToStream.cacheNumbers = false;
 
 
 //type MqttContentTypes = 'string' | 'binary';
 
-// interface MqttPacket {
-//   properties: {
-//     contentType: MqttContentTypes;
-//   };
-// }
+interface MqttPacket {
+  // properties: {
+  //   contentType: MqttContentTypes;
+  // };
+}
 
 // TODO: add special errors on lost connection
 // TODO: может определять старые зависшие соединения - по таймауту последнего использования например -
@@ -26,12 +25,15 @@ import {CError} from '../../../system/lib/CError';
 // TODO: подумать что будет с навешанными событиями через Remotecall ??? при потере соединения
 //       обработчики всеравно останутся и нельзя гарантированно сказать что обработчики уже не нужны
 
+const TIMEOUT_OF_CONNECTION_SEC = 20;
+
 
 /**
  * The same for rpi and x86
  */
 export default class Mqtt implements MqttIo {
   private readonly events = new IndexedEventEmitter();
+  // TODO: лучше делать объект так как connectionId могут множиться ключи это hex бесконечного индекса
   private readonly connections: mqtt.MqttClient[] = [];
 
 
@@ -45,23 +47,40 @@ export default class Mqtt implements MqttIo {
     }
   }
 
+  // async init() {
+  // }
+
 
   async newConnection(url: string, options: MqttOptions): Promise<string> {
     const connectionId = String(this.connections.length);
 
-    this.connections.push( this.connectToServer(connectionId, url, options) );
+    return new Promise<string>((resolve, reject) => {
+      try {
+        this.connectToServer(connectionId, url, options);
+      }
+      catch (e) {
+        return reject(e);
+      }
 
-    // TODO: похоже по логике тут нужно ожидать события onConnect ???
-    // TODO: поднять событие как только будет подписка на событие onConnect.
-    //       либо это событие не поднимать в начале только на reconnect
+      let handlerIndex: number;
+      const connectionTimeout = setTimeout(() => {
+        this.events.removeListener(handlerIndex);
+        reject(`Timeout of connection has been exceeded`);
+      }, TIMEOUT_OF_CONNECTION_SEC * 1000);
 
-    return connectionId;
+      handlerIndex = this.events.once(this.makeEventName(MqttIoEvents.connect, connectionId), () => {
+        clearTimeout(connectionTimeout);
+        resolve(connectionId);
+      });
+    });
   }
 
   async close(connectionId: string, force: boolean = false): Promise<void> {
     if (!this.connections[Number(connectionId)]) return;
 
     const client = this.connections[Number(connectionId)];
+
+    // TODO: удалить все хэндлеры и connectionId
 
     return callPromised(client.end.bind(client), force);
   }
@@ -161,27 +180,37 @@ export default class Mqtt implements MqttIo {
   }
 
 
-  private connectToServer(connectionId: string, url: string, options: MqttOptions): mqtt.MqttClient {
-    const connection = mqtt.connect(url, options);
+  private connectToServer(connectionId: string, url: string, options: MqttOptions) {
+    const client: mqtt.MqttClient = mqtt.connect(url, options);
 
-    //connection.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
-    connection.on('message', (topic: string, data: Buffer) => {
+    this.connections.push(client);
+
+    client.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
       //const contentType: string | undefined = packet.properties && packet.properties.contentType;
       this.handleIncomeMessage(connectionId, topic, data);
     });
-    connection.on('error', (err: Error) =>
+    client.on('error', (err: Error) =>
       this.events.emit(this.makeEventName(MqttIoEvents.error, connectionId), String(err))
     );
-    connection.on('connect',() =>
+    client.on('connect',() =>
       this.events.emit(this.makeEventName(MqttIoEvents.connect, connectionId))
     );
+    client.on('close', () => this.handleClose(connectionId));
+    client.on('disconnect', (packet: MqttPacket) => this.handleDisconnect(connectionId, packet));
+    // Other interesting events: offline, reconnect
+  }
+
+  private handleClose = (connectionId: string) => {
     // TODO: только когда удаляем connectionId и закрываем соединение
-    connection.on('close',
-      () => this.events.emit(this.makeEventName(MqttIoEvents.close, connectionId)));
+
+    // TODO: удалить все хэндлеры и connectionId
+
+    this.events.emit(this.makeEventName(MqttIoEvents.close, connectionId));
+  }
+
+  private handleDisconnect = (connectionId: string, packet: MqttPacket) => {
 
     // TODO: add on disconnect event - MqttIoEvents.disconnect
-
-    return connection;
   }
 
   /**
