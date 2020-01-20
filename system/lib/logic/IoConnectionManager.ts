@@ -79,7 +79,7 @@ export default class IoConnectionManager {
       .catch(this.context.log.error);
   }
 
-  async registerListeners(listeners: ((connectionId: string) => Promise<number>)[]) {
+  registerListeners(listeners: ((connectionId: string) => Promise<number>)[]) {
     this.listeners = listeners;
   }
 
@@ -102,6 +102,13 @@ export default class IoConnectionManager {
     this.openPromised = new Promised<void>();
 
     // TODO: остановить попытки переконнекта (или начать заного)
+  }
+
+  handleClose = () => {
+    // TODO: add
+    // TODO: remove old events
+    // this.listenIoEvents()
+    //   .catch(this.log.error);
   }
 
   async doRequest<T>(cb: (connectionId: string) => Promise<T>): Promise<T> {

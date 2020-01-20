@@ -26,12 +26,6 @@ enum CONNECTION_POSITION {
   events,
 }
 
-// TODO: add special errors on lost connection
-// TODO: может определять старые зависшие соединения - по таймауту последнего использования например -
-//       тогда если соединение оборвется то в connection manager оно всеравно создастся заного.
-// TODO: подумать что будет с навешанными событиями через Remotecall ??? при потере соединения
-//       обработчики всеравно останутся и нельзя гарантированно сказать что обработчики уже не нужны
-
 const TIMEOUT_OF_CONNECTION_SEC = 20;
 // TODO: use infinity counter
 let connectionCounter: number = 0;
@@ -76,7 +70,7 @@ export default class Mqtt implements MqttIo {
       }, TIMEOUT_OF_CONNECTION_SEC * 1000);
 
       handlerIndex = this.connections[connectionId][CONNECTION_POSITION.events].once(
-        this.makeEventName(MqttIoEvents.connect, connectionId),
+        MqttIoEvents.connect,
         () => {
           clearTimeout(connectionTimeout);
           resolve(connectionId);
@@ -212,11 +206,11 @@ export default class Mqtt implements MqttIo {
     });
     client.on('error', (err: Error) =>
       this.connections[connectionId][CONNECTION_POSITION.events]
-        .emit(this.makeEventName(MqttIoEvents.error, connectionId), String(err))
+        .emit(MqttIoEvents.error, String(err))
     );
     client.on('connect',() =>
       this.connections[connectionId][CONNECTION_POSITION.events]
-        .emit(this.makeEventName(MqttIoEvents.connect, connectionId))
+        .emit(MqttIoEvents.connect)
     );
     client.on('close', () => this.handleClose(connectionId));
     client.on('disconnect', (packet: MqttPacket) => this.handleDisconnect(connectionId, packet));
@@ -257,11 +251,7 @@ export default class Mqtt implements MqttIo {
     // }
 
     this.connections[connectionId][CONNECTION_POSITION.events]
-      .emit(this.makeEventName(MqttIoEvents.message, connectionId), topic, preparedData);
-  }
-
-  private makeEventName(eventNum: MqttIoEvents, connectionId: string): string {
-    return `${eventNum}-${connectionId}`;
+      .emit(MqttIoEvents.message, topic, preparedData);
   }
 
   private makeConnectionId(): string {
