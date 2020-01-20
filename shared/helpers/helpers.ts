@@ -47,7 +47,7 @@ export function getFileNameOfPath(pathToIo: string): string {
 }
 
 export function resolvePlatformDir(platform: Platforms): string {
-  return path.join(REPO_ROOT, platform);
+  return path.join(REPO_ROOT, 'platforms', platform);
 }
 
 export function loadMachineConfigInPlatformDir(os: Os, platformDir: string, machine: string): MachineConfig {
