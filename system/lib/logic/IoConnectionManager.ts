@@ -7,7 +7,7 @@ import {CError} from '../CError';
 interface ControlledIo {
   open: () => Promise<string>;
   close: (connectionId: string) => Promise<void>;
-  removeListener: (handlerIndex: number) => Promise<void>;
+  removeListener: (connectionId: string, handlerIndex: number) => Promise<void>;
 }
 
 const CONNECTION_SENDER_ID = 'IoCm.connection';
@@ -89,7 +89,6 @@ export default class IoConnectionManager {
     }
 
     this.openPromised.resolve();
-
 
     // TODO: остановить попытки переконнекта
   }
@@ -193,11 +192,13 @@ export default class IoConnectionManager {
   }
 
   private async removeIoListeners() {
+    if (!this.connectionId) return;
+
     const promises: Promise<void>[] = [];
 
     // remove old events if exist
     for (let handlerIndex of this.handlersIndexes) {
-      promises.push(this.controlledIo.removeListener(handlerIndex));
+      promises.push(this.controlledIo.removeListener(this.connectionId, handlerIndex));
     }
 
     return Promise.all(promises);

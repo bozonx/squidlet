@@ -6,7 +6,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {callPromised} from 'system/lib/common';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
 import {CError} from 'system/lib/CError';
-import {MqttClient} from 'mqtt/types/lib/client';
+import IoContext from 'system/interfaces/IoContext';
 
 require('mqtt-packet').writeToStream.cacheNumbers = false;
 
@@ -19,6 +19,13 @@ interface MqttPacket {
   // };
 }
 
+type ConnectionItem = [mqtt.MqttClient, IndexedEventEmitter];
+
+enum CONNECTION_POSITION {
+  client,
+  events,
+}
+
 // TODO: add special errors on lost connection
 // TODO: может определять старые зависшие соединения - по таймауту последнего использования например -
 //       тогда если соединение оборвется то в connection manager оно всеравно создастся заного.
@@ -26,33 +33,32 @@ interface MqttPacket {
 //       обработчики всеравно останутся и нельзя гарантированно сказать что обработчики уже не нужны
 
 const TIMEOUT_OF_CONNECTION_SEC = 20;
+// TODO: use infinity counter
+let connectionCounter: number = 0;
 
 
 /**
  * The same for rpi and x86
  */
 export default class Mqtt implements MqttIo {
-  private readonly events = new IndexedEventEmitter();
-  // TODO: лучше делать объект так как connectionId могут множиться ключи это hex бесконечного индекса
-  private readonly connections: mqtt.MqttClient[] = [];
+  private ioContext?: IoContext;
+  private readonly connections: Record<string, ConnectionItem> = {};
 
+
+  async init(ioContext: IoContext) {
+    this.ioContext = ioContext;
+  }
 
   async destroy() {
-    this.events.destroy();
-
-    for (let connectionId in this.connections) {
-      await this.close(connectionId);
-
-      // TODO: наверное поднять события onEnd
+    for (let connectionId of Object.keys(this.connections)) {
+      this.close(connectionId)
+        .catch(this.ioContext && this.ioContext.log.error);
     }
   }
 
-  // async init() {
-  // }
-
 
   async newConnection(url: string, options: MqttOptions): Promise<string> {
-    const connectionId = String(this.connections.length);
+    const connectionId = this.makeConnectionId();
 
     return new Promise<string>((resolve, reject) => {
       try {
@@ -64,70 +70,87 @@ export default class Mqtt implements MqttIo {
 
       let handlerIndex: number;
       const connectionTimeout = setTimeout(() => {
-        this.events.removeListener(handlerIndex);
+        this.connections[connectionId][CONNECTION_POSITION.events].removeListener(handlerIndex);
+        this.close(connectionId);
         reject(`Timeout of connection has been exceeded`);
       }, TIMEOUT_OF_CONNECTION_SEC * 1000);
 
-      handlerIndex = this.events.once(this.makeEventName(MqttIoEvents.connect, connectionId), () => {
-        clearTimeout(connectionTimeout);
-        resolve(connectionId);
-      });
+      handlerIndex = this.connections[connectionId][CONNECTION_POSITION.events].once(
+        this.makeEventName(MqttIoEvents.connect, connectionId),
+        () => {
+          clearTimeout(connectionTimeout);
+          resolve(connectionId);
+        }
+      );
     });
   }
 
   async close(connectionId: string, force: boolean = false): Promise<void> {
-    if (!this.connections[Number(connectionId)]) return;
+    if (!this.connections[connectionId]) return;
 
-    const client = this.connections[Number(connectionId)];
+    try {
+      this.connections[connectionId][CONNECTION_POSITION.events].destroy();
+    }
+    catch (e) {
+      this.ioContext && this.ioContext.log.error(e);
+    }
 
-    // TODO: удалить все хэндлеры и connectionId
+    const client = this.connections[connectionId][CONNECTION_POSITION.client];
+
+    // TODO: удалить все хэндлеры
 
     return callPromised(client.end.bind(client), force);
   }
 
   async isConnected(connectionId: string): Promise<boolean> {
-    return this.connections[Number(connectionId)].connected;
+    return this.connections[connectionId][CONNECTION_POSITION.client].connected;
   }
 
   async isDisconnecting(connectionId: string): Promise<boolean> {
-    return this.connections[Number(connectionId)].disconnecting;
+    return this.connections[connectionId][CONNECTION_POSITION.client].disconnecting;
   }
 
   async isDisconnected(connectionId: string): Promise<boolean> {
-    return this.connections[Number(connectionId)].disconnected;
+    return this.connections[connectionId][CONNECTION_POSITION.client].disconnected;
   }
 
   async isReconnecting(connectionId: string): Promise<boolean> {
-    return this.connections[Number(connectionId)].reconnecting;
+    return this.connections[connectionId][CONNECTION_POSITION.client].reconnecting;
   }
 
 
   async onConnect(connectionId: string, cb: () => void): Promise<number> {
-    return this.events.addListener(this.makeEventName(MqttIoEvents.connect, connectionId), cb);
+    return this.connections[connectionId][CONNECTION_POSITION.events]
+      .addListener(MqttIoEvents.connect, cb);
   }
 
   async onClose(connectionId: string, cb: () => void): Promise<number> {
-    return this.events.addListener(this.makeEventName(MqttIoEvents.close, connectionId), cb);
+    return this.connections[connectionId][CONNECTION_POSITION.events]
+      .addListener(MqttIoEvents.close, cb);
   }
 
   async onDisconnect(connectionId: string, cb: () => void): Promise<number> {
-    return this.events.addListener(this.makeEventName(MqttIoEvents.disconnect, connectionId), cb);
+    return this.connections[connectionId][CONNECTION_POSITION.events]
+      .addListener(MqttIoEvents.disconnect, cb);
   }
 
   async onMessage(connectionId: string, cb: (topic: string, data: Uint8Array) => void): Promise<number> {
-    return this.events.addListener(this.makeEventName(MqttIoEvents.message, connectionId), cb);
+    return this.connections[connectionId][CONNECTION_POSITION.events]
+      .addListener(MqttIoEvents.message, cb);
   }
 
   async onError(connectionId: string, cb: (err: string) => void): Promise<number> {
-    return this.events.addListener(this.makeEventName(MqttIoEvents.error, connectionId), cb);
+    return this.connections[connectionId][CONNECTION_POSITION.events]
+      .addListener(MqttIoEvents.error, cb);
   }
 
-  async removeListener(handlerId: number): Promise<void> {
-    this.events.removeListener(handlerId);
+  async removeListener(connectionId: string, handlerId: number): Promise<void> {
+    this.connections[connectionId][CONNECTION_POSITION.events]
+      .removeListener(handlerId);
   }
 
   async publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void> {
-    if (!this.connections[Number(connectionId)]) {
+    if (!this.connections[connectionId]) {
       throw new CError(1001, `Mqtt.publish: No connection "${connectionId}"`);
     }
 
@@ -153,28 +176,28 @@ export default class Mqtt implements MqttIo {
     //   }
     // };
 
-    const client = this.connections[Number(connectionId)];
+    const client = this.connections[connectionId][CONNECTION_POSITION.client];
 
     return callPromised(client.publish.bind(client), topic, preparedData);
     //return callPromised(client.publish.bind(client), topic, preparedData, options);
   }
 
   subscribe(connectionId: string, topic: string): Promise<void> {
-    if (!this.connections[Number(connectionId)]) {
+    if (!this.connections[connectionId]) {
       throw new CError(1001, `Mqtt.subscribe: No connection "${connectionId}"`);
     }
 
-    const client = this.connections[Number(connectionId)];
+    const client = this.connections[connectionId][CONNECTION_POSITION.client];
 
     return callPromised(client.subscribe.bind(client), topic);
   }
 
   unsubscribe(connectionId: string, topic: string): Promise<void> {
-    if (!this.connections[Number(connectionId)]) {
+    if (!this.connections[connectionId]) {
       throw new CError(1001, `Mqtt.unsubscribe: No connection "${connectionId}"`);
     }
 
-    const client = this.connections[Number(connectionId)];
+    const client = this.connections[connectionId][CONNECTION_POSITION.client];
 
     return callPromised(client.unsubscribe.bind(client), topic);
   }
@@ -183,34 +206,34 @@ export default class Mqtt implements MqttIo {
   private connectToServer(connectionId: string, url: string, options: MqttOptions) {
     const client: mqtt.MqttClient = mqtt.connect(url, options);
 
-    this.connections.push(client);
-
     client.on('message', (topic: string, data: Buffer, packet: MqttPacket) => {
       //const contentType: string | undefined = packet.properties && packet.properties.contentType;
       this.handleIncomeMessage(connectionId, topic, data);
     });
     client.on('error', (err: Error) =>
-      this.events.emit(this.makeEventName(MqttIoEvents.error, connectionId), String(err))
+      this.connections[connectionId][CONNECTION_POSITION.events]
+        .emit(this.makeEventName(MqttIoEvents.error, connectionId), String(err))
     );
     client.on('connect',() =>
-      this.events.emit(this.makeEventName(MqttIoEvents.connect, connectionId))
+      this.connections[connectionId][CONNECTION_POSITION.events]
+        .emit(this.makeEventName(MqttIoEvents.connect, connectionId))
     );
     client.on('close', () => this.handleClose(connectionId));
     client.on('disconnect', (packet: MqttPacket) => this.handleDisconnect(connectionId, packet));
     // Other interesting events: offline, reconnect
+
+    this.connections[connectionId] = [client, new IndexedEventEmitter()];
   }
 
   private handleClose = (connectionId: string) => {
-    // TODO: только когда удаляем connectionId и закрываем соединение
+    this.connections[connectionId][CONNECTION_POSITION.events].emit(MqttIoEvents.close);
 
-    // TODO: удалить все хэндлеры и connectionId
-
-    this.events.emit(this.makeEventName(MqttIoEvents.close, connectionId));
+    this.close(connectionId)
+      .catch(this.ioContext && this.ioContext.log.error);
   }
 
   private handleDisconnect = (connectionId: string, packet: MqttPacket) => {
-
-    // TODO: add on disconnect event - MqttIoEvents.disconnect
+    this.connections[connectionId][CONNECTION_POSITION.events].emit(MqttIoEvents.disconnect);
   }
 
   /**
@@ -233,11 +256,20 @@ export default class Mqtt implements MqttIo {
     //   preparedData = data.toString();
     // }
 
-    this.events.emit(this.makeEventName(MqttIoEvents.message, connectionId), topic, preparedData);
+    this.connections[connectionId][CONNECTION_POSITION.events]
+      .emit(this.makeEventName(MqttIoEvents.message, connectionId), topic, preparedData);
   }
 
   private makeEventName(eventNum: MqttIoEvents, connectionId: string): string {
     return `${eventNum}-${connectionId}`;
+  }
+
+  private makeConnectionId(): string {
+    const id: string = String(connectionCounter);
+
+    connectionCounter++;
+
+    return id;
   }
 
 }

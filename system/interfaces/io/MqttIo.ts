@@ -2,6 +2,7 @@ import IoItem from '../IoItem';
 
 
 export const Methods = [
+  'init',
   'destroy',
   'newConnection',
   'reConnect',
@@ -82,7 +83,7 @@ export default interface MqttIo extends IoItem {
    */
   onMessage(connectionId: string, cb: (topic: string, data: Uint8Array) => void): Promise<number>;
   onError(connectionId: string, cb: (err: string) => void): Promise<number>;
-  removeListener(handlerId: number): Promise<void>;
+  removeListener(connectionId: string, handlerId: number): Promise<void>;
 
   publish(connectionId: string, topic: string, data: string | Uint8Array): Promise<void>;
 
