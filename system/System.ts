@@ -72,6 +72,9 @@ export default class System {
 
 
   async start() {
+    this.context.log.info(`---> Initializing EnvSet`);
+    await this.envSet.init();
+
     this.context.log.info(`---> Initializing io`);
     await this.ioManager.init();
 

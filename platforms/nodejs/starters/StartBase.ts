@@ -77,8 +77,6 @@ export default abstract class StartBase implements Starter {
     const envSetTmpDir = path.join(this.buildWorkDir, ENV_BUILD_TMP_DIR);
     const {platform, machine} = this.resolvePlatformMachine();
 
-    await this.makeRootDirs();
-
     this._envBuilder = new EnvBuilder(
       this.resolveHostConfig(),
       appEnvSetDir,
@@ -194,11 +192,6 @@ export default abstract class StartBase implements Starter {
     );
   }
 
-  private async makeRootDirs() {
-    await this.os.mkdirP(path.join(this.appWorkDir, systemConfig.rootDirs.envSet));
-    await this.os.mkdirP(path.join(this.appWorkDir, systemConfig.rootDirs.varData));
-    await this.os.mkdirP(path.join(this.appWorkDir, systemConfig.rootDirs.tmp));
-  }
 
   private getOsMachine(): Promise<NodejsMachines> {
     return getOsMachine(this.os);

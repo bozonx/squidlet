@@ -23,6 +23,27 @@ export default class EnvSet {
     this.context = context;
   }
 
+  async init() {
+    // make base dirs if need
+    try {
+      await this.storageIo.mkdir(systemConfig.rootDirs.envSet);
+    }
+    catch (e) {
+    }
+
+    try {
+      await this.storageIo.mkdir(systemConfig.rootDirs.varData);
+    }
+    catch (e) {
+    }
+
+    try {
+      await this.storageIo.mkdir(systemConfig.rootDirs.tmp);
+    }
+    catch (e) {
+    }
+  }
+
 
   /**
    * Get builtin config.
