@@ -19,6 +19,12 @@ export function getAllTheClassMembers(obj: Object, exclude: string[] = []): stri
     '__lookupGetter__',
     '__lookupSetter__',
     '__proto__',
+    'hasOwnProperty',
+    'isPrototypeOf',
+    'propertyIsEnumerable',
+    'toString',
+    'valueOf',
+    'toLocaleString',
     ...exclude
   ];
 

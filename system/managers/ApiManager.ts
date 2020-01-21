@@ -109,7 +109,6 @@ export default class ApiManager {
     this.endPoints[endPointName] = representObject;
   }
 
-  // TODO: check how it works
   /**
    * Get api's method names include namespaces (namespace.methodName)
    */
@@ -117,7 +116,9 @@ export default class ApiManager {
     let result: string[] = getAllTheClassMembers(this.standardApi, ['destroy']);
 
     for (let namespace of Object.keys(this.endPoints)) {
-      result = result.concat(getAllTheClassMembers(this.endPoints[namespace]));
+      result = result.concat(getAllTheClassMembers(this.endPoints[namespace]).map((item: string) => {
+        return `${namespace}/${item}`;
+      }));
     }
 
     return result;

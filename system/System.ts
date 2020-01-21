@@ -72,17 +72,14 @@ export default class System {
 
 
   async start() {
-    this.context.log.info(`---> Initializing EnvSet`);
-    await this.envSet.init();
-
     this.context.log.info(`---> Initializing io`);
     await this.ioManager.init();
 
+    this.context.log.info(`---> Initializing EnvSet`);
+    await this.envSet.init();
+
     this.context.log.info(`---> Initializing context`);
     await this.context.init();
-
-    this.context.log.info(`---> Make file structure`);
-    await this.makeFileStructure();
 
     this.context.log.info(`---> Instantiating entities`);
     await this.driversManager.instantiate();
@@ -127,28 +124,6 @@ export default class System {
     }
     catch (err) {
       this.context.log.error(err);
-    }
-  }
-
-  private async makeFileStructure() {
-    const storage: StorageIo = this.ioManager.getIo<StorageIo>('Storage');
-
-    try {
-      await storage.mkdir(systemConfig.rootDirs.envSet);
-    }
-    catch (e) {
-    }
-
-    try {
-      await storage.mkdir(systemConfig.rootDirs.varData);
-    }
-    catch (e) {
-    }
-
-    try {
-      await storage.mkdir(systemConfig.rootDirs.tmp);
-    }
-    catch (e) {
     }
   }
 
