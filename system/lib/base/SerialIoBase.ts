@@ -158,7 +158,8 @@ export default abstract class SerialIoBase implements SerialIo {
   protected async makePortItem(portNum: number, paramsOverride: SerialParams): Promise<SerialItem> {
     const params: SerialParams = {
       ...defaultSerialParams,
-      ...this.getPreDefinedPortParams()[portNum],
+      // TODO: review
+      //...this.getPreDefinedPortParams()[portNum],
       ...paramsOverride,
     };
 
