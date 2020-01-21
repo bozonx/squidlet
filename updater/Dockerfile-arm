@@ -3,7 +3,7 @@ FROM amd64/node:13.1.0
 COPY build/updater-arm/ app/
 COPY updater/start.js app/start.js
 
-ENV PUID=1000 PGID=1000 LOG_LEVEL="" MQTT_BROKER_HOST="" MQTT_BROKER_PORT="" IOSERVER_MODE=false
+ENV WORK_DIR="/app/data" PUID=1000 PGID=1000 LOG_LEVEL="" MQTT_BROKER_HOST="" MQTT_BROKER_PORT="" IOSERVER_MODE=false
 
 WORKDIR /app
 

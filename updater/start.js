@@ -1,11 +1,12 @@
 const fs = require('fs');
 
-const squidletIndex = '/app/data/envSet/bundle/bundle.js';
-const updaterIndex = '/app/bundle.js';
+const env = process.env;
+const workDir = env.WORK_DIR;
+const squidletIndex = workDir + '/envSet/bundle/bundle.js';
+const updaterIndex = './bundle.js';
 
 let stat;
 let instantiateMain;
-const env = process.env;
 const hostConfigOverride = {
   mqtt: {
     host: env.MQTT_BROKER_HOST || undefined,
@@ -37,7 +38,7 @@ async function start() {
   await main.init();
   await main.configureIoSet(
     (code) => process.exit(code),
-    '/app/data',
+    workDir,
     (env.PUID) ? Number(env.PUID) : undefined,
     (env.PGID) ? Number(env.PGID) : undefined
   );
