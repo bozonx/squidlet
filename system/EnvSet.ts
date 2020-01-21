@@ -25,22 +25,16 @@ export default class EnvSet {
 
   async init() {
     // make base dirs if need
-    try {
+    if (!await this.storageIo.exists(systemConfig.rootDirs.envSet)) {
       await this.storageIo.mkdir(systemConfig.rootDirs.envSet);
     }
-    catch (e) {
-    }
 
-    try {
+    if (!await this.storageIo.exists(systemConfig.rootDirs.varData)) {
       await this.storageIo.mkdir(systemConfig.rootDirs.varData);
     }
-    catch (e) {
-    }
 
-    try {
+    if (!await this.storageIo.exists(systemConfig.rootDirs.tmp)) {
       await this.storageIo.mkdir(systemConfig.rootDirs.tmp);
-    }
-    catch (e) {
     }
   }
 
