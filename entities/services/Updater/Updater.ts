@@ -32,6 +32,8 @@ export default class Updater extends ServiceBase<Props> {
     };
 
     this.context.system.apiManager.registerEndpoint('updater', updaterApi);
+
+    await this.bundleUpdate.init();
   }
 
 }

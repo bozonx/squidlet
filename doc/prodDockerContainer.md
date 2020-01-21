@@ -12,7 +12,7 @@
       -p 8087:8087 \
       -p 8088:8088 \
       -p 8089:8089 \
-      -v path/to/data:/data \
+      -v path/to/data:/app/data \
       -e PUID=1000 \
       -e PGID=1000 \
       -e LOG_LEVEL=info \
@@ -36,7 +36,7 @@
       -p 8087:8087 \
       -p 8088:8088 \
       -p 8089:8089 \
-      -v path/to/data:/data \
+      -v path/to/data:/app/data \
       -e PUID=1000 \
       -e PGID=1000 \
       -e LOG_LEVEL=info \
@@ -49,7 +49,7 @@
       -p 8087:8087 \
       -p 8088:8088 \
       -p 8089:8089 \
-      -v /home/pi/workdirs/squidlet:/data \
+      -v /home/pi/workdirs/squidlet:/app/data \
       -e LOG_LEVEL=debug \
       bozonx/squidlet:rpi
 
