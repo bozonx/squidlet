@@ -166,10 +166,10 @@ export default class IoServer {
     );
     const ioContext: IoContext = this.makeIoContext();
 
-    for (let ioName of Object.keys(this.ioSet.getNames())) {
+    for (let ioName of this.ioSet.getNames()) {
       const ioItem: IoItem = this.ioSet.getIo(ioName);
 
-      if (ioItem.configure) {
+      if (ioItem.configure && ioDefinitions[ioName]) {
         this.log.debug(`configure io "${ioName}" with ${JSON.stringify(ioDefinitions[ioName])}`);
         await ioItem.configure(ioDefinitions[ioName]);
       }
