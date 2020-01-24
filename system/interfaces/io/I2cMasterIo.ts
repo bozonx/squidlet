@@ -36,9 +36,9 @@ export const Methods = [
   'init',
   'configure',
   'destroy',
+  'destroyBus',
   'i2cWriteDevice',
   'i2cReadDevice',
-  'destroyBus',
 ];
 
 
@@ -46,7 +46,9 @@ export default interface I2cMasterIo extends IoItem {
   init(ioContext: IoContext): Promise<void>;
   configure(definition: I2cDefinition): Promise<void>;
   destroy(): Promise<void>;
+
+  destroyBus(busNum: string | number): Promise<void>;
+
   i2cWriteDevice(busNum: string | number | undefined, addrHex: number, data: Uint8Array): Promise<void>;
   i2cReadDevice(busNum: string | number | undefined, addrHex: number, count: number): Promise<Uint8Array>;
-  destroyBus(busNum: string | number): Promise<void>;
 }

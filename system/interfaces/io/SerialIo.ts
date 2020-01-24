@@ -52,7 +52,6 @@ export const Methods = [
   'configure',
   'destroy',
 
-  //'newPort',
   'destroyPort',
 
   'onData',
@@ -79,18 +78,14 @@ export default interface SerialIo extends IoItem {
   configure(definition: SerialDefinition): Promise<void>;
   destroy(): Promise<void>;
 
-  // /**
-  //  * Create a new port and wait while it opens.
-  //  * If you don't specify a portNum then a new one will be created and this number will be returned.
-  //  */
-  // newPort(portNum: number | undefined, paramsOverride: SerialParams): Promise<number>;
-
   destroyPort(portNum: string | number): Promise<void>;
 
+  // TODO: if ioServer is restarted then it will lost handlers
   onData(portNum: string | number, handler: SerialMessageHandler): Promise<number>;
   onError(portNum: string | number, handler: (err: string) => void): Promise<number>;
   removeListener(portNum: string | number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
 
+  // TODO: maybe add undefined to resolve default port
   // write binary data
   write(portNum: string | number, data: Uint8Array): Promise<void>;
   // Print to the serial port - without a line break

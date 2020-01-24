@@ -1,6 +1,6 @@
 import * as rollup from 'rollup';
 import {ModuleFormat, OutputOptions, RollupOptions} from 'rollup';
-import * as sourceMaps from 'rollup-plugin-sourcemaps';
+import sourceMaps from 'rollup-plugin-sourcemaps';
 import * as json from 'rollup-plugin-json';
 import { terser } from 'rollup-plugin-terser';
 
