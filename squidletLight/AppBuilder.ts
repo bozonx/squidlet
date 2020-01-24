@@ -18,6 +18,7 @@ import {
 import LogLevel from '../system/interfaces/LogLevel';
 import {ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../shared/constants';
 import {BUNDLE_FILE_NAME, BUNDLE_SUM_FILE_NAME} from '../entities/services/Updater/BundleUpdate';
+import GroupConfigParser from '../shared/helpers/GroupConfigParser';
 
 const squidletPackageJson = require('../package.json');
 
@@ -39,17 +40,24 @@ export default class AppBuilder {
   private readonly outputDir: string;
   private readonly platform: Platforms;
   private readonly machine: string;
+  private readonly hostName?: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
   private readonly ioServer?: boolean;
   private readonly os: Os = new Os();
-  private readonly envBuilder: EnvBuilder;
+  private readonly groupConfig: GroupConfigParser;
+  private _envBuilder?: EnvBuilder;
+
+  private get envBuilder(): EnvBuilder {
+    return this._envBuilder as any;
+  }
 
 
   constructor(
     platform: Platforms,
     machine: string,
     hostConfigPath: string,
+    hostName?: string,
     argOutputDir?: string,
     minimize: boolean = true,
     logLevel?: LogLevel,
@@ -61,14 +69,21 @@ export default class AppBuilder {
     this.outputDir = resolveOutputDir(workDir, argOutputDir);
     this.platform = platform;
     this.machine = machine;
+    this.hostName = hostName;
     this.minimize = minimize;
     this.logLevel = logLevel;
     this.ioServer = ioServer;
+    this.groupConfig = new GroupConfigParser(this.os, hostConfigPath);
+
+  }
+
+  async init() {
+    await this.groupConfig.init();
 
     const envBuilderTmpDir = path.join(this.tmpDir, ENV_BUILD_TMP_DIR);
 
-    this.envBuilder = new EnvBuilder(
-      hostConfigPath,
+    this._envBuilder = new EnvBuilder(
+      this.groupConfig.getHostConfig(this.hostName),
       this.tmpDir,
       envBuilderTmpDir,
       this.platform,
@@ -77,7 +92,7 @@ export default class AppBuilder {
   }
 
 
-  async build() {
+  build = async () => {
     await this.os.rimraf(`${this.outputDir}/*`);
     await this.os.rimraf(`${this.tmpDir}/*`);
     await this.os.mkdirP(this.outputDir);

@@ -16,6 +16,7 @@ Required params:
 
 Optional Params:
 
+* --name uses only if group config is specified and selects a host config from group config
 * --output-dir - path to output dir where `bundle.js`m `bundle.sum` and `package.json` will be placed
 * --minimize=true - default is true
 * --io-server=false - build IO server standalone instead of full app. Default is false

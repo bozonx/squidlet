@@ -12,7 +12,7 @@ import {JsonTypes} from '../../system/interfaces/Types';
 import {HttpResponse} from '../../system/interfaces/Http';
 
 
-const httpApiManifestPath = path.resolve(__dirname, '../entities/services/HttpApi/manifest.yaml');
+const httpApiManifestPath = path.resolve(__dirname, '../../entities/services/HttpApi/manifest.yaml');
 const httpClientIo = new HttpClient();
 
 

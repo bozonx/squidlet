@@ -80,12 +80,14 @@ export default class CommandUpdate {
       platform,
       machine,
       this.hostConfigPath,
+      this.args.name,
       undefined,
       this.args.minimize !== 'false',
       undefined,
       this.args.ioServer === 'true',
     );
 
+    await builder.init();
     await builder.build();
   }
 

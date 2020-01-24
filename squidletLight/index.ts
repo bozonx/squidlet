@@ -12,6 +12,7 @@ const IO_SERVER_DEFAULT_HOST_CONFIG_PATH = path.join(__dirname, 'ioServerHostCon
 const argOutputDir = yargs.argv.outputDir as string | undefined;
 const platform = yargs.argv.platform as Platforms | undefined;
 const machine = yargs.argv.machine as string | undefined;
+const name = yargs.argv.name as string | undefined;
 const minimize = yargs.argv.minimize !== 'false';
 const logLevel = yargs.argv.logLevel as LogLevel | undefined;
 const ioServer = yargs.argv.ioServer === 'true';
@@ -35,11 +36,13 @@ const builder = new AppBuilder(
   platform,
   machine,
   hostConfigPath || IO_SERVER_DEFAULT_HOST_CONFIG_PATH,
+  name,
   argOutputDir,
   minimize,
   logLevel,
   ioServer
 );
 
-builder.build()
+builder.init()
+  .then(builder.build)
   .catch(consoleError);

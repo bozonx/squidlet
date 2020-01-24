@@ -12,6 +12,7 @@ Params:
   which will be uploaded to the host.
 * --host - set remote host
 * --port - set remote port. Is isn't set - default will be used
+* --name uses only if group config is specified and selects a host config from group config
 * --minimize=true - should minimize the bundle or not. Default is true
 * --io-server=false - build IO server instead of ordinary app
 * --log-level - Set builtin log level for logger. debug|info|warn|error. By default not set.
@@ -81,8 +82,7 @@ Config is optional, if it does not includes io definitions you don't have to spe
 * --machine can be x86, arm or rpi. It tries recognize it automatically if this argument isn't set
 * --prod=true - if set production version will be used instead. By default is development.
 * --work-dir - set working dir for host where envset, data and tmp dirs will be placed.
-* --name uses only if group config is specified
-  and selects a host config from group config
+* --name uses only if group config is specified and selects a host config from group config
 * --log-level - log level which will be used. It overrides a log level specified in a host config.
 * --user - owner of files which will be written. It can be a user name or uid. It is optional
 * --group - group of files which will be written, It can be a group name or uid. It is optional
