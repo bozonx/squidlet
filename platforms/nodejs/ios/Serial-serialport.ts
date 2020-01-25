@@ -3,60 +3,66 @@ import {OpenOptions} from 'serialport';
 
 import SerialIo, {SerialParams, SerialPortLike} from 'system/interfaces/io/SerialIo';
 import {omitObj} from 'system/lib/objects';
-import {SERVER_STARTING_TIMEOUT_SEC} from 'system/constants';
 import SerialIoBase from 'system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
+import {callPromised} from 'system/lib/common';
 
 
 export default class Serial extends SerialIoBase implements SerialIo {
-  protected createConnection(portNum: number, params: SerialParams): Promise<SerialPortLike> {
-    return new Promise<SerialPortLike>((resolve, reject) => {
-      if (!params.dev) {
-        throw new Error(
-          `Params of serial port ${portNum} has to have a "dev" parameter ` +
-          `which points to serial device`
-        );
+  protected async createConnection(portNum: number | string, params: SerialParams): Promise<SerialPortLike> {
+    if (!params.dev) {
+      throw new Error(
+        `Params of serial port ${portNum} has to have a "dev" parameter ` +
+        `which points to serial device`
+      );
+    }
+
+    // pick options. baudRate has the same name
+    const options: OpenOptions = omitObj(params, 'dev', 'pinRX', 'pinTX');
+    const serialPort: SerialPort = new SerialPort(params.dev, options);
+
+    return {
+      write(data: any, encode?: string): Promise<void> {
+        const bufer: Buffer = Buffer.from(data);
+
+        return callPromised(serialPort.write, bufer, encode);
+      },
+      close(): Promise<void> {
+        return callPromised(serialPort.close);
+      },
+      onData(cb: (data: Uint8Array | string) => void) {
+        serialPort.on('data', (receivedBuffer: Buffer) => {
+          if (Buffer.isBuffer(receivedBuffer)) {
+            throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
+          }
+
+          // TODO: может ли тут прийти строка????
+          // TODO: если буфер пустой значит ли это что это пустая строка????
+
+          return cb(convertBufferToUint8Array(receivedBuffer));
+        });
+      },
+      onError(cb: (err: string) => void) {
+        // TODO: check
+        serialPort.on('error', (error: { message: string }) => {
+          cb(error.message);
+        });
+      },
+      onOpen(cb: () => void) {
+        serialPort.on('open', cb);
       }
-
-      const options: OpenOptions = omitObj(params, 'dev', 'pinRX', 'pinTX');
-      const serialPort: SerialPort = new SerialPort(params.dev, options);
-
-      let openTimeout: any;
-      let errorHandler: any;
-      let openHandler: any;
-
-      errorHandler = (err: {message: string}) => {
-        clearTimeout(openTimeout);
-        serialPort.off('error', errorHandler);
-        serialPort.off('open', openHandler);
-        reject(err.message);
-      };
-      openHandler = () => {
-        clearTimeout(openTimeout);
-        serialPort.off('error', errorHandler);
-        serialPort.off('open', openHandler);
-        resolve(serialPort as any);
-      };
-
-      serialPort.on('error', errorHandler);
-      serialPort.on('open', openHandler);
-
-      openTimeout = setTimeout(() => {
-        serialPort.off('error', errorHandler);
-        serialPort.off('open', openHandler);
-        reject(`Serial IO: timeout of opening a serial port has been exceeded`);
-      }, SERVER_STARTING_TIMEOUT_SEC * 1000);
-    });
+    };
   }
 
-  protected prepareBinaryDataToWrite(data: Uint8Array): any {
-    return Buffer.from(data);
-  }
 
-  protected convertIncomeBinaryData(data: any): Uint8Array {
-    if (Buffer.isBuffer(data)) throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
+  // private prepareBinaryDataToWrite(data: Uint8Array): any {
+  //   return Buffer.from(data);
+  // }
 
-    return convertBufferToUint8Array(data as Buffer);
-  }
+  // private convertIncomeBinaryData(data: any): Uint8Array {
+  //   if (Buffer.isBuffer(data)) throw new Error(`Unknown type of returned value "${JSON.stringify(data)}"`);
+  //
+  //   return convertBufferToUint8Array(data as Buffer);
+  // }
 
 }

@@ -31,21 +31,21 @@ export interface SerialDefinition {
   ports: {[index: string]: SerialParams};
   // TODO: add default baudRate
   // TODO: add default port
-
 }
 
 // low level instance
 export interface SerialPortLike {
-  write(data: any): Promise<void>;
-  write(data: any, encode: string): Promise<void>;
+  write(data: any, encode?: string): Promise<void>;
   close(): Promise<void>;
-  on(eventName: 'data'): Promise<any>;
-  on(eventName: 'error'): Promise<string>;
+  onData(cb: (data: Uint8Array | string) => void): void;
+  onError(cb: (err: string) => void): void;
+  onOpen(cb: () => void): void;
 }
 
 
+// TODO: does it really need???
 export const defaultSerialParams: SerialParams = {
-  baudRate: 9600
+  baudRate: 115200 // 9600
 };
 
 export const Methods = [

@@ -25,25 +25,8 @@ let unnamedPortNumIndex = 0;
 
 export default abstract class SerialIoBase implements SerialIo {
   protected definition?: SerialDefinition;
-  private instances: Record<string, SerialItem> = {};
-
-  // TODO: add open connection promise
-
-
-  // TODO: review - maybe use serial instance wrapper
+  protected instances: Record<string, SerialItem> = {};
   protected abstract createConnection(portNum: number | string, params: SerialParams): Promise<SerialPortLike>;
-
-  // TODO: review - maybe use serial instance wrapper
-  /**
-   * Convert binary data which will be written.
-   */
-  protected abstract prepareBinaryDataToWrite(data: Uint8Array): any;
-
-  // TODO: review - maybe use serial instance wrapper
-  /**
-   * Convert binary data which is received from bus.
-   */
-  protected abstract convertIncomeBinaryData(data: any): Uint8Array;
 
 
   async init(ioContext: IoContext): Promise<void> {
@@ -71,18 +54,22 @@ export default abstract class SerialIoBase implements SerialIo {
 
   async destroy() {
     for (let portNum in this.instances) {
-      await this.destroyPort(Number(portNum));
+      if (!this.instances.hasOwnProperty(portNum)) continue;
+
+      await this.destroyPort(portNum);
     }
 
     delete this.instances;
   }
 
-  async destroyPort(portNum: number | string) {
-    // TODO: reivew
-    await this.instances[portNum][ItemPosition.serialPort].close();
-    // TODO: remove handlers???
+  destroyPort(portNum: number | string): Promise<void> {
+    const promise: Promise<void> = this.instances[portNum][ItemPosition.serialPort].close();
+
     this.instances[portNum][ItemPosition.events].destroy();
+
     delete this.instances[portNum];
+
+    return promise;
   }
 
   async onData(portNum: number | string, handler: (data: string | Uint8Array) => void): Promise<number> {
@@ -98,7 +85,7 @@ export default abstract class SerialIoBase implements SerialIo {
   }
 
   async write(portNum: number | string, data: Uint8Array): Promise<void> {
-    await this.getItem(portNum)[ItemPosition.serialPort].write(this.prepareBinaryDataToWrite(data));
+    await this.getItem(portNum)[ItemPosition.serialPort].write(data);
   }
 
   async print(portNum: number | string, data: string): Promise<void> {
@@ -117,11 +104,41 @@ export default abstract class SerialIoBase implements SerialIo {
       ...params,
     };
 
+    // TODO: лучше не ждать
     const serialPort: SerialPortLike = await this.createConnection(portNum, combinedParams);
     const events = new IndexedEventEmitter<DefaultHandler>();
 
     // TODO: может лучше чтобы он сам эмитил?
     // TODO: лучше сюда перенести open timeout
+
+    let openTimeout: any;
+    let errorHandler: any;
+    let openHandler: any;
+
+    errorHandler = (err: {message: string}) => {
+      clearTimeout(openTimeout);
+      serialPort.off('error', errorHandler);
+      serialPort.off('open', openHandler);
+      reject(err.message);
+    };
+    openHandler = () => {
+      clearTimeout(openTimeout);
+      serialPort.off('error', errorHandler);
+      serialPort.off('open', openHandler);
+      // TODO: remake
+      resolve(serialPort as any);
+    };
+
+    serialPort.on('error', errorHandler);
+    serialPort.on('open', openHandler);
+
+    openTimeout = setTimeout(() => {
+      serialPort.off('error', errorHandler);
+      serialPort.off('open', openHandler);
+      reject(`Serial IO: timeout of opening a serial port has been exceeded`);
+    }, SERVER_STARTING_TIMEOUT_SEC * 1000);
+
+
 
     serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));
     // TODO: скорее всего err другой
@@ -141,29 +158,40 @@ export default abstract class SerialIoBase implements SerialIo {
     return this.instances[portNum];
   }
 
-  // TODO: review
-  protected handleIncomeData(portNum: number, data: any) {
-    const parsedData: string | Uint8Array = this.parseIncomeData(data);
-
-    this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, parsedData);
-  }
-
-  // TODO: review
-  protected parseIncomeData(data: any): string | Uint8Array {
-    if (!data) {
-      return '';
-    }
-    else if (typeof data === 'string') {
-      //return utf8TextToUint8Array(data);
-
-      return data;
-    }
-
-    return this.convertIncomeBinaryData(data);
-  }
+  // // TODO: review
+  // protected handleIncomeData(portNum: number, data: any) {
+  //   const parsedData: string | Uint8Array = this.parseIncomeData(data);
+  //
+  //   this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, parsedData);
+  // }
+  //
+  // // TODO: review
+  // protected parseIncomeData(data: any): string | Uint8Array {
+  //   if (!data) {
+  //     return '';
+  //   }
+  //   else if (typeof data === 'string') {
+  //     //return utf8TextToUint8Array(data);
+  //
+  //     return data;
+  //   }
+  //
+  //   // TODO: remove convertIncomeBinaryData
+  //   return this.convertIncomeBinaryData(data);
+  // }
 
 }
 
+
+// /**
+//  * Convert binary data which will be written.
+//  */
+// protected abstract prepareBinaryDataToWrite(data: Uint8Array): any;
+//
+// /**
+//  * Convert binary data which is received from bus.
+//  */
+// protected abstract convertIncomeBinaryData(data: any): Uint8Array;
 
 // async read(portNum: number, length?: number): Promise<string | Uint8Array> {
 //   const result: string | Buffer | null = this.getItem(portNum)[ItemPosition.serialPort].read(length);
