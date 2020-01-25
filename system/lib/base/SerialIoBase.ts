@@ -27,7 +27,7 @@ let unnamedPortNumIndex = 0;
 export default abstract class SerialIoBase implements SerialIo {
   protected definition?: SerialDefinition;
   // TODO: review
-  private readonly instances: {[index: string]: SerialItem} = {};
+  private instances: {[index: string]: SerialItem} = {};
 
   // TODO: add open connection promise
 
@@ -49,27 +49,34 @@ export default abstract class SerialIoBase implements SerialIo {
 
 
   async init(ioContext: IoContext): Promise<void> {
+    if (!this.definition) {
+      throw new Error(`No serial port definitions`);
+    }
+
+    const promises: Promise<void>[] = [];
+
+    for (let portNum in this.definition.ports) {
+      promises.push(
+        this.makePortItem(portNum, this.definition.ports[portNum])
+          .then((item: SerialItem) => {
+            this.instances[portNum] = item;
+          })
+      );
+    }
+
+    return Promise.all(promises).then();
   }
 
   async configure(definition: SerialDefinition) {
     this.definition = definition;
   }
 
-  // async newPort(portNum: number | undefined, paramsOverride: SerialParams): Promise<number> {
-  //   const resolvedPortNum = this.resolvePortNum(portNum);
-  //
-  //   if (!this.instances[resolvedPortNum]) {
-  //     this.instances[resolvedPortNum] = await this.makePortItem(resolvedPortNum, paramsOverride);
-  //   }
-  //
-  //   return resolvedPortNum;
-  // }
-
   async destroy() {
-    // TODO: reivew
-    for (let portNum of Object.keys(this.instances)) {
-      this.destroyPort(Number(portNum));
+    for (let portNum in this.instances) {
+      await this.destroyPort(Number(portNum));
     }
+
+    delete this.instances;
   }
 
   async destroyPort(portNum: number | string) {
@@ -115,10 +122,6 @@ export default abstract class SerialIoBase implements SerialIo {
   // }
 
 
-  // protected getPreDefinedPortParams(): {[index: string]: SerialParams} {
-  //   return preDefinedPortsParams;
-  // }
-
   protected resolvePortNum(portNum: number | undefined): number {
     if (typeof portNum === 'number') return portNum;
 
@@ -155,15 +158,13 @@ export default abstract class SerialIoBase implements SerialIo {
     return this.convertIncomeBinaryData(data);
   }
 
-  protected async makePortItem(portNum: number, paramsOverride: SerialParams): Promise<SerialItem> {
-    const params: SerialParams = {
+  protected async makePortItem(portNum: string, params: SerialParams): Promise<SerialItem> {
+    const combinedParams: SerialParams = {
       ...defaultSerialParams,
-      // TODO: review
-      //...this.getPreDefinedPortParams()[portNum],
-      ...paramsOverride,
+      ...params,
     };
 
-    const serialPort: SerialPortLike = await this.createConnection(portNum, params);
+    const serialPort: SerialPortLike = await this.createConnection(portNum, combinedParams);
     const events = new IndexedEventEmitter<DefaultHandler>();
 
     serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));

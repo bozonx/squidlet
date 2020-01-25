@@ -30,6 +30,8 @@ export interface SerialDefinition {
   // params of ports by portNum or port name
   ports: {[index: string]: SerialParams};
   // TODO: add default baudRate
+  // TODO: add default port
+
 }
 
 // TODO: make wrapper with promises
