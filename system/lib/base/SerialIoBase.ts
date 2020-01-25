@@ -6,7 +6,6 @@ import SerialIo, {
   SerialPortLike
 } from '../../interfaces/io/SerialIo';
 import {ENCODE} from '../constants';
-import {callPromised} from '../common';
 import IndexedEventEmitter, {DefaultHandler} from '../IndexedEventEmitter';
 import IoContext from '../../interfaces/IoContext';
 
@@ -26,8 +25,7 @@ let unnamedPortNumIndex = 0;
 
 export default abstract class SerialIoBase implements SerialIo {
   protected definition?: SerialDefinition;
-  // TODO: review
-  private instances: {[index: string]: SerialItem} = {};
+  private instances: Record<string, SerialItem> = {};
 
   // TODO: add open connection promise
 
@@ -81,8 +79,7 @@ export default abstract class SerialIoBase implements SerialIo {
 
   async destroyPort(portNum: number | string) {
     // TODO: reivew
-    // TODO: а он есть ????
-    await callPromised(this.instances[portNum][ItemPosition.serialPort].close);
+    await this.instances[portNum][ItemPosition.serialPort].close();
     // TODO: remove handlers???
     this.instances[portNum][ItemPosition.events].destroy();
     delete this.instances[portNum];
@@ -101,36 +98,41 @@ export default abstract class SerialIoBase implements SerialIo {
   }
 
   async write(portNum: number | string, data: Uint8Array): Promise<void> {
-    await callPromised(
-      this.getItem(portNum)[ItemPosition.serialPort].write,
-      this.prepareBinaryDataToWrite(data)
-    );
+    await this.getItem(portNum)[ItemPosition.serialPort].write(this.prepareBinaryDataToWrite(data));
   }
 
   async print(portNum: number | string, data: string): Promise<void> {
-    await callPromised(this.getItem(portNum)[ItemPosition.serialPort].write, data, ENCODE);
+    await this.getItem(portNum)[ItemPosition.serialPort].write(data, ENCODE);
   }
 
   async println(portNum: number | string, data: string): Promise<void> {
-    await callPromised(this.getItem(portNum)[ItemPosition.serialPort].write, `${data}\n`, ENCODE);
+    await this.getItem(portNum)[ItemPosition.serialPort].write(`${data}\n`, ENCODE);
   }
 
-  // async read(portNum: number, length?: number): Promise<string | Uint8Array> {
-  //   const result: string | Buffer | null = this.getItem(portNum)[ItemPosition.serialPort].read(length);
-  //
-  //   return this.parseIncomeData(result);
-  // }
-
-
-  protected resolvePortNum(portNum: number | undefined): number {
-    if (typeof portNum === 'number') return portNum;
-
-    unnamedPortNumIndex++;
-
-    return unnamedPortNumIndex;
-  }
 
   // TODO: review
+  protected async makePortItem(portNum: string, params: SerialParams): Promise<SerialItem> {
+    const combinedParams: SerialParams = {
+      ...defaultSerialParams,
+      ...params,
+    };
+
+    const serialPort: SerialPortLike = await this.createConnection(portNum, combinedParams);
+    const events = new IndexedEventEmitter<DefaultHandler>();
+
+    // TODO: может лучше чтобы он сам эмитил?
+    // TODO: лучше сюда перенести open timeout
+
+    serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));
+    // TODO: скорее всего err другой
+    serialPort.on('error', (err: {message: string}) => events.emit(SerialEvents.error, err.message));
+
+    return [
+      serialPort,
+      events
+    ];
+  }
+
   protected getItem(portNum: number | string): SerialItem {
     if (!this.instances[portNum]) {
       throw new Error(`Serial IO: port "${portNum}" hasn't been instantiated`);
@@ -139,12 +141,14 @@ export default abstract class SerialIoBase implements SerialIo {
     return this.instances[portNum];
   }
 
+  // TODO: review
   protected handleIncomeData(portNum: number, data: any) {
     const parsedData: string | Uint8Array = this.parseIncomeData(data);
 
     this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, parsedData);
   }
 
+  // TODO: review
   protected parseIncomeData(data: any): string | Uint8Array {
     if (!data) {
       return '';
@@ -158,23 +162,19 @@ export default abstract class SerialIoBase implements SerialIo {
     return this.convertIncomeBinaryData(data);
   }
 
-  protected async makePortItem(portNum: string, params: SerialParams): Promise<SerialItem> {
-    const combinedParams: SerialParams = {
-      ...defaultSerialParams,
-      ...params,
-    };
-
-    const serialPort: SerialPortLike = await this.createConnection(portNum, combinedParams);
-    const events = new IndexedEventEmitter<DefaultHandler>();
-
-    serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));
-    // TODO: скорее всего err другой
-    serialPort.on('error', (err: {message: string}) => events.emit(SerialEvents.error, err.message));
-
-    return [
-      serialPort,
-      events
-    ];
-  }
-
 }
+
+
+// async read(portNum: number, length?: number): Promise<string | Uint8Array> {
+//   const result: string | Buffer | null = this.getItem(portNum)[ItemPosition.serialPort].read(length);
+//
+//   return this.parseIncomeData(result);
+// }
+
+// protected resolvePortNum(portNum: number | undefined): number {
+//   if (typeof portNum === 'number') return portNum;
+//
+//   unnamedPortNumIndex++;
+//
+//   return unnamedPortNumIndex;
+// }

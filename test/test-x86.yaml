@@ -10,4 +10,10 @@ ioServer:
   host: 0.0.0.0
 updater: {}
 
+ios:
+  Serial:
+    ports:
+      0:
+        dev: dev/ttyUSB0
+
 #devices:
