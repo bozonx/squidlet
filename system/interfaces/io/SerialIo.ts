@@ -34,14 +34,13 @@ export interface SerialDefinition {
 
 }
 
-// TODO: make wrapper with promises
 // low level instance
 export interface SerialPortLike {
-  write(data: any, cb: (err: string) => void): void;
-  write(data: any, encode: string, cb: (err: string) => void): void;
-  close(cb: (err: string) => void): void;
-  on(eventName: 'data', cb: (data: any) => void): void;
-  on(eventName: 'error', cb: (err: {message: string}) => void): void;
+  write(data: any): Promise<void>;
+  write(data: any, encode: string): Promise<void>;
+  close(): Promise<void>;
+  on(eventName: 'data'): Promise<any>;
+  on(eventName: 'error'): Promise<string>;
 }
 
 
