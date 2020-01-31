@@ -3,6 +3,7 @@ import DriverBase from 'system/base/DriverBase';
 import SerialIo from 'system/interfaces/io/SerialIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {SerialMessageHandler} from 'system/interfaces/io/SerialIo';
+import {uint8ArrayToAscii} from '../../../system/lib/serialize';
 
 
 export interface SerialProps {
@@ -33,8 +34,15 @@ export class Serial extends DriverBase<SerialProps> {
   }
 
 
-  onMessage(cb: SerialMessageHandler): number {
-    return this.messageEvents.addListener(cb);
+  onMessage(cb: SerialMessageHandler, isBinary: boolean = false): number {
+    return this.messageEvents.addListener((data: Uint8Array | string) => {
+      if (isBinary) {
+        cb(data);
+      }
+      else {
+        cb(uint8ArrayToAscii(data as Uint8Array));
+      }
+    });
   }
 
   async write(data: Uint8Array) {

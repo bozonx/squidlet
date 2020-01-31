@@ -263,6 +263,8 @@ export default class DeviceBase<
       (partialState: Dictionary): void => {
         this.context.state.updateState(stateCategory, this.id, partialState);
       },
+      this.id,
+      this.log.debug,
       this.log.error,
       this.context.config.config.queueJobTimeoutSec,
       initialCb,
