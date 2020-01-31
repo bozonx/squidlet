@@ -6,7 +6,7 @@ import IoItem from '../../../system/interfaces/IoItem';
 import Os from '../../../shared/helpers/Os';
 import StorageEnvMemoryWrapper from '../../../shared/helpers/StorageEnvMemoryWrapper';
 import StorageIo from '../../../system/interfaces/io/StorageIo';
-import {getFileNameOfPath, resolvePlatformDir} from '../../../shared/helpers/helpers';
+import {resolvePlatformDir} from '../../../shared/helpers/helpers';
 import MachineConfig from '../../../hostEnvBuilder/interfaces/MachineConfig';
 import HostEnvSet from '../../../hostEnvBuilder/interfaces/HostEnvSet';
 
@@ -41,7 +41,7 @@ export default class IoSetDevelopSrc implements IoSet {
     const machineConfig: MachineConfig = this.envBuilder.configManager.machineConfig;
 
     for (let ioName of Object.keys(machineConfig.ios)) {
-      this.instantiateIo(machineConfig.ios[ioName], platformDir);
+      this.instantiateIo(ioName, machineConfig.ios[ioName], platformDir);
     }
   }
 
@@ -86,8 +86,7 @@ export default class IoSetDevelopSrc implements IoSet {
     }
   }
 
-  private instantiateIo(ioPath: string, platformDir: string) {
-    const ioName: string = getFileNameOfPath(ioPath);
+  private instantiateIo(ioName: string, ioPath: string, platformDir: string) {
     const ioAbsPath = path.resolve(platformDir, ioPath);
     const IoItemClass: new () => IoItem = this.os.require(ioAbsPath).default;
 

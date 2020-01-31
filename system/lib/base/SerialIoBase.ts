@@ -22,7 +22,7 @@ export enum ItemPosition {
   events,
 }
 
-let unnamedPortNumIndex = 0;
+//let unnamedPortNumIndex = 0;
 
 
 export default abstract class SerialIoBase implements SerialIo {
