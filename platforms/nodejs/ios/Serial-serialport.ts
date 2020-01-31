@@ -34,11 +34,10 @@ export default class Serial extends SerialIoBase implements SerialIo {
         switch (eventName) {
           case 'data':
             serialPort.on('data', (receivedBuffer: Buffer) => {
-              if (Buffer.isBuffer(receivedBuffer)) {
+              if (!Buffer.isBuffer(receivedBuffer)) {
                 throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
               }
 
-              // TODO: может ли тут прийти строка????
               // TODO: если буфер пустой значит ли это что это пустая строка????
 
               return cb(convertBufferToUint8Array(receivedBuffer));
