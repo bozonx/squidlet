@@ -38,8 +38,6 @@ export default class Serial extends SerialIoBase implements SerialIo {
                 throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
               }
 
-              // TODO: если буфер пустой значит ли это что это пустая строка????
-
               return cb(convertBufferToUint8Array(receivedBuffer));
             });
             break;
