@@ -8,6 +8,8 @@ import SerialIo, {
 import {ENCODE} from '../constants';
 import IndexedEventEmitter, {DefaultHandler} from '../IndexedEventEmitter';
 import IoContext from '../../interfaces/IoContext';
+import {SERVER_STARTING_TIMEOUT_SEC} from '../../constants';
+import Promised from '../Promised';
 
 
 export type SerialItem = [
@@ -99,50 +101,45 @@ export default abstract class SerialIoBase implements SerialIo {
 
   // TODO: review
   protected async makePortItem(portNum: string, params: SerialParams): Promise<SerialItem> {
+    const connectionPromised: Promised = new Promised<void>();
     const combinedParams: SerialParams = {
       ...defaultSerialParams,
       ...params,
     };
 
-    // TODO: лучше не ждать
     const serialPort: SerialPortLike = await this.createConnection(portNum, combinedParams);
     const events = new IndexedEventEmitter<DefaultHandler>();
-
-    // TODO: может лучше чтобы он сам эмитил?
-    // TODO: лучше сюда перенести open timeout
 
     let openTimeout: any;
     let errorHandler: any;
     let openHandler: any;
 
-    errorHandler = (err: {message: string}) => {
+    errorHandler = (err: string) => {
       clearTimeout(openTimeout);
       serialPort.off('error', errorHandler);
       serialPort.off('open', openHandler);
-      reject(err.message);
+      connectionPromised.reject(new Error(err));
     };
     openHandler = () => {
       clearTimeout(openTimeout);
       serialPort.off('error', errorHandler);
       serialPort.off('open', openHandler);
-      // TODO: remake
-      resolve(serialPort as any);
+      connectionPromised.resolve();
     };
+    openTimeout = setTimeout(() => {
+      serialPort.off('error', errorHandler);
+      serialPort.off('open', openHandler);
+      connectionPromised.reject(new Error(`Serial IO: timeout of opening a serial port has been exceeded`));
+    }, SERVER_STARTING_TIMEOUT_SEC * 1000);
 
     serialPort.on('error', errorHandler);
     serialPort.on('open', openHandler);
 
-    openTimeout = setTimeout(() => {
-      serialPort.off('error', errorHandler);
-      serialPort.off('open', openHandler);
-      reject(`Serial IO: timeout of opening a serial port has been exceeded`);
-    }, SERVER_STARTING_TIMEOUT_SEC * 1000);
+    await connectionPromised.promise;
 
-
-
-    serialPort.on('data', (data: any) => this.handleIncomeData(portNum, data));
-    // TODO: скорее всего err другой
-    serialPort.on('error', (err: {message: string}) => events.emit(SerialEvents.error, err.message));
+    serialPort.on('data', (data: Uint8Array | string) =>
+      this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, data));
+    serialPort.on('error', (err: string) => events.emit(SerialEvents.error, err));
 
     return [
       serialPort,
@@ -156,6 +153,10 @@ export default abstract class SerialIoBase implements SerialIo {
     }
 
     return this.instances[portNum];
+  }
+
+  private tryToConnect() {
+
   }
 
   // // TODO: review

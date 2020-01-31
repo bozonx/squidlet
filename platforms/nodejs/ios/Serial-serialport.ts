@@ -30,37 +30,36 @@ export default class Serial extends SerialIoBase implements SerialIo {
       close(): Promise<void> {
         return callPromised(serialPort.close);
       },
-      // on(eventName: 'open', cb: () => void) {},
-      // on(eventName: 'error', cb: (data: Uint8Array | string) => void) {},
       on(eventName: SerialPortItemEvent, cb: (...p: any[]) => void) {
-        if (eventName === 'data') {
-          serialPort.on('data', (receivedBuffer: Buffer) => {
-            if (Buffer.isBuffer(receivedBuffer)) {
-              throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
-            }
+        switch (eventName) {
+          case 'data':
+            serialPort.on('data', (receivedBuffer: Buffer) => {
+              if (Buffer.isBuffer(receivedBuffer)) {
+                throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
+              }
 
-            // TODO: может ли тут прийти строка????
-            // TODO: если буфер пустой значит ли это что это пустая строка????
+              // TODO: может ли тут прийти строка????
+              // TODO: если буфер пустой значит ли это что это пустая строка????
 
-            return cb(convertBufferToUint8Array(receivedBuffer));
-          });
-        }
-        else if (eventName === 'error') {
-          // TODO: check
-          serialPort.on('error', (error: { message: string }) => {
-            cb(error.message);
-          });
-        }
-        else if (eventName === 'open') {
-          serialPort.on('open', cb);
-        }
-        else {
-          throw new Error(`Unknown event name`);
+              return cb(convertBufferToUint8Array(receivedBuffer));
+            });
+            break;
+          case 'error':
+            // TODO: check
+            serialPort.on('error', (error: { message: string }) => {
+              cb(error.message);
+            });
+            break;
+          case 'open':
+            serialPort.on('open', cb);
+            break;
+          default:
+            throw new Error(`Unknown event name "${eventName}"`);
         }
       },
 
       off(eventName: SerialPortItemEvent, cb: (...p: any[]) => void) {
-
+        serialPort.off(eventName, cb);
       }
     };
 
