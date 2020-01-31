@@ -15,12 +15,16 @@ export type Schema = {[index: string]: SchemaElement};
  */
 export default class DeviceState extends ConsistentState {
   private readonly schema: Schema;
+  private readonly deviceId: string;
+  private readonly logDebug: (msg: string) => void;
 
 
   constructor(
     schema: Schema,
     stateGetter: () => Dictionary,
     stateUpdater: (partialState: Dictionary) => void,
+    deviceId: string,
+    logDebug: (msg: string) => void,
     logError: (msg: string) => void,
     jobTimeoutSec?: number,
     initialize?: Initialize,
@@ -38,6 +42,8 @@ export default class DeviceState extends ConsistentState {
     );
 
     this.schema = schema;
+    this.deviceId = deviceId;
+    this.logDebug = logDebug;
   }
 
   // TODO: test
@@ -83,6 +89,8 @@ export default class DeviceState extends ConsistentState {
       partialData,
       `Invalid device state to write: "${JSON.stringify(partialData)}"`
     );
+
+    this.logDebug(`DeviceState.write: deviceId: ${this.deviceId}, ${JSON.stringify(partialData)}`);
 
     return super.write(partialData);
   }

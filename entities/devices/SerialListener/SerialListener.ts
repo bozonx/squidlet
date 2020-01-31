@@ -16,9 +16,9 @@ export default class SerialListener extends DeviceBase<Props> {
     this.depsInstances.serial = await this.context.getSubDriver('Serial', this.props);
 
     this.serial.onMessage((data: string | Uint8Array) => {
-      console.log(11111111, data);
+
+      this.setStatus(data);
     });
   }
-
 
 }
