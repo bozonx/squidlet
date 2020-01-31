@@ -1,7 +1,7 @@
 import * as SerialPort from 'serialport';
 import {OpenOptions} from 'serialport';
 
-import SerialIo, {SerialParams, SerialPortLike} from 'system/interfaces/io/SerialIo';
+import SerialIo, {SerialParams, SerialPortItemEvent, SerialPortLike} from 'system/interfaces/io/SerialIo';
 import {omitObj} from 'system/lib/objects';
 import SerialIoBase from 'system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from 'system/lib/buffer';
@@ -30,28 +30,40 @@ export default class Serial extends SerialIoBase implements SerialIo {
       close(): Promise<void> {
         return callPromised(serialPort.close);
       },
-      onData(cb: (data: Uint8Array | string) => void) {
-        serialPort.on('data', (receivedBuffer: Buffer) => {
-          if (Buffer.isBuffer(receivedBuffer)) {
-            throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
-          }
+      // on(eventName: 'open', cb: () => void) {},
+      // on(eventName: 'error', cb: (data: Uint8Array | string) => void) {},
+      on(eventName: SerialPortItemEvent, cb: (...p: any[]) => void) {
+        if (eventName === 'data') {
+          serialPort.on('data', (receivedBuffer: Buffer) => {
+            if (Buffer.isBuffer(receivedBuffer)) {
+              throw new Error(`Unknown type of returned value "${JSON.stringify(receivedBuffer)}"`);
+            }
 
-          // TODO: может ли тут прийти строка????
-          // TODO: если буфер пустой значит ли это что это пустая строка????
+            // TODO: может ли тут прийти строка????
+            // TODO: если буфер пустой значит ли это что это пустая строка????
 
-          return cb(convertBufferToUint8Array(receivedBuffer));
-        });
+            return cb(convertBufferToUint8Array(receivedBuffer));
+          });
+        }
+        else if (eventName === 'error') {
+          // TODO: check
+          serialPort.on('error', (error: { message: string }) => {
+            cb(error.message);
+          });
+        }
+        else if (eventName === 'open') {
+          serialPort.on('open', cb);
+        }
+        else {
+          throw new Error(`Unknown event name`);
+        }
       },
-      onError(cb: (err: string) => void) {
-        // TODO: check
-        serialPort.on('error', (error: { message: string }) => {
-          cb(error.message);
-        });
-      },
-      onOpen(cb: () => void) {
-        serialPort.on('open', cb);
+
+      off(eventName: SerialPortItemEvent, cb: (...p: any[]) => void) {
+
       }
     };
+
   }
 
 

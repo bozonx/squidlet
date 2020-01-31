@@ -10,6 +10,8 @@ export enum SerialEvents {
   error,
 }
 
+export type SerialPortItemEvent = 'open' | 'error' | 'data';
+
 
 export interface SerialParams {
   // device name. It uses only if squidlet runs on OS. Like /dev/ttyUSB0
@@ -37,9 +39,13 @@ export interface SerialDefinition {
 export interface SerialPortLike {
   write(data: any, encode?: string): Promise<void>;
   close(): Promise<void>;
-  onData(cb: (data: Uint8Array | string) => void): void;
-  onError(cb: (err: string) => void): void;
-  onOpen(cb: () => void): void;
+  on(eventName: 'open', cb: () => void): void;
+  on(eventName: 'error', cb: (err: string) => void): void;
+  on(eventName: 'data', cb: (data: Uint8Array | string) => void): void;
+  off(eventName: SerialPortItemEvent, cb: (...p: any[]) => void): void;
+  // onData(cb: (data: Uint8Array | string) => void): void;
+  // onError(cb: (err: string) => void): void;
+  // onOpen(cb: () => void): void;
 }
 
 
@@ -84,7 +90,7 @@ export default interface SerialIo extends IoItem {
   // TODO: if ioServer is restarted then it will lost handlers
   onData(portNum: string | number, handler: SerialMessageHandler): Promise<number>;
   onError(portNum: string | number, handler: (err: string) => void): Promise<number>;
-  removeListener(portNum: string | number, eventName: SerialEvents, handlerIndex: number): Promise<void>;
+  removeListener(portNum: string | number, handlerIndex: number): Promise<void>;
 
   // TODO: maybe add undefined to resolve default port
   // write binary data
