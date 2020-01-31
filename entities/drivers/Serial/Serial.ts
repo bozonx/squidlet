@@ -5,12 +5,12 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {SerialMessageHandler} from 'system/interfaces/io/SerialIo';
 
 
-interface Props {
+export interface SerialProps {
   portNum: number | string;
 }
 
 
-export class Serial extends DriverBase<Props> {
+export class Serial extends DriverBase<SerialProps> {
   private readonly messageEvents = new IndexedEvents<SerialMessageHandler>();
   private get serialIo(): SerialIo {
     return this.depsInstances.serialIo;
@@ -68,7 +68,7 @@ export class Serial extends DriverBase<Props> {
 }
 
 
-export default class Factory extends DriverFactoryBase<Serial, Props> {
+export default class Factory extends DriverFactoryBase<Serial, SerialProps> {
   protected SubDriverClass = Serial;
-  protected instanceId = (props: Props): string => String(props.portNum);
+  protected instanceId = (props: SerialProps): string => String(props.portNum);
 }

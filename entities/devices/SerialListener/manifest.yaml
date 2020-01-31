@@ -1,0 +1,13 @@
+name: SerialListener
+type: log
+main: SerialListener.ts
+
+drivers:
+  - Serial
+
+props:
+  $base: 'drivers.Serial'
+
+status:
+  default:
+    type: boolean
