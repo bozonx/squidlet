@@ -15,6 +15,7 @@ ios:
     ports:
       0:
         dev: /dev/ttyUSB0
+        baudRate: 9600
 
 devices:
   serialListener:
