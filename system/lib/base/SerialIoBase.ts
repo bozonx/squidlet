@@ -99,17 +99,37 @@ export default abstract class SerialIoBase implements SerialIo {
   }
 
 
-  // TODO: review
   protected async makePortItem(portNum: string, params: SerialParams): Promise<SerialItem> {
-    const connectionPromised: Promised = new Promised<void>();
     const combinedParams: SerialParams = {
       ...defaultSerialParams,
       ...params,
     };
-
     const serialPort: SerialPortLike = await this.createConnection(portNum, combinedParams);
     const events = new IndexedEventEmitter<DefaultHandler>();
 
+    await this.tryToConnect(serialPort);
+
+    serialPort.on('data', (data: Uint8Array | string) =>
+      this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, data));
+    serialPort.on('error', (err: string) => events.emit(SerialEvents.error, err));
+
+    return [
+      serialPort,
+      events
+    ];
+  }
+
+  protected getItem(portNum: number | string): SerialItem {
+    if (!this.instances[portNum]) {
+      throw new Error(`Serial IO: port "${portNum}" hasn't been instantiated`);
+    }
+
+    return this.instances[portNum];
+  }
+
+
+  private tryToConnect(serialPort: SerialPortLike): Promise<void> {
+    const connectionPromised: Promised = new Promised<void>();
     let openTimeout: any;
     let errorHandler: any;
     let openHandler: any;
@@ -135,28 +155,7 @@ export default abstract class SerialIoBase implements SerialIo {
     serialPort.on('error', errorHandler);
     serialPort.on('open', openHandler);
 
-    await connectionPromised.promise;
-
-    serialPort.on('data', (data: Uint8Array | string) =>
-      this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, data));
-    serialPort.on('error', (err: string) => events.emit(SerialEvents.error, err));
-
-    return [
-      serialPort,
-      events
-    ];
-  }
-
-  protected getItem(portNum: number | string): SerialItem {
-    if (!this.instances[portNum]) {
-      throw new Error(`Serial IO: port "${portNum}" hasn't been instantiated`);
-    }
-
-    return this.instances[portNum];
-  }
-
-  private tryToConnect() {
-
+    return connectionPromised.promise;
   }
 
   // // TODO: review
