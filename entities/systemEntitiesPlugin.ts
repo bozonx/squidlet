@@ -15,6 +15,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'GpioLocal/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'GpioPcf8574/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));
+  await env.addDevice(path.join(devicesRoot, 'SerialListener/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Switch/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Toggle/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'WallSwitchSensor/manifest.yaml'));
