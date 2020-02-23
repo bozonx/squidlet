@@ -1,17 +1,17 @@
-import Promised from '../lib/Promised';
-import RemoteCall from '../lib/remoteCall/RemoteCall';
-import {makeUniqId} from '../lib/uniqId';
-import {deserializeJson, serializeJson} from '../lib/serialize';
-import RemoteCallMessage from '../interfaces/RemoteCallMessage';
-import HostConfig from '../interfaces/HostConfig';
-import IoSet from '../interfaces/IoSet';
-import {METHOD_DELIMITER} from '../constants';
+import Promised from '../../../system/lib/Promised';
+import RemoteCall from '../../../system/lib/remoteCall/RemoteCall';
+import {makeUniqId} from '../../../system/lib/uniqId';
+import {deserializeJson, serializeJson} from '../../../system/lib/serialize';
+import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
+import HostConfig from '../../../system/interfaces/HostConfig';
+import IoSet from '../../../system/interfaces/IoSet';
+import {METHOD_DELIMITER} from '../../../system/constants';
 
 
 /**
  * Serving of connection to IO server
  */
-export default class IoServerConnection {
+export default class IoServerConnectionLogic {
   private readonly connectionId: string;
   private readonly hostConfig: HostConfig;
   private readonly ioSet: IoSet;

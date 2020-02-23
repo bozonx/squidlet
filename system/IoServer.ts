@@ -1,17 +1,17 @@
-import IoSet from '../interfaces/IoSet';
-import WebSocketServerIo from '../interfaces/io/WebSocketServerIo';
-import HostConfig from '../interfaces/HostConfig';
-import {pathJoin} from '../lib/paths';
-import systemConfig from '../systemConfig';
-import StorageIo from '../interfaces/io/StorageIo';
-import IoItem, {IoDefinitions} from '../interfaces/IoItem';
+import IoSet from './interfaces/IoSet';
+import WebSocketServerIo from './interfaces/io/WebSocketServerIo';
+import HostConfig from './interfaces/HostConfig';
+import {pathJoin} from './lib/paths';
+import systemConfig from './systemConfig';
+import StorageIo from './interfaces/io/StorageIo';
+import IoItem, {IoDefinitions} from './interfaces/IoItem';
 // TODO: use ioSet's - use driver
-import WsServerLogic from '../../entities/drivers/WsServer/WsServerLogic';
+import WsServerLogic from '../entities/drivers/WsServer/WsServerLogic';
 
-import IoServerConnection from './IoServerConnection';
-import IoServerHttpApi from './IoServerHttpApi';
-import IoContext from '../interfaces/IoContext';
-import Logger from '../interfaces/Logger';
+import IoServerConnectionLogic from '../entities/services/IoServerConnection/IoServerConnectionLogic';
+import IoServerHttpApi from '../entities/services/IoServerHttpApi/IoServerHttpApi';
+import IoContext from './interfaces/IoContext';
+import Logger from './interfaces/Logger';
 
 
 export default class IoServer {
@@ -19,7 +19,7 @@ export default class IoServer {
   private _hostConfig?: HostConfig;
   private readonly log: Logger;
   private _wsServer?: WsServerLogic;
-  private ioConnection?: IoServerConnection;
+  private ioConnection?: IoServerConnectionLogic;
   private httpApi?: IoServerHttpApi;
 
   private get hostConfig(): HostConfig {
@@ -69,7 +69,7 @@ export default class IoServer {
       return;
     }
 
-    this.ioConnection = new IoServerConnection(
+    this.ioConnection = new IoServerConnectionLogic(
       connectionId,
       this.ioSet,
       this.hostConfig,
