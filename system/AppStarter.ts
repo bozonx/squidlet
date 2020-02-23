@@ -1,6 +1,6 @@
 import IoSet from './interfaces/IoSet';
 import System from './System';
-import IoServer from './ioServer/IoServer';
+import IoServer from './IoServer';
 import {AppType} from './interfaces/AppType';
 import Logger from './interfaces/Logger';
 import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';

@@ -1,18 +1,18 @@
-import {ParsedUrl, parseUrl} from '../lib/url';
-import {prepareRoute} from '../lib/route';
-import HostInfo from '../interfaces/HostInfo';
-import {HttpServerIo, HttpServerProps} from '../interfaces/io/HttpServerIo';
-import {HttpApiBody} from '../../entities/services/HttpApi/HttpApi';
-import IoSet from '../interfaces/IoSet';
-import HostConfig from '../interfaces/HostConfig';
+import {ParsedUrl, parseUrl} from '../../../system/lib/url';
+import {prepareRoute} from '../../../system/lib/route';
+import HostInfo from '../../../system/interfaces/HostInfo';
+import {HttpServerIo, HttpServerProps} from '../../../system/interfaces/io/HttpServerIo';
+import {HttpApiBody} from '../HttpApi/HttpApi';
+import IoSet from '../../../system/interfaces/IoSet';
+import HostConfig from '../../../system/interfaces/HostConfig';
 // TODO: use from system's interfaces
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../entities/drivers/HttpServer/HttpServerLogic';
-import SysIo from '../interfaces/io/SysIo';
-import StorageIo from '../interfaces/io/StorageIo';
-import {pathJoin} from '../lib/paths';
-import systemConfig from '../systemConfig';
-import {START_APP_TYPE_FILE_NAME} from '../constants';
-import {AppType} from '../interfaces/AppType';
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServer/HttpServerLogic';
+import SysIo from '../../../system/interfaces/io/SysIo';
+import StorageIo from '../../../system/interfaces/io/StorageIo';
+import {pathJoin} from '../../../system/lib/paths';
+import systemConfig from '../../../system/systemConfig';
+import {START_APP_TYPE_FILE_NAME} from '../../../system/constants';
+import {AppType} from '../../../system/interfaces/AppType';
 
 
 const SWITCH_TO_APP_TIMEOUT_SEC = 5;
