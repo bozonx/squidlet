@@ -22,8 +22,6 @@ export enum ItemPosition {
   events,
 }
 
-//let unnamedPortNumIndex = 0;
-
 
 export default abstract class SerialIoBase implements SerialIo {
   protected definition?: SerialDefinition;
@@ -158,51 +156,4 @@ export default abstract class SerialIoBase implements SerialIo {
     return connectionPromised.promise;
   }
 
-  // // TODO: review
-  // protected handleIncomeData(portNum: number, data: any) {
-  //   const parsedData: string | Uint8Array = this.parseIncomeData(data);
-  //
-  //   this.getItem(portNum)[ItemPosition.events].emit(SerialEvents.data, parsedData);
-  // }
-  //
-  // // TODO: review
-  // protected parseIncomeData(data: any): string | Uint8Array {
-  //   if (!data) {
-  //     return '';
-  //   }
-  //   else if (typeof data === 'string') {
-  //     //return utf8TextToUint8Array(data);
-  //
-  //     return data;
-  //   }
-  //
-  //   // TODO: remove convertIncomeBinaryData
-  //   return this.convertIncomeBinaryData(data);
-  // }
-
 }
-
-
-// /**
-//  * Convert binary data which will be written.
-//  */
-// protected abstract prepareBinaryDataToWrite(data: Uint8Array): any;
-//
-// /**
-//  * Convert binary data which is received from bus.
-//  */
-// protected abstract convertIncomeBinaryData(data: any): Uint8Array;
-
-// async read(portNum: number, length?: number): Promise<string | Uint8Array> {
-//   const result: string | Buffer | null = this.getItem(portNum)[ItemPosition.serialPort].read(length);
-//
-//   return this.parseIncomeData(result);
-// }
-
-// protected resolvePortNum(portNum: number | undefined): number {
-//   if (typeof portNum === 'number') return portNum;
-//
-//   unnamedPortNumIndex++;
-//
-//   return unnamedPortNumIndex;
-// }
