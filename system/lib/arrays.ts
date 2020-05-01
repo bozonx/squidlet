@@ -5,6 +5,17 @@
 import {cloneDeepObject} from './objects';
 
 
+// TODO: test
+export function fill(array: any[], value: any): any[] {
+  const result: any[] = [];
+
+  for (let index in array) {
+    array[index] = value;
+  }
+
+  return result;
+}
+
 export function lastItem(arr: any[]): any {
   // shift when you calculates length
   const ARRAY_INDEX_SHIFT = 1;
