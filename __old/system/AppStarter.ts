@@ -30,7 +30,8 @@ export default class AppStarter {
   }
 
   destroy = async (): Promise<void> => {
-    const app = (this.system) ? this.system : this.ioServer;
+    //const app = (this.system) ? this.system : this.ioServer;
+    const app = this.system;
 
     if (!app) throw new Error('No app');
 

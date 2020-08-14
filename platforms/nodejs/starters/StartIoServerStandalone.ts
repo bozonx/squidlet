@@ -8,10 +8,6 @@ export default class StartIoServerStandalone extends StartDevelop {
   protected lockAppSwitch = true;
 
 
-  async start() {
-    await super.start(true);
-  }
-
   /**
    * Remove useless props from host config such as entities definitions.
    */

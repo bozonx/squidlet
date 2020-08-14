@@ -1,14 +1,16 @@
-import AppStarter from './AppStarter';
 import IoSet from './interfaces/IoSet';
 import HostConfig from './interfaces/HostConfig';
 import StorageIo from './interfaces/io/StorageIo';
 import SysIo from './interfaces/io/SysIo';
-import {APP_DESTROY_TIMEOUT_SEC} from './constants';
+import {APP_DESTROY_TIMEOUT_SEC, SystemEvents} from './constants';
 import Logger from './interfaces/Logger';
+import System from './System';
+import LogLevel from './interfaces/LogLevel';
+import {AppType} from './interfaces/AppType';
 
 
 /**
- * It manages ioSet object and system starter
+ * It prepares ioSet, connects logger and starts system
  */
 export default class Main {
   get hasBeenStarted(): boolean {
@@ -18,7 +20,7 @@ export default class Main {
   private ioSet: IoSet;
   private hostConfigOverride?: HostConfig;
   private logger: Logger;
-  private app?: AppStarter;
+  private system?: System;
   private started: boolean = false;
 
 
@@ -36,10 +38,17 @@ export default class Main {
     this.logger = logger;
   }
 
-  async init() {
-    this.app = new AppStarter(this.ioSet, this.hostConfigOverride, this.logger);
+  async init(specifiedAppType?: AppType) {
+    // TODO: review does it really need ???
+    const hostConfigOverride: HostConfig = { ...this.hostConfigOverride } as any;
 
     delete this.hostConfigOverride;
+
+    if (specifiedAppType) {
+      hostConfigOverride.appType = specifiedAppType;
+    }
+
+    this.system = new System(this.ioSet, hostConfigOverride);
 
     this.ioSet.init && await this.ioSet.init();
   }
@@ -61,9 +70,13 @@ export default class Main {
    * Start app or IoServer
    */
   async start() {
-    if (!this.app) throw new Error(`No app`);
+    if (!this.system) throw new Error(`No system`);
 
-    await this.app.start();
+    this.system.addListener(SystemEvents.logger, (level: LogLevel, message: string) => {
+      this.logger[level](message);
+    });
+
+    await this.system.start();
 
     this.started = true;
   }
@@ -82,6 +95,7 @@ export default class Main {
     const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
     // set uid, git and workDir to Storage IO
     await storageIo.configure({ uid, gid, workDir });
+    // TODO: review
     // make destroy before process.exit
     await sysIo.configure({
       exit: (code: number) => {
@@ -96,10 +110,10 @@ export default class Main {
   }
 
   private async doDestroy() {
-    if (!this.app) throw new Error('No app');
+    if (!this.system) throw new Error('No system');
 
     try {
-      await this.app.destroy();
+      await this.system.destroy();
     }
     catch (e) {
       this.logger.error(e);
@@ -115,7 +129,7 @@ export default class Main {
     }
     finally {
       delete this.ioSet;
-      delete this.app;
+      delete this.system;
       delete this.logger;
     }
   }
