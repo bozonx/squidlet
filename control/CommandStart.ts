@@ -47,7 +47,8 @@ export default class CommandStart {
   }
 
   /**
-   * Start in common develop mode. All the IOs and entities will be load from local ts files.
+   * Start in common development mode on local machine.
+   * All the IOs and entities will be load from local ts files.
    */
   startDevSrc(): Promise<void> {
     const starter = new StartDevelop(this.configPath, this.starterProps);
@@ -66,21 +67,9 @@ export default class CommandStart {
 
 
   private async startApp(starter: Starter) {
-    listenScriptEnd(() => this.gracefullyDestroyCb(starter.destroy));
+    listenScriptEnd(starter.destroy);
     await starter.init();
     await starter.start();
-  }
-
-  private gracefullyDestroyCb = async (destroy: () => Promise<void>) => {
-    try {
-      await destroy();
-    }
-    catch (err) {
-      console.error(err);
-      process.exit(2);
-    }
-
-    process.exit(0);
   }
 
 }
