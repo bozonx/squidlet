@@ -11,14 +11,14 @@ export default class StartIoServerStandalone extends StartDevelop {
 
 
   async start() {
-    // TODO: не запускать
-    //await super.start();
-    console.info(`===> collect env set`);
-    await this.envBuilder.collect();
+    await super.start(true);
 
-    const ioSet: IoSet = await this.makeIoSet();
-
-    this.main = await this.startMain(Main, ioSet, true);
+    // // console.info(`===> collect env set`);
+    // // await this.envBuilder.collect();
+    //
+    // const ioSet: IoSet = await this.makeIoSet();
+    //
+    // this.main = await this.startMain(Main, ioSet, true);
   }
 
   /**
