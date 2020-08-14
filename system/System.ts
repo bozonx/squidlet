@@ -14,6 +14,9 @@ import StorageIo from './interfaces/io/StorageIo';
 import systemConfig from './systemConfig';
 
 
+/**
+ * It is the main singleton for using in other parts or application.
+ */
 export default class System {
   readonly context: Context;
   readonly events = new IndexedEventEmitter();
@@ -109,6 +112,8 @@ export default class System {
     this.context.log.info(`===> System initialization has been finished`);
   }
 
+  // TODO: любые события или какие-то определенные ????
+  //       Наверное лучше использовать SystemEvents
   addListener(eventName: number | string, cb: AnyHandler): number {
     return this.events.addListener(eventName, cb);
   }
