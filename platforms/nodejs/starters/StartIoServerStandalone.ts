@@ -1,7 +1,5 @@
-import IoSet from '../../../system/interfaces/IoSet';
 import PreHostConfig from '../../../hostEnvBuilder/interfaces/PreHostConfig';
-import {omitObj} from '../../../system/lib/objects';
-import Main from '../../../system/Main';
+import {pickObj} from '../../../system/lib/objects';
 import StartDevelop from './StartDevelop';
 
 
@@ -12,32 +10,36 @@ export default class StartIoServerStandalone extends StartDevelop {
 
   async start() {
     await super.start(true);
-
-    // // console.info(`===> collect env set`);
-    // // await this.envBuilder.collect();
-    //
-    // const ioSet: IoSet = await this.makeIoSet();
-    //
-    // this.main = await this.startMain(Main, ioSet, true);
   }
 
   /**
    * Remove useless props from host config such as entities definitions.
    */
   protected resolveHostConfig(): PreHostConfig {
-    return omitObj(
-      this.hostConfig,
-      'plugins',
-      'devices',
-      'drivers',
-      'services',
-      'devicesDefaults',
-      'automation',
-      'network',
-      'wsApi',
-      'httpApi',
-      'updater',
-    );
+    return {
+      ...pickObj(this.hostConfig,
+        'id',
+        'config',
+        'ios',
+        'ioServer'
+      ),
+      // ...omitObj(
+      //   this.hostConfig,
+      //   'plugins',
+      //   'devices',
+      //   'drivers',
+      //   'services',
+      //   'devicesDefaults',
+      //   'automation',
+      //   'network',
+      //   'wsApi',
+      //   'httpApi',
+      //   'updater',
+      // ),
+      // TODO: add plugins - сервисы ioServer
+      // TODO: add drivers ??? - необходимые для ioServer
+      // TODO: add services - сервисы ioServer
+    };
   }
 
 }

@@ -116,6 +116,7 @@ export default abstract class StartBase implements Starter {
   }
 
   protected async startMain(
+    // TODO: зачем передавать ??? можно же просто загрузить. Или это для прода нужно тоже?
     MainClass: typeof Main,
     ioSet: IoSet,
     ioServerMode?: boolean
