@@ -1,0 +1,11 @@
+name: IoServerConnection
+main: IoServerConnection.ts
+
+drivers:
+  - WsServerSessions
+
+props:
+  $base: 'drivers.WsServerSessions'
+  port:
+    type: number
+    default: 8089

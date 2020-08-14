@@ -118,15 +118,13 @@ export default abstract class StartBase implements Starter {
   protected async startMain(
     // TODO: зачем передавать ??? можно же просто загрузить. Или это для прода нужно тоже?
     MainClass: typeof Main,
-    ioSet: IoSet,
-    ioServerMode?: boolean
+    ioSet: IoSet
   ): Promise<Main> {
     const logger = new ConsoleLoggerColorful(this.starterProps.logLevel);
     const main: Main = new MainClass(
       ioSet,
       logger,
       undefined,
-      ioServerMode,
       this.lockAppSwitch
     );
 
