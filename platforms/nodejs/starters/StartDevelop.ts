@@ -18,12 +18,12 @@ export default class StartDevelop extends StartBase {
   }
 
 
-  async start(ioServerMode?: boolean) {
+  async start() {
     await super.start();
 
     const ioSet: IoSet = await this.makeIoSet();
 
-    this.main = await this.startMain(Main, ioSet, ioServerMode);
+    this.main = await this.startMain(Main, ioSet);
   }
 
 

@@ -20,7 +20,7 @@ export default class AppStarter {
   private readonly hostConfigOverride?: HostConfig;
   private logger: Logger;
   private system?: System;
-  private ioServer?: IoServer;
+  //private ioServer?: IoServer;
 
 
   constructor(ioSet: IoSet, hostConfigOverride?: HostConfig, logger: Logger = new ConsoleLogger()) {
@@ -43,15 +43,14 @@ export default class AppStarter {
     finally {
       delete this.ioSet;
       delete this.system;
-      delete this.ioServer;
+      //delete this.ioServer;
       delete this.logger;
     }
   }
 
 
-  // TODO: может лучше в консруктор передать startIoServerFirst
-  async start(startIoServerFirst: boolean = false) {
-    let startIoServer: boolean = startIoServerFirst;
+  async start() {
+    //let startIoServer: boolean = startIoServerFirst;
     let fileContent: AppType | undefined;
     const storageIo: StorageIo = await this.ioSet.getIo<StorageIo>('Storage');
     const startAppTypeFileName: string = pathJoin(
@@ -63,15 +62,17 @@ export default class AppStarter {
     if (fileExists) {
       fileContent = await storageIo.readFile(startAppTypeFileName) as AppType;
 
-      startIoServer = fileContent === 'ioServer';
+      //startIoServer = fileContent === 'ioServer';
     }
 
-    if (startIoServer) {
-      await this.startIoServer();
-    }
-    else {
-      await this.startSystem(fileContent);
-    }
+    // if (startIoServer) {
+    //   await this.startIoServer();
+    // }
+    // else {
+    //   await this.startSystem(fileContent);
+    // }
+
+    await this.startSystem(fileContent);
   }
 
 
@@ -91,11 +92,11 @@ export default class AppStarter {
     await this.system.start();
   }
 
-  private startIoServer = async () => {
-    this.ioServer = new IoServer( this.ioSet, this.logger );
-
-    await this.ioServer.start();
-  }
+  // private startIoServer = async () => {
+  //   this.ioServer = new IoServer( this.ioSet, this.logger );
+  //
+  //   await this.ioServer.start();
+  // }
 
 }
 

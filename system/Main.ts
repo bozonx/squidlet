@@ -18,7 +18,6 @@ export default class Main {
   private ioSet: IoSet;
   private hostConfigOverride?: HostConfig;
   private logger: Logger;
-  private readonly ioServerMode?: boolean;
   private app?: AppStarter;
   private started: boolean = false;
 
@@ -27,7 +26,6 @@ export default class Main {
     ioSet: IoSet,
     logger: Logger,
     hostConfigOverride?: HostConfig,
-    ioServerMode?: boolean,
     lockAppSwitch?: boolean
   ) {
     this.ioSet = ioSet;
@@ -36,7 +34,6 @@ export default class Main {
       ...hostConfigOverride,
     } as HostConfig;
     this.logger = logger;
-    this.ioServerMode = ioServerMode;
   }
 
   async init() {
@@ -66,7 +63,7 @@ export default class Main {
   async start() {
     if (!this.app) throw new Error(`No app`);
 
-    await this.app.start(this.ioServerMode);
+    await this.app.start();
 
     this.started = true;
   }
