@@ -11,6 +11,7 @@ import systemConfig from './systemConfig';
 
 /**
  * Base class for builds which use src files or which use requireJs to load modules.
+ * It gives ability to load system configs and entity files.
  */
 export default class EnvSet {
   private readonly context: Context;

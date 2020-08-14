@@ -1,5 +1,7 @@
 # Squidlet control script
 
+This script gives ability to manipulate and update remote squidlet host and start host.
+
 ## Update hosts
 
 Update host
@@ -175,7 +177,7 @@ It reboot a micro-controller and boots to io-server mode.
 
     squidletctl switch-to-ioserver --host=my-host [--port=8089]
 
-## Switch to io server
+## Switch io server to normal app mode.
 
 Switch io server to app.
 

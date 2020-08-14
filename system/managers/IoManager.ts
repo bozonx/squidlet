@@ -51,6 +51,8 @@ export default class IoManager {
 
       if (ioItem.init) {
         this.context.log.debug(`IoManager: initialize io "${ioName}"`);
+
+        // TODO: make IoContext
         await ioItem.init(this);
       }
     }
