@@ -14,7 +14,7 @@ import IoContext from './interfaces/IoContext';
 import Logger from './interfaces/Logger';
 
 
-export default class IoServer {
+export default class IoServerOld {
   private readonly ioSet: IoSet;
   private _hostConfig?: HostConfig;
   private readonly log: Logger;
@@ -46,7 +46,7 @@ export default class IoServer {
     await this.startHttpApi();
     await this.initWsIoServer();
 
-    this.log.info('===> IoServer initialization has been finished');
+    this.log.info('===> IoServerOld initialization has been finished');
   }
 
   destroy = async () => {
@@ -78,7 +78,7 @@ export default class IoServer {
       this.log.error
     );
 
-    // stop IoServer's http api server to not to busy the port
+    // stop IoServerOld's http api server to not to busy the port
     this.httpApi && await this.httpApi.destroy();
 
     delete this.httpApi;

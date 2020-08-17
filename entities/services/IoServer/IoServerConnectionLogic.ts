@@ -3,8 +3,6 @@ import RemoteCall from '../../../system/lib/remoteCall/RemoteCall';
 import {makeUniqId} from '../../../system/lib/uniqId';
 import {deserializeJson, serializeJson} from '../../../system/lib/serialize';
 import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
-import HostConfig from '../../../system/interfaces/HostConfig';
-import IoSet from '../../../system/interfaces/IoSet';
 import {METHOD_DELIMITER} from '../../../system/constants';
 
 
@@ -13,8 +11,8 @@ import {METHOD_DELIMITER} from '../../../system/constants';
  */
 export default class IoServerConnectionLogic {
   private readonly connectionId: string;
-  private readonly hostConfig: HostConfig;
-  private readonly ioSet: IoSet;
+  // TODO: import context
+  private readonly context: Context;
   private readonly wsServerSend: (connectionId: string, data: string | Uint8Array) => Promise<void>;
   private readonly logDebug: (msg: string) => void;
   private readonly logError: (msg: string) => void;
@@ -25,22 +23,20 @@ export default class IoServerConnectionLogic {
 
   constructor(
     connectionId: string,
-    ioSet: IoSet,
-    hostConfig: HostConfig,
+    context: Context,
     wsServerSend: (connectionId: string, data: string | Uint8Array) => Promise<void>,
     logDebug: (msg: string) => void,
     logError: (msg: string) => void
   ) {
     this.connectionId = connectionId;
-    this.hostConfig = hostConfig;
-    this.ioSet = ioSet;
+    this.context = context;
     this.wsServerSend = wsServerSend;
     this.logDebug = logDebug;
     this.logError = logError;
     this.remoteCall = new RemoteCall(
       this.sendToClient,
       this.callIoMethod,
-      hostConfig.config.rcResponseTimoutSec,
+      this.context.config.config.rcResponseTimoutSec,
       this.logError,
       makeUniqId
     );
@@ -108,7 +104,7 @@ export default class IoServerConnectionLogic {
       throw new Error(`No method name: "${fullName}"`);
     }
 
-    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.ioSet.getIo(ioName);
+    const IoItem: {[index: string]: (...args: any[]) => Promise<any>} = this.context.getIo(ioName);
 
     if (!IoItem[methodName]) {
       throw new Error(`Method doesn't exist: "${ioName}.${methodName}"`);
