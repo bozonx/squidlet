@@ -1,13 +1,17 @@
 import StorageIo, {StatsSimplified} from 'system/interfaces/io/StorageIo';
-import DriverBase from 'system/base/DriverBase';
 import {pathDirname, pathJoin} from 'system/lib/paths';
 import systemConfig from 'system/systemConfig';
+import ServiceBase from 'system/base/ServiceBase';
+
+
+interface Props {
+}
 
 
 /**
  * Shared variable data storage. It manages data in varData/common
  */
-export class VarStorage extends DriverBase {
+export class VarStorage extends ServiceBase<Props> {
   private rootDir!: string;
   private storageIo!: StorageIo;
 
