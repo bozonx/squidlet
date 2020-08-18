@@ -19,6 +19,11 @@ export default class StartIoServerStandalone extends StartDevelop {
         'ios',
         'ioServer'
       ),
+      services: {
+        ioServer: {
+          service: 'IoServer',
+        },
+      },
       // ...omitObj(
       //   this.hostConfig,
       //   'plugins',

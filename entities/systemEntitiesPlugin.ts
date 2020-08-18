@@ -45,6 +45,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   // services
   await env.addService(path.join(servicesRoot, 'Automation/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'HttpApi/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'IoServer/manifest.yaml'));
   //await env.addService(path.join(servicesRoot, 'Network/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'MqttApiTopics/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Network/manifest.yaml'));
