@@ -115,7 +115,8 @@ export default class IoServerHttpApi {
 
     const storageIo: StorageIo = await this.ioSet.getIo<StorageIo>('Storage');
     const startAppTypeFileName: string = pathJoin(
-      systemConfig.rootDirs.tmp,
+      systemConfig.rootDirs.varData,
+      systemConfig.envSetDirs.system,
       START_APP_TYPE_FILE_NAME,
     );
     const ioServerAppType: AppType = 'app';

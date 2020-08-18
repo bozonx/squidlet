@@ -4,11 +4,17 @@ import systemConfig from './systemConfig';
 
 const allowedConfigs: {[index: string]: {[index: string]: string[]}} = {
   updater: {
+    // TODO: add channel drivers
     [systemConfig.fileNames.driversList]: [],
-    [systemConfig.fileNames.servicesList]: [],
+    // TODO: add network service
+    // TODO: add http api service
+    [systemConfig.fileNames.servicesList]: ['Updater'],
   },
   ioServer: {
+    // TODO: use channel driver instead of it
     [systemConfig.fileNames.driversList]: ['WsServer'],
+    // TODO: add network service
+    // TODO: add http api service
     [systemConfig.fileNames.servicesList]: ['IoServer'],
   },
 };

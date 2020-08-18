@@ -104,7 +104,8 @@ export default class StandardApi {
       'Storage'
     );
     const startAppTypeFileName: string = pathJoin(
-      systemConfig.rootDirs.tmp,
+      systemConfig.rootDirs.varData,
+      systemConfig.envSetDirs.system,
       START_APP_TYPE_FILE_NAME,
     );
 

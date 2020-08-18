@@ -49,17 +49,18 @@ export default class Context {
       'Storage'
     );
     const startAppTypeFileName: string = pathJoin(
-      systemConfig.rootDirs.tmp,
+      systemConfig.rootDirs.varData,
+      systemConfig.envSetDirs.system,
       START_APP_TYPE_FILE_NAME,
     );
-    // TODO: что по умолчанию
-    let appType: AppType = 'updater';
+    // TODO: что по умолчанию? updater?
+    let appType: AppType = 'app';
     // load tmp/startAppType file
     if (await storageIo.exists(startAppTypeFileName)) {
       appType = await storageIo.readFile(startAppTypeFileName) as any;
     }
 
-    // TODO: может дать возможность перепределить appType
+    // TODO: может дать возможность перепределить appType?
     this.hostConfig = mergeDeepObjects({
       ...this.hostConfigOverride,
       appType,
