@@ -9,11 +9,7 @@ import SysIo from './interfaces/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
 import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
 import DeviceBase from './base/DeviceBase';
-import StorageIo from './interfaces/io/StorageIo';
-import {pathJoin} from './lib/paths';
-import systemConfig from './systemConfig';
 import {AppType} from './interfaces/AppType';
-import {VarStorage} from '../entities/drivers/VarStorage/SharedStorage';
 
 
 export default class StandardApi {
@@ -87,6 +83,7 @@ export default class StandardApi {
 
   setAutomationRuleActive(ruleName: string, setActive: boolean) {
     // TODO: pass generic instead of "as any"
+    // TODO: use just this.context.service
     const automationService: Automation = this.context.system.servicesManager.getService(
       'Automation'
     ) as any;
@@ -101,29 +98,8 @@ export default class StandardApi {
 
     this.context.log.info(`Switching to app type "${appType}"`);
 
-    const varStorage: VarStorage = await this.context.service.varStorage;
-    const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
-      'Storage'
-    );
-    const startAppTypeFileName: string = pathJoin(
-      systemConfig.rootDirs.varData,
-      //systemConfig.envSetDirs.system,
-      START_APP_TYPE_FILE_NAME,
-    );
-
-    // TODO: use var data service with mkdirp
-    try {
-      await storageIo.mkdir(pathJoin(
-        systemConfig.rootDirs.varData,
-        systemConfig.envSetDirs.system,
-      ));
-    }
-    catch (e) {
-
-    }
-
-    // write varData/system/startAppType
-    await storageIo.writeFile(startAppTypeFileName, appType);
+    // write varData/var/startAppType
+    await this.context.service.varStorage.writeFile(START_APP_TYPE_FILE_NAME, appType);
     // and exit
     await this.context.system.ioManager.getIo<SysIo>('Sys').exit();
   }

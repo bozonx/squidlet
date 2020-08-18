@@ -14,7 +14,7 @@ import {mergeDeepObjects} from './lib/objects';
 import {AppType} from './interfaces/AppType';
 import {pathJoin} from './lib/paths';
 import StorageIo from './interfaces/io/StorageIo';
-import {ServicesObj} from './managers/ServicesManager';
+import ServicesObj from './interfaces/ServicesObj';
 
 
 export default class Context {
@@ -49,22 +49,23 @@ export default class Context {
     const loadedConfig = await this.system.envSet.loadConfig<HostConfig>(
       systemConfig.fileNames.hostConfig
     );
+    // use storage here because services hasn't been initialized at the moment
     const storageIo: StorageIo = await this.system.ioManager.getIo<StorageIo>(
       'Storage'
     );
     const startAppTypeFileName: string = pathJoin(
       systemConfig.rootDirs.varData,
-      systemConfig.envSetDirs.system,
+      systemConfig.storageDirs.var,
       START_APP_TYPE_FILE_NAME,
     );
     // TODO: что по умолчанию? updater?
     let appType: AppType = 'app';
-    // load varData/system/startAppType file
+    // load varData/var/startAppType
     if (await storageIo.exists(startAppTypeFileName)) {
       appType = await storageIo.readFile(startAppTypeFileName) as any;
     }
 
-    // TODO: может дать возможность перепределить appType?
+    // TODO: может дать возможность перепределить appType в hostConfigOverride?
     this.hostConfig = mergeDeepObjects({
       ...this.hostConfigOverride,
       appType,

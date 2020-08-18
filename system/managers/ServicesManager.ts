@@ -3,15 +3,14 @@ import EntityManagerBase from './EntityManagerBase';
 import ServiceBase from '../base/ServiceBase';
 import systemConfig from '../systemConfig';
 import {EntityType} from '../interfaces/EntityTypes';
-
-
-export interface ServicesObj {
-
-}
+import ServicesObj from '../interfaces/ServicesObj';
 
 
 export default class ServicesManager extends EntityManagerBase<ServiceBase> {
-  service: ServicesObj = {};
+  // shortcut to faster access
+  get service(): ServicesObj {
+    return this.instances as any;
+  }
 
   protected entityType: EntityType = 'service';
 
