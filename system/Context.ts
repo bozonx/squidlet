@@ -5,12 +5,15 @@ import State from './lib/State';
 import HostConfig from './interfaces/HostConfig';
 import System from './System';
 import {makeUniqId} from './lib/uniqId';
-import {SystemEvents} from './constants';
+import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
 import IoItem from './interfaces/IoItem';
 import DriverBase from './base/DriverBase';
 import ServiceBase from './base/ServiceBase';
 import systemConfig from './systemConfig';
 import {mergeDeepObjects} from './lib/objects';
+import {AppType} from './interfaces/AppType';
+import {pathJoin} from './lib/paths';
+import StorageIo from './interfaces/io/StorageIo';
 
 
 export default class Context {
@@ -42,8 +45,23 @@ export default class Context {
     const loadedConfig = await this.system.envSet.loadConfig<HostConfig>(
       systemConfig.fileNames.hostConfig
     );
+    const storageIo: StorageIo = await this.system.ioManager.getIo<StorageIo>(
+      'Storage'
+    );
+    const startAppTypeFileName: string = pathJoin(
+      systemConfig.rootDirs.tmp,
+      START_APP_TYPE_FILE_NAME,
+    );
+    let appType: AppType = 'updater';
+    // load tmp/startAppType file
+    if (await storageIo.exists(startAppTypeFileName)) {
+      appType = await storageIo.readFile(startAppTypeFileName) as any;
+    }
 
-    this.hostConfig = mergeDeepObjects(this.hostConfigOverride, loadedConfig) as any;
+    this.hostConfig = mergeDeepObjects({
+      ...this.hostConfigOverride,
+      appType,
+    }, loadedConfig) as any;
   }
 
   destroy() {

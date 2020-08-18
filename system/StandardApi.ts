@@ -100,18 +100,17 @@ export default class StandardApi {
 
     this.context.log.info(`Switching to app type " ${appType}"`);
 
-    // TODO: review
-    ////////////
-    const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>('Storage');
+    const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
+      'Storage'
+    );
     const startAppTypeFileName: string = pathJoin(
       systemConfig.rootDirs.tmp,
       START_APP_TYPE_FILE_NAME,
     );
-    const ioServerAppType: AppType = 'ioServer';
 
-    await storageIo.writeFile(startAppTypeFileName, ioServerAppType);
-    ////////////
-
+    // write tmp/startAppType
+    await storageIo.writeFile(startAppTypeFileName, appType);
+    // and exit
     await this.context.system.ioManager.getIo<SysIo>('Sys').exit();
   }
 
