@@ -55,7 +55,7 @@ export default class Context {
     );
     // TODO: что по умолчанию? updater?
     let appType: AppType = 'app';
-    // load tmp/startAppType file
+    // load varData/system/startAppType file
     if (await storageIo.exists(startAppTypeFileName)) {
       appType = await storageIo.readFile(startAppTypeFileName) as any;
     }

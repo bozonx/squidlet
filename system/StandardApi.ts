@@ -98,7 +98,7 @@ export default class StandardApi {
     //   throw new Error(`Switching to app is not allowed in config`);
     // }
 
-    this.context.log.info(`Switching to app type " ${appType}"`);
+    this.context.log.info(`Switching to app type "${appType}"`);
 
     const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
       'Storage'
@@ -109,7 +109,18 @@ export default class StandardApi {
       START_APP_TYPE_FILE_NAME,
     );
 
-    // write tmp/startAppType
+    // TODO: use var data service with mkdirp
+    try {
+      await storageIo.mkdir(pathJoin(
+        systemConfig.rootDirs.varData,
+        systemConfig.envSetDirs.system,
+      ));
+    }
+    catch (e) {
+
+    }
+
+    // write varData/system/startAppType
     await storageIo.writeFile(startAppTypeFileName, appType);
     // and exit
     await this.context.system.ioManager.getIo<SysIo>('Sys').exit();
