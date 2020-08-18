@@ -3,11 +3,11 @@ import {normalizeHexString} from '../../../system/lib/binaryHelpers';
 
 const pigpioClient = require('pigpio-client');
 
-import IoItem from 'system/interfaces/IoItem';
 import Promised from 'system/lib/Promised';
 import {compactUndefined} from 'system/lib/arrays';
 import IoContext from 'system/interfaces/IoContext';
 import PigpioPinWrapper, {PigpioInfo, PigpioOptions} from '../helpers/PigpioPinWrapper';
+import PigpioClientIo from '../../../system/interfaces/io/PigpioClientIo';
 
 
 const I2CO = 54;
@@ -34,7 +34,7 @@ const DEFAULT_OPTIONS = {
 let instance: PigpioClient | undefined;
 
 
-export default class PigpioClient implements IoItem {
+export default class PigpioClient implements PigpioClientIo {
   get inited(): boolean {
     return Boolean(this._ioContext);
   }

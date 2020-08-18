@@ -1,3 +1,6 @@
+import IoItem from '../IoItem';
+import PigpioPinWrapper from '../../../platforms/nodejs/helpers/PigpioPinWrapper';
+
 
 export const Methods = [
   'init',
@@ -14,6 +17,14 @@ export const Methods = [
   'i2cReadDevice',
 ];
 
-export default interface PigpioClientIo {
-  // TODO: add
+export default interface PigpioClientIo extends IoItem {
+  isPinInitialized(pin: number): boolean;
+  getPinInstance(pin: number): PigpioPinWrapper | undefined;
+  makePinInstance(pin: number): void;
+  clearPin(pin: number): void;
+  getInstantiatedPinList(): string[];
+  i2cOpen(bus: number, address: number): Promise<number>;
+  i2cClose(addressConnectionId: number): Promise<void>;
+  i2cWriteDevice(addressConnectionId: number, data: Uint8Array): void;
+  i2cReadDevice(addressConnectionId: number, count: number): Promise<Uint8Array>;
 }
