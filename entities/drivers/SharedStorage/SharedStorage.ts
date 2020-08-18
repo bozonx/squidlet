@@ -5,34 +5,32 @@ import systemConfig from 'system/systemConfig';
 
 
 /**
- * Shared variable data storage
+ * Shared variable data storage. It manages data in varData/common
  */
 export class SharedStorage extends DriverBase {
-  private rootDir: string = '';
-  private get storageDev(): StorageIo {
-    return this.depsInstances.storageDev as any;
-  }
+  private rootDir!: string;
+  private storageIo!: StorageIo;
 
 
   init = async () => {
-    this.depsInstances.storageDev = this.context.getIo('Storage');
+    this.storageIo = this.context.getIo('Storage');
     this.rootDir = pathJoin(
       systemConfig.rootDirs.varData,
-      systemConfig.storageDirs.common,
+      systemConfig.storageDirs.var,
     );
   }
 
 
   async isDir(pathToDir: string): Promise<boolean> {
     const absPath: string = pathJoin(this.rootDir, pathToDir);
-    const stats: StatsSimplified = await this.storageDev.stat(absPath);
+    const stats: StatsSimplified = await this.storageIo.stat(absPath);
 
     return stats.dir;
   }
 
   async isFile(pathToFile: string) {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
-    const stats: StatsSimplified = await this.storageDev.stat(absPath);
+    const stats: StatsSimplified = await this.storageIo.stat(absPath);
 
     return !stats.dir;
   }
@@ -40,19 +38,19 @@ export class SharedStorage extends DriverBase {
   isExists(pathToFileOrDir: string): Promise<boolean> {
     const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
 
-    return this.storageDev.exists(absPath);
+    return this.storageIo.exists(absPath);
   }
 
   readFile(pathToFile: string): Promise<string> {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
 
-    return this.storageDev.readFile(absPath);
+    return this.storageIo.readFile(absPath);
   }
 
   readBinFile(pathToFile: string): Promise<Uint8Array> {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
 
-    return this.storageDev.readBinFile(absPath);
+    return this.storageIo.readBinFile(absPath);
   }
 
   /**
@@ -61,13 +59,13 @@ export class SharedStorage extends DriverBase {
   readDir(pathToDir: string): Promise<string[]> {
     const absPath: string = pathJoin(this.rootDir, pathToDir);
 
-    return this.storageDev.readdir(absPath);
+    return this.storageIo.readdir(absPath);
   }
 
   writeFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
 
-    return this.storageDev.writeFile(absPath, data);
+    return this.storageIo.writeFile(absPath, data);
   }
 
   /**
@@ -75,26 +73,26 @@ export class SharedStorage extends DriverBase {
    */
   async rm(pathToFileOrDir: string) {
     const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
-    const stats: StatsSimplified = await this.storageDev.stat(pathToFileOrDir);
+    const stats: StatsSimplified = await this.storageIo.stat(pathToFileOrDir);
 
     if (stats.dir) {
-      return this.storageDev.rmdir(absPath);
+      return this.storageIo.rmdir(absPath);
     }
     else {
-      return this.storageDev.unlink(absPath);
+      return this.storageIo.unlink(absPath);
     }
   }
 
   appendFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
 
-    return this.storageDev.appendFile(absPath, data);
+    return this.storageIo.appendFile(absPath, data);
   }
 
   stat(pathToFileOrDir: string): Promise<StatsSimplified> {
     const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
 
-    return this.storageDev.stat(absPath);
+    return this.storageIo.stat(absPath);
   }
 
 
@@ -109,7 +107,7 @@ export class SharedStorage extends DriverBase {
     const oldAbsPath: string = pathJoin(this.rootDir, fromPath);
     const newAbsPath: string = pathJoin(this.rootDir, toPath);
 
-    return this.storageDev.rename(oldAbsPath, newAbsPath);
+    return this.storageIo.rename(oldAbsPath, newAbsPath);
   }
 
   async rename(pathToFileOrDir: string, newName: string): Promise<void> {
@@ -117,7 +115,7 @@ export class SharedStorage extends DriverBase {
     const fileDir: string = pathDirname(absPath);
     const newPath: string = pathJoin(fileDir, newName);
 
-    return this.storageDev.rename(absPath, newPath);
+    return this.storageIo.rename(absPath, newPath);
   }
 
   /**

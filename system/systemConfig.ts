@@ -15,8 +15,7 @@ const systemConfig = {
   },
   // dirs under varDataDir which is set in host config
   storageDirs: {
-    common: 'common',
-    system: 'system',
+    var: 'var',
     cache: 'cache',
     logs: 'logs',
   },

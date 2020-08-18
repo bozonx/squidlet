@@ -103,9 +103,12 @@ export default class StandardApi {
     const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
       'Storage'
     );
+    const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
+      'Storage'
+    );
     const startAppTypeFileName: string = pathJoin(
       systemConfig.rootDirs.varData,
-      systemConfig.envSetDirs.system,
+      //systemConfig.envSetDirs.system,
       START_APP_TYPE_FILE_NAME,
     );
 
