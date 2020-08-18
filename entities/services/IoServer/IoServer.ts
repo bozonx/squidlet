@@ -1,12 +1,11 @@
 import ServiceBase from 'system/base/ServiceBase';
 import {WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
-import WebSocketServerIo from '../../../system/interfaces/io/WebSocketServerIo';
-import WsServerLogic from '../../drivers/WsServer/WsServerLogic';
 import IoServerConnectionLogic from './IoServerConnectionLogic';
+import {WsServer} from '../../drivers/WsServer/WsServer';
 
 
 export default class IoServer extends ServiceBase<WsServerSessionsProps> {
-  private wsServer!: WsServerLogic;
+  private wsServer!: WsServer;
   private ioConnection?: IoServerConnectionLogic;
 
 
@@ -47,17 +46,7 @@ export default class IoServer extends ServiceBase<WsServerSessionsProps> {
       throw new Error(`Can't init ioServer because it isn't allowed in a host config`);
     }
 
-    const wsServerIo = this.context.getIo<WebSocketServerIo>('WebSocketServer');
-    const props = this.context.config.ioServer;
-
-    this.wsServer = new WsServerLogic(
-      wsServerIo,
-      props,
-      () => this.log.error(`Websocket server has been closed`),
-      this.log.debug,
-      this.log.info,
-      this.log.error,
-    );
+    this.wsServer = await this.context.getSubDriver('WsServer', this.props);
 
     await this.wsServer.init();
 

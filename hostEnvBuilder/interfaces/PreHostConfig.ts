@@ -77,14 +77,4 @@ export default interface PreHostConfig {
 
   // additional npm packages which will be installed
   //dependencies?: {[index: string]: string};
-
-  // host and port to listen to in IO server mode.
-  // it will use default values if this param is an empty object.
-  ioServer?: {
-    // default is localhost
-    host?: string;
-    // default is 8089
-    port?: number;
-  };
-
 }

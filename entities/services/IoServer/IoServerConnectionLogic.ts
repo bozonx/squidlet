@@ -11,7 +11,6 @@ import {METHOD_DELIMITER} from '../../../system/constants';
  */
 export default class IoServerConnectionLogic {
   private readonly connectionId: string;
-  // TODO: import context
   private readonly context: Context;
   private readonly wsServerSend: (connectionId: string, data: string | Uint8Array) => Promise<void>;
   private readonly logDebug: (msg: string) => void;

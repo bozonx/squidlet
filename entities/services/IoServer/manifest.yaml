@@ -2,5 +2,8 @@ name: IoServer
 main: IoServer.ts
 
 drivers:
+  - WsServer
 
 props:
+  host: localhost
+  port: 8089

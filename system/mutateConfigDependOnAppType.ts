@@ -8,7 +8,7 @@ const allowedConfigs: {[index: string]: {[index: string]: string[]}} = {
     [systemConfig.fileNames.servicesList]: [],
   },
   ioServer: {
-    [systemConfig.fileNames.driversList]: [],
+    [systemConfig.fileNames.driversList]: ['WsServer'],
     [systemConfig.fileNames.servicesList]: ['IoServer'],
   },
 };
