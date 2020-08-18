@@ -109,9 +109,9 @@ export default class IoServerHttpApi {
   }
 
   private async apiSwitchToApp(): Promise<HttpApiBody> {
-    if (this.hostConfig.lockAppSwitch) {
-      throw new Error(`Switching to App is not allowed!`);
-    }
+    // if (this.hostConfig.lockAppSwitch) {
+    //   throw new Error(`Switching to App is not allowed!`);
+    // }
 
     const storageIo: StorageIo = await this.ioSet.getIo<StorageIo>('Storage');
     const startAppTypeFileName: string = pathJoin(

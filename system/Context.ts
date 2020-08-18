@@ -52,12 +52,14 @@ export default class Context {
       systemConfig.rootDirs.tmp,
       START_APP_TYPE_FILE_NAME,
     );
+    // TODO: что по умолчанию
     let appType: AppType = 'updater';
     // load tmp/startAppType file
     if (await storageIo.exists(startAppTypeFileName)) {
       appType = await storageIo.readFile(startAppTypeFileName) as any;
     }
 
+    // TODO: может дать возможность перепределить appType
     this.hostConfig = mergeDeepObjects({
       ...this.hostConfigOverride,
       appType,

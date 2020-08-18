@@ -44,7 +44,6 @@ export default interface HostConfig {
   appType: AppType;
   platform: Platforms;
   machine: string;
-  lockAppSwitch?: boolean;
   //platform: Platforms;
   // specific config for each host
   config: HostConfigConfig;

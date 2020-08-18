@@ -36,7 +36,6 @@ export default abstract class StartBase implements Starter {
   protected gid?: number;
   protected platform: Platforms = 'nodejs';
   protected machine?: NodejsMachines;
-  protected lockAppSwitch?: boolean;
   protected envBuilder!: EnvBuilder;
 
   protected get hostConfig(): PreHostConfig {
@@ -120,8 +119,6 @@ export default abstract class StartBase implements Starter {
     const main: Main = new MainClass(
       ioSet,
       logger,
-      undefined,
-      this.lockAppSwitch
     );
 
     console.info(`===> Starting app`);

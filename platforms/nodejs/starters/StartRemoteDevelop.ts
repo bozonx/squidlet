@@ -19,7 +19,6 @@ const SENDER_REPEATS_INTERVAL_SEC = 2;
 
 export default class StartRemoteDevelop extends StartBase {
   protected buildRoot = 'remote';
-  protected lockAppSwitch = true;
 
   private remoteHostInfo?: HostInfo;
   private readonly host: string;
@@ -70,7 +69,7 @@ export default class StartRemoteDevelop extends StartBase {
     const ioSet: IoSet = await this.makeIoSet();
     const logger = new ConsoleLoggerColorful(this.starterProps.logLevel);
 
-    this.main = new Main(ioSet, logger, undefined, this.lockAppSwitch);
+    this.main = new Main(ioSet, logger);
 
     console.info(`===> Starting app`);
 

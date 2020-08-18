@@ -28,14 +28,10 @@ export default class Main {
   constructor(
     ioSet: IoSet,
     logger: Logger,
-    hostConfigOverride?: HostConfig,
-    lockAppSwitch?: boolean
+    hostConfigOverride?: HostConfig
   ) {
     this.ioSet = ioSet;
-    this.hostConfigOverride = {
-      lockAppSwitch,
-      ...hostConfigOverride,
-    } as HostConfig;
+    this.hostConfigOverride = hostConfigOverride as HostConfig;
     this.logger = logger;
   }
 

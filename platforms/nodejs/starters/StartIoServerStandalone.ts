@@ -5,7 +5,6 @@ import StartDevelop from './StartDevelop';
 
 export default class StartIoServerStandalone extends StartDevelop {
   protected buildRoot = 'ioServer';
-  protected lockAppSwitch = true;
 
 
   // /**

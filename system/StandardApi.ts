@@ -94,9 +94,9 @@ export default class StandardApi {
   }
 
   async switchApp(appType: AppType) {
-    if (this.context.config.lockAppSwitch) {
-      throw new Error(`Switching to app is not allowed in config`);
-    }
+    // if (this.context.config.lockAppSwitch) {
+    //   throw new Error(`Switching to app is not allowed in config`);
+    // }
 
     this.context.log.info(`Switching to app type " ${appType}"`);
 
