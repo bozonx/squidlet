@@ -14,11 +14,14 @@ const allowedConfigs: {[index: string]: {[index: string]: string[]}} = {
 };
 
 
-export default function mutateConfigDependOnAppType(
+/**
+ * Ignore useless entities in io server and updater mode
+ */
+export default function mutateConfigDependOnAppType<T>(
   appType: AppType,
   configFileName: string,
-  configData: string[]
-): string[] {
+  configData: any
+): T {
   if (
     ['updater', 'ioServer'].includes(appType)
     && [
@@ -26,7 +29,7 @@ export default function mutateConfigDependOnAppType(
       systemConfig.fileNames.servicesList
     ].includes(configFileName)
   ) {
-    return allowedConfigs[appType][configFileName];
+    return allowedConfigs[appType][configFileName] as any;
   }
 
   return configData;

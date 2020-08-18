@@ -7,6 +7,7 @@ import StorageIo from './interfaces/io/StorageIo';
 import {splitFirstElement} from './lib/strings';
 import {convertEntityTypeToPlural} from './lib/helpers';
 import systemConfig from './systemConfig';
+import mutateConfigDependOnAppType from './mutateConfigDependOnAppType';
 
 
 /**
@@ -45,14 +46,20 @@ export default class EnvSet {
    * In development mode it will be loaded from memory by devlopment ioSet.
    * @param configFileName - config name with ".json" extension
    */
-  loadConfig<T>(configFileName: string): Promise<T> {
+  async loadConfig<T>(configFileName: string): Promise<T> {
     const pathToFile: string = pathJoin(
       systemConfig.rootDirs.envSet,
       systemConfig.envSetDirs.configs,
       configFileName
     );
 
-    return this.readJsonObjectFile(pathToFile) as Promise<T>;
+    const loadedConfig = await this.readJsonObjectFile(pathToFile) as any;
+
+    return mutateConfigDependOnAppType<T>(
+      this.context.config.appType,
+      configFileName,
+      loadedConfig
+    ) as T;
   }
 
   /**
