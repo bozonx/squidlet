@@ -37,6 +37,7 @@ export default class StartRemoteDevelop extends StartBase {
 
     if (!argIoSet) throw new Error(`--ioset param is required`);
 
+    // TODO: поидее нужно распарсить уровнем выше
     const {host, port} = this.parseIoSetString(argIoSet);
 
     this.host = host;
@@ -53,6 +54,7 @@ export default class StartRemoteDevelop extends StartBase {
   async init() {
     this.remoteHostInfo = await this.switchAppAndGetInfo();
 
+    // TODO: как будет резолвится machine etc ???
     await super.init();
 
     if (!this.remoteHostInfo) throw new Error(`no remoteHostInfo`);
@@ -68,7 +70,7 @@ export default class StartRemoteDevelop extends StartBase {
     const ioSet: IoSet = await this.makeIoSet();
     const logger = new ConsoleLoggerColorful(this.starterProps.logLevel);
 
-    this.main = new Main(ioSet, logger, undefined, false, this.lockAppSwitch);
+    this.main = new Main(ioSet, logger, undefined, this.lockAppSwitch);
 
     console.info(`===> Starting app`);
 

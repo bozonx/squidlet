@@ -37,10 +37,7 @@ export default abstract class StartBase implements Starter {
   protected platform: Platforms = 'nodejs';
   protected machine?: NodejsMachines;
   protected lockAppSwitch?: boolean;
-
-  protected get envBuilder(): EnvBuilder {
-    return this._envBuilder as any;
-  }
+  protected envBuilder!: EnvBuilder;
 
   protected get hostConfig(): PreHostConfig {
     return this.groupConfig.getHostConfig(this.starterProps.hostName);
@@ -49,7 +46,6 @@ export default abstract class StartBase implements Starter {
     return this.hostConfig.id as any;
   }
 
-  private _envBuilder?: EnvBuilder;
 
   /**
    * Prepare ioSet here.
@@ -77,7 +73,7 @@ export default abstract class StartBase implements Starter {
     const envSetTmpDir = path.join(this.buildWorkDir, ENV_BUILD_TMP_DIR);
     const {platform, machine} = this.resolvePlatformMachine();
 
-    this._envBuilder = new EnvBuilder(
+    this.envBuilder = new EnvBuilder(
       this.resolveHostConfig(),
       appEnvSetDir,
       envSetTmpDir,
