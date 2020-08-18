@@ -13,6 +13,7 @@ import StorageIo from './interfaces/io/StorageIo';
 import {pathJoin} from './lib/paths';
 import systemConfig from './systemConfig';
 import {AppType} from './interfaces/AppType';
+import {VarStorage} from '../entities/drivers/VarStorage/SharedStorage';
 
 
 export default class StandardApi {
@@ -100,9 +101,7 @@ export default class StandardApi {
 
     this.context.log.info(`Switching to app type "${appType}"`);
 
-    const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
-      'Storage'
-    );
+    const varStorage: VarStorage = await this.context.service.varStorage;
     const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>(
       'Storage'
     );

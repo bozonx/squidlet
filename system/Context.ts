@@ -14,6 +14,7 @@ import {mergeDeepObjects} from './lib/objects';
 import {AppType} from './interfaces/AppType';
 import {pathJoin} from './lib/paths';
 import StorageIo from './interfaces/io/StorageIo';
+import {ServicesObj} from './managers/ServicesManager';
 
 
 export default class Context {
@@ -30,6 +31,9 @@ export default class Context {
   }
   get isInitialized() {
     return this.system.wasAppInitialized;
+  }
+  get service(): ServicesObj {
+    return this.system.servicesManager.service;
   }
 
   private hostConfig?: HostConfig;

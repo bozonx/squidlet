@@ -5,7 +5,14 @@ import systemConfig from '../systemConfig';
 import {EntityType} from '../interfaces/EntityTypes';
 
 
+export interface ServicesObj {
+
+}
+
+
 export default class ServicesManager extends EntityManagerBase<ServiceBase> {
+  service: ServicesObj = {};
+
   protected entityType: EntityType = 'service';
 
 

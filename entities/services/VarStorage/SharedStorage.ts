@@ -7,7 +7,7 @@ import systemConfig from 'system/systemConfig';
 /**
  * Shared variable data storage. It manages data in varData/common
  */
-export class SharedStorage extends DriverBase {
+export class VarStorage extends DriverBase {
   private rootDir!: string;
   private storageIo!: StorageIo;
 
