@@ -112,7 +112,6 @@ export default class ConfigManager {
       machine: this.machine as any,
       appType,
       config: normalizedConfig.config as any,
-      ioServer: normalizedConfig.ioServer as any,
     };
   }
 

@@ -45,7 +45,6 @@ export default function validateHostConfig(rawConfig: {[index: string]: any}): s
     () => isObject(rawConfig.network, 'network'),
     () => isObject(rawConfig.wsApi, 'wsApi'),
     () => isObject(rawConfig.httpApi, 'httpApi'),
-    () => isObject(rawConfig.ioServer, 'ioServer'),
     () => isObject(rawConfig.updater, 'updater'),
 
     () => isObject(rawConfig.devicesDefaults, 'devicesDefaults'),

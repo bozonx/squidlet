@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import {Stats} from 'fs';
 import * as shelljs from 'shelljs';
-import * as rimraf from 'rimraf';
+import rimraf from 'rimraf';
 import * as yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';

@@ -72,6 +72,7 @@ export default class AppBuilder {
     this.hostName = hostName;
     this.minimize = minimize;
     this.logLevel = logLevel;
+    // TODO: remove ???
     this.ioServer = ioServer;
     this.groupConfig = new GroupConfigParser(this.os, hostConfigPath);
 
@@ -164,7 +165,9 @@ export default class AppBuilder {
     return _.template(fileContent)({
       REPO_ROOT: relativeRepoRoot,
       LOG_LEVEL: this.logLevel || 'undefined',
+      // TODO: remove ???
       IO_SERVER_MODE: this.ioServer || 'undefined',
+      // TODO: remove ???
       LOCK_APP_SWITCH: this.ioServer || 'undefined',
     });
   }

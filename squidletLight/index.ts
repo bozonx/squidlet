@@ -15,6 +15,7 @@ const machine = yargs.argv.machine as string | undefined;
 const name = yargs.argv.name as string | undefined;
 const minimize = yargs.argv.minimize !== 'false';
 const logLevel = yargs.argv.logLevel as LogLevel | undefined;
+// TODO: remove ???
 const ioServer = yargs.argv.ioServer === 'true';
 
 

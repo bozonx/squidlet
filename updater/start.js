@@ -31,6 +31,7 @@ else {
 const main = instantiateMain(
   hostConfigOverride,
   process.env.LOG_LEVEL || undefined,
+  // TODO: remove ???
   process.env.IOSERVER_MODE === 'true'
 );
 

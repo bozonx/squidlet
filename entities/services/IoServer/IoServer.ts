@@ -42,10 +42,6 @@ export default class IoServer extends ServiceBase<WsServerSessionsProps> {
 
 
   private async initWsServer() {
-    if (!this.context.config.ioServer) {
-      throw new Error(`Can't init ioServer because it isn't allowed in a host config`);
-    }
-
     this.wsServer = await this.context.getSubDriver('WsServer', this.props);
 
     await this.wsServer.init();
