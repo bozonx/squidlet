@@ -61,7 +61,7 @@ export default class HttpApiClient {
 
   private loadDefaultPort(): number {
     const yamlContent: string = fs.readFileSync(httpApiManifestPath, ENCODE);
-    const serviceManifest = yaml.safeLoad(yamlContent);
+    const serviceManifest = yaml.safeLoad(yamlContent) as {[index: string]: any};
     const serviceProps = collectPropsDefaults(serviceManifest.props);
 
     return serviceProps.port;

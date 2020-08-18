@@ -127,7 +127,7 @@ export default class IoClient {
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
     const yamlContent: string = fs.readFileSync(wsApiManifestPath, ENCODE);
-    const serviceManifest = yaml.safeLoad(yamlContent);
+    const serviceManifest = yaml.safeLoad(yamlContent) as {[index: string]: any};
     const serviceProps = collectPropsDefaults(serviceManifest.props);
     const host: string = specifiedHost || serviceProps.host;
     const port: number= specifiedPort || serviceProps.port;
