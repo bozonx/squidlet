@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as gulp from 'gulp';
-import * as babel from 'gulp-babel';
+import babel from 'gulp-babel';
 
 
 /**

@@ -1,5 +1,5 @@
 import * as gulp from 'gulp';
-import * as pump from 'pump';
+import pump from 'pump';
 const terser = require('gulp-terser');
 
 
