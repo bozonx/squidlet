@@ -1,3 +1,6 @@
+import path from 'path';
+import fs from 'fs';
+
 import RemoteCall from '../../system/lib/remoteCall/RemoteCall';
 import {deserializeJson, serializeJson} from '../../system/lib/serialize';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
@@ -7,8 +10,12 @@ import {makeUniqId} from '../../system/lib/uniqId';
 import {WsCloseStatus} from '../../system/interfaces/io/WebSocketClientIo';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import {METHOD_DELIMITER} from '../../system/constants';
+import {ENCODE} from '../../system/lib/constants';
+import * as yaml from 'js-yaml';
+import {collectPropsDefaults} from '../../system/lib/helpers';
 
 
+const wsApiManifestPath = path.resolve(__dirname, '../../entities/services/IoServer/manifest.yaml');
 const wsClientIo = new WebSocketClient();
 
 
@@ -119,8 +126,11 @@ export default class IoClient {
   }
 
   private makeClientProps(specifiedHost?: string, specifiedPort?: number): WsClientLogicProps {
-    const host: string = specifiedHost || hostDefaultConfig.ioServer.host;
-    const port: number= specifiedPort || hostDefaultConfig.ioServer.port;
+    const yamlContent: string = fs.readFileSync(wsApiManifestPath, ENCODE);
+    const serviceManifest = yaml.safeLoad(yamlContent);
+    const serviceProps = collectPropsDefaults(serviceManifest.props);
+    const host: string = specifiedHost || serviceProps.host;
+    const port: number= specifiedPort || serviceProps.port;
     const url = `ws://${host}:${port}`;
 
     return  {

@@ -84,6 +84,7 @@ export default class CommandUpdate {
       undefined,
       this.args.minimize !== 'false',
       undefined,
+      // TODO: remove ???
       this.args.ioServer === 'true',
     );
 

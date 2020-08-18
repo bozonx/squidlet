@@ -5,5 +5,9 @@ drivers:
   - WsServer
 
 props:
-  host: localhost
-  port: 8089
+  host:
+    type: string
+    default: localhost
+  port:
+    type: number
+    default: 8089
