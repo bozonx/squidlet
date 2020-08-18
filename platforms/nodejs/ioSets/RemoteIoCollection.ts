@@ -54,7 +54,8 @@ export default class RemoteIoCollection {
 
 
   private makeFakeIo(ioName: string): IoItem {
-    const ioDefinitionPath = path.join(SYSTEM_DIR, 'interfaces', 'platforms', `${ioName}Io`);
+    // TODO: use constants
+    const ioDefinitionPath = path.join(SYSTEM_DIR, 'interfaces', 'io', `${ioName}Io`);
     const ioItem: {[index: string]: any} = {};
     let ioMethods: string[];
 
