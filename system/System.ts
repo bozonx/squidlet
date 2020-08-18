@@ -61,6 +61,10 @@ export default class System {
     this.apiManager = new ApiManager(this.context);
   }
 
+  /**
+   * It destroys the app.
+   * Don't call this inside app, to exit call SysIo.exit().
+   */
   destroy = async () => {
     this.context.log.info('... destroying System');
     await this.events.emitSync(SystemEvents.beforeDestroy);

@@ -1,4 +1,5 @@
 import HttpApiClient from '../shared/helpers/HttpApiClient';
+import {AppType} from '../system/interfaces/AppType';
 
 
 export default class HttpApiCall {
@@ -67,20 +68,12 @@ export default class HttpApiCall {
     console.info(result);
   }
 
-  async switchToIoServer(host?: string, port?: string) {
+  async switchApp(appType: AppType, host?: string, port?: string) {
     const apiClient = await this.makeClient(host, port);
 
-    await apiClient.callMethod('switchToIoServer');
+    await apiClient.callMethod('switchApp', appType);
 
-    console.info(`Switched to io server successfully`);
-  }
-
-  async switchToApp(host?: string, port?: string) {
-    const apiClient = await this.makeClient(host, port);
-
-    await apiClient.callMethod('switchToApp');
-
-    console.info(`Switched to io app successfully`);
+    console.info(`Switched to app "${appType}" successfully`);
   }
 
 

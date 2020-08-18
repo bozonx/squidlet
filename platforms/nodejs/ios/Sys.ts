@@ -4,6 +4,7 @@ import {ExecException} from 'child_process';
 import SysIo from 'system/interfaces/io/SysIo';
 import SysInfo from 'system/interfaces/SysInfo';
 import {SysConfig} from 'system/interfaces/io/SysIo';
+import {AppType} from '../../../system/interfaces/AppType';
 
 
 let config: SysConfig | undefined;
@@ -22,9 +23,10 @@ export default class Sys implements SysIo {
    */
   async exit(code: number = 0) {
     if (config && config.exit) {
+      // call starter's exit
       return config.exit(code);
     }
-    // or just exit
+    // or just exit if doesn't set
     process.exit(code);
   }
 

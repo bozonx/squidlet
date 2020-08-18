@@ -93,18 +93,15 @@ export default class StandardApi {
     automationService.setRuleActive(ruleName, setActive);
   }
 
-
-  async switchToIoServer() {
+  async switchApp(appType: AppType) {
     if (this.context.config.lockAppSwitch) {
-      throw new Error(`Switching to IO-server isn't allowed it config`);
+      throw new Error(`Switching to app is not allowed in config`);
     }
 
-    if (!this.context.config.ioServer) {
-      throw new Error(`IoServer params aren't set int the host config`);
-    }
+    this.context.log.info(`Switching to app type " ${appType}"`);
 
-    this.context.log.info(`Switching to IO server`);
-
+    // TODO: review
+    ////////////
     const storageIo: StorageIo = await this.context.system.ioManager.getIo<StorageIo>('Storage');
     const startAppTypeFileName: string = pathJoin(
       systemConfig.rootDirs.tmp,
@@ -113,16 +110,9 @@ export default class StandardApi {
     const ioServerAppType: AppType = 'ioServer';
 
     await storageIo.writeFile(startAppTypeFileName, ioServerAppType);
+    ////////////
 
-    this.context.system.ioManager.getIo<SysIo>('Sys').exit();
-  }
-
-  switchToApp() {
-    return `Can't switch to app because app is already running`;
-  }
-
-  republishWholeState() {
-    // TODO: publish all the states of all the devices etc
+    await this.context.system.ioManager.getIo<SysIo>('Sys').exit();
   }
 
   async exit(code: number = 0): Promise<string> {
@@ -147,6 +137,9 @@ export default class StandardApi {
     return `It will be rebooted in ${this.context.config.config.rebootDelaySec} seconds`;
   }
 
+  republishWholeState() {
+    // TODO: publish all the states of all the devices etc
+  }
 
   /**
    * Listen device status and make object with changed params

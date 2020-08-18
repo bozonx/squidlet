@@ -1,5 +1,6 @@
 import IoItem from '../IoItem';
 import SysInfo from '../SysInfo';
+import {AppType} from '../AppType';
 
 
 export const Methods = [
@@ -11,7 +12,7 @@ export const Methods = [
 ];
 
 export interface SysConfig {
-  exit?: (code: number) => void;
+  exit?: (code: number, switchToApp?: AppType) => void;
 }
 
 
@@ -32,7 +33,7 @@ export default interface SysIo extends IoItem {
   reboot(): Promise<void>;
 
   /**
-   * It turn off the system.
+   * It turns off the system.
    */
   shutdown(): Promise<void>;
 

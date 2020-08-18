@@ -13,6 +13,7 @@ import {AppType} from './interfaces/AppType';
  * It prepares ioSet, connects logger and starts system
  */
 export default class Main {
+  // TODO: review
   get hasBeenStarted(): boolean {
     return this.started;
   }
@@ -89,13 +90,17 @@ export default class Main {
    * @param uid
    * @param gid
    */
-  async configureIoSet(processExit: (code: number) => void, workDir?: string, uid?: number, gid?: number) {
+  async configureIoSet(
+    processExit: (code: number) => void,
+    workDir?: string,
+    uid?: number,
+    gid?: number
+  ) {
     // get Storage IO
     const storageIo: StorageIo = this.ioSet.getIo<StorageIo>('Storage');
     const sysIo: SysIo = this.ioSet.getIo<SysIo>('Sys');
     // set uid, git and workDir to Storage IO
     await storageIo.configure({ uid, gid, workDir });
-    // TODO: review
     // make destroy before process.exit
     await sysIo.configure({
       exit: (code: number) => {

@@ -121,7 +121,7 @@ export default class StartRemoteDevelop extends StartBase {
 
     if (info.appType === 'ioServer') return info;
 
-    await this.httpApiClient.callMethod('switchToIoServer');
+    await this.httpApiClient.callMethod('switchApp', 'ioServer');
 
     for (let i = 0; i < SENDER_REPEATS; i++) {
       let result: HostInfo | undefined;

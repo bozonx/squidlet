@@ -37,7 +37,7 @@ Categories:
     
 ## Switch app to IO server
 
-    /api/switchToIoServer
+    /api/switchApp
     
 ## Switch IO server to app
 

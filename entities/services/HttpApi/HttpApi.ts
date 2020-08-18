@@ -24,7 +24,7 @@ const allowedApiMethodsToCall = [
   'setAutomationRuleActive',
   //'getSessionStore',
   'republishWholeState',
-  'switchToIoServer',
+  'switchApp',
   'switchToApp',
   'reboot',
 ];
