@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {Stats} from 'fs';
 import * as shelljs from 'shelljs';
 import rimraf from 'rimraf';
-import * as yaml from 'js-yaml';
+import yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
@@ -28,7 +28,7 @@ export default class Os {
   async loadYamlFile(fullPath: string): Promise<{[index: string]: any}> {
     const yamlContent: string = await this.getFileContent(fullPath);
 
-    return yaml.safeLoad(yamlContent);
+    return yaml.safeLoad(yamlContent) as any;
   }
 
   async writeFile(pathTo: string, data: string | Uint8Array, options?: OwnerOptions): Promise<void> {
