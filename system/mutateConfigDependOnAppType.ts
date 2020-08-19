@@ -7,14 +7,14 @@ const allowedConfigs: {[index: string]: {[index: string]: string[]}} = {
     // TODO: add channel drivers
     [systemConfig.fileNames.driversList]: ['WsServer', 'HttpServer', 'WsServerSessions', 'HttpServerRouter'],
     // TODO: add network service
-    [systemConfig.fileNames.servicesList]: ['Updater', 'HttpApi', 'WsApi'],
+    [systemConfig.fileNames.servicesList]: ['Updater', 'HttpApi', 'WsApi', 'SharedStorage'],
     [systemConfig.fileNames.devicesDefinitions]: [],
   },
   ioServer: {
     // TODO: use channel driver instead of it
     [systemConfig.fileNames.driversList]: ['WsServer', 'HttpServer', 'WsServerSessions', 'HttpServerRouter'],
     // TODO: add network service
-    [systemConfig.fileNames.servicesList]: ['IoServer', 'Updater', 'HttpApi', 'WsApi'],
+    [systemConfig.fileNames.servicesList]: ['IoServer', 'Updater', 'HttpApi', 'WsApi', 'SharedStorage'],
     [systemConfig.fileNames.devicesDefinitions]: [],
   },
 };

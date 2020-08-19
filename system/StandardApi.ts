@@ -104,8 +104,6 @@ export default class StandardApi {
     this.context.system.ioManager.getIo<SysIo>('Sys').exit()
       // TODO: лучше всетаки использовать await - но там ошибка
       .catch(this.context.log.error);
-
-    return '';
   }
 
   async exit(code: number = 0): Promise<string> {

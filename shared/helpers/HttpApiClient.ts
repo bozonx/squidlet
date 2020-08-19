@@ -92,11 +92,12 @@ export default class HttpApiClient {
       throw new Error(`Result of request "${url}" returns not successful status "${result.status}" but there isn't error string.`);
     }
 
-    if (!body.result) {
-      throw new Error(`Result of request "${url}" doesn't content "result" in the body`);
-    }
+    // if (!body.result) {
+    //   throw new Error(`Result of request "${url}" doesn't content "result" in the body`);
+    // }
 
-    return body.result as T;
+    return body as T;
+    //return body.result as T;
   }
 
 }
