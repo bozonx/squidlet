@@ -68,13 +68,18 @@ export default class System {
   destroy = async () => {
     this.context.log.info('... destroying System');
     await this.events.emitSync(SystemEvents.beforeDestroy);
+    this.context.log.info('... destroying apiManager');
     await this.apiManager.destroy();
+    this.context.log.info('... destroying devicesManager');
     await this.devicesManager.destroy();
+    this.context.log.info('... destroying servicesManager');
     await this.servicesManager.destroy();
+    this.context.log.info('... destroying driversManager');
     await this.driversManager.destroy();
+    this.context.log.info('... destroying context');
     this.context.destroy();
-    this.events.destroy();
     this.context.log.info('System has been successfully destroyed');
+    this.events.destroy();
   }
 
 
