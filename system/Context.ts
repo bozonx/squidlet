@@ -58,18 +58,16 @@ export default class Context {
       systemConfig.storageDirs.var,
       START_APP_TYPE_FILE_NAME,
     );
-    // TODO: что по умолчанию? updater?
     let appType: AppType = 'app';
     // load varData/var/startAppType
     if (await storageIo.exists(startAppTypeFileName)) {
       appType = await storageIo.readFile(startAppTypeFileName) as any;
     }
-
-    // TODO: может дать возможность перепределить appType в hostConfigOverride?
-    this.hostConfig = mergeDeepObjects({
-      ...this.hostConfigOverride,
+    // it allows to override appType in hostConfigOverride
+    this.hostConfig = mergeDeepObjects(this.hostConfigOverride, {
+      ...loadedConfig,
       appType,
-    }, loadedConfig) as any;
+    }) as any;
   }
 
   destroy() {

@@ -6,14 +6,13 @@ import {APP_DESTROY_TIMEOUT_SEC, SystemEvents} from './constants';
 import Logger from './interfaces/Logger';
 import System from './System';
 import LogLevel from './interfaces/LogLevel';
-import {AppType} from './interfaces/AppType';
 
 
 /**
  * It prepares ioSet, connects logger and starts system
  */
 export default class Main {
-  // TODO: review
+  // TODO: review может лучше брать из System ?
   get hasBeenStarted(): boolean {
     return this.started;
   }
@@ -35,17 +34,10 @@ export default class Main {
     this.logger = logger;
   }
 
-  async init(specifiedAppType?: AppType) {
-    // TODO: review does it really need ???
-    const hostConfigOverride: HostConfig = { ...this.hostConfigOverride } as any;
+  async init() {
+    this.system = new System(this.ioSet, this.hostConfigOverride);
 
     delete this.hostConfigOverride;
-
-    if (specifiedAppType) {
-      hostConfigOverride.appType = specifiedAppType;
-    }
-
-    this.system = new System(this.ioSet, hostConfigOverride);
 
     this.ioSet.init && await this.ioSet.init();
   }

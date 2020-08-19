@@ -22,6 +22,10 @@ catch (e) {
 
 if (stat && stat.isFile()) {
   instantiateMain = require(squidletIndex);
+
+  if (process.env.IOSERVER_MODE === 'true') {
+    hostConfigOverride.appType = 'ioServer';
+  }
 }
 else {
   instantiateMain = require(updaterIndex);
@@ -31,8 +35,6 @@ else {
 const main = instantiateMain(
   hostConfigOverride,
   process.env.LOG_LEVEL || undefined,
-  // TODO: remove ???
-  process.env.IOSERVER_MODE === 'true'
 );
 
 async function start() {

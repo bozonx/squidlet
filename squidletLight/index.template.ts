@@ -16,16 +16,13 @@ const ioSet: IoSet = new IoSetBuiltin(envSet, ios, devicesMainFiles, driversMain
 
 export default function instantiateMain (
   hostConfigOverride?: HostConfig,
-  logLevel?: LogLevel,
-  ioServerMode?: boolean
+  logLevel?: LogLevel
 ): Main {
   const consoleLogger = new ConsoleLogger(logLevel || ${LOG_LEVEL});
 
   return new Main(
     ioSet,
     consoleLogger,
-    hostConfigOverride,
-    (typeof ioServerMode === 'undefined') ? ${IO_SERVER_MODE} : ioServerMode,
-    ${LOCK_APP_SWITCH}
+    hostConfigOverride
   );
 }
