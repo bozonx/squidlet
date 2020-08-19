@@ -170,15 +170,10 @@ Params
 * --port - set remote port. Is isn't set - default will be used
 * --level - max level to listen to. Default is info
 
-## Switch to io server
+## Switch to io server and normal app
 
 Switch app to io server for development purpose.
 It reboot a micro-controller and boots to io-server mode.
 
-    squidletctl switch-to-ioserver --host=my-host [--port=8089]
-
-## Switch io server to normal app mode.
-
-Switch io server to app.
-
-    squidletctl switch-to-app --host=my-host [--port=8089]
+    squidletctl switch-app ioServer --host=my-host [--port=8089]
+    squidletctl switch-app app --host=my-host [--port=8089]

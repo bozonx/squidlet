@@ -77,9 +77,7 @@ export default class IoClient {
   callIoMethod(ioName: string, methodName: string, ...args: any[]): Promise<any> {
     const pathToMethod = `${ioName}${METHOD_DELIMITER}${methodName}`;
 
-    console.log(111111, args)
-
-    this.logDebug(`IoClient.callIoMethod: ${pathToMethod}, ${JSON.stringify(args)}`);
+    this.logDebug(`IoClient.callIoMethod: ${pathToMethod}, ${args.length}`);
 
     return this.remoteCall.callMethod(pathToMethod, ...args);
   }

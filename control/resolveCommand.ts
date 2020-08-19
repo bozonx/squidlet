@@ -62,10 +62,8 @@ async function startCommand(command: string, positionArgsRest: string[], args: {
       return httpApiCall.reboot(args.host, args.port);
     case 'info':
       return httpApiCall.info(args.host, args.port);
-    case 'switch-to-ioserver':
-      return httpApiCall.switchApp('ioServer', args.host, args.port, );
-    case 'switch-to-app':
-      return httpApiCall.switchApp('app', args.host, args.port);
+    case 'switch-app':
+      return httpApiCall.switchApp(positionArgsRest[0] as any, args.host, args.port);
     default:
       console.error(`Unknown command "${command}"`);
       process.exit(2);
