@@ -43,7 +43,6 @@ export default class AppBuilder {
   private readonly hostName?: string;
   private readonly minimize: boolean;
   private readonly logLevel?: LogLevel;
-  private readonly ioServer?: boolean;
   private readonly os: Os = new Os();
   private readonly groupConfig: GroupConfigParser;
   private _envBuilder?: EnvBuilder;
@@ -61,7 +60,6 @@ export default class AppBuilder {
     argOutputDir?: string,
     minimize: boolean = true,
     logLevel?: LogLevel,
-    ioServer?: boolean
   ) {
     const workDir: string = DEFAULT_WORK_DIR;
 
@@ -72,10 +70,7 @@ export default class AppBuilder {
     this.hostName = hostName;
     this.minimize = minimize;
     this.logLevel = logLevel;
-    // TODO: remove ???
-    this.ioServer = ioServer;
     this.groupConfig = new GroupConfigParser(this.os, hostConfigPath);
-
   }
 
   async init() {
@@ -165,10 +160,6 @@ export default class AppBuilder {
     return _.template(fileContent)({
       REPO_ROOT: relativeRepoRoot,
       LOG_LEVEL: this.logLevel || 'undefined',
-      // TODO: remove ???
-      IO_SERVER_MODE: this.ioServer || 'undefined',
-      // TODO: remove ???
-      LOCK_APP_SWITCH: this.ioServer || 'undefined',
     });
   }
 

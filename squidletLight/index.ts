@@ -8,15 +8,13 @@ import AppBuilder from './AppBuilder';
 
 
 const hostConfigPath: string | undefined = yargs.argv._[0] as any;
-const IO_SERVER_DEFAULT_HOST_CONFIG_PATH = path.join(__dirname, 'ioServerHostConfig.yaml');
+//const IO_SERVER_DEFAULT_HOST_CONFIG_PATH = path.join(__dirname, 'ioServerHostConfig.yaml');
 const argOutputDir = yargs.argv.outputDir as string | undefined;
 const platform = yargs.argv.platform as Platforms | undefined;
 const machine = yargs.argv.machine as string | undefined;
 const name = yargs.argv.name as string | undefined;
 const minimize = yargs.argv.minimize !== 'false';
 const logLevel = yargs.argv.logLevel as LogLevel | undefined;
-// TODO: remove ???
-const ioServer = yargs.argv.ioServer === 'true';
 
 
 if (!platform) {
@@ -27,7 +25,7 @@ else if (!machine) {
   console.error(`--machine is required`);
   process.exit(2);
 }
-else if (!ioServer && !hostConfigPath) {
+else if (!hostConfigPath) {
   console.error(`host config is required`);
   process.exit(2);
 }
@@ -36,12 +34,12 @@ else if (!ioServer && !hostConfigPath) {
 const builder = new AppBuilder(
   platform,
   machine,
-  hostConfigPath || IO_SERVER_DEFAULT_HOST_CONFIG_PATH,
+  hostConfigPath,
+  //hostConfigPath || IO_SERVER_DEFAULT_HOST_CONFIG_PATH,
   name,
   argOutputDir,
   minimize,
-  logLevel,
-  ioServer
+  logLevel
 );
 
 builder.init()
