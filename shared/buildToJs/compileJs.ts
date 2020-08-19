@@ -8,6 +8,9 @@ import babel from 'gulp-babel';
  */
 export default function compileJs (srcDir: string, destDir: string, strictMode?: boolean) {
   return new Promise((resolve, reject) => {
+
+    console.log(11111111111111, srcDir, destDir, strictMode)
+
     return gulp
       .src(path.resolve(srcDir, `**/*.js`))
       .pipe(babel({
@@ -36,6 +39,8 @@ export default function compileJs (srcDir: string, destDir: string, strictMode?:
           '@babel/plugin-transform-destructuring',
           '@babel/plugin-transform-parameters',
           '@babel/plugin-transform-spread',
+
+          '@babel/plugin-proposal-optional-chaining',
 
           // it isn't need for espruino 2.0, but compiler emits errors
           '@babel/plugin-transform-classes',

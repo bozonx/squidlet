@@ -56,8 +56,7 @@ export default class EnvSet {
     const loadedConfig = await this.readJsonObjectFile(pathToFile) as any;
 
     return mutateConfigDependOnAppType<T>(
-      // TODO: add ?. syntax
-      this.context.config && this.context.config.appType,
+      this.context.config?.appType,
       configFileName,
       loadedConfig
     ) as T;
