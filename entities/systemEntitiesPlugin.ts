@@ -49,7 +49,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addService(path.join(servicesRoot, 'MqttApiTopics/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Network/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'Updater/manifest.yaml'));
-  await env.addService(path.join(servicesRoot, 'VarStorage/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'SharedStorage/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'WsApi/manifest.yaml'));
 
   // add used on host drivers related on ios

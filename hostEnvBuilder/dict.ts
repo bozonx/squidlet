@@ -4,11 +4,16 @@ export const servicesShortcut: {[index: string]: string} = {
   wsApi: 'WsApi',
   httpApi: 'HttpApi',
   updater: 'Updater',
+  ioServer: 'IoServer',
+  // TODO: неправильно так как для него нет props,
+  //       но по другому не будет работать в defaultServices
+  sharedStorage: 'SharedStorage',
 };
 
-// services which set by default event you don't specify it in host config.
+// services which set by default even you don't specify it in host config.
 // To turn off the service you should specify: logger: false.
 export const defaultServices = [
+  'sharedStorage',
   //'updater',
   //'httpApi',
 ];

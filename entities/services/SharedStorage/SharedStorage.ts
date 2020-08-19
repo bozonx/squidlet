@@ -11,7 +11,7 @@ interface Props {
 /**
  * Shared variable data storage. It manages data in varData/common
  */
-export class VarStorage extends ServiceBase<Props> {
+export default class SharedStorage extends ServiceBase<Props> {
   private rootDir!: string;
   private storageIo!: StorageIo;
 

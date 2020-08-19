@@ -98,8 +98,10 @@ export default class StandardApi {
 
     this.context.log.info(`Switching to app type "${appType}"`);
 
+    console.log(111111111, Object.keys(this.context.service))
+
     // write varData/var/startAppType
-    await this.context.service.varStorage.writeFile(START_APP_TYPE_FILE_NAME, appType);
+    await this.context.service.sharedStorage.writeFile(START_APP_TYPE_FILE_NAME, appType);
     // and exit
     await this.context.system.ioManager.getIo<SysIo>('Sys').exit();
   }

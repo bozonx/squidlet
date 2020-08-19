@@ -1,5 +1,5 @@
-name: VarStorage
-main: VarStorage.ts
+name: SharedStorage
+main: SharedStorage.ts
 system: true
 
 ios:

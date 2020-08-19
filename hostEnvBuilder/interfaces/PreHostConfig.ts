@@ -74,6 +74,7 @@ export default interface PreHostConfig {
   wsApi?: {[index: string]: any};
   httpApi?: {[index: string]: any};
   updater?: {[index: string]: any};
+  ioServer?: {[index: string]: any};
 
   // additional npm packages which will be installed
   //dependencies?: {[index: string]: string};

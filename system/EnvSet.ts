@@ -38,6 +38,24 @@ export default class EnvSet {
     if (!await this.storageIo.exists(systemConfig.rootDirs.tmp)) {
       await this.storageIo.mkdir(systemConfig.rootDirs.tmp);
     }
+
+    const varDir = pathJoin(systemConfig.rootDirs.varData, systemConfig.storageDirs.var);
+
+    if (!await this.storageIo.exists(varDir)) {
+      await this.storageIo.mkdir(varDir);
+    }
+
+    const cacheDir = pathJoin(systemConfig.rootDirs.varData, systemConfig.storageDirs.cache);
+
+    if (!await this.storageIo.exists(cacheDir)) {
+      await this.storageIo.mkdir(cacheDir);
+    }
+
+    const logsDir = pathJoin(systemConfig.rootDirs.varData, systemConfig.storageDirs.logs);
+
+    if (!await this.storageIo.exists(logsDir)) {
+      await this.storageIo.mkdir(logsDir);
+    }
   }
 
 
