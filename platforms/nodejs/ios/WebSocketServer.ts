@@ -221,7 +221,8 @@ export default class WebSocketServer implements WebSocketServerIo {
     const server = this.servers[Number(serverId)][ITEM_POSITION.wsServer];
 
     // call server close
-    await callPromised(server.close.bind(server));
+    // TODO: если раскоментировать то будет ошибка при дестрое
+    //await callPromised(server.close.bind(server));
 
     delete this.servers[Number(serverId)];
   }

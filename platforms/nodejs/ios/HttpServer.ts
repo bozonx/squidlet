@@ -61,7 +61,8 @@ export default class HttpServer implements HttpServerIo {
     const serverItem = this.servers[serverIdNum];
 
     serverItem[ITEM_POSITION.events].destroy();
-    await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
+    // TODO: если раскоментировать то будет ошибка при дестрое
+    //await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
 
     delete this.servers[serverIdNum];
 
