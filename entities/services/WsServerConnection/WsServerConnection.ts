@@ -8,22 +8,20 @@ import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import ServiceBase from 'system/base/ServiceBase';
 import {
-  isRequest,
   makeConnectionRequest,
   encodeRequest,
   encodeResponse,
-  decodeIncomeMessage
+  decodeIncomeMessage,
+  isRequest
 } from 'system/lib/connectionHelpers';
 import Promised from 'system/lib/Promised';
 
 import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
-import {NetworkResponse, NetworkStatus} from '../../../system/interfaces/NetworkDriver';
-import {stringToUint8Array} from '../../../system/lib/binaryHelpers';
-import {types} from 'util';
 
 
 type Timeout = NodeJS.Timeout;
 type IncomeRequestHandler = (request: ConnectionRequest, sessionId: string) => void;
+type IncomeResponseHandler = (response: ConnectionResponse, sessionId: string) => void;
 
 interface Props extends WsServerSessionsProps {
 }
@@ -31,9 +29,8 @@ interface Props extends WsServerSessionsProps {
 
 export default class WsServerConnection extends ServiceBase<Props> implements Connection {
   server!: WsServerSessions;
-  // TODO: какой тип???
-  private incomeMessagesEvent = new IndexedEvents();
   private incomeRequestsEvent = new IndexedEvents<IncomeRequestHandler>();
+  private incomeResponsesEvent = new IndexedEvents<IncomeResponseHandler>();
 
 
   init = async () => {
@@ -60,7 +57,7 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
     let timeout: Timeout | undefined;
 
     // wait for response
-    const handlerIndex = this.incomeMessagesEvent.addListener((
+    const handlerIndex = this.incomeResponsesEvent.addListener((
       response: ConnectionResponse
     ) => {
       // check if promised if fulfilled in case of timeout has exceeded
@@ -70,7 +67,7 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
 
       // TODO: проверить что это response
 
-      this.removeListener(handlerIndex);
+      this.incomeResponsesEvent.removeListener(handlerIndex);
       clearTimeout(timeout as any);
 
       promised.resolve(response);
@@ -86,7 +83,7 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
     timeout = setTimeout(() => {
       if (promised.isFulfilled()) return;
 
-      this.removeListener(handlerIndex);
+      this.incomeResponsesEvent.removeListener(handlerIndex);
 
       promised.reject(new Error(
         `WsServerConnection.request: Timeout of request has been exceeded ` +
@@ -146,21 +143,18 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
   private handleIncomeMessage = (sessionId: string, data: string | Uint8Array) => {
     if (!(data instanceof Uint8Array) || !data.length) return;
 
+    // TODO: проверить заголовок чтобы определить что это комманда для connection
+
     const decodedMessage: ConnectionRequest | ConnectionResponse = decodeIncomeMessage(data);
 
-    if (decodedMessage.request) {
+    if (isRequest(decodedMessage)) {
       // request
+      this.incomeRequestsEvent.emit(decodedMessage as ConnectionRequest, sessionId);
     }
     else {
       // response
+      this.incomeResponsesEvent.emit(decodedMessage as ConnectionResponse, sessionId);
     }
-
-    // TODO: проверить заголовок чтобы определить что это комманда для connection
-
-    // TODO: add
-    // TODO: decode and make response
-    // TODO: use incomeMessagesEvent
-    //if (!isRequest(request)) return;
   }
 
 }
