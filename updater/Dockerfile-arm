@@ -1,4 +1,4 @@
-FROM amd64/node:13.1.0
+FROM amd64/node:13.7.0
 
 COPY build/updater-arm/ app/
 COPY updater/start.js app/start.js
