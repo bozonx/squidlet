@@ -70,6 +70,11 @@ export default class RemoteIoCollection {
       ioItem[methodName] = this.makeMethod(ioName, methodName);
     }
 
+    // make stubs for configure and init methods
+    // because they have to be run only at IoServer's side
+    ioItem.configure = () => Promise.resolve();
+    ioItem.init = () => Promise.resolve();
+
     return ioItem as IoItem;
   }
 

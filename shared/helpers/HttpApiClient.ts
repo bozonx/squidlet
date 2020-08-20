@@ -96,8 +96,8 @@ export default class HttpApiClient {
     //   throw new Error(`Result of request "${url}" doesn't content "result" in the body`);
     // }
 
-    return body as T;
-    //return body.result as T;
+    //return body as T;
+    return body?.result as T;
   }
 
 }

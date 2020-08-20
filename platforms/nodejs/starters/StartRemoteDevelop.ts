@@ -69,7 +69,9 @@ export default class StartRemoteDevelop extends StartBase {
     const ioSet: IoSet = await this.makeIoSet();
     const logger = new ConsoleLoggerColorful(this.starterProps.logLevel);
 
-    this.main = new Main(ioSet, logger);
+    this.main = new Main(ioSet, logger, {
+      appType: 'app',
+    });
 
     console.info(`===> Starting app`);
 
