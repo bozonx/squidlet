@@ -130,10 +130,10 @@ export default class StartRemoteDevelop extends StartBase {
       await new Promise<void>((resolve, reject) => {
         //if (i >= SENDER_REPEATS -1)
         setTimeout(() => {
-          this.sender.send<HostInfo>('info', this.httpApiClient.callMethod('info') as any)
+          this.sender.send<HostInfo>('info', () => this.httpApiClient.callMethod('info') as any)
             .then((hostInfo: HostInfo) => {
               // just end cycle if app hasn't been switched
-              if (hostInfo.appType === 'ioServer') return resolve();
+              if (hostInfo.appType !== 'ioServer') return resolve();
 
               result = hostInfo;
 
