@@ -1,5 +1,5 @@
-name: WsServerChannel
-main: WsServerChannel.ts
+name: WsClientConnection
+main: WsClientConnection.ts
 
 #props:
 #  host:
