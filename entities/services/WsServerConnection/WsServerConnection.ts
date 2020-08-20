@@ -1,10 +1,10 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import ChannelDriver, {
+import Connection, {
   ChannelIncomeRequestHandler,
   ChannelRequest,
   ChannelSendResponse
-} from 'system/interfaces/ChannelDriver';
+} from 'system/interfaces/Connection';
 import {WsServer} from '../WsServer/WsServer';
 import {ConnectionParams} from '../../../system/interfaces/io/WebSocketServerIo';
 import {WsServerSessions} from '../WsServerSessions/WsServerSessions';
@@ -16,7 +16,7 @@ interface Props {
 }
 
 
-export class WsServerChannel extends DriverBase<Props> implements ChannelDriver {
+export class WsServerConnection extends DriverBase<Props> implements Connection {
   server!: WsServerSessions;
   // TODO: add type
   private incomeMessagesEvent = new IndexedEvents();
@@ -186,8 +186,8 @@ export class WsServerChannel extends DriverBase<Props> implements ChannelDriver 
 
 }
 
-export default class Factory extends DriverFactoryBase<WsServerChannel, Props> {
-  protected SubDriverClass = WsServerChannel;
+export default class Factory extends DriverFactoryBase<WsServerConnection, Props> {
+  protected SubDriverClass = WsServerConnection;
   protected instanceId = (props: Props): string => {
     // TODO: review
     return `${props.host}:${props.port}`;
