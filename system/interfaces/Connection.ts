@@ -1,7 +1,8 @@
 export enum ConnectionStatus {
-  ok = 0,
+  request,
+  responseOk,
   // body contains an error string
-  errorMessage,
+  responseError,
 }
 
 export interface ConnectionRequest {
@@ -11,14 +12,12 @@ export interface ConnectionRequest {
   data: Uint8Array;
 }
 
-export interface ConnectionSendResponse {
+export interface ConnectionResponse {
+  requestId: number;
+  channel: number;
   status: ConnectionStatus;
   body?: Uint8Array;
   error?: string;
-}
-
-export interface ConnectionResponse extends ConnectionSendResponse {
-  requestId: number;
 }
 
 // export interface ConnectionDriverProps {
@@ -28,7 +27,7 @@ export interface ConnectionResponse extends ConnectionSendResponse {
 // }
 
 export type ConnectionIncomeRequestHandler = (request: ConnectionRequest) => Promise<ConnectionResponse>;
-export type ConnectionIncomeResponseHandler = (request: ConnectionResponse) => void;
+export type ConnectionIncomeResponseHandler = (response: ConnectionResponse) => void;
 
 
 export default interface Connection {
@@ -40,13 +39,13 @@ export default interface Connection {
    * Register is 8 bits.
    * Port is from 0 to 255 but don't use port 255 it is registered for network data transfer.
    */
-  request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionSendResponse>;
+  request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionResponse>;
 
   /**
    * Handle income request at specified register.
    * You have to generate a response
    */
-  onRequest(channel: number, handler: ConnectionIncomeRequestHandler): number;
+  onRequest(sessionId: string, channel: number, handler: ConnectionIncomeRequestHandler): number;
 
   /**
    * Remove listener that has been set by `onRequest` or `onResponse`

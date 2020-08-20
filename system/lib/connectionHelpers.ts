@@ -1,4 +1,4 @@
-import {ConnectionRequest} from '../interfaces/Connection';
+import {ConnectionRequest, ConnectionResponse} from '../interfaces/Connection';
 
 
 export function makeConnectionRequest(
@@ -14,6 +14,11 @@ export function makeConnectionRequest(
 }
 
 export function makeConnectionRequestMessage(request: ConnectionRequest): Uint8Array {
+  // TODO: add
+  return new Uint8Array();
+}
+
+export function makeConnectionResponseMessage(response: ConnectionResponse): Uint8Array {
   // TODO: add
   return new Uint8Array();
 }
