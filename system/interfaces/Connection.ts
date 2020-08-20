@@ -5,9 +5,9 @@ export enum ConnectionStatus {
 }
 
 export interface ConnectionRequest {
-  channel: number;
   // should be 16 bits
   requestId: number;
+  channel: number;
   data: Uint8Array;
 }
 
