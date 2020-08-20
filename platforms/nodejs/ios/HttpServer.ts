@@ -38,7 +38,10 @@ export default class HttpServer implements HttpServerIo {
   async destroy() {
     for (let serverId in this.servers) {
       // destroy events of server
-      this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
+      // TODO: review
+      if (this.servers[Number(serverId)] && this.servers[Number(serverId)][ITEM_POSITION.events]) {
+        this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
+      }
 
       // TODO: not emit events
       await this.closeServer(serverId);
@@ -142,6 +145,8 @@ export default class HttpServer implements HttpServerIo {
   }
 
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+    if (!this.servers[Number(serverId)]) return Promise.resolve();
+
     const events = this.servers[Number(serverId)][ITEM_POSITION.events];
 
     return new Promise<void>((resolve, reject) => {

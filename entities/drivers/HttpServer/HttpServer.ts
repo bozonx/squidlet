@@ -48,6 +48,15 @@ export class HttpServer extends DriverBase<HttpServerProps> {
   }
 
 
+  // TODO: review disable and enable
+  async disable() {
+    await this.server?.closeServer();
+  }
+
+  async enable() {
+    await this.init();
+  }
+
   onRequest(cb: (request: HttpDriverRequest) => Promise<HttpDriverResponse>): number {
     if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.onRequest}`);
 

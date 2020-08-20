@@ -26,16 +26,14 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
   private get router(): HttpRouterLogic {
     return this._router as any;
   }
-  private get server(): HttpServer {
-    return this.depsInstances.server;
-  }
+  private server!: HttpServer;
   private get closedMsg() {
     return `Server "${this.props.host}:${this.props.port}" has been already closed`;
   }
 
 
   init = async () => {
-    this.depsInstances.server = await this.context.getSubDriver('HttpServer', this.props);
+    this.server = await this.context.getSubDriver('HttpServer', this.props);
     this._router = new HttpRouterLogic(this.log.debug);
 
     this.server.onRequest(this.handleIncomeRequest);
@@ -45,6 +43,14 @@ export class HttpServerRouter extends DriverBase<HttpServerProps> {
     this.router.destroy();
   }
 
+
+  async disable() {
+    await this.server.disable();
+  }
+
+  async enable() {
+    await this.server.enable();
+  }
 
   addRoute(
     method: HttpMethods,

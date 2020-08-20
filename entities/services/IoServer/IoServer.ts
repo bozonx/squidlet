@@ -51,6 +51,14 @@ export default class IoServer extends ServiceBase<WsServerSessionsProps> {
       return;
     }
 
+    // turn off HttpApi of IoServer
+    try {
+      await this.context.service['httpApi'].disable();
+    }
+    catch (e) {
+      console.warn(e);
+    }
+
     this.ioConnection = new IoServerConnectionLogic(
       connectionId,
       this.context,

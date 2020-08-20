@@ -31,16 +31,23 @@ const allowedApiMethodsToCall = [
 
 
 export default class HttpApi extends ServiceBase<HttpServerProps> {
-  private get router(): HttpServerRouter {
-    return this.depsInstances.router;
-  }
+  private router!: HttpServerRouter;
 
 
   init = async () => {
-    this.depsInstances.router = await this.context.getSubDriver('HttpServerRouter', this.props);
+    this.router = await this.context.getSubDriver('HttpServerRouter', this.props);
 
     this.router.addRoute('get', '/api/:apiMethodName/:args', this.handleRoute);
     this.router.addRoute('get', '/api/:apiMethodName', this.handleRoute);
+  }
+
+
+  async disable() {
+    await this.router.disable();
+  }
+
+  async enable() {
+    await this.router.enable();
   }
 
 
