@@ -5,19 +5,22 @@ export enum ConnectionStatus {
   responseError,
 }
 
-export interface ConnectionRequest {
+interface ConnectionMessage {
   // should be 16 bits
   requestId: number;
   channel: number;
-  data: Uint8Array;
+  status: ConnectionStatus;
 }
 
-export interface ConnectionResponse {
-  requestId: number;
-  channel: number;
-  status: ConnectionStatus;
+export interface ConnectionRequest extends ConnectionMessage {
+  request: true;
+  body: Uint8Array;
+}
+
+export interface ConnectionResponse extends ConnectionMessage {
+  response: true;
+  // it will be undefined on error
   body?: Uint8Array;
-  // TODO: он вообще нужен ???
   error?: string;
 }
 
