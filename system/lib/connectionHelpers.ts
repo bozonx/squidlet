@@ -1,4 +1,4 @@
-import {ConnectionRequest, ConnectionResponse} from '../interfaces/Connection';
+import {ConnectionRequest, ConnectionResponse, ConnectionStatus} from '../interfaces/Connection';
 
 
 export function makeConnectionRequest(
@@ -28,7 +28,6 @@ export function decodeIncomeMessage(data: Uint8Array): ConnectionRequest | Conne
   return {} as ConnectionRequest;
 }
 
-// export function isRequest(request: ConnectionRequest): boolean {
-//   // TODO: add
-//   return true;
-// }
+export function isRequest(request: ConnectionRequest | ConnectionResponse): boolean {
+  return request.status === ConnectionStatus.request;
+}

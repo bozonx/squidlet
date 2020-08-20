@@ -13,12 +13,13 @@ interface ConnectionMessage {
 }
 
 export interface ConnectionRequest extends ConnectionMessage {
-  request: true;
+  //request: true;
   body: Uint8Array;
 }
 
 export interface ConnectionResponse extends ConnectionMessage {
-  response: true;
+  // means response
+  //request: false;
   // it will be undefined on error
   body?: Uint8Array;
   error?: string;
