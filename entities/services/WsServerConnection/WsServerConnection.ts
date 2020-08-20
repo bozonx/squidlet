@@ -1,6 +1,5 @@
 import Connection, {
-  ConnectionIncomeRequestHandler,
-  ConnectionIncomeResponseHandler,
+  ConnectionOnRequestHandler,
   ConnectionRequest,
   ConnectionResponse,
   ConnectionStatus
@@ -9,6 +8,7 @@ import {ConnectionParams} from 'system/interfaces/io/WebSocketServerIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import ServiceBase from 'system/base/ServiceBase';
 import {
+  isRequest,
   makeConnectionRequest,
   makeConnectionRequestMessage,
   makeConnectionResponseMessage
@@ -19,6 +19,7 @@ import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSes
 
 
 type Timeout = NodeJS.Timeout;
+type IncomeRequestHandler = (request: ConnectionRequest, sessionId: string) => void;
 
 interface Props extends WsServerSessionsProps {
 }
@@ -26,7 +27,9 @@ interface Props extends WsServerSessionsProps {
 
 export default class WsServerConnection extends ServiceBase<Props> implements Connection {
   server!: WsServerSessions;
-  private incomeMessagesEvent = new IndexedEvents<ConnectionIncomeResponseHandler>();
+  // TODO: какой тип???
+  private incomeMessagesEvent = new IndexedEvents();
+  private incomeRequestsEvent = new IndexedEvents<IncomeRequestHandler>();
 
 
   init = async () => {
@@ -37,6 +40,7 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
       // TODO: add
       // TODO: decode and make response
       // TODO: use incomeMessagesEvent
+      if (!isRequest(request)) return;
     });
     this.server.onNewSession((sessionId: string, connectionParams: ConnectionParams) => {
       // TODO: add
@@ -92,38 +96,37 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
     return promised.promise;
   }
 
-  // TODO: когда сессия закончится удалять всех слушателей данной сессии
-  onRequest(sessionId: string, channel: number, handler: ConnectionIncomeRequestHandler): number {
-    // TODO: обработка ошибок самого cbWrapper
-    // TODO: не известно что это responce или request
-    const cbWrapper = async (request: ConnectionRequest) => {
-      // TODO: как проверить сессию что она наша?
-      // check for our channel
-      if (request.channel !== channel) return;
-
-      // TODO: првоерить что это request
-
-      let response: ConnectionResponse;
-
+  onRequest(handler: ConnectionOnRequestHandler): number {
+    const cbWrapper = (
+      request: ConnectionRequest,
+      sessionId: string
+    ) => {
+      // TODO: add timeout на выполнение хэндлера
       try {
-        response = await handler(request);
+        handler(request, sessionId)
+          .then((response: ConnectionResponse) => this.sendResponseBack(response, sessionId))
+          .catch((e) => {
+            // TODO: что делать в лучае ошибки ??? сформировать ошибочный ответ и отправить
+          });
       }
       catch (e) {
         // TODO: что делать в лучае ошибки ??? сформировать ошибочный ответ и отправить
       }
-
-      const responseMessage: Uint8Array = makeConnectionResponseMessage(response);
-      // TODO: отправить ответ
-      await this.server.send(sessionId, responseMessage);
     };
 
-    return this.incomeMessagesEvent.addListener(cbWrapper);
-
-    // TODO: add timeout
+    return this.incomeRequestsEvent.addListener(cbWrapper);
   }
 
   removeListener(handlerIndex: number): void {
     this.incomeMessagesEvent.removeListener(handlerIndex);
+  }
+
+
+  private async sendResponseBack(response: ConnectionResponse, sessionId: string) {
+    const responseMessage: Uint8Array = makeConnectionResponseMessage(response);
+    // TODO: отправить ответ
+    await this.server.send(sessionId, responseMessage);
+    // TODO: add timeout
   }
 
 }

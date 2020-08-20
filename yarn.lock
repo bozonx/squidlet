@@ -3583,6 +3583,14 @@ mocha@^8.1.1:
     yargs-parser "13.1.2"
     yargs-unparser "1.6.1"
 
+modbus-serial@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/modbus-serial/-/modbus-serial-8.0.1.tgz#03c789fd9364ff1ff7ef5675bf7620eaee406172"
+  integrity sha512-WcN5nuQOMxpMcywCa9tABzktXK60t/zrZLHW7lWfqdXCljBMkQ4QWxuljm5+ayDaBeDgh/0iOIhzfDQ0O7i2KA==
+  dependencies:
+    debug "^4.1.1"
+    serialport "^9.0.0"
+
 module-definition@^3.0.0, module-definition@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/module-definition/-/module-definition-3.3.0.tgz#aae06d68c99c5f93841e59b8a4469b974956d4d4"
@@ -4659,7 +4667,7 @@ serialize-javascript@4.0.0, serialize-javascript@^4.0.0:
   dependencies:
     randombytes "^2.1.0"
 
-serialport@^9.0.1:
+serialport@^9.0.0, serialport@^9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/serialport/-/serialport-9.0.1.tgz#0d326eddcaf7091bde4f6818fc985cfcb5281bec"
   integrity sha512-35Ms8dqjtAb73lptfEZG2l/nFZOxHt3hUjCHvl+g3Mu737gzFLDpSBrRywBJw4G4eS5ozZ3YcthwYnop1WO+ng==

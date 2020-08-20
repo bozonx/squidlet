@@ -22,3 +22,8 @@ export function makeConnectionResponseMessage(response: ConnectionResponse): Uin
   // TODO: add
   return new Uint8Array();
 }
+
+export function isRequest(request: ConnectionRequest): boolean {
+  // TODO: add
+  return true;
+}

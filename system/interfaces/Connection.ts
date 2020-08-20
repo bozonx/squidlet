@@ -27,8 +27,11 @@ export interface ConnectionResponse {
 //   //requestTimeoutSec: number;
 // }
 
-export type ConnectionIncomeRequestHandler = (request: ConnectionRequest) => Promise<ConnectionResponse>;
-export type ConnectionIncomeResponseHandler = (response: ConnectionResponse) => void;
+export type ConnectionOnRequestHandler = (
+  request: ConnectionRequest,
+  sessionId: string
+) => Promise<ConnectionResponse>;
+//export type ConnectionIncomeResponseHandler = (response: ConnectionResponse) => void;
 
 
 export default interface Connection {
@@ -43,10 +46,10 @@ export default interface Connection {
   request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionResponse>;
 
   /**
-   * Handle income request at specified register.
+   * Handle income request at specified channel.
    * You have to generate a response
    */
-  onRequest(sessionId: string, channel: number, handler: ConnectionIncomeRequestHandler): number;
+  onRequest(handler: ConnectionOnRequestHandler): number;
 
   /**
    * Remove listener that has been set by `onRequest` or `onResponse`

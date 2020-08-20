@@ -27,6 +27,7 @@
     "js-yaml": "^3.14.0",
     "jsmodbus": "^4.0.4",
     "lodash": "^4.17.20",
+    "modbus-serial": "^8.0.1",
     "mqtt": "^4.2.0",
     "mqtt-packet": "^6.3.2",
     "pigpio-client": "^1.5.1",
