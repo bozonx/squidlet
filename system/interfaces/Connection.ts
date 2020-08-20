@@ -17,6 +17,7 @@ export interface ConnectionResponse {
   channel: number;
   status: ConnectionStatus;
   body?: Uint8Array;
+  // TODO: он вообще нужен ???
   error?: string;
 }
 
