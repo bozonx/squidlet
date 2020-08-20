@@ -4,6 +4,7 @@ import {makeUniqId} from '../../../system/lib/uniqId';
 import {deserializeJson, serializeJson} from '../../../system/lib/serialize';
 import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 import {METHOD_DELIMITER} from '../../../system/constants';
+import Context from 'system/Context';
 
 
 /**

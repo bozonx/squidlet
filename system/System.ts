@@ -51,7 +51,7 @@ export default class System {
    * @param ioSet - has to be initialized before
    * @param hostConfigOverride - part of HostConfig to overwrite some params
    */
-  constructor(ioSet: IoSet, hostConfigOverride?: HostConfig) {
+  constructor(ioSet: IoSet, hostConfigOverride?: Partial<HostConfig>) {
     this.context = new Context(this, hostConfigOverride);
     this.ioManager = new IoManager(this.context, ioSet);
     this.envSet = new EnvSet(this.context);

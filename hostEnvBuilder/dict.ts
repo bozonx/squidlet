@@ -4,7 +4,7 @@ export const servicesShortcut: {[index: string]: string} = {
   wsApi: 'WsApi',
   httpApi: 'HttpApi',
   updater: 'Updater',
-  //ioServer: 'IoServer',
+  ioServer: 'IoServer',
   // TODO: неправильно так как для него нет props,
   //       но по другому не будет работать в defaultServices
   sharedStorage: 'SharedStorage',
@@ -14,6 +14,7 @@ export const servicesShortcut: {[index: string]: string} = {
 // To turn off the service you should specify: logger: false.
 export const defaultServices = [
   'sharedStorage',
+  //'ioServer',
   //'updater',
   //'httpApi',
 ];

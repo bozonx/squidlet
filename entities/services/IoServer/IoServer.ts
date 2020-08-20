@@ -12,7 +12,7 @@ export default class IoServer extends ServiceBase<WsServerSessionsProps> {
   init = async () => {
     this.log.info('--> Initializing websocket io servers');
 
-    await this.initWsServer();
+    this.wsServer = await this.context.getSubDriver('WsServer', this.props);
 
     this.wsServer.onMessage((connectionId: string, data: string | Uint8Array) => {
       if (!this.ioConnection) {
@@ -40,13 +40,6 @@ export default class IoServer extends ServiceBase<WsServerSessionsProps> {
     delete this.ioConnection;
   }
 
-
-  private async initWsServer() {
-    this.wsServer = await this.context.getSubDriver('WsServer', this.props);
-
-    await this.wsServer.init();
-
-  }
 
   private handleNewIoClientConnection = async (connectionId: string) => {
     if (this.ioConnection) {

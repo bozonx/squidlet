@@ -19,7 +19,7 @@ import ServicesObj from './interfaces/ServicesObj';
 
 export default class Context {
   readonly system: System;
-  readonly hostConfigOverride?: HostConfig;
+  readonly hostConfigOverride?: Partial<HostConfig>;
   readonly log: LogPublisher = new LogPublisher(this);
   readonly sessions: Sessions = new Sessions(makeUniqId);
   readonly state: State = new State();
@@ -39,7 +39,7 @@ export default class Context {
   private hostConfig?: HostConfig;
 
 
-  constructor(system: System, hostConfigOverride?: HostConfig) {
+  constructor(system: System, hostConfigOverride?: Partial<HostConfig>) {
     this.system = system;
     this.hostConfigOverride = hostConfigOverride;
   }

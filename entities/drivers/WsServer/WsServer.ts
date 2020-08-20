@@ -49,7 +49,7 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
   }
 
 
-  send(connectionId: string, data: string | Uint8Array): Promise<void> {
+  send = (connectionId: string, data: string | Uint8Array): Promise<void> => {
     if (!this.server) throw new Error(`WebSocketServer.send: ${this.closedMsg}`);
 
     return this.server.send(connectionId, data);

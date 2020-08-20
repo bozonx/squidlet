@@ -18,7 +18,7 @@ export default class Main {
   }
 
   private ioSet: IoSet;
-  private hostConfigOverride?: HostConfig;
+  private hostConfigOverride?: Partial<HostConfig>;
   private logger: Logger;
   private system?: System;
   private started: boolean = false;
@@ -27,10 +27,10 @@ export default class Main {
   constructor(
     ioSet: IoSet,
     logger: Logger,
-    hostConfigOverride?: HostConfig
+    hostConfigOverride?: Partial<HostConfig>
   ) {
     this.ioSet = ioSet;
-    this.hostConfigOverride = hostConfigOverride as HostConfig;
+    this.hostConfigOverride = hostConfigOverride;
     this.logger = logger;
   }
 
