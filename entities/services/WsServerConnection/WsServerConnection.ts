@@ -13,9 +13,12 @@ import {
   makeConnectionRequestMessage,
   makeConnectionResponseMessage
 } from 'system/lib/connectionHelpers';
+import Promised from 'system/lib/Promised';
 
 import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
 
+
+type Timeout = NodeJS.Timeout;
 
 interface Props extends WsServerSessionsProps {
 }
@@ -49,27 +52,44 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
     const requestMessage: Uint8Array = makeConnectionRequestMessage(request);
     // send request and wait while sending is finished
     await this.server.send(sessionId, requestMessage);
+
+    const promised = new Promised<ConnectionResponse>();
+    let timeout: Timeout | undefined;
+
     // wait for response
-    return new Promise((resolve, reject) => {
-      const handlerIndex = this.incomeMessagesEvent.addListener((
-        response: ConnectionResponse
-      ) => {
-        // listen only our response
-        if (response.requestId !== request.requestId) return;
+    const handlerIndex = this.incomeMessagesEvent.addListener((
+      response: ConnectionResponse
+    ) => {
+      // check if promised if fulfilled in case of timeout has exceeded
+      if (promised.isFulfilled()) return;
+      // listen only our response
+      if (response.requestId !== request.requestId) return;
 
-        this.incomeMessagesEvent.removeListener(handlerIndex);
+      this.removeListener(handlerIndex);
+      clearTimeout(timeout as any);
 
-        // TODO: или может всегда делать resolve ????
-        if (response.status === ConnectionStatus.responseError) {
-          reject(new Error(response.error));
-        }
-        else {
-          resolve(response);
-        }
-      });
+      promised.resolve(response);
 
-      // TODO: add timeout
+      // if (response.status === ConnectionStatus.responseError) {
+      //   promised.reject(new Error(response.error));
+      // }
+      // else {
+      //   promised.resolve(response);
+      // }
     });
+
+    timeout = setTimeout(() => {
+      if (promised.isFulfilled()) return;
+
+      this.removeListener(handlerIndex);
+
+      promised.reject(new Error(
+        `WsServerConnection.request: Timeout of request has been exceeded ` +
+        `of channel "${channel}"`
+      ));
+    }, this.config.config.requestTimeoutSec * 1000);
+
+    return promised.promise;
   }
 
   // TODO: когда сессия закончится удалять всех слушателей данной сессии
@@ -89,7 +109,7 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
         response = await handler(request);
       }
       catch (e) {
-        // TODO: что делать в лучае ошибки ???
+        // TODO: что делать в лучае ошибки ??? сформировать ошибочный ответ и отправить
       }
 
       const responseMessage: Uint8Array = makeConnectionResponseMessage(response);
