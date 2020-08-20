@@ -1,5 +1,4 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import DriverBase from 'system/base/DriverBase';
 import Connection, {
   ChannelIncomeRequestHandler,
   ChannelRequest,
@@ -9,14 +8,16 @@ import {WsServer} from '../WsServer/WsServer';
 import {ConnectionParams} from '../../../system/interfaces/io/WebSocketServerIo';
 import {WsServerSessions} from '../WsServerSessions/WsServerSessions';
 import IndexedEvents from '../../../system/lib/IndexedEvents';
+import ServiceBase from '../../../system/base/ServiceBase';
+import {WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
+import {makeConnectionRequest, makeConnectionRequestMessage} from '../../../system/lib/connectionHelpers';
 
 
-interface Props {
-  // TODO: решить какие будут props, наверное те что для WsServer driver
+interface Props extends WsServerSessionsProps {
 }
 
 
-export class WsServerConnection extends DriverBase<Props> implements Connection {
+export default class WsServerConnection extends ServiceBase<Props> implements Connection {
   server!: WsServerSessions;
   // TODO: add type
   private incomeMessagesEvent = new IndexedEvents();
@@ -42,8 +43,9 @@ export class WsServerConnection extends DriverBase<Props> implements Connection 
   async request(sessionId: string, channel: number, data: Uint8Array): Promise<ChannelSendResponse> {
     // TODO: сформировать requestId
     // TODO: сформировать запрос
-    const request: ChannelRequest = makeChannelRequest(channel, data);
-    const requestMessage: Uint8Array = makeChannelRequestMessage(request);
+
+    const request: ChannelRequest = makeConnectionRequest(channel, data);
+    const requestMessage: Uint8Array = makeConnectionRequestMessage(request);
     // wait while request is finished
     await this.server.send(sessionId, requestMessage);
 
@@ -184,12 +186,4 @@ export class WsServerConnection extends DriverBase<Props> implements Connection 
   //   this.log.error(`WebSocketServer: ${this.closedMsg}, you can't manipulate it any more!`);
   // }
 
-}
-
-export default class Factory extends DriverFactoryBase<WsServerConnection, Props> {
-  protected SubDriverClass = WsServerConnection;
-  protected instanceId = (props: Props): string => {
-    // TODO: review
-    return `${props.host}:${props.port}`;
-  }
 }
