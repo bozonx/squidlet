@@ -13,17 +13,22 @@ export function makeConnectionRequest(
   };
 }
 
-export function makeConnectionRequestMessage(request: ConnectionRequest): Uint8Array {
+export function encodeRequest(request: ConnectionRequest): Uint8Array {
   // TODO: add
   return new Uint8Array();
 }
 
-export function makeConnectionResponseMessage(response: ConnectionResponse): Uint8Array {
+export function encodeResponse(response: ConnectionResponse): Uint8Array {
   // TODO: add
   return new Uint8Array();
 }
 
-export function isRequest(request: ConnectionRequest): boolean {
+export function decodeIncomeMessage(data: Uint8Array): ConnectionRequest | ConnectionResponse {
   // TODO: add
-  return true;
+  return {} as ConnectionRequest;
 }
+
+// export function isRequest(request: ConnectionRequest): boolean {
+//   // TODO: add
+//   return true;
+// }
