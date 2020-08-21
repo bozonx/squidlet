@@ -8,7 +8,7 @@ import IndexedEvents from '../IndexedEvents';
 import {
   decodeIncomeMessage,
   encodeRequest,
-  encodeResponse,
+  encodeResponse, isConnectionMessage,
   isRequest,
   makeConnectionRequest
 } from '../connectionHelpers';
@@ -100,9 +100,7 @@ export default abstract class ConnectionBase<Props> extends ServiceBase<Props> i
 
 
   protected handleIncomeMessage = (sessionId: string, data: Uint8Array) => {
-    if (!(data instanceof Uint8Array) || !data.length) return;
-
-    // TODO: проверить заголовок чтобы определить что это комманда для connection
+    if (!isConnectionMessage(data)) return;
 
     const decodedMessage: ConnectionRequest | ConnectionResponse = decodeIncomeMessage(data);
 

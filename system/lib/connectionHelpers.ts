@@ -31,3 +31,8 @@ export function decodeIncomeMessage(data: Uint8Array): ConnectionRequest | Conne
 export function isRequest(request: ConnectionRequest | ConnectionResponse): boolean {
   return request.status === ConnectionStatus.request;
 }
+
+export function isConnectionMessage(data: Uint8Array): boolean {
+  // TODO: проверить заголовок чтобы определить что это комманда для connection
+
+}
