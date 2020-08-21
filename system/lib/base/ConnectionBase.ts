@@ -20,6 +20,9 @@ type IncomeRequestHandler = (request: ConnectionRequest, sessionId: string) => v
 type IncomeResponseHandler = (response: ConnectionResponse, sessionId: string) => void;
 
 
+// TODO: где должен сверяться request id ???
+
+
 export default abstract class ConnectionBase<Props> extends ServiceBase<Props> implements Connection {
   protected incomeRequestsEvent = new IndexedEvents<IncomeRequestHandler>();
   protected incomeResponsesEvent = new IndexedEvents<IncomeResponseHandler>();
