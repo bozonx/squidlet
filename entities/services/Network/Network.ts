@@ -1,11 +1,9 @@
 import ServiceBase from 'system/base/ServiceBase';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
-import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import Router from './Router';
 import Connection, {ConnectionResponse, ConnectionStatus} from '../../../system/interfaces/Connection';
-import {encodeRequest} from '../../../system/lib/connectionHelpers';
 import IndexedEvents from '../../../system/lib/IndexedEvents';
+import HostsCache, {HostItem} from './HostsCache';
 
 
 // interface NodeProps {
@@ -64,6 +62,7 @@ type IncomeRequestsHandler = (request: NetworkRequest) => void;
 
 export default class Network extends ServiceBase<NetworkProps> {
   private incomeRequestsEvent = new IndexedEvents<IncomeRequestsHandler>();
+  private readonly hostsCache: HostsCache;
 
   //private readonly router: Router;
   // link between { sessionId: [ hostId, networkDriverNum, busId ] }
@@ -74,6 +73,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     super(context, definition);
 
     //this.router = new Router(this.context, this.props);
+    this.hostsCache = new HostsCache();
   }
 
 
@@ -91,14 +91,20 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   async request(hostId: string, channel: number, data: Uint8Array): Promise<NetworkResponse> {
-    const connection: Connection = await this.resolveConnection(hostId);
-    // TODO: resolve it !!!!!
-    const sessionId = '1';
+    // const connection: Connection = await this.resolveConnection(hostId);
+    // // TODO: resolve it !!!!!
+    // const connectionId = '1';
+
+    const connectionItem: HostItem | undefined = this.hostsCache.resolveByHost(hostId);
+
+    if (!connectionItem) {
+      throw new Error(`Host "${hostId}" hasn't been connected`);
+    }
 
     // TODO: нужно закодировать сообщение с to, from
     // TODO: нужно передать status ???
 
-    const result: ConnectionResponse = await connection.request(sessionId, channel, data);
+    const result: ConnectionResponse = await connection.request(connectionId, channel, data);
 
     return {
       to: hostId,
