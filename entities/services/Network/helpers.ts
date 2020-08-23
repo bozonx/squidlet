@@ -1,25 +1,85 @@
-import {asciiToUint8Array, deserializeJson, serializeJson, uint8ArrayToAscii} from 'system/lib/serialize';
-import {combine2numberToByte, concatUint8Arr, extract2NumbersFromByte} from 'system/lib/binaryHelpers';
-import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
-import NetworkMessage from './interfaces/NetworkMessage';
+import {
+  stringToUint8Array
+} from 'system/lib/binaryHelpers';
+import {MAX_NUM_16_BIT} from 'system/constants';
 import {NetworkRequest, NetworkResponse} from './Network';
 
 
-const METADATA_LENGTH = 2;
-
-enum POSITIONS {
-  messageType,
-  // one byte witch contains 4-bit lengths of "to" and "from" fields
-  lengths,
-}
-
-
+/**
+ * Bytes:
+ * * 1 byte length of "to"
+ * * 'to" data
+ * * 1 byte length of "from"
+ * * "from" data
+ * * 1 byte length of "sender"
+ * * "sender" data
+ * * 1 byte length of "url"
+ * * url data
+ * * 1 byte TTL
+ * * body
+ * @param request
+ */
 export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
+  if (typeof request.to !== 'string') {
+    throw new Error(`request.to has to be a string`);
+  }
+  if (request.to.length > 255) {
+    throw new Error(`Value of request.to is too long: ${request.to.length}`);
+  }
+  else if (typeof request.from !== 'string') {
+    throw new Error(`request.from has to be a string`);
+  }
+  else if (request.from.length > 255) {
+    throw new Error(`Value of request.from is too long: ${request.from.length}`);
+  }
+  else if (typeof request.sender !== 'string') {
+    throw new Error(`request.sender has to be a string`);
+  }
+  else if (request.sender.length > 255) {
+    throw new Error(`Value of request.sender is too long: ${request.sender.length}`);
+  }
+  else if (typeof request.url !== 'string') {
+    throw new Error(`request.url has to be a string`);
+  }
+  else if (request.url.length > 255) {
+    throw new Error(`Url is too long: ${request.url.length}`);
+  }
+  else if (typeof request.TTL !== 'number') {
+    throw new Error(`request.TTL has to be a number`);
+  }
+  else if (request.TTL > 255) {
+    throw new Error(`TTL is too long: ${request.TTL}`);
+  }
 
+  const encodedTo: Uint8Array = stringToUint8Array(request.to);
+  const encodedFrom: Uint8Array = stringToUint8Array(request.from);
+  const encodedSender: Uint8Array = stringToUint8Array(request.sender);
+  const encodedUrl: Uint8Array = stringToUint8Array(request.url);
+
+  const result: Uint8Array = new Uint8Array([
+    encodedTo.length,
+    ...encodedTo,
+    encodedFrom.length,
+    ...encodedFrom,
+    encodedSender.length,
+    ...encodedSender,
+    encodedUrl.length,
+    ...encodedUrl,
+    request.TTL,
+    ...request.body,
+  ]);
+
+  if (result.length > MAX_NUM_16_BIT) {
+    throw new Error(`request.body is too long: ${request.body.length}`);
+  }
+
+  return result;
 }
 
 export function decodeNetworkResponse(data: Uint8Array): NetworkResponse {
-
+  const toLength: number = data[0];
+  // TODO: провеить
+  const decodedTo: Uint8Array = data.slice(1, toLength);
 }
 
 // export function serializeMessage(message: NetworkMessage): Uint8Array {
@@ -46,30 +106,30 @@ export function decodeNetworkResponse(data: Uint8Array): NetworkResponse {
 //   );
 // }
 
-export function deserializeMessage(data: Uint8Array): NetworkMessage {
-  const [toLength, fromLength] = extract2NumbersFromByte(data[POSITIONS.lengths]);
-  const payloadStart: number = METADATA_LENGTH + toLength + fromLength;
-  const from: string = uint8ArrayToAscii(data.slice(METADATA_LENGTH + toLength, payloadStart));
-  const payload: RemoteCallMessage = deserializeJson(data.slice(payloadStart));
-
-  const result: NetworkMessage = {
-    from,
-    messageType: data[POSITIONS.messageType],
-    payload,
-  };
-
-  if (toLength) {
-    result.to = uint8ArrayToAscii(data.slice(METADATA_LENGTH, METADATA_LENGTH + toLength));
-  }
-
-  return result;
-}
-
-/**
- * Resolve:
- * serial => SerialNetwork
- * SerialNetwork => SerialNetwork
- */
-export function resolveNetworkDriverName(shortName: string): string {
-  // TODO: add
-}
+// export function deserializeMessage(data: Uint8Array): NetworkMessage {
+//   const [toLength, fromLength] = extract2NumbersFromByte(data[POSITIONS.lengths]);
+//   const payloadStart: number = METADATA_LENGTH + toLength + fromLength;
+//   const from: string = uint8ArrayToAscii(data.slice(METADATA_LENGTH + toLength, payloadStart));
+//   const payload: RemoteCallMessage = deserializeJson(data.slice(payloadStart));
+//
+//   const result: NetworkMessage = {
+//     from,
+//     messageType: data[POSITIONS.messageType],
+//     payload,
+//   };
+//
+//   if (toLength) {
+//     result.to = uint8ArrayToAscii(data.slice(METADATA_LENGTH, METADATA_LENGTH + toLength));
+//   }
+//
+//   return result;
+// }
+//
+// /**
+//  * Resolve:
+//  * serial => SerialNetwork
+//  * SerialNetwork => SerialNetwork
+//  */
+// export function resolveNetworkDriverName(shortName: string): string {
+//   // TODO: add
+// }

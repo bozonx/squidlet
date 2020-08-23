@@ -8,6 +8,7 @@ export const DEFAULT_DEVICE_STATUS = 'default';
 // should start IO server on app start
 export const START_APP_TYPE_FILE_NAME = 'startAppType';
 export const METHOD_DELIMITER = '.';
+export const MAX_NUM_16_BIT = 65536;
 
 
 export enum SystemEvents {
