@@ -114,8 +114,8 @@ export default class Network extends ServiceBase<NetworkProps> {
       from: this.context.config.id,
       sender: this.context.config.id,
       TTL: DEFAULT_TTL,
-      body,
       url,
+      body,
     };
     const encodedMessage: Uint8Array = encodeNetworkRequest(request);
     // make request
