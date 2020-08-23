@@ -8,8 +8,8 @@ export interface HostItem {
 /**
  * Closest hosts cache
  */
-export default class HostsCache {
-  resolveByHost(hostId: string): HostItem {
+export default class ActiveHosts {
+  resolveByHostId(hostId: string): HostItem | undefined {
 
   }
 
