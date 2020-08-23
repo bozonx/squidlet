@@ -3,7 +3,7 @@ import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import Connection, {ConnectionResponse, ConnectionStatus} from '../../../system/interfaces/Connection';
 import IndexedEvents from '../../../system/lib/IndexedEvents';
-import HostsCache, {HostItem} from './HostsCache';
+import ActiveHosts, {HostItem} from './ActiveHosts';
 
 
 // interface NodeProps {
@@ -62,7 +62,7 @@ type IncomeRequestsHandler = (request: NetworkRequest) => void;
 
 export default class Network extends ServiceBase<NetworkProps> {
   private incomeRequestsEvent = new IndexedEvents<IncomeRequestsHandler>();
-  private readonly hostsCache: HostsCache;
+  private readonly activeHosts: ActiveHosts;
 
   //private readonly router: Router;
   // link between { sessionId: [ hostId, networkDriverNum, busId ] }
@@ -73,7 +73,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     super(context, definition);
 
     //this.router = new Router(this.context, this.props);
-    this.hostsCache = new HostsCache();
+    this.activeHosts = new ActiveHosts();
   }
 
 
@@ -91,15 +91,14 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   async request(hostId: string, channel: number, data: Uint8Array): Promise<NetworkResponse> {
-    // const connection: Connection = await this.resolveConnection(hostId);
-    // // TODO: resolve it !!!!!
-    // const connectionId = '1';
-
-    const connectionItem: HostItem | undefined = this.hostsCache.resolveByHost(hostId);
+    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
 
     if (!connectionItem) {
       throw new Error(`Host "${hostId}" hasn't been connected`);
     }
+
+    const connection: Connection = this.getConnection(connectionItem?.connectionName);
+
 
     // TODO: нужно закодировать сообщение с to, from
     // TODO: нужно передать status ???
@@ -142,7 +141,7 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 
-  private resolveConnection(hostId: string): Promise<Connection> {
+  private getConnection(connectionName: string): Connection {
     // TODO: see network config and find connection which has the same hostId
   }
 
