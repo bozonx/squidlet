@@ -1,9 +1,15 @@
 import ServiceBase from 'system/base/ServiceBase';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
-import Connection, {ConnectionResponse, ConnectionStatus} from '../../../system/interfaces/Connection';
+import Connection, {
+  ConnectionMessage,
+  ConnectionResponse,
+  ConnectionStatus
+} from '../../../system/interfaces/Connection';
 import IndexedEvents from '../../../system/lib/IndexedEvents';
 import ActiveHosts, {HostItem} from './ActiveHosts';
+import {decodeNetworkResponse, encodeNetworkRequest} from './helpers';
+import {omitObj} from '../../../system/lib/objects';
 
 
 // interface NodeProps {
@@ -29,19 +35,18 @@ export interface NetworkProps {
 interface NetworkMessage {
   to: string;
   from: string;
-  channel: number;
-}
-
-export interface NetworkResponse extends NetworkMessage {
-  // TODO: does it really need?
-  requestId: number;
-  status: ConnectionStatus;
-  body?: Uint8Array;
-  error?: string;
+  sender: string;
+  TTL: number;
+  body: Uint8Array;
 }
 
 export interface NetworkRequest extends NetworkMessage {
-  body: Uint8Array;
+  url: string;
+}
+
+export interface NetworkResponse extends NetworkMessage {
+  // TODO: может отправлять вторым аргументом?
+  connectionMessage: ConnectionMessage;
 }
 
 type NetworkOnRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;
@@ -58,6 +63,12 @@ type IncomeRequestsHandler = (request: NetworkRequest) => void;
 // }
 
 //export const NETWORK_PORT = 255;
+
+// TODO: use config's
+// max 255
+const DEFAULT_TTL = 10;
+// channel of connection which network uses to send and receive messages
+const SEND_RECEIVE_CHANNEL = 254;
 
 
 export default class Network extends ServiceBase<NetworkProps> {
@@ -90,7 +101,7 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 
-  async request(hostId: string, channel: number, data: Uint8Array): Promise<NetworkResponse> {
+  async request(hostId: string, url: string, body: Uint8Array): Promise<NetworkResponse> {
     const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
 
     if (!connectionItem) {
@@ -98,22 +109,38 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
 
     const connection: Connection = this.getConnection(connectionItem?.connectionName);
+    const request: NetworkRequest = {
+      to: hostId,
+      from: this.context.config.id,
+      sender: this.context.config.id,
+      TTL: DEFAULT_TTL,
+      body,
+      url,
+    };
+    const encodedMessage: Uint8Array = encodeNetworkRequest(request);
+    // make request
+    const connectionResponse: ConnectionResponse = await connection.request(
+      connectionItem.connectionId,
+      SEND_RECEIVE_CHANNEL,
+      encodedMessage
+    );
 
+    if (connectionResponse.status === ConnectionStatus.responseError) {
+      throw new Error(connectionResponse.error);
+    }
+    else if (!connectionResponse.body) {
+      throw new Error(`Result doesn't contains the body`);
+    }
 
-    // TODO: нужно закодировать сообщение с to, from
-    // TODO: нужно передать status ???
-
-    const result: ConnectionResponse = await connection.request(connectionId, channel, data);
+    const response: NetworkResponse = decodeNetworkResponse(connectionResponse.body);
 
     return {
-      to: hostId,
-      // TODO: см в раскодированном ответе
-      from: this.context.config.id,
-      channel,
-      status: result.status,
-      requestId: result.requestId,
-      body: result.body,
-      error: result.error,
+      ...response,
+      connectionMessage: omitObj(
+        connectionResponse,
+        'body',
+        'error'
+      ) as ConnectionMessage,
     };
   }
 
