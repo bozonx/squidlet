@@ -2,6 +2,7 @@ import {asciiToUint8Array, deserializeJson, serializeJson, uint8ArrayToAscii} fr
 import {combine2numberToByte, concatUint8Arr, extract2NumbersFromByte} from 'system/lib/binaryHelpers';
 import RemoteCallMessage from 'system/interfaces/RemoteCallMessage';
 import NetworkMessage from './interfaces/NetworkMessage';
+import {NetworkRequest, NetworkResponse} from './Network';
 
 
 const METADATA_LENGTH = 2;
@@ -13,29 +14,37 @@ enum POSITIONS {
 }
 
 
-export function serializeMessage(message: NetworkMessage): Uint8Array {
-  if (message.to && message.to.length > 16) {
-    throw new Error(`"to" field of network message is too long: ${message.to.length}`);
-  }
-  else if (message.from.length > 16) {
-    throw new Error(`"from" field of network message is too long: ${message.from.length}`);
-  }
+export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
 
-  const toLength: number = (message.to) ? message.to.length : 0;
-  const payload: Uint8Array = serializeJson(message.payload);
-  const lengthsByte: number = combine2numberToByte(toLength, message.from.length);
-
-  return concatUint8Arr(
-    // meta data
-    new Uint8Array([message.messageType, lengthsByte]),
-    // to hostId max 16 bytes
-    asciiToUint8Array(message.to || ''),
-    // from hostId max 16 bytes
-    asciiToUint8Array(message.from),
-    // encoded message
-    payload
-  );
 }
+
+export function decodeNetworkResponse(data: Uint8Array): NetworkResponse {
+
+}
+
+// export function serializeMessage(message: NetworkMessage): Uint8Array {
+//   if (message.to && message.to.length > 16) {
+//     throw new Error(`"to" field of network message is too long: ${message.to.length}`);
+//   }
+//   else if (message.from.length > 16) {
+//     throw new Error(`"from" field of network message is too long: ${message.from.length}`);
+//   }
+//
+//   const toLength: number = (message.to) ? message.to.length : 0;
+//   const payload: Uint8Array = serializeJson(message.payload);
+//   const lengthsByte: number = combine2numberToByte(toLength, message.from.length);
+//
+//   return concatUint8Arr(
+//     // meta data
+//     new Uint8Array([message.messageType, lengthsByte]),
+//     // to hostId max 16 bytes
+//     asciiToUint8Array(message.to || ''),
+//     // from hostId max 16 bytes
+//     asciiToUint8Array(message.from),
+//     // encoded message
+//     payload
+//   );
+// }
 
 export function deserializeMessage(data: Uint8Array): NetworkMessage {
   const [toLength, fromLength] = extract2NumbersFromByte(data[POSITIONS.lengths]);
