@@ -8,7 +8,7 @@ describe.only 'entities.services.Network.helpers', ->
       uri: 'd'
       to: 'a'
       from: 'b'
-      sender: 'c'
+      route: []
       payload: new Uint8Array([0,1,2])
     }
     @eEncodedMessage = new Uint8Array([
@@ -19,8 +19,7 @@ describe.only 'entities.services.Network.helpers', ->
       97,
       1,
       98,
-      1,
-      99,
+      0,
       0,
       1,
       2,
