@@ -2,7 +2,8 @@ import ServiceBase from 'system/base/ServiceBase';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import Connection, {
-  ConnectionMessage,
+  CONNECTION_SERVICE_TYPE,
+  ConnectionMessage, ConnectionRequest,
   ConnectionResponse,
   ConnectionStatus
 } from 'system/interfaces/Connection';
@@ -92,6 +93,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   init = async () => {
+    this.initConnections();
     // await this.router.init();
     // this.router.onIncomeDestMessage(this.handleIncomeMessage);
 
@@ -193,8 +195,29 @@ export default class Network extends ServiceBase<NetworkProps> {
     );
   }
 
-  private handleIncomeMessage = (sessionId: string, data: Uint8Array) => {
+  private initConnections() {
+    for (let serviceName of Object.keys(this.context.service)) {
+      if (this.context.service[serviceName] !== CONNECTION_SERVICE_TYPE) continue;
 
+      this.addConnectionListeners(this.context.service[serviceName]);
+    }
+  }
+
+  private addConnectionListeners(connection: Connection) {
+    connection.onRequest((request: ConnectionRequest, connectionId: string) => {
+      // TODO: декодировать
+      // TODO: зарегистрировать соединение в кэше если не было
+      // TODO: отправить в роутер
+      // TODO: если надо переслать уменьшить ttl
+      // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
+
+    });
+    connection.onNewConnection((connectionId: string) => {
+
+    });
+    connection.onEndConnection((connectionId: string) => {
+
+    });
   }
 
 }
