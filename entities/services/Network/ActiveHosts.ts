@@ -12,6 +12,11 @@ export default class ActiveHosts {
   private activeHosts: HostItem[];
 
 
+  destroy() {
+    // TODO: add
+  }
+
+
   // TODO: сделать регистрацию хостов
   // TODO: сделать удаление хостов когда он отсоединился
 

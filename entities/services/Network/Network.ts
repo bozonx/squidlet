@@ -13,6 +13,7 @@ import {omitObj} from 'system/lib/objects';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import Router from './Router';
+import {message} from 'gulp-typescript/release/utils';
 
 
 // interface NodeProps {
@@ -84,19 +85,15 @@ export const RESPONSE_STATUS_URI = {
 
 
 export default class Network extends ServiceBase<NetworkProps> {
-  private incomeRequestsEvent = new IndexedEvents<IncomeRequestsHandler>();
+  //private incomeRequestsEvent = new IndexedEvents<IncomeRequestsHandler>();
   private readonly activeHosts: ActiveHosts;
   private readonly router: Router;
-
-  //private readonly router: Router;
-  // link between { sessionId: [ hostId, networkDriverNum, busId ] }
-  //private sessionLinks: {[index: string]: AddressDefinition} = {};
+  private incomeRequestHandlers: {[index: string]: IncomeRequestsHandler};
 
 
   constructor(context: Context, definition: EntityDefinition) {
     super(context, definition);
 
-    //this.router = new Router(this.context, this.props);
     this.activeHosts = new ActiveHosts();
     this.router = new Router();
   }
@@ -104,15 +101,12 @@ export default class Network extends ServiceBase<NetworkProps> {
 
   init = async () => {
     this.initConnections();
-    // await this.router.init();
-    // this.router.onIncomeDestMessage(this.handleIncomeMessage);
-
-    // TODO: собрать все используемые connections
-    // TODO: навешаться на все используемые connections
   }
 
   destroy = async () => {
-    //this.router.destroy();
+    this.activeHosts.destroy();
+    this.router.destroy();
+    // TODO: clear incomeRequestHandlers
   }
 
 
@@ -162,27 +156,16 @@ export default class Network extends ServiceBase<NetworkProps> {
     };
   }
 
-  onRequest(handler: NetworkOnRequestHandler): number {
-    // TODO: похоже что на 1 uri 1 обработчик иначе не понятно что возвращать
-    // TODO: нужно всетаки сделать обертку в которой выполнить хэндлер и сформировать ответ
-    const cbWrapper = (request: NetworkMessage): void => {
-      try {
-        handler(request)
-          .then((response: NetworkMessage) => this.sendResponseBack(response))
-          .catch((e) => {
-            // TODO: add
-          });
-      }
-      catch (e) {
-        // TODO: add
-      }
-    };
+  onRequest(uri: string, handler: NetworkOnRequestHandler) {
+    if (this.incomeRequestHandlers[uri]) {
+      throw new Error(`Handler of uri has already defined`);
+    }
 
-    return this.incomeRequestsEvent.addListener(cbWrapper);
+    this.incomeRequestHandlers[uri] = handler;
   }
 
-  removeListener(handlerIndex: number): void {
-    this.incomeRequestsEvent.removeListener(handlerIndex);
+  removeListener(uri: string): void {
+    delete this.incomeRequestHandlers[uri];
   }
 
 
@@ -192,20 +175,6 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
 
     return this.context.service[connectionName];
-  }
-
-  private async sendResponseBack(response: NetworkMessage) {
-    const connection: Connection = await this.resolveConnection(response.hostId);
-    // TODO: resolve it !!!!!
-    const sessionId = '1';
-
-    // TODO:  может использовать такой метов в connection.sendResponseBack()
-    const result: ConnectionResponse = await connection.request(
-      sessionId,
-      response.channel,
-      // TODO: в случае ошибки отправить error
-      response.payload,
-    );
   }
 
   private initConnections() {
@@ -259,11 +228,48 @@ export default class Network extends ServiceBase<NetworkProps> {
       };
     }
     else {
-      // TODO: добавить данные connection - channel, requestId, status
-      this.incomeRequestsEvent.emit(incomeMessage);
+      if (!this.incomeRequestHandlers[incomeMessage.uri]) {
+        // TODO: отправить ошибочное сообщение что нет обраотчика
+      }
+
+      try {
+        // TODO: добавить данные connection - channel, requestId, status
+        this.incomeRequestHandlers[incomeMessage.uri](message)
+          .then((response: NetworkMessage) => this.sendResponseBack(response))
+          .catch((e) => {
+            // TODO: add
+          });
+      }
+      catch (e) {
+        // TODO: add
+      }
+
       // TODO: нужно выполнить хэндлер и отправить ответ
       // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
+
+
+      // TODO: похоже что на 1 uri 1 обработчик иначе не понятно что возвращать
+      // TODO: нужно всетаки сделать обертку в которой выполнить хэндлер и сформировать ответ
+      // const cbWrapper = (request: NetworkMessage): void => {
+
+      // };
+      //
+      // return this.incomeRequestsEvent.addListener(cbWrapper);
     }
+  }
+
+  private async sendResponseBack(response: NetworkMessage) {
+    const connection: Connection = await this.resolveConnection(response.hostId);
+    // TODO: resolve it !!!!!
+    const sessionId = '1';
+
+    // TODO:  может использовать такой метов в connection.sendResponseBack()
+    const result: ConnectionResponse = await connection.request(
+      sessionId,
+      response.channel,
+      // TODO: в случае ошибки отправить error
+      response.payload,
+    );
   }
 
 }
