@@ -10,7 +10,7 @@ import Connection, {
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import ActiveHosts, {HostItem} from './ActiveHosts';
-import {decodeNetworkResponse, encodeNetworkRequest} from './helpers';
+import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 
 
 // interface NodeProps {
@@ -33,28 +33,28 @@ export interface NetworkProps {
 // like [ hostId, networkDriverNum, busId ]
 //type AddressDefinition = [string, NetworkDriver, number | string];
 
-interface NetworkMessage {
+export interface NetworkMessage {
+  TTL: number;
   to: string;
   from: string;
   sender: string;
-  TTL: number;
   payload: Uint8Array;
-}
-
-export interface NetworkRequest extends NetworkMessage {
   uri: string;
 }
 
-export interface NetworkResponse extends NetworkMessage {
-}
+// export interface NetworkRequest extends NetworkMessage {
+// }
+//
+// export interface NetworkResponse extends NetworkMessage {
+// }
 
-export interface NetworkResponseFull extends NetworkResponse {
+export interface NetworkResponseFull extends NetworkMessage {
   // TODO: может отправлять вторым аргументом?
   connectionMessage: ConnectionMessage;
 }
 
-type NetworkOnRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;
-type IncomeRequestsHandler = (request: NetworkRequest) => void;
+type NetworkOnRequestHandler = (request: NetworkMessage) => Promise<NetworkMessage>;
+type IncomeRequestsHandler = (request: NetworkMessage) => void;
 
 // TODO: review
 // enum NetworkDriver {
@@ -73,6 +73,12 @@ type IncomeRequestsHandler = (request: NetworkRequest) => void;
 const DEFAULT_TTL = 10;
 // channel of connection which network uses to send and receive messages
 const SEND_RECEIVE_CHANNEL = 254;
+export const RESPONSE_STATUS_URI = {
+  routed: '00',
+  response: '01',
+  responseError: '02',
+  timeout: '03',
+};
 
 
 export default class Network extends ServiceBase<NetworkProps> {
@@ -114,7 +120,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
 
     const connection: Connection = this.getConnection(connectionItem.connectionName);
-    const request: NetworkRequest = {
+    const request: NetworkMessage = {
       to: hostId,
       from: this.context.config.id,
       sender: this.context.config.id,
@@ -122,7 +128,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       uri,
       payload,
     };
-    const encodedMessage: Uint8Array = encodeNetworkRequest(request);
+    const encodedMessage: Uint8Array = encodeNetworkMessage(request);
     // make request
     const connectionResponse: ConnectionResponse = await connection.request(
       connectionItem.connectionId,
@@ -137,7 +143,9 @@ export default class Network extends ServiceBase<NetworkProps> {
       throw new Error(`Result doesn't contains the payload`);
     }
 
-    const response: NetworkResponse = decodeNetworkResponse(connectionResponse.payload);
+    // TODO: add uri response
+
+    const response: NetworkMessage = decodeNetworkMessage(connectionResponse.payload);
 
     return {
       ...response,
@@ -149,13 +157,12 @@ export default class Network extends ServiceBase<NetworkProps> {
     };
   }
 
-  // TODO: может лучше слушать определенный канал?
   onRequest(handler: NetworkOnRequestHandler): number {
     // TODO: нужно всетаки сделать обертку в которой выполнить хэндлер и сформировать ответ
-    const cbWrapper = (request: NetworkRequest): void => {
+    const cbWrapper = (request: NetworkMessage): void => {
       try {
         handler(request)
-          .then((response: NetworkResponse) => this.sendResponseBack(response))
+          .then((response: NetworkMessage) => this.sendResponseBack(response))
           .catch((e) => {
             // TODO: add
           });
@@ -205,12 +212,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
   private addConnectionListeners(connection: Connection) {
     connection.onRequest((request: ConnectionRequest, connectionId: string) => {
-      // TODO: декодировать
-      // TODO: зарегистрировать соединение в кэше если не было
-      // TODO: отправить в роутер
-      // TODO: если надо переслать уменьшить ttl
-      // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
-
+      this.handleIncomeMessage(request, connectionId,connection);
     });
     connection.onNewConnection((connectionId: string) => {
 
@@ -218,6 +220,23 @@ export default class Network extends ServiceBase<NetworkProps> {
     connection.onEndConnection((connectionId: string) => {
 
     });
+  }
+
+  private handleIncomeMessage(request: ConnectionRequest, connectionId: string, connection: Connection) {
+    const incomeMessage: NetworkMessage = decodeNetworkMessage(request.payload);
+
+    // TODO: зарегистрировать соединение в кэше если не было
+
+    if (this.router.hasToBeRouted(incomeMessage)) {
+      this.router.sendFuther(incomeMessage);
+
+      // TODO: make responce - routed
+      // TODO: если надо переслать уменьшить ttl
+    }
+    else {
+      // TODO: call cb
+    }
+    // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
   }
 
 }
