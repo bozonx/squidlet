@@ -33,12 +33,18 @@ export interface ConnectionResponse extends ConnectionMessage {
 
 export type ConnectionOnRequestHandler = (
   request: ConnectionRequest,
-  sessionId: string
+  connectionId: string
 ) => Promise<ConnectionResponse>;
+
+export type ConnectionServiceType = 'connection';
+export const CONNECTION_SERVICE_TYPE = 'connection';
+
 //export type ConnectionIncomeResponseHandler = (response: ConnectionResponse) => void;
 
 
 export default interface Connection {
+  serviceType: ConnectionServiceType;
+
   /**
    * Send data and waiting of response.
    * On the other side you should listen to this address and send data to the same address
@@ -55,8 +61,11 @@ export default interface Connection {
    */
   onRequest(handler: ConnectionOnRequestHandler): number;
 
+  onNewConnection(cb: (connectionId: string) => void): void;
+  onEndConnection(cb: (connectionId: string) => void): void;
+
   /**
-   * Remove listener that has been set by `onRequest` or `onResponse`
+   * Remove listener
    */
   removeListener(handlerIndex: number): void;
 }
