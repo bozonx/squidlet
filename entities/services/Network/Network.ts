@@ -97,7 +97,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     const encodedMessage: Uint8Array = encodeNetworkMessage(request);
     // make request
     const connectionResponse: ConnectionResponse = await connection.request(
-      connectionItem.connectionId,
+      connectionItem.peerId,
       SEND_RECEIVE_CHANNEL,
       encodedMessage
     );
@@ -161,21 +161,21 @@ export default class Network extends ServiceBase<NetworkProps> {
   private addConnectionListeners(connection: Connection) {
     connection.onRequest((
       request: ConnectionRequest,
-      connectionId: string
+      peerId: string
     ): Promise<ConnectionResponse> => {
-      return this.handleIncomeMessage(request, connectionId,connection);
+      return this.handleIncomeMessage(request, peerId,connection);
     });
-    connection.onNewConnection((connectionId: string) => {
+    connection.onNewConnection((peerId: string) => {
       // TODO: зарегистрировать соединение
     });
-    connection.onEndConnection((connectionId: string) => {
+    connection.onEndConnection((peerId: string) => {
       // TODO: закрыть соединение
     });
   }
 
   private async handleIncomeMessage(
     request: ConnectionRequest,
-    connectionId: string,
+    peerId: string,
     connection: Connection
   ): Promise<ConnectionResponse> {
     const incomeMessage: NetworkMessage = decodeNetworkMessage(request.payload);
@@ -235,6 +235,21 @@ export default class Network extends ServiceBase<NetworkProps> {
     const connection: Connection = await this.resolveConnection(response.hostId);
     // TODO: resolve it !!!!!
     const sessionId = '1';
+
+    const message: ConnectionResponse = {
+      //channel: request.channel,
+      // TODO: зачем вставлять requestId если он вставится в Connection ???
+      //requestId: request.requestId,
+      //status: ConnectionStatus.responseOk,
+      payload: encodeNetworkMessage({
+        TTL: this.context.config.config.defaultTtl,
+        to: incomeMessage.from,
+        from: this.context.config.id,
+        route: [],
+        uri: RESPONSE_STATUS_URI.routed,
+        payload: new Uint8Array(0),
+      }),
+    };
 
     // TODO:  может использовать такой метов в connection.sendResponseBack()
     const result: ConnectionResponse = await connection.request(
