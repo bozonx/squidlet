@@ -46,7 +46,7 @@ export interface NetworkRequest extends NetworkMessage {
 
 export interface NetworkResponse extends NetworkMessage {
   // TODO: может отправлять вторым аргументом?
-  connectionMessage: ConnectionMessage;
+  //connectionMessage: ConnectionMessage;
 }
 
 type NetworkOnRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;
