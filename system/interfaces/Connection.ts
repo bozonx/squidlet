@@ -46,6 +46,11 @@ export default interface Connection {
    * Handle income requests at specified port.
    * Only one handler of specified port is allowed.
    * You have to generate a response in your handler.
+   * Reserved channels:
+   * * 252 - network service messages
+   * * 253 - response status OK
+   * * 254 - response status Error
+   * * 255 - broadcast message
    */
   startListenPort(port: number, handler: ConnectionOnRequestHandler): void;
 
