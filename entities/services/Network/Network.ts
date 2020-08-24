@@ -5,11 +5,11 @@ import Connection, {
   ConnectionMessage,
   ConnectionResponse,
   ConnectionStatus
-} from '../../../system/interfaces/Connection';
-import IndexedEvents from '../../../system/lib/IndexedEvents';
+} from 'system/interfaces/Connection';
+import IndexedEvents from 'system/lib/IndexedEvents';
+import {omitObj} from 'system/lib/objects';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkResponse, encodeNetworkRequest} from './helpers';
-import {omitObj} from '../../../system/lib/objects';
 
 
 // interface NodeProps {
@@ -45,8 +45,11 @@ export interface NetworkRequest extends NetworkMessage {
 }
 
 export interface NetworkResponse extends NetworkMessage {
+}
+
+export interface NetworkResponseFull extends NetworkResponse {
   // TODO: может отправлять вторым аргументом?
-  //connectionMessage: ConnectionMessage;
+  connectionMessage: ConnectionMessage;
 }
 
 type NetworkOnRequestHandler = (request: NetworkRequest) => Promise<NetworkResponse>;
@@ -101,14 +104,14 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 
-  async request(hostId: string, url: string, body: Uint8Array): Promise<NetworkResponse> {
+  async request(hostId: string, url: string, body: Uint8Array): Promise<NetworkResponseFull> {
     const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
 
     if (!connectionItem) {
       throw new Error(`Host "${hostId}" hasn't been connected`);
     }
 
-    const connection: Connection = this.getConnection(connectionItem?.connectionName);
+    const connection: Connection = this.getConnection(connectionItem.connectionName);
     const request: NetworkRequest = {
       to: hostId,
       from: this.context.config.id,
@@ -169,7 +172,11 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   private getConnection(connectionName: string): Connection {
-    // TODO: see network config and find connection which has the same hostId
+    if (!this.context.service[connectionName]) {
+      throw new Error(`Can't find connection "${connectionName}"`);
+    }
+
+    return this.context.service[connectionName];
   }
 
   private async sendResponseBack(response: NetworkResponse) {
