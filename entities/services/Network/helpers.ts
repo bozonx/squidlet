@@ -1,6 +1,6 @@
 import {MAX_NUM_16_BIT} from 'system/constants';
+import {deserializeStringArray, serializeStringArray} from 'system/lib/serialize';
 import {NetworkRequest, NetworkResponse} from './Network';
-import {asciiToUint8Array, uint8ArrayToAscii} from '../../../system/lib/serialize';
 
 
 /**
@@ -11,15 +11,15 @@ import {asciiToUint8Array, uint8ArrayToAscii} from '../../../system/lib/serializ
  * * "from" data
  * * 1 byte length of "sender"
  * * "sender" data
- * * 1 byte length of "url"
- * * url data
+ * * 1 byte length of "uri"
+ * * uri data
  * * 1 byte TTL
  * * body
  * @param request
  */
 export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
 
-  // TODO: проверить если не указанны to,from,sender,url
+  // TODO: проверить если не указанны to,from,sender,uri
   // TODO: проверить ttl < 0
 
   if (typeof request.to !== 'string') {
@@ -40,11 +40,11 @@ export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
   else if (request.sender.length > 255) {
     throw new Error(`Value of request.sender is too long: ${request.sender.length}`);
   }
-  else if (typeof request.url !== 'string') {
-    throw new Error(`request.url has to be a string`);
+  else if (typeof request.uri !== 'string') {
+    throw new Error(`request.uri has to be a string`);
   }
-  else if (request.url.length > 255) {
-    throw new Error(`Url is too long: ${request.url.length}`);
+  else if (request.uri.length > 255) {
+    throw new Error(`uri is too long: ${request.uri.length}`);
   }
   else if (typeof request.TTL !== 'number') {
     throw new Error(`request.TTL has to be a number`);
@@ -53,22 +53,14 @@ export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
     throw new Error(`TTL is too long: ${request.TTL}`);
   }
 
-  const encodedTo: Uint8Array = asciiToUint8Array(request.to);
-  const encodedFrom: Uint8Array = asciiToUint8Array(request.from);
-  const encodedSender: Uint8Array = asciiToUint8Array(request.sender);
-  const encodedUrl: Uint8Array = asciiToUint8Array(request.url);
-
-  // TODO: maybe use concatUint8Arr ???
   const result: Uint8Array = new Uint8Array([
-    encodedTo.length,
-    ...encodedTo,
-    encodedFrom.length,
-    ...encodedFrom,
-    encodedSender.length,
-    ...encodedSender,
-    encodedUrl.length,
-    ...encodedUrl,
     request.TTL,
+    ...serializeStringArray([
+      request.uri,
+      request.to,
+      request.from,
+      request.sender,
+    ]),
     ...request.body,
   ]);
 
@@ -92,22 +84,27 @@ export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
  * @param data
  */
 export function decodeNetworkResponse(data: Uint8Array): NetworkResponse {
-  const toLength: number = data[0];
-  const toStartIndex: number = 1;
-  const toEndIndex: number = toLength + toStartIndex;
-  const fromLength: number = data[toEndIndex];
-  const fromStartIndex: number = toEndIndex + 1;
-  const fromEndIndex: number = fromLength + fromStartIndex;
-  const senderLength: number = data[fromEndIndex];
-  const senderStartIndex: number = fromEndIndex + 1;
-  const senderEndIndex: number = senderLength + senderStartIndex;
+  // const toLength: number = data[1];
+  // const toStartIndex: number = 2;
+  // const toEndIndex: number = toLength + toStartIndex;
+  // const fromLength: number = data[toEndIndex];
+  // const fromStartIndex: number = toEndIndex + 1;
+  // const fromEndIndex: number = fromLength + fromStartIndex;
+  // const senderLength: number = data[fromEndIndex];
+  // const senderStartIndex: number = fromEndIndex + 1;
+  // const senderEndIndex: number = senderLength + senderStartIndex;
+
+  const [parsedArr, lastIndex] = deserializeStringArray(data, 1, 3);
 
   return {
-    to: uint8ArrayToAscii(data.slice(toStartIndex, toEndIndex)),
-    from: uint8ArrayToAscii(data.slice(fromStartIndex, fromEndIndex)),
-    sender: uint8ArrayToAscii(data.slice(senderStartIndex, senderEndIndex)),
-    TTL: data[senderEndIndex],
-    body: data.slice(senderEndIndex + 1),
+    TTL: data[0],
+    to: parsedArr[0],
+    from: parsedArr[1],
+    sender: parsedArr[2],
+    // to: uint8ArrayToAscii(data.slice(toStartIndex, toEndIndex)),
+    // from: uint8ArrayToAscii(data.slice(fromStartIndex, fromEndIndex)),
+    // sender: uint8ArrayToAscii(data.slice(senderStartIndex, senderEndIndex)),
+    body: data.slice(lastIndex + 1),
   };
 }
 

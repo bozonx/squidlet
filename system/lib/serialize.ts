@@ -140,3 +140,48 @@ export function deserializeJson(serialized: Uint8Array | any) {
     return value;
   });
 }
+
+// TODO: test
+export function serializeStringArray(arr: string[], lengthBytes: number = 1): Uint8Array {
+  if (lengthBytes !== 1) throw new Error(`Bigger length than 1 byte isn't supported`);
+
+  const result: number[] = [];
+
+  for (let item of arr) {
+    // TODO: проверить длину элемента массива
+    result.push(item.length);
+    result.push(...asciiToUint8Array(item));
+  }
+
+  return new Uint8Array(result);
+}
+
+// TODO: test
+/**
+ * Make array from Uint8Array which was encoded by serializeStringArray
+ * and return the last index
+ * @param data
+ * @param startIndex
+ * @param count
+ */
+export function deserializeStringArray(
+  data: Uint8Array,
+  startIndex: number,
+  count: number
+): [string[], number] {
+  const result: string[] = [];
+  let i: number;
+
+  for (i = startIndex; i < data.length; i++) {
+    const itemLength: number = data[i];
+    const itemData = data.slice(i + 1, i + itemLength + 1);
+
+    result.push(uint8ArrayToAscii(itemData));
+
+    i = i + itemLength;
+
+    if (result.length >= count) break;
+  }
+
+  return [result, i];
+}
