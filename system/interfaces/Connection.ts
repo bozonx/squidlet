@@ -1,11 +1,12 @@
 export enum ConnectionStatus {
   request,
   responseOk,
-  // body contains an error string
+  // payload contains an error string
   responseError,
 }
 
 export interface ConnectionMessage {
+  // TODO: rename to port
   channel: number;
   // should be 16 bits
   requestId: number;
@@ -14,14 +15,15 @@ export interface ConnectionMessage {
 
 export interface ConnectionRequest extends ConnectionMessage {
   //request: true;
-  body: Uint8Array;
+  // TODO: rename to payload
+  payload: Uint8Array;
 }
 
 export interface ConnectionResponse extends ConnectionMessage {
   // means response
   //request: false;
   // it will be undefined on error
-  body?: Uint8Array;
+  payload?: Uint8Array;
   error?: string;
 }
 
