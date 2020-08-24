@@ -1,0 +1,8 @@
+recursive: true
+ui: bdd
+colors: true
+spec: test/**/*.spec.coffee
+require:
+  - coffeescript/register
+  - ts-node/register
+  - ./test/main.coffee
