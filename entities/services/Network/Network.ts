@@ -38,7 +38,7 @@ interface NetworkMessage {
   from: string;
   sender: string;
   TTL: number;
-  body: Uint8Array;
+  payload: Uint8Array;
 }
 
 export interface NetworkRequest extends NetworkMessage {
@@ -106,7 +106,7 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 
-  async request(hostId: string, uri: string, body: Uint8Array): Promise<NetworkResponseFull> {
+  async request(hostId: string, uri: string, payload: Uint8Array): Promise<NetworkResponseFull> {
     const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
 
     if (!connectionItem) {
@@ -120,7 +120,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       sender: this.context.config.id,
       TTL: DEFAULT_TTL,
       uri,
-      body,
+      payload,
     };
     const encodedMessage: Uint8Array = encodeNetworkRequest(request);
     // make request
@@ -133,17 +133,17 @@ export default class Network extends ServiceBase<NetworkProps> {
     if (connectionResponse.status === ConnectionStatus.responseError) {
       throw new Error(connectionResponse.error);
     }
-    else if (!connectionResponse.body) {
-      throw new Error(`Result doesn't contains the body`);
+    else if (!connectionResponse.payload) {
+      throw new Error(`Result doesn't contains the payload`);
     }
 
-    const response: NetworkResponse = decodeNetworkResponse(connectionResponse.body);
+    const response: NetworkResponse = decodeNetworkResponse(connectionResponse.payload);
 
     return {
       ...response,
       connectionMessage: omitObj(
         connectionResponse,
-        'body',
+        'payload',
         'error'
       ) as ConnectionMessage,
     };
@@ -191,7 +191,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       sessionId,
       response.channel,
       // TODO: в случае ошибки отправить error
-      response.body,
+      response.payload,
     );
   }
 
