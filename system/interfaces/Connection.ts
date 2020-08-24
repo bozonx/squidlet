@@ -1,3 +1,4 @@
+// TODO: use status as channels
 export enum ConnectionStatus {
   request,
   responseOk,
@@ -6,42 +7,30 @@ export enum ConnectionStatus {
 }
 
 export interface ConnectionMessage {
-  // TODO: rename to port
-  channel: number;
+  port: number;
   // should be 16 bits
   requestId: number;
   status: ConnectionStatus;
 }
 
 export interface ConnectionRequest extends ConnectionMessage {
-  //request: true;
-  // TODO: rename to payload
   payload: Uint8Array;
 }
 
 export interface ConnectionResponse extends ConnectionMessage {
-  // means response
-  //request: false;
   // it will be undefined on error
   payload?: Uint8Array;
   error?: string;
 }
 
-// export interface ConnectionDriverProps {
-//   busId: number | string;
-//   // wait seconds for data transfer ends
-//   //requestTimeoutSec: number;
-// }
-
 export type ConnectionOnRequestHandler = (
   request: ConnectionRequest,
   connectionId: string
 ) => Promise<ConnectionResponse>;
-
 export type ConnectionServiceType = 'connection';
-export const CONNECTION_SERVICE_TYPE = 'connection';
 
-//export type ConnectionIncomeResponseHandler = (response: ConnectionResponse) => void;
+// TODO: может где-то сделать enum ???
+export const CONNECTION_SERVICE_TYPE = 'connection';
 
 
 export default interface Connection {
@@ -49,26 +38,29 @@ export default interface Connection {
 
   /**
    * Send data and waiting of response.
-   * On the other side you should listen to this address and send data to the same address
-   * on this side.
+   * On the other side you should listen to this port and send request.
    * An error will be risen only if request hasn't been sent or on response timeout.
-   * Register is 8 bits.
-   * Port is from 0 to 255 but don't use port 255 it is registered for network data transfer.
+   * Port is from 0 to 255 but don't use port 254 and 255.
    */
-  request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionResponse>;
-
-  // TODO: может тоже на 1 port 1 обработчик ???
-  /**
-   * Handle income request at specified channel.
-   * You have to generate a response
-   */
-  onRequest(handler: ConnectionOnRequestHandler): number;
-
-  onNewConnection(cb: (connectionId: string) => void): void;
-  onEndConnection(cb: (connectionId: string) => void): void;
+  request(connectionId: string, port: number, payload: Uint8Array): Promise<ConnectionResponse>;
 
   /**
-   * Remove listener
+   * Handle income request at specified port.
+   * You have to generate a response.
+   * Only one handler of one port is allowed
    */
-  removeListener(handlerIndex: number): void;
+  onRequest(port: number, handler: ConnectionOnRequestHandler): void;
+
+  onNewConnection(cb: (connectionId: string) => void): number;
+  onEndConnection(cb: (connectionId: string) => void): number;
+
+  /**
+   * Remove listener of onRequest
+   */
+  removeRequestListener(port: number): void;
+
+  /**
+   * Remove listener of onNewConnection or onEndConnection
+   */
+  removeConnectionListener(handlerIndex: number): void;
 }
