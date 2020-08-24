@@ -1,8 +1,6 @@
-import {
-  stringToUint8Array
-} from 'system/lib/binaryHelpers';
 import {MAX_NUM_16_BIT} from 'system/constants';
 import {NetworkRequest, NetworkResponse} from './Network';
+import {asciiToUint8Array, uint8ArrayToAscii} from '../../../system/lib/serialize';
 
 
 /**
@@ -51,11 +49,12 @@ export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
     throw new Error(`TTL is too long: ${request.TTL}`);
   }
 
-  const encodedTo: Uint8Array = stringToUint8Array(request.to);
-  const encodedFrom: Uint8Array = stringToUint8Array(request.from);
-  const encodedSender: Uint8Array = stringToUint8Array(request.sender);
-  const encodedUrl: Uint8Array = stringToUint8Array(request.url);
+  const encodedTo: Uint8Array = asciiToUint8Array(request.to);
+  const encodedFrom: Uint8Array = asciiToUint8Array(request.from);
+  const encodedSender: Uint8Array = asciiToUint8Array(request.sender);
+  const encodedUrl: Uint8Array = asciiToUint8Array(request.url);
 
+  // TODO: maybe use concatUint8Arr ???
   const result: Uint8Array = new Uint8Array([
     encodedTo.length,
     ...encodedTo,
@@ -76,10 +75,40 @@ export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
   return result;
 }
 
+/**
+ * Bytes:
+ * * 1 byte length of "to"
+ * * 'to" data
+ * * 1 byte length of "from"
+ * * "from" data
+ * * 1 byte length of "sender"
+ * * "sender" data
+ * * 1 byte TTL
+ * * body
+ * @param request
+ */
 export function decodeNetworkResponse(data: Uint8Array): NetworkResponse {
   const toLength: number = data[0];
-  // TODO: провеить
-  const decodedTo: Uint8Array = data.slice(1, toLength);
+  const toStartIndex: number = 1;
+  const toEndIndex: number = toLength + toStartIndex;
+  const fromLength: number = data[toEndIndex];
+  const fromStartIndex: number = toEndIndex + 1;
+  const fromEndIndex: number = fromLength + fromStartIndex;
+  const senderLength: number = data[fromEndIndex];
+  const senderStartIndex: number = fromEndIndex + 1;
+  const senderEndIndex: number = senderLength + senderStartIndex;
+  // const urlLength: number = data[toEndIndex];
+  // const urlStartIndex: number = toEndIndex + 1;
+  // const urlEndIndex: number = urlLength + urlStartIndex;
+
+  return {
+    to: uint8ArrayToAscii(data.slice(toStartIndex, toEndIndex)),
+    from: uint8ArrayToAscii(data.slice(fromStartIndex, fromEndIndex)),
+    sender: uint8ArrayToAscii(data.slice(senderStartIndex, senderEndIndex)),
+    //url: uint8ArrayToAscii(data.slice(urlStartIndex, urlEndIndex)),
+    TTL: data[senderEndIndex],
+    body: data.slice(senderEndIndex + 1),
+  };
 }
 
 // export function serializeMessage(message: NetworkMessage): Uint8Array {

@@ -63,6 +63,8 @@ export function addFirstItemUint8Arr(arr: Uint8Array, itemToAdd: number): Uint8A
 }
 
 // TODO: test
+// TODO: work only with ASCII strings
+// TODO: зачем нужно если есть asciiToUint8Array ????
 export function stringToUint8Array(str: string): Uint8Array {
   const result = new Uint8Array(str.length);
 
