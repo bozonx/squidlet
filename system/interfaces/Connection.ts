@@ -1,16 +1,13 @@
-// TODO: use status as channels
 export enum ConnectionStatus {
-  request,
-  responseOk,
+  responseOk = 253,
   // payload contains an error string
-  responseError,
+  responseError = 254,
 }
 
-export interface ConnectionMessage {
+interface ConnectionMessage {
   port: number;
   // should be 16 bits
   requestId: number;
-  status: ConnectionStatus;
 }
 
 export interface ConnectionRequest extends ConnectionMessage {
@@ -18,6 +15,7 @@ export interface ConnectionRequest extends ConnectionMessage {
 }
 
 export interface ConnectionResponse extends ConnectionMessage {
+  status: ConnectionStatus;
   // it will be undefined on error
   payload?: Uint8Array;
   error?: string;
@@ -25,8 +23,8 @@ export interface ConnectionResponse extends ConnectionMessage {
 
 export type ConnectionOnRequestHandler = (
   request: ConnectionRequest,
-  connectionId: string
-) => Promise<ConnectionResponse>;
+  peerId: string
+) => Promise<Uint8Array>;
 export type ConnectionServiceType = 'connection';
 
 // TODO: может где-то сделать enum ???
@@ -42,25 +40,25 @@ export default interface Connection {
    * An error will be risen only if request hasn't been sent or on response timeout.
    * Port is from 0 to 255 but don't use port 254 and 255.
    */
-  request(connectionId: string, port: number, payload: Uint8Array): Promise<ConnectionResponse>;
+  request(peerId: string, port: number, payload: Uint8Array): Promise<ConnectionResponse>;
 
   /**
-   * Handle income request at specified port.
-   * You have to generate a response.
-   * Only one handler of one port is allowed
+   * Handle income requests at specified port.
+   * Only one handler of specified port is allowed.
+   * You have to generate a response in your handler.
    */
-  onRequest(port: number, handler: ConnectionOnRequestHandler): void;
-
-  onNewConnection(cb: (connectionId: string) => void): number;
-  onEndConnection(cb: (connectionId: string) => void): number;
+  startListenPort(port: number, handler: ConnectionOnRequestHandler): void;
 
   /**
    * Remove listener of onRequest
    */
-  removeRequestListener(port: number): void;
+  stopListenPort(port: number): void;
+
+  onPeerConnect(cb: (peerId: string) => void): number;
+  onPeerDisconnect(cb: (peerId: string) => void): number;
 
   /**
-   * Remove listener of onNewConnection or onEndConnection
+   * Remove listener of onPeerConnect or onPeerDisconnect
    */
-  removeConnectionListener(handlerIndex: number): void;
+  removeListener(handlerIndex: number): void;
 }

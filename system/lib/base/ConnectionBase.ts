@@ -31,6 +31,9 @@ export default abstract class ConnectionBase<Props> extends ServiceBase<Props> i
 
 
   async request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionResponse> {
+
+    // TODO: запрещать использовать порты 253, 254, 255
+
     const request: ConnectionRequest = makeConnectionRequest(channel, data);
     const requestMessage: Uint8Array = encodeRequest(request);
     // send request and wait while sending is finished
