@@ -336,6 +336,7 @@ export function getAsciiNumber(num: number): number {
   return num + ASCII_NUMERIC_OFFSET;
 }
 
+// TODO: ненужен поидее, можно использовать синтаксис ...
 export function concatUint8Arr(...arrs: Uint8Array[]): Uint8Array {
   let offset: number = 0;
   const lengths: number = arrs.map((item) => item.length)
@@ -377,3 +378,4 @@ export function extract2NumbersFromByte(byte: number): [number, number] {
 //
 //   return value.constructor === Uint8Array;
 // }
+

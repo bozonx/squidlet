@@ -42,7 +42,7 @@ interface NetworkMessage {
 }
 
 export interface NetworkRequest extends NetworkMessage {
-  url: string;
+  uri: string;
 }
 
 export interface NetworkResponse extends NetworkMessage {
@@ -106,7 +106,7 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 
-  async request(hostId: string, url: string, body: Uint8Array): Promise<NetworkResponseFull> {
+  async request(hostId: string, uri: string, body: Uint8Array): Promise<NetworkResponseFull> {
     const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
 
     if (!connectionItem) {
@@ -119,7 +119,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       from: this.context.config.id,
       sender: this.context.config.id,
       TTL: DEFAULT_TTL,
-      url,
+      uri,
       body,
     };
     const encodedMessage: Uint8Array = encodeNetworkRequest(request);

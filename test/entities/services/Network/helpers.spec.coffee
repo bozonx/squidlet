@@ -4,42 +4,42 @@ helpers = require('../../../../entities/services/Network/helpers')
 describe.only 'entities.services.Network.helpers', ->
   beforeEach ->
     @request = {
+      TTL: 10
+      uri: 'd'
       to: 'a'
       from: 'b'
       sender: 'c'
-      url: 'd'
-      TTL: 10
       body: new Uint8Array([0,1,2])
     }
     @requestEncoded = new Uint8Array([
+      10,
+      1,
+      100,
       1,
       97,
       1,
       98,
       1,
       99,
-      1,
-      100,
-      10,
       0,
       1,
       2,
     ])
     @response = {
+      TTL: 10
       to: 'a'
       from: 'b'
       sender: 'c'
-      TTL: 10
       body: new Uint8Array([0,1,2])
     }
     @responseEncoded = new Uint8Array([
+      10,
       1,
       97,
       1,
       98,
       1,
       99,
-      10,
       0,
       1,
       2,
