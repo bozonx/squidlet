@@ -3,7 +3,8 @@ import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import Connection, {
   CONNECTION_SERVICE_TYPE,
-  ConnectionMessage, ConnectionRequest,
+  ConnectionMessage,
+  ConnectionRequest,
   ConnectionResponse,
   ConnectionStatus
 } from 'system/interfaces/Connection';
@@ -11,6 +12,7 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
+import Router from './Router';
 
 
 // interface NodeProps {
@@ -84,6 +86,7 @@ export const RESPONSE_STATUS_URI = {
 export default class Network extends ServiceBase<NetworkProps> {
   private incomeRequestsEvent = new IndexedEvents<IncomeRequestsHandler>();
   private readonly activeHosts: ActiveHosts;
+  private readonly router: Router;
 
   //private readonly router: Router;
   // link between { sessionId: [ hostId, networkDriverNum, busId ] }
@@ -95,6 +98,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
     //this.router = new Router(this.context, this.props);
     this.activeHosts = new ActiveHosts();
+    this.router = new Router();
   }
 
 
@@ -188,7 +192,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     return this.context.service[connectionName];
   }
 
-  private async sendResponseBack(response: NetworkResponse) {
+  private async sendResponseBack(response: NetworkMessage) {
     const connection: Connection = await this.resolveConnection(response.hostId);
     // TODO: resolve it !!!!!
     const sessionId = '1';
@@ -211,30 +215,42 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
   private addConnectionListeners(connection: Connection) {
-    connection.onRequest((request: ConnectionRequest, connectionId: string) => {
-      this.handleIncomeMessage(request, connectionId,connection);
+    connection.onRequest((
+      request: ConnectionRequest,
+      connectionId: string
+    ): Promise<ConnectionResponse> => {
+      return this.handleIncomeMessage(request, connectionId,connection);
     });
     connection.onNewConnection((connectionId: string) => {
-
+      // TODO: зарегистрировать соединение
     });
     connection.onEndConnection((connectionId: string) => {
-
+      // TODO: закрыть соединение
     });
   }
 
-  private handleIncomeMessage(request: ConnectionRequest, connectionId: string, connection: Connection) {
+  private async handleIncomeMessage(
+    request: ConnectionRequest,
+    connectionId: string,
+    connection: Connection
+  ): Promise<ConnectionResponse> {
     const incomeMessage: NetworkMessage = decodeNetworkMessage(request.payload);
 
     // TODO: зарегистрировать соединение в кэше если не было
 
     if (this.router.hasToBeRouted(incomeMessage)) {
-      this.router.sendFuther(incomeMessage);
+      this.router.sendFurther(incomeMessage);
 
-      // TODO: make responce - routed
-      // TODO: если надо переслать уменьшить ttl
+      return {
+        channel: request.channel,
+        requestId: request.requestId,
+        status: ConnectionStatus.responseOk,
+        // TODO: add payload
+        payload,
+      };
     }
     else {
-      // TODO: call cb
+      // TODO: call cb - rise event
     }
     // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
   }
