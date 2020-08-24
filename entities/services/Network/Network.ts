@@ -8,7 +8,6 @@ import Connection, {
   ConnectionResponse,
   ConnectionStatus
 } from 'system/interfaces/Connection';
-import IndexedEvents from 'system/lib/IndexedEvents';
 import {omitObj} from 'system/lib/objects';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
@@ -16,40 +15,18 @@ import Router from './Router';
 import {message} from 'gulp-typescript/release/utils';
 
 
-// interface NodeProps {
-//   // driver name like: 'SerialNetwork' etc
-//   driver: string;
-//   busId: string | number;
-// }
-//
-// interface NetworkInterface extends NodeProps {
-//   // props of network driver
-//   [index: string]: any;
-// }
-
 export interface NetworkProps {
-  // interfaces: NetworkInterface[];
-  // closestHosts: {[index: string]: NodeProps};
-  // networkMap: {[index: string]: any};
 }
-
-// like [ hostId, networkDriverNum, busId ]
-//type AddressDefinition = [string, NetworkDriver, number | string];
 
 export interface NetworkMessage {
   TTL: number;
   to: string;
   from: string;
-  sender: string;
+  // hosts between to and from
+  route: string[];
   payload: Uint8Array;
   uri: string;
 }
-
-// export interface NetworkRequest extends NetworkMessage {
-// }
-//
-// export interface NetworkResponse extends NetworkMessage {
-// }
 
 export interface NetworkResponseFull extends NetworkMessage {
   // TODO: может отправлять вторым аргументом?
@@ -59,36 +36,23 @@ export interface NetworkResponseFull extends NetworkMessage {
 type NetworkOnRequestHandler = (request: NetworkMessage) => Promise<NetworkMessage>;
 type IncomeRequestsHandler = (request: NetworkMessage) => void;
 
-// TODO: review
-// enum NetworkDriver {
-//   serial,
-//   mqtt,
-//   wsServer,
-//   wsClient,
-//   i2cMaster,
-//   i2cSlave,
-// }
-
-//export const NETWORK_PORT = 255;
-
-// TODO: use config's
-// max 255
-const DEFAULT_TTL = 10;
 // channel of connection which network uses to send and receive messages
 const SEND_RECEIVE_CHANNEL = 254;
 export const RESPONSE_STATUS_URI = {
-  routed: '00',
-  response: '01',
-  responseError: '02',
-  timeout: '03',
+  routed: '0',
+  response: '1',
+  responseError: '2',
+  timeout: '3',
+  getName: '4',
+  ping: '5',
+  pong: '6',
 };
 
 
 export default class Network extends ServiceBase<NetworkProps> {
-  //private incomeRequestsEvent = new IndexedEvents<IncomeRequestsHandler>();
   private readonly activeHosts: ActiveHosts;
   private readonly router: Router;
-  private incomeRequestHandlers: {[index: string]: IncomeRequestsHandler};
+  private incomeRequestHandlers: {[index: string]: IncomeRequestsHandler} = {};
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -111,6 +75,10 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   async request(hostId: string, uri: string, payload: Uint8Array): Promise<NetworkResponseFull> {
+    if (uri.length <= 1) {
+      throw new Error(`Uri has to have length greater than 1. One byte is for status number`);
+    }
+
     const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
 
     if (!connectionItem) {
@@ -121,8 +89,8 @@ export default class Network extends ServiceBase<NetworkProps> {
     const request: NetworkMessage = {
       to: hostId,
       from: this.context.config.id,
-      sender: this.context.config.id,
-      TTL: DEFAULT_TTL,
+      route: [],
+      TTL: this.context.config.config.defaultTtl,
       uri,
       payload,
     };
@@ -218,10 +186,10 @@ export default class Network extends ServiceBase<NetworkProps> {
         requestId: request.requestId,
         status: ConnectionStatus.responseOk,
         payload: encodeNetworkMessage({
-          TTL: DEFAULT_TTL,
+          TTL: this.context.config.config.defaultTtl,
           to: incomeMessage.from,
           from: this.context.config.id,
-          sender: this.context.config.id,
+          route: [],
           uri: RESPONSE_STATUS_URI.routed,
           payload: new Uint8Array(0),
         }),

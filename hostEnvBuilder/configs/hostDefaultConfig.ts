@@ -11,6 +11,8 @@ const config: HostConfigConfig = {
   rcResponseTimoutSec: 30,
   queueJobTimeoutSec: 120,
   rebootDelaySec: 5,
+  // TTL for network, max 255
+  defaultTtl: 10,
   //appSwitchLock: false,
   // default params for connections
   // connections: {
