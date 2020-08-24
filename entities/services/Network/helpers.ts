@@ -61,11 +61,11 @@ export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
       request.from,
       request.sender,
     ]),
-    ...request.body,
+    ...request.payload,
   ]);
 
   if (result.length > MAX_NUM_16_BIT) {
-    throw new Error(`request.body is too long: ${request.body.length}`);
+    throw new Error(`request.payload is too long: ${request.payload.length}`);
   }
 
   return result;
@@ -104,7 +104,7 @@ export function decodeNetworkResponse(data: Uint8Array): NetworkResponse {
     // to: uint8ArrayToAscii(data.slice(toStartIndex, toEndIndex)),
     // from: uint8ArrayToAscii(data.slice(fromStartIndex, fromEndIndex)),
     // sender: uint8ArrayToAscii(data.slice(senderStartIndex, senderEndIndex)),
-    body: data.slice(lastIndex + 1),
+    payload: data.slice(lastIndex + 1),
   };
 }
 
