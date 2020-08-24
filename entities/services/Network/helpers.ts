@@ -18,6 +18,10 @@ import {asciiToUint8Array, uint8ArrayToAscii} from '../../../system/lib/serializ
  * @param request
  */
 export function encodeNetworkRequest(request: NetworkRequest): Uint8Array {
+
+  // TODO: проверить если не указанны to,from,sender,url
+  // TODO: проверить ttl < 0
+
   if (typeof request.to !== 'string') {
     throw new Error(`request.to has to be a string`);
   }
