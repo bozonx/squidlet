@@ -57,6 +57,7 @@ export default interface Connection {
    */
   request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionResponse>;
 
+  // TODO: может тоже на 1 port 1 обработчик ???
   /**
    * Handle income request at specified channel.
    * You have to generate a response
