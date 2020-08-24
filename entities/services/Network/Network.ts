@@ -9,10 +9,10 @@ import Connection, {
   ConnectionStatus
 } from 'system/interfaces/Connection';
 import {omitObj} from 'system/lib/objects';
+
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import Router from './Router';
-import {message} from 'gulp-typescript/release/utils';
 
 
 export interface NetworkProps {
@@ -20,25 +20,26 @@ export interface NetworkProps {
 
 export interface NetworkMessage {
   TTL: number;
+  // 2 or more character is allowed
+  uri: string;
   to: string;
   from: string;
-  // hosts between to and from
+  // hosts between "to" and "from"
   route: string[];
   payload: Uint8Array;
-  uri: string;
 }
 
+// TODO: review
 export interface NetworkResponseFull extends NetworkMessage {
   // TODO: может отправлять вторым аргументом?
   connectionMessage: ConnectionMessage;
 }
 
 type NetworkOnRequestHandler = (request: NetworkMessage) => Promise<NetworkMessage>;
-type IncomeRequestsHandler = (request: NetworkMessage) => void;
 
 // channel of connection which network uses to send and receive messages
-const SEND_RECEIVE_CHANNEL = 254;
-export const RESPONSE_STATUS_URI = {
+const NETWORK_PORT = 252;
+export const SPECIAL_URI = {
   routed: '0',
   response: '1',
   responseError: '2',
@@ -52,7 +53,7 @@ export const RESPONSE_STATUS_URI = {
 export default class Network extends ServiceBase<NetworkProps> {
   private readonly activeHosts: ActiveHosts;
   private readonly router: Router;
-  private incomeRequestHandlers: {[index: string]: IncomeRequestsHandler} = {};
+  private incomeRequestHandlers: {[index: string]: (request: NetworkMessage) => void} = {};
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -70,10 +71,13 @@ export default class Network extends ServiceBase<NetworkProps> {
   destroy = async () => {
     this.activeHosts.destroy();
     this.router.destroy();
-    // TODO: clear incomeRequestHandlers
+    delete this.incomeRequestHandlers;
+
+    // TODO: на всех connections вызывать stopListenPort и removeListener
   }
 
 
+  // TODO: review
   async request(hostId: string, uri: string, payload: Uint8Array): Promise<NetworkResponseFull> {
     if (uri.length <= 1) {
       throw new Error(`Uri has to have length greater than 1. One byte is for status number`);
@@ -98,7 +102,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     // make request
     const connectionResponse: ConnectionResponse = await connection.request(
       connectionItem.peerId,
-      SEND_RECEIVE_CHANNEL,
+      //NETWORK_CHANNEL,
       encodedMessage
     );
 
@@ -159,16 +163,16 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
   private addConnectionListeners(connection: Connection) {
-    connection.onRequest((
+    connection.startListenPort(NETWORK_PORT, (
       request: ConnectionRequest,
       peerId: string
-    ): Promise<ConnectionResponse> => {
+    ): Promise<Uint8Array> => {
       return this.handleIncomeMessage(request, peerId,connection);
     });
-    connection.onNewConnection((peerId: string) => {
+    connection.onPeerConnect((peerId: string) => {
       // TODO: зарегистрировать соединение
     });
-    connection.onEndConnection((peerId: string) => {
+    connection.onPeerDisconnect((peerId: string) => {
       // TODO: закрыть соединение
     });
   }
@@ -195,7 +199,7 @@ export default class Network extends ServiceBase<NetworkProps> {
           to: incomeMessage.from,
           from: this.context.config.id,
           route: [],
-          uri: RESPONSE_STATUS_URI.routed,
+          uri: SPECIAL_URI.routed,
           payload: new Uint8Array(0),
         }),
       };
@@ -246,7 +250,7 @@ export default class Network extends ServiceBase<NetworkProps> {
         to: incomeMessage.from,
         from: this.context.config.id,
         route: [],
-        uri: RESPONSE_STATUS_URI.routed,
+        uri: SPECIAL_URI.routed,
         payload: new Uint8Array(0),
       }),
     };
