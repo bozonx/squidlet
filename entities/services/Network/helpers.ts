@@ -15,59 +15,59 @@ import {NetworkMessage} from './Network';
  * * uri data
  * * 1 byte TTL
  * * body
- * @param request
+ * @param message
  */
-export function encodeNetworkMessage(request: NetworkMessage): Uint8Array {
+export function encodeNetworkMessage(message: NetworkMessage): Uint8Array {
 
   // TODO: проверить если не указанны to,from,sender,uri
   // TODO: проверить ttl < 0
   // TODO: uri > 2
 
-  if (typeof request.to !== 'string') {
-    throw new Error(`request.to has to be a string`);
+  if (typeof message.to !== 'string') {
+    throw new Error(`message.to has to be a string`);
   }
-  if (request.to.length > 255) {
-    throw new Error(`Value of request.to is too long: ${request.to.length}`);
+  if (message.to.length > 255) {
+    throw new Error(`Value of message.to is too long: ${message.to.length}`);
   }
-  else if (typeof request.from !== 'string') {
-    throw new Error(`request.from has to be a string`);
+  else if (typeof message.from !== 'string') {
+    throw new Error(`message.from has to be a string`);
   }
-  else if (request.from.length > 255) {
-    throw new Error(`Value of request.from is too long: ${request.from.length}`);
+  else if (message.from.length > 255) {
+    throw new Error(`Value of message.from is too long: ${message.from.length}`);
   }
-  else if (typeof request.sender !== 'string') {
-    throw new Error(`request.sender has to be a string`);
+  else if (typeof message.sender !== 'string') {
+    throw new Error(`message.sender has to be a string`);
   }
-  else if (request.sender.length > 255) {
-    throw new Error(`Value of request.sender is too long: ${request.sender.length}`);
+  else if (message.sender.length > 255) {
+    throw new Error(`Value of message.sender is too long: ${message.sender.length}`);
   }
-  else if (typeof request.uri !== 'string') {
-    throw new Error(`request.uri has to be a string`);
+  else if (typeof message.uri !== 'string') {
+    throw new Error(`message.uri has to be a string`);
   }
-  else if (request.uri.length > 255) {
-    throw new Error(`uri is too long: ${request.uri.length}`);
+  else if (message.uri.length > 255) {
+    throw new Error(`uri is too long: ${message.uri.length}`);
   }
-  else if (typeof request.TTL !== 'number') {
-    throw new Error(`request.TTL has to be a number`);
+  else if (typeof message.TTL !== 'number') {
+    throw new Error(`message.TTL has to be a number`);
   }
-  else if (request.TTL > 255) {
-    throw new Error(`TTL is too long: ${request.TTL}`);
+  else if (message.TTL > 255) {
+    throw new Error(`TTL is too long: ${message.TTL}`);
   }
 
 
   const result: Uint8Array = new Uint8Array([
-    request.TTL,
+    message.TTL,
     ...serializeStringArray([
-      request.uri,
-      request.to,
-      request.from,
-      request.sender,
+      message.uri,
+      message.to,
+      message.from,
+      message.sender,
     ]),
-    ...request.payload,
+    ...message.payload,
   ]);
 
   if (result.length > MAX_NUM_16_BIT) {
-    throw new Error(`request.payload is too long: ${request.payload.length}`);
+    throw new Error(`message.payload is too long: ${message.payload.length}`);
   }
 
   return result;

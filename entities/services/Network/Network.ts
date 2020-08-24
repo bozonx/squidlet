@@ -147,6 +147,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       throw new Error(`Result doesn't contains the payload`);
     }
 
+    // TODO: ответ ждать в течении таймаута так как он может уйти далеко
     // TODO: add uri response
 
     const response: NetworkMessage = decodeNetworkMessage(connectionResponse.payload);
@@ -162,6 +163,7 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
   onRequest(handler: NetworkOnRequestHandler): number {
+    // TODO: похоже что на 1 uri 1 обработчик иначе не понятно что возвращать
     // TODO: нужно всетаки сделать обертку в которой выполнить хэндлер и сформировать ответ
     const cbWrapper = (request: NetworkMessage): void => {
       try {
@@ -240,19 +242,28 @@ export default class Network extends ServiceBase<NetworkProps> {
 
     if (this.router.hasToBeRouted(incomeMessage)) {
       this.router.sendFurther(incomeMessage);
-
+      // send message back which means that income message was routed.
       return {
         channel: request.channel,
+        // TODO: зачем вставлять requestId если он вставится в Connection ???
         requestId: request.requestId,
         status: ConnectionStatus.responseOk,
-        // TODO: add payload
-        payload,
+        payload: encodeNetworkMessage({
+          TTL: DEFAULT_TTL,
+          to: incomeMessage.from,
+          from: this.context.config.id,
+          sender: this.context.config.id,
+          uri: RESPONSE_STATUS_URI.routed,
+          payload: new Uint8Array(0),
+        }),
       };
     }
     else {
-      // TODO: call cb - rise event
+      // TODO: добавить данные connection - channel, requestId, status
+      this.incomeRequestsEvent.emit(incomeMessage);
+      // TODO: нужно выполнить хэндлер и отправить ответ
+      // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
     }
-    // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
   }
 
 }
