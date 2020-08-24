@@ -9,8 +9,14 @@ export interface HostItem {
  * Closest hosts cache
  */
 export default class ActiveHosts {
-  resolveByHostId(hostId: string): HostItem | undefined {
+  private activeHosts: HostItem[];
 
+
+  // TODO: сделать регистрацию хостов
+  // TODO: сделать удаление хостов когда он отсоединился
+
+  resolveByHostId(hostId: string): HostItem | undefined {
+    return this.activeHosts.find((item) => item.hostId === hostId);
   }
 
 }
