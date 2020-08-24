@@ -1,6 +1,11 @@
 import {NetworkMessage} from './Network';
 
 export default class Router {
+  destroy() {
+    // TODO: add
+  }
+
+
   hasToBeRouted(message: NetworkMessage): boolean {
     // TODO: add
   }
