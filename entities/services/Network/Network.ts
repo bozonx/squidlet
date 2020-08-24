@@ -124,6 +124,11 @@ export default class Network extends ServiceBase<NetworkProps> {
     };
   }
 
+  /**
+   * Handle income requests. Only on handler of one uri is allowed.
+   * @param uri
+   * @param handler
+   */
   onRequest(uri: string, handler: NetworkOnRequestHandler) {
     if (this.incomeRequestHandlers[uri]) {
       throw new Error(`Handler of uri has already defined`);
