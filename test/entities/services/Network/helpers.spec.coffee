@@ -9,7 +9,7 @@ describe.only 'entities.services.Network.helpers', ->
       sender: 'c'
       url: 'd'
       TTL: 10
-      body: new Uint8Array([0,1,3])
+      body: new Uint8Array([0,1,2])
     }
     @requestEncoded = new Uint8Array([
       1,
@@ -25,9 +25,36 @@ describe.only 'entities.services.Network.helpers', ->
       1,
       2,
     ])
+    @response = {
+      to: 'a'
+      from: 'b'
+      sender: 'c'
+      TTL: 10
+      body: new Uint8Array([0,1,2])
+    }
+    @responseEncoded = new Uint8Array([
+      1,
+      97,
+      1,
+      98,
+      1,
+      99,
+      10,
+      0,
+      1,
+      2,
+    ])
 
-  it 'serializeMessage and deserializeMessage', ->
+  # TODO: проверить ошибки
+  # TODO: проверить body = 0
+
+  it 'encodeNetworkRequest', ->
     assert.deepEqual(helpers.encodeNetworkRequest(@request), @requestEncoded);
+
+  it 'decodeNetworkResponse', ->
+    assert.deepEqual(helpers.decodeNetworkResponse(@responseEncoded), @response);
+
+
 
 #  it 'serializeMessage and deserializeMessage - no "to"', ->
 #    delete @message.to
