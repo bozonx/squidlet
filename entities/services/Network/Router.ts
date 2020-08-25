@@ -6,9 +6,17 @@ export default class Router {
   }
 
 
-  hasToBeRouted(message: NetworkMessage): boolean {
+  cacheRoute(
+    incomeMessageTo: string,
+    incomeMessageFrom: string,
+    incomeMessageRoute: string[],
+  ) {
     // TODO: add
   }
+
+  // hasToBeRouted(message: NetworkMessage): boolean {
+  //   // TODO: add
+  // }
 
   sendFurther(message: NetworkMessage) {
     // TODO: если надо переслать уменьшить ttl
