@@ -7,48 +7,53 @@ import Connection, {
   ConnectionResponse,
   ConnectionStatus
 } from 'system/interfaces/Connection';
+import {lastItem} from 'system/lib/arrays';
 import {omitObj} from 'system/lib/objects';
 
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import Router from './Router';
-import {lastItem} from '../../../system/lib/arrays';
 
 
 export interface NetworkProps {
 }
 
 export interface NetworkMessage {
+  // 1 byte number, max 255. Each mediate host decrements this value.
   TTL: number;
-  // 2 or more character is allowed
+  // 8 bytes hash which uses to send responses back
+  requestId: string;
+  // 2 or more character which represent resource on the host "to"
+  // which listens to income requests
   uri: string;
+  // hostId which is recipient of this message
   to: string;
+  // hostId which send the message
   from: string;
-  // hosts between "to" and "from"
+  // mediate hosts between "to" and "from"
   route: string[];
   payload: Uint8Array;
 }
 
 // TODO: review
-export interface NetworkResponseFull extends NetworkMessage {
-  // TODO: может отправлять вторым аргументом?
-  connectionMessage: ConnectionMessage;
-}
+// export interface NetworkResponseFull extends NetworkMessage {
+//   // TODO: может отправлять вторым аргументом?
+//   connectionMessage: ConnectionMessage;
+// }
 
-type NetworkOnRequestHandler = (request: NetworkMessage) => Promise<Uint8Array>;
+type UriHandler = (request: NetworkMessage) => Promise<Uint8Array>;
 
-// channel of connection which network uses to send and receive messages
+// port of connection which network uses to send and receive messages
 const NETWORK_PORT = 252;
 export const SPECIAL_URI = {
-  // TODO: поидее не нужно
-  routed: '0',
-  response: '1',
-  responseError: '2',
-  timeout: '3',
-  getName: '4',
-  ping: '5',
-  pong: '6',
+  response: '0',
+  responseError: '1',
+  timeout: '2',
+  getName: '3',
+  ping: '4',
+  pong: '5',
 };
+// status of response of connection
 export enum RESPONSE_STATUS {
   ok,
   routed,
@@ -58,7 +63,7 @@ export enum RESPONSE_STATUS {
 export default class Network extends ServiceBase<NetworkProps> {
   private readonly activeHosts: ActiveHosts;
   private readonly router: Router;
-  private incomeRequestHandlers: {[index: string]: NetworkOnRequestHandler} = {};
+  private incomeRequestHandlers: {[index: string]: UriHandler} = {};
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -123,6 +128,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       throw new Error(`Result doesn't contains the payload`);
     }
 
+    // TODO: принимать RESPONSE_STATUS - выводить в лог
     // TODO: ответ ждать в течении таймаута так как он может уйти далеко
     // TODO: add uri response
 
@@ -145,7 +151,7 @@ export default class Network extends ServiceBase<NetworkProps> {
    * @param uri
    * @param handler
    */
-  onRequest(uri: string, handler: NetworkOnRequestHandler) {
+  startListenUrl(uri: string, handler: UriHandler) {
     if (this.incomeRequestHandlers[uri]) {
       throw new Error(`Handler of uri has already defined`);
     }
@@ -153,7 +159,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     this.incomeRequestHandlers[uri] = handler;
   }
 
-  removeListener(uri: string): void {
+  stopListenUri(uri: string) {
     delete this.incomeRequestHandlers[uri];
   }
 
