@@ -99,6 +99,25 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
 }
 
 /**
+ * Call function which is returns promise safely
+ */
+export function callSafely(
+  method: (...params: any[]) => Promise<any>,
+  ...params: any[]
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    try {
+      method(...params)
+        .then(resolve)
+        .catch(reject);
+    }
+    catch (err) {
+      reject(err);
+    }
+  });
+}
+
+/**
  * Is number or number as string.
  */
 export function isKindOfNumber(value: any): boolean {
