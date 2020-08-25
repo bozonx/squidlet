@@ -20,8 +20,15 @@ export default class Router {
   // }
 
   /**
-   * Send new message, response or send message to the next host on a route
-   * @param message
+   * Send mediate message or new one
+   * @param incomeMessage
+   */
+  async sendMessage(incomeMessage: NetworkMessage) {
+    // TODO: add
+  }
+
+  /**
+   * Send new message or response
    */
   async send(
     toHostId: string,
