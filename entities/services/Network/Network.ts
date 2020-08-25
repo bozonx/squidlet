@@ -23,7 +23,7 @@ export interface NetworkMessage {
   // 1 byte number, max 255. Each mediate host decrements this value.
   TTL: number;
   // 8 bytes hash which uses to send responses back
-  requestId: string;
+  messageId: string;
   // 2 or more character which represent resource on the host "to"
   // which listens to income requests
   uri: string;
@@ -250,11 +250,11 @@ export default class Network extends ServiceBase<NetworkProps> {
       throw new Error(`Error while executing handler of uri "${incomeMessage.uri}" :${e}`);
     }
     // send response but don't wait for result
-    // TODO: нужен requestId иначе на другой стороне мы не поймем на что пришел ответ
     this.router.send(
       incomeMessage.from,
       String(SPECIAL_URI.responseOk),
       payloadToSendBack,
+      incomeMessage.messageId,
       incomeMessage.TTL
     )
       .catch(this.log.error);

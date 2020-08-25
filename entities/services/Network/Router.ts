@@ -29,13 +29,18 @@ export default class Router {
 
   /**
    * Send new message or response
+   * If requestId doesn't set it will be generated
+   * If TTL doesn't set the default value will be used
    */
   async send(
     toHostId: string,
     uri: string,
     payload: Uint8Array,
+    messageId?: string,
     TTL?: number
   ) {
+    // TODO: нужен requestId иначе на другой стороне мы не поймем на что пришел ответ
+
     const message: NetworkMessage = {
       TTL: this.context.config.config.defaultTtl,
       to: request.from,
