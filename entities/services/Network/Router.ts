@@ -6,6 +6,7 @@ import {lastItem} from 'system/lib/arrays';
 import Network, {NETWORK_PORT, NetworkMessage, RESPONSE_STATUS, SPECIAL_URI} from './Network';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import ActiveHosts, {HostItem} from './ActiveHosts';
+import {makeUniqId} from '../../../system/lib/uniqId';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
@@ -35,7 +36,8 @@ export default class Router {
 
 
   newMessageId(): string {
-    // TODO: add
+    // TODO: set 8 bytes length
+    return makeUniqId();
   }
 
   // TODO: поидее не нужно делать обычными событиями,
@@ -84,14 +86,10 @@ export default class Router {
   async send(
     toHostId: string,
     uri: string,
-    payload: Uint8Array | string,
+    payload: Uint8Array,
     messageId: string,
     TTL?: number
   ) {
-    // TODO: payload string преобразовать в Uint
-
-    // TODO: нужен requestId иначе на другой стороне мы не поймем на что пришел ответ
-
     const message: NetworkMessage = {
       TTL: this.context.config.config.defaultTtl,
       to: request.from,

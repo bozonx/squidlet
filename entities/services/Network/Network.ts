@@ -3,7 +3,7 @@ import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import {callSafely} from 'system/lib/common';
 import Promised from 'system/lib/Promised';
-import {uint8ArrayToAscii} from 'system/lib/serialize';
+import {asciiToUint8Array, uint8ArrayToAscii} from 'system/lib/serialize';
 
 import Router from './Router';
 
@@ -163,7 +163,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       this.router.send(
         incomeMessage.from,
         String(SPECIAL_URI.responseError),
-        `No handler on uri "${incomeMessage.uri}"`,
+        asciiToUint8Array(`No handler on uri "${incomeMessage.uri}"`),
         incomeMessage.messageId,
       )
         .catch(this.log.error);
@@ -190,7 +190,7 @@ export default class Network extends ServiceBase<NetworkProps> {
         this.router.send(
           incomeMessage.from,
           String(SPECIAL_URI.responseError),
-          `Error while executing handler of uri "${incomeMessage.uri}" :${e}`,
+          asciiToUint8Array(`Error while executing handler of uri "${incomeMessage.uri}" :${e}`),
           incomeMessage.messageId,
         )
           .catch(this.log.error);
