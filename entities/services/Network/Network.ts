@@ -1,20 +1,11 @@
 import ServiceBase from 'system/base/ServiceBase';
 import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
-import Connection, {
-  CONNECTION_SERVICE_TYPE,
-  ConnectionMessage,
-  ConnectionRequest,
-  ConnectionResponse,
-  ConnectionStatus
-} from 'system/interfaces/Connection';
-import {lastItem} from 'system/lib/arrays';
-import {omitObj} from 'system/lib/objects';
+import {callSafely} from 'system/lib/common';
+import Promised from 'system/lib/Promised';
+import {uint8ArrayToAscii} from 'system/lib/serialize';
 
-import ActiveHosts, {HostItem} from './ActiveHosts';
-import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import Router from './Router';
-import {callSafely} from '../../../system/lib/common';
 
 
 export interface NetworkProps {
@@ -37,7 +28,8 @@ export interface NetworkMessage {
   payload: Uint8Array;
 }
 
-type UriHandler = (request: NetworkMessage, connectionRequest: ConnectionMessage) => Promise<Uint8Array>;
+type Timeout = NodeJS.Timeout;
+type UriHandler = (request: NetworkMessage) => Promise<Uint8Array>;
 
 // port of connection which network uses to send and receive messages
 export const NETWORK_PORT = 252;
@@ -67,7 +59,7 @@ export default class Network extends ServiceBase<NetworkProps> {
   constructor(context: Context, definition: EntityDefinition) {
     super(context, definition);
 
-    this.router = new Router(this, this.context);
+    this.router = new Router(this.context);
   }
 
 
@@ -82,63 +74,66 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 
-  // TODO: review
+  /**
+   * Send request and wait for response
+   * @param toHostId
+   * @param uri
+   * @param payload
+   * @param TTL
+   */
   async request(
     toHostId: string,
     uri: string,
     payload: Uint8Array,
     TTL?: number
-  ): Promise<NetworkResponseFull> {
+  ): Promise<Uint8Array> {
     if (uri.length <= 1) {
       throw new Error(`Uri has to have length greater than 1. One byte is for status number`);
     }
 
-    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(toHostId);
+    const messageId: string = this.router.newMessageId();
 
-    if (!connectionItem) {
-      throw new Error(`Host "${toHostId}" hasn't been connected`);
-    }
-
-    const connection: Connection = this.getConnection(connectionItem.connectionName);
-    const request: NetworkMessage = {
-      to: toHostId,
-      from: this.context.config.id,
-      route: [],
-      TTL: this.context.config.config.defaultTtl,
+    // make request
+    await this.router.send(
+      toHostId,
       uri,
       payload,
-    };
-    const encodedMessage: Uint8Array = encodeNetworkMessage(request);
-    // make request
-    const connectionResponse: ConnectionResponse = await connection.request(
-      connectionItem.peerId,
-      //NETWORK_CHANNEL,
-      encodedMessage
+      messageId,
+      TTL,
     );
 
-    if (connectionResponse.status === ConnectionStatus.responseError) {
-      throw new Error(connectionResponse.error);
-    }
-    else if (!connectionResponse.payload) {
-      throw new Error(`Result doesn't contains the payload`);
-    }
+    const promised = new Promised<Uint8Array>();
+    let timeout: Timeout | undefined;
+    const responseListener: number = this.router.onIncomeResponse((
+      incomeMessage: NetworkMessage
+    ) => {
+      if (incomeMessage.messageId !== messageId) return;
 
-    // TODO: принимать RESPONSE_STATUS - выводить в лог
-    // TODO: ответ ждать в течении таймаута так как он может уйти далеко
-    // TODO: add uri response
+      this.router.removeListener(responseListener);
+      clearTimeout(timeout as any);
 
-    const response: NetworkMessage = decodeNetworkMessage(connectionResponse.payload);
+      if (incomeMessage.uri === String(SPECIAL_URI.responseError)) {
+        // if an error has been returned just convert it to string and reject promise
+        return promised.reject(new Error(uint8ArrayToAscii(incomeMessage.payload)));
+      }
+      else if (incomeMessage.uri !== String(SPECIAL_URI.responseOk)) {
+        return promised.reject(new Error(`Unknown response URI "${incomeMessage.uri}"`));
+      }
+      // it's OK
+      promised.resolve(payload);
+    });
 
-    // TODO: use router.send
+    timeout = setTimeout(() => {
+      if (promised.isFulfilled()) return;
 
-    return {
-      ...response,
-      connectionMessage: omitObj(
-        connectionResponse,
-        'payload',
-        'error'
-      ) as ConnectionMessage,
-    };
+      this.router.removeListener(responseListener);
+
+      promised.reject(new Error(
+        `Timeout of request has been exceeded of URI "${uri}"`
+      ));
+    }, this.config.config.requestTimeoutSec * 1000);
+
+    return promised.promise;
   }
 
   /**
@@ -162,11 +157,9 @@ export default class Network extends ServiceBase<NetworkProps> {
   /**
    * Handle request which is for current host
    */
-  private handleIncomeRequest(
-    incomeMessage: NetworkMessage,
-    request: ConnectionRequest
-  ) {
+  private handleIncomeRequest(incomeMessage: NetworkMessage) {
     if (!this.incomeRequestHandlers[incomeMessage.uri]) {
+      // TODO: поидее нужно отправить ответным сообщением сразу
       this.router.send(
         incomeMessage.from,
         String(SPECIAL_URI.responseError),
@@ -181,10 +174,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     callSafely(
       this.incomeRequestHandlers[incomeMessage.uri],
       incomeMessage,
-      {
-        port: request.port,
-        requestId: request.requestId,
-      }
+      //{ port: request.port, requestId: request.requestId }
     )
       .then((payloadToSendBack: Uint8Array) => {
         // send response but don't wait for result
@@ -196,7 +186,7 @@ export default class Network extends ServiceBase<NetworkProps> {
         )
           .catch(this.log.error);
       })
-      .catch((e) => {
+      .catch((e: Error) => {
         this.router.send(
           incomeMessage.from,
           String(SPECIAL_URI.responseError),

@@ -98,6 +98,7 @@ export function callPromised(method: Function, ...params: any[]): Promise<any> {
   });
 }
 
+// TODO: test
 /**
  * Call function which is returns promise safely
  */

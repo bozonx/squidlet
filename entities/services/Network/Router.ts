@@ -1,26 +1,24 @@
 import Context from 'system/Context';
+import IndexedEvents from 'system/lib/IndexedEvents';
+import Connection, {CONNECTION_SERVICE_TYPE, ConnectionRequest, ConnectionStatus} from 'system/interfaces/Connection';
+import {lastItem} from 'system/lib/arrays';
+
 import Network, {NETWORK_PORT, NetworkMessage, RESPONSE_STATUS, SPECIAL_URI} from './Network';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
-import IndexedEvents from '../../../system/lib/IndexedEvents';
-import Connection, {CONNECTION_SERVICE_TYPE, ConnectionRequest} from '../../../system/interfaces/Connection';
-import ActiveHosts from './ActiveHosts';
-import {lastItem} from '../../../system/lib/arrays';
+import ActiveHosts, {HostItem} from './ActiveHosts';
 
 
-type IncomeMessageHandler = (
-  incomeMessage: NetworkMessage,
-  request: ConnectionRequest
-) => void;
+type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
 
 
 export default class Router {
   private context: Context;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
+  private incomeResponseEvents = new IndexedEvents<IncomeMessageHandler>();
   private readonly activeHosts: ActiveHosts;
 
 
-  // TODO: does network need ???
-  constructor(network: Network, context: Context) {
+  constructor(context: Context) {
     this.context = context;
     this.activeHosts = new ActiveHosts();
   }
@@ -36,8 +34,21 @@ export default class Router {
   }
 
 
+  newMessageId(): string {
+    // TODO: add
+  }
+
+  // TODO: поидее не нужно делать обычными событиями,
+  //  так как всеравно на 1 uri навешивается 1 обработчик
   onIncomeRequest(handler: IncomeMessageHandler): number {
     return this.incomeMessagesEvents.addListener(handler);
+  }
+
+  onIncomeResponse(cb: IncomeMessageHandler): number {
+
+    // TODO: подниматьсобытия
+
+    return this.incomeResponseEvents.addListener(cb);
   }
 
   removeListener(handlerIndex: number) {
@@ -74,7 +85,7 @@ export default class Router {
     toHostId: string,
     uri: string,
     payload: Uint8Array | string,
-    messageId?: string,
+    messageId: string,
     TTL?: number
   ) {
     // TODO: payload string преобразовать в Uint
@@ -92,6 +103,39 @@ export default class Router {
     // TODO: если надо переслать уменьшить ttl
     // TODO: add
     encodeNetworkMessage(message);
+
+    // const request: NetworkMessage = {
+    //   to: toHostId,
+    //   from: this.context.config.id,
+    //   route: [],
+    //   TTL: this.context.config.config.defaultTtl,
+    //   uri,
+    //   payload,
+    // };
+    //const encodedMessage: Uint8Array = encodeNetworkMessage(request);
+
+    if (connectionResponse.status === ConnectionStatus.responseError) {
+      throw new Error(connectionResponse.error);
+    }
+    else if (!connectionResponse.payload) {
+      throw new Error(`Result doesn't contains the payload`);
+    }
+
+    // TODO: принимать RESPONSE_STATUS - выводить в лог
+    // TODO: ответ ждать в течении таймаута так как он может уйти далеко
+    // TODO: add uri response
+
+    const response: NetworkMessage = decodeNetworkMessage(connectionResponse.payload);
+
+    // TODO: review
+
+    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(toHostId);
+
+    if (!connectionItem) {
+      throw new Error(`Host "${toHostId}" hasn't been connected`);
+    }
+
+    const connection: Connection = this.getConnection(connectionItem.connectionName);
 
     // TODO:  может использовать такой метов в connection.sendResponseBack()
     // const result: ConnectionResponse = await connection.request(
