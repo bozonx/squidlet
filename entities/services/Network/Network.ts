@@ -3,6 +3,7 @@ import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import Connection, {
   CONNECTION_SERVICE_TYPE,
+  ConnectionMessage,
   ConnectionRequest,
   ConnectionResponse,
   ConnectionStatus
@@ -35,24 +36,19 @@ export interface NetworkMessage {
   payload: Uint8Array;
 }
 
-// TODO: review
-// export interface NetworkResponseFull extends NetworkMessage {
-//   // TODO: может отправлять вторым аргументом?
-//   connectionMessage: ConnectionMessage;
-// }
-
-type UriHandler = (request: NetworkMessage) => Promise<Uint8Array>;
+type UriHandler = (request: NetworkMessage, connectionRequest: ConnectionMessage) => Promise<Uint8Array>;
 
 // port of connection which network uses to send and receive messages
 const NETWORK_PORT = 252;
-export const SPECIAL_URI = {
-  response: '0',
-  responseError: '1',
-  timeout: '2',
-  getName: '3',
-  ping: '4',
-  pong: '5',
-};
+
+export enum SPECIAL_URI {
+  responseOk,
+  responseError,
+  //timeout,
+  getName,
+  ping,
+  pong,
+}
 // status of response of connection
 export enum RESPONSE_STATUS {
   ok,
@@ -209,7 +205,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
     if (incomeMessage.to !== this.context.config.id) {
       // if receiver isn't current host send message further
-      this.router.send(incomeMessage)
+      this.router.sendMessage(incomeMessage)
         .catch(this.log.error);
       // send status routed back
       return new Uint8Array([RESPONSE_STATUS.routed]);
@@ -220,7 +216,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
 
     // TODO: может отправить статус ошибки тут, а не в connection
-    await this.executeUriHandler(incomeMessage);
+    await this.executeUriHandler(incomeMessage, request);
 
     // send status OK back
     return new Uint8Array([RESPONSE_STATUS.ok]);
@@ -238,12 +234,17 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
   }
 
-  private async executeUriHandler(incomeMessage: NetworkMessage) {
+  private async executeUriHandler(incomeMessage: NetworkMessage, request: ConnectionRequest) {
     let payloadToSendBack: Uint8Array;
     // execute handler of uri
     try {
-      // TODO: добавить данные connection - channel, requestId ???
-      payloadToSendBack = await this.incomeRequestHandlers[incomeMessage.uri](incomeMessage);
+      payloadToSendBack = await this.incomeRequestHandlers[incomeMessage.uri](
+        incomeMessage,
+        {
+          port: request.port,
+          requestId: request.requestId,
+        }
+      );
     }
     catch (e) {
       throw new Error(`Error while executing handler of uri "${incomeMessage.uri}" :${e}`);
@@ -252,7 +253,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     // TODO: нужен requestId иначе на другой стороне мы не поймем на что пришел ответ
     this.router.send(
       incomeMessage.from,
-      SPECIAL_URI.response,
+      String(SPECIAL_URI.responseOk),
       payloadToSendBack,
       incomeMessage.TTL
     )

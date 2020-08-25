@@ -5,7 +5,7 @@ export enum ConnectionStatus {
   responseError = 254,
 }
 
-interface ConnectionMessage {
+export interface ConnectionMessage {
   port: number;
   // should be 16 bits
   requestId: number;
