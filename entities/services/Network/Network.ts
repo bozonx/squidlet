@@ -3,7 +3,6 @@ import Context from 'system/Context';
 import EntityDefinition from 'system/interfaces/EntityDefinition';
 import Connection, {
   CONNECTION_SERVICE_TYPE,
-  ConnectionMessage,
   ConnectionRequest,
   ConnectionResponse,
   ConnectionStatus
@@ -13,6 +12,7 @@ import {omitObj} from 'system/lib/objects';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import Router from './Router';
+import {lastItem} from '../../../system/lib/arrays';
 
 
 export interface NetworkProps {
@@ -78,20 +78,25 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   // TODO: review
-  async request(hostId: string, uri: string, payload: Uint8Array): Promise<NetworkResponseFull> {
+  async request(
+    toHostId: string,
+    uri: string,
+    payload: Uint8Array,
+    TTL?: number
+  ): Promise<NetworkResponseFull> {
     if (uri.length <= 1) {
       throw new Error(`Uri has to have length greater than 1. One byte is for status number`);
     }
 
-    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(hostId);
+    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(toHostId);
 
     if (!connectionItem) {
-      throw new Error(`Host "${hostId}" hasn't been connected`);
+      throw new Error(`Host "${toHostId}" hasn't been connected`);
     }
 
     const connection: Connection = this.getConnection(connectionItem.connectionName);
     const request: NetworkMessage = {
-      to: hostId,
+      to: toHostId,
       from: this.context.config.id,
       route: [],
       TTL: this.context.config.config.defaultTtl,
@@ -158,18 +163,20 @@ export default class Network extends ServiceBase<NetworkProps> {
     for (let serviceName of Object.keys(this.context.service)) {
       if (this.context.service[serviceName] !== CONNECTION_SERVICE_TYPE) continue;
 
-      this.addConnectionListeners(this.context.service[serviceName]);
+      this.addConnectionListeners(serviceName, this.context.service[serviceName]);
     }
   }
 
-  private addConnectionListeners(connection: Connection) {
+  private addConnectionListeners(connectionName: string, connection: Connection) {
     connection.startListenPort(NETWORK_PORT, (
       request: ConnectionRequest,
       peerId: string
     ): Promise<Uint8Array> => {
-      return this.handleIncomeMessage(request, peerId,connection);
+      return this.handleIncomeMessage(request, peerId, connectionName);
     });
     connection.onPeerConnect((peerId: string) => {
+      // TODO: нужно отправить запрос genHostId и потом зарегистрировать
+      //this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
       // TODO: зарегистрировать соединение
     });
     connection.onPeerDisconnect((peerId: string) => {
@@ -180,88 +187,97 @@ export default class Network extends ServiceBase<NetworkProps> {
   private async handleIncomeMessage(
     request: ConnectionRequest,
     peerId: string,
-    connection: Connection
-  ): Promise<ConnectionResponse> {
+    connectionName: string
+  ): Promise<Uint8Array> {
     const incomeMessage: NetworkMessage = decodeNetworkMessage(request.payload);
+    const closestHostId: string = (incomeMessage.route.length)
+      ? lastItem(incomeMessage.route)
+      : incomeMessage.from;
 
-    // TODO: зарегистрировать соединение в кэше если не было
+    this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
 
-    if (this.router.hasToBeRouted(incomeMessage)) {
+    if (incomeMessage.route.length) {
+      this.router.cacheRoute(incomeMessage.to, incomeMessage.from, incomeMessage.route);
+    }
+
+    if (incomeMessage.to !== this.context.config.id) {
+      // if receiver isn't current host send message further
       this.router.sendFurther(incomeMessage);
       // send message back which means that income message was routed.
-      return {
-        channel: request.channel,
-        // TODO: зачем вставлять requestId если он вставится в Connection ???
-        requestId: request.requestId,
-        status: ConnectionStatus.responseOk,
-        payload: encodeNetworkMessage({
-          TTL: this.context.config.config.defaultTtl,
-          to: incomeMessage.from,
-          from: this.context.config.id,
-          route: [],
-          uri: SPECIAL_URI.routed,
-          payload: new Uint8Array(0),
-        }),
-      };
-    }
-    else {
-      if (!this.incomeRequestHandlers[incomeMessage.uri]) {
-        // TODO: отправить ошибочное сообщение что нет обраотчика
-      }
-
-      try {
-        // TODO: добавить данные connection - channel, requestId, status
-        this.incomeRequestHandlers[incomeMessage.uri](message)
-          .then((response: NetworkMessage) => this.sendResponseBack(response))
-          .catch((e) => {
-            // TODO: add
-          });
-      }
-      catch (e) {
-        // TODO: add
-      }
-
-      // TODO: нужно выполнить хэндлер и отправить ответ
-      // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
-
-
-      // TODO: похоже что на 1 uri 1 обработчик иначе не понятно что возвращать
-      // TODO: нужно всетаки сделать обертку в которой выполнить хэндлер и сформировать ответ
-      // const cbWrapper = (request: NetworkMessage): void => {
-
-      // };
-      //
-      // return this.incomeRequestsEvent.addListener(cbWrapper);
-    }
-  }
-
-  private async sendResponseBack(response: NetworkMessage) {
-    const connection: Connection = await this.resolveConnection(response.hostId);
-    // TODO: resolve it !!!!!
-    const sessionId = '1';
-
-    const message: ConnectionResponse = {
-      //channel: request.channel,
-      // TODO: зачем вставлять requestId если он вставится в Connection ???
-      //requestId: request.requestId,
-      //status: ConnectionStatus.responseOk,
-      payload: encodeNetworkMessage({
+      return encodeNetworkMessage({
         TTL: this.context.config.config.defaultTtl,
         to: incomeMessage.from,
         from: this.context.config.id,
         route: [],
         uri: SPECIAL_URI.routed,
         payload: new Uint8Array(0),
-      }),
-    };
+      });
+    }
 
-    // TODO:  может использовать такой метов в connection.sendResponseBack()
-    const result: ConnectionResponse = await connection.request(
-      sessionId,
-      response.channel,
-      // TODO: в случае ошибки отправить error
-      response.payload,
-    );
+    if (!this.incomeRequestHandlers[incomeMessage.uri]) {
+      throw new Error(`No handler on uri "${incomeMessage.uri}"`);
+    }
+
+    try {
+      // TODO: добавить данные connection - channel, requestId, status
+      this.incomeRequestHandlers[incomeMessage.uri](message)
+        .then((response: NetworkMessage) => this.sendResponseBack(response))
+        .catch((e) => {
+          // TODO: add
+        });
+    }
+    catch (e) {
+      // TODO: add
+    }
+
+    // TODO: ответ статус OK, но само сообщение отправить через request
+
+    // TODO: нужно выполнить хэндлер и отправить ответ
+    // TODO: сформировать ответ ??? наверное ответ со статусом куда оно переправленно
+
+
+    // TODO: похоже что на 1 uri 1 обработчик иначе не понятно что возвращать
+    // TODO: нужно всетаки сделать обертку в которой выполнить хэндлер и сформировать ответ
+    // const cbWrapper = (request: NetworkMessage): void => {
+
+    // };
+    //
+    // return this.incomeRequestsEvent.addListener(cbWrapper);
   }
+
+  private makeResponse(to: string, uri: string, payload?: Uint8Array): NetworkMessage {
+    return {
+      TTL: this.context.config.config.defaultTtl,
+      to,
+      from: this.context.config.id,
+      // TODO: сформировать маршрут, ближайший хост может быть другой
+      route: [],
+      uri,
+      payload: payload || new Uint8Array(0),
+    };
+  }
+
+  // private async sendResponseBack(response: NetworkMessage) {
+  //   const connection: Connection = await this.resolveConnection(response.hostId);
+  //   // TODO: resolve it !!!!!
+  //   const peerId = '1';
+  //
+  //   const encodedMessage: Uint8Array = encodeNetworkMessage({
+  //     TTL: this.context.config.config.defaultTtl,
+  //     to: incomeMessage.from,
+  //     from: this.context.config.id,
+  //     route: [],
+  //     uri: SPECIAL_URI.routed,
+  //     payload: new Uint8Array(0),
+  //   });
+  //
+  //   // TODO:  может использовать такой метов в connection.sendResponseBack()
+  //   // const result: ConnectionResponse = await connection.request(
+  //   //   peerId,
+  //   //   response.channel,
+  //   //   // TODO: в случае ошибки отправить error
+  //   //   response.payload,
+  //   // );
+  // }
 
 }

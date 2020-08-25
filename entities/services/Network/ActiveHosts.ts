@@ -17,6 +17,10 @@ export default class ActiveHosts {
   }
 
 
+  cacheHost(hostId: string, peerId: string, connectionName: string) {
+    // TODO: add
+  }
+
   // TODO: сделать регистрацию хостов
   // TODO: сделать удаление хостов когда он отсоединился
 
