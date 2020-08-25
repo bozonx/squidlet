@@ -41,7 +41,6 @@ export default abstract class ConnectionBase<Props> extends ServiceBase<Props> i
 
     const promised = new Promised<ConnectionResponse>();
     let timeout: Timeout | undefined;
-
     // wait for response
     const handlerIndex = this.incomeResponsesEvent.addListener((
       response: ConnectionResponse
