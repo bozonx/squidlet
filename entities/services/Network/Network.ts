@@ -42,7 +42,6 @@ const NETWORK_PORT = 252;
 export const SPECIAL_URI = {
   // TODO: поидее не нужно
   routed: '0',
-  // TODO: поидее не нужно
   response: '1',
   responseError: '2',
   timeout: '3',
@@ -129,6 +128,8 @@ export default class Network extends ServiceBase<NetworkProps> {
 
     const response: NetworkMessage = decodeNetworkMessage(connectionResponse.payload);
 
+    // TODO: use router.send
+
     return {
       ...response,
       connectionMessage: omitObj(
@@ -177,9 +178,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     connection.startListenPort(NETWORK_PORT, (
       request: ConnectionRequest,
       peerId: string
-    ): Promise<Uint8Array> => {
-      return this.handleIncomeMessage(request, peerId, connectionName);
-    });
+    ): Promise<Uint8Array> => this.handleIncomeRequest(request, peerId, connectionName));
     connection.onPeerConnect((peerId: string) => {
       // TODO: нужно отправить запрос genHostId и потом зарегистрировать
       //this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
@@ -190,7 +189,10 @@ export default class Network extends ServiceBase<NetworkProps> {
     });
   }
 
-  private async handleIncomeMessage(
+  /**
+   * Handle requests which came out of connection and sand status back
+   */
+  private async handleIncomeRequest(
     request: ConnectionRequest,
     peerId: string,
     connectionName: string
@@ -201,7 +203,8 @@ export default class Network extends ServiceBase<NetworkProps> {
 
     if (incomeMessage.to !== this.context.config.id) {
       // if receiver isn't current host send message further
-      this.router.sendFurther(incomeMessage);
+      this.router.send(incomeMessage)
+        .catch(this.log.error);
       // send status routed back
       return new Uint8Array([RESPONSE_STATUS.routed]);
     }
@@ -210,6 +213,7 @@ export default class Network extends ServiceBase<NetworkProps> {
       throw new Error(`No handler on uri "${incomeMessage.uri}"`);
     }
 
+    // TODO: может отправить статус ошибки тут, а не в connection
     await this.executeUriHandler(incomeMessage);
 
     // send status OK back
@@ -232,58 +236,21 @@ export default class Network extends ServiceBase<NetworkProps> {
     let payloadToSendBack: Uint8Array;
     // execute handler of uri
     try {
-      // TODO: добавить данные connection - channel, requestId
+      // TODO: добавить данные connection - channel, requestId ???
       payloadToSendBack = await this.incomeRequestHandlers[incomeMessage.uri](incomeMessage);
     }
     catch (e) {
       throw new Error(`Error while executing handler of uri "${incomeMessage.uri}" :${e}`);
     }
     // send response but don't wait for result
-    this.sendResponse(payloadToSendBack, incomeMessage);
+    // TODO: нужен requestId иначе на другой стороне мы не поймем на что пришел ответ
+    this.router.send(
+      incomeMessage.from,
+      SPECIAL_URI.response,
+      payloadToSendBack,
+      incomeMessage.TTL
+    )
+      .catch(this.log.error);
   }
 
-  private sendResponse(payload: Uint8Array, request: NetworkMessage) {
-    const connection: Connection = await this.resolveConnection(response.hostId);
-    // TODO: resolve it !!!!!
-    const peerId = '1';
-
-    const encodedMessage: Uint8Array = encodeNetworkMessage({
-      TTL: this.context.config.config.defaultTtl,
-      to: incomeMessage.from,
-      from: this.context.config.id,
-      route: [],
-      uri: SPECIAL_URI.routed,
-      payload: new Uint8Array(0),
-    });
-
-    // TODO:  может использовать такой метов в connection.sendResponseBack()
-    // const result: ConnectionResponse = await connection.request(
-    //   peerId,
-    //   response.channel,
-    //   // TODO: в случае ошибки отправить error
-    //   response.payload,
-    // );
-  }
-
-  // private makeResponse(to: string, uri: string, payload?: Uint8Array): NetworkMessage {
-  //   return {
-  //     TTL: this.context.config.config.defaultTtl,
-  //     to,
-  //     from: this.context.config.id,
-  //     // TODO: сформировать маршрут, ближайший хост может быть другой
-  //     route: [],
-  //     uri,
-  //     payload: payload || new Uint8Array(0),
-  //   };
-  // }
-
-  // send message back which means that income message was routed.
-  // return encodeNetworkMessage({
-  //   TTL: this.context.config.config.defaultTtl,
-  //   to: incomeMessage.from,
-  //   from: this.context.config.id,
-  //   route: [],
-  //   uri: SPECIAL_URI.routed,
-  //   payload: new Uint8Array(0),
-  // });
 }
