@@ -164,6 +164,8 @@ export default class Router {
   ) {
     const incomeMessage: NetworkMessage = decodeNetworkMessage(payload);
 
+    // TODO: нужно отправить запрос genHostId и потом зарегистрировать
+
     if (incomeMessage.to !== this.context.config.id) {
       // if receiver isn't current host send message further
       this.sendFurther(incomeMessage)
@@ -183,4 +185,15 @@ export default class Router {
     // TODO: add
   }
 
+  // private cacheRoute(incomeMessage: NetworkMessage, peerId: string, connectionName: string) {
+  //   const closestHostId: string = (incomeMessage.route.length)
+  //     ? lastItem(incomeMessage.route)
+  //     : incomeMessage.from;
+  //
+  //   this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
+  //
+  //   if (incomeMessage.route.length) {
+  //     //this.router.cacheRoute(incomeMessage.to, incomeMessage.from, incomeMessage.route);
+  //   }
+  // }
 }

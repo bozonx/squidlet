@@ -8,12 +8,12 @@ import Connection, {
   ConnectionStatus
 } from 'system/interfaces/Connection';
 
-import ActiveHosts, {HostItem} from './ActiveHosts';
+import ActivePeers from './ActivePeers';
 
 
 type IncomeMessageHandler = (
   payload: Uint8Array,
-  fromClosestHost: string,
+  fromPeerId: string,
   done: (result: Uint8Array) => void
 ) => void;
 
@@ -24,21 +24,22 @@ type IncomeMessageHandler = (
  */
 export default class Transport {
   private context: Context;
-  private readonly activeHosts: ActiveHosts;
+  private readonly activePeers: ActivePeers;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
 
 
   constructor(context: Context) {
     this.context = context;
-    this.activeHosts = new ActiveHosts();
+    this.activePeers = new ActivePeers();
   }
 
   init() {
+    this.activePeers.init();
     this.initConnections();
   }
 
   destroy() {
-    this.activeHosts.destroy();
+    this.activePeers.destroy();
     this.incomeMessagesEvents.destroy();
     // TODO: на всех connections вызывать stopListenPort и removeListener
   }
@@ -47,24 +48,23 @@ export default class Transport {
   /**
    * Send new message.
    * It resolves the connection to use.
-   * @param toClosestHostId - hostId of the closest host which is directly
+   * @param peerId - hostId of the closest host which is directly
    *   wired to current host
    * @param payload
    */
   async send(
-    toClosestHostId: string,
+    peerId: string,
     payload: Uint8Array,
   ): Promise<Uint8Array> {
-    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(toClosestHostId);
+    const connectionName: string | undefined = this.activePeers.resolveConnectionName(peerId);
 
-    if (!connectionItem) {
-      throw new Error(`Host "${toClosestHostId}" hasn't been connected`);
+    if (!connectionName) {
+      throw new Error(`Peer "${peerId}" hasn't been connected`);
     }
 
-    const connection: Connection = this.getConnection(connectionItem.connectionName);
-
+    const connection: Connection = this.getConnection(connectionName);
     const response: ConnectionResponse = await connection.request(
-      connectionItem.peerId,
+      peerId,
       NETWORK_PORT,
       payload
     );
@@ -76,6 +76,8 @@ export default class Transport {
     if (!response.payload) {
       throw new Error(`No response.payload`);
     }
+
+    // TODO: зачем здесь payload ??? ответ же просто информативный
 
     return response.payload;
   }
@@ -104,13 +106,11 @@ export default class Transport {
     ): Promise<Uint8Array> => this.handleIncomeMessages(request, peerId, connectionName));
 
     connection.onPeerConnect((peerId: string) => {
-      // TODO: нужно отправить запрос genHostId и потом зарегистрировать
-      //this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
-      // TODO: зарегистрировать соединение
+      this.activePeers.activatePeer(peerId, connectionName);
     });
 
     connection.onPeerDisconnect((peerId: string) => {
-      // TODO: закрыть соединение
+      this.activePeers.deactivatePeer(peerId);
     });
   }
 
@@ -129,16 +129,9 @@ export default class Transport {
         resolve(result);
       };
 
-      // TODO: обновить кэш! Но где заранее взять имя хоста ????
-      //this.cacheRoute(incomeMessage, peerId, connectionName);
+      this.activePeers.activatePeer(peerId, connectionName);
 
-      const hostItem: HostItem | undefined = this.activeHosts.resolveByPeerId(peerId);
-
-      if (!hostItem) {
-        throw new Error(`Can't resolve hostItem by peerId ${peerId}`);
-      }
-
-      this.incomeMessagesEvents.emit(request.payload, hostItem.hostId, done);
+      this.incomeMessagesEvents.emit(request.payload, peerId, done);
     });
   }
 
@@ -149,17 +142,5 @@ export default class Transport {
 
     return this.context.service[connectionName];
   }
-
-  // private cacheRoute(incomeMessage: NetworkMessage, peerId: string, connectionName: string) {
-  //   const closestHostId: string = (incomeMessage.route.length)
-  //     ? lastItem(incomeMessage.route)
-  //     : incomeMessage.from;
-  //
-  //   this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
-  //
-  //   if (incomeMessage.route.length) {
-  //     //this.router.cacheRoute(incomeMessage.to, incomeMessage.from, incomeMessage.route);
-  //   }
-  // }
 
 }
