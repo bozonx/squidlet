@@ -30,7 +30,7 @@ export default abstract class ConnectionBase<Props> extends ServiceBase<Props> i
   protected abstract write(sessionId: string, data: Uint8Array): Promise<void>;
 
 
-  async request(sessionId: string, channel: number, data: Uint8Array): Promise<ConnectionResponse> {
+  async request(peerId: string, port: number, data: Uint8Array): Promise<ConnectionResponse> {
 
     // TODO: запрещать использовать порты 253, 254, 255
 

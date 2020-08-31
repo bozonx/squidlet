@@ -20,6 +20,7 @@ type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
 export default class Router {
   private context: Context;
   private transport: Transport;
+  private activeHosts: ActiveHosts;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
   //private incomeResponseEvents = new IndexedEvents<IncomeMessageHandler>();
 
@@ -27,15 +28,18 @@ export default class Router {
   constructor(context: Context) {
     this.context = context;
     this.transport = new Transport(context);
+    this.activeHosts = new ActiveHosts();
   }
 
   init() {
     this.transport.init();
     this.transport.onIncomeMessage(this.handleIncomeTransportMessages);
+    this.activeHosts.init();
   }
 
   destroy() {
     this.transport.destroy();
+    this.activeHosts.destroy();
   }
 
 
