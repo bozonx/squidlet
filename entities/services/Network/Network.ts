@@ -94,7 +94,7 @@ export default class Network extends ServiceBase<NetworkProps> {
    * @param uri
    * @param handler
    */
-  startListenUrl(uri: string, handler: UriHandler) {
+  startListenUri(uri: string, handler: UriHandler) {
     if (this.uriHandlers[uri]) {
       throw new Error(`Handler of uri has already defined`);
     }
@@ -111,11 +111,10 @@ export default class Network extends ServiceBase<NetworkProps> {
    * Handle request which is for current host
    */
   private handleIncomeMessage(incomeMessage: NetworkMessage) {
-
-    // TODO: review - может быть и запрос и ответ
-
+    // listen only requests. They have uri with length greater than 1
+    if (incomeMessage.uri.length <= 1 ) return;
+    // if no handler - then send an error back
     if (!this.uriHandlers[incomeMessage.uri]) {
-      // TODO: поидее нужно отправить ответным сообщением сразу
       this.router.send(
         incomeMessage.from,
         String(SPECIAL_URI.responseError),
@@ -126,31 +125,32 @@ export default class Network extends ServiceBase<NetworkProps> {
 
       return;
     }
+    // call handler and send response but don't wait for result
+    this.callUriHandlerAndSandBack(incomeMessage)
+      .catch(this.log.error);
+  }
 
-    callSafely(
-      this.uriHandlers[incomeMessage.uri],
-      incomeMessage,
-      //{ port: request.port, requestId: request.requestId }
-    )
-      .then((payloadToSendBack: Uint8Array) => {
-        // send response but don't wait for result
-        this.router.send(
-          incomeMessage.from,
-          String(SPECIAL_URI.responseOk),
-          payloadToSendBack,
-          incomeMessage.messageId,
-        )
-          .catch(this.log.error);
-      })
-      .catch((e: Error) => {
-        this.router.send(
-          incomeMessage.from,
-          String(SPECIAL_URI.responseError),
-          asciiToUint8Array(`Error while executing handler of uri "${incomeMessage.uri}" :${e}`),
-          incomeMessage.messageId,
-        )
-          .catch(this.log.error);
-      });
+  private async callUriHandlerAndSandBack(incomeMessage: NetworkMessage) {
+    let backUri: string = String(SPECIAL_URI.responseOk);
+    let payloadToSendBack: Uint8Array;
+
+    try {
+      payloadToSendBack = await callSafely(
+        this.uriHandlers[incomeMessage.uri],
+        incomeMessage,
+      );
+    }
+    catch (e) {
+      backUri = String(SPECIAL_URI.responseError);
+      payloadToSendBack = asciiToUint8Array(`Error while executing handler of uri "${incomeMessage.uri}" :${e}`);
+    }
+    // send back data which handler returned or error
+    await this.router.send(
+      incomeMessage.from,
+      backUri,
+      payloadToSendBack,
+      incomeMessage.messageId,
+    );
   }
 
   private waitForResponse(uri: string, messageId: string): Promise<Uint8Array> {
@@ -185,46 +185,20 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
   private async processResponse(incomeMessage: NetworkMessage): Promise<Uint8Array> {
-    if (incomeMessage.uri === String(SPECIAL_URI.responseError)) {
-      // if an error has been returned just convert it to string and reject promise
-      throw new Error(uint8ArrayToAscii(incomeMessage.payload));
+    switch (incomeMessage.uri) {
+      case String(SPECIAL_URI.responseOk):
+        // it's OK
+        return incomeMessage.payload;
+
+      // TODO: add get name
+      // TODO: ping, pong
+
+      case String(SPECIAL_URI.responseError):
+        // if an error has been returned just convert it to string and reject promise
+        throw new Error(uint8ArrayToAscii(incomeMessage.payload));
+      default:
+        throw new Error(`Unknown response URI "${incomeMessage.uri}"`);
     }
-    else if (incomeMessage.uri !== String(SPECIAL_URI.responseOk)) {
-      throw new Error(`Unknown response URI "${incomeMessage.uri}"`);
-    }
-    // it's OK
-    return incomeMessage.payload;
   }
 
 }
-
-
-// private makeResponse(to: string, uri: string, payload?: Uint8Array): NetworkMessage {
-//   return {
-//     TTL: this.context.config.config.defaultTtl,
-//     to,
-//     from: this.context.config.id,
-//     // TODO: сформировать маршрут, ближайший хост может быть другой
-//     route: [],
-//     uri,
-//     payload: payload || new Uint8Array(0),
-//   };
-// }
-
-// send message back which means that income message was routed.
-// return encodeNetworkMessage({
-//   TTL: this.context.config.config.defaultTtl,
-//   to: incomeMessage.from,
-//   from: this.context.config.id,
-//   route: [],
-//   uri: SPECIAL_URI.routed,
-//   payload: new Uint8Array(0),
-// });
-
-// // status of response of connection
-// export enum RESPONSE_STATUS {
-//   // message has been successfully received
-//   received,
-//   // message has been send further on the route
-//   routed,
-// }
