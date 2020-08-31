@@ -12,6 +12,10 @@ export default class ActiveHosts {
   private activeHosts: HostItem[];
 
 
+  init() {
+    // TODO: add
+  }
+
   destroy() {
     // TODO: add
   }

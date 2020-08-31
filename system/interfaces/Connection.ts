@@ -1,3 +1,17 @@
+/*
+ * request
+ * * port
+ * * requestId
+ * * status 255 = request
+ * * any data
+ *
+ * response
+ * * port
+ * * requestId
+ * * status 0 == OK, >0<255 = response error code
+ * * any data | no data
+ */
+
 // TODO: review
 export enum ConnectionStatus {
   responseOk = 253,

@@ -19,18 +19,16 @@ type IncomeMessageHandler = (
 
 
 /**
- * It sends and receives messages into network.
- * It resends messages further to the next subnet.
+ * It sends and receives messages into direct connections.
  */
 export default class Transport {
   private context: Context;
-  private readonly activePeers: ActivePeers;
+  private readonly activePeers: ActivePeers = new ActivePeers();
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
 
 
   constructor(context: Context) {
     this.context = context;
-    this.activePeers = new ActivePeers();
   }
 
   init() {
@@ -50,10 +48,12 @@ export default class Transport {
    * It resolves the connection to use.
    * @param peerId - hostId of the closest host which is directly
    *   wired to current host
+   * @param port
    * @param payload
    */
-  async send(
+  async request(
     peerId: string,
+    port: number,
     payload: Uint8Array,
   ): Promise<Uint8Array> {
     const connectionName: string | undefined = this.activePeers.resolveConnectionName(peerId);
@@ -62,10 +62,12 @@ export default class Transport {
       throw new Error(`Peer "${peerId}" hasn't been connected`);
     }
 
+    // TODO: может интерфейс запроса-ответа здесь сделать ??? а в connections просто send
+
     const connection: Connection = this.getConnection(connectionName);
     const response: ConnectionResponse = await connection.request(
       peerId,
-      NETWORK_PORT,
+      port,
       payload
     );
 
