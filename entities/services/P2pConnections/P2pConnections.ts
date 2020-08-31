@@ -1,22 +1,31 @@
 import Context from 'system/Context';
-import IndexedEvents from 'system/lib/IndexedEvents';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Connection, {
-  CONNECTION_SERVICE_TYPE, IncomeDataHandler,
+  CONNECTION_SERVICE_TYPE, IncomeMessageHandler,
 } from 'system/interfaces/Connection';
+import ServiceBase from 'system/base/ServiceBase';
 
 import ActivePeers from './ActivePeers';
 
 
-export type PeerStatusHandler = (peerId: string, connectionName: string) => Promise<void>;
+export type PeerStatusHandler = (peerId: string, connectionName: string) => void;
+
+enum P2pConnectionsEvents {
+  message,
+  connected,
+  disconnected
+}
 
 
 /**
  * It sends and receives messages into direct connections.
  */
-export default class P2pConnections {
+export default class P2pConnections extends ServiceBase {
   private context: Context;
-  private readonly activePeers: ActivePeers = new ActivePeers();
-  private incomeMessagesEvents = new IndexedEvents<IncomeDataHandler>();
+  private events = new IndexedEventEmitter();
+  //private readonly activePeers: ActivePeers = new ActivePeers();
+  // connections by peers - {peerId: connectionName}
+  private activePeers: {[index: string]: string} = {};
 
 
   constructor(context: Context) {
@@ -24,13 +33,13 @@ export default class P2pConnections {
   }
 
   init() {
-    this.activePeers.init();
+    //this.activePeers.init();
     this.initConnections();
   }
 
   destroy() {
-    this.activePeers.destroy();
-    this.incomeMessagesEvents.destroy();
+    //this.activePeers.destroy();
+    this.events.destroy();
     // TODO: на всех connections поидее нужно отписаться
   }
 
@@ -44,7 +53,7 @@ export default class P2pConnections {
    * @param payload
    */
   async send(peerId: string, port: number, payload: Uint8Array): Promise<void> {
-    const connectionName: string | undefined = this.activePeers.resolveConnectionName(peerId);
+    const connectionName: string | undefined = this.activePeers[peerId];
 
     if (!connectionName) {
       throw new Error(`Peer "${peerId}" hasn't been connected`);
@@ -55,21 +64,21 @@ export default class P2pConnections {
     await connection.send(peerId, port, payload);
   }
 
-  onIncomeData(cb: IncomeDataHandler): number {
-    return this.incomeMessagesEvents.addListener(cb);
+  onIncomeMessage(cb: IncomeMessageHandler): number {
+    return this.events.addListener(P2pConnectionsEvents.message, cb);
   }
 
   onPeerConnect(cb: PeerStatusHandler): number {
-    // TODO: use events
+    return this.events.addListener(P2pConnectionsEvents.connected, cb);
   }
 
   onPeerDisconnect(cb: PeerStatusHandler): number {
-    // TODO: use events
+    return this.events.addListener(P2pConnectionsEvents.disconnected, cb);
   }
 
 
   removeListener(handlerIndex: number) {
-    this.incomeMessagesEvents.removeListener(handlerIndex);
+    this.events.removeListener(handlerIndex);
   }
 
 
@@ -82,17 +91,18 @@ export default class P2pConnections {
   }
 
   private addConnectionListeners(connectionName: string, connection: Connection) {
-    connection.startListenPort(NETWORK_PORT, (
-      request: ConnectionRequest,
-      peerId: string
-    ): Promise<Uint8Array> => this.handleIncomeMessages(request, peerId, connectionName));
+    connection.onIncomeMessage((
+      peerId: string,
+      port: number,
+      payload: Uint8Array
+    ): void => this.handleIncomeMessages(peerId, port, payload, connectionName));
 
     connection.onPeerConnect((peerId: string) => {
-      this.activePeers.activatePeer(peerId, connectionName);
+      this.activatePeer(peerId, connectionName);
     });
 
     connection.onPeerDisconnect((peerId: string) => {
-      this.activePeers.deactivatePeer(peerId);
+      this.deactivatePeer(peerId, connectionName);
     });
   }
 
@@ -100,21 +110,24 @@ export default class P2pConnections {
    * Handle requests which came out of connection and sand status back
    */
   private handleIncomeMessages(
-    request: ConnectionRequest,
     peerId: string,
+    port: number,
+    payload: Uint8Array,
     connectionName: string
-  ): Promise<Uint8Array> {
-    return new Promise<Uint8Array>((resolve, reject) => {
-      const done = (result: Uint8Array) => {
-        // TODO: если вернули ошибку ????
-        // TODO: перестать ожидать по таймауту
-        resolve(result);
-      };
+  ): void {
 
-      this.activePeers.activatePeer(peerId, connectionName);
 
-      this.incomeMessagesEvents.emit(request.payload, peerId, done);
-    });
+    // return new Promise<Uint8Array>((resolve, reject) => {
+    //   const done = (result: Uint8Array) => {
+    //     // TODO: если вернули ошибку ????
+    //     // TODO: перестать ожидать по таймауту
+    //     resolve(result);
+    //   };
+    //
+    //   this.activePeers.activatePeer(peerId, connectionName);
+    //
+    //   this.incomeMessagesEvents.emit(request.payload, peerId, done);
+    // });
   }
 
   private getConnection(connectionName: string): Connection {
@@ -123,6 +136,29 @@ export default class P2pConnections {
     }
 
     return this.context.service[connectionName];
+  }
+
+  activatePeer(peerId: string, connectionName: string) {
+    if (this.activePeers[peerId] && this.activePeers[peerId] !== connectionName) {
+      throw new Error(
+        `Peer ${peerId} has different connection.` +
+        ` Last is ${this.activePeers[peerId]}, new id ${connectionName}`
+      );
+    }
+
+    const wasRegistered: boolean = Boolean(this.activePeers[peerId]);
+
+    this.activePeers[peerId] = connectionName;
+
+    if (!wasRegistered) {
+      this.events.emit(P2pConnectionsEvents.connected, peerId, connectionName);
+    }
+  }
+
+  deactivatePeer(peerId: string, connectionName: string) {
+    delete this.activePeers[peerId];
+
+    this.events.emit(P2pConnectionsEvents.disconnected, peerId, connectionName);
   }
 
 }
