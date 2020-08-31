@@ -31,11 +31,9 @@ export interface NetworkMessage {
 type Timeout = NodeJS.Timeout;
 type UriHandler = (request: NetworkMessage) => Promise<Uint8Array>;
 
-// TODO: наверное 254
 // port of connection which network uses to send and receive messages
-export const NETWORK_PORT = 252;
+export const NETWORK_PORT = 254;
 
-// TODO: не будет наверное использоваться
 export enum SPECIAL_URI {
   responseOk,
   responseError,
@@ -44,18 +42,11 @@ export enum SPECIAL_URI {
   ping,
   pong,
 }
-// status of response of connection
-export enum RESPONSE_STATUS {
-  // message has been successfully received
-  received,
-  // message has been send further on the route
-  routed,
-}
 
 
 export default class Network extends ServiceBase<NetworkProps> {
   private readonly router: Router;
-  private incomeRequestHandlers: {[index: string]: UriHandler} = {};
+  private uriHandlers: {[index: string]: UriHandler} = {};
 
 
   constructor(context: Context, definition: EntityDefinition) {
@@ -67,12 +58,13 @@ export default class Network extends ServiceBase<NetworkProps> {
 
   init = async () => {
     this.router.init();
-    this.router.onIncomeRequest(this.handleIncomeRequest);
+    this.router.onIncomeMessage(this.handleIncomeMessage);
   }
 
   destroy = async () => {
     this.router.destroy();
-    delete this.incomeRequestHandlers;
+
+    delete this.uriHandlers;
   }
 
 
@@ -92,46 +84,9 @@ export default class Network extends ServiceBase<NetworkProps> {
     const messageId: string = this.router.newMessageId();
 
     // send request and wait while it is finished
-    await this.router.send(
-      toHostId,
-      uri,
-      payload,
-      messageId,
-      TTL,
-    );
+    await this.router.send(toHostId, uri, payload, messageId, TTL);
 
-    const promised = new Promised<Uint8Array>();
-    let timeout: Timeout | undefined;
-    const responseListener: number = this.router.onIncomeResponse((
-      incomeMessage: NetworkMessage
-    ) => {
-      if (incomeMessage.messageId !== messageId) return;
-
-      this.router.removeListener(responseListener);
-      clearTimeout(timeout as any);
-
-      if (incomeMessage.uri === String(SPECIAL_URI.responseError)) {
-        // if an error has been returned just convert it to string and reject promise
-        return promised.reject(new Error(uint8ArrayToAscii(incomeMessage.payload)));
-      }
-      else if (incomeMessage.uri !== String(SPECIAL_URI.responseOk)) {
-        return promised.reject(new Error(`Unknown response URI "${incomeMessage.uri}"`));
-      }
-      // it's OK
-      promised.resolve(payload);
-    });
-
-    timeout = setTimeout(() => {
-      if (promised.isFulfilled()) return;
-
-      this.router.removeListener(responseListener);
-
-      promised.reject(new Error(
-        `Timeout of request has been exceeded of URI "${uri}"`
-      ));
-    }, this.config.config.requestTimeoutSec * 1000);
-
-    return promised.promise;
+    return this.waitForResponse(uri, messageId);
   }
 
   /**
@@ -140,23 +95,26 @@ export default class Network extends ServiceBase<NetworkProps> {
    * @param handler
    */
   startListenUrl(uri: string, handler: UriHandler) {
-    if (this.incomeRequestHandlers[uri]) {
+    if (this.uriHandlers[uri]) {
       throw new Error(`Handler of uri has already defined`);
     }
 
-    this.incomeRequestHandlers[uri] = handler;
+    this.uriHandlers[uri] = handler;
   }
 
   stopListenUri(uri: string) {
-    delete this.incomeRequestHandlers[uri];
+    delete this.uriHandlers[uri];
   }
 
 
   /**
    * Handle request which is for current host
    */
-  private handleIncomeRequest(incomeMessage: NetworkMessage) {
-    if (!this.incomeRequestHandlers[incomeMessage.uri]) {
+  private handleIncomeMessage(incomeMessage: NetworkMessage) {
+
+    // TODO: review - может быть и запрос и ответ
+
+    if (!this.uriHandlers[incomeMessage.uri]) {
       // TODO: поидее нужно отправить ответным сообщением сразу
       this.router.send(
         incomeMessage.from,
@@ -170,7 +128,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
 
     callSafely(
-      this.incomeRequestHandlers[incomeMessage.uri],
+      this.uriHandlers[incomeMessage.uri],
       incomeMessage,
       //{ port: request.port, requestId: request.requestId }
     )
@@ -193,6 +151,49 @@ export default class Network extends ServiceBase<NetworkProps> {
         )
           .catch(this.log.error);
       });
+  }
+
+  private waitForResponse(uri: string, messageId: string): Promise<Uint8Array> {
+    const promised = new Promised<Uint8Array>();
+    let timeout: Timeout | undefined;
+
+    const responseListener: number = this.router.onIncomeMessage((
+      incomeMessage: NetworkMessage
+    ) => {
+      // listen only ours response
+      if (incomeMessage.messageId !== messageId) return;
+
+      this.router.removeListener(responseListener);
+      clearTimeout(timeout as any);
+
+      this.processResponse(incomeMessage)
+        .then(promised.resolve)
+        .catch(promised.reject);
+    });
+
+    timeout = setTimeout(() => {
+      this.router.removeListener(responseListener);
+
+      if (promised.isFulfilled()) return;
+
+      promised.reject(new Error(
+        `Timeout of request has been exceeded of URI "${uri}"`
+      ));
+    }, this.config.config.requestTimeoutSec * 1000);
+
+    return promised.promise;
+  }
+
+  private async processResponse(incomeMessage: NetworkMessage): Promise<Uint8Array> {
+    if (incomeMessage.uri === String(SPECIAL_URI.responseError)) {
+      // if an error has been returned just convert it to string and reject promise
+      throw new Error(uint8ArrayToAscii(incomeMessage.payload));
+    }
+    else if (incomeMessage.uri !== String(SPECIAL_URI.responseOk)) {
+      throw new Error(`Unknown response URI "${incomeMessage.uri}"`);
+    }
+    // it's OK
+    return incomeMessage.payload;
   }
 
 }
@@ -219,3 +220,11 @@ export default class Network extends ServiceBase<NetworkProps> {
 //   uri: SPECIAL_URI.routed,
 //   payload: new Uint8Array(0),
 // });
+
+// // status of response of connection
+// export enum RESPONSE_STATUS {
+//   // message has been successfully received
+//   received,
+//   // message has been send further on the route
+//   routed,
+// }
