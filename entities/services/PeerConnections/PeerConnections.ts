@@ -12,7 +12,7 @@ export type PeerStatusHandler = (peerId: string, connectionName: string) => void
 /**
  * It sends and receives messages into direct connections.
  */
-export default class P2pConnections extends ServiceBase {
+export default class PeerConnections extends ServiceBase {
   private events = new IndexedEventEmitter();
   // connections by peers - {peerId: connectionName}
   private activePeers: {[index: string]: string} = {};
