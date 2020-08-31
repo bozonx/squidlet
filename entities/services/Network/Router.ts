@@ -37,7 +37,7 @@ export default class Router {
       // TODO: сделать запрос имени хоста и зарегистрировать его
     });
     this.p2pConnections.onPeerDisconnect((peerId: string, connectionName: string) => {
-      // TODO: remove active host
+      this.routeResolver.deactivatePeer(peerId);
     });
   }
 
@@ -73,7 +73,8 @@ export default class Router {
     messageId: string,
     TTL?: number
   ) {
-    const route: string[] = this.routes.resolveRoute(toHostId);
+    // TODO: наверное убрать первый и последний элементы
+    const route: string[] = this.routeResolver.resolveRoute(toHostId);
     const message: NetworkMessage = {
       TTL: TTL || this.context.config.config.defaultTtl,
       messageId,
@@ -85,7 +86,9 @@ export default class Router {
     };
 
     const encodedMessage: Uint8Array = encodeNetworkMessage(message);
-    const peerId: string | undefined = this.activeHosts.resolvePeerId(route[0] || toHostId);
+    const peerId: string | undefined = this.routeResolver.resolvePeerId(
+      route[0] || toHostId
+    );
 
     if (!peerId) {
       throw new Error(`No route to host`);
@@ -106,7 +109,15 @@ export default class Router {
 
     const incomeMessage: NetworkMessage = decodeNetworkMessage(payload);
 
-    // TODO: зарегистрировать хост
+    this.routeResolver.saveRoute([
+      incomeMessage.from,
+      ...incomeMessage.route,
+      incomeMessage.to
+    ]);
+    // TODO: как определить ближайший хост???
+    const closestHost = incomeMessage.from;
+
+    this.routeResolver.activatePeer(peerId, closestHost);
 
     if (incomeMessage.to !== this.context.config.id) {
       // if receiver isn't current host send message further
@@ -124,10 +135,28 @@ export default class Router {
    * @param incomeMessage
    */
   private async sendFurther(incomeMessage: NetworkMessage) {
-    // TODO: add
-    // TODO: если надо переслать уменьшить ttl
-    // TODO: нужно ли устанавливать статус routed ???
+    if (incomeMessage.TTL <= 0) {
+      // TODO: что делать???
+      return;
+    }
 
+    const encodedMessage: Uint8Array = encodeNetworkMessage({
+      ...incomeMessage,
+      TTL: incomeMessage.TTL - 1,
+    });
+    // TODO: добавить откуда пришло
+    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId([
+      incomeMessage.from,
+      ...incomeMessage.route,
+      incomeMessage.to,
+    ]);
+    const peerId: string | undefined = this.routeResolver.resolvePeerId(closestHostId);
+
+    if (!peerId) {
+      throw new Error(`No route to host`);
+    }
+    // just send to peer
+    await this.p2pConnections.send(peerId, NETWORK_PORT, encodedMessage);
   }
 
 }
