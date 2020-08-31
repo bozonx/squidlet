@@ -12,26 +12,25 @@ import {makeUniqId} from '../../../system/lib/uniqId';
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
 
 
+/**
+ * It sends and receives messages into network.
+ * It resends messages further to the next subnet.
+ */
 export default class Router {
   private context: Context;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
   private incomeResponseEvents = new IndexedEvents<IncomeMessageHandler>();
-  private readonly activeHosts: ActiveHosts;
 
 
   constructor(context: Context) {
     this.context = context;
-    this.activeHosts = new ActiveHosts();
   }
 
   init() {
-    this.initConnections();
   }
 
   destroy() {
-    this.activeHosts.destroy();
-    this.incomeMessagesEvents.destroy();
-    // TODO: на всех connections вызывать stopListenPort и removeListener
+
   }
 
 
@@ -70,18 +69,20 @@ export default class Router {
   //   // TODO: add
   // }
 
-  /**
-   * Send mediate message or new one
-   * @param incomeMessage
-   */
-  async sendMessage(incomeMessage: NetworkMessage) {
-    // TODO: add
-  }
+  // /**
+  //  * Send mediate message or new one
+  //  * @param incomeMessage
+  //  */
+  // async sendMessage(incomeMessage: NetworkMessage) {
+  //   // TODO: add
+  // }
 
   /**
    * Send new message or response
    * If requestId doesn't set it will be generated
-   * If TTL doesn't set the default value will be used
+   * If TTL doesn't set the default value will be used.
+   * It just sends and doesn't wait for any response.
+   * It it is the new request, make messageId by calling `router.newMessageId()`
    */
   async send(
     toHostId: string,
@@ -127,14 +128,6 @@ export default class Router {
 
     // TODO: review
 
-    const connectionItem: HostItem | undefined = this.activeHosts.resolveByHostId(toHostId);
-
-    if (!connectionItem) {
-      throw new Error(`Host "${toHostId}" hasn't been connected`);
-    }
-
-    const connection: Connection = this.getConnection(connectionItem.connectionName);
-
     // TODO:  может использовать такой метов в connection.sendResponseBack()
     // const result: ConnectionResponse = await connection.request(
     //   peerId,
@@ -166,51 +159,7 @@ export default class Router {
   //   payload: new Uint8Array(0),
   // });
 
-  private initConnections() {
-    for (let serviceName of Object.keys(this.context.service)) {
-      if (this.context.service[serviceName] !== CONNECTION_SERVICE_TYPE) continue;
 
-      this.addConnectionListeners(serviceName, this.context.service[serviceName]);
-    }
-  }
-
-  private addConnectionListeners(connectionName: string, connection: Connection) {
-    connection.startListenPort(NETWORK_PORT, (
-      request: ConnectionRequest,
-      peerId: string
-    ): Promise<Uint8Array> => this.handleIncomeMessages(request, peerId, connectionName));
-    connection.onPeerConnect((peerId: string) => {
-      // TODO: нужно отправить запрос genHostId и потом зарегистрировать
-      //this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
-      // TODO: зарегистрировать соединение
-    });
-    connection.onPeerDisconnect((peerId: string) => {
-      // TODO: закрыть соединение
-    });
-  }
-
-  /**
-   * Handle requests which came out of connection and sand status back
-   */
-  private async handleIncomeMessages(
-    request: ConnectionRequest,
-    peerId: string,
-    connectionName: string
-  ): Promise<Uint8Array> {
-    const incomeMessage: NetworkMessage = decodeNetworkMessage(request.payload);
-
-    this.cacheRoute(incomeMessage, peerId, connectionName);
-
-    if (incomeMessage.to !== this.context.config.id) {
-      // if receiver isn't current host send message further
-      this.sendMessage(incomeMessage)
-        .catch(this.context.log.error);
-      // send status routed back
-      return new Uint8Array([RESPONSE_STATUS.routed]);
-    }
-    // send status OK back
-    return new Uint8Array([RESPONSE_STATUS.received]);
-  }
 
   private cacheRoute(incomeMessage: NetworkMessage, peerId: string, connectionName: string) {
     const closestHostId: string = (incomeMessage.route.length)
@@ -224,12 +173,5 @@ export default class Router {
     }
   }
 
-  private getConnection(connectionName: string): Connection {
-    if (!this.context.service[connectionName]) {
-      throw new Error(`Can't find connection "${connectionName}"`);
-    }
-
-    return this.context.service[connectionName];
-  }
 
 }
