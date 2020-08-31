@@ -1,18 +1,12 @@
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Connection, {
-  CONNECTION_SERVICE_TYPE,
+  CONNECTION_SERVICE_TYPE, ConnectionsEvents,
 } from 'system/interfaces/Connection';
 import ServiceBase from 'system/base/ServiceBase';
 
 
 export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8Array, connectionName: string) => void;
 export type PeerStatusHandler = (peerId: string, connectionName: string) => void;
-
-enum P2pConnectionsEvents {
-  message,
-  connected,
-  disconnected
-}
 
 
 /**
@@ -55,15 +49,15 @@ export default class P2pConnections extends ServiceBase {
   }
 
   onIncomeMessage(cb: IncomeMessageHandler): number {
-    return this.events.addListener(P2pConnectionsEvents.message, cb);
+    return this.events.addListener(ConnectionsEvents.message, cb);
   }
 
   onPeerConnect(cb: PeerStatusHandler): number {
-    return this.events.addListener(P2pConnectionsEvents.connected, cb);
+    return this.events.addListener(ConnectionsEvents.connected, cb);
   }
 
   onPeerDisconnect(cb: PeerStatusHandler): number {
-    return this.events.addListener(P2pConnectionsEvents.disconnected, cb);
+    return this.events.addListener(ConnectionsEvents.disconnected, cb);
   }
 
 
@@ -107,7 +101,7 @@ export default class P2pConnections extends ServiceBase {
   ): void {
     this.activatePeer(peerId, connectionName);
 
-    this.events.emit(P2pConnectionsEvents.message, peerId, port, payload, connectionName);
+    this.events.emit(ConnectionsEvents.message, peerId, port, payload, connectionName);
   }
 
   private getConnection(connectionName: string): Connection {
@@ -131,7 +125,7 @@ export default class P2pConnections extends ServiceBase {
     this.activePeers[peerId] = connectionName;
 
     if (!wasRegistered) {
-      this.events.emit(P2pConnectionsEvents.connected, peerId, connectionName);
+      this.events.emit(ConnectionsEvents.connected, peerId, connectionName);
     }
   }
 
@@ -140,7 +134,7 @@ export default class P2pConnections extends ServiceBase {
 
     delete this.activePeers[peerId];
 
-    this.events.emit(P2pConnectionsEvents.disconnected, peerId, connectionName);
+    this.events.emit(ConnectionsEvents.disconnected, peerId, connectionName);
   }
 
 }
