@@ -7,7 +7,6 @@ import Network, {NETWORK_PORT, NetworkMessage, RESPONSE_STATUS, SPECIAL_URI} fro
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {makeUniqId} from '../../../system/lib/uniqId';
-import Transport from './Transport';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
@@ -19,7 +18,7 @@ type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
  */
 export default class Router {
   private context: Context;
-  private transport: Transport;
+  //private transport: Transport;
   private activeHosts: ActiveHosts;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
   //private incomeResponseEvents = new IndexedEvents<IncomeMessageHandler>();
@@ -27,7 +26,7 @@ export default class Router {
 
   constructor(context: Context) {
     this.context = context;
-    this.transport = new Transport(context);
+    //this.transport = new Transport(context);
     this.activeHosts = new ActiveHosts();
   }
 

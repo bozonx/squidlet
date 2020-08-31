@@ -1,30 +1,43 @@
-import {NETWORK_PORT} from './Network';
 import Context from 'system/Context';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Connection, {
-  CONNECTION_SERVICE_TYPE,
-  ConnectionRequest,
-  ConnectionResponse,
-  ConnectionStatus
+  CONNECTION_SERVICE_TYPE, IncomeDataHandler,
 } from 'system/interfaces/Connection';
 
 import ActivePeers from './ActivePeers';
 
 
-type IncomeMessageHandler = (
-  payload: Uint8Array,
-  fromPeerId: string,
-  done: (result: Uint8Array) => void
-) => void;
+/*
+
+new
+ request/response
+ * port
+ * any data
+
+========= OLD ==========
+ * request
+ * * port
+ * * requestId
+ * * status 255 = request
+ * * any data
+ *
+ * response
+ * * port
+ * * requestId
+ * * status 0 == OK, >0<255 = response error code
+ * * any data | no data
+ */
+
+export type PeerStatusHandler = (peerId: string, connectionName: string) => Promise<void>;
 
 
 /**
  * It sends and receives messages into direct connections.
  */
-export default class Transport {
+export default class P2pConnections {
   private context: Context;
   private readonly activePeers: ActivePeers = new ActivePeers();
-  private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
+  private incomeMessagesEvents = new IndexedEvents<IncomeDataHandler>();
 
 
   constructor(context: Context) {
@@ -39,7 +52,7 @@ export default class Transport {
   destroy() {
     this.activePeers.destroy();
     this.incomeMessagesEvents.destroy();
-    // TODO: на всех connections вызывать stopListenPort и removeListener
+    // TODO: на всех connections поидее нужно отписаться
   }
 
 
@@ -51,42 +64,30 @@ export default class Transport {
    * @param port
    * @param payload
    */
-  async request(
-    peerId: string,
-    port: number,
-    payload: Uint8Array,
-  ): Promise<Uint8Array> {
+  async send(peerId: string, port: number, payload: Uint8Array): Promise<void> {
     const connectionName: string | undefined = this.activePeers.resolveConnectionName(peerId);
 
     if (!connectionName) {
       throw new Error(`Peer "${peerId}" hasn't been connected`);
     }
 
-    // TODO: может интерфейс запроса-ответа здесь сделать ??? а в connections просто send
-
     const connection: Connection = this.getConnection(connectionName);
-    const response: ConnectionResponse = await connection.request(
-      peerId,
-      port,
-      payload
-    );
 
-    if (response.status === ConnectionStatus.responseError) {
-      throw new Error(response.error);
-    }
-
-    if (!response.payload) {
-      throw new Error(`No response.payload`);
-    }
-
-    // TODO: зачем здесь payload ??? ответ же просто информативный
-
-    return response.payload;
+    await connection.send(peerId, port, payload);
   }
 
-  onIncomeMessage(cb: IncomeMessageHandler) {
+  onIncomeData(cb: IncomeDataHandler): number {
     return this.incomeMessagesEvents.addListener(cb);
   }
+
+  onPeerConnect(cb: PeerStatusHandler): number {
+    // TODO: use events
+  }
+
+  onPeerDisconnect(cb: PeerStatusHandler): number {
+    // TODO: use events
+  }
+
 
   removeListener(handlerIndex: number) {
     this.incomeMessagesEvents.removeListener(handlerIndex);
