@@ -31,9 +31,11 @@ export interface NetworkMessage {
 type Timeout = NodeJS.Timeout;
 type UriHandler = (request: NetworkMessage) => Promise<Uint8Array>;
 
+// TODO: наверное 254
 // port of connection which network uses to send and receive messages
 export const NETWORK_PORT = 252;
 
+// TODO: не будет наверное использоваться
 export enum SPECIAL_URI {
   responseOk,
   responseError,
@@ -194,3 +196,26 @@ export default class Network extends ServiceBase<NetworkProps> {
   }
 
 }
+
+
+// private makeResponse(to: string, uri: string, payload?: Uint8Array): NetworkMessage {
+//   return {
+//     TTL: this.context.config.config.defaultTtl,
+//     to,
+//     from: this.context.config.id,
+//     // TODO: сформировать маршрут, ближайший хост может быть другой
+//     route: [],
+//     uri,
+//     payload: payload || new Uint8Array(0),
+//   };
+// }
+
+// send message back which means that income message was routed.
+// return encodeNetworkMessage({
+//   TTL: this.context.config.config.defaultTtl,
+//   to: incomeMessage.from,
+//   from: this.context.config.id,
+//   route: [],
+//   uri: SPECIAL_URI.routed,
+//   payload: new Uint8Array(0),
+// });
