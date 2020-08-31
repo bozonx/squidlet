@@ -28,4 +28,8 @@ export default class ActiveHosts {
     return this.activeHosts.find((item) => item.hostId === hostId);
   }
 
+  resolveByPeerId(peerId: string): HostItem | undefined {
+    return this.activeHosts.find((item) => item.peerId === peerId);
+  }
+
 }

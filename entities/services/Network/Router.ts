@@ -7,6 +7,7 @@ import Network, {NETWORK_PORT, NetworkMessage, RESPONSE_STATUS, SPECIAL_URI} fro
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import ActiveHosts, {HostItem} from './ActiveHosts';
 import {makeUniqId} from '../../../system/lib/uniqId';
+import Transport from './Transport';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
@@ -18,19 +19,23 @@ type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
  */
 export default class Router {
   private context: Context;
+  private transport: Transport;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
-  private incomeResponseEvents = new IndexedEvents<IncomeMessageHandler>();
+  //private incomeResponseEvents = new IndexedEvents<IncomeMessageHandler>();
 
 
   constructor(context: Context) {
     this.context = context;
+    this.transport = new Transport(context);
   }
 
   init() {
+    this.transport.init();
+    this.transport.onIncomeMessage(this.handleIncomeTransportMessages);
   }
 
   destroy() {
-
+    this.transport.destroy();
   }
 
 
@@ -66,14 +71,6 @@ export default class Router {
   // }
 
   // hasToBeRouted(message: NetworkMessage): boolean {
-  //   // TODO: add
-  // }
-
-  // /**
-  //  * Send mediate message or new one
-  //  * @param incomeMessage
-  //  */
-  // async sendMessage(incomeMessage: NetworkMessage) {
   //   // TODO: add
   // }
 
@@ -160,18 +157,30 @@ export default class Router {
   // });
 
 
+  private handleIncomeTransportMessages(
+    payload: Uint8Array,
+    fromClosestHost: string,
+    done: (result: Uint8Array) => void
+  ) {
+    const incomeMessage: NetworkMessage = decodeNetworkMessage(payload);
 
-  private cacheRoute(incomeMessage: NetworkMessage, peerId: string, connectionName: string) {
-    const closestHostId: string = (incomeMessage.route.length)
-      ? lastItem(incomeMessage.route)
-      : incomeMessage.from;
-
-    this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
-
-    if (incomeMessage.route.length) {
-      //this.router.cacheRoute(incomeMessage.to, incomeMessage.from, incomeMessage.route);
+    if (incomeMessage.to !== this.context.config.id) {
+      // if receiver isn't current host send message further
+      this.sendFurther(incomeMessage)
+        .catch(this.context.log.error);
+      // send status routed back
+      return done(new Uint8Array([RESPONSE_STATUS.routed]));
     }
+    // send status OK back
+    return done(new Uint8Array([RESPONSE_STATUS.received]));
   }
 
+  /**
+   * Send mediate message or new one
+   * @param incomeMessage
+   */
+  private async sendFurther(incomeMessage: NetworkMessage) {
+    // TODO: add
+  }
 
 }

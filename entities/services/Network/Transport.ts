@@ -1,7 +1,6 @@
-import {NETWORK_PORT, NetworkMessage, RESPONSE_STATUS} from './Network';
+import {NETWORK_PORT} from './Network';
 import Context from 'system/Context';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {makeUniqId} from 'system/lib/uniqId';
 import Connection, {
   CONNECTION_SERVICE_TYPE,
   ConnectionRequest,
@@ -10,10 +9,13 @@ import Connection, {
 } from 'system/interfaces/Connection';
 
 import ActiveHosts, {HostItem} from './ActiveHosts';
-import {decodeNetworkMessage} from './helpers';
 
 
-type IncomeMessageHandler = (connectionName: string, incomeMessage: NetworkMessage) => void;
+type IncomeMessageHandler = (
+  payload: Uint8Array,
+  fromClosestHost: string,
+  done: (result: Uint8Array) => void
+) => void;
 
 
 /**
@@ -41,11 +43,6 @@ export default class Transport {
     // TODO: на всех connections вызывать stopListenPort и removeListener
   }
 
-
-  newMessageId(): string {
-    // TODO: set 8 bytes length
-    return makeUniqId();
-  }
 
   /**
    * Send new message.
@@ -105,11 +102,13 @@ export default class Transport {
       request: ConnectionRequest,
       peerId: string
     ): Promise<Uint8Array> => this.handleIncomeMessages(request, peerId, connectionName));
+
     connection.onPeerConnect((peerId: string) => {
       // TODO: нужно отправить запрос genHostId и потом зарегистрировать
       //this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
       // TODO: зарегистрировать соединение
     });
+
     connection.onPeerDisconnect((peerId: string) => {
       // TODO: закрыть соединение
     });
@@ -118,24 +117,29 @@ export default class Transport {
   /**
    * Handle requests which came out of connection and sand status back
    */
-  private async handleIncomeMessages(
+  private handleIncomeMessages(
     request: ConnectionRequest,
     peerId: string,
     connectionName: string
   ): Promise<Uint8Array> {
-    const incomeMessage: NetworkMessage = decodeNetworkMessage(request.payload);
+    return new Promise<Uint8Array>((resolve, reject) => {
+      const done = (result: Uint8Array) => {
+        // TODO: если вернули ошибку ????
+        // TODO: перестать ожидать по таймауту
+        resolve(result);
+      };
 
-    this.cacheRoute(incomeMessage, peerId, connectionName);
+      // TODO: обновить кэш! Но где заранее взять имя хоста ????
+      //this.cacheRoute(incomeMessage, peerId, connectionName);
 
-    if (incomeMessage.to !== this.context.config.id) {
-      // if receiver isn't current host send message further
-      this.sendMessage(incomeMessage)
-        .catch(this.context.log.error);
-      // send status routed back
-      return new Uint8Array([RESPONSE_STATUS.routed]);
-    }
-    // send status OK back
-    return new Uint8Array([RESPONSE_STATUS.received]);
+      const hostItem: HostItem | undefined = this.activeHosts.resolveByPeerId(peerId);
+
+      if (!hostItem) {
+        throw new Error(`Can't resolve hostItem by peerId ${peerId}`);
+      }
+
+      this.incomeMessagesEvents.emit(request.payload, hostItem.hostId, done);
+    });
   }
 
   private getConnection(connectionName: string): Connection {
@@ -145,5 +149,17 @@ export default class Transport {
 
     return this.context.service[connectionName];
   }
+
+  // private cacheRoute(incomeMessage: NetworkMessage, peerId: string, connectionName: string) {
+  //   const closestHostId: string = (incomeMessage.route.length)
+  //     ? lastItem(incomeMessage.route)
+  //     : incomeMessage.from;
+  //
+  //   this.activeHosts.cacheHost(closestHostId, peerId, connectionName);
+  //
+  //   if (incomeMessage.route.length) {
+  //     //this.router.cacheRoute(incomeMessage.to, incomeMessage.from, incomeMessage.route);
+  //   }
+  // }
 
 }
