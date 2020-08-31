@@ -7,6 +7,12 @@ export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8
 export type PeerStatusHandler = (peerId: string) => void;
 export type ConnectionServiceType = 'connection';
 
+export enum ConnectionsEvents {
+  message,
+  connected,
+  disconnected
+}
+
 // TODO: может где-то сделать enum ???
 export const CONNECTION_SERVICE_TYPE = 'connection';
 
