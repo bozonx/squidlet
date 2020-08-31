@@ -1,13 +1,11 @@
-import Context from 'system/Context';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Connection, {
-  CONNECTION_SERVICE_TYPE, IncomeMessageHandler,
+  CONNECTION_SERVICE_TYPE,
 } from 'system/interfaces/Connection';
 import ServiceBase from 'system/base/ServiceBase';
 
-import ActivePeers from './ActivePeers';
 
-
+export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8Array, connectionName: string) => void;
 export type PeerStatusHandler = (peerId: string, connectionName: string) => void;
 
 enum P2pConnectionsEvents {
@@ -21,24 +19,16 @@ enum P2pConnectionsEvents {
  * It sends and receives messages into direct connections.
  */
 export default class P2pConnections extends ServiceBase {
-  private context: Context;
   private events = new IndexedEventEmitter();
-  //private readonly activePeers: ActivePeers = new ActivePeers();
   // connections by peers - {peerId: connectionName}
   private activePeers: {[index: string]: string} = {};
 
 
-  constructor(context: Context) {
-    this.context = context;
-  }
-
-  init() {
-    //this.activePeers.init();
+  async init() {
     this.initConnections();
   }
 
-  destroy() {
-    //this.activePeers.destroy();
+  async destroy() {
     this.events.destroy();
     // TODO: на всех connections поидее нужно отписаться
   }
@@ -115,19 +105,9 @@ export default class P2pConnections extends ServiceBase {
     payload: Uint8Array,
     connectionName: string
   ): void {
+    this.activatePeer(peerId, connectionName);
 
-
-    // return new Promise<Uint8Array>((resolve, reject) => {
-    //   const done = (result: Uint8Array) => {
-    //     // TODO: если вернули ошибку ????
-    //     // TODO: перестать ожидать по таймауту
-    //     resolve(result);
-    //   };
-    //
-    //   this.activePeers.activatePeer(peerId, connectionName);
-    //
-    //   this.incomeMessagesEvents.emit(request.payload, peerId, done);
-    // });
+    this.events.emit(P2pConnectionsEvents.message, peerId, port, payload, connectionName);
   }
 
   private getConnection(connectionName: string): Connection {
@@ -138,7 +118,7 @@ export default class P2pConnections extends ServiceBase {
     return this.context.service[connectionName];
   }
 
-  activatePeer(peerId: string, connectionName: string) {
+  private activatePeer(peerId: string, connectionName: string) {
     if (this.activePeers[peerId] && this.activePeers[peerId] !== connectionName) {
       throw new Error(
         `Peer ${peerId} has different connection.` +
@@ -155,7 +135,9 @@ export default class P2pConnections extends ServiceBase {
     }
   }
 
-  deactivatePeer(peerId: string, connectionName: string) {
+  private deactivatePeer(peerId: string, connectionName: string) {
+    if (!this.activePeers[peerId]) return;
+
     delete this.activePeers[peerId];
 
     this.events.emit(P2pConnectionsEvents.disconnected, peerId, connectionName);
