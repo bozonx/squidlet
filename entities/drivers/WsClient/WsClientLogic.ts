@@ -212,7 +212,7 @@ export default class WsClientLogic {
       this.openPromise.resolve();
     }
 
-    this.logDebug(`WsClientLogic income message connection ${this.connectionId} from ${this.props.url}, data length ${data.length}`);
+    //this.logDebug(`WsClientLogic income message connection ${this.connectionId} from ${this.props.url}, data length ${data.length}`);
     // ordinary message
     this.messageEvents.emit(data);
   }

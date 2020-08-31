@@ -77,7 +77,7 @@ export default class IoClient {
   callIoMethod(ioName: string, methodName: string, ...args: any[]): Promise<any> {
     const pathToMethod = `${ioName}${METHOD_DELIMITER}${methodName}`;
 
-    this.logDebug(`IoClient.callIoMethod: ${pathToMethod}, ${args.length}`);
+    //this.logDebug(`IoClient.callIoMethod: ${pathToMethod}, ${args.length}`);
 
     return this.remoteCall.callMethod(pathToMethod, ...args);
   }
@@ -102,7 +102,7 @@ export default class IoClient {
       return this.logError(err);
     }
 
-    this.logDebug(`IoClient send to server ${JSON.stringify(message)}`);
+    //this.logDebug(`IoClient send to server ${JSON.stringify(message)}`);
 
     await this.client.send(binData);
   }
@@ -120,7 +120,7 @@ export default class IoClient {
       return this.logError(`IoClient: Can't decode message: ${err}`);
     }
 
-    this.logDebug(`IoClient income message ${JSON.stringify(msg)}`);
+    //this.logDebug(`IoClient income message ${JSON.stringify(msg)}`);
 
     await this.remoteCall.incomeMessage(msg);
   }
