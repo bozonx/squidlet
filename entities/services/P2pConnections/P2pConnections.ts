@@ -7,27 +7,6 @@ import Connection, {
 import ActivePeers from './ActivePeers';
 
 
-/*
-
-new
- request/response
- * port
- * any data
-
-========= OLD ==========
- * request
- * * port
- * * requestId
- * * status 255 = request
- * * any data
- *
- * response
- * * port
- * * requestId
- * * status 0 == OK, >0<255 = response error code
- * * any data | no data
- */
-
 export type PeerStatusHandler = (peerId: string, connectionName: string) => Promise<void>;
 
 
