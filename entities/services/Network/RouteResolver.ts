@@ -21,16 +21,16 @@ export default class RouteResolver {
     return route[0];
   }
 
+  saveRoute(route: string[]) {
+    // TODO: add
+  }
+
   resolvePeerId(closestHostId: string): string | undefined {
     for (let peerId of Object.keys(this.hostIds)) {
       if (this.hostIds[peerId] === closestHostId) return peerId;
     }
 
     return;
-  }
-
-  saveRoute(route: string[]) {
-    // TODO: add
   }
 
   activatePeer(peerId: string, hostId: string) {
