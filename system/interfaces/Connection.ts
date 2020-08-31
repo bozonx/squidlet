@@ -3,8 +3,8 @@ export interface ConnectionMessage {
   payload: Uint8Array;
 }
 
-export type IncomeDataHandler = (peerId: string, port: number, payload: Uint8Array) => Promise<void>;
-export type PeerStatusHandler = (peerId: string) => Promise<void>;
+export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8Array) => void;
+export type PeerStatusHandler = (peerId: string) => void;
 export type ConnectionServiceType = 'connection';
 
 // TODO: может где-то сделать enum ???
@@ -20,7 +20,7 @@ export default interface Connection {
    */
   send(peerId: string, port: number, payload: Uint8Array): Promise<void>;
 
-  onIncomeData(cb: IncomeDataHandler): number;
+  onIncomeMessage(cb: IncomeMessageHandler): number;
   onPeerConnect(cb: PeerStatusHandler): number;
   onPeerDisconnect(cb: PeerStatusHandler): number;
 
