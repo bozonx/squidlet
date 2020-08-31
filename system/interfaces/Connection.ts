@@ -1,3 +1,4 @@
+// TODO: review
 export enum ConnectionStatus {
   responseOk = 253,
   // TODO: может ошибку обрабатывать не на этом уровне а выше?

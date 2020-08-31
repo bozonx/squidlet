@@ -76,10 +76,6 @@ export default class Network extends ServiceBase<NetworkProps> {
 
   /**
    * Send request and wait for response
-   * @param toHostId
-   * @param uri
-   * @param payload
-   * @param TTL
    */
   async request(
     toHostId: string,
@@ -93,7 +89,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
     const messageId: string = this.router.newMessageId();
 
-    // make request
+    // send request and wait while it is finished
     await this.router.send(
       toHostId,
       uri,

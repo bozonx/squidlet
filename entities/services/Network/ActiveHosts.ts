@@ -1,6 +1,6 @@
 export interface HostItem {
   hostId: string;
-  connectionId: string;
+  peerId: string;
   connectionName: string;
 }
 
