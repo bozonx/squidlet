@@ -7,31 +7,29 @@ import Connection, {
   PeerStatusHandler
 } from 'system/interfaces/Connection';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSocketServerIo';
 
-import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
-
-
-interface Props extends WsServerSessionsProps {
-}
+import {WsServer} from '../../drivers/WsServer/WsServer';
 
 
-export default class WsServerConnection extends ServiceBase<Props> implements Connection {
+export default class WsServerConnection extends ServiceBase<WebSocketServerProps> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
 
   private events = new IndexedEventEmitter();
-  // TODO: review как используются сессии, может лучше обычный сервер использовать
-  server!: WsServerSessions;
+  private server!: WsServer;
+
 
   init = async () => {
     // it creates a new server on specified host:port
-    this.server = await this.context.getSubDriver('WsServerSessions', this.props);
+    this.server = await this.context.getSubDriver('WsServer', this.props);
 
     this.server.onMessage(this.handleIncomeMessage);
-    // TODO: add !!!!
-    // this.server.onNewSession((sessionId: string, connectionParams: ConnectionParams) => {
-    // });
-    // this.server.onSessionClose((sessionId: string) => {
-    // });
+    this.server.onConnection((connectionId: string, connectionParams: ConnectionParams) => {
+      this.events.emit(ConnectionsEvents.connected, connectionId);
+    });
+    this.server.onConnectionClose((connectionId: string) => {
+      this.events.emit(ConnectionsEvents.disconnected, connectionId);
+    });
   }
 
 
@@ -63,13 +61,13 @@ export default class WsServerConnection extends ServiceBase<Props> implements Co
   }
 
 
-  private handleIncomeMessage = (peerId: string, data: string | Uint8Array) => {
+  private handleIncomeMessage = (connectionId: string, data: string | Uint8Array) => {
     if (!(data instanceof Uint8Array) || !data.length) return;
 
     const [port, ...rest] = data;
     const payload = new Uint8Array(rest);
-
-    this.events.emit(ConnectionsEvents.message, peerId, port, payload);
+    // peerId is actually connectionId
+    this.events.emit(ConnectionsEvents.message, connectionId, port, payload);
   }
 
 }
