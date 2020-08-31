@@ -4,7 +4,7 @@ import {makeUniqId} from 'system/lib/uniqId';
 
 import {NETWORK_PORT, NetworkMessage} from './Network';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
-import P2pConnections from '../P2pConnections/P2pConnections';
+import PeerConnections from '../PeerConnections/PeerConnections';
 import RouteResolver from './RouteResolver';
 
 
@@ -20,8 +20,8 @@ export default class Router {
   private routeResolver: RouteResolver = new RouteResolver();
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
 
-  private get p2pConnections(): P2pConnections {
-    return this.context.service.P2pConnections;
+  private get peerConnections(): PeerConnections {
+    return this.context.service.PeerConnections;
   }
 
 
@@ -31,12 +31,12 @@ export default class Router {
 
   init() {
     this.routeResolver.init();
-    this.p2pConnections.onIncomeMessage(this.handleIncomeMessages);
+    this.peerConnections.onIncomeMessage(this.handleIncomeMessages);
 
-    this.p2pConnections.onPeerConnect((peerId: string, connectionName: string) => {
+    this.peerConnections.onPeerConnect((peerId: string, connectionName: string) => {
       // TODO: сделать запрос имени хоста и зарегистрировать его
     });
-    this.p2pConnections.onPeerDisconnect((peerId: string, connectionName: string) => {
+    this.peerConnections.onPeerDisconnect((peerId: string, connectionName: string) => {
       this.routeResolver.deactivatePeer(peerId);
     });
   }
@@ -94,7 +94,7 @@ export default class Router {
       throw new Error(`No route to host`);
     }
     // just send to peer
-    await this.p2pConnections.send(peerId, NETWORK_PORT, encodedMessage);
+    await this.peerConnections.send(peerId, NETWORK_PORT, encodedMessage);
   }
 
 
@@ -156,7 +156,7 @@ export default class Router {
       throw new Error(`No route to host`);
     }
     // just send to peer
-    await this.p2pConnections.send(peerId, NETWORK_PORT, encodedMessage);
+    await this.peerConnections.send(peerId, NETWORK_PORT, encodedMessage);
   }
 
 }
