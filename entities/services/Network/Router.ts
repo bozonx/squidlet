@@ -81,6 +81,7 @@ export default class Router {
       uri,
       to: toHostId,
       from: this.context.config.id,
+      bearer: this.context.config.id,
       route,
       payload,
     };
