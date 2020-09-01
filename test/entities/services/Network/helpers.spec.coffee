@@ -1,57 +1,40 @@
 helpers = require('../../../../entities/services/Network/helpers')
 
 
-describe.only 'entities.services.Network.helpers', ->
+describe 'entities.services.Network.helpers', ->
   beforeEach ->
     @message = {
       TTL: 10
-      uri: 'd'
-      to: 'a'
-      from: 'b'
-      route: []
+      messageId: 'aaaaaaaa'
+      uri: 'b'
+      to: 'c'
+      completeRoute: ['d', 'e']
       payload: new Uint8Array([0,1,2])
     }
-    @eEncodedMessage = new Uint8Array([
+    @encodedMessage = new Uint8Array([
+      # TTL
       10,
-      1,
-      100,
-      1,
-      97,
-      1,
-      98,
-      0,
-      0,
-      1,
+      # messageId
+      97, 97, 97, 97, 97, 97, 97, 97,
+      # length of completeRoute array
       2,
+      # uri
+      1, 98,
+      # to
+      1, 99,
+      # completeRoute
+      1, 100, 1, 101,
+      # payload
+      0, 1, 2
     ])
-#    @response = {
-#      TTL: 10
-#      to: 'a'
-#      from: 'b'
-#      sender: 'c'
-#      body: new Uint8Array([0,1,2])
-#    }
-#    @responseEncoded = new Uint8Array([
-#      10,
-#      1,
-#      97,
-#      1,
-#      98,
-#      1,
-#      99,
-#      0,
-#      1,
-#      2,
-#    ])
 
   # TODO: проверить ошибки
-  # TODO: проверить body = 0
 
-  it 'encodeNetworkMessage', ->
-    assert.deepEqual(helpers.encodeNetworkMessage(@message), @eEncodedMessage);
+  it.only 'encodeNetworkMessage', ->
+    assert.deepEqual(helpers.encodeNetworkMessage(@message), @encodedMessage);
 
   it 'decodeNetworkMessage', ->
-    assert.deepEqual(helpers.decodeNetworkMessage(@eEncodedMessage), @message);
+    assert.deepEqual(helpers.decodeNetworkMessage(@encodedMessage), @message);
 
 
 
