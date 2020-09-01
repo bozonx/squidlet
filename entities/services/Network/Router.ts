@@ -2,6 +2,7 @@ import Context from 'system/Context';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {makeUniqId} from 'system/lib/uniqId';
 import {omitObj} from 'system/lib/objects';
+import {lastItem} from 'system/lib/arrays';
 
 import PeerConnections from '../PeerConnections/PeerConnections';
 import {NETWORK_PORT, NetworkMessage} from './Network';
@@ -75,20 +76,17 @@ export default class Router {
     messageId: string,
     TTL?: number
   ) {
-    const route: string[] = this.routeResolver.resolveRoute(toHostId);
     const message: NetworkMessage = {
       TTL: TTL || this.context.config.config.defaultTtl,
       messageId,
       uri,
       to: toHostId,
-      from: this.context.config.id,
-      bearer: this.context.config.id,
-      route,
+      completeRoute: [this.context.config.id],
       payload,
     };
     const encodedMessage: Uint8Array = encodeNetworkMessage(message);
 
-    await this.sendToPeer(route, encodedMessage);
+    await this.sendToPeer(toHostId, encodedMessage);
   }
 
 
@@ -98,8 +96,8 @@ export default class Router {
 
     const incomeMessage: NetworkMessage = decodeNetworkMessage(payload);
 
-    this.routeResolver.saveRoute(incomeMessage.route);
-    this.routeResolver.activatePeer(peerId, incomeMessage.bearer);
+    this.routeResolver.saveRoute(incomeMessage.completeRoute);
+    this.routeResolver.activatePeer(peerId, lastItem(incomeMessage.completeRoute));
 
     if (incomeMessage.to !== this.context.config.id) {
       // if receiver isn't current host then send message further
@@ -125,22 +123,20 @@ export default class Router {
       );
     }
 
-    const route: string[] = this.routeResolver.resolveRoute(incomeMessage.to);
     const encodedMessage: Uint8Array = encodeNetworkMessage({
       ...incomeMessage,
-      route,
-      // set current host as mediate host
-      bearer: this.context.config.id,
+      // add current host as a bearer
+      completeRoute: [...incomeMessage.completeRoute, this.context.config.id],
       // decrement TTL on each host
       TTL: incomeMessage.TTL - 1,
     });
 
-    await this.sendToPeer(route, encodedMessage);
+    await this.sendToPeer(incomeMessage.to, encodedMessage);
   }
 
-  private async sendToPeer(route: string[], payload: Uint8Array) {
-    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(route);
-
+  private async sendToPeer(to: string, payload: Uint8Array) {
+    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(to);
+    // TODO: поидее нужно сделать ping
     if (!closestHostId) throw new Error(`No route to host`);
 
     const peerId: string | undefined = this.routeResolver.resolvePeerId(closestHostId);

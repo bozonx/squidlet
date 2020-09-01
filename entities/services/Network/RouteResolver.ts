@@ -1,59 +1,67 @@
+import {lastItem} from 'system/lib/arrays';
 
-/*
-* смотрим хост с кэше маршрутов
-* если есть то отправляем по этому маршруту
-* если не удалось или нет кэша маршрута то делаем резолв хоста
-* отправляем широковещательный запрос и собираем обратный путь, 1й вернувшийся ответ записывается в кэш как маршрут, остальные игнорируются
- */
+
+// TODO: если нет маршрута то делаем ping (наверное широковещательный на все подключения)
+// TODO: сделать таймаут если маршрут не используется то он удаляется из кэша
+// TODO: если была ошибка отправки сообщения до ближайшего хоста
+//       то удалить его из routes и hostIds
 
 export default class RouteResolver {
   private readonly myHostId: string;
-  // host ids like {peerId: hostId}
-  private hostIds: {[index: string]: string} = {};
+  // routes from current host to remote: {remoteHostId: [oneHost, secondHost, ...]}
+  private routes: {[index: string]: string[]} = {};
+  // closest host ids like {peerId: hostId}
+  private closestHostIds: {[index: string]: string} = {};
 
 
   constructor(myHostId: string) {
     this.myHostId = myHostId;
   }
 
-
   init() {
   }
 
   destroy() {
-    delete this.hostIds;
+    delete this.routes;
+    delete this.closestHostIds;
   }
 
 
-  resolveRoute(toHostId: string): string[] {
-    // TODO: make it
-    return [this.myHostId, toHostId];
+  /**
+   * Get closest hostId on route to host "to" from cache
+   * @param to
+   */
+  resolveClosestHostId(to: string): string | undefined {
+    return this.routes[to][0];
   }
 
-  resolveClosestHostId(route: string[]): string {
-    // TODO: наверное отрезать пройденную часть маршрута
-    // TODO: add
-    return route[1];
-  }
-
-  saveRoute(route: string[]) {
-    // TODO: add
+  /**
+   * Save completed route of income message
+   * @param completedRoute
+   */
+  saveRoute(completedRoute: string[]) {
+    if (!completedRoute.length) throw new Error(`completedRoute is empty`);
+    // TODO: впринципе можно не сохранять сам последний элемент для экономии
+    const route = completedRoute.reverse();
+    const remoteHost: string = lastItem(route);
+    // save the last actual route to remote host
+    this.routes[remoteHost] = route;
   }
 
   resolvePeerId(closestHostId: string): string | undefined {
-    for (let peerId of Object.keys(this.hostIds)) {
-      if (this.hostIds[peerId] === closestHostId) return peerId;
+    for (let peerId of Object.keys(this.closestHostIds)) {
+      if (this.closestHostIds[peerId] === closestHostId) return peerId;
     }
 
     return;
   }
 
   activatePeer(peerId: string, hostId: string) {
-    this.hostIds[peerId] = hostId;
+    this.closestHostIds[peerId] = hostId;
   }
 
   deactivatePeer(peerId: string) {
-    delete this.hostIds[peerId];
+    delete this.closestHostIds[peerId];
   }
 
 }
