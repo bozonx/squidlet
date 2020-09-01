@@ -5,10 +5,10 @@ import {omitObj} from 'system/lib/objects';
 import {lastItem} from 'system/lib/arrays';
 
 import PeerConnections from '../PeerConnections/PeerConnections';
-import {NETWORK_PORT} from './Network';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import RouteResolver from './RouteResolver';
 import NetworkMessage from './interfaces/NetworkMessage';
+import {NETWORK_PORT} from './NetworkLogic';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
