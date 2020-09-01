@@ -18,7 +18,7 @@ type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
  */
 export default class Router {
   private context: Context;
-  private routeResolver: RouteResolver = new RouteResolver();
+  private routeResolver: RouteResolver;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
 
   private get peerConnections(): PeerConnections {
@@ -28,6 +28,7 @@ export default class Router {
 
   constructor(context: Context) {
     this.context = context;
+    this.routeResolver = new RouteResolver(this.context.config.id);
   }
 
   init() {
@@ -74,7 +75,6 @@ export default class Router {
     messageId: string,
     TTL?: number
   ) {
-    // TODO: наверное убрать первый и последний элементы
     const route: string[] = this.routeResolver.resolveRoute(toHostId);
     const message: NetworkMessage = {
       TTL: TTL || this.context.config.config.defaultTtl,
@@ -88,11 +88,13 @@ export default class Router {
     };
 
     const encodedMessage: Uint8Array = encodeNetworkMessage(message);
-    const peerId: string | undefined = this.routeResolver.resolvePeerId(
-      route[0] || toHostId
-    );
+    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(route);
 
-    if (!peerId) throw new Error(`No route to host`);
+    if (!closestHostId) throw new Error(`No route to host`);
+
+    const peerId: string | undefined = this.routeResolver.resolvePeerId(closestHostId);
+
+    if (!peerId) throw new Error(`Can't resolve peer of host ${closestHostId}`);
 
     // just send to peer
     await this.peerConnections.send(peerId, NETWORK_PORT, encodedMessage);
@@ -105,12 +107,7 @@ export default class Router {
 
     const incomeMessage: NetworkMessage = decodeNetworkMessage(payload);
 
-    // TODO: наверное просто route передать
-    this.routeResolver.saveRoute([
-      incomeMessage.from,
-      ...incomeMessage.route,
-      incomeMessage.to
-    ]);
+    this.routeResolver.saveRoute(incomeMessage.route);
     this.routeResolver.activatePeer(peerId, incomeMessage.bearer);
 
     if (incomeMessage.to !== this.context.config.id) {
@@ -139,16 +136,14 @@ export default class Router {
 
     const encodedMessage: Uint8Array = encodeNetworkMessage({
       ...incomeMessage,
+      // TODO: можно передалать route может что-то поменялось
       bearer: this.context.config.id,
       // decrement TTL on each host
       TTL: incomeMessage.TTL - 1,
     });
-    // TODO: наверное отрезать пройденную часть маршрута
-    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId([
-      incomeMessage.from,
-      ...incomeMessage.route,
-      incomeMessage.to,
-    ]);
+    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(
+      incomeMessage.route
+    );
     const peerId: string | undefined = this.routeResolver.resolvePeerId(closestHostId);
 
     if (!peerId) {

@@ -25,7 +25,7 @@ export interface NetworkMessage {
   from: string;
   // the closest host which sent or resent message
   bearer: string;
-  // mediate hosts between "to" and "from"
+  // full route between "to" and "from"
   route: string[];
   payload: Uint8Array;
 }

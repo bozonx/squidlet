@@ -7,8 +7,14 @@
  */
 
 export default class RouteResolver {
+  private readonly myHostId: string;
   // host ids like {peerId: hostId}
   private hostIds: {[index: string]: string} = {};
+
+
+  constructor(myHostId: string) {
+    this.myHostId = myHostId;
+  }
 
 
   init() {
@@ -20,13 +26,14 @@ export default class RouteResolver {
 
 
   resolveRoute(toHostId: string): string[] {
-    // TODO: add
-    return [];
+    // TODO: make it
+    return [this.myHostId, toHostId];
   }
 
   resolveClosestHostId(route: string[]): string {
+    // TODO: наверное отрезать пройденную часть маршрута
     // TODO: add
-    return route[0];
+    return route[1];
   }
 
   saveRoute(route: string[]) {
