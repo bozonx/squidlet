@@ -1,7 +1,7 @@
 helpers = require('../../../../entities/services/Network/helpers')
 
 
-describe 'entities.services.Network.helpers', ->
+describe.only 'entities.services.Network.helpers', ->
   beforeEach ->
     @message = {
       TTL: 10
@@ -28,25 +28,29 @@ describe 'entities.services.Network.helpers', ->
       0, 1, 2
     ])
 
-  # TODO: проверить ошибки
-
-  it.only 'encodeNetworkMessage', ->
+  it 'encodeNetworkMessage', ->
     assert.deepEqual(helpers.encodeNetworkMessage(@message), @encodedMessage);
 
   it 'decodeNetworkMessage', ->
     assert.deepEqual(helpers.decodeNetworkMessage(@encodedMessage), @message);
 
+  it 'circular', ->
+    assert.deepEqual(
+      helpers.decodeNetworkMessage(helpers.encodeNetworkMessage(@message)),
+      @message
+    );
 
-
-#  it 'serializeMessage and deserializeMessage - no "to"', ->
-#    delete @message.to
-#
-#    assert.deepEqual(helpers.deserializeMessage(helpers.serializeMessage(@message)), @message);
-#
-#  it '"to" is too long', ->
-#    @message.to = '12345678901234567'
-#    assert.throws(() => helpers.serializeMessage(@message));
-#
-#  it '"from" is too long', ->
-#    @message.from = '12345678901234567'
-#    assert.throws(() => helpers.serializeMessage(@message));
+  it 'encodeNetworkMessage errors', ->
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., TTL: '1'}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., TTL: 0}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., TTL: 256}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., messageId: 1}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., messageId: 'a'}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., uri: 1}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., uri: _.repeat('a', 256)}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., to: 1}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., to: _.repeat('a', 256)}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., completeRoute: {}}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., completeRoute: _.repeat('a', 256).split('')}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., completeRoute: ['a', _.repeat('a', 256)]}));
+    assert.throws(() => helpers.encodeNetworkMessage({@message..., payload: [0]}));

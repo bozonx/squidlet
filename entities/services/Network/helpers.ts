@@ -79,17 +79,15 @@ export function encodeNetworkMessage(message: NetworkMessage): Uint8Array {
  */
 export function decodeNetworkMessage(data: Uint8Array): NetworkMessage {
   const completeRouteLength: number = data[9];
-  // TODO: check indexes
   const [parsedArr, completeRouteStartIndex] = deserializeStringArray(data, 10, 2);
   const [completeRoute, lastIndex] = deserializeStringArray(
     data,
-    completeRouteStartIndex,
+    completeRouteStartIndex + 1,
     completeRouteLength
   );
 
   return {
     TTL: data[0],
-    // TODO: check indexes
     messageId: uint8ArrayToAscii(data.slice(1, 9)),
     uri: parsedArr[0],
     to: parsedArr[1],
