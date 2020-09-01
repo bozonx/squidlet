@@ -36,7 +36,6 @@ export const NETWORK_PORT = 254;
 export enum SPECIAL_URI {
   responseOk,
   responseError,
-  //timeout,
   getName,
   ping,
   pong,
@@ -115,7 +114,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     // if no handler - then send an error back
     if (!this.uriHandlers[incomeMessage.uri]) {
       this.router.send(
-        incomeMessage.from,
+        incomeMessage.completeRoute[0],
         String(SPECIAL_URI.responseError),
         asciiToUint8Array(`No handler on uri "${incomeMessage.uri}"`),
         incomeMessage.messageId,
@@ -145,7 +144,7 @@ export default class Network extends ServiceBase<NetworkProps> {
     }
     // send back data which handler returned or error
     await this.router.send(
-      incomeMessage.from,
+      incomeMessage.completeRoute[0],
       backUri,
       payloadToSendBack,
       incomeMessage.messageId,
@@ -188,9 +187,6 @@ export default class Network extends ServiceBase<NetworkProps> {
       case String(SPECIAL_URI.responseOk):
         // it's OK
         return incomeMessage.payload;
-
-      // TODO: add get name
-      // TODO: ping, pong
 
       case String(SPECIAL_URI.responseError):
         // if an error has been returned just convert it to string and reject promise

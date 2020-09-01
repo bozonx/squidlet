@@ -13,6 +13,9 @@ import RouteResolver from './RouteResolver';
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
 
 
+// TODO: add get name
+// TODO: ping, pong
+
 /**
  * It sends and receives messages into network.
  * It resends messages further to the next subnet.
@@ -76,6 +79,13 @@ export default class Router {
     messageId: string,
     TTL?: number
   ) {
+    if (messageId.length !== 8) {
+      throw new Error(`Incorrect length of messageId: ${messageId.length}`);
+    }
+    else if (typeof TTL === 'number' && (TTL <= 0 || TTL > 255)) {
+      throw new Error(`Incorrect TTL: ${TTL}. It has to be from 1 to 255`);
+    }
+
     const message: NetworkMessage = {
       TTL: TTL || this.context.config.config.defaultTtl,
       messageId,
