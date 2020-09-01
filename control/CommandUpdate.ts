@@ -83,7 +83,7 @@ export default class CommandUpdate {
       this.args.name,
       undefined,
       this.args.minimize !== 'false',
-      undefined,
+      this.args.logLevel,
     );
 
     await builder.init();

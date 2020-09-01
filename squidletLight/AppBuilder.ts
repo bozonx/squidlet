@@ -159,7 +159,7 @@ export default class AppBuilder {
 
     return _.template(fileContent)({
       REPO_ROOT: relativeRepoRoot,
-      LOG_LEVEL: this.logLevel || 'undefined',
+      LOG_LEVEL: `'${this.logLevel}'` || 'undefined',
     });
   }
 
