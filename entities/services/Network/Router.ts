@@ -6,6 +6,7 @@ import {NETWORK_PORT, NetworkMessage} from './Network';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import PeerConnections from '../PeerConnections/PeerConnections';
 import RouteResolver from './RouteResolver';
+import {omitObj} from '../../../system/lib/objects';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
@@ -91,37 +92,29 @@ export default class Router {
       route[0] || toHostId
     );
 
-    if (!peerId) {
-      throw new Error(`No route to host`);
-    }
+    if (!peerId) throw new Error(`No route to host`);
+
     // just send to peer
     await this.peerConnections.send(peerId, NETWORK_PORT, encodedMessage);
   }
 
 
-  private handleIncomeMessages(
-    peerId: string,
-    port: number,
-    payload: Uint8Array,
-    connectionName: string
-  ) {
-    // listen only ours port
+  private handleIncomeMessages(peerId: string, port: number, payload: Uint8Array) {
+    // listen only our port
     if (port !== NETWORK_PORT) return;
 
     const incomeMessage: NetworkMessage = decodeNetworkMessage(payload);
 
+    // TODO: наверное просто route передать
     this.routeResolver.saveRoute([
       incomeMessage.from,
       ...incomeMessage.route,
       incomeMessage.to
     ]);
-    // TODO: как определить ближайший хост???
-    const closestHost = incomeMessage.from;
-
-    this.routeResolver.activatePeer(peerId, closestHost);
+    this.routeResolver.activatePeer(peerId, incomeMessage.bearer);
 
     if (incomeMessage.to !== this.context.config.id) {
-      // if receiver isn't current host send message further
+      // if receiver isn't current host then send message further
       this.sendFurther(incomeMessage)
         .catch(this.context.log.error);
 
@@ -132,20 +125,25 @@ export default class Router {
   }
 
   /**
-   * Send mediate message or new one
+   * Send mediate message further
    * @param incomeMessage
    */
   private async sendFurther(incomeMessage: NetworkMessage) {
     if (incomeMessage.TTL <= 0) {
-      // TODO: что делать???
-      return;
+      return this.context.log.warn(
+        `TTL of network message has been exceeded: `
+        + `${JSON.stringify(omitObj(incomeMessage, 'payload'))}`
+        + `. Payload length is ${incomeMessage.payload.length}`
+      );
     }
 
     const encodedMessage: Uint8Array = encodeNetworkMessage({
       ...incomeMessage,
+      bearer: this.context.config.id,
+      // decrement TTL on each host
       TTL: incomeMessage.TTL - 1,
     });
-    // TODO: добавить откуда пришло
+    // TODO: наверное отрезать пройденную часть маршрута
     const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId([
       incomeMessage.from,
       ...incomeMessage.route,
