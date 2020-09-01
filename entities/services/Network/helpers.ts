@@ -18,42 +18,50 @@ import NetworkMessage from './interfaces/NetworkMessage';
  * @param message
  */
 export function encodeNetworkMessage(message: NetworkMessage): Uint8Array {
+  if (typeof message.TTL !== 'number') {
+    throw new Error(`TTL has to be a number`);
+  }
+  else if (message.TTL <=0 || message.TTL > 255) {
+    throw new Error(`Incorrect TTL: ${message.TTL}. It has to be from 1 to 255`);
+  }
 
-  // TODO: проверить если не указанны to,from,sender,uri
-  // TODO: проверить ttl < 0
-  // TODO: uri > 2
+  if (typeof message.messageId !== 'string') {
+    throw new Error(`messageId has to be a string`);
+  }
+  else if (message.messageId.length !== 8) {
+    throw new Error(`Incorrect length of messageId: ${message.messageId.length}`);
+  }
 
-  if (typeof message.to !== 'string') {
-    throw new Error(`message.to has to be a string`);
-  }
-  if (message.to.length > 255) {
-    throw new Error(`Value of message.to is too long: ${message.to.length}`);
-  }
-  else if (typeof message.from !== 'string') {
-    throw new Error(`message.from has to be a string`);
-  }
-  else if (message.from.length > 255) {
-    throw new Error(`Value of message.from is too long: ${message.from.length}`);
-  }
-  else if (typeof message.sender !== 'string') {
-    throw new Error(`message.sender has to be a string`);
-  }
-  else if (message.sender.length > 255) {
-    throw new Error(`Value of message.sender is too long: ${message.sender.length}`);
-  }
   else if (typeof message.uri !== 'string') {
-    throw new Error(`message.uri has to be a string`);
+    throw new Error(`uri has to be a string`);
   }
   else if (message.uri.length > 255) {
     throw new Error(`uri is too long: ${message.uri.length}`);
   }
-  else if (typeof message.TTL !== 'number') {
-    throw new Error(`message.TTL has to be a number`);
+
+  else if (typeof message.to !== 'string') {
+    throw new Error(`"to" has to be a string`);
   }
-  else if (message.TTL > 255) {
-    throw new Error(`TTL is too long: ${message.TTL}`);
+  else if (message.to.length > 255) {
+    throw new Error(`Value of message.to is too long: ${message.to.length}`);
   }
 
+  else if (!Array.isArray(message.completeRoute)) {
+    throw new Error(`completeRoute has to be an array`);
+  }
+
+  else if (!(message.payload instanceof Uint8Array)) {
+    throw new Error(`payload has to be an Uint8Array`);
+  }
+
+  for (let item of message.completeRoute) {
+    if (typeof item !== 'string') {
+      throw new Error(`element "${item}" of completeRoute has to be a string`);
+    }
+    else if (item.length > 255) {
+      throw new Error(`element "${item}" of completeRoute is too long: ${message.uri.length}`);
+    }
+  }
 
   const result: Uint8Array = new Uint8Array([
     message.TTL,
