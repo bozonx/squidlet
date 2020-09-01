@@ -1,7 +1,7 @@
 helpers = require('../../../../entities/services/Network/helpers')
 
 
-describe.only 'entities.services.Network.helpers', ->
+describe 'entities.services.Network.helpers', ->
   beforeEach ->
     @message = {
       TTL: 10
