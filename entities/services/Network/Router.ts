@@ -2,8 +2,8 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {makeUniqId} from 'system/lib/uniqId';
 import {omitObj} from 'system/lib/objects';
 import {lastItem} from 'system/lib/arrays';
+import Connection from 'system/interfaces/Connection';
 
-import PeerConnections from '../PeerConnections/PeerConnections';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
 import RouteResolver from './RouteResolver';
 import NetworkMessage from './interfaces/NetworkMessage';
@@ -21,6 +21,7 @@ type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
  * It resends messages further to the next subnet.
  */
 export default class Router {
+  private readonly peerConnections: Connection;
   private readonly myId: string;
   private readonly defaultTtl: number;
   private readonly logWarn: (msg: string) => void;
@@ -28,17 +29,15 @@ export default class Router {
   private routeResolver: RouteResolver;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
 
-  private get peerConnections(): PeerConnections {
-    return this.context.service.PeerConnections;
-  }
-
 
   constructor(
+    peerConnections: Connection,
     myId: string,
     defaultTtl: number,
     logWarn: (msg: string) => void,
     logError: (msg: string) => void,
   ) {
+    this.peerConnections = peerConnections;
     this.myId = myId;
     this.defaultTtl = defaultTtl;
     this.logWarn = logWarn;
@@ -50,10 +49,10 @@ export default class Router {
     this.routeResolver.init();
     this.peerConnections.onIncomeMessage(this.handleIncomeMessages);
 
-    this.peerConnections.onPeerConnect((peerId: string, connectionName: string) => {
+    this.peerConnections.onPeerConnect((peerId: string) => {
       // TODO: сделать запрос имени хоста и зарегистрировать его
     });
-    this.peerConnections.onPeerDisconnect((peerId: string, connectionName: string) => {
+    this.peerConnections.onPeerDisconnect((peerId: string) => {
       this.routeResolver.deactivatePeer(peerId);
     });
   }

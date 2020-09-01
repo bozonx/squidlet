@@ -1,19 +1,22 @@
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import Connection, {
-  CONNECTION_SERVICE_TYPE, ConnectionsEvents,
+  CONNECTION_SERVICE_TYPE,
+  ConnectionsEvents,
+  IncomeMessageHandler,
+  PeerStatusHandler,
 } from 'system/interfaces/Connection';
 import ServiceBase from 'system/base/ServiceBase';
 
 
-export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8Array, connectionName: string) => void;
-export type PeerStatusHandler = (peerId: string, connectionName: string) => void;
+// export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8Array, connectionName: string) => void;
+// export type PeerStatusHandler = (peerId: string, connectionName: string) => void;
 
 
 /**
  * It sends and receives messages into direct connections.
  * It listens to all the connections.
  */
-export default class PeerConnections extends ServiceBase {
+export default class PeerConnections extends ServiceBase implements Connection {
   private events = new IndexedEventEmitter();
   // connections by peers - {peerId: connectionName}
   private activePeers: {[index: string]: string} = {};
@@ -61,9 +64,17 @@ export default class PeerConnections extends ServiceBase {
     return this.events.addListener(ConnectionsEvents.disconnected, cb);
   }
 
-
   removeListener(handlerIndex: number) {
     this.events.removeListener(handlerIndex);
+  }
+
+  /**
+   * Get connectionName by peerId
+   * @param peerId
+   */
+  resolveConnectionName(peerId: string): string | undefined {
+    // TODO: add
+    return;
   }
 
 

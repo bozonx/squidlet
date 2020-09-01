@@ -18,7 +18,7 @@ export const CONNECTION_SERVICE_TYPE = 'connection';
 
 
 export default interface Connection {
-  serviceType: ConnectionServiceType;
+  serviceType?: ConnectionServiceType;
 
   /**
    * Send data to peer and don't wait for response.

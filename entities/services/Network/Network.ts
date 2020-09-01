@@ -13,6 +13,7 @@ export default class Network extends ServiceBase<NetworkProps> {
 
   init = async () => {
     this.logic = new NetworkLogic(
+      this.context.service.PeerConnections,
       this.context.config.id,
       this.context.config.config.requestTimeoutSec,
       this.context.config.config.defaultTtl,
