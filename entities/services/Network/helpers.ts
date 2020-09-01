@@ -1,20 +1,9 @@
-import {MAX_NUM_16_BIT} from 'system/constants';
-import {deserializeStringArray, serializeStringArray} from 'system/lib/serialize';
+import {asciiToUint8Array, deserializeStringArray, serializeStringArray, uint8ArrayToAscii} from 'system/lib/serialize';
 import NetworkMessage from './interfaces/NetworkMessage';
 
 
 /**
- * Bytes:
- * * 1 byte length of "to"
- * * 'to" data
- * * 1 byte length of "from"
- * * "from" data
- * * 1 byte length of "sender"
- * * "sender" data
- * * 1 byte length of "uri"
- * * uri data
- * * 1 byte TTL
- * * body
+ * Encode network message to bytes serial.
  * @param message
  */
 export function encodeNetworkMessage(message: NetworkMessage): Uint8Array {
@@ -49,6 +38,9 @@ export function encodeNetworkMessage(message: NetworkMessage): Uint8Array {
   else if (!Array.isArray(message.completeRoute)) {
     throw new Error(`completeRoute has to be an array`);
   }
+  else if (message.completeRoute.length > 255) {
+    throw new Error(`completeRoute is too long: ${message.completeRoute.length}`);
+  }
 
   else if (!(message.payload instanceof Uint8Array)) {
     throw new Error(`payload has to be an Uint8Array`);
@@ -64,109 +56,44 @@ export function encodeNetworkMessage(message: NetworkMessage): Uint8Array {
   }
 
   const result: Uint8Array = new Uint8Array([
+    // 1 byte
     message.TTL,
+    // 8 bytes
+    ...asciiToUint8Array(message.messageId),
+    // 1 byte
+    message.completeRoute.length,
     ...serializeStringArray([
       message.uri,
       message.to,
-      message.from,
-      message.sender,
     ]),
+    ...serializeStringArray(message.completeRoute),
     ...message.payload,
   ]);
-
-  if (result.length > MAX_NUM_16_BIT) {
-    throw new Error(`message.payload is too long: ${message.payload.length}`);
-  }
 
   return result;
 }
 
 /**
- * Bytes:
- * * 1 byte length of "to"
- * * 'to" data
- * * 1 byte length of "from"
- * * "from" data
- * * 1 byte length of "sender"
- * * "sender" data
- * * 1 byte TTL
- * * body
+ * Decode network message to object.
  * @param data
  */
 export function decodeNetworkMessage(data: Uint8Array): NetworkMessage {
-  // const toLength: number = data[1];
-  // const toStartIndex: number = 2;
-  // const toEndIndex: number = toLength + toStartIndex;
-  // const fromLength: number = data[toEndIndex];
-  // const fromStartIndex: number = toEndIndex + 1;
-  // const fromEndIndex: number = fromLength + fromStartIndex;
-  // const senderLength: number = data[fromEndIndex];
-  // const senderStartIndex: number = fromEndIndex + 1;
-  // const senderEndIndex: number = senderLength + senderStartIndex;
-
-  const [parsedArr, lastIndex] = deserializeStringArray(data, 1, 4);
+  const completeRouteLength: number = data[9];
+  // TODO: check indexes
+  const [parsedArr, completeRouteStartIndex] = deserializeStringArray(data, 10, 2);
+  const [completeRoute, lastIndex] = deserializeStringArray(
+    data,
+    completeRouteStartIndex,
+    completeRouteLength
+  );
 
   return {
     TTL: data[0],
+    // TODO: check indexes
+    messageId: uint8ArrayToAscii(data.slice(1, 9)),
     uri: parsedArr[0],
     to: parsedArr[1],
-    from: parsedArr[2],
-    sender: parsedArr[3],
-    // to: uint8ArrayToAscii(data.slice(toStartIndex, toEndIndex)),
-    // from: uint8ArrayToAscii(data.slice(fromStartIndex, fromEndIndex)),
-    // sender: uint8ArrayToAscii(data.slice(senderStartIndex, senderEndIndex)),
+    completeRoute,
     payload: data.slice(lastIndex + 1),
   };
 }
-
-// export function serializeMessage(message: NetworkMessage): Uint8Array {
-//   if (message.to && message.to.length > 16) {
-//     throw new Error(`"to" field of network message is too long: ${message.to.length}`);
-//   }
-//   else if (message.from.length > 16) {
-//     throw new Error(`"from" field of network message is too long: ${message.from.length}`);
-//   }
-//
-//   const toLength: number = (message.to) ? message.to.length : 0;
-//   const payload: Uint8Array = serializeJson(message.payload);
-//   const lengthsByte: number = combine2numberToByte(toLength, message.from.length);
-//
-//   return concatUint8Arr(
-//     // meta data
-//     new Uint8Array([message.messageType, lengthsByte]),
-//     // to hostId max 16 bytes
-//     asciiToUint8Array(message.to || ''),
-//     // from hostId max 16 bytes
-//     asciiToUint8Array(message.from),
-//     // encoded message
-//     payload
-//   );
-// }
-
-// export function deserializeMessage(data: Uint8Array): NetworkMessage {
-//   const [toLength, fromLength] = extract2NumbersFromByte(data[POSITIONS.lengths]);
-//   const payloadStart: number = METADATA_LENGTH + toLength + fromLength;
-//   const from: string = uint8ArrayToAscii(data.slice(METADATA_LENGTH + toLength, payloadStart));
-//   const payload: RemoteCallMessage = deserializeJson(data.slice(payloadStart));
-//
-//   const result: NetworkMessage = {
-//     from,
-//     messageType: data[POSITIONS.messageType],
-//     payload,
-//   };
-//
-//   if (toLength) {
-//     result.to = uint8ArrayToAscii(data.slice(METADATA_LENGTH, METADATA_LENGTH + toLength));
-//   }
-//
-//   return result;
-// }
-//
-// /**
-//  * Resolve:
-//  * serial => SerialNetwork
-//  * SerialNetwork => SerialNetwork
-//  */
-// export function resolveNetworkDriverName(shortName: string): string {
-//   // TODO: add
-// }
