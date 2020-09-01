@@ -22,12 +22,27 @@ export enum SPECIAL_URI {
 
 
 export default class NetworkLogic {
+  private readonly requestTimeoutSec: number;
+  private readonly logError: (msg: string) => void;
   private readonly router: Router;
   private uriHandlers: {[index: string]: UriHandler} = {};
 
 
-  constructor() {
-    this.router = new Router(this.context);
+  constructor(
+    myId: string,
+    requestTimeoutSec: number,
+    defaultTtl: number,
+    logWarn: (msg: string) => void,
+    logError: (msg: string) => void,
+  ) {
+    this.requestTimeoutSec = requestTimeoutSec;
+    this.logError = logError;
+    this.router = new Router(
+      myId,
+      defaultTtl,
+      logWarn,
+      logError
+    );
   }
 
 
@@ -95,13 +110,13 @@ export default class NetworkLogic {
         asciiToUint8Array(`No handler on uri "${incomeMessage.uri}"`),
         incomeMessage.messageId,
       )
-        .catch(this.log.error);
+        .catch(this.logError);
 
       return;
     }
     // call handler and send response but don't wait for result
     this.callUriHandlerAndSandBack(incomeMessage)
-      .catch(this.context.log.error);
+      .catch(this.logError);
   }
 
   private async callUriHandlerAndSandBack(incomeMessage: NetworkMessage) {
@@ -153,7 +168,7 @@ export default class NetworkLogic {
       promised.reject(new Error(
         `Timeout of request has been exceeded of URI "${uri}"`
       ));
-    }, this.context.config.config.requestTimeoutSec * 1000);
+    }, this.requestTimeoutSec * 1000);
 
     return promised.promise;
   }
