@@ -21,12 +21,9 @@ export interface NetworkMessage {
   uri: string;
   // hostId which is recipient of this message
   to: string;
-  // hostId which send the message
-  from: string;
-  // the closest host which sent or resent message
-  bearer: string;
-  // full route between "to" and "from"
-  route: string[];
+  // complete route between "from" and bearer(last host which sent this message)
+  // "from" is the first element and bearer is the last  one.
+  completeRoute: string[];
   payload: Uint8Array;
 }
 
