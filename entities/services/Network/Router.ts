@@ -1,12 +1,12 @@
 import Context from 'system/Context';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {makeUniqId} from 'system/lib/uniqId';
+import {omitObj} from 'system/lib/objects';
 
+import PeerConnections from '../PeerConnections/PeerConnections';
 import {NETWORK_PORT, NetworkMessage} from './Network';
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
-import PeerConnections from '../PeerConnections/PeerConnections';
 import RouteResolver from './RouteResolver';
-import {omitObj} from '../../../system/lib/objects';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;

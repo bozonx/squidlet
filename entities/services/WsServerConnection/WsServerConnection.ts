@@ -12,7 +12,10 @@ import {ConnectionParams, WebSocketServerProps} from 'system/interfaces/io/WebSo
 import {WsServer} from '../../drivers/WsServer/WsServer';
 
 
-export default class WsServerConnection extends ServiceBase<WebSocketServerProps> implements Connection {
+export default class WsServerConnection
+  extends ServiceBase<WebSocketServerProps>
+  implements Connection
+{
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
 
   private events = new IndexedEventEmitter();

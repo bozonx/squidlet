@@ -11,6 +11,7 @@ export type PeerStatusHandler = (peerId: string, connectionName: string) => void
 
 /**
  * It sends and receives messages into direct connections.
+ * It listens to all the connections.
  */
 export default class PeerConnections extends ServiceBase {
   private events = new IndexedEventEmitter();
