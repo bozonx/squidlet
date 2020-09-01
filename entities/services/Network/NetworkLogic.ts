@@ -1,6 +1,7 @@
 import {asciiToUint8Array, uint8ArrayToAscii} from 'system/lib/serialize';
 import {callSafely} from 'system/lib/common';
 import Promised from 'system/lib/Promised';
+import Connection from 'system/interfaces/Connection';
 
 import NetworkMessage from './interfaces/NetworkMessage';
 import Router from './Router';
@@ -29,6 +30,7 @@ export default class NetworkLogic {
 
 
   constructor(
+    peerConnections: Connection,
     myId: string,
     requestTimeoutSec: number,
     defaultTtl: number,
@@ -38,6 +40,7 @@ export default class NetworkLogic {
     this.requestTimeoutSec = requestTimeoutSec;
     this.logError = logError;
     this.router = new Router(
+      peerConnections,
       myId,
       defaultTtl,
       logWarn,
