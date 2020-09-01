@@ -86,18 +86,9 @@ export default class Router {
       route,
       payload,
     };
-
     const encodedMessage: Uint8Array = encodeNetworkMessage(message);
-    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(route);
 
-    if (!closestHostId) throw new Error(`No route to host`);
-
-    const peerId: string | undefined = this.routeResolver.resolvePeerId(closestHostId);
-
-    if (!peerId) throw new Error(`Can't resolve peer of host ${closestHostId}`);
-
-    // just send to peer
-    await this.peerConnections.send(peerId, NETWORK_PORT, encodedMessage);
+    await this.sendToPeer(route, encodedMessage);
   }
 
 
@@ -134,23 +125,29 @@ export default class Router {
       );
     }
 
+    const route: string[] = this.routeResolver.resolveRoute(incomeMessage.to);
     const encodedMessage: Uint8Array = encodeNetworkMessage({
       ...incomeMessage,
-      // TODO: можно передалать route может что-то поменялось
+      route,
+      // set current host as mediate host
       bearer: this.context.config.id,
       // decrement TTL on each host
       TTL: incomeMessage.TTL - 1,
     });
-    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(
-      incomeMessage.route
-    );
+
+    await this.sendToPeer(route, encodedMessage);
+  }
+
+  private async sendToPeer(route: string[], payload: Uint8Array) {
+    const closestHostId: string | undefined = this.routeResolver.resolveClosestHostId(route);
+
+    if (!closestHostId) throw new Error(`No route to host`);
+
     const peerId: string | undefined = this.routeResolver.resolvePeerId(closestHostId);
 
-    if (!peerId) {
-      throw new Error(`No route to host`);
-    }
-    // just send to peer
-    await this.peerConnections.send(peerId, NETWORK_PORT, encodedMessage);
+    if (!peerId) throw new Error(`Can't resolve peer of host ${closestHostId}`);
+
+    await this.peerConnections.send(peerId, NETWORK_PORT, payload);
   }
 
 }
