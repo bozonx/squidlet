@@ -6,25 +6,10 @@ import Promised from 'system/lib/Promised';
 import {asciiToUint8Array, uint8ArrayToAscii} from 'system/lib/serialize';
 
 import Router from './Router';
+import NetworkMessage from './interfaces/NetworkMessage';
 
 
 export interface NetworkProps {
-}
-
-export interface NetworkMessage {
-  // 1 byte number, max 255. Each mediate host decrements this value.
-  TTL: number;
-  // 8 bytes hash which uses to send responses back
-  messageId: string;
-  // 2 or more character which represent resource on the host "to"
-  // which listens to income requests
-  uri: string;
-  // hostId which is recipient of this message
-  to: string;
-  // complete route between "from" and bearer(last host which sent this message)
-  // "from" is the first element and bearer is the last  one.
-  completeRoute: string[];
-  payload: Uint8Array;
 }
 
 type Timeout = NodeJS.Timeout;
