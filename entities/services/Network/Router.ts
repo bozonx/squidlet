@@ -1,4 +1,3 @@
-import Context from 'system/Context';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import {makeUniqId} from 'system/lib/uniqId';
 import {omitObj} from 'system/lib/objects';
@@ -22,7 +21,10 @@ type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
  * It resends messages further to the next subnet.
  */
 export default class Router {
-  private context: Context;
+  private readonly myId: string;
+  private readonly defaultTtl: number;
+  private readonly logWarn: (msg: string) => void;
+  private readonly logError: (msg: string) => void;
   private routeResolver: RouteResolver;
   private incomeMessagesEvents = new IndexedEvents<IncomeMessageHandler>();
 
@@ -31,9 +33,17 @@ export default class Router {
   }
 
 
-  constructor(context: Context) {
-    this.context = context;
-    this.routeResolver = new RouteResolver(this.context.config.id);
+  constructor(
+    myId: string,
+    defaultTtl: number,
+    logWarn: (msg: string) => void,
+    logError: (msg: string) => void,
+  ) {
+    this.myId = myId;
+    this.defaultTtl = defaultTtl;
+    this.logWarn = logWarn;
+    this.logError = logError;
+    this.routeResolver = new RouteResolver(myId);
   }
 
   init() {
@@ -81,11 +91,11 @@ export default class Router {
     TTL?: number
   ) {
     const encodedMessage: Uint8Array = encodeNetworkMessage({
-      TTL: TTL || this.context.config.config.defaultTtl,
+      TTL: TTL || this.defaultTtl,
       messageId,
       uri,
       to: toHostId,
-      completeRoute: [this.context.config.id],
+      completeRoute: [this.myId],
       payload,
     });
 
@@ -102,10 +112,10 @@ export default class Router {
     this.routeResolver.saveRoute(incomeMessage.completeRoute);
     this.routeResolver.activatePeer(peerId, lastItem(incomeMessage.completeRoute));
 
-    if (incomeMessage.to !== this.context.config.id) {
+    if (incomeMessage.to !== this.myId) {
       // if receiver isn't current host then send message further
       this.sendFurther(incomeMessage)
-        .catch(this.context.log.error);
+        .catch(this.logError);
 
       return;
     }
@@ -119,7 +129,7 @@ export default class Router {
    */
   private async sendFurther(incomeMessage: NetworkMessage) {
     if (incomeMessage.TTL <= 0) {
-      return this.context.log.warn(
+      return this.logWarn(
         `TTL of network message has been exceeded: `
         + `${JSON.stringify(omitObj(incomeMessage, 'payload'))}`
         + `. Payload length is ${incomeMessage.payload.length}`
@@ -129,7 +139,7 @@ export default class Router {
     const encodedMessage: Uint8Array = encodeNetworkMessage({
       ...incomeMessage,
       // add current host as a bearer
-      completeRoute: [...incomeMessage.completeRoute, this.context.config.id],
+      completeRoute: [...incomeMessage.completeRoute, this.myId],
       // decrement TTL on each host
       TTL: incomeMessage.TTL - 1,
     });

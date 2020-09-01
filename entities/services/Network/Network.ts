@@ -12,7 +12,13 @@ export default class Network extends ServiceBase<NetworkProps> {
 
 
   init = async () => {
-    this.logic = new NetworkLogic();
+    this.logic = new NetworkLogic(
+      this.context.config.id,
+      this.context.config.config.requestTimeoutSec,
+      this.context.config.config.defaultTtl,
+      this.context.log.warn,
+      this.context.log.error,
+    );
 
     this.logic.init();
   }
