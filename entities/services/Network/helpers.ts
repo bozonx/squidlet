@@ -1,6 +1,6 @@
 import {MAX_NUM_16_BIT} from 'system/constants';
 import {deserializeStringArray, serializeStringArray} from 'system/lib/serialize';
-import {NetworkMessage} from './Network';
+import NetworkMessage from './interfaces/NetworkMessage';
 
 
 /**
