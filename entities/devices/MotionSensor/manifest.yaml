@@ -1,0 +1,12 @@
+name: MotionSensor
+type: motion-sensor
+main: MotionSensor.ts
+
+drivers:
+  - BinaryInput
+
+props: ./props.yaml
+
+status:
+  default:
+    type: boolean
