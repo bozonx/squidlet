@@ -275,8 +275,14 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         ? this.props.defaultPollIntervalMs
         : pollProps.resultLength;
 
-      // write request and read result
-      result = await this.transfer(pollProps.request, resolvedLength);
+      if (pollProps.request.length) {
+        // write request and read result
+        result = await this.transfer(pollProps.request, resolvedLength);
+      }
+      else {
+        // read for data
+        result = await this.read(resolvedLength);
+      }
     }
     else {
       throw new Error(`Can't resolve request of ${JSON.stringify(pollProps)}`);
