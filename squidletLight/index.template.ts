@@ -18,7 +18,8 @@ export default function instantiateMain (
   hostConfigOverride?: HostConfig,
   logLevel?: LogLevel
 ): Main {
-  const consoleLogger = new ConsoleLogger(logLevel || ${LOG_LEVEL});
+  const defaultLogLevel: LogLevel = 'info';
+  const consoleLogger = new ConsoleLogger(logLevel || ${LOG_LEVEL} || defaultLogLevel);
 
   return new Main(
     ioSet,
