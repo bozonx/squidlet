@@ -1,0 +1,17 @@
+$base: 'drivers.BinaryInput'
+
+# see BinaryInput driver
+blockTime:
+  default: 50
+
+debounce:
+  default: 25
+
+### BinaryInput driver props
+# invert: {}
+# invertOnPullup: {}
+# edge: {}
+# pullup: {}
+# pulldown: {}
+# pin: {}
+# gpio: {}
