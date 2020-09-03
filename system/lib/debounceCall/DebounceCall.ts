@@ -39,9 +39,11 @@ export default class DebounceCall {
     // if there isn't debounce time - call immediately
     if (!debounceMs) return this.callCbImmediately(id, cb);
 
+    // it there is debounce in progress then just update cb
     if (this.items[id]) {
       this.updateItem(this.items[id], id, cb, debounceMs);
     }
+    // else if it is the first time
     else {
       const timeout = setTimeout(() => this.callCb(id), debounceMs);
       // make a new item
@@ -78,7 +80,12 @@ export default class DebounceCall {
   }
 
 
-  protected updateItem(item: DebounceItem, id: string | number, cb: DebounceCb, debounceMs?: number) {
+  protected updateItem(
+    item: DebounceItem,
+    id: string | number,
+    cb: DebounceCb,
+    debounceMs?: number
+  ) {
     // update cb
     item[ItemPosition.lastCbToCall] = cb;
   }
@@ -90,7 +97,7 @@ export default class DebounceCall {
     if (!this.items[id]) return;
 
     try {
-      // call cb
+      // just call cb and don't handle the result
       this.items[id][ItemPosition.lastCbToCall]();
     }
     catch (err) {
