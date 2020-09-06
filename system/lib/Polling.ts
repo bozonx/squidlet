@@ -54,8 +54,9 @@ export default class Polling {
 
     const id = this.resolveId(uniqId);
     const pollingCbWrapper: MethodWrapper = () => {
+      // TODO: почему не ждем завершения ????
+      // TODO: use try cactch ???
       methodWhichWillPoll()
-      // TODO: don't use null
       // TODO: add types
         .then((result) => this.events.emit(id, undefined, result))
         .catch((e) => this.events.emit(id, e));
@@ -99,6 +100,9 @@ export default class Polling {
 
     // make first poll
     //this.currentPolls[id][CURRENT_POLL_ENUM.methodWrapper]();
+
+
+    // TODO: не ждет завершения и не будет результата !!!!!
 
     try {
       result = await this.currentPolls[id][CURRENT_POLL_ENUM.methodWrapper]();

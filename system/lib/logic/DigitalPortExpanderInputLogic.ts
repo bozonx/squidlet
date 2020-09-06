@@ -60,21 +60,22 @@ export default class DigitalPortExpanderInputLogic {
 
   /**
    * State which is income after poling request.
+   * This method will be called at any request as many times as pins count
    */
   incomeState(pin: number, newValue: boolean, debounceMs?: number) {
-    // save value to the buffer if poling is in progress
+    // save the most actual value to the buffer
+    // if poling for the actual values is in progress
     if (this.isPollInProgress()) {
-      if (!this.polledPinsBuffer) {
-        return this.logError(`No polledPinsBuffer`);
-      }
+      if (!this.polledPinsBuffer) return this.logError(`No polledPinsBuffer`)
 
       this.polledPinsBuffer[pin] = newValue;
 
       return;
     }
 
-    // else first time or at debounce time.
-    // If not changed = nothing happened. It needs because we don't exactly know which pin is changed.
+    // else it is the first time or debounce time.
+    // If not changed = nothing happened.
+    // It needs because we don't exactly know which pin is changed.
     if (newValue === getBitFromByte(this.getState(), pin)) return;
 
     // if value was changed then update state and rise an event.
@@ -101,7 +102,8 @@ export default class DigitalPortExpanderInputLogic {
 
 
   /**
-   * Handle income state
+   * Handle income state.
+   * For first change of change at debounce time.
    */
   private handleIncomeState(pin: number, newValue: boolean, debounceMs?: number) {
     // make debounced call
@@ -115,7 +117,8 @@ export default class DigitalPortExpanderInputLogic {
 
       return;
     }
-    // else emit right now if there isn't debounce
+
+    // else emit right now if there isn't any debounce
     // clear debounce if set
     if (this.debounce.isInvoking(pin)) this.debounce.clear(pin);
     // set a new value
@@ -125,21 +128,35 @@ export default class DigitalPortExpanderInputLogic {
   }
 
   /**
-   * It is only the first one callback of debounce cycle.
+   * While debounce is in progress all other requests are ignored.
+   * When debounce is finished then the confirmations is started.
    */
   private async handleEndOfDebounce(pin: number) {
-    this.polledPinsBuffer = {};
+    // TODO: что если этот буфер уже был создан ????
+    // TODO: поидее другие пины должны дождаться ответа
+    // TODO: после pollOnce НЕ вызывается incomeState
 
-    try {
-      this.pollPromise = this.pollOnce();
+    // TODO: review может спокойно запускать новый poll - может там очередь отрабатывает
 
+    // If poll is in progress then just wait for poll is finished
+    if (this.polledPinsBuffer) {
       await this.pollPromise;
     }
-    catch (e) {
-      delete this.pollPromise;
-      delete this.polledPinsBuffer;
+    // It there isn't any poll then make a new one
+    else {
+      this.polledPinsBuffer = {};
 
-      throw e;
+      try {
+        this.pollPromise = this.pollOnce();
+
+        await this.pollPromise;
+      }
+      catch (e) {
+        delete this.pollPromise;
+        delete this.polledPinsBuffer;
+
+        throw e;
+      }
     }
 
     this.setFinalState(pin);
