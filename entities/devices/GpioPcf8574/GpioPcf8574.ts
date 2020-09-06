@@ -58,6 +58,7 @@ export default class GpioPcf8574 extends DeviceBase<Props> {
         ? (this.props.defaultDebounce || 0)
         : debounce;
 
+      // TODO: почему??? можно же распознать в драйвере
       if (typeof edge !== 'undefined' && edge !== Edge.both) {
         throw new Error(
           `GpioPcf8574.digitalSetupInput: Edge "rising" or "falling" aren't supported ` +

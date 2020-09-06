@@ -2,29 +2,29 @@ import DeviceBase from 'system/base/DeviceBase';
 import {Dictionary} from 'system/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from 'system/constants';
 
-import {BinaryInput, BinaryInputProps} from '../../drivers/BinaryInput/BinaryInput';
+import {ImpulseInput, ImpulseInputProps} from '../../drivers/ImpulseInput/ImpulseInput';
 
 
-interface Props extends BinaryInputProps {
+interface Props extends ImpulseInputProps {
 }
 
 
 export default class MotionSensor extends DeviceBase<Props> {
-  private get binaryInput(): BinaryInput {
-    return this.depsInstances.binaryInput;
+  private get impulseInput(): ImpulseInput {
+    return this.depsInstances.impulseInput;
   }
 
 
   protected async didInit() {
-    this.depsInstances.binaryInput = await this.context.getSubDriver('BinaryInput', this.props);
+    this.depsInstances.impulseInput = await this.context.getSubDriver('ImpulseInput', this.props);
     // listen driver's change
-    this.binaryInput.onChange(this.onInputChange);
+    this.impulseInput.onChange(this.onInputChange);
   }
 
 
   protected statusGetter = async (): Promise<Dictionary> => {
     // TODO: нужно ли тут делать read ???? делается до инициализации gpio
-    return { [DEFAULT_DEVICE_STATUS]: await this.binaryInput.read() };
+    return { [DEFAULT_DEVICE_STATUS]: await this.impulseInput.isInProgress() };
   }
 
 

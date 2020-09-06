@@ -2,7 +2,7 @@ type Timeout = NodeJS.Timeout;
 import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
+import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
@@ -14,6 +14,8 @@ import DeviceBase from 'system/base/DeviceBase';
 type RisingHandler = () => void;
 type ImpulseInputMode = 'fixed' | 'increasing';
 
+
+// TODO: можно ли тут использовать debounce с пролонгацией?
 
 // TODO: edge isn't supported but it in DigitalPinInputProps
 export interface ImpulseInputProps extends DigitalPinInputProps {
@@ -73,15 +75,21 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 
   // setup pin after all the drivers has been initialized
   handleGpioInit = async () => {
-    this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
-
     const edge: Edge = resolveEdge('rising', this.isInverted());
+
+    this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
 
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
       // listen to only high levels
-      await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, edge);
+      await this.gpio.digitalSetupInput(
+        this.props.pin,
+        this.getResistorMode(),
+        this.props.debounce,
+        // TODO: uncomment
+        //edge
+      );
     }
     catch (err) {
       this.log.error(
@@ -151,7 +159,11 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   }
 
 
-  private handleChange = () => {
+  private handleChange = (level: boolean) => {
+
+    // TODO: revmoe
+    if (!invertIfNeed(level, this.isInverted())) return;
+
     // skip other changes while block time
     if (this.isBlocked()) return;
 
