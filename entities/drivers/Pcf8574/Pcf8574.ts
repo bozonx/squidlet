@@ -126,6 +126,8 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   async setupInput(pin: number, debounce?: number): Promise<void> {
     this.checkPinRange(pin);
 
+    // TODO: сделать виртуальный edge
+
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
         `PCF8574Driver.setupInput(${pin}, ${debounce}). This pin has been already set up.` +
@@ -313,6 +315,9 @@ export class Pcf8574 extends DriverBase<Pcf8574ExpanderProps> {
   }
 
   private handleIcStateChange = (data: Uint8Array) => {
+
+    console.log('------- handleIcStateChange ---------', data)
+
     if (!data || data.length !== DATA_LENGTH) {
       return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
     }

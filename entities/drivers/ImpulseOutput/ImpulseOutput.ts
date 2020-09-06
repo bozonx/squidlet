@@ -29,6 +29,9 @@ export interface ImpulseOutputProps extends DigitalPinOutputProps {
 }
 
 
+// TODO: можно ли тут использовать debounce с пролонгацией?
+
+
 /**
  * Impulse output logic steps:
  * fixed mode:

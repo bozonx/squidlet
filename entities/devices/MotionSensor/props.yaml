@@ -1,17 +1,14 @@
-$base: 'drivers.BinaryInput'
+$base: 'drivers.ImpulseInput'
 
-# see BinaryInput driver
+# see ImpulseInput driver
+impulseLength:
+  default: 30000
+
 blockTime:
   default: 50
 
 debounce:
   default: 25
 
-### BinaryInput driver props
-# invert: {}
-# invertOnPullup: {}
-# edge: {}
-# pullup: {}
-# pulldown: {}
-# pin: {}
-# gpio: {}
+mode:
+  default: increasing
