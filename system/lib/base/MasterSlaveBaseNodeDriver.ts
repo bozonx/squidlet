@@ -180,9 +180,29 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
       this.pollAllFunctions();
     }
     else if (this.props.feedback === 'poll') {
+      // TODO: review indexStr
+      // TODO: review restart - он вообще ожидает выполнения ????
+
       // restart polling - it will make a new request and restart interval
       for (let indexStr in this.props.poll) {
+
+        // TODO: не ждет завершения
+        // TODO: нужно ждать ближайшего результата !!!!
+
         await this.polling.restart(indexStr);
+
+        await new Promise((resolve, reject) => {
+
+          // TODO: add timeout
+
+          this.polling.addListener((err: Error | undefined, result: any) => {
+            if (err) {
+              return reject(err);
+            }
+
+            resolve();
+          }, indexStr);
+        });
       }
     }
     else {
@@ -249,7 +269,11 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
         ? this.props.defaultPollIntervalMs
         : pollProps.intervalMs;
 
-      this.polling.start(() => this.doPoll(parseInt(indexStr)), pollInterval, indexStr);
+      this.polling.start(
+        () => this.doPoll(parseInt(indexStr)),
+        pollInterval,
+        indexStr
+      );
     }
   }
 
@@ -292,11 +316,17 @@ export default abstract class MasterSlaveBaseNodeDriver<T extends MasterSlaveBas
   }
 
   protected handleIncomeData(incomeData: Uint8Array, pollIndex: number) {
+
+
+    // TODO: почему решает что данные одинаковые ????
+    //  наверное потомучто раньше они уже установились
+
     if (!this.props.poll) return;
     // do nothing if it isn't polling data address or data is equal to previous data
     else if (
       !this.props.poll[pollIndex]
-      || isEqualUint8Array(this.pollLastData[pollIndex], incomeData)
+      // TODO: раскоментировать
+      //|| isEqualUint8Array(this.pollLastData[pollIndex], incomeData)
     ) return;
 
     // save data
