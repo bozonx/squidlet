@@ -3,7 +3,7 @@ export interface DigitalOutputResult {
   state: boolean;
 }
 
-// TODO: review
+// TODO: make it
 export interface I2cResult {
   data: Uint8Array;
 }

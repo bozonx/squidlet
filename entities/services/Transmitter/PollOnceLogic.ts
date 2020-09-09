@@ -24,7 +24,7 @@ export default class PollOnceLogic {
     const [messages, nextPackageLength] = await readLogic(this.askDataCb);
 
     if (nextPackageLength) {
-      // TODO: make a new poll
+      // TODO: make a new poll, но обработать текущий и поднять события
     }
 
     const functionsData: [number, Results][] = parseIncomeMessage(messages);
