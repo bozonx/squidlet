@@ -6,6 +6,6 @@ export const Methods = [
 ];
 
 
-export default interface ModBusMasterRs485Io extends IoItem {
+export default interface ModBusMasterRtuIo extends IoItem {
 
 }
