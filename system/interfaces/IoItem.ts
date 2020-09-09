@@ -14,7 +14,7 @@ export default interface IoItem {
 
   /**
    * Setup props before init.
-   * It allowed to call it move once.
+   * It allowed to call it more than once.
    */
   configure?: (definition?: any) => Promise<void>;
 
