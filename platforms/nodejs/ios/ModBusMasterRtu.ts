@@ -1,4 +1,4 @@
-import ModBusMasterRs485Io from '../../../system/interfaces/io/ModBusMasterRs485Io';
+import ModBusMasterRtuIo from '../../../system/interfaces/io/ModBusMasterRtuIo';
 
 // // create a tcp modbus client
 // const Modbus = require('jsmodbus')
@@ -10,6 +10,6 @@ import ModBusMasterRs485Io from '../../../system/interfaces/io/ModBusMasterRs485
 // const client = new Modbus.client.RTU(socket, address)
 //
 
-export default class ModBusMasterRs485 implements ModBusMasterRs485Io {
+export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
 
 }
