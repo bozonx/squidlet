@@ -12,6 +12,8 @@ export const Methods = [
   'readInputRegisters',
   'writeSingleCoil',
   'writeSingleRegister',
+  'writeMultipleCoils',
+  'writeMultipleRegisters',
 ];
 
 
