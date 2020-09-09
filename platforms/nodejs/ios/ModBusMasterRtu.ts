@@ -102,7 +102,7 @@ export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
   }
 
   private getPort(portNum: number | string): ModbusRTUClient {
-
+    // TODO: ADD !!!
   }
 
 }
