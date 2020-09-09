@@ -24,7 +24,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     }
 
     return Promise.all(Object.keys(this.definition.ports).map((portNum: string) => {
-      return this.makePortItem(portNum, this.definition.ports[portNum])
+      return this.makePortItem(portNum, this.definition!.ports[portNum])
         .then((item: ModbusRTUClient) => this.instances[portNum] = item);
     })).then();
   }
@@ -42,8 +42,13 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
   }
 
 
-  async readCoils(portNum: number | string, start: number, count: number): Promise<number[]> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+  async readCoils(
+    portNum: number | string,
+    slaveId: number,
+    start: number,
+    count: number
+  ): Promise<number[]> {
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
       .readCoils(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -51,8 +56,13 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     return [];
   }
 
-  async readDiscreteInputs(portNum: number | string, start: number, count: number): Promise<number[]> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+  async readDiscreteInputs(
+    portNum: number | string,
+    slaveId: number,
+    start: number,
+    count: number
+  ): Promise<number[]> {
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
       .readDiscreteInputs(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -60,21 +70,29 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     return [];
   }
 
-  async readHoldingRegisters(portNum: number | string, start: number, count: number): Promise<Uint8Array> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+  async readHoldingRegisters(
+    portNum: number | string,
+    slaveId: number,
+    start: number,
+    count: number
+  ): Promise<Uint8Array> {
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
       .readHoldingRegisters(start, count);
     // TODO: check result
     console.log(11111111, result);
+
+    // TODO: add handle error
 
     return new Uint8Array();
   }
 
   async readInputRegisters(
     portNum: number | string,
+    slaveId: number,
     start: number,
     count: number
   ): Promise<Uint8Array> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
       .readInputRegisters(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -84,51 +102,76 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
 
   async writeSingleCoil(
     portNum: number | string,
+    slaveId: number,
     address: number,
     value: boolean | 0 | 1
   ): Promise<void> {
     // TODO: check result
-    await this.getPort(portNum).writeSingleCoil(address, value);
+    await this.getInstance(portNum, slaveId).writeSingleCoil(address, value);
   }
 
   async writeSingleRegister(
     portNum: number | string,
+    slaveId: number,
     address: number,
     value: number
   ): Promise<void> {
     // TODO: check result
-    await this.getPort(portNum).writeSingleRegister(address, value);
+    await this.getInstance(portNum, slaveId).writeSingleRegister(address, value);
   }
 
   async writeMultipleCoils(
     portNum: number | string,
+    slaveId: number,
     start: number,
     values: boolean[]
   ): Promise<void> {
     // TODO: check result
-    await this.getPort(portNum).writeMultipleCoils(start, values);
+    await this.getInstance(portNum, slaveId).writeMultipleCoils(start, values);
   }
 
   async writeMultipleRegisters(
     portNum: number | string,
+    slaveId: number,
     start: number,
     values: Uint8Array
   ): Promise<void> {
     // TODO: check result
-    await this.getPort(portNum).writeMultipleRegisters(start, [...values]);
-  }
-
-  private getPort(portNum: number | string): ModbusRTUClient {
-    if (!this.instances[portNum]) {
-      throw new Error(`ModBusMasterRtu: port "${portNum}" hasn't been instantiated`);
-    }
-
-    return this.instances[portNum];
+    await this.getInstance(portNum, slaveId).writeMultipleRegisters(start, [...values]);
   }
 
 
   protected async makePortItem(portNum: string, params: ModbusParams): Promise<ModbusRTUClient> {
+    const combinedParams: ModbusParams = {
+      // TODO: add default params ???
+      ...params,
+    };
 
+    const options = {
+      baudRate: 9600,
+      parity: 'none',
+      dataBits: 8,
+      stopBits: 1,
+    };
+
+    const socket = new SerialPort('/dev/ttyUSB1', options);
+    const client = new Modbus.client.RTU(socket, slaveAddress);
+  }
+
+  private getInstance(portNum: number | string, slaveId: number): ModbusRTUClient {
+    const instanceId: string = this.makeInstanceId(portNum, slaveId);
+
+    if (!this.instances[instanceId]) {
+      throw new Error(
+        `ModBusMasterRtu: slave ${slaveId} on port "${portNum}" hasn't been instantiated`
+      );
+    }
+
+    return this.instances[instanceId];
+  }
+
+  private makeInstanceId(portNum: number | string, slaveId: number): string {
+    return `${portNum}${slaveId}`;
   }
 
 }
