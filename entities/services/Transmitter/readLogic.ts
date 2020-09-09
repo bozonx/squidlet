@@ -51,7 +51,9 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
  * nextPackageLength is the length of the next package is available to be read.
  * @param askDataCb
  */
-export default async function readLogic(askDataCb: AskData): Promise<[Uint8Array[], number]> {
+export default async function readLogic(
+  askDataCb: AskData
+): Promise<[Uint8Array[], number]> {
   const packageLengthResult: Uint8Array = await askDataCb(
     READ_REGISTERS.readPackageLength,
     READ_PACKAGE_LENGTH_COUNT
