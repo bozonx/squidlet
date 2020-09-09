@@ -31,12 +31,11 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
       break;
     }
 
-    // TODO: test by hard
     const endOfMessage = pointerToNextMessage + 1 + messageLength;
     const message: Uint8Array = result.slice(pointerToNextMessage + 1, endOfMessage);
 
     messages.push(message);
-    // TODO: test by hard
+
     pointerToNextMessage = endOfMessage;
   }
 
