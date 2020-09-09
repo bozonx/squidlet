@@ -1,19 +1,25 @@
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
-import readLogic from './readLogic';
+import readLogic, {AskDataCb} from './readLogic';
 import parseIncomeMessage, {MESSAGE_POSITIONS, Results} from './parseIncomeMessage';
+import IndexedEvents from '../../../system/lib/IndexedEvents';
+
+
+type FunctionHandler = (functionNumber: number, args: Results) => void;
 
 
 export default class PollOnceLogic {
-  private functionsEvents = new IndexedEventEmitter();
+  private readonly askDataCb: AskDataCb;
+  private functionsEvents = new IndexedEvents<FunctionHandler>();
 
 
-  constructor() {
+  constructor(askDataCb: AskDataCb) {
+    this.askDataCb = askDataCb;
   }
 
 
-  addEventListener(functionNumber: number, cb: (args: any[]) => void): number {
-    return this.functionsEvents.addListener(functionNumber, cb);
+  addEventListener(cb: FunctionHandler): number {
+    return this.functionsEvents.addListener(cb);
   }
 
   removeListener(handlerIndex: number) {
@@ -35,11 +41,6 @@ export default class PollOnceLogic {
         item[MESSAGE_POSITIONS.functionsArgs]
       );
     }
-  }
-
-
-  private askDataCb = async (register: number, count: number): Promise<Uint8Array> => {
-    // TODO: make a new poll
   }
 
 }

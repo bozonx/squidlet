@@ -1,4 +1,4 @@
-type AskData = (register: number, count: number) => Promise<Uint8Array>;
+export type AskDataCb = (register: number, count: number) => Promise<Uint8Array>;
 
 
 enum READ_REGISTERS {
@@ -52,7 +52,7 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
  * @param askDataCb
  */
 export default async function readLogic(
-  askDataCb: AskData
+  askDataCb: AskDataCb
 ): Promise<[Uint8Array[], number]> {
   const packageLengthResult: Uint8Array = await askDataCb(
     READ_REGISTERS.readPackageLength,
