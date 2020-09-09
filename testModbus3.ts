@@ -94,8 +94,8 @@ socket.on('open', function () {
   // }, 100);
 
   setTimeout(() => {
-    client.readHoldingRegisters(1, 2)
-    //client.readInputRegisters(0, 3)
+    //client.readHoldingRegisters(0, 1)
+    client.readInputRegisters(0, 4)
       .then((data: any) => console.log('reading result ', data))
       .catch(handleErrors)
       .finally(() => socket.close());
