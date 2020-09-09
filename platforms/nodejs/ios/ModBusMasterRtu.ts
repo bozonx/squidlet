@@ -5,10 +5,11 @@ const SerialPort = require('serialport');
 
 import ModBusMasterRtuIo, {ModbusDefinition, ModbusParams} from 'system/interfaces/io/ModBusMasterRtuIo';
 import IoContext from 'system/interfaces/IoContext';
+import {omitObj} from '../../../system/lib/objects';
 
 
 export default class ModBusMasterRtu implements ModBusMasterRtuIo {
-  private ioContext?: IoContext;
+  private ioContext!: IoContext;
   private definition?: ModbusDefinition;
   private instances: Record<string, ModbusRTUClient> = {};
 
@@ -144,39 +145,57 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     const instanceId: string = this.makeInstanceId(portNum, slaveId);
 
     if (!this.instances[instanceId]) {
-      throw new Error(
-        `ModBusMasterRtu: slave ${slaveId} on port "${portNum}" hasn't been instantiated`
-      );
+      this.instances[instanceId] = await this.makeInstance(portNum, slaveId);
     }
-
-
-    if (!this.definition) {
-      throw new Error(`No modbus port definitions`);
-    }
-
-    return Promise.all(Object.keys(this.definition.ports).map((portNum: string) => {
-      return this.makeInstance(portNum, this.definition!.ports[portNum])
-        .then((item: ModbusRTUClient) => this.instances[portNum] = item);
-    })).then();
 
     return this.instances[instanceId];
   }
 
-  private async makeInstance(portNum: string, params: ModbusParams): Promise<ModbusRTUClient> {
+  private async makeInstance(portNum: number | string, slaveId: number): Promise<ModbusRTUClient> {
+    if (!this.definition) {
+      throw new Error(`No modbus definitions`);
+    }
+    else if (!this.definition.ports[portNum]) {
+      throw new Error(`No modbus definitions for port "${portNum}"`);
+    }
+
     const combinedParams: ModbusParams = {
       // TODO: add default params ???
-      ...params,
+      ...this.definition.ports[portNum],
     };
 
-    const options = {
-      baudRate: 9600,
-      parity: 'none',
-      dataBits: 8,
-      stopBits: 1,
-    };
+    const serialOptions = omitObj(
+      combinedParams,
+      'deRePin',
+      'dev',
+      'pinRX',
+      'pinTX'
+    );
 
-    const socket = new SerialPort('/dev/ttyUSB1', options);
-    const client = new Modbus.client.RTU(socket, slaveAddress);
+    const socket = new SerialPort(combinedParams.dev, serialOptions);
+    const client = new Modbus.client.RTU(socket, slaveId);
+
+    socket.on('error', (err: Error) => {
+      this.ioContext.log.error(`ModBusMasterRtu serial error: ${err}`);
+    });
+
+    socket.on('close', function () {
+      // TODO: what to do ???
+      //console.log('close', arguments);
+    });
+
+    // socket.on('data', (data: Buffer) => {
+    //   console.log(11111111, data);
+    // });
+
+    return new Promise((resolve, reject) => {
+
+      // TODO: add timeout and call reject
+
+      socket.on('open', function () {
+        resolve(client);
+      });
+    });
   }
 
   private makeInstanceId(portNum: number | string, slaveId: number): string {
