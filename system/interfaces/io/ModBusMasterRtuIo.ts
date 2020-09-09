@@ -22,8 +22,6 @@ export default interface ModBusMasterRtuIo extends IoItem {
   readInputRegisters(portNum: number | string, start: number, count: number): Promise<Uint8Array>;
   writeSingleCoil(portNum: number | string, address: number, value: boolean | 0 | 1): Promise<void>;
   writeSingleRegister(portNum: number | string, address: number, value: number): Promise<void>;
-
-  // writeMultipleCoils(portNum: number | string, start: number, values: boolean[]): PromiseUserRequest<CastRequestBody<Req, WriteMultipleCoilsRequestBody>>
-  // writeMultipleCoils(portNum: number | string, start: number, values: Buffer, quantity: number): PromiseUserRequest<CastRequestBody<Req, WriteMultipleCoilsRequestBody>>
-  // writeMultipleRegisters(portNum: number | string, start: number, values: number[] | Buffer): Promise<import("./user-request").IUserRequestResolve<CastRequestBody<Req, WriteMultipleRegistersRequestBody>>>
+  writeMultipleCoils(portNum: number | string, start: number, values: boolean[]): Promise<void>;
+  writeMultipleRegisters(portNum: number | string, start: number, values: Uint8Array): Promise<void>;
 }

@@ -1,6 +1,6 @@
 import {CastRequestBody} from 'jsmodbus/dist/request-response-map';
 
-const Modbus = require('jsmodbus');
+import Modbus, {ModbusRTUClient} from 'jsmodbus';
 const SerialPort = require('serialport');
 
 import ModBusMasterRtuIo from 'system/interfaces/io/ModBusMasterRtuIo';
@@ -13,7 +13,11 @@ import {
   WriteSingleCoilRequestBody,
   WriteSingleRegisterRequestBody
 } from 'jsmodbus/dist/request';
-import {PromiseUserRequest} from 'jsmodbus/dist/user-request';
+import {IUserRequestResolve, PromiseUserRequest} from 'jsmodbus/dist/user-request';
+import {ENCODE} from '../../../system/lib/constants';
+import {ItemPosition} from '../../../system/lib/base/SerialIoBase';
+import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
+
 
 // // create a tcp modbus client
 // const Modbus = require('jsmodbus')
@@ -53,7 +57,9 @@ export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
   }
 
 
-  readCoils(portNum: number | string, start: number, count: number): Promise<number[]> {
+  async readCoils(portNum: number | string, start: number, count: number): Promise<number[]> {
+    const result: IUserRequestResolve = this.getPort(portNum).readCoils(start, count);
+
 
   }
 
@@ -65,28 +71,38 @@ export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
 
   }
 
-  readInputRegisters(portNum: number | string, start: number, count: number): Promise<Uint8Array> {
+  async readInputRegisters(
+    portNum: number | string,
+    start: number,
+    count: number
+  ): Promise<Uint8Array> {
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum).readInputRegisters(start, count);
 
+    console.log(11111111, result);
   }
 
-  writeSingleCoil(portNum: number | string, address: number, value: boolean | 0 | 1): Promise<void> {
-
+  async writeSingleCoil(portNum: number | string, address: number, value: boolean | 0 | 1): Promise<void> {
+    // TODO: check result
+    await this.getPort(portNum).writeSingleCoil(address, value);
   }
 
-  writeSingleRegister(portNum: number | string, address: number, value: number): Promise<void> {
-
+  async writeSingleRegister(portNum: number | string, address: number, value: number): Promise<void> {
+    // TODO: check result
+    await this.getPort(portNum).writeSingleRegister(address, value);
   }
 
-  // writeMultipleCoils(portNum: number | string, start: number, values: boolean[]): PromiseUserRequest<CastRequestBody<Req, WriteMultipleCoilsRequestBody>> {
-  //
-  // }
-  //
-  // writeMultipleCoils(portNum: number | string, start: number, values: Buffer, quantity: number): PromiseUserRequest<CastRequestBody<Req, WriteMultipleCoilsRequestBody>> {
-  //
-  // }
-  //
-  // writeMultipleRegisters(portNum: number | string, start: number, values: number[] | Buffer): Promise<import("./user-request").IUserRequestResolve<CastRequestBody<Req, WriteMultipleRegistersRequestBody>>> {
-  //
-  // }
+  async writeMultipleCoils(portNum: number | string, start: number, values: boolean[]): Promise<void> {
+    // TODO: check result
+    await this.getPort(portNum).writeMultipleCoils(start, values);
+  }
+
+  async writeMultipleRegisters(portNum: number | string, start: number, values: Uint8Array): Promise<void> {
+    // TODO: check result
+    await this.getPort(portNum).writeMultipleRegisters(start, [...values]);
+  }
+
+  private getPort(portNum: number | string): ModbusRTUClient {
+
+  }
 
 }
