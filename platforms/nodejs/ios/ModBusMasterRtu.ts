@@ -3,11 +3,12 @@ import {IUserRequestResolve} from 'jsmodbus/dist/user-request';
 import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 const SerialPort = require('serialport');
 
-import ModBusMasterRtuIo from 'system/interfaces/io/ModBusMasterRtuIo';
+import ModBusMasterRtuIo, {ModbusDefinition, ModbusParams} from 'system/interfaces/io/ModBusMasterRtuIo';
 import IoContext from 'system/interfaces/IoContext';
 
 
 export default class ModBusMasterRtu implements ModBusMasterRtuIo {
+  protected definition?: ModbusDefinition;
   private ioContext?: IoContext;
   protected instances: Record<string, ModbusRTUClient> = {};
 
@@ -17,19 +18,23 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
    */
   async init(ioContext: IoContext): Promise<void> {
     this.ioContext = ioContext;
+
+    if (!this.definition) {
+      throw new Error(`No modbus port definitions`);
+    }
+
+    return Promise.all(Object.keys(this.definition.ports).map((portNum: string) => {
+      return this.makePortItem(portNum, this.definition.ports[portNum])
+        .then((item: ModbusRTUClient) => this.instances[portNum] = item);
+    })).then();
   }
 
   /**
    * Setup props before init.
    * It allowed to call it more than once.
    */
-  async configure(definition?: any): Promise<void> {
-    const options = {
-      baudRate: 9600,
-      parity: 'none',
-      dataBits: 8,
-      stopBits: 1,
-    };
+  async configure(definition: ModbusDefinition) {
+    this.definition = definition;
   }
 
   async destroy(): Promise<void> {
@@ -119,6 +124,11 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     }
 
     return this.instances[portNum];
+  }
+
+
+  protected async makePortItem(portNum: string, params: ModbusParams): Promise<ModbusRTUClient> {
+
   }
 
 }

@@ -1,4 +1,5 @@
 import IoItem from '../IoItem';
+import {BaudRate, SerialParams} from './SerialIo';
 
 
 export const Methods = [
@@ -16,6 +17,16 @@ export const Methods = [
   'writeMultipleRegisters',
 ];
 
+export interface ModbusParams extends SerialParams {
+  deRePin?: number;
+}
+
+export interface ModbusDefinition {
+  // params of ports by portNum or port name
+  ports: {[index: string]: ModbusParams};
+  // TODO: add default baudRate
+  // TODO: add default port
+}
 
 export default interface ModBusMasterRtuIo extends IoItem {
   readCoils(portNum: number | string, start: number, count: number): Promise<number[]>;
