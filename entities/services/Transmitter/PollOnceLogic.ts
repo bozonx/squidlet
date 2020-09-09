@@ -1,7 +1,7 @@
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 import readLogic from './readLogic';
-import parseIncomeMessage, {RESULT_POSITIONS} from './parseIncomeMessage';
+import parseIncomeMessage, {MESSAGE_POSITIONS} from './parseIncomeMessage';
 
 
 export default class PollOnceLogic {
@@ -31,8 +31,8 @@ export default class PollOnceLogic {
 
     for (let item of functionsData) {
       this.functionsEvents.emit(
-        item[RESULT_POSITIONS.functionNum],
-        item[RESULT_POSITIONS.functionsArgs]
+        item[MESSAGE_POSITIONS.functionNum],
+        item[MESSAGE_POSITIONS.functionsArgs]
       );
     }
   }
