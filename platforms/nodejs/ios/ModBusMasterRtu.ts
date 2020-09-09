@@ -8,9 +8,9 @@ import IoContext from 'system/interfaces/IoContext';
 
 
 export default class ModBusMasterRtu implements ModBusMasterRtuIo {
-  protected definition?: ModbusDefinition;
   private ioContext?: IoContext;
-  protected instances: Record<string, ModbusRTUClient> = {};
+  private definition?: ModbusDefinition;
+  private instances: Record<string, ModbusRTUClient> = {};
 
 
   /**
@@ -18,15 +18,6 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
    */
   async init(ioContext: IoContext): Promise<void> {
     this.ioContext = ioContext;
-
-    if (!this.definition) {
-      throw new Error(`No modbus port definitions`);
-    }
-
-    return Promise.all(Object.keys(this.definition.ports).map((portNum: string) => {
-      return this.makePortItem(portNum, this.definition!.ports[portNum])
-        .then((item: ModbusRTUClient) => this.instances[portNum] = item);
-    })).then();
   }
 
   /**
@@ -48,7 +39,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     start: number,
     count: number
   ): Promise<number[]> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
+    const instance = await this.getInstance(portNum, slaveId);
+    const result: IUserRequestResolve<ModbusRTURequest> = await instance
       .readCoils(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -62,7 +54,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     start: number,
     count: number
   ): Promise<number[]> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
+    const instance = await this.getInstance(portNum, slaveId);
+    const result: IUserRequestResolve<ModbusRTURequest> = await instance
       .readDiscreteInputs(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -76,7 +69,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     start: number,
     count: number
   ): Promise<Uint8Array> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
+    const instance = await this.getInstance(portNum, slaveId);
+    const result: IUserRequestResolve<ModbusRTURequest> = await instance
       .readHoldingRegisters(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -92,7 +86,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     start: number,
     count: number
   ): Promise<Uint8Array> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getInstance(portNum, slaveId)
+    const instance = await this.getInstance(portNum, slaveId);
+    const result: IUserRequestResolve<ModbusRTURequest> = await instance
       .readInputRegisters(start, count);
     // TODO: check result
     console.log(11111111, result);
@@ -106,8 +101,9 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     address: number,
     value: boolean | 0 | 1
   ): Promise<void> {
+    const instance = await this.getInstance(portNum, slaveId);
     // TODO: check result
-    await this.getInstance(portNum, slaveId).writeSingleCoil(address, value);
+    await instance.writeSingleCoil(address, value);
   }
 
   async writeSingleRegister(
@@ -116,8 +112,9 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     address: number,
     value: number
   ): Promise<void> {
+    const instance = await this.getInstance(portNum, slaveId);
     // TODO: check result
-    await this.getInstance(portNum, slaveId).writeSingleRegister(address, value);
+    await instance.writeSingleRegister(address, value);
   }
 
   async writeMultipleCoils(
@@ -126,8 +123,9 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     start: number,
     values: boolean[]
   ): Promise<void> {
+    const instance = await this.getInstance(portNum, slaveId);
     // TODO: check result
-    await this.getInstance(portNum, slaveId).writeMultipleCoils(start, values);
+    await instance.writeMultipleCoils(start, values);
   }
 
   async writeMultipleRegisters(
@@ -136,12 +134,35 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     start: number,
     values: Uint8Array
   ): Promise<void> {
+    const instance = await this.getInstance(portNum, slaveId);
     // TODO: check result
-    await this.getInstance(portNum, slaveId).writeMultipleRegisters(start, [...values]);
+    await instance.writeMultipleRegisters(start, [...values]);
   }
 
 
-  protected async makePortItem(portNum: string, params: ModbusParams): Promise<ModbusRTUClient> {
+  private async getInstance(portNum: number | string, slaveId: number): Promise<ModbusRTUClient> {
+    const instanceId: string = this.makeInstanceId(portNum, slaveId);
+
+    if (!this.instances[instanceId]) {
+      throw new Error(
+        `ModBusMasterRtu: slave ${slaveId} on port "${portNum}" hasn't been instantiated`
+      );
+    }
+
+
+    if (!this.definition) {
+      throw new Error(`No modbus port definitions`);
+    }
+
+    return Promise.all(Object.keys(this.definition.ports).map((portNum: string) => {
+      return this.makeInstance(portNum, this.definition!.ports[portNum])
+        .then((item: ModbusRTUClient) => this.instances[portNum] = item);
+    })).then();
+
+    return this.instances[instanceId];
+  }
+
+  private async makeInstance(portNum: string, params: ModbusParams): Promise<ModbusRTUClient> {
     const combinedParams: ModbusParams = {
       // TODO: add default params ???
       ...params,
@@ -156,18 +177,6 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
 
     const socket = new SerialPort('/dev/ttyUSB1', options);
     const client = new Modbus.client.RTU(socket, slaveAddress);
-  }
-
-  private getInstance(portNum: number | string, slaveId: number): ModbusRTUClient {
-    const instanceId: string = this.makeInstanceId(portNum, slaveId);
-
-    if (!this.instances[instanceId]) {
-      throw new Error(
-        `ModBusMasterRtu: slave ${slaveId} on port "${portNum}" hasn't been instantiated`
-      );
-    }
-
-    return this.instances[instanceId];
   }
 
   private makeInstanceId(portNum: number | string, slaveId: number): string {
