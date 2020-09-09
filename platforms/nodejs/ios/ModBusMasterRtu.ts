@@ -1,41 +1,21 @@
-import {CastRequestBody} from 'jsmodbus/dist/request-response-map';
-
 import Modbus, {ModbusRTUClient} from 'jsmodbus';
+import {IUserRequestResolve} from 'jsmodbus/dist/user-request';
+import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 const SerialPort = require('serialport');
 
 import ModBusMasterRtuIo from 'system/interfaces/io/ModBusMasterRtuIo';
 import IoContext from 'system/interfaces/IoContext';
-import {
-  ReadCoilsRequestBody,
-  ReadDiscreteInputsRequestBody,
-  ReadHoldingRegistersRequestBody,
-  ReadInputRegistersRequestBody, WriteMultipleCoilsRequestBody, WriteMultipleRegistersRequestBody,
-  WriteSingleCoilRequestBody,
-  WriteSingleRegisterRequestBody
-} from 'jsmodbus/dist/request';
-import {IUserRequestResolve, PromiseUserRequest} from 'jsmodbus/dist/user-request';
-import {ENCODE} from '../../../system/lib/constants';
-import {ItemPosition} from '../../../system/lib/base/SerialIoBase';
-import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 
 
-// // create a tcp modbus client
-// const Modbus = require('jsmodbus')
-// const SerialPort = require('serialport')
-// const options = {
-//   baudRate: 57600
-// }
-// const socket = new SerialPort("/dev/tty-usbserial1", options)
-// const client = new Modbus.client.RTU(socket, address)
-//
-
-export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
+export default class ModBusMasterRtu implements ModBusMasterRtuIo {
   private ioContext?: IoContext;
+  protected instances: Record<string, ModbusRTUClient> = {};
+
 
   /**
    * Initialize platforms Item at System initialization time. It isn't allowed to call it more than once.
    */
-  init(ioContext: IoContext): Promise<void> {
+  async init(ioContext: IoContext): Promise<void> {
     this.ioContext = ioContext;
   }
 
@@ -43,7 +23,7 @@ export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
    * Setup props before init.
    * It allowed to call it more than once.
    */
-  configure(definition?: any): Promise<void> {
+  async configure(definition?: any): Promise<void> {
     const options = {
       baudRate: 9600,
       parity: 'none',
@@ -52,23 +32,36 @@ export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
     };
   }
 
-  destroy(): Promise<void> {
-
+  async destroy(): Promise<void> {
+    // TODO: add!
   }
 
 
   async readCoils(portNum: number | string, start: number, count: number): Promise<number[]> {
-    const result: IUserRequestResolve = this.getPort(portNum).readCoils(start, count);
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+      .readCoils(start, count);
+    // TODO: check result
+    console.log(11111111, result);
 
-
+    return [];
   }
 
-  readDiscreteInputs(portNum: number | string, start: number, count: number): Promise<number[]> {
+  async readDiscreteInputs(portNum: number | string, start: number, count: number): Promise<number[]> {
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+      .readDiscreteInputs(start, count);
+    // TODO: check result
+    console.log(11111111, result);
 
+    return [];
   }
 
-  readHoldingRegisters(portNum: number | string, start: number, count: number): Promise<Uint8Array> {
+  async readHoldingRegisters(portNum: number | string, start: number, count: number): Promise<Uint8Array> {
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+      .readHoldingRegisters(start, count);
+    // TODO: check result
+    console.log(11111111, result);
 
+    return new Uint8Array();
   }
 
   async readInputRegisters(
@@ -76,33 +69,56 @@ export default class ModBusMasterRs485 implements ModBusMasterRtuIo {
     start: number,
     count: number
   ): Promise<Uint8Array> {
-    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum).readInputRegisters(start, count);
-
+    const result: IUserRequestResolve<ModbusRTURequest> = await this.getPort(portNum)
+      .readInputRegisters(start, count);
+    // TODO: check result
     console.log(11111111, result);
+
+    return new Uint8Array();
   }
 
-  async writeSingleCoil(portNum: number | string, address: number, value: boolean | 0 | 1): Promise<void> {
+  async writeSingleCoil(
+    portNum: number | string,
+    address: number,
+    value: boolean | 0 | 1
+  ): Promise<void> {
     // TODO: check result
     await this.getPort(portNum).writeSingleCoil(address, value);
   }
 
-  async writeSingleRegister(portNum: number | string, address: number, value: number): Promise<void> {
+  async writeSingleRegister(
+    portNum: number | string,
+    address: number,
+    value: number
+  ): Promise<void> {
     // TODO: check result
     await this.getPort(portNum).writeSingleRegister(address, value);
   }
 
-  async writeMultipleCoils(portNum: number | string, start: number, values: boolean[]): Promise<void> {
+  async writeMultipleCoils(
+    portNum: number | string,
+    start: number,
+    values: boolean[]
+  ): Promise<void> {
     // TODO: check result
     await this.getPort(portNum).writeMultipleCoils(start, values);
   }
 
-  async writeMultipleRegisters(portNum: number | string, start: number, values: Uint8Array): Promise<void> {
+  async writeMultipleRegisters(
+    portNum: number | string,
+    start: number,
+    values: Uint8Array
+  ): Promise<void> {
     // TODO: check result
     await this.getPort(portNum).writeMultipleRegisters(start, [...values]);
   }
 
   private getPort(portNum: number | string): ModbusRTUClient {
-    // TODO: ADD !!!
+    if (!this.instances[portNum]) {
+      throw new Error(`ModBusMasterRtu: port "${portNum}" hasn't been instantiated`);
+    }
+
+    return this.instances[portNum];
   }
 
 }
