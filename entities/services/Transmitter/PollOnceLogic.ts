@@ -1,7 +1,7 @@
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 import readLogic from './readLogic';
-import parseIncomeMessage, {MESSAGE_POSITIONS} from './parseIncomeMessage';
+import parseIncomeMessage, {MESSAGE_POSITIONS, Results} from './parseIncomeMessage';
 
 
 export default class PollOnceLogic {
@@ -27,7 +27,7 @@ export default class PollOnceLogic {
       // TODO: make a new poll
     }
 
-    const functionsData: [number, any[]][] = parseIncomeMessage(messages);
+    const functionsData: [number, Results][] = parseIncomeMessage(messages);
 
     for (let item of functionsData) {
       this.functionsEvents.emit(
