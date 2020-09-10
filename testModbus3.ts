@@ -1,5 +1,7 @@
 // create a tcp modbus client
 import {uint8ToNum} from './system/lib/binaryHelpers';
+import {IUserRequestResolve} from 'jsmodbus/dist/user-request';
+import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 
 const Modbus = require('jsmodbus');
 const SerialPort = require('serialport');
@@ -96,7 +98,9 @@ socket.on('open', function () {
   setTimeout(() => {
     //client.readHoldingRegisters(0, 1)
     client.readInputRegisters(0, 4)
-      .then((data: any) => console.log('reading result ', data))
+      .then(({metrics, request, response}:  IUserRequestResolve<ModbusRTURequest>) => {
+        console.log('result values', (response as any).body.values);
+      })
       .catch(handleErrors)
       .finally(() => socket.close());
   }, 200);

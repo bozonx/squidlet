@@ -1,11 +1,15 @@
 import Modbus, {ModbusRTUClient} from 'jsmodbus';
 import {IUserRequestResolve} from 'jsmodbus/dist/user-request';
 import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
-const SerialPort = require('serialport');
+import ReadInputRegistersRequestBody from 'jsmodbus/dist/request/read-input-registers';
+import {ReadHoldingRegistersRequestBody} from 'jsmodbus/dist/request';
+import {CastRequestBody} from 'jsmodbus/dist/request-response-map';
+import * as SerialPort from 'serialport';
 
 import ModBusMasterRtuIo, {ModbusDefinition, ModbusParams} from 'system/interfaces/io/ModBusMasterRtuIo';
 import IoContext from 'system/interfaces/IoContext';
-import {omitObj} from '../../../system/lib/objects';
+import {omitObj} from 'system/lib/objects';
+
 
 
 export default class ModBusMasterRtu implements ModBusMasterRtuIo {
@@ -71,14 +75,15 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     count: number
   ): Promise<Uint8Array> {
     const instance = await this.getInstance(portNum, slaveId);
-    const result: IUserRequestResolve<ModbusRTURequest> = await instance
+    const result: IUserRequestResolve<CastRequestBody<ModbusRTURequest, ReadHoldingRegistersRequestBody>> = await instance
       .readHoldingRegisters(start, count);
-    // TODO: check result
-    console.log(11111111, result);
+    const values: Buffer | number[] = result.response.body.values;
 
-    // TODO: add handle error
+    if (values.length !== count) {
+      throw new Error(`Incorrect values length: ${values.length}, expected ${count}`);
+    }
 
-    return new Uint8Array();
+    return new Uint8Array(values);
   }
 
   async readInputRegisters(
@@ -88,12 +93,15 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     count: number
   ): Promise<Uint8Array> {
     const instance = await this.getInstance(portNum, slaveId);
-    const result: IUserRequestResolve<ModbusRTURequest> = await instance
+    const result: IUserRequestResolve<CastRequestBody<ModbusRTURequest, ReadInputRegistersRequestBody>> = await instance
       .readInputRegisters(start, count);
-    // TODO: check result
-    console.log(11111111, result);
+    const values: Buffer | number[] | Uint16Array = result.response.body.values;
 
-    return new Uint8Array();
+    if (values.length !== count) {
+      throw new Error(`Incorrect values length: ${values.length}, expected ${count}`);
+    }
+
+    return new Uint8Array(values);
   }
 
   async writeSingleCoil(
