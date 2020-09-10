@@ -2,10 +2,9 @@ import Context from 'system/Context';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
-import PollOnceLogic, {FunctionHandler} from './portExpander/services/PortExpander/PollOnceLogic';
 import {numToUint8Word} from './system/lib/binaryHelpers';
-import {Results} from './portExpander/services/PortExpander/parsePortExpanderFunctionsReturns';
-import {AskDataCb} from './portExpander/services/PortExpander/readLogic';
+import {AskDataCb} from './system/lib/remoteFunctionProtocol/readLogic';
+import PollOnceLogic, {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceLogic';
 
 
 async function start () {

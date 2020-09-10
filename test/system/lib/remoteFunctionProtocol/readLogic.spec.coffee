@@ -1,4 +1,4 @@
-readLogic = require('../../portExpander/services/PortExpander/readLogic')
+readLogic = require('../../../../system/lib/remoteFunctionProtocol/readLogic')
 
 
 describe.only 'entities.services.PortExpander.readLogic', ->
