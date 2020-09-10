@@ -4,7 +4,7 @@ import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
 import PollOnceLogic, {FunctionHandler} from './portExpander/services/PortExpander/PollOnceLogic';
 import {numToUint8Word} from './system/lib/binaryHelpers';
-import {Results} from './portExpander/services/PortExpander/parseIncomeMessage';
+import {Results} from './portExpander/services/PortExpander/parseFunctionsArgs';
 import {AskDataCb} from './portExpander/services/PortExpander/readLogic';
 
 
@@ -39,7 +39,7 @@ async function start () {
 
     return new Uint8Array(parsedValues);
   };
-  const pollOnceLogic = new PollOnceLogic(askDataCb);
+  const pollOnceLogic = new PollOnceLogic(askDataCb, console.warn);
 
   await masterIo.configure({
     ports: {
