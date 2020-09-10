@@ -9,6 +9,9 @@ export interface ModbusMasterDriverProps {
 }
 
 
+// TODO: use Sender ???
+
+
 export class ModbusMaster extends DriverBase<ModbusMasterDriverProps> {
   private modBusIo!: ModBusMasterRtuIo;
 

@@ -15,6 +15,8 @@ import IoContext from 'system/interfaces/IoContext';
 import {omitObj} from 'system/lib/objects';
 
 
+// TODO: handle errors
+
 
 export default class ModBusMasterRtu implements ModBusMasterRtuIo {
   private ioContext!: IoContext;
@@ -190,8 +192,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
       'pinTX'
     );
 
-    // TODO: лучше использовать SerialIo наверное
-    //       чтобы не добпускать создание повторных инстансов ????
+    // TODO: лучше использовать SerialIo наверное ???
+    //       чтобы не допускать создание повторных инстансов ????
     const socket = new SerialPort(combinedParams.dev, serialOptions, (error?: Error | null) => {
       if (!error) return;
 
