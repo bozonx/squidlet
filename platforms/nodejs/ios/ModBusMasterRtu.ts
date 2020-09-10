@@ -47,7 +47,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     slaveId: number,
     start: number,
     count: number
-  ): Promise<number[]> {
+  ): Promise<boolean[]> {
     const instance = await this.getInstance(portNum, slaveId);
     const result: IUserRequestResolve<ModbusRTURequest> = await instance
       .readCoils(start, count);
@@ -62,7 +62,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     slaveId: number,
     start: number,
     count: number
-  ): Promise<number[]> {
+  ): Promise<boolean[]> {
     const instance = await this.getInstance(portNum, slaveId);
     const result: IUserRequestResolve<ModbusRTURequest> = await instance
       .readDiscreteInputs(start, count);
@@ -112,7 +112,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     portNum: number | string,
     slaveId: number,
     address: number,
-    value: boolean | 0 | 1
+    value: boolean
   ): Promise<void> {
     const instance = await this.getInstance(portNum, slaveId);
     // TODO: check result

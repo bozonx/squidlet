@@ -38,19 +38,20 @@ export default interface ModBusMasterRtuIo extends IoItem {
     slaveId: number,
     start: number,
     count: number
-  ): Promise<number[]>;
+  ): Promise<boolean[]>;
 
   readDiscreteInputs(
     portNum: number | string,
     slaveId: number,
     start: number,
     count: number
-  ): Promise<number[]>;
+  ): Promise<boolean[]>;
 
   readHoldingRegisters(
     portNum: number | string,
     slaveId: number,
-    start: number, count: number
+    start: number,
+    count: number
   ): Promise<Uint16Array>;
 
   readInputRegisters(
@@ -64,7 +65,7 @@ export default interface ModBusMasterRtuIo extends IoItem {
     portNum: number | string,
     slaveId: number,
     address: number,
-    value: boolean | 0 | 1
+    value: boolean
   ): Promise<void>;
 
   writeSingleRegister(
