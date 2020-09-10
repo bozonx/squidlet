@@ -172,6 +172,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
       'pinTX'
     );
 
+    // TODO: лучше использовать SerialIo наверное
+    //       чтобы не добпускать создание повторных инстансов ????
     const socket = new SerialPort(combinedParams.dev, serialOptions);
     const client = new Modbus.client.RTU(socket, slaveId);
 
@@ -203,3 +205,27 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
   }
 
 }
+
+// TODO: for reconnecting see node-net-reconnect npm module
+
+
+// function handleErrors(err: any) {
+//   if (Modbus.errors.isUserRequestError(err)) {
+//     switch (err.err) {
+//       case 'OutOfSync':
+//       case 'Protocol':
+//       case 'Timeout':
+//       case 'ManuallyCleared':
+//       case 'ModbusException':
+//       case 'Offline':
+//       case 'crcMismatch':
+//         console.log('Error Message: ' + err.message, 'Error' + 'Modbus Error Type: ' + err.err);
+//         break;
+//     }
+//
+//   } else if (Modbus.errors.isInternalException(err)) {
+//     console.log('Error Message: ' + err.message, 'Error' + 'Error Name: ' + err.name, err.stack);
+//   } else {
+//     console.log('Unknown Error', err);
+//   }
+// }
