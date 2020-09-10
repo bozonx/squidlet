@@ -2,6 +2,8 @@ import Context from 'system/Context';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
+import PollOnceLogic from './portExpander/services/PortExpander/PollOnceLogic';
+import {numToUint8Word} from './system/lib/binaryHelpers';
 
 
 async function start () {
@@ -20,7 +22,6 @@ async function start () {
     }
   };
   const modbusMasterDriver: ModbusMaster = new ModbusMaster(context, definition);
-
 
   await masterIo.configure({
     ports: {
@@ -43,14 +44,32 @@ async function start () {
   } as any);
   await modbusMasterDriver.init();
 
-  const pinNumber: number = 12;
-  const pinState: boolean = true;
+  const askDataCb = async (register: number, count: number): Promise<Uint8Array> => {
+    const result: Uint16Array = await modbusMasterDriver
+      .readInputRegisters(register, count);
+    const parsedValues: number[] = [];
+
+    for (let item of result) {
+      const bytes: Uint8Array = numToUint8Word(item);
+
+      parsedValues.push(bytes[0]);
+      parsedValues.push(bytes[1]);
+    }
+
+    return new Uint8Array(parsedValues);
+  };
+  const pollOnceLogic = new PollOnceLogic(askDataCb);
 
 
-  const result: Uint16Array = await modbusMasterDriver
-    .readInputRegisters(0, 4);
 
-  console.log(22222222, result);
+
+  // const pinNumber: number = 12;
+  // const pinState: boolean = true;
+
+  // const result: Uint16Array = await modbusMasterDriver
+  //   .readInputRegisters(0, 4);
+  //
+  // console.log(22222222, result);
 
   // client.writeMultipleRegisters(0x00, pinSetupMessage)
   //   .then((data: any) => console.log('writing result ', data))
