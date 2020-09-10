@@ -1,10 +1,28 @@
+import Context from 'system/Context';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
+import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
+import EntityDefinition from './system/interfaces/EntityDefinition';
 
 
 async function start () {
-  const master: ModBusMasterRtu = new ModBusMasterRtu();
+  const masterIo: ModBusMasterRtu = new ModBusMasterRtu();
+  const context: Context = {
+    getIo() {
+      return masterIo;
+    }
+  } as any;
+  const definition: EntityDefinition = {
+    id: 'ModbusMaster',
+    className: 'ModbusMaster',
+    props: {
+      portNum: 0,
+      slaveId: 1,
+    }
+  };
+  const modbusMasterDriver: ModbusMaster = new ModbusMaster(context, definition);
 
-  await master.configure({
+
+  await masterIo.configure({
     ports: {
       0: {
         dev: '/dev/ttyUSB1',
@@ -15,7 +33,7 @@ async function start () {
       },
     },
   });
-  await master.init({
+  await masterIo.init({
     log: {
       debug: console.log,
       info: console.log,
@@ -23,13 +41,14 @@ async function start () {
       error: console.error,
     }
   } as any);
+  await modbusMasterDriver.init();
 
-  const slaveAddress = 0x01;
   const pinNumber: number = 12;
   const pinState: boolean = true;
 
 
-  const result: Uint16Array = await master.readInputRegisters(0, slaveAddress, 0,4);
+  const result: Uint16Array = await modbusMasterDriver
+    .readInputRegisters(0, 4);
 
   console.log(22222222, result);
 
