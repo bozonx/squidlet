@@ -64,7 +64,10 @@ export async function readOnce(
     );
 
     if (packageLengthResult.length !== READ_PACKAGE_LENGTH_COUNT) {
-      throw new Error(`Invalid length of readPackageLength result`);
+      throw new Error(
+        `Invalid length of readPackageLength result: ${packageLengthResult.length}, ` +
+        `Expected: ${READ_PACKAGE_LENGTH_COUNT}`
+      );
     }
 
     packageLength = packageLengthResult[0];
