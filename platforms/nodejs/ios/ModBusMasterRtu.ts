@@ -4,7 +4,10 @@ import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 import ReadInputRegistersRequestBody from 'jsmodbus/dist/request/read-input-registers';
 import {ReadHoldingRegistersRequestBody} from 'jsmodbus/dist/request';
 import {CastRequestBody} from 'jsmodbus/dist/request-response-map';
-import * as SerialPort from 'serialport';
+const SerialPort = require('serialport');
+//import * as SerialPort from 'serialport';
+
+import {OpenOptions} from 'serialport';
 
 import ModBusMasterRtuIo, {ModbusDefinition, ModbusParams} from 'system/interfaces/io/ModBusMasterRtuIo';
 import IoContext from 'system/interfaces/IoContext';
@@ -172,7 +175,13 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
       ...this.definition.ports[portNum],
     };
 
-    const serialOptions = omitObj(
+    if (!combinedParams.dev) {
+      throw new Error(
+        `Definition of modbus serial port ${portNum} doesn't have the "dev" param defined`
+      );
+    }
+
+    const serialOptions: OpenOptions = omitObj(
       combinedParams,
       'deRePin',
       'dev',
@@ -182,7 +191,13 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
 
     // TODO: лучше использовать SerialIo наверное
     //       чтобы не добпускать создание повторных инстансов ????
-    const socket = new SerialPort(combinedParams.dev, serialOptions);
+    const socket = new SerialPort(combinedParams.dev, serialOptions, (error?: Error | null) => {
+      if (!error) return;
+
+      this.ioContext.log.error(
+        `ModBusMasterRtu serial "${combinedParams.dev}" initialization error: ${error}`
+      );
+    });
     const client = new Modbus.client.RTU(socket, slaveId);
 
     socket.on('error', (err: Error) => {
