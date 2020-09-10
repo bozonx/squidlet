@@ -1,25 +1,24 @@
 import IndexedEvents from 'system/lib/IndexedEvents';
 
-import readLogic, {AskDataCb} from './readLogic';
 import {MESSAGE_POSITIONS} from './constants';
+import readLogic from './readLogic';
 
 
 export type FunctionHandler = (funcNum: number, returnData: Uint8Array) => void;
 
 
-export default class PollOnceLogic {
-  private readonly askDataCb: AskDataCb;
+export default abstract class PollOnceBase {
   private readonly logWarn: (msg: string) => void;
   private functionsEvents = new IndexedEvents<FunctionHandler>();
 
 
-  constructor(
-    askDataCb: AskDataCb,
-    logWarn: (msg: string) => void,
-  ) {
-    this.askDataCb = askDataCb;
+  constructor(logWarn: (msg: string) => void) {
     this.logWarn = logWarn;
   }
+
+
+  protected abstract readLength(): Promise<number>;
+  protected abstract readPackage(length: number): Promise<Uint8Array>;
 
 
   addEventListener(cb: FunctionHandler): number {
@@ -31,11 +30,11 @@ export default class PollOnceLogic {
   }
 
   async pollOnce(): Promise<void> {
-    return await readLogic(this.askDataCb, this.handleIncomePacket);
+    return await readLogic(this.readLength, this.readPackage, this.handleIncomePacket);
   }
 
 
-  private handleIncomePacket(messages: Uint8Array[]) {
+  private handleIncomePacket = (messages: Uint8Array[]) => {
     // emit all the income messages
     for (let item of messages) {
       const funcNum: number = item[MESSAGE_POSITIONS.functionNum];

@@ -1,4 +1,5 @@
-export type AskDataCb = (register: number, count: number) => Promise<Uint8Array>;
+export type ReadLengthCb = () => Promise<number>;
+export type ReadPackageCb = (length: number) => Promise<Uint8Array>;
 
 
 enum READ_REGISTERS {
@@ -48,11 +49,10 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
  * Result is [Messages[], nextPackageLength]
  * An empty Messages array on result means no new data is available.
  * nextPackageLength is the length of the next package is available to be read.
- * @param askDataCb
- * @param packageLengthToRead
  */
 export async function readOnce(
-  askDataCb: AskDataCb,
+  readLength: ReadLengthCb,
+  readPackage: ReadPackageCb,
   packageLengthToRead?: number
 ): Promise<[Uint8Array[], number]> {
   let packageLength: number = packageLengthToRead || 0;
@@ -95,15 +95,17 @@ export async function readOnce(
 
 
 export default async function readLogic(
-  askDataCb: AskDataCb,
+  readLength: ReadLengthCb,
+  readPackage: ReadPackageCb,
   incomeMessageHandler: (messages: Uint8Array[]) => void
 ): Promise<void> {
-  let packageLength: number = 0;
+  let currentPackageLength: number = 0;
   // read while there no one packets remain
   while (true) {
     const [messages, nextPackageLength] = await readOnce(
-      askDataCb,
-      packageLength || undefined
+      readLength,
+      readPackage,
+      currentPackageLength || undefined
     );
 
     if (!nextPackageLength) {
@@ -111,7 +113,7 @@ export default async function readLogic(
       break;
     }
     else {
-      packageLength = nextPackageLength;
+      currentPackageLength = nextPackageLength;
     }
 
     incomeMessageHandler(messages);
