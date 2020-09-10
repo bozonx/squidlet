@@ -29,6 +29,7 @@ async function start () {
       .readInputRegisters(register, count);
     const parsedValues: number[] = [];
 
+    // TODO: move to helpers
     for (let item of result) {
       const bytes: Uint8Array = numToUint8Word(item);
 
