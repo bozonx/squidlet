@@ -1,7 +1,7 @@
-readLogic = require('../../../../entities/services/Transmitter/readLogic')
+readLogic = require('../../portExpander/services/PortExpander/readLogic')
 
 
-describe.only 'entities.services.Transmitter.readLogic', ->
+describe.only 'entities.services.PortExpander.readLogic', ->
   beforeEach ->
   it 'parseResult - full message', ->
     packagePayload = new Uint8Array([

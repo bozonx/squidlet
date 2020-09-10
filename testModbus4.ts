@@ -62,14 +62,6 @@ async function start () {
   //     .catch(handleErrors);
   // }, 100);
 
-  // setTimeout(() => {
-  //   //client.readHoldingRegisters(0, 1)
-  //   client.readInputRegisters(0, 4)
-  //     .then((data: any) => console.log('reading result ', data))
-  //     .catch(handleErrors)
-  //     .finally(() => socket.close());
-  // }, 200);
-
 }
 
 start()
