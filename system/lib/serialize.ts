@@ -157,6 +157,7 @@ export function serializeStringArray(arr: string[], lengthBytes: number = 1): Ui
 }
 
 // TODO: test
+// TODO: use deserializeUint8Array
 /**
  * Make array from Uint8Array which was encoded by serializeStringArray
  * and return the last index
@@ -184,4 +185,28 @@ export function deserializeStringArray(
   }
 
   return [result, i];
+}
+
+// TODO: test
+export function deserializeUint8Array(
+  data: Uint8Array,
+  startIndex: number = 0,
+  count?: number
+): {arrays: Uint8Array[], lastElementIndex: number} {
+  const resolvedCount = (typeof count === 'undefined') ? data.length : count;
+  const result: Uint8Array[] = [];
+  let i: number;
+
+  for (i = startIndex; i < data.length; i++) {
+    const itemLength: number = data[i];
+    const itemData = data.slice(i + 1, i + itemLength + 1);
+
+    result.push(itemData);
+
+    i = i + itemLength;
+
+    if (result.length >= resolvedCount) break;
+  }
+
+  return {arrays: result, lastElementIndex: i};
 }

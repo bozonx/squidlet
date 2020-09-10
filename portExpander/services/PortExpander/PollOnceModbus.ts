@@ -9,6 +9,8 @@ enum READ_REGISTERS {
   package,
 }
 
+const READ_PACKAGE_LENGTH_COUNT = 1;
+
 
 export default class PollOnceModbus extends PollOnceBase {
   private readonly modbusMasterDriver: ModbusMaster;
@@ -23,7 +25,7 @@ export default class PollOnceModbus extends PollOnceBase {
 
   protected readLength = async (): Promise<number> => {
     const result: Uint16Array = await this.modbusMasterDriver
-      .readInputRegisters(READ_REGISTERS.length, 1);
+      .readInputRegisters(READ_REGISTERS.length, READ_PACKAGE_LENGTH_COUNT);
 
     const bytes: Uint8Array = numToUint8Word(result[0]);
 

@@ -76,6 +76,17 @@ export class ModbusMaster extends DriverBase<ModbusMasterDriverProps> {
   }
 
   async writeMultipleCoils(start: number, values: boolean[]): Promise<void> {
+
+    // TODO: проверять длину тут или в IO
+
+    // if (result.length !== length) {
+    //   throw new Error(
+    //     `PollOnceModbusЖ Invalid length of readPackageLength result: ${result.length}, ` +
+    //     `Expected: ${READ_PACKAGE_LENGTH_COUNT}`
+    //   );
+    // }
+
+
     return this.modBusIo.writeMultipleCoils(
       this.props.portNum,
       this.props.slaveId,

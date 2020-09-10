@@ -1,47 +1,43 @@
+import {deserializeUint8Array} from '../serialize';
+
 export type ReadLengthCb = () => Promise<number>;
 export type ReadPackageCb = (length: number) => Promise<Uint8Array>;
 
 
-enum READ_REGISTERS {
-  readPackageLength,
-  readPackage
-}
-
-const READ_PACKAGE_LENGTH_COUNT = 1;
 const NEXT_PACKAGE_MARKER = 255;
 
 
-export function parseResult(result: Uint8Array): [Uint8Array[], number] {
-  const messages: Uint8Array[] = [];
-  let nextPackageLength: number = 0;
-  let pointerToNextMessage: number = 0;
-
-  for (let i = 0; i < result.length; i++) {
-    const messageLength: number = result[pointerToNextMessage];
-
-    if (pointerToNextMessage >= result.length - 1) {
-      break;
-    }
-    // the enf of data or no data
-    if (messageLength === 0) {
-      break;
-    }
-    else if (messageLength === NEXT_PACKAGE_MARKER) {
-      nextPackageLength = result[pointerToNextMessage + 1];
-
-      break;
-    }
-
-    const endOfMessage = pointerToNextMessage + 1 + messageLength;
-    const message: Uint8Array = result.slice(pointerToNextMessage + 1, endOfMessage);
-
-    messages.push(message);
-
-    pointerToNextMessage = endOfMessage;
-  }
-
-  return [messages, nextPackageLength];
-}
+// export function parseResult(result: Uint8Array): [Uint8Array[], number] {
+//   const messages: Uint8Array[] = [];
+//   let nextPackageLength: number = 0;
+//   let pointerToNextMessage: number = 0;
+//
+//   for (let i = 0; i < result.length; i++) {
+//     const messageLength: number = result[pointerToNextMessage];
+//
+//     if (pointerToNextMessage >= result.length - 1) {
+//       break;
+//     }
+//     // the enf of data or no data
+//     if (messageLength === 0) {
+//       break;
+//     }
+//     else if (messageLength === NEXT_PACKAGE_MARKER) {
+//       nextPackageLength = result[pointerToNextMessage + 1];
+//
+//       break;
+//     }
+//
+//     const endOfMessage = pointerToNextMessage + 1 + messageLength;
+//     const message: Uint8Array = result.slice(pointerToNextMessage + 1, endOfMessage);
+//
+//     messages.push(message);
+//
+//     pointerToNextMessage = endOfMessage;
+//   }
+//
+//   return [messages, nextPackageLength];
+// }
 
 /**
  * It asks for data and return array of messages which has been received.
@@ -55,42 +51,30 @@ export async function readOnce(
   readPackage: ReadPackageCb,
   packageLengthToRead?: number
 ): Promise<{messages: Uint8Array[], nextPackageLength: number}> {
+  const result: {messages: Uint8Array[], nextPackageLength: number} = {
+    messages: [],
+    nextPackageLength: 0
+  };
   let packageLength: number = packageLengthToRead || 0;
 
-  // TODO: если последними байтами указанна длина то можно ее сразу отчиплять
-  //       и использовать спец хэлпер
-
   if (!packageLength) {
-    // TODO: тут же будет разложен слово на байты !!!!
-    const packageLengthResult: Uint8Array = await askDataCb(
-      READ_REGISTERS.readPackageLength,
-      READ_PACKAGE_LENGTH_COUNT
-    );
-
-    console.log(1111111, packageLengthResult)
-
-    if (packageLengthResult.length !== READ_PACKAGE_LENGTH_COUNT) {
-      throw new Error(
-        `Invalid length of readPackageLength result: ${packageLengthResult.length}, ` +
-        `Expected: ${READ_PACKAGE_LENGTH_COUNT}`
-      );
-    }
-
-    packageLength = packageLengthResult[0];
+    packageLength = await readLength();
   }
 
-  if (!packageLength) return [[], 0];
+  if (!packageLength) return result;
 
-  const packageResult: Uint8Array = await askDataCb(
-    READ_REGISTERS.readPackage,
-    packageLength
-  );
+  const packageResult: Uint8Array = await readPackage(packageLength);
 
-  if (packageResult.length !== packageLength) {
-    throw new Error(`Invalid length of package result`);
+  if (packageResult[0] === NEXT_PACKAGE_MARKER) {
+    result.nextPackageLength = packageResult[1];
+  }
+  else {
+    const {arrays} = deserializeUint8Array(packageResult);
+
+    result.messages = arrays;
   }
 
-  return parseResult(packageResult);
+  return result;
 }
 
 
