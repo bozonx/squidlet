@@ -26,25 +26,9 @@ export default class PollOnceLogic {
   }
 
   async pollOnce(): Promise<void> {
-    let packageLength: number = 0;
-    // read while there no one packets remain
-    while (true) {
-      const [messages, nextPackageLength] = await readLogic(
-        this.askDataCb,
-        packageLength || undefined
-      );
-
-      if (!nextPackageLength) {
-        // means the end
-        break;
-      }
-      else {
-        packageLength = nextPackageLength;
-      }
-
-      this.handleIncomePacket(messages);
-    }
+    return await readLogic(this.askDataCb, this.handleIncomePacket);
   }
+
 
   private handleIncomePacket(messages: Uint8Array[]) {
     const functionsData: [number, Results][] = parseIncomeMessage(messages);

@@ -42,7 +42,6 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
   return [messages, nextPackageLength];
 }
 
-
 /**
  * It asks for data and return array of messages which has been received.
  * It use for poll.
@@ -52,7 +51,7 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
  * @param askDataCb
  * @param packageLengthToRead
  */
-export default async function readLogic(
+export async function readOnce(
   askDataCb: AskDataCb,
   packageLengthToRead?: number
 ): Promise<[Uint8Array[], number]> {
@@ -83,4 +82,29 @@ export default async function readLogic(
   }
 
   return parseResult(packageResult);
+}
+
+
+export default async function readLogic(
+  askDataCb: AskDataCb,
+  incomeMessageHandler: (messages: Uint8Array[]) => void
+): Promise<void> {
+  let packageLength: number = 0;
+  // read while there no one packets remain
+  while (true) {
+    const [messages, nextPackageLength] = await readOnce(
+      askDataCb,
+      packageLength || undefined
+    );
+
+    if (!nextPackageLength) {
+      // means the end
+      break;
+    }
+    else {
+      packageLength = nextPackageLength;
+    }
+
+    incomeMessageHandler(messages);
+  }
 }
