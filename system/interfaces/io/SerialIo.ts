@@ -22,8 +22,10 @@ export interface SerialParams {
   pinTX?: number;
   // default is 9600
   baudRate?: BaudRate;
+  // TODO: выяснить как правильно пишется
   databits?: 7 | 8;                      // (default 8)How many data bits - 7 or 8
   parity?: 'none' | 'o' | 'odd' | 'e' | 'even'; // (default none) Parity bit
+  // TODO: выяснить как правильно пишется
   stopbits?: number;                     // (default 1) Number of stop bits to use
 }
 
