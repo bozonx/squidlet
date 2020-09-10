@@ -58,7 +58,7 @@ export default async function readLogic(
 ): Promise<[Uint8Array[], number]> {
   let packageLength: number = packageLengthToRead || 0;
 
-  if (!packageLengthToRead) {
+  if (!packageLength) {
     const packageLengthResult: Uint8Array = await askDataCb(
       READ_REGISTERS.readPackageLength,
       READ_PACKAGE_LENGTH_COUNT
