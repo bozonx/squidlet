@@ -228,6 +228,23 @@ export function uint8ToNum(uint8Arr: Uint8Array): number {
   return hexStringToHexNum(hexStr);
 }
 
+// TODO: test
+/**
+ * convert [65535, 0] => [255,255, 0, 0]
+ */
+export function uint16ToUint8(arr16: Uint16Array): Uint8Array {
+  const parsedValues: number[] = [];
+
+  for (let item of arr16) {
+    const bytes: Uint8Array = numToUint8Word(item);
+
+    parsedValues.push(bytes[0]);
+    parsedValues.push(bytes[1]);
+  }
+
+  return new Uint8Array(parsedValues);
+}
+
 /**
  * Make hex string from 32 bit number (0 - 4294967295).
  * It always returns 8 characters.

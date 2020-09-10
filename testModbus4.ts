@@ -2,9 +2,8 @@ import Context from 'system/Context';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
-import {numToUint8Word} from './system/lib/binaryHelpers';
-import {AskDataCb} from './system/lib/remoteFunctionProtocol/readLogic';
-import PollOnceLogic, {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceLogic';
+import PollOnceModbus from './portExpander/services/PortExpander/PollOnceModbus';
+import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
 
 
 async function start () {
@@ -23,22 +22,7 @@ async function start () {
     }
   };
   const modbusMasterDriver: ModbusMaster = new ModbusMaster(context, definition);
-  const askDataCb: AskDataCb = async (register: number, count: number): Promise<Uint8Array> => {
-    const result: Uint16Array = await modbusMasterDriver
-      .readInputRegisters(register, count);
-    const parsedValues: number[] = [];
-
-    // TODO: move to helpers
-    for (let item of result) {
-      const bytes: Uint8Array = numToUint8Word(item);
-
-      parsedValues.push(bytes[0]);
-      parsedValues.push(bytes[1]);
-    }
-
-    return new Uint8Array(parsedValues);
-  };
-  const pollOnceLogic = new PollOnceLogic(askDataCb, console.warn);
+  const pollOnce = new PollOnceModbus(modbusMasterDriver, console.warn);
 
   await masterIo.configure({
     ports: {
@@ -89,8 +73,8 @@ async function start () {
 
   };
 
-  pollOnceLogic.addEventListener(handler);
-  await pollOnceLogic.pollOnce();
+  pollOnce.addEventListener(handler);
+  await pollOnce.pollOnce();
 
 
   // const pinNumber: number = 12;
