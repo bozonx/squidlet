@@ -1,5 +1,5 @@
 import IoItem from '../IoItem';
-import {BaudRate, SerialParams} from './SerialIo';
+import {SerialParams} from './SerialIo';
 
 
 export const Methods = [
@@ -28,6 +28,10 @@ export interface ModbusDefinition {
   // TODO: add default port
 }
 
+
+// TODO: что должно передаваться из ModbusIo - Uint16Array или Uint8Array ???
+
+
 export default interface ModBusMasterRtuIo extends IoItem {
   readCoils(
     portNum: number | string,
@@ -47,14 +51,14 @@ export default interface ModBusMasterRtuIo extends IoItem {
     portNum: number | string,
     slaveId: number,
     start: number, count: number
-  ): Promise<Uint8Array>;
+  ): Promise<Uint16Array>;
 
   readInputRegisters(
     portNum: number | string,
     slaveId: number,
     start: number,
     count: number
-  ): Promise<Uint8Array>;
+  ): Promise<Uint16Array>;
 
   writeSingleCoil(
     portNum: number | string,
@@ -81,6 +85,6 @@ export default interface ModBusMasterRtuIo extends IoItem {
     portNum: number | string,
     slaveId: number,
     start: number,
-    values: Uint8Array
+    values: Uint16Array
   ): Promise<void>;
 }
