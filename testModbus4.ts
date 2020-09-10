@@ -2,8 +2,10 @@ import Context from 'system/Context';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
-import PollOnceLogic from './portExpander/services/PortExpander/PollOnceLogic';
+import PollOnceLogic, {FunctionHandler} from './portExpander/services/PortExpander/PollOnceLogic';
 import {numToUint8Word} from './system/lib/binaryHelpers';
+import {Results} from './portExpander/services/PortExpander/parseIncomeMessage';
+import {AskDataCb} from './portExpander/services/PortExpander/readLogic';
 
 
 async function start () {
@@ -22,6 +24,21 @@ async function start () {
     }
   };
   const modbusMasterDriver: ModbusMaster = new ModbusMaster(context, definition);
+  const askDataCb: AskDataCb = async (register: number, count: number): Promise<Uint8Array> => {
+    const result: Uint16Array = await modbusMasterDriver
+      .readInputRegisters(register, count);
+    const parsedValues: number[] = [];
+
+    for (let item of result) {
+      const bytes: Uint8Array = numToUint8Word(item);
+
+      parsedValues.push(bytes[0]);
+      parsedValues.push(bytes[1]);
+    }
+
+    return new Uint8Array(parsedValues);
+  };
+  const pollOnceLogic = new PollOnceLogic(askDataCb);
 
   await masterIo.configure({
     ports: {
@@ -44,23 +61,13 @@ async function start () {
   } as any);
   await modbusMasterDriver.init();
 
-  const askDataCb = async (register: number, count: number): Promise<Uint8Array> => {
-    const result: Uint16Array = await modbusMasterDriver
-      .readInputRegisters(register, count);
-    const parsedValues: number[] = [];
-
-    for (let item of result) {
-      const bytes: Uint8Array = numToUint8Word(item);
-
-      parsedValues.push(bytes[0]);
-      parsedValues.push(bytes[1]);
-    }
-
-    return new Uint8Array(parsedValues);
+  ////////////////// Do things
+  const handler: FunctionHandler = (functionNumber: number, args: Results) => {
+    console.log(1111111, functionNumber, args);
   };
-  const pollOnceLogic = new PollOnceLogic(askDataCb);
 
-
+  pollOnceLogic.addEventListener(handler);
+  await pollOnceLogic.pollOnce();
 
 
   // const pinNumber: number = 12;
