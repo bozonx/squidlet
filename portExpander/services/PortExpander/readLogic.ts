@@ -57,11 +57,17 @@ export async function readOnce(
 ): Promise<[Uint8Array[], number]> {
   let packageLength: number = packageLengthToRead || 0;
 
+  // TODO: если последними байтами указанна длина то можно ее сразу отчиплять
+  //       и использовать спец хэлпер
+
   if (!packageLength) {
+    // TODO: тут же будет разложен слово на байты !!!!
     const packageLengthResult: Uint8Array = await askDataCb(
       READ_REGISTERS.readPackageLength,
       READ_PACKAGE_LENGTH_COUNT
     );
+
+    console.log(1111111, packageLengthResult)
 
     if (packageLengthResult.length !== READ_PACKAGE_LENGTH_COUNT) {
       throw new Error(

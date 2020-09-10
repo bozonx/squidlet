@@ -4,7 +4,7 @@ import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
 import PollOnceLogic, {FunctionHandler} from './portExpander/services/PortExpander/PollOnceLogic';
 import {numToUint8Word} from './system/lib/binaryHelpers';
-import {Results} from './portExpander/services/PortExpander/parseFunctionsArgs';
+import {Results} from './portExpander/services/PortExpander/parsePortExpanderFunctionsReturns';
 import {AskDataCb} from './portExpander/services/PortExpander/readLogic';
 
 
@@ -63,8 +63,31 @@ async function start () {
   await modbusMasterDriver.init();
 
   ////////////////// Do things
-  const handler: FunctionHandler = (functionNumber: number, args: Results) => {
-    console.log(1111111, functionNumber, args);
+  const handler: FunctionHandler = (funcNum: number, returnData: Uint8Array) => {
+    console.log(1111111, funcNum, returnData);
+
+    // if (!functionsParsers[functionNum]) {
+    //   this.logWarn(
+    //     `PollOnceLogic: Can't recognize the function handler: ${functionNum}`
+    //   );
+    //
+    //   continue;
+    // }
+    //
+    // let args: Results;
+    //
+    // try {
+    //   args = functionsParsers[functionNum](data);
+    // }
+    // catch (e) {
+    //   this.logWarn(
+    //     `PollOnceLogic: an error occurred while parsing ` +
+    //     `function ${functionNum} result: ${e}`
+    //   );
+    //
+    //   continue;
+    // }
+
   };
 
   pollOnceLogic.addEventListener(handler);
