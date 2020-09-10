@@ -12,4 +12,3 @@ props:
   slaveId:
     type: number
     required: true
-

@@ -1,35 +1,4 @@
-// create a tcp modbus client
-import {uint8ToNum} from './system/lib/binaryHelpers';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
-
-
-function makePinSetupPackage(pinNum: number): number[] {
-  const digitalOutputSetupFunctionNum = 10;
-  const dataWords: number[] = [uint8ToNum(new Uint8Array([
-    pinNum,
-    0,
-  ]))];
-  const lengthAndFuncWord: number = uint8ToNum(new Uint8Array([
-    dataWords.length,
-    digitalOutputSetupFunctionNum
-  ]));
-
-  return [lengthAndFuncWord, ...dataWords];
-}
-
-function makePinWritePackage(pinNum: number, state: boolean): number[] {
-  const digitalOutputWriteFunctionNum = 11;
-  const dataWords: number[] = [uint8ToNum(new Uint8Array([
-    pinNum,
-    (state) ? 1 : 0,
-  ]))];
-  const lengthAndFuncWord = uint8ToNum(new Uint8Array([
-    dataWords.length,
-    digitalOutputWriteFunctionNum
-  ]));
-
-  return [lengthAndFuncWord, ...dataWords];
-}
 
 
 async function start () {
@@ -58,8 +27,6 @@ async function start () {
   const slaveAddress = 0x01;
   const pinNumber: number = 12;
   const pinState: boolean = true;
-  const pinSetupMessage: number[] = makePinSetupPackage(pinNumber);
-  const pinWriteMessage: number[] = makePinWritePackage(pinNumber, pinState);
 
 
   const result: Uint16Array = await master.readInputRegisters(0, slaveAddress, 0,4);
