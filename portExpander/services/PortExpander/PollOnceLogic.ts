@@ -1,11 +1,10 @@
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import IndexedEvents from 'system/lib/IndexedEvents';
 
 import readLogic, {AskDataCb} from './readLogic';
 import parseIncomeMessage, {MESSAGE_POSITIONS, Results} from './parseIncomeMessage';
-import IndexedEvents from '../../../system/lib/IndexedEvents';
 
 
-type FunctionHandler = (functionNumber: number, args: Results) => void;
+export type FunctionHandler = (functionNumber: number, args: Results) => void;
 
 
 export default class PollOnceLogic {
