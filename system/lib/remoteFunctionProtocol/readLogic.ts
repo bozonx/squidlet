@@ -54,7 +54,7 @@ export async function readOnce(
   readLength: ReadLengthCb,
   readPackage: ReadPackageCb,
   packageLengthToRead?: number
-): Promise<[Uint8Array[], number]> {
+): Promise<{messages: Uint8Array[], nextPackageLength: number}> {
   let packageLength: number = packageLengthToRead || 0;
 
   // TODO: если последними байтами указанна длина то можно ее сразу отчиплять
@@ -99,23 +99,23 @@ export default async function readLogic(
   readPackage: ReadPackageCb,
   incomeMessageHandler: (messages: Uint8Array[]) => void
 ): Promise<void> {
-  let currentPackageLength: number = 0;
+  let nextPackageLength: number = 0;
   // read while there no one packets remain
   while (true) {
-    const [messages, nextPackageLength] = await readOnce(
+    const result = await readOnce(
       readLength,
       readPackage,
-      currentPackageLength || undefined
+      nextPackageLength || undefined
     );
 
-    if (!nextPackageLength) {
+    if (result.nextPackageLength) {
+      nextPackageLength = result.nextPackageLength;
+    }
+    else {
       // means the end
       break;
     }
-    else {
-      currentPackageLength = nextPackageLength;
-    }
 
-    incomeMessageHandler(messages);
+    incomeMessageHandler(result.messages);
   }
 }
