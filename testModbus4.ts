@@ -38,6 +38,7 @@ async function start () {
   await master.configure({
     ports: {
       0: {
+        dev: '/dev/ttyUSB1',
         baudRate: 9600,
         parity: 'none',
         databits: 8,
@@ -61,7 +62,9 @@ async function start () {
   const pinWriteMessage: number[] = makePinWritePackage(pinNumber, pinState);
 
 
-  const result = await master.readInputRegisters(0, slaveAddress, 0,4);
+  const result: Uint16Array = await master.readInputRegisters(0, slaveAddress, 0,4);
+
+  console.log(22222222, result);
 
   // client.writeMultipleRegisters(0x00, pinSetupMessage)
   //   .then((data: any) => console.log('writing result ', data))

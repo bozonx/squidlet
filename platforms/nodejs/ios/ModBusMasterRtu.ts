@@ -1,9 +1,10 @@
-import Modbus, {ModbusRTUClient} from 'jsmodbus';
+import {ModbusRTUClient} from 'jsmodbus';
 import {IUserRequestResolve} from 'jsmodbus/dist/user-request';
 import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 import ReadInputRegistersRequestBody from 'jsmodbus/dist/request/read-input-registers';
 import {ReadHoldingRegistersRequestBody} from 'jsmodbus/dist/request';
 import {CastRequestBody} from 'jsmodbus/dist/request-response-map';
+const Modbus = require('jsmodbus');
 const SerialPort = require('serialport');
 //import * as SerialPort from 'serialport';
 
@@ -76,7 +77,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     slaveId: number,
     start: number,
     count: number
-  ): Promise<Uint8Array> {
+  ): Promise<Uint16Array> {
     const instance = await this.getInstance(portNum, slaveId);
     const result: IUserRequestResolve<CastRequestBody<ModbusRTURequest, ReadHoldingRegistersRequestBody>> = await instance
       .readHoldingRegisters(start, count);
@@ -86,7 +87,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
       throw new Error(`Incorrect values length: ${values.length}, expected ${count}`);
     }
 
-    return new Uint8Array(values);
+    return new Uint16Array(values);
   }
 
   async readInputRegisters(
@@ -94,7 +95,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     slaveId: number,
     start: number,
     count: number
-  ): Promise<Uint8Array> {
+  ): Promise<Uint16Array> {
     const instance = await this.getInstance(portNum, slaveId);
     const result: IUserRequestResolve<CastRequestBody<ModbusRTURequest, ReadInputRegistersRequestBody>> = await instance
       .readInputRegisters(start, count);
@@ -104,7 +105,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
       throw new Error(`Incorrect values length: ${values.length}, expected ${count}`);
     }
 
-    return new Uint8Array(values);
+    return new Uint16Array(values);
   }
 
   async writeSingleCoil(
@@ -144,7 +145,7 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     portNum: number | string,
     slaveId: number,
     start: number,
-    values: Uint8Array
+    values: Uint16Array
   ): Promise<void> {
     const instance = await this.getInstance(portNum, slaveId);
     // TODO: check result
