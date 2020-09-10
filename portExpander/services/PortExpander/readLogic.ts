@@ -50,20 +50,26 @@ export function parseResult(result: Uint8Array): [Uint8Array[], number] {
  * An empty Messages array on result means no new data is available.
  * nextPackageLength is the length of the next package is available to be read.
  * @param askDataCb
+ * @param packageLengthToRead
  */
 export default async function readLogic(
-  askDataCb: AskDataCb
+  askDataCb: AskDataCb,
+  packageLengthToRead?: number
 ): Promise<[Uint8Array[], number]> {
-  const packageLengthResult: Uint8Array = await askDataCb(
-    READ_REGISTERS.readPackageLength,
-    READ_PACKAGE_LENGTH_COUNT
-  );
+  let packageLength: number = packageLengthToRead || 0;
 
-  if (packageLengthResult.length !== READ_PACKAGE_LENGTH_COUNT) {
-    throw new Error(`Invalid length of readPackageLength result`);
+  if (!packageLengthToRead) {
+    const packageLengthResult: Uint8Array = await askDataCb(
+      READ_REGISTERS.readPackageLength,
+      READ_PACKAGE_LENGTH_COUNT
+    );
+
+    if (packageLengthResult.length !== READ_PACKAGE_LENGTH_COUNT) {
+      throw new Error(`Invalid length of readPackageLength result`);
+    }
+
+    packageLength = packageLengthResult[0];
   }
-
-  const packageLength: number = packageLengthResult[0];
 
   if (!packageLength) return [[], 0];
 
