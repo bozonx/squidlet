@@ -150,6 +150,8 @@ export default class ModBusMasterRtu implements ModBusMasterRtuIo {
     values: Uint16Array
   ): Promise<void> {
     const instance = await this.getInstance(portNum, slaveId);
+
+    console.log(1111111111, values)
     // TODO: check result
     await instance.writeMultipleRegisters(start, [...values]);
   }
