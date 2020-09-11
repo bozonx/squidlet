@@ -20,7 +20,11 @@ export default class CallFunctionModbus extends CallFunctionBase {
 
     console.log(1111111, packageData)
 
-    const package16Bit: Uint16Array = uint8ToUint16(packageData);
+    //const package16Bit: Uint16Array = uint8ToUint16(packageData);
+    const package16Bit: Uint16Array = uint8ToUint16(new Uint8Array([
+      1, 10, 12,
+      2, 11, 12, 1
+    ]));
 
     await this.modbusMasterDriver.writeMultipleRegisters(WRITE_START_INDEX, package16Bit);
   }
