@@ -47,7 +47,7 @@ async function start () {
 
   ////////////////// Do things
   const handler: FunctionHandler = (funcNum: number, returnData: Uint8Array) => {
-    console.log(1111111, funcNum, returnData);
+    console.log('return of funcNum: ', funcNum, ', data is: ', returnData);
 
     // if (!functionsParsers[functionNum]) {
     //   this.logWarn(

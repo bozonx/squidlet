@@ -37,6 +37,9 @@ export default class PollOnceModbus extends PollOnceBase {
    * @param length - count of 16 bit words
    */
   protected readPackage = async (length: number): Promise<Uint8Array> => {
+
+    //return new Uint8Array([2,5,1])
+
     const result: Uint16Array = await this.modbusMasterDriver
       .readInputRegisters(READ_REGISTERS.package, length);
 
