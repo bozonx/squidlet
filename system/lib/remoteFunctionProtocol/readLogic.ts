@@ -67,6 +67,10 @@ export async function readOnce(
 
   if (packageResult[0] === NEXT_PACKAGE_MARKER) {
     result.nextPackageLength = packageResult[1];
+
+    const {arrays} = deserializeUint8Array(packageResult, 2);
+
+    result.messages = arrays;
   }
   else {
     const {arrays} = deserializeUint8Array(packageResult);
@@ -92,6 +96,8 @@ export default async function readLogic(
       nextPackageLength || undefined
     );
 
+    incomeMessageHandler(result.messages);
+
     if (result.nextPackageLength) {
       nextPackageLength = result.nextPackageLength;
     }
@@ -99,7 +105,5 @@ export default async function readLogic(
       // means the end
       break;
     }
-
-    incomeMessageHandler(result.messages);
   }
 }
