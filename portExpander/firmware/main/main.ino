@@ -1,9 +1,9 @@
-#include <ModbusSlave.h>
+#include "modbusConnection.h"
 
 
 void setup() {
   modbusConnectionBegin();
-  //Serial.println("started!");
+  Serial.println("started!");
 }
 
 void loop() {
