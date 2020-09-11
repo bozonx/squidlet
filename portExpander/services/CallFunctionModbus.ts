@@ -17,6 +17,9 @@ export default class CallFunctionModbus extends CallFunctionBase {
 
 
   protected async writePackage(packageData: Uint8Array): Promise<void> {
+
+    console.log(1111111, packageData)
+
     const package16Bit: Uint16Array = uint8ToUint16(packageData);
 
     await this.modbusMasterDriver.writeMultipleRegisters(WRITE_START_INDEX, package16Bit);

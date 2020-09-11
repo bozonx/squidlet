@@ -1,0 +1,93 @@
+#include <Arduino.h>
+#include <ArduinoRS485.h>
+#include <ArduinoModbus.h>
+
+#include "global.cpp"
+
+// array of function pointers
+void (*functionsArray []) (uint8_t data[]) = {};
+
+#include "digitalOutput.h"
+
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial);
+
+  RS485.setPins(TX_PIN, SEND_RECEIVE_SWITCH_PIN, SEND_RECEIVE_SWITCH_PIN);
+
+  // start the Modbus RTU server, with (slave) id 42
+  if (!ModbusRTUServer.begin(SLAVE_ADDRESS, 9600)) {
+    Serial.println("Failed to start Modbus RTU Server!");
+    while (1);
+  }
+
+  // configure holding registers at address 0x00
+  ModbusRTUServer.configureHoldingRegisters(0x00, FUNCTIONS_NUM);
+
+  // configure input registers at address 0x00
+  ModbusRTUServer.configureInputRegisters(0x00, FUNCTIONS_NUM);
+
+  digitalOutputBegin();
+
+  Serial.print("Inited!");
+
+  ModbusRTUServer.inputRegisterWrite(0x01, 0x06);
+  ModbusRTUServer.holdingRegisterWrite(0x01, 0x06);
+}
+
+
+void loop() {
+//  if (RS485.available() > 0) {  //если есть доступные данные
+//    Serial.print("available: ");
+//    Serial.println(RS485.available());
+// 
+//    // отсылаем то, что получили
+//    Serial.print("I received: ");
+//    Serial.print(RS485.peek());
+//    Serial.print(" - ");
+//    Serial.print(RS485.peek());
+//    Serial.print(" - ");
+//    Serial.println(RS485.peek());
+//  }
+
+  
+  
+  // poll for Modbus RTU requests
+  ModbusRTUServer.poll();
+
+  uint8_t data[MAX_PAYLOAD_LENGTH_BYTES] = {};
+
+  if (ModbusRTUServer.holdingRegisterRead(0) != 0) {
+    uint8_t packageLengthWords;
+    uint8_t functionToCall;
+
+    for (int i = 0; i < MAX_PACKAGE_LENGTH_WORDS; i++) {
+      if (i == 0) {
+        long value = ModbusRTUServer.holdingRegisterRead(i);
+        packageLengthWords = (value >> 8);
+        functionToCall = value & 0xff;
+
+        continue;
+      }
+      // parse data
+      long value = ModbusRTUServer.holdingRegisterRead(i);
+      uint8_t firstByte = (value >> 8);
+      uint8_t secondByte = value & 0xff;
+      // save bytes of words
+      data[(i - 1) * 2] = firstByte;
+      data[((i - 1) * 2) + 1] = secondByte;
+
+      // if it is the end of package then stop
+      if (i >= (packageLengthWords)) {
+        break;
+      }
+    }
+    // call function
+    functionsArray[functionToCall](data);
+
+    // stop read
+    ModbusRTUServer.holdingRegisterWrite(0, 0);
+  }
+
+}

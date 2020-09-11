@@ -31,9 +31,14 @@ export default abstract class CallFunctionBase {
 
 
   private async sendPackages(): Promise<void> {
+    // TODO: вынести код формирования пакетов в хэлперы
     const packages: Uint8Array[] = [];
 
     for (let item of this.callBuffer) {
+
+      // TODO: запихивать в 1 пакет несколько сообщений с указанием длины
+      // TODO: если длина слишком большая то делать новый пакет
+
       packages.push(makeCallFunctionMessage(item[0], item[1]));
     }
 
