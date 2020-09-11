@@ -253,7 +253,7 @@ export function uint8ToUint16(arr8: Uint8Array): Uint16Array {
   const result: number[] = [];
 
   for (let i = 0; i < arr8.length; i++) {
-    if (arr8.length > i + 2) {
+    if (i + 2 > arr8.length) {
       // the last odd byte
       result.push(uint8ToNum(new Uint8Array([arr8[i], 0])));
 
