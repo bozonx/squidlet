@@ -1,10 +1,8 @@
 import {deserializeUint8Array} from '../serialize';
+import {NEXT_PACKAGE_MARKER} from './constants';
 
 export type ReadLengthCb = () => Promise<number>;
 export type ReadPackageCb = (length: number) => Promise<Uint8Array>;
-
-
-const NEXT_PACKAGE_MARKER = 255;
 
 
 // export function parseResult(result: Uint8Array): [Uint8Array[], number] {
