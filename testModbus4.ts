@@ -4,6 +4,7 @@ import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
 import PollOnceModbus from './portExpander/services/PortExpander/PollOnceModbus';
 import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
+import CallFunctionModbus from './portExpander/services/CallFunctionModbus';
 
 
 async function start () {
@@ -23,6 +24,7 @@ async function start () {
   };
   const modbusMasterDriver: ModbusMaster = new ModbusMaster(context, definition);
   const pollOnce = new PollOnceModbus(modbusMasterDriver, console.warn);
+  const callFunction = new CallFunctionModbus(modbusMasterDriver);
 
   await masterIo.configure({
     ports: {
@@ -76,25 +78,13 @@ async function start () {
   pollOnce.addEventListener(handler);
   await pollOnce.pollOnce();
 
+  const pinNumber: number = 12;
+  const pinState: number = 1;
 
-  // const pinNumber: number = 12;
-  // const pinState: boolean = true;
-
-  // const result: Uint16Array = await modbusMasterDriver
-  //   .readInputRegisters(0, 4);
-  //
-  // console.log(22222222, result);
-
-  // client.writeMultipleRegisters(0x00, pinSetupMessage)
-  //   .then((data: any) => console.log('writing result ', data))
-  //   .catch(handleErrors);
-  //
-  // setTimeout(() => {
-  //   client.writeMultipleRegisters(0x00, pinWriteMessage)
-  //     .then((data: any) => console.log('writing result ', data))
-  //     .catch(handleErrors);
-  // }, 100);
-
+  await callFunction.callFunction(
+    10,
+    new Uint8Array([pinNumber, pinState])
+  );
 }
 
 start()

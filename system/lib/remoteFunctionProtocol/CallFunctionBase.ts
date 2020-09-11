@@ -1,6 +1,7 @@
 import {makeCallFunctionMessage} from './writeLogic';
 import {clearArray} from '../arrays';
 
+
 export default abstract class CallFunctionBase {
   private callBuffer: [number, Uint8Array][] = [];
 
