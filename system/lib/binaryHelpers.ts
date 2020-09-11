@@ -230,19 +230,44 @@ export function uint8ToNum(uint8Arr: Uint8Array): number {
 
 // TODO: test
 /**
- * convert [65535, 0] => [255,255, 0, 0]
+ * Converts [65535, 0] => [255,255, 0, 0]
  */
 export function uint16ToUint8(arr16: Uint16Array): Uint8Array {
-  const parsedValues: number[] = [];
+  const result: number[] = [];
 
   for (let item of arr16) {
     const bytes: Uint8Array = numToUint8Word(item);
 
-    parsedValues.push(bytes[0]);
-    parsedValues.push(bytes[1]);
+    result.push(bytes[0]);
+    result.push(bytes[1]);
   }
 
-  return new Uint8Array(parsedValues);
+  return new Uint8Array(result);
+}
+
+// TODO: test
+/**
+ * Converts [255,255, 0, 0] => [65535, 0]
+ */
+export function uint8ToUint16(arr8: Uint8Array): Uint16Array {
+  const result: number[] = [];
+
+  for (let i = 0; i < arr8.length; i++) {
+    if (arr8.length > i + 2) {
+      // the last odd byte
+      result.push(uint8ToNum(new Uint8Array([arr8[i], 0])));
+
+      break;
+    }
+    else {
+      // on ordinary bytes
+      result.push(uint8ToNum(new Uint8Array([arr8[i], arr8[i + 1]])));
+
+      i++;
+    }
+  }
+
+  return new Uint16Array(result);
 }
 
 /**
