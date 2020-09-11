@@ -76,13 +76,17 @@ async function start () {
   };
 
   pollOnce.addEventListener(handler);
-  await pollOnce.pollOnce();
+  //await pollOnce.pollOnce();
 
   const pinNumber: number = 12;
   const pinState: number = 1;
 
   await callFunction.callFunction(
     10,
+    new Uint8Array([pinNumber])
+  );
+  await callFunction.callFunction(
+    11,
     new Uint8Array([pinNumber, pinState])
   );
 }
