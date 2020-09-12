@@ -76,18 +76,19 @@ async function start () {
 
   };
 
+  const outputPinNumber: number = 12;
+  const inputPinNumber: number = 11;
+
   pollOnce.addEventListener(handler);
   // setup input pin
   await callFunction.callFunction(
     12,
     // pin 11
-    new Uint8Array([11])
+    new Uint8Array([inputPinNumber])
   );
   // read pin
   await pollOnce.pollOnce();
 
-  const pinNumber: number = 12;
-  let pinState: number = 1;
 
 
   //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
