@@ -1,6 +1,6 @@
 import CallFunctionBase from 'system/lib/remoteFunctionProtocol/CallFunctionBase';
-import {ModbusMaster} from '../../entities/drivers/ModbusMaster/ModbusMaster';
-import {uint8ToUint16} from '../../system/lib/binaryHelpers';
+import {ModbusMaster} from '../../../entities/drivers/ModbusMaster/ModbusMaster';
+import {uint8ToUint16} from '../../../system/lib/binaryHelpers';
 
 
 const WRITE_START_INDEX = 0;
