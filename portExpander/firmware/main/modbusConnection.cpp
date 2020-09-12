@@ -33,8 +33,8 @@ uint8_t beforeReadInputRegisters(uint8_t fc, uint16_t address, uint16_t length16
     slave.writeRegisterToBuffer(0, package16BitLength);
   }
   else if (address == 1) {
-    uint8_t package8Bit[MAX_PACKAGE_LENGTH_BYTES];
-    uint16_t package16Bit[MAX_PACKAGE_LENGTH_WORDS];
+    uint8_t package8Bit[MAX_PACKAGE_LENGTH_BYTES] = {0};
+    uint16_t package16Bit[MAX_PACKAGE_LENGTH_WORDS] = {0};
     int length8Bit = length16Bit * 2;
 
     handlePackageAsk(package8Bit, length8Bit);

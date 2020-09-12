@@ -38,7 +38,7 @@ void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
   package[1] = 13;
   package[2] = 5;
   // TODO: этого быть не должно - проверить во внешнем коде что подставляется лишний 0
-  package[3] = 0;
+  //package[3] = 0;
 }
 
 boolean hasReturnCb(uint8_t funcNum) {
