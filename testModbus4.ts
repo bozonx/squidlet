@@ -76,38 +76,41 @@ async function start () {
 
   };
 
-  const outputPinNumber: number = 12;
   const inputPinNumber: number = 11;
 
-  pollOnce.addEventListener(handler);
-  // setup input pin
-  // await callFunction.callFunction(
-  //   12,
-  //   // pin 11
-  //   new Uint8Array([inputPinNumber])
-  // );
-  // read pin
-  await pollOnce.pollOnce();
+  // pollOnce.addEventListener(handler);
+  // // setup input pin
+  // // await callFunction.callFunction(
+  // //   12,
+  // //   // pin 11
+  // //   new Uint8Array([inputPinNumber])
+  // // );
+  // // read pin
+  // await pollOnce.pollOnce();
 
 
 
   //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
 
   // TODO: не собирается в пакет, отправляется по одной
-  // callFunction.callFunction(
-  //   10,
-  //   new Uint8Array([pinNumber])
-  // );
-  //
-  // while(true) {
-  //   pinState = (pinState) ? 0 : 1;
-  //
-  //   await callFunction.callFunction(
-  //     11,
-  //     new Uint8Array([pinNumber, pinState])
-  //   );
-  //   await (new Promise((resolve => setTimeout(resolve, 1000))));
-  // }
+
+  const outputPinNumber: number = 12;
+  let pinState: number = 0;
+
+  callFunction.callFunction(
+    10,
+    new Uint8Array([outputPinNumber])
+  );
+
+  while(true) {
+    pinState = (pinState) ? 0 : 1;
+
+    await callFunction.callFunction(
+      11,
+      new Uint8Array([outputPinNumber, pinState])
+    );
+    await (new Promise((resolve => setTimeout(resolve, 1000))));
+  }
 
 }
 
