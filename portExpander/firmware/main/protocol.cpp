@@ -4,7 +4,7 @@
 
 
 // array of function pointers
-void (*functionsArray []) (uint8_t data[]) = {};
+void (*functionsArray [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
 
 
 void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
@@ -17,6 +17,12 @@ void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
   }
 }
 
+
+void registerFunc(uint8_t funcNum, FuncCb callback) {
+  Serial.print(funcNum);
+  Serial.println(" - funcNum");
+  functionsArray[funcNum] = callback;
+}
 
 void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
   // TODO: make helper function
@@ -52,13 +58,13 @@ void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
       }      
     }
 
-    Serial.print(funcNum);
-    Serial.println(" - funcNum");
-    Serial.print(argsData[0]);
-    Serial.println(" - argsData[0]");
+    Serial.println("func");
+    Serial.println(sizeof(functionsArray[funcNum]));
+    Serial.println("func");
+    Serial.println(sizeof(functionsArray[1]));
 
     // call function
-    //functionsArray[funcNum](argsData);
+    functionsArray[funcNum](argsData, sizeOfArgs);
   }
 }
 

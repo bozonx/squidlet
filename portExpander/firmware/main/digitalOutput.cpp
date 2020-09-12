@@ -4,17 +4,17 @@
 #include "protocol.h"
 
 
-auto digitalOutputSetup = [](uint8_t data[MAX_PAYLOAD_LENGTH_BYTES]) {
-  Serial.println("setup");
-  pinMode(data[0], OUTPUT);
-};
-
-auto digitalOutputWrite = [](uint8_t data[MAX_PAYLOAD_LENGTH_BYTES]) {
-  Serial.println("write");
-  digitalWrite(data[0], data[1]);
-};
-
 void digitalOutputBegin() {
-  //functionsArray[10] = digitalOutputSetup;
-  //functionsArray[11] = digitalOutputWrite;
+  auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
+    Serial.println("setup");
+    pinMode(data[0], OUTPUT);
+  };
+  
+  auto digitalOutputWrite = [](uint8_t data[], int dataLength) {
+    Serial.println("write");
+    digitalWrite(data[0], data[1]);
+  };
+
+  registerFunc(10, digitalOutputSetup);
+  registerFunc(11, digitalOutputWrite);
 }
