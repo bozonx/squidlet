@@ -199,6 +199,9 @@ export function deserializeUint8Array(
 
   for (i = startIndex; i < data.length; i++) {
     const itemLength: number = data[i];
+
+    if (!itemLength) break;
+
     const itemData = data.slice(i + 1, i + itemLength + 1);
 
     result.push(itemData);
