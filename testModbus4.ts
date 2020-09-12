@@ -5,6 +5,7 @@ import EntityDefinition from './system/interfaces/EntityDefinition';
 import PollOnceModbus from './portExpander/services/PortExpander/PollOnceModbus';
 import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
 import CallFunctionModbus from './portExpander/services/PortExpander/CallFunctionModbus';
+import {uint8ToNum} from './system/lib/binaryHelpers';
 
 
 async function start () {
@@ -76,28 +77,29 @@ async function start () {
   };
 
   pollOnce.addEventListener(handler);
-  //await pollOnce.pollOnce();
+  await pollOnce.pollOnce();
 
   const pinNumber: number = 12;
   let pinState: number = 1;
 
+
+  //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
+
   // TODO: не собирается в пакет, отправляется по одной
-
-  callFunction.callFunction(
-    10,
-    new Uint8Array([pinNumber])
-  );
-
-  while(true) {
-    pinState = (pinState) ? 0 : 1;
-
-    await callFunction.callFunction(
-      11,
-      new Uint8Array([pinNumber, pinState])
-    );
-    await (new Promise((resolve => setTimeout(resolve, 1000))));
-  }
-
+  // callFunction.callFunction(
+  //   10,
+  //   new Uint8Array([pinNumber])
+  // );
+  //
+  // while(true) {
+  //   pinState = (pinState) ? 0 : 1;
+  //
+  //   await callFunction.callFunction(
+  //     11,
+  //     new Uint8Array([pinNumber, pinState])
+  //   );
+  //   await (new Promise((resolve => setTimeout(resolve, 1000))));
+  // }
 
 }
 
