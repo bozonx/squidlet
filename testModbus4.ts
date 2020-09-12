@@ -32,8 +32,8 @@ async function start () {
         dev: '/dev/ttyUSB1',
         baudRate: 9600,
         parity: 'none',
-        databits: 8,
-        stopbits: 1,
+        dataBits: 8,
+        stopBits: 1,
       },
     },
   });
