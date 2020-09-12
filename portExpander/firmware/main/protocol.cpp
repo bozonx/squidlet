@@ -22,6 +22,10 @@ void registerFunc(uint8_t funcNum, FuncCb callback) {
   functionsArray[funcNum] = callback;
 }
 
+void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
+  // TODO: register this
+}
+
 void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
   int sizeOfPackage8Bit = sizeOfPackage16Bit * 2;
   uint8_t package8Bit[sizeOfPackage8Bit];
