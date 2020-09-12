@@ -16,10 +16,10 @@ int const NOT_STATE = -1;
 
 // TODO: можно ли оптимизировать, использовать хэш например???
 // pin state which has been read
-uint8_t sentPinStates[DIGITAL_PIN_COUNT];
+int sentPinStates[DIGITAL_PIN_COUNT];
 // TODO: можно ли оптимизировать, использовать хэш например???
 // pin state which hasn't been read yet
-uint8_t newPinStates[DIGITAL_PIN_COUNT];
+int newPinStates[DIGITAL_PIN_COUNT];
 
 
 auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *haveMoreMessages) {

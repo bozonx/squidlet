@@ -18,6 +18,22 @@ void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
 }
 
 
+uint8_t handlePackageLengthAsk() {
+  // TODO: сформировать сообщения и сохранить пакеты в буфер
+  // TODO: если повторно запрашивается длина то отдать длину первого пакета в буфере
+  
+  return 3;
+}
+
+void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
+    
+  // TODO: взять 1е сообщение из буфера и записать в регистры и удалить сообщение из буфера
+  // TODO: если других сообщений уже нет то удалить буфер и ждать новых запросов
+  // [length of message(2), functionNum(13), data(5)]
+
+  
+}
+
 boolean hasReturnCb(uint8_t funcNum) {
   // TODO: register add
   return false;

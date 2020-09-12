@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ModbusSlave.h>
 #include "modbusConnection.h"
+#include "global.cpp"
 #include "protocol.h"
 
 
@@ -24,14 +25,19 @@ uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
 // Handle Read Input Registers (FC=04).
 uint8_t beforeReadInputRegisters(uint8_t fc, uint16_t address, uint16_t length) {
   if (address == 0) {
-    // TODO: сформировать сообщения и сохранить пакеты в буфер
-    // TODO: если повторно запрашивается длина то отдать длину первого сообщения в буфере
-    slave.writeRegisterToBuffer(0, 2);
+    double packageLength8Bytes = handlePackageLengthAsk();
+
+    uint16_t package16BitLength = ceil(packageLength8Bytes / 2);
+  
+    slave.writeRegisterToBuffer(0, package16BitLength);
   }
   else if (address == 1) {
-    // TODO: взять 1е сообщение из буфера и записать в регистры и удалить сообщение из буфера
-    // TODO: если других сообщений уже нет то удалить буфер и ждать новых запросов
-    // [length of message(2), functionNum(13), data(5)]
+    uint8_t packageToSend[MAX_PACKAGE_LENGTH_WORDS];
+    
+    handlePackageAsk(packageToSend, length);
+
+    // TODO: преобразовать в uint 16
+
     slave.writeRegisterToBuffer(0, 525);
     slave.writeRegisterToBuffer(1, 1280);
   }
