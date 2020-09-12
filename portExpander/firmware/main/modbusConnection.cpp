@@ -8,7 +8,6 @@
 Modbus slave(Serial, 1, 13); // stream = Serial, slave id = 1, rs485 control-pin = 8
 
 
-
 // FC = 16
 uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
   uint16_t package16Bit[length];

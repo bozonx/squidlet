@@ -19,14 +19,10 @@ void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
 
 
 void registerFunc(uint8_t funcNum, FuncCb callback) {
-  Serial.print(funcNum);
-  Serial.println(" - funcNum");
   functionsArray[funcNum] = callback;
 }
 
 void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
-  // TODO: make helper function
-  //int sizeOfPackage16Bit = sizeof(package16Bit)/sizeof(package16Bit[0]);
   int sizeOfPackage8Bit = sizeOfPackage16Bit * 2;
   uint8_t package8Bit[sizeOfPackage8Bit];
 
@@ -58,10 +54,7 @@ void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
       }      
     }
 
-    Serial.println("func");
-    Serial.println(sizeof(functionsArray[funcNum]));
-    Serial.println("func");
-    Serial.println(sizeof(functionsArray[1]));
+    // TODO: how to check if function exists ???
 
     // call function
     functionsArray[funcNum](argsData, sizeOfArgs);
