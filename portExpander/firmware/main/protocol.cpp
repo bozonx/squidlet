@@ -32,6 +32,13 @@ void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
   // [length of message(2), functionNum(13), data(5)]
 
   
+//    slave.writeRegisterToBuffer(0, 525);
+//    slave.writeRegisterToBuffer(1, 1280);
+  package[0] = 2;
+  package[1] = 13;
+  package[2] = 5;
+  // TODO: этого быть не должно - проверить во внешнем коде что подставляется лишний 0
+  package[3] = 0;
 }
 
 boolean hasReturnCb(uint8_t funcNum) {
@@ -47,6 +54,7 @@ void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
   // TODO: register this
 }
 
+// TODO: нужно уже принимать 8 бит, а конвертацию делать в modbus connection
 void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
   int sizeOfPackage8Bit = sizeOfPackage16Bit * 2;
   uint8_t package8Bit[sizeOfPackage8Bit];

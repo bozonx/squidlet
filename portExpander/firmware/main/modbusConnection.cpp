@@ -3,6 +3,7 @@
 #include "modbusConnection.h"
 #include "global.cpp"
 #include "protocol.h"
+#include "helpers.h"
 
 
 // Explicitly set a stream to use the Serial port.
@@ -23,34 +24,26 @@ uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
 }
 
 // Handle Read Input Registers (FC=04).
-uint8_t beforeReadInputRegisters(uint8_t fc, uint16_t address, uint16_t length) {
+uint8_t beforeReadInputRegisters(uint8_t fc, uint16_t address, uint16_t length16Bit) {
   if (address == 0) {
     double packageLength8Bytes = handlePackageLengthAsk();
 
     uint16_t package16BitLength = ceil(packageLength8Bytes / 2);
-  
+
     slave.writeRegisterToBuffer(0, package16BitLength);
   }
   else if (address == 1) {
-    uint8_t packageToSend[MAX_PACKAGE_LENGTH_WORDS];
-    
-    handlePackageAsk(packageToSend, length);
+    uint8_t package8Bit[MAX_PACKAGE_LENGTH_BYTES];
+    uint16_t package16Bit[MAX_PACKAGE_LENGTH_WORDS];
+    int length8Bit = length16Bit * 2;
 
-    // TODO: преобразовать в uint 16
+    handlePackageAsk(package8Bit, length8Bit);
+    convertUint8ToUint16(package8Bit, length8Bit, package16Bit);
 
-    slave.writeRegisterToBuffer(0, 525);
-    slave.writeRegisterToBuffer(1, 1280);
+    for (int i = 0; i < length16Bit; i++) {
+      slave.writeRegisterToBuffer(i, package16Bit[i]);
+    }
   }
-  
-//  uint16_t package[];
-//  
-//  prepareOutcomeData(address, length);
-//
-//  for (int i = 0; i < length; i++) {
-//    slave.writeRegisterToBuffer(i, package[i]);
-//
-//    Serial.println(package[i]);
-//  }
 
   return STATUS_OK;
 }
