@@ -81,7 +81,9 @@ async function start () {
   const pinNumber: number = 12;
   const pinState: number = 1;
 
-  await callFunction.callFunction(
+  // TODO: не собирается в пакет
+
+  callFunction.callFunction(
     10,
     new Uint8Array([pinNumber])
   );
