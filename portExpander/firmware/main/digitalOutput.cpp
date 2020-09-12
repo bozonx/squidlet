@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "digitalOutput.h"
 #include "global.cpp"
+#include "protocol.h"
 
 
 auto digitalOutputSetup = [](uint8_t data[MAX_PAYLOAD_LENGTH_BYTES]) {
@@ -14,6 +15,6 @@ auto digitalOutputWrite = [](uint8_t data[MAX_PAYLOAD_LENGTH_BYTES]) {
 };
 
 void digitalOutputBegin() {
-  functionsArray[10] = digitalOutputSetup;
-  functionsArray[11] = digitalOutputWrite;
+  //functionsArray[10] = digitalOutputSetup;
+  //functionsArray[11] = digitalOutputWrite;
 }

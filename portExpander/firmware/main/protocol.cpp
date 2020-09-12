@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "protocol.h"
 #include "global.cpp"
 
 
@@ -6,8 +7,8 @@
 void (*functionsArray []) (uint8_t data[]) = {};
 
 
-void convert16BitArrTo8Bit(uint16_t arr16[], uint8_t *result) {
-  for (int i = 0; i < sizeof(arr16); i++) {
+void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
+  for (int i = 0; i < sizeofArr; i++) {
     uint8_t firstByte = (arr16[i] >> 8);
     uint8_t secondByte = arr16[i] & 0xff;
 
@@ -17,17 +18,19 @@ void convert16BitArrTo8Bit(uint16_t arr16[], uint8_t *result) {
 }
 
 
-void handleIncomeData(uint16_t package16Bit[]) {
-  int sizeOfPackage16Bit = sizeof(package16Bit)/sizeof(package16Bit[0]);
+void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
+  // TODO: make helper function
+  //int sizeOfPackage16Bit = sizeof(package16Bit)/sizeof(package16Bit[0]);
   int sizeOfPackage8Bit = sizeOfPackage16Bit * 2;
   uint8_t package8Bit[sizeOfPackage8Bit];
 
-  Serial.print("sizeOfPackage16Bit - ");
-  Serial.println(sizeOfPackage16Bit);
-  
-  convert16BitArrTo8Bit(package16Bit, package8Bit);
+  convert16BitArrTo8Bit(package16Bit, sizeOfPackage16Bit, package8Bit);
 
   for (int i = 0; i < sizeOfPackage8Bit; i++) {
+    if (i + 1 >= sizeOfPackage8Bit) {
+      break;
+    }
+
     uint8_t sizeOfArgs = package8Bit[i];
     uint8_t funcNum = package8Bit[i + 1];
 
@@ -38,28 +41,24 @@ void handleIncomeData(uint16_t package16Bit[]) {
     int dataFirstByte = i + 2;
     uint8_t argsData[sizeOfArgs];
 
-    i = i + 2;
+    // shift of function num
+    i++;
 
     if (sizeOfArgs > 0) {
       for (int l = 0; l < sizeOfArgs; l++) {
         argsData[l] = package8Bit[dataFirstByte + l];
   
         i++;
-  
-        Serial.print(l);
-        Serial.print(" - ");
-        Serial.println(i);
       }      
     }
 
-    Serial.print(i);
-    Serial.println(" - i");
-    Serial.print(sizeOfArgs);
-    Serial.println(" - sizeOfArgs");
     Serial.print(funcNum);
     Serial.println(" - funcNum");
     Serial.print(argsData[0]);
     Serial.println(" - argsData[0]");
+
+    // call function
+    //functionsArray[funcNum](argsData);
   }
 }
 
