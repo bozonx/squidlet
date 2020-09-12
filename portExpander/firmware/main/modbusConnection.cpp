@@ -23,6 +23,15 @@ uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
 
 // Handle Read Input Registers (FC=04).
 uint8_t beforeReadInputRegisters(uint8_t fc, uint16_t address, uint16_t length) {
+  if (address == 0) {
+    slave.writeRegisterToBuffer(0, 2);
+  }
+  else if (address == 1) {
+    // [length of message(2), functionNum(13), data(5)]
+    slave.writeRegisterToBuffer(0, 525);
+    slave.writeRegisterToBuffer(1, 1280);
+  }
+  
 //  uint16_t package[] = prepareOutcomeData(address, length);
 //
 //  for (int i = 0; i < length; i++) {
