@@ -46,19 +46,23 @@ auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *
   }
 };
 
+void readPin(uint8_t pinNum) {
+  newPinStates[pinNum] = digitalRead(pinNum);
+
+  if (!hasReturnCb(DIGITAL_INPUT_RETURN_FUNC)) {
+    registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
+  }
+}
+
 auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
   //Serial.println("setup");
   pinMode(data[0], INPUT);
   // read the initial state
-  newPinStates[data[0]] = digitalRead(data[0]);
-
-  registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
+  readPin(data[0]);
 };
 
 auto digitalReadForce = [](uint8_t data[], int dataLength) {
-  
-  // TODO: добавить ф-ю для жесткого считывания
-  
+  readPin(data[0]);
 };
 
 

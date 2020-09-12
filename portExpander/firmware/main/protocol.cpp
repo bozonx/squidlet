@@ -18,7 +18,7 @@ void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
 }
 
 
-boolean hasReturnCb() {
+boolean hasReturnCb(uint8_t funcNum) {
   // TODO: register add
   return false;
 }

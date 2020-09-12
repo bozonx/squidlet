@@ -24,15 +24,21 @@ uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
 // Handle Read Input Registers (FC=04).
 uint8_t beforeReadInputRegisters(uint8_t fc, uint16_t address, uint16_t length) {
   if (address == 0) {
+    // TODO: сформировать сообщения и сохранить пакеты в буфер
+    // TODO: если повторно запрашивается длина то отдать длину первого сообщения в буфере
     slave.writeRegisterToBuffer(0, 2);
   }
   else if (address == 1) {
+    // TODO: взять 1е сообщение из буфера и записать в регистры и удалить сообщение из буфера
+    // TODO: если других сообщений уже нет то удалить буфер и ждать новых запросов
     // [length of message(2), functionNum(13), data(5)]
     slave.writeRegisterToBuffer(0, 525);
     slave.writeRegisterToBuffer(1, 1280);
   }
   
-//  uint16_t package[] = prepareOutcomeData(address, length);
+//  uint16_t package[];
+//  
+//  prepareOutcomeData(address, length);
 //
 //  for (int i = 0; i < length; i++) {
 //    slave.writeRegisterToBuffer(i, package[i]);
