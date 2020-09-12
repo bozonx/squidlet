@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <ModbusSlave.h>
-//#include "modbusConnection.h"
+#include "modbusConnection.h"
 #include "protocol.h"
 
 
@@ -11,20 +11,13 @@ Modbus slave(Serial, 1, 13); // stream = Serial, slave id = 1, rs485 control-pin
 
 // FC = 16
 uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
-  uint16_t package16Bit[4];
-
-  Serial.print("sizeof(package16Bit) - ");
-  Serial.println(sizeof(package16Bit)/sizeof(package16Bit[0]));
-  Serial.print("length - ");
-  Serial.println(length);
+  uint16_t package16Bit[length];
 
   for (int i = 0; i < length; i++) {
     package16Bit[i] = slave.readRegisterFromBuffer(address + i);
   }
 
-
-
-  handleIncomeData(package16Bit);
+  handleIncomeData(package16Bit, length);
 
   return STATUS_OK;
 }
