@@ -203,6 +203,8 @@ export function numToWord(num: number): string {
   let result: string = int16ToHexString(num);
 
   if (result.length === 2) result = '00' + result;
+  // TODO: test it with value 3329
+  else if (result.length === 3) result = '0' + result;
 
   return result;
 }
