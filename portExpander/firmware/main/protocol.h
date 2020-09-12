@@ -2,8 +2,10 @@
 #define protocol_h
 
 typedef void (*FuncCb)(uint8_t data[], int dataLength);
+typedef void (*ReturnCb)(uint8_t data[], int dataLength);
 
 void registerFunc(uint8_t funcNum, FuncCb callback);
+void registerReturnCallback(uint8_t funcNum, ReturnCb callback);
 
 void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit);
 
