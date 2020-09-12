@@ -18,6 +18,11 @@ void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
 }
 
 
+boolean hasReturnCb() {
+  // TODO: register add
+  return false;
+}
+
 void registerFunc(uint8_t funcNum, FuncCb callback) {
   functionsArray[funcNum] = callback;
 }
