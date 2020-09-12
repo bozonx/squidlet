@@ -81,11 +81,11 @@ async function start () {
 
   pollOnce.addEventListener(handler);
   // setup input pin
-  await callFunction.callFunction(
-    12,
-    // pin 11
-    new Uint8Array([inputPinNumber])
-  );
+  // await callFunction.callFunction(
+  //   12,
+  //   // pin 11
+  //   new Uint8Array([inputPinNumber])
+  // );
   // read pin
   await pollOnce.pollOnce();
 
