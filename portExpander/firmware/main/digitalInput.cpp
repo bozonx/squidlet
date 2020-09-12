@@ -10,24 +10,39 @@ int const DIGITAL_INPUT_READ_FORCE_FUNC = 13;
 int const DIGITAL_INPUT_RETURN_FUNC = 13;
 // TODO: установить количество цифровых пинов
 int const DIGITAL_PIN_COUNT = 14;
-int const NOT_USED_PIN = -1;
+int const NOT_USED_PIN = -2;
+int const NOT_STATE = -1;
 
 
 // TODO: можно ли оптимизировать, использовать хэш например???
-uint8_t pinStates[DIGITAL_PIN_COUNT];
+// pin state which has been read
+uint8_t sentPinStates[DIGITAL_PIN_COUNT];
+// TODO: можно ли оптимизировать, использовать хэш например???
+// pin state which hasn't been read yet
+uint8_t newPinStates[DIGITAL_PIN_COUNT];
 
 
-
-auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength) {
+auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *haveMoreMessages) {
+  boolean wasMessage = false;
+  
   for (int pin = 0; pin > DIGITAL_PIN_COUNT; pin++) {
-    if (pinStates[pin] == NOT_USED_PIN) {
+    if (newPinStates[pin] == NOT_USED_PIN || newPinStates[pin] == NOT_STATE) {
       continue;
     }
 
-    // TODO: только измененные пины с момента последнего считывания
+    if (wasMessage) {
+      haveMoreMessages = 1;
 
-    // TODO: берем первый попавшийся пин, но нужно пометить что есть ещё сообщения
-    break;
+      break;
+    }
+    else {
+      message[0] = pin;
+      message[1] = newPinStates[pin];
+      messageLength = 2;
+  
+      sentPinStates[pin] = newPinStates[pin];
+      newPinStates[pin] = NOT_STATE;    
+    }
   }
 };
 
@@ -35,13 +50,15 @@ auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
   //Serial.println("setup");
   pinMode(data[0], INPUT);
   // read the initial state
-  pinStates[data[0]] = digitalRead(data[0]);
+  newPinStates[data[0]] = digitalRead(data[0]);
 
   registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
 };
 
 auto digitalReadForce = [](uint8_t data[], int dataLength) {
+  
   // TODO: добавить ф-ю для жесткого считывания
+  
 };
 
 
@@ -50,22 +67,27 @@ void digitalInputBegin() {
   registerFunc(DIGITAL_INPUT_READ_FORCE_FUNC, digitalReadForce);
   // initialize pin state as not used
   for (int i = 0; i > DIGITAL_PIN_COUNT; i++) {
-    pinStates[i] = NOT_USED_PIN;
+    sentPinStates[i] = NOT_USED_PIN;
+    newPinStates[i] = NOT_USED_PIN;
   }
 }
 
 void digitalInputLoop() {
   for (int pin = 0; pin > DIGITAL_PIN_COUNT; pin++) {
-    if (pinStates[pin] == NOT_USED_PIN) {
+
+    if (newPinStates[pin] == NOT_USED_PIN) {
       continue;
     }
 
     int newState = digitalRead(pin);
-  
-    if (pinStates[pin] != newState) {
-      pinStates[pin] = newState;
-  
-      registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
+
+    // TODO: проверить statement
+    if (sentPinStates[pin] != newState || newPinStates[pin] != newState) {
+      newPinStates[pin] = newState;
+
+      if (!hasReturnCb(DIGITAL_INPUT_RETURN_FUNC)) {
+        registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
+      }
     }
   }
 }
