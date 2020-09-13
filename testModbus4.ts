@@ -83,7 +83,7 @@ async function start () {
   // // await callFunction.callFunction(
   // //   12,
   // //   // pin 11
-  // //   new Uint8Array([inputPinNumber])
+  // //   new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_REGISTER_MODE.pullup])
   // // );
   // // read pin
   // await pollOnce.pollOnce();
