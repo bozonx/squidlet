@@ -2,10 +2,9 @@
 #define protocol_h
 
 typedef void (*FuncCb)(uint8_t data[], int dataLength);
-typedef void (*ReturnCb)(uint8_t* message[], int *messageLength, int *hasMoreMessages);
+typedef void (*ReturnCb)(uint8_t *feedbackNum, uint8_t* argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages);
 
-boolean hasReturnCb(uint8_t funcNum);
-void registerReturnCallback(uint8_t funcNum, ReturnCb callback);
+void registerFeedbackCallback(ReturnCb callback);
 void registerFunc(uint8_t funcNum, FuncCb callback);
 uint8_t handlePackageLengthAsk();
 void handlePackageAsk(uint8_t *package, int lengthShouldBeRead);

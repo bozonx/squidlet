@@ -15,6 +15,7 @@
 //#define I2C_ADDRESS_EEPROM_CELL 0
 
 int const MAX_PACKAGE_LENGTH_WORDS = MAX_PACKAGE_LENGTH_BYTES / 2;
+int const MAX_ARGS_LENGTH_BYTES = MAX_PACKAGE_LENGTH_BYTES - 2;
 // length of payload excluding the first word which is length and function number
 int const MAX_PAYLOAD_LENGTH_BYTES = MAX_PACKAGE_LENGTH_BYTES - 2;
 int const MAX_PAYLOAD_LENGTH_WORDS = (MAX_PACKAGE_LENGTH_BYTES / 2) - 1;

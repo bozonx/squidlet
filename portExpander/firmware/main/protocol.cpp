@@ -6,25 +6,20 @@
 // Function callbacks by function number
 void (*functioncCallbacks [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
 // Function callbacks by function number
-void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t* message[], int *messageLength, int *hasMoreMessages) = {};
-// last element index
-int feedbackStackLastIndex = 0;
+void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t *feedbackNum, uint8_t* argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) = {};
+int feedbackStackLength = 0;
+uint8_t packageStack[FEEDBACK_STACK_LENGTH][MAX_PACKAGE_LENGTH_BYTES];
+uint8_t packageLengthStack[FEEDBACK_STACK_LENGTH];
+int packageStackLength = 0;
 
 
-boolean hasReturnCb(uint8_t funcNum) {
-  
-  // TODO: register add
-  
-  return false;
-}
-
-void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
+void registerFeedbackCallback(ReturnCb callback) {
 
   // TODO: проверить что нет переполнения массива
   
-  feedbackStack[feedbackStackLastIndex] = callback;
+  feedbackStack[feedbackStackLength] = callback;
 
-  feedbackStackLastIndex++;
+  feedbackStackLength++;
 }
 
 void registerFunc(uint8_t funcNum, FuncCb callback) {
@@ -35,10 +30,30 @@ void registerFunc(uint8_t funcNum, FuncCb callback) {
 }
 
 uint8_t handlePackageLengthAsk() {
-  // TODO: сформировать сообщения и сохранить пакеты в буфер
-  // TODO: если повторно запрашивается длина то отдать длину первого пакета в буфере
+  if (packageStackLength == 0) {
+    // there aren't any packages to be read, make new packages
+    // TODO: если повторно запрашивается длина то отдать длину первого пакета в буфере
+    // 
+    for (int i = 0; i < feedbackStackLength; i++) {
+      uint8_t feedbackNum = 0;
+      uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
+      uint8_t argsDataLength = 0;
+      uint8_t hasMoreMessages = 0;
   
-  return 3;
+      // TODO: что делать с hasMoreMessages ????
+      // TODO: как сохранить длину пакета в стэке ????
+  
+      //feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
+      // clear the callback
+      feedbackStack[i] = 0;
+  
+      
+    }
+    // flush callbacks. Means all of them has been read.
+    feedbackStackLength = 0;
+  }
+  // return the length of the first one
+  return packageLengthStack[0];
 }
 
 void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
