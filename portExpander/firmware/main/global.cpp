@@ -10,6 +10,8 @@
 #define SERIAL_BAUD_RATE 9600
 #define MODBUS_ADDRESS_EEPROM_CELL 0
 #define I2C_ADDRESS_EEPROM_CELL 0
+// TODO: установить реальное количество цифровых пинов
+#define DIGITAL_PIN_COUNT 14
 
 int const MAX_PACKAGE_LENGTH_WORDS = MAX_PACKAGE_LENGTH_BYTES / 2;
 // length of payload excluding the first word which is length and function number
