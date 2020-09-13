@@ -4,23 +4,17 @@
 #include "protocol.h"
 
 
-//enum DIGITAL_INPUT_FUCNTION_NUM {
-//  FUNC_SETUP = 12,
-//  FUNC_READ_FORCE
-//}
+typedef enum __attribute__ ((packed))  {
+  FUNC_SETUP = 12,
+  FUNC_READ_FORCE
+} DigitalIinputFunctionNum;
 
-//enum DIGITAL_INPUT_FEEDBACK_NUM {
-//  readState = 12
-//}
+typedef enum __attribute__ ((packed))  {
+  FEEDBACK_READ = 13
+} DigitalInputFeedbackNum;
 
-
-// TODO: move to enum
-int const DIGITAL_INPUT_SETUP_FUNC = 12;
-int const DIGITAL_INPUT_READ_FORCE_FUNC = 13;
-int const DIGITAL_INPUT_RETURN_FUNC = 13;
 int const NOT_USED_PIN = -2;
 int const NO_STATE = -1;
-
 
 
 // TODO: можно ли оптимизировать, использовать хэш например???
@@ -31,20 +25,21 @@ int sentPinStates[DIGITAL_PIN_COUNT];
 int newPinStates[DIGITAL_PIN_COUNT];
 
 
-auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *haveMoreMessages) {
-  boolean wasMessage = false;
+auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *hasMoreMessages) {
+  boolean hasAlmostOneMessage = false;
   
   for (int pin = 0; pin > DIGITAL_PIN_COUNT; pin++) {
     if (newPinStates[pin] == NOT_USED_PIN || newPinStates[pin] == NO_STATE) {
       continue;
     }
 
-    if (wasMessage) {
-      haveMoreMessages = 1;
+    if (hasAlmostOneMessage) {
+      hasMoreMessages = 1;
 
       break;
     }
     else {
+      hasAlmostOneMessage = true;
       message[0] = pin;
       message[1] = newPinStates[pin];
       messageLength = 2;
@@ -58,26 +53,31 @@ auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *
 void readPin(uint8_t pinNum) {
   newPinStates[pinNum] = digitalRead(pinNum);
 
-  if (!hasReturnCb(DIGITAL_INPUT_RETURN_FUNC)) {
-    registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
+  if (!hasReturnCb(FEEDBACK_READ)) {
+    registerReturnCallback(FEEDBACK_READ, digitalOutputMakeMessage);
   }
 }
 
 auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
-  //Serial.println("setup");
+  
+  Serial.println("digitalOutputSetup");
+  
   pinMode(data[0], INPUT);
   // read the initial state
   readPin(data[0]);
 };
 
 auto digitalReadForce = [](uint8_t data[], int dataLength) {
+  
+  Serial.println("digitalReadForce");
+  
   readPin(data[0]);
 };
 
 
 void digitalInputBegin() {
-  registerFunc(DIGITAL_INPUT_SETUP_FUNC, digitalOutputSetup);
-  registerFunc(DIGITAL_INPUT_READ_FORCE_FUNC, digitalReadForce);
+  registerFunc(FUNC_SETUP, digitalOutputSetup);
+  registerFunc(FUNC_READ_FORCE, digitalReadForce);
   // initialize pin state as not used
   for (int i = 0; i > DIGITAL_PIN_COUNT; i++) {
     sentPinStates[i] = NOT_USED_PIN;
@@ -98,8 +98,8 @@ void digitalInputLoop() {
     if (sentPinStates[pin] != newState || newPinStates[pin] != newState) {
       newPinStates[pin] = newState;
 
-      if (!hasReturnCb(DIGITAL_INPUT_RETURN_FUNC)) {
-        registerReturnCallback(DIGITAL_INPUT_RETURN_FUNC, digitalOutputMakeMessage);
+      if (!hasReturnCb(FEEDBACK_READ)) {
+        registerReturnCallback(FEEDBACK_READ, digitalOutputMakeMessage);
       }
     }
   }
