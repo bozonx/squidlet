@@ -2,7 +2,7 @@
 #define protocol_h
 
 typedef void (*FuncCb)(uint8_t data[], int dataLength);
-typedef void (*ReturnCb)(uint8_t *feedbackNum, uint8_t argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages);
+typedef void (*ReturnCb)(uint8_t &feedbackNum, uint8_t argsData[], uint8_t &argsDataLength, uint8_t &hasMoreMessages);
 
 void registerFeedbackCallback(ReturnCb callback);
 void registerFunc(uint8_t funcNum, FuncCb callback);
