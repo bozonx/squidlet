@@ -30,7 +30,7 @@ int sentPinStates[DIGITAL_PIN_COUNT] = {0};
 int newPinStates[DIGITAL_PIN_COUNT] = {0};
 
 
-auto digitalOutputMakeMessage = [](uint8_t *feedbackNum, uint8_t argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) {
+auto digitalOutputMakeMessage = [](uint8_t &feedbackNum, uint8_t argsData[], uint8_t &argsDataLength, uint8_t &hasMoreMessages) {
   boolean hasAlmostOneMessage = false;
   
   for (int pin = 0; pin < DIGITAL_PIN_COUNT; pin++) {
@@ -63,6 +63,13 @@ void setNewPinState(uint8_t pin, int state) {
 //  Serial.print(pin);
 //  Serial.print(" - ");
 //  Serial.println(state);
+
+
+//  Serial.print(pin);
+//  Serial.println(" - pin");
+//  Serial.print(state);
+//  Serial.println(" - state");
+  
   
   // register feedback callback only if it hasn't been reistered
   if (newPinStates[pin] <= 0) {
