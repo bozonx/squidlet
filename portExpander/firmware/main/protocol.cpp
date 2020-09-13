@@ -3,7 +3,7 @@
 #include "global.cpp"
 
 
-// array of function pointers
+// Function callbacks by function number
 void (*functionsArray [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
 
 
@@ -31,43 +31,53 @@ void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
 }
 
 boolean hasReturnCb(uint8_t funcNum) {
+  
   // TODO: register add
+  
   return false;
 }
 
+void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
+
+  // TODO: проверить что номер ф-и в нужных пределах
+  
+  // TODO: register this
+  
+}
+
 void registerFunc(uint8_t funcNum, FuncCb callback) {
+
+  // TODO: проверить что номер ф-и в нужных пределах
+  
   functionsArray[funcNum] = callback;
 }
 
-void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
-  // TODO: register this
-}
 
+// Split messages in package, the first byte is size of args and the seconf is function name.
+// Call function at any message in the package.
 void handleIncomeData(uint8_t *package8Bit, int sizeOfPackage8Bit) {
   for (int i = 0; i < sizeOfPackage8Bit; i++) {
+    // if is odd byte then stop cycle
     if (i + 1 >= sizeOfPackage8Bit) {
       break;
     }
 
     uint8_t sizeOfArgs = package8Bit[i];
     uint8_t funcNum = package8Bit[i + 1];
-
-    if (sizeOfArgs == 0 && funcNum == 0) {
+    // if the end of data of package
+    if (funcNum == 0) {
       break;
     }
     
     int dataFirstByte = i + 2;
     uint8_t argsData[sizeOfArgs];
-
     // shift of function num
     i++;
-
-    if (sizeOfArgs > 0) {
-      for (int l = 0; l < sizeOfArgs; l++) {
-        argsData[l] = package8Bit[dataFirstByte + l];
-  
-        i++;
-      }      
+    // read args data of there are any
+    for (int l = 0; l < sizeOfArgs; l++) {
+      argsData[l] = package8Bit[dataFirstByte + l];
+      // shift the main interator
+      i++;
     }
 
     // TODO: how to check if function exists ???
@@ -76,9 +86,3 @@ void handleIncomeData(uint8_t *package8Bit, int sizeOfPackage8Bit) {
     functionsArray[funcNum](argsData, sizeOfArgs);
   }
 }
-
-//uint16_t prepareOutcomeData(uint16_t address, uint16_t length) {
-//  uint16_t package[length];
-//  
-//  return package;
-//}
