@@ -7,7 +7,7 @@
 typedef enum __attribute__ ((packed))  {
   FUNC_SETUP = 12,
   FUNC_READ_FORCE
-} DigitalIinputFunctionNum;
+} DigitalInputFunctionNum;
 
 typedef enum __attribute__ ((packed))  {
   FEEDBACK_READ = 13
@@ -24,10 +24,10 @@ int const NO_STATE = -1;
 
 // TODO: можно ли оптимизировать, использовать хэш например???
 // pin state which has been read
-int sentPinStates[DIGITAL_PIN_COUNT];
+int sentPinStates[DIGITAL_PIN_COUNT] = {0};
 // TODO: можно ли оптимизировать, использовать хэш например???
 // pin state which hasn't been read yet
-int newPinStates[DIGITAL_PIN_COUNT];
+int newPinStates[DIGITAL_PIN_COUNT] = {0};
 
 
 auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *hasMoreMessages) {

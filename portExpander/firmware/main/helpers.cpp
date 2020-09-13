@@ -13,13 +13,13 @@ void convertUint8ToUint16(uint8_t *sourceArr8Bit, int sourceLength, uint16_t *re
   }
 }
 
-void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr16, uint8_t *result) {
+void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr16, uint8_t *resultArr8Bit) {
   for (int i = 0; i < sizeofArr16; i++) {
     uint8_t firstByte = (arr16[i] >> 8);
     uint8_t secondByte = arr16[i] & 0xff;
 
-    result[i * 2] = firstByte;
-    result[(i * 2) + 1] = secondByte;
+    resultArr8Bit[i * 2] = firstByte;
+    resultArr8Bit[(i * 2) + 1] = secondByte;
   }
 }
 

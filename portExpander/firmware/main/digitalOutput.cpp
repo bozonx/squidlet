@@ -4,6 +4,12 @@
 #include "protocol.h"
 
 
+typedef enum __attribute__ ((packed))  {
+  FUNC_SETUP = 10,
+  FUNC_WRITE
+} DigitalOutputFunctionNum;
+
+
 auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
   pinMode(data[0], OUTPUT);
 };
@@ -14,6 +20,6 @@ auto digitalOutputWrite = [](uint8_t data[], int dataLength) {
 
 
 void digitalOutputBegin() {
-  registerFunc(10, digitalOutputSetup);
-  registerFunc(11, digitalOutputWrite);
+  registerFunc(FUNC_SETUP, digitalOutputSetup);
+  registerFunc(FUNC_WRITE, digitalOutputWrite);
 }
