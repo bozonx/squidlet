@@ -4,9 +4,10 @@
 
 
 void setup() {
+  modbusConnectionBegin();
   digitalOutputBegin();
   digitalInputBegin();
-  modbusConnectionBegin();
+  
   Serial.println("started!");
 }
 
