@@ -4,14 +4,23 @@
 #include "protocol.h"
 
 
+//enum DIGITAL_INPUT_FUCNTION_NUM {
+//  FUNC_SETUP = 12,
+//  FUNC_READ_FORCE
+//}
+
+//enum DIGITAL_INPUT_FEEDBACK_NUM {
+//  readState = 12
+//}
+
+
 // TODO: move to enum
 int const DIGITAL_INPUT_SETUP_FUNC = 12;
 int const DIGITAL_INPUT_READ_FORCE_FUNC = 13;
 int const DIGITAL_INPUT_RETURN_FUNC = 13;
-// TODO: установить количество цифровых пинов
-int const DIGITAL_PIN_COUNT = 14;
 int const NOT_USED_PIN = -2;
-int const NOT_STATE = -1;
+int const NO_STATE = -1;
+
 
 
 // TODO: можно ли оптимизировать, использовать хэш например???
@@ -26,7 +35,7 @@ auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *
   boolean wasMessage = false;
   
   for (int pin = 0; pin > DIGITAL_PIN_COUNT; pin++) {
-    if (newPinStates[pin] == NOT_USED_PIN || newPinStates[pin] == NOT_STATE) {
+    if (newPinStates[pin] == NOT_USED_PIN || newPinStates[pin] == NO_STATE) {
       continue;
     }
 
@@ -41,7 +50,7 @@ auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *
       messageLength = 2;
   
       sentPinStates[pin] = newPinStates[pin];
-      newPinStates[pin] = NOT_STATE;    
+      newPinStates[pin] = NO_STATE;    
     }
   }
 };
