@@ -30,7 +30,7 @@ int sentPinStates[DIGITAL_PIN_COUNT] = {0};
 int newPinStates[DIGITAL_PIN_COUNT] = {0};
 
 
-auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *hasMoreMessages) {
+auto digitalOutputMakeMessage = [](uint8_t *feedbackNum, uint8_t* argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) {
   boolean hasAlmostOneMessage = false;
   
   for (int pin = 0; pin < DIGITAL_PIN_COUNT; pin++) {
@@ -45,9 +45,11 @@ auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *
     }
     else {
       hasAlmostOneMessage = true;
-      message[0] = pin;
-      message[1] = newPinStates[pin];
-      messageLength = 2;
+      int feedbackRead = FEEDBACK_READ;
+      feedbackNum = feedbackRead;
+      argsData[0] = pin;
+      argsData[1] = newPinStates[pin];
+      argsDataLength = 2;
       // move pin state to saved array
       sentPinStates[pin] = newPinStates[pin];
       // clear buffered state
@@ -57,11 +59,12 @@ auto digitalOutputMakeMessage = [](uint8_t* message[], int *messageLength, int *
 };
 
 void setNewPinState(uint8_t pin, int state) {
-  newPinStates[pin] = state;
-
-  if (!hasReturnCb(FEEDBACK_READ)) {
-    registerReturnCallback(FEEDBACK_READ, digitalOutputMakeMessage);
+  // register feedback callback only if it hasn't been reistered
+  if (newPinStates[pin] <= 0) {
+    registerFeedbackCallback(digitalOutputMakeMessage);
   }
+
+  newPinStates[pin] = state;
 }
 
 void readPin(uint8_t pin) {
