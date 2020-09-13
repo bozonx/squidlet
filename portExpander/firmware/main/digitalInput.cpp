@@ -59,6 +59,11 @@ auto digitalOutputMakeMessage = [](uint8_t *feedbackNum, uint8_t argsData[], uin
 };
 
 void setNewPinState(uint8_t pin, int state) {
+
+//  Serial.print(pin);
+//  Serial.print(" - ");
+//  Serial.println(state);
+  
   // register feedback callback only if it hasn't been reistered
   if (newPinStates[pin] <= 0) {
     registerFeedbackCallback(digitalOutputMakeMessage);
@@ -71,11 +76,8 @@ void readPin(uint8_t pin) {
   setNewPinState(pin, digitalRead(pin));
 }
 
-auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
-  
-  Serial.println("digitalOutputSetup");
-
-  if (data[0] == RESISTOR_PULLUP) {
+auto digitalInputSetup = [](uint8_t data[], int dataLength) {
+  if (data[1] == RESISTOR_PULLUP) {
     pinMode(data[0], INPUT_PULLUP);
   }
   else {
@@ -96,7 +98,7 @@ auto digitalReadForce = [](uint8_t data[], int dataLength) {
 
 /////////// PUBLIC
 void digitalInputBegin() {
-  registerFunc(FUNC_SETUP, digitalOutputSetup);
+  registerFunc(FUNC_SETUP, digitalInputSetup);
   registerFunc(FUNC_READ_FORCE, digitalReadForce);
   // initialize pin state as not used
   for (int i = 0; i < DIGITAL_PIN_COUNT; i++) {

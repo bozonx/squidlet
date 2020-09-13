@@ -6,6 +6,7 @@ import PollOnceModbus from './portExpander/services/PortExpander/PollOnceModbus'
 import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
 import CallFunctionModbus from './portExpander/services/PortExpander/CallFunctionModbus';
 import {uint8ToNum} from './system/lib/binaryHelpers';
+import {PORT_EXPANDER_INPUT_REGISTER_MODE} from './portExpander/services/PortExpander/constants';
 
 
 async function start () {
@@ -75,24 +76,25 @@ async function start () {
     // }
 
   };
+  //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
 
-  const inputPinNumber: number = 11;
 
+  //////////////////// READ
+
+  // const inputPinNumber: number = 11;
+  //
   // pollOnce.addEventListener(handler);
   // // setup input pin
-  // // await callFunction.callFunction(
-  // //   12,
-  // //   // pin 11
-  // //   new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_REGISTER_MODE.pullup])
-  // // );
+  // await callFunction.callFunction(
+  //   12,
+  //   // pin 11, 1
+  //   new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_REGISTER_MODE.pullup])
+  // );
   // // read pin
   // await pollOnce.pollOnce();
 
 
-
-  //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
-
-  // TODO: не собирается в пакет, отправляется по одной
+  ///////////////// WRITE
 
   const outputPinNumber: number = 12;
   let pinState: number = 0;
@@ -111,6 +113,8 @@ async function start () {
     );
     await (new Promise((resolve => setTimeout(resolve, 1000))));
   }
+
+  // TODO: write не собирается в пакет, отправляется по одной
 
 }
 

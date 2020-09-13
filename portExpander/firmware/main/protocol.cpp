@@ -36,6 +36,9 @@ uint8_t handlePackageLengthAsk() {
     // there aren't any packages to be read, make new packages
 
     // TODO: нужно же формировать несколько сообщений в 1 пакет и только если длина сообщений превышает длину пакета то создавать новый пакет
+
+  
+
     
     for (int i = 0; i < feedbackStackLength; i++) {
       uint8_t feedbackNum = 0;
@@ -63,6 +66,7 @@ uint8_t handlePackageLengthAsk() {
     // flush callbacks. Means all of them has been read.
     feedbackStackLength = 0;
   }
+
   // return the length of the first one
   return packageLengthStack[0];
 }
