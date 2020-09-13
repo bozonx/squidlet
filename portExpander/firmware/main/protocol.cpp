@@ -7,17 +7,6 @@
 void (*functionsArray [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
 
 
-void convert16BitArrTo8Bit(uint16_t arr16[], int sizeofArr, uint8_t *result) {
-  for (int i = 0; i < sizeofArr; i++) {
-    uint8_t firstByte = (arr16[i] >> 8);
-    uint8_t secondByte = arr16[i] & 0xff;
-
-    result[i * 2] = firstByte;
-    result[(i * 2) + 1] = secondByte;
-  }
-}
-
-
 uint8_t handlePackageLengthAsk() {
   // TODO: сформировать сообщения и сохранить пакеты в буфер
   // TODO: если повторно запрашивается длина то отдать длину первого пакета в буфере
@@ -54,13 +43,7 @@ void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
   // TODO: register this
 }
 
-// TODO: нужно уже принимать 8 бит, а конвертацию делать в modbus connection
-void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit) {
-  int sizeOfPackage8Bit = sizeOfPackage16Bit * 2;
-  uint8_t package8Bit[sizeOfPackage8Bit];
-
-  convert16BitArrTo8Bit(package16Bit, sizeOfPackage16Bit, package8Bit);
-
+void handleIncomeData(uint8_t *package8Bit, int sizeOfPackage8Bit) {
   for (int i = 0; i < sizeOfPackage8Bit; i++) {
     if (i + 1 >= sizeOfPackage8Bit) {
       break;

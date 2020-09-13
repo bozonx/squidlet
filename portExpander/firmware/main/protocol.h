@@ -9,8 +9,7 @@ void handlePackageAsk(uint8_t *package, int lengthShouldBeRead);
 boolean hasReturnCb(uint8_t funcNum);
 void registerFunc(uint8_t funcNum, FuncCb callback);
 void registerReturnCallback(uint8_t funcNum, ReturnCb callback);
-
-void handleIncomeData(uint16_t *package16Bit, int sizeOfPackage16Bit);
+void handleIncomeData(uint8_t *package8Bit, int sizeOfPackage8Bit);
 
 //uint16_t prepareOutcomeData(uint16_t address, uint16_t length);
 

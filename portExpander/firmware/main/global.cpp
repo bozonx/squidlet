@@ -1,3 +1,4 @@
+// TODO: rename to MODBUS_SLAVE_DEFAULT_ADDRESS
 // address of current device on modbus bus
 #define SLAVE_ADDRESS 1
 

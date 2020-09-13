@@ -18,7 +18,12 @@ uint8_t afterWriteRegisters(uint8_t fc, uint16_t address, uint16_t length) {
     package16Bit[i] = slave.readRegisterFromBuffer(address + i);
   }
 
-  handleIncomeData(package16Bit, length);
+  int sizeOfPackage8Bit = length * 2;
+  uint8_t package8Bit[sizeOfPackage8Bit] = {0};
+
+  convert16BitArrTo8Bit(package16Bit, length, package8Bit);
+  
+  handleIncomeData(package8Bit, sizeOfPackage8Bit);
 
   return STATUS_OK;
 }
