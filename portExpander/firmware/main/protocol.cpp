@@ -4,8 +4,35 @@
 
 
 // Function callbacks by function number
-void (*functionsArray [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
+void (*functioncCallbacks [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
+// Function callbacks by function number
+void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t* message[], int *messageLength, int *hasMoreMessages) = {};
+// last element index
+int feedbackStackLastIndex = 0;
 
+
+boolean hasReturnCb(uint8_t funcNum) {
+  
+  // TODO: register add
+  
+  return false;
+}
+
+void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
+
+  // TODO: проверить что нет переполнения массива
+  
+  feedbackStack[feedbackStackLastIndex] = callback;
+
+  feedbackStackLastIndex++;
+}
+
+void registerFunc(uint8_t funcNum, FuncCb callback) {
+
+  // TODO: проверить что номер ф-и в нужных пределах
+  
+  functioncCallbacks[funcNum] = callback;
+}
 
 uint8_t handlePackageLengthAsk() {
   // TODO: сформировать сообщения и сохранить пакеты в буфер
@@ -29,29 +56,6 @@ void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
   // TODO: этого быть не должно - проверить во внешнем коде что подставляется лишний 0
   //package[3] = 0;
 }
-
-boolean hasReturnCb(uint8_t funcNum) {
-  
-  // TODO: register add
-  
-  return false;
-}
-
-void registerReturnCallback(uint8_t funcNum, ReturnCb callback) {
-
-  // TODO: проверить что номер ф-и в нужных пределах
-  
-  // TODO: register this
-  
-}
-
-void registerFunc(uint8_t funcNum, FuncCb callback) {
-
-  // TODO: проверить что номер ф-и в нужных пределах
-  
-  functionsArray[funcNum] = callback;
-}
-
 
 // Split messages in package, the first byte is size of args and the seconf is function name.
 // Call function at any message in the package.
@@ -83,6 +87,6 @@ void handleIncomeData(uint8_t *package8Bit, int sizeOfPackage8Bit) {
     // TODO: how to check if function exists ???
 
     // call function
-    functionsArray[funcNum](argsData, sizeOfArgs);
+    functioncCallbacks[funcNum](argsData, sizeOfArgs);
   }
 }
