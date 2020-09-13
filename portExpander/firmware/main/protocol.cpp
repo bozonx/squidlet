@@ -6,11 +6,13 @@
 // Function callbacks by function number
 void (*functioncCallbacks [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
 // Function callbacks by function number
-void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t *feedbackNum, uint8_t* argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) = {};
+void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t *feedbackNum, uint8_t argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) = {};
 int feedbackStackLength = 0;
-uint8_t packageStack[FEEDBACK_STACK_LENGTH][MAX_PACKAGE_LENGTH_BYTES];
-uint8_t packageLengthStack[FEEDBACK_STACK_LENGTH];
+uint8_t packageStack[FEEDBACK_PACKAGES_STACK_LENGTH][MAX_PACKAGE_LENGTH_BYTES];
+uint8_t packageLengthStack[FEEDBACK_PACKAGES_STACK_LENGTH];
 int packageStackLength = 0;
+// length of packages in the stack which has been read
+int readPackagesLength = 0;
 
 
 void registerFeedbackCallback(ReturnCb callback) {
@@ -32,8 +34,9 @@ void registerFunc(uint8_t funcNum, FuncCb callback) {
 uint8_t handlePackageLengthAsk() {
   if (packageStackLength == 0) {
     // there aren't any packages to be read, make new packages
-    // TODO: если повторно запрашивается длина то отдать длину первого пакета в буфере
-    // 
+
+    // TODO: нужно же формировать несколько сообщений в 1 пакет и только если длина сообщений превышает длину пакета то создавать новый пакет
+    
     for (int i = 0; i < feedbackStackLength; i++) {
       uint8_t feedbackNum = 0;
       uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
@@ -43,11 +46,19 @@ uint8_t handlePackageLengthAsk() {
       // TODO: что делать с hasMoreMessages ????
       // TODO: как сохранить длину пакета в стэке ????
   
-      //feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
+      feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
       // clear the callback
       feedbackStack[i] = 0;
   
-      
+      packageLengthStack[feedbackStackLength] = argsDataLength + 2;
+      packageStack[feedbackStackLength][0] = argsDataLength + 1;
+      packageStack[feedbackStackLength][1] = feedbackNum;
+
+      for (int i = 0; i < argsDataLength; i++) {
+        packageStack[feedbackStackLength][i + 2] = argsData[i];
+      }
+  
+      feedbackStackLength++;
     }
     // flush callbacks. Means all of them has been read.
     feedbackStackLength = 0;
@@ -57,19 +68,30 @@ uint8_t handlePackageLengthAsk() {
 }
 
 void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
-    
-  // TODO: взять 1е сообщение из буфера и записать в регистры и удалить сообщение из буфера
-  // TODO: если других сообщений уже нет то удалить буфер и ждать новых запросов
-  // [length of message(2), functionNum(13), data(5)]
+  if (packageStackLength == 0) {
+    return;
+  }
 
-  
+  // TODO: проверить readPackagesLength
+
+  for (int i = 0; i < packageLengthStack[readPackagesLength]; i++) {
+    package[i] == packageStack[readPackagesLength][i];
+  }
+  // mark package than is has been read
+  readPackagesLength++;
+
+  // TODO: проверить
+  if (readPackagesLength >= packageStackLength) {
+    // all done, clear
+    packageStackLength = 0;
+    readPackagesLength = 0;
+  }
+
 //    slave.writeRegisterToBuffer(0, 525);
 //    slave.writeRegisterToBuffer(1, 1280);
-  package[0] = 2;
-  package[1] = 13;
-  package[2] = 5;
-  // TODO: этого быть не должно - проверить во внешнем коде что подставляется лишний 0
-  //package[3] = 0;
+//  package[0] = 2;
+//  package[1] = 13;
+//  package[2] = 5;
 }
 
 // Split messages in package, the first byte is size of args and the seconf is function name.
@@ -89,7 +111,7 @@ void handleIncomeData(uint8_t *package8Bit, int sizeOfPackage8Bit) {
     }
     
     int dataFirstByte = i + 2;
-    uint8_t argsData[sizeOfArgs];
+    uint8_t argsData[sizeOfArgs] = {0};
     // shift of function num
     i++;
     // read args data of there are any

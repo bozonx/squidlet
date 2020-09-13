@@ -30,7 +30,7 @@ int sentPinStates[DIGITAL_PIN_COUNT] = {0};
 int newPinStates[DIGITAL_PIN_COUNT] = {0};
 
 
-auto digitalOutputMakeMessage = [](uint8_t *feedbackNum, uint8_t* argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) {
+auto digitalOutputMakeMessage = [](uint8_t *feedbackNum, uint8_t argsData[], uint8_t *argsDataLength, uint8_t *hasMoreMessages) {
   boolean hasAlmostOneMessage = false;
   
   for (int pin = 0; pin < DIGITAL_PIN_COUNT; pin++) {
