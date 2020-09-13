@@ -1,5 +1,5 @@
-#ifndef Digital_Output_h
-#define Digital_Output_h
+#ifndef digitalOutput_h
+#define digitalOutput_h
 
 void digitalOutputBegin();
 
