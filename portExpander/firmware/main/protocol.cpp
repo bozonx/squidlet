@@ -20,8 +20,9 @@ int readPackagesLength = 0;
 
 
 void registerFeedbackCallback(ReturnCb callback) {
-
-  // TODO: проверить что нет переполнения массива
+  if (feedbackStackLength > FEEDBACK_STACK_LENGTH) {
+    return;
+  }
   
   feedbackStack[feedbackStackLength] = callback;
 
@@ -29,9 +30,10 @@ void registerFeedbackCallback(ReturnCb callback) {
 }
 
 void registerFunc(uint8_t funcNum, FuncCb callback) {
+  if (funcNum > FUNCTIONS_NUM) {
+    return;
+  }
 
-  // TODO: проверить что номер ф-и в нужных пределах
-  
   functioncCallbacks[funcNum] = callback;
 }
 
@@ -80,21 +82,22 @@ void addFeedbackMessageToPackage(uint8_t &feedbackNum, uint8_t argsData[], uint8
 uint8_t handlePackageLengthAsk() {
   if (packagesCount == 0) {
     // there aren't any packages to be read, make new packages
-
     for (int i = 0; i < feedbackStackLength; i++) {
       uint8_t feedbackNum = 0;
       uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
       uint8_t argsDataLength = 0;
-      uint8_t hasMoreMessages = 0;
-  
-      // TODO: что делать с hasMoreMessages ???? - нужно в цикле выгрузить все сообщения
-  
-      feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
+      int doReadMessages = 1;
 
+      while (doReadMessages) {
+        uint8_t hasMoreMessages = 0;
+        
+        feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
+        addFeedbackMessageToPackage(feedbackNum, argsData, argsDataLength);
+
+        doReadMessages = hasMoreMessages;
+      }
       // clear the callback
       feedbackStack[i] = 0;
-      // TODO: следить что данные будут передаваться поссылке каждый раз
-      addFeedbackMessageToPackage(feedbackNum, argsData, argsDataLength);
     }
     // flush all the callbacks. Means all of them has been read.
     feedbackStackLength = 0;
