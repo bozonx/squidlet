@@ -91,7 +91,10 @@ async function start () {
     new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_REGISTER_MODE.pullup])
   );
 
-  await pollOnce.pollOnce();
+  setInterval(() => {
+    pollOnce.pollOnce();
+  }, 1000);
+
 
   // setTimeout(() => {
   //   // read pin

@@ -29,6 +29,8 @@ export default class PollOnceModbus extends PollOnceBase {
 
     const bytes: Uint8Array = numToUint8Word(result[0]);
 
+    console.log(3333333, result)
+
     return bytes[1];
   }
 
@@ -43,7 +45,7 @@ export default class PollOnceModbus extends PollOnceBase {
     const result: Uint16Array = await this.modbusMasterDriver
       .readInputRegisters(READ_REGISTERS.package, length);
 
-    console.log(11111111, result)
+    console.log(4444444, result)
 
     return uint16ToUint8(result);
   }

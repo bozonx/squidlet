@@ -54,7 +54,7 @@ socket.on('open', function () {
 });
 
 socket.on('data', (data) => {
-  console.log(11111111, data)
+  console.log('--- serial data', data)
 })
 
 socket.on('error', console.error)
