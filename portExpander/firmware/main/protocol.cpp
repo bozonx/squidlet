@@ -38,104 +38,92 @@ void registerFunc(uint8_t funcNum, FuncCb callback) {
 }
 
 void addFeedbackMessageToPackage(uint8_t &feedbackNum, uint8_t argsData[], uint8_t &argsDataLength) {
-
-
-//  Serial.print(packagesCount);
-//  Serial.println(" - packagesCount");
-//  Serial.print(feedbackStackLength);
-//  Serial.println(" - feedbackStackLength");
-
-//  Serial.print(feedbackNum);
-//  Serial.println(" - feedbackNum");
-//  Serial.print(argsData[0]);
-//  Serial.println(" - argsData[0]");
-//  Serial.print(argsData[1]);
-//  Serial.println(" - argsData[1]");
-//  Serial.print(argsDataLength);
-//  Serial.println(" - argsDataLength");
-
-  // TODO: добавлять в конец текущего пакета если есть место
-  // TODO: нужно же формировать несколько сообщений в 1 пакет и только если длина сообщений превышает длину пакета то создавать новый пакет
-
-  // put message into packet
-  // save full length of packet
-  lengthsOfPackagesInStack[packagesCount] = argsDataLength + 2;
-  packageStack[packagesCount][0] = argsDataLength + 1;
-  packageStack[packagesCount][1] = feedbackNum;
-
-  for (int i = 0; i < argsDataLength; i++) {
-    packageStack[packagesCount][i + 2] = argsData[i];
+  // length of data + function num + args
+  int messageLength = argsDataLength + 2;
+  int currentPackageLength = lengthsOfPackagesInStack[packagesCount - 1];
+  
+  // initiate the first package
+  if (packagesCount == 0) {
+    packagesCount = 1;
   }
 
-//  Serial.println(lengthsOfPackagesInStack[packagesCount]);
-//  Serial.println(packageStack[packagesCount][0]);
-//  Serial.println(packageStack[packagesCount][1]);
-//  Serial.println(packageStack[packagesCount][2]);
-//  Serial.println(packageStack[packagesCount][3]);
-//  Serial.println("--");
+  if (currentPackageLength + messageLength > AVAILABLE_PACKAGE_LENGTH_BYTES) {
+    // current package is full go to the next one
+    packagesCount++;
+    lengthsOfPackagesInStack[packagesCount - 1] = 0;
+  }
+  // put message into packet
 
-  // current package is full go to the next one next time
-  packagesCount++;
+  // save full length of packet
+  lengthsOfPackagesInStack[packagesCount - 1] = currentPackageLength + messageLength;
+  // set data length including function num and args
+  packageStack[packagesCount - 1][currentPackageLength] = argsDataLength + 1;
+  // set function num
+  packageStack[packagesCount - 1][currentPackageLength + 1] = feedbackNum;
+  // copy args data
+  for (int i = 0; i < argsDataLength; i++) {
+    packageStack[packagesCount - 1][currentPackageLength + 2 + i] = argsData[i];
+  }
+}
+
+void readFeedbackStack() {
+  // there aren't any packages to be read, make new packages
+  for (int i = 0; i < feedbackStackLength; i++) {
+    uint8_t feedbackNum = 0;
+    uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
+    uint8_t argsDataLength = 0;
+    int doReadMessages = 1;
+
+    while (doReadMessages) {
+      uint8_t hasMoreMessages = 0;
+      
+      feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
+      addFeedbackMessageToPackage(feedbackNum, argsData, argsDataLength);
+
+      doReadMessages = hasMoreMessages;
+    }
+    // clear the callback
+    feedbackStack[i] = 0;
+  }
+  // flush all the callbacks. Means all of them has been read.
+  feedbackStackLength = 0;
 }
 
 
 uint8_t handlePackageLengthAsk() {
   if (packagesCount == 0) {
-    // there aren't any packages to be read, make new packages
-    for (int i = 0; i < feedbackStackLength; i++) {
-      uint8_t feedbackNum = 0;
-      uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
-      uint8_t argsDataLength = 0;
-      int doReadMessages = 1;
-
-      while (doReadMessages) {
-        uint8_t hasMoreMessages = 0;
-        
-        feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
-        addFeedbackMessageToPackage(feedbackNum, argsData, argsDataLength);
-
-        doReadMessages = hasMoreMessages;
-      }
-      // clear the callback
-      feedbackStack[i] = 0;
-    }
-    // flush all the callbacks. Means all of them has been read.
-    feedbackStackLength = 0;
+    // read feedback stack and make packages
+    readFeedbackStack();
   }
-
-//  Serial.print(packagesCount);
-//  Serial.println(" - packagesCount");
-//  Serial.print(lengthsOfPackagesInStack[0]);
-//  Serial.println(" - lengthsOfPackagesInStack[0]");
-
   // return the length of the first package
   return lengthsOfPackagesInStack[0];
 }
 
 void handlePackageAsk(uint8_t package[], int lengthShouldBeRead) {
+  // if no available packages - do noting
   if (packagesCount == 0) {
     return;
   }
 
+  int packageLength = lengthsOfPackagesInStack[readPackagesLength];
+
   // TODO: проверить lengthShouldBeRead
   // TODO: проверить readPackagesLength
 
-  for (int i = 0; i < lengthsOfPackagesInStack[readPackagesLength]; i++) {
+  // copy package
+  for (int i = 0; i < packageLength; i++) {
     package[i] = packageStack[readPackagesLength][i];
   }
 
   // mark package than is has been read
   readPackagesLength++;
 
-  // TODO: проверить
   if (readPackagesLength >= packagesCount) {
     // all done, clear
     packagesCount = 0;
     readPackagesLength = 0;
+    lengthsOfPackagesInStack[0] = 0;
   }
-
-//    slave.writeRegisterToBuffer(0, 525);
-//    slave.writeRegisterToBuffer(1, 1280);
 
 //  package[0] = 3;
 //  package[1] = 13;
