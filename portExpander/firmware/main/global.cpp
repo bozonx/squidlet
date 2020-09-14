@@ -5,6 +5,7 @@
 
 // max is 226
 #define MAX_PACKAGE_LENGTH_BYTES 128
+// TODO: rename to FUNCTIONS_COUNT
 #define FUNCTIONS_NUM 250
 // TODO: review
 #define FEEDBACK_STACK_LENGTH 2
@@ -17,6 +18,8 @@
 //#define MODBUS_ADDRESS_EEPROM_CELL 0
 //#define I2C_ADDRESS_EEPROM_CELL 0
 
+// minus 2 bytes which are used for setting length of the next package
+int const AVAILABLE_PACKAGE_LENGTH_BYTES = MAX_PACKAGE_LENGTH_BYTES - 2;
 int const MAX_PACKAGE_LENGTH_WORDS = MAX_PACKAGE_LENGTH_BYTES / 2;
 int const MAX_ARGS_LENGTH_BYTES = MAX_PACKAGE_LENGTH_BYTES - 2;
 // length of payload excluding the first word which is length and function number
