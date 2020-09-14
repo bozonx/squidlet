@@ -49,9 +49,19 @@ async function start () {
   } as any);
   await modbusMasterDriver.init();
 
+
+
   ////////////////// Do things
+  const inputPinNumber: number = 11;
+  const outputPinNumber: number = 12;
+
   const handler: FunctionHandler = (funcNum: number, returnData: Uint8Array) => {
     console.log('return of funcNum: ', funcNum, ', data is: ', returnData);
+
+    callFunction.callFunction(
+      11,
+      new Uint8Array([outputPinNumber, (returnData[1]) ? 0 : 1])
+    );
 
     // if (!functionsParsers[functionNum]) {
     //   this.logWarn(
@@ -81,7 +91,6 @@ async function start () {
 
   //////////////////// READ
 
-  const inputPinNumber: number = 11;
 
   pollOnce.addEventListener(handler);
   // setup input pin
@@ -89,6 +98,10 @@ async function start () {
     12,
     // pin 11, 1
     new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_REGISTER_MODE.pullup])
+  );
+  await callFunction.callFunction(
+    10,
+    new Uint8Array([outputPinNumber])
   );
 
   setInterval(() => {
@@ -105,7 +118,7 @@ async function start () {
 
   ///////////////// WRITE
 
-  // const outputPinNumber: number = 12;
+  //
   // let pinState: number = 0;
   //
   // callFunction.callFunction(
