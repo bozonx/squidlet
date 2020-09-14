@@ -7,10 +7,14 @@
 void (*functioncCallbacks [FUNCTIONS_NUM]) (uint8_t data[], int dataLength) = {};
 // Function callbacks by function number
 void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t &feedbackNum, uint8_t argsData[], uint8_t &argsDataLength, uint8_t &hasMoreMessages) = {};
+// length of queue of feedback callback which wait to be read
 int feedbackStackLength = 0;
+// stack of packages
 uint8_t packageStack[FEEDBACK_PACKAGES_STACK_LENGTH][MAX_PACKAGE_LENGTH_BYTES];
-uint8_t packageLengthStack[FEEDBACK_PACKAGES_STACK_LENGTH];
-int packageStackLength = 0;
+// lengths of packages in the stack
+uint8_t lengthsOfPackagesInStack[FEEDBACK_PACKAGES_STACK_LENGTH];
+// count of available packages
+int packagesCount = 0;
 // length of packages in the stack which has been read
 int readPackagesLength = 0;
 
@@ -31,101 +35,109 @@ void registerFunc(uint8_t funcNum, FuncCb callback) {
   functioncCallbacks[funcNum] = callback;
 }
 
-uint8_t handlePackageLengthAsk() {
+void addFeedbackMessageToPackage(uint8_t &feedbackNum, uint8_t argsData[], uint8_t &argsDataLength) {
 
-  //Serial.print(packageStackLength);
-  //Serial.println(" - packageStackLength");
 
-  return 4;
+//  Serial.print(packagesCount);
+//  Serial.println(" - packagesCount");
+//  Serial.print(feedbackStackLength);
+//  Serial.println(" - feedbackStackLength");
 
-//  if (packageStackLength == 0) {
-//    // there aren't any packages to be read, make new packages
-//
-//    // TODO: нужно же формировать несколько сообщений в 1 пакет и только если длина сообщений превышает длину пакета то создавать новый пакет
-//
-//    for (int i = 0; i < feedbackStackLength; i++) {
-//      uint8_t feedbackNum = 0;
-//      uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
-//      uint8_t argsDataLength = 0;
-//      uint8_t hasMoreMessages = 0;
-//  
-//      // TODO: что делать с hasMoreMessages ????
-//      // TODO: как сохранить длину пакета в стэке ????
-//  
-//      feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
-//
-//      // clear the callback
-//      feedbackStack[i] = 0;
-//
-//      packageLengthStack[feedbackStackLength] = argsDataLength + 2;
-////      packageStack[feedbackStackLength][0] = argsDataLength + 1;
-////      packageStack[feedbackStackLength][1] = feedbackNum;
-//
-//      Serial.print(feedbackNum);
-//      Serial.println(" - feedbackNum");
-//      Serial.print(argsData[0]);
-//      Serial.println(" - argsData[0]");
-//      Serial.print(argsData[1]);
-//      Serial.println(" - argsData[1]");
-//      Serial.print(argsDataLength);
-//      Serial.println(" - argsDataLength");
-//      Serial.print(hasMoreMessages);
-//      Serial.println(" - hasMoreMessages");
-//      
-//      Serial.print(feedbackStackLength);
-//      Serial.println(" - feedbackStackLength");
-//      Serial.print(packageLengthStack[feedbackStackLength]);
-//      Serial.println(" - packageLengthStack[feedbackStackLength]");
-////      Serial.print(packageStack[feedbackStackLength][0]);
-////      Serial.println(" - packageStack[feedbackStackLength][0]");
-////      Serial.print(packageStack[feedbackStackLength][1]);
-////      Serial.println(" - packageStack[feedbackStackLength][1]");
-//
-////
-////      for (int i = 0; i < argsDataLength; i++) {
-////        packageStack[feedbackStackLength][i + 2] = argsData[i];
-////      }
-////  
-//      feedbackStackLength++;
-//    }
-//    // flush callbacks. Means all of them has been read.
-//    feedbackStackLength = 0;
-//  }
-//
-//  return 0;
-  
+//  Serial.print(feedbackNum);
+//  Serial.println(" - feedbackNum");
+//  Serial.print(argsData[0]);
+//  Serial.println(" - argsData[0]");
+//  Serial.print(argsData[1]);
+//  Serial.println(" - argsData[1]");
+//  Serial.print(argsDataLength);
+//  Serial.println(" - argsDataLength");
 
-  // return the length of the first one
-  //return packageLengthStack[0];
+  // TODO: добавлять в конец текущего пакета если есть место
+  // TODO: нужно же формировать несколько сообщений в 1 пакет и только если длина сообщений превышает длину пакета то создавать новый пакет
+
+  // put message into packet
+  // save full length of packet
+  lengthsOfPackagesInStack[packagesCount] = argsDataLength + 2;
+  packageStack[packagesCount][0] = argsDataLength + 1;
+  packageStack[packagesCount][1] = feedbackNum;
+
+  for (int i = 0; i < argsDataLength; i++) {
+    packageStack[packagesCount][i + 2] = argsData[i];
+  }
+
+//  Serial.println(lengthsOfPackagesInStack[packagesCount]);
+//  Serial.println(packageStack[packagesCount][0]);
+//  Serial.println(packageStack[packagesCount][1]);
+//  Serial.println(packageStack[packagesCount][2]);
+//  Serial.println(packageStack[packagesCount][3]);
+//  Serial.println("--");
+
+  // current package is full go to the next one next time
+  packagesCount++;
 }
 
-void handlePackageAsk(uint8_t *package, int lengthShouldBeRead) {
-//  if (packageStackLength == 0) {
-//    return;
-//  }
+
+uint8_t handlePackageLengthAsk() {
+  if (packagesCount == 0) {
+    // there aren't any packages to be read, make new packages
+
+    for (int i = 0; i < feedbackStackLength; i++) {
+      uint8_t feedbackNum = 0;
+      uint8_t argsData[MAX_ARGS_LENGTH_BYTES] = {0};
+      uint8_t argsDataLength = 0;
+      uint8_t hasMoreMessages = 0;
+  
+      // TODO: что делать с hasMoreMessages ???? - нужно в цикле выгрузить все сообщения
+  
+      feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
+
+      // clear the callback
+      feedbackStack[i] = 0;
+      // TODO: следить что данные будут передаваться поссылке каждый раз
+      addFeedbackMessageToPackage(feedbackNum, argsData, argsDataLength);
+    }
+    // flush all the callbacks. Means all of them has been read.
+    feedbackStackLength = 0;
+  }
+
+//  Serial.print(packagesCount);
+//  Serial.println(" - packagesCount");
+//  Serial.print(lengthsOfPackagesInStack[0]);
+//  Serial.println(" - lengthsOfPackagesInStack[0]");
+
+  // return the length of the first package
+  return lengthsOfPackagesInStack[0];
+}
+
+void handlePackageAsk(uint8_t package[], int lengthShouldBeRead) {
+  if (packagesCount == 0) {
+    return;
+  }
 
   // TODO: проверить lengthShouldBeRead
   // TODO: проверить readPackagesLength
 
-//  for (int i = 0; i < packageLengthStack[readPackagesLength]; i++) {
-//    package[i] == packageStack[readPackagesLength][i];
-//  }
-//  // mark package than is has been read
-//  readPackagesLength++;
-//
-//  // TODO: проверить
-//  if (readPackagesLength >= packageStackLength) {
-//    // all done, clear
-//    packageStackLength = 0;
-//    readPackagesLength = 0;
-//  }
+  for (int i = 0; i < lengthsOfPackagesInStack[readPackagesLength]; i++) {
+    package[i] = packageStack[readPackagesLength][i];
+  }
+
+  // mark package than is has been read
+  readPackagesLength++;
+
+  // TODO: проверить
+  if (readPackagesLength >= packagesCount) {
+    // all done, clear
+    packagesCount = 0;
+    readPackagesLength = 0;
+  }
 
 //    slave.writeRegisterToBuffer(0, 525);
 //    slave.writeRegisterToBuffer(1, 1280);
-  package[0] = 3;
-  package[1] = 13;
-  package[2] = 11;
-  package[3] = 1;
+
+//  package[0] = 3;
+//  package[1] = 13;
+//  package[2] = 11;
+//  package[3] = 1;
 }
 
 // Split messages in package, the first byte is size of args and the seconf is function name.

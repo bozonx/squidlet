@@ -6,8 +6,10 @@
 // max is 226
 #define MAX_PACKAGE_LENGTH_BYTES 128
 #define FUNCTIONS_NUM 250
-#define FEEDBACK_STACK_LENGTH 10
-#define FEEDBACK_PACKAGES_STACK_LENGTH 5
+// TODO: review
+#define FEEDBACK_STACK_LENGTH 2
+// TODO: review
+#define FEEDBACK_PACKAGES_STACK_LENGTH 2
 #define SEND_RECEIVE_SWITCH_PIN 13
 // TODO: установить реальное количество цифровых пинов
 #define DIGITAL_PIN_COUNT 14
