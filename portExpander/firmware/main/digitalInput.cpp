@@ -28,9 +28,6 @@ int freshState[STATE_BYTES_COUNT] = {0};
 boolean hasRegisteredMessageCb = false;
 
 
-// TODO: нужна ф-я которая перестает слушать пин - stopListenPin
-
-
 void startListenPin(uint8_t pin) {
   int octetNum = getOctetNum(pin);
   int bitNumInOctet = getBitNumInOctet(pin);
