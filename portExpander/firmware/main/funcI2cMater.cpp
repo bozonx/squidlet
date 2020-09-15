@@ -1,25 +1,36 @@
 #include <Arduino.h>
+#include <Wire.h>
 #include "funcI2cMater.h"
 //#include "global.cpp"
-//#include "protocol.h"
+#include "protocol.h"
 
 
 typedef enum __attribute__ ((packed))  {
-  FUNC_SETUP = 10,
-  FUNC_WRITE
-} DigitalOutputFunctionNum;
+  FUNC_SETUP = 40,
+  FUNC_WRITE,
+  FUNC_READ
+} I2cMasterFunctionNum;
+
+typedef enum __attribute__ ((packed))  {
+  FEEDBACK_READ = 43
+} I2cMasterFeedbackNum;
 
 
-auto digitalOutputSetup = [](uint8_t data[], int dataLength) {
-  pinMode(data[0], OUTPUT);
+auto i2cMasterSetup = [](uint8_t data[], int dataLength) {
+  Wire.begin();
 };
 
-auto digitalOutputWrite = [](uint8_t data[], int dataLength) {
+auto i2cMasterWrite = [](uint8_t data[], int dataLength) {
+  digitalWrite(data[0], data[1]);
+};
+
+auto i2cMasterRead = [](uint8_t data[], int dataLength) {
   digitalWrite(data[0], data[1]);
 };
 
 
 void i2cMasterBegin() {
-  registerFunc(FUNC_SETUP, digitalOutputSetup);
-  registerFunc(FUNC_WRITE, digitalOutputWrite);
+  registerFunc(FUNC_SETUP, i2cMasterSetup);
+  registerFunc(FUNC_WRITE, i2cMasterWrite);
+  registerFunc(FUNC_READ, i2cMasterRead);
 }

@@ -6,7 +6,7 @@
 // max is 226
 #define MAX_PACKAGE_LENGTH_BYTES 128
 // TODO: rename to FUNCTIONS_COUNT
-#define FUNCTIONS_NUM 250
+#define FUNCTIONS_NUM 120
 // TODO: review
 #define FEEDBACK_STACK_LENGTH 2
 // TODO: review
