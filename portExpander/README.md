@@ -50,18 +50,19 @@
 
 * 40 i2cMasterSetup(sdaPin, slcPin, frequency)
 * 41 i2cMasterWrite(sdaPin, address, ...data)
-* 42 i2cMasterRead(sdaPin, address, ...data)
-* 43 ??? return data
-* 44 i2cSlaveSetup(address, sdaPin, slcPin, frequency)
-* 45 i2cSlaveSetReadToBuffer(sdaPin, data) Set data to buffer
+* 42 i2cMasterRead(sdaPin, address, length)
+* 43 i2cMasterScan(sdaPin);
+* 44 ??? return data
+* 45 i2cSlaveSetup(address, sdaPin, slcPin, frequency)
+* 46 i2cSlaveSetReadToBuffer(sdaPin, data) Set data to buffer
      which will be read by master
-* 46??? data which sends master
+* 47??? data which sends master
 
 50-59 modbus, serial
 
 * 50 modbusMasterSetup(txPin, rxPin, transmitterPin, ...serialParams)
-* 51 modbusMasterWrite(txPin, address, funcNum, data)
-* 52 modbusMasterRead(txPin, address, funcNum, length)
+* 51 modbusMasterWrite(txPin, address, data)
+* 52 modbusMasterRead(txPin, address, length)
 * 53 ??? return data which has been read
 ... modbus slave
 * .. serialSetup(txPin, rxPin, bod, ...params)
@@ -73,5 +74,7 @@
 70-79 bluetooth
 
 80-89 WiFi
+
+90-99 useless
 
 100-120 custom functions
