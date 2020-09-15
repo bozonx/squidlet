@@ -22,6 +22,8 @@ int const NOT_USED_PIN = -2;
 int const NO_STATE = -1;
 
 
+// TODO: использовать ввиде байтов - используемые пины, сохраненный стейт, новый стейт
+
 // TODO: можно ли оптимизировать, использовать хэш например???
 // pin state which has been read
 int sentPinStates[DIGITAL_PIN_COUNT] = {0};
@@ -91,10 +93,14 @@ auto digitalInputSetup = [](uint8_t data[], int dataLength) {
     pinMode(data[0], INPUT);
   }
 
+  // TODO: зачем считывать если будет считанно в loop
+  // TODO: нужно просто установить no_state
+
   // read the initial state
   readPin(data[0]);
 };
 
+// TODO: зачем нужно ????
 auto digitalReadForce = [](uint8_t data[], int dataLength) {
   
   Serial.println("digitalReadForce");
