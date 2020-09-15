@@ -49,10 +49,10 @@
 40-49 I2C master, I2C slave
 
 * 40 i2cMasterSetup(sdaPin, slcPin, frequency)
-* 41 i2cMasterWrite(sdaPin, data)
-* 42 i2cMasterRead(sdaPin, data)
+* 41 i2cMasterWrite(sdaPin, address, ...data)
+* 42 i2cMasterRead(sdaPin, address, ...data)
 * 43 ??? return data
-* 44 i2cSlaveSetup(sdaPin, slcPin, frequency)
+* 44 i2cSlaveSetup(address, sdaPin, slcPin, frequency)
 * 45 i2cSlaveSetReadToBuffer(sdaPin, data) Set data to buffer
      which will be read by master
 * 46??? data which sends master
@@ -60,8 +60,8 @@
 50-59 modbus, serial
 
 * 50 modbusMasterSetup(txPin, rxPin, transmitterPin, ...serialParams)
-* 51 modbusMasterWrite(txPin, funcNum, data)
-* 52 modbusMasterRead(txPin, funcNum, length)
+* 51 modbusMasterWrite(txPin, address, funcNum, data)
+* 52 modbusMasterRead(txPin, address, funcNum, length)
 * 53 ??? return data which has been read
 ... modbus slave
 * .. serialSetup(txPin, rxPin, bod, ...params)

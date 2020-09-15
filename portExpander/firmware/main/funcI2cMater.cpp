@@ -16,16 +16,24 @@ typedef enum __attribute__ ((packed))  {
 } I2cMasterFeedbackNum;
 
 
+// params: sdaPin, slcPin, frequency aren't used in arduino
 auto i2cMasterSetup = [](uint8_t data[], int dataLength) {
   Wire.begin();
 };
 
 auto i2cMasterWrite = [](uint8_t data[], int dataLength) {
-  digitalWrite(data[0], data[1]);
+  // param data[0] (sdaPin) isn't used on arduino, it can be just 0
+  Wire.beginTransmission(data[1]);
+
+  for (int i = 0; i < dataLength - 2; i++) {
+    Wire.write(data[i + 2]);
+  }
+
+  Wire.endTransmission();
 };
 
 auto i2cMasterRead = [](uint8_t data[], int dataLength) {
-  digitalWrite(data[0], data[1]);
+  // TODO: !!!!
 };
 
 
