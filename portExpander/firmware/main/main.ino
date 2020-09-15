@@ -1,6 +1,7 @@
 #include "funcDigitalOutput.h"
 #include "funcDigitalInput.h"
 #include "funcI2cMater.h"
+#include "funcI2cSlave.h"
 #include "modbusConnection.h"
 #include "global.cpp"
 
@@ -11,6 +12,8 @@ void setup() {
   modbusConnectionBegin();
   digitalOutputBegin();
   digitalInputBegin();
+  i2cMasterBegin();
+  i2cSlaveBegin();
 
   Serial.println("started!");
 }

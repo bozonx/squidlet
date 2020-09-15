@@ -1,5 +1,3 @@
-
-
 ## Protocol
 
 ### Send to mk
@@ -29,4 +27,51 @@
 10-19 Digital input and output
 
 * 10 digitalOutputSetup(pinNum)
-* 11 
+* 11 digitalOutputWrite(pinNum, 0 | 1)
+* 12 digitalInputSetup(pinNum, register). Register is 0(none) and 1(pullup)
+* 13 digitalReadForce(pinNum). Initiate feedback message.
+??? return message
+??? interrupt in/out
+
+20-29 Analog, PWM
+
+* 20 analogOutputSetup(pinNum)
+* 21 analogOutputWrite(pinNum, value)
+* 22 analogInputSetup(pinNum. filterParams)
+??? return message.
+* 24 pwmSetup(pinNum)
+* 25 pwmSet(pinNum, impulseLength, pauseLength)
+
+30-39 EPPROM, memory, spi
+
+* ...
+
+40-49 I2C master, I2C slave
+
+* 40 i2cMasterSetup(sdaPin, slcPin, frequency)
+* 41 i2cMasterWrite(sdaPin, data)
+* 42 i2cMasterRead(sdaPin, data)
+* 43 ??? return data
+* 44 i2cSlaveSetup(sdaPin, slcPin, frequency)
+* 45 i2cSlaveSetReadToBuffer(sdaPin, data) Set data to buffer
+     which will be read by master
+* 46??? data which sends master
+
+50-59 modbus, serial
+
+* 50 modbusMasterSetup(txPin, rxPin, transmitterPin, ...serialParams)
+* 51 modbusMasterWrite(txPin, funcNum, data)
+* 52 modbusMasterRead(txPin, funcNum, length)
+* 53 ??? return data which has been read
+... modbus slave
+* .. serialSetup(txPin, rxPin, bod, ...params)
+* .. serialWrite(txPin, data)
+* ??? return message from rxPin
+
+60-69 one-wire master, slave
+
+70-79 bluetooth
+
+80-89 WiFi
+
+100-120 custom functions
