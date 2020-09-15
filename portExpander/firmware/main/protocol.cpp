@@ -11,6 +11,9 @@ void (*feedbackStack [FEEDBACK_STACK_LENGTH]) (uint8_t &feedbackNum, uint8_t arg
 int feedbackStackLength = 0;
 // stack of packages
 uint8_t packageStack[FEEDBACK_PACKAGES_STACK_LENGTH][MAX_PACKAGE_LENGTH_BYTES];
+
+// TODO: лучше наверное хранить длину пакета вначале и потом делать slice
+
 // lengths of packages in the stack
 uint8_t lengthsOfPackagesInStack[FEEDBACK_PACKAGES_STACK_LENGTH];
 // count of available packages

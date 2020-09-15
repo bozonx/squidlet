@@ -32,8 +32,19 @@ auto i2cMasterWrite = [](uint8_t data[], int dataLength) {
   Wire.endTransmission();
 };
 
+// params: sdaPin, address, length
 auto i2cMasterRead = [](uint8_t data[], int dataLength) {
-  // TODO: !!!!
+  // param data[0] (sdaPin) isn't used on arduino, it can be just 0
+  
+  Wire.requestFrom(data[1], data[2]);
+
+  // TODO: закинуть сообщение в буфер
+
+  while (Wire.available()) { // slave may send less than requested
+    char c = Wire.read(); // receive a byte as character
+    Serial.print(c);         // print the character
+  }
+  
 };
 
 
