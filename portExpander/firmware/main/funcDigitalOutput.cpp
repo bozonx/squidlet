@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "digitalOutput.h"
+#include "funcDigitalOutput.h"
 #include "global.cpp"
 #include "protocol.h"
 
