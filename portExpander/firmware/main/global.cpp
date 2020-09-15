@@ -12,8 +12,6 @@
 // TODO: review
 #define FEEDBACK_PACKAGES_STACK_LENGTH 2
 #define SEND_RECEIVE_SWITCH_PIN 13
-// TODO: установить реальное количество цифровых пинов
-#define DIGITAL_PIN_COUNT 14
 
 //#define MODBUS_ADDRESS_EEPROM_CELL 0
 //#define I2C_ADDRESS_EEPROM_CELL 0
