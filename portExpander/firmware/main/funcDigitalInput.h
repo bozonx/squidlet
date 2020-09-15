@@ -1,5 +1,5 @@
-#ifndef digitalInput_h
-#define digitalInput_h
+#ifndef funcDigitalInput_h
+#define funcDigitalInput_h
 
 void digitalInputBegin();
 void digitalInputLoop();

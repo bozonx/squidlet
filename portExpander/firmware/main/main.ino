@@ -1,5 +1,5 @@
-#include "digitalOutput.h"
-#include "digitalInput.h"
+#include "funcDigitalOutput.h"
+#include "funcDigitalInput.h"
 #include "funcI2cMater.h"
 #include "modbusConnection.h"
 #include "global.cpp"

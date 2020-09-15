@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "digitalInput.h"
+#include "funcDigitalInput.h"
 #include "global.cpp"
 #include "helpers.h"
 #include "protocol.h"
@@ -108,7 +108,7 @@ void digitalInputLoop() {
 
     if (isStateChanged() && !hasRegisteredMessageCb) {
       hasRegisteredMessageCb = true;
-      
+
       registerFeedbackCallback(digitalOutputMakeMessage);
     }
   }
