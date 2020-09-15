@@ -60,7 +60,7 @@ async function start () {
 
     callFunction.callFunction(
       11,
-      new Uint8Array([outputPinNumber, (returnData[1]) ? 0 : 1])
+      new Uint8Array([outputPinNumber, (returnData[1]) ? 0 : 8])
     );
 
     // if (!functionsParsers[functionNum]) {
