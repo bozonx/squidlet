@@ -53,43 +53,43 @@ async function start () {
 
   ////////////////// Do things
   // setup i2c
-  await callFunction.callFunction(
-    40,
-    new Uint8Array([])
-  );
-
-  await (new Promise((resolve => setTimeout(resolve, 100))));
-
+  // await callFunction.callFunction(
+  //   40,
+  //   new Uint8Array([])
+  // );
+  //
+  // await (new Promise((resolve => setTimeout(resolve, 100))));
+  //
+  // // await callFunction.callFunction(
+  // //   41,
+  // //   new Uint8Array([0, 0x41, 0x06, 0xc7, 0x07, 0x00, 0x08, 0xcc, 0x09, 0x04])
+  // // );
+  //
   // await callFunction.callFunction(
   //   41,
-  //   new Uint8Array([0, 0x41, 0x06, 0xc7, 0x07, 0x00, 0x08, 0xcc, 0x09, 0x04])
+  //   new Uint8Array([0, 0x41, 0x06, 0xc7])
   // );
-
-  await callFunction.callFunction(
-    41,
-    new Uint8Array([0, 0x41, 0x06, 0xc7])
-  );
-
-  await (new Promise((resolve => setTimeout(resolve, 100))));
-
-  await callFunction.callFunction(
-    41,
-    new Uint8Array([0, 0x41, 0x07, 0x00])
-  );
-
-  await (new Promise((resolve => setTimeout(resolve, 100))));
-
-  await callFunction.callFunction(
-    41,
-    new Uint8Array([0, 0x41, 0x08, 0xcc])
-  );
-
-  await (new Promise((resolve => setTimeout(resolve, 100))));
-
-  await callFunction.callFunction(
-    41,
-    new Uint8Array([0, 0x41, 0x09, 0x04])
-  );
+  //
+  // await (new Promise((resolve => setTimeout(resolve, 100))));
+  //
+  // await callFunction.callFunction(
+  //   41,
+  //   new Uint8Array([0, 0x41, 0x07, 0x00])
+  // );
+  //
+  // await (new Promise((resolve => setTimeout(resolve, 100))));
+  //
+  // await callFunction.callFunction(
+  //   41,
+  //   new Uint8Array([0, 0x41, 0x08, 0xcc])
+  // );
+  //
+  // await (new Promise((resolve => setTimeout(resolve, 100))));
+  //
+  // await callFunction.callFunction(
+  //   41,
+  //   new Uint8Array([0, 0x41, 0x09, 0x04])
+  // );
 
 
   const inputPinNumber: number = 11;
