@@ -6,7 +6,7 @@ import PollOnceModbus from './portExpander/services/PortExpander/PollOnceModbus'
 import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
 import CallFunctionModbus from './portExpander/services/PortExpander/CallFunctionModbus';
 import {uint8ToNum} from './system/lib/binaryHelpers';
-import {PORT_EXPANDER_INPUT_REGISTER_MODE} from './portExpander/services/PortExpander/constants';
+import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/PortExpander/constants';
 
 
 async function start () {
@@ -97,7 +97,7 @@ async function start () {
   await callFunction.callFunction(
     12,
     // pin 11, 1
-    new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_REGISTER_MODE.pullup])
+    new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_RESISTOR_MODE.pullup])
   );
   await callFunction.callFunction(
     10,
