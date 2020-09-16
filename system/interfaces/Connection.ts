@@ -3,8 +3,13 @@ export interface ConnectionMessage {
   payload: Uint8Array;
 }
 
-export type IncomeMessageHandler = (peerId: string, port: number, payload: Uint8Array) => void;
-export type PeerStatusHandler = (peerId: string) => void;
+export interface ConnectionProps {
+  address: number;
+}
+
+
+export type IncomeMessageHandler = (port: number, payload: Uint8Array) => void;
+export type StatusHandler = () => void;
 export type ConnectionServiceType = 'connection';
 
 export enum ConnectionsEvents {
@@ -17,24 +22,26 @@ export enum ConnectionsEvents {
 export const CONNECTION_SERVICE_TYPE = 'connection';
 
 
+/**
+ * Connection between two peers. Both side know address each other.
+ */
 export default interface Connection {
   serviceType?: ConnectionServiceType;
-
-  // TODO: does it need?
-  //connectionPromise: Promise<void>;
 
   /**
    * Send data to peer and don't wait for response.
    * Port is from 0 and up to 253. Don't use 254 and 255.
    */
-  send(peerId: string, port: number, payload: Uint8Array): Promise<void>;
+  send(port: number, payload: Uint8Array): Promise<void>;
+
+  isConnected(): boolean;
 
   onIncomeMessage(cb: IncomeMessageHandler): number;
-  onPeerConnect(cb: PeerStatusHandler): number;
-  onPeerDisconnect(cb: PeerStatusHandler): number;
+  onConnect(cb: StatusHandler): number;
+  onDisconnect(cb: StatusHandler): number;
 
   /**
-   * Remove listener of onIncomeData, onPeerConnect or onPeerDisconnect
+   * Remove listener of onIncomeData, onConnect or onDisconnect
    */
   removeListener(handlerIndex: number): void;
 }
