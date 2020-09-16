@@ -1,0 +1,11 @@
+name: ModbusRtuConnection
+main: ModbusRtuConnection.ts
+
+#drivers:
+#  - WsServerSessions
+
+props: {}
+#  $base: 'drivers.WsServerSessions'
+#  port:
+#    type: number
+#    default: 8088
