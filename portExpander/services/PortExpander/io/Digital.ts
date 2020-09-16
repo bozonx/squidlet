@@ -107,14 +107,13 @@ export default class Digital implements DigitalIo {
     );
   }
 
-  // TODO: add
   async clearPin(pin: number): Promise<void> {
-    delete this.resistors[pin];
+    delete this.pinParams[pin];
 
-    this.events.removeAllListeners(pin);
-    this.debounceCall.clear(pin);
-    this.throttleCall.clear(pin);
-    this.client.clearPin(pin);
+    this.pinChangeLogic.clearPin(pin);
+
+    // TODO: вызвать ф-ю чтобы отписаться от пина
+    //this.client.clearPin(pin);
   }
 
   async clearAll(): Promise<void> {

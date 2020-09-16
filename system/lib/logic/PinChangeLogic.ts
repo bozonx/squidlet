@@ -38,6 +38,12 @@ export default class PinChangeLogic {
     this.events.removeListener(handlerIndex);
   }
 
+  clearPin(pin: number) {
+    this.events.removeAllListeners(pin);
+    this.debounceCall.clear(pin);
+    this.throttleCall.clear(pin);
+  }
+
 
   handlePinChange(
     pin: number,
