@@ -20,6 +20,9 @@ export const CONNECTION_SERVICE_TYPE = 'connection';
 export default interface Connection {
   serviceType?: ConnectionServiceType;
 
+  // TODO: does it need?
+  //connectionPromise: Promise<void>;
+
   /**
    * Send data to peer and don't wait for response.
    * Port is from 0 and up to 253. Don't use 254 and 255.

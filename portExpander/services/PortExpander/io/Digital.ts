@@ -1,33 +1,33 @@
-/*
- * It uses a pigpiod daemon via websocket.
- */
-
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
-import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
-import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import IoContext from 'system/interfaces/IoContext';
-import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
-import PigpioClient from './PigpioClient';
+
+import {PORT_EXPANDER_FEEDBACK, PORT_EXPANDER_FUNCTIONS} from '../constants';
+import ExpanderFunctionCall from '../ExpanderFunctionCall';
 
 
 export default class Digital implements DigitalIo {
+  private readonly functionCall: ExpanderFunctionCall;
+
   //private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
-  // private readonly events = new IndexedEventEmitter<ChangeHandler>();
+  private readonly events = new IndexedEventEmitter<ChangeHandler>();
   // private readonly debounceCall: DebounceCall = new DebounceCall();
   // private readonly throttleCall: ThrottleCall = new ThrottleCall();
 
 
-  async init(ioContext: IoContext): Promise<void> {
-    this._ioContext = ioContext;
-    this._client = ioContext.getIo<PigpioClient>('PigpioClient');
+  constructor(functionCall: ExpanderFunctionCall) {
+    this.functionCall = functionCall;
+
+    this.functionCall.onMessage(this.handleIncomeMessages);
   }
 
+
   async destroy(): Promise<void> {
-    this.debounceCall.destroy();
-    this.throttleCall.destroy();
-    this.events.destroy();
+    this.functionCall.destroy();
+
+    // this.debounceCall.destroy();
+    // this.throttleCall.destroy();
+    // this.events.destroy();
   }
 
 
@@ -36,28 +36,17 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
-    if (this.client.isPinInitialized(pin)) {
-      throw new Error(
-        `Digital IO setupInput(): Pin ${pin} has been set up before. ` +
-        `You should to call \`clearPin(${pin})\` and after that try again.`
-      );
+    if (inputMode === InputResistorMode.pulldown) {
+      // TODO: review, может это режим по умолчанию
+      // TODO: проверить на соответсвующем мк
+      throw new Error(`Port expander on arduino doesn't support a pulldown resistor`);
     }
-    // wait for connection
-    await this.client.connectionPromise;
-    // make instance
-    this.client.makePinInstance(pin);
 
-    const pinInstance = this.getPinInstance('setupInput', pin);
-    const pullUpDown: number = this.convertInputResistorMode(inputMode);
     // make setup
-    await Promise.all([
-      pinInstance.modeSet('input'),
-      pinInstance.pullUpDown(pullUpDown),
-    ]);
-
-    const handler = (level: number, tick: number) => this.handlePinChange(pin, level, tick, debounce, edge);
-
-    pinInstance.notify(handler);
+    await this.functionCall.callFunc(
+      PORT_EXPANDER_FUNCTIONS.digitalInputSetup,
+      new Uint8Array([pin, inputMode])
+    );
   }
 
   /**
@@ -65,42 +54,33 @@ export default class Digital implements DigitalIo {
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
   async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
-    if (this.client.isPinInitialized(pin)) {
-      throw new Error(
-        `Digital IO setupOutput(): Pin ${pin} has been set up before. ` +
-        `You should to call \`clearPin(${pin})\` and after that try again.`
-      );
+    if (outputMode && outputMode === OutputResistorMode.opendrain) {
+      // TODO: review, может это режим по умолчанию
+      // TODO: проверить на соответсвующем мк
+      throw new Error(`Port expander on arduino doesn't support an opendrain resistor`);
     }
-    // wait for connection
-    await this.client.connectionPromise;
-    // make instance
-    this.client.makePinInstance(pin);
 
-    const pinInstance = this.getPinInstance('setupOutput', pin);
-    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
-    // save resistor mode
-    this.resistors[pin] = outputMode;
     // make setup
-    await Promise.all([
-      pinInstance.modeSet('output'),
-      pinInstance.pullUpDown(pullUpDown),
-    ]);
+    await this.functionCall.callFunc(
+      PORT_EXPANDER_FUNCTIONS.digitalOutputSetup,
+      new Uint8Array([pin])
+    );
     // set initial value if it defined
     if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
-
-    const pinInstance = this.getPinInstance('getPinDirection', pin);
-
-    const modeNum: number = await pinInstance.modeGet();
-
-    if (modeNum === 0) {
-      return PinDirection.input;
-    }
-
-    return PinDirection.output;
+    // if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
+    //
+    // const pinInstance = this.getPinInstance('getPinDirection', pin);
+    //
+    // const modeNum: number = await pinInstance.modeGet();
+    //
+    // if (modeNum === 0) {
+    //   return PinDirection.input;
+    // }
+    //
+    // return PinDirection.output;
   }
 
   /**
@@ -108,22 +88,18 @@ export default class Digital implements DigitalIo {
    * It throws an error if pin hasn't configured before
    */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    return this.resistors[pin];
+    //return this.resistors[pin];
   }
 
   async read(pin: number): Promise<boolean> {
-    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
-
     return this.simpleRead(pin);
   }
 
   async write(pin: number, value: boolean): Promise<void> {
-    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
-
-    const pinInstance = this.getPinInstance('write', pin);
-    const numValue: number = (value) ? 1 : 0;
-
-    return pinInstance.write(numValue);
+    return this.functionCall.callFunc(
+      PORT_EXPANDER_FUNCTIONS.digitalOutputWrite,
+      new Uint8Array([Number(value)])
+    );
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
@@ -133,6 +109,33 @@ export default class Digital implements DigitalIo {
   async removeListener(handlerIndex: number): Promise<void> {
     this.events.removeListener(handlerIndex);
   }
+
+
+  private handleIncomeMessages(funcNum: number, args: Uint8Array) {
+    // TODO: add
+  }
+
+  private async simpleRead(pin: number): Promise<boolean> {
+    const result: Uint8Array = await this.functionCall.request(
+      PORT_EXPANDER_FUNCTIONS.digitalReadForce,
+      // TODO: feedback всетаки отдельно или вместе в functions ???
+      PORT_EXPANDER_FEEDBACK.digitalInputRead,
+      new Uint8Array([pin])
+    );
+
+    return Boolean(result[0]);
+  }
+
+
+
+
+
+
+  ///////////////////////////
+
+
+
+
 
   async clearPin(pin: number): Promise<void> {
     delete this.resistors[pin];
@@ -196,52 +199,6 @@ export default class Digital implements DigitalIo {
     }
 
     this.events.emit(pin, realLevel);
-  }
-
-  private async simpleRead(pin: number): Promise<boolean> {
-    const pinInstance = this.getPinInstance('simpleRead', pin);
-
-    // returns 0 or 1
-    const result: number = await pinInstance.read();
-
-    return Boolean(result);
-  }
-
-  private convertInputResistorMode(resistorMode: InputResistorMode): number {
-    switch (resistorMode) {
-      case (InputResistorMode.none):
-        return 0;
-      case (InputResistorMode.pulldown):
-        return 1;
-      case (InputResistorMode.pullup):
-        return 2;
-      default:
-        throw new Error(`Unknown mode "${resistorMode}"`);
-    }
-  }
-
-  private convertOutputResistorMode(resistorMode: OutputResistorMode): number {
-    switch (resistorMode) {
-      case (OutputResistorMode.none):
-        return 0;
-
-      case (OutputResistorMode.opendrain):
-        //throw new Error(`Open-drain mode isn't supported`);
-        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
-        return 2;
-      default:
-        throw new Error(`Unknown mode "${resistorMode}"`);
-    }
-  }
-
-  private getPinInstance(methodWhichAsk: string, pin: number): PigpioPinWrapper {
-    const instance: PigpioPinWrapper | undefined = this.client.getPinInstance(pin);
-
-    if (!instance) {
-      throw new Error(`Digital dev ${methodWhichAsk}: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
-    }
-
-    return instance;
   }
 
 }
