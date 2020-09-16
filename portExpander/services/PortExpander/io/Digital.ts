@@ -1,10 +1,9 @@
 import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
-import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import PinChangeLogic from 'system/lib/logic/PinChangeLogic';
 
 import {PORT_EXPANDER_FEEDBACK, PORT_EXPANDER_FUNCTIONS} from '../constants';
 import ExpanderFunctionCall from '../ExpanderFunctionCall';
-import PinChangeLogic from '../../../../system/lib/logic/PinChangeLogic';
 
 
 export default class Digital implements DigitalIo {
@@ -109,25 +108,6 @@ export default class Digital implements DigitalIo {
     this.pinChangeLogic.removeListener(handlerIndex);
   }
 
-
-  private handleIncomeMessages(funcNum: number, args: Uint8Array) {
-    if (funcNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
-
-    //this.events.emit(args[0], Boolean(args[1]));
-    this.handlePinChange(args[0], Boolean(args[1]), debounce: number, edge: Edge);
-  }
-
-  private simpleRead = async (pin: number): Promise<boolean> => {
-    const result: Uint8Array = await this.functionCall.request(
-      PORT_EXPANDER_FUNCTIONS.digitalReadForce,
-      // TODO: feedback всетаки отдельно или вместе в functions ???
-      PORT_EXPANDER_FEEDBACK.digitalInputRead,
-      new Uint8Array([pin])
-    );
-
-    return Boolean(result[0]);
-  }
-
   // TODO: add
   async clearPin(pin: number): Promise<void> {
     delete this.resistors[pin];
@@ -145,5 +125,28 @@ export default class Digital implements DigitalIo {
     }
   }
 
+
+  private handleIncomeMessages(funcNum: number, args: Uint8Array) {
+    if (funcNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
+
+    //this.events.emit(args[0], Boolean(args[1]));
+    this.pinChangeLogic.handlePinChange(
+      args[0],
+      Boolean(args[1]),
+      debounce,
+      edge
+    );
+  }
+
+  private simpleRead = async (pin: number): Promise<boolean> => {
+    const result: Uint8Array = await this.functionCall.request(
+      PORT_EXPANDER_FUNCTIONS.digitalReadForce,
+      // TODO: feedback всетаки отдельно или вместе в functions ???
+      PORT_EXPANDER_FEEDBACK.digitalInputRead,
+      new Uint8Array([pin])
+    );
+
+    return Boolean(result[0]);
+  }
 
 }
