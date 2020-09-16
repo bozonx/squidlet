@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "funcI2cMater.h"
-//#include "global.cpp"
+#include "global.cpp"
 #include "protocol.h"
 
 
@@ -15,9 +15,17 @@ typedef enum __attribute__ ((packed))  {
   FEEDBACK_READ = 43
 } I2cMasterFeedbackNum;
 
+boolean i2cMasterHasBeenSetup = false;
+
 
 // params: sdaPin, slcPin, frequency aren't used in arduino
 auto i2cMasterSetup = [](uint8_t data[], int dataLength) {
+  if (i2cMasterHasBeenSetup) {
+    return;
+  }
+
+  i2cMasterHasBeenSetup = true;
+  
   Wire.begin();
 };
 
@@ -35,16 +43,30 @@ auto i2cMasterWrite = [](uint8_t data[], int dataLength) {
 // params: sdaPin, address, length
 auto i2cMasterRead = [](uint8_t data[], int dataLength) {
   // param data[0] (sdaPin) isn't used on arduino, it can be just 0
+
+  if (dataLength > AVAILABLE_PACKAGE_LENGTH_BYTES) {
+    // do nothing if length of the message is too big
+    return;
+  }
   
   Wire.requestFrom(data[1], data[2]);
 
-  // TODO: закинуть сообщение в буфер
+  uint8_t argsData[dataLength] = {0};
+  int feedbackNum = FEEDBACK_READ;
+  int i = 0;
 
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character
-    Serial.print(c);         // print the character
+  while (Wire.available()) {
+    argsData[i] = Wire.read();
+    
+    i++;
   }
-  
+
+  if (i + 1 == dataLength) {
+    // do nothing if data length doesn't match
+    return;
+  }
+
+  addFeedbackMessage(feedbackNum, argsData, dataLength);
 };
 
 

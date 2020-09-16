@@ -40,7 +40,8 @@ void registerFunc(uint8_t funcNum, FuncCb callback) {
   functioncCallbacks[funcNum] = callback;
 }
 
-void addFeedbackMessageToPackage(uint8_t &feedbackNum, uint8_t argsData[], uint8_t &argsDataLength) {
+// Add a message to the last package or create a new package
+void addFeedbackMessage(uint8_t feedbackNum, uint8_t argsData[], uint8_t argsDataLength) {
   // length of data + function num + args
   int messageLength = argsDataLength + 2;
   int currentPackageLength = lengthsOfPackagesInStack[packagesCount - 1];
@@ -81,7 +82,7 @@ void readFeedbackStack() {
       uint8_t hasMoreMessages = 0;
       
       feedbackStack[i](feedbackNum, argsData, argsDataLength, hasMoreMessages);
-      addFeedbackMessageToPackage(feedbackNum, argsData, argsDataLength);
+      addFeedbackMessage(feedbackNum, argsData, argsDataLength);
 
       doReadMessages = hasMoreMessages;
     }
