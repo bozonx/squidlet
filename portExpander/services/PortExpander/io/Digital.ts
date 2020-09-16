@@ -6,17 +6,23 @@ import {PORT_EXPANDER_FEEDBACK, PORT_EXPANDER_FUNCTIONS} from '../constants';
 import ExpanderFunctionCall from '../ExpanderFunctionCall';
 
 
+interface PinParamItem {
+  direction: PinDirection;
+  resistor: InputResistorMode | OutputResistorMode;
+  debounce?: number;
+  edge?: Edge;
+}
+
+
 export default class Digital implements DigitalIo {
   private readonly functionCall: ExpanderFunctionCall;
   private readonly pinChangeLogic: PinChangeLogic;
-
-  //private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
-  //private readonly events = new IndexedEventEmitter<ChangeHandler>();
+  private pinParams: {[index: string]: PinParamItem} = {};
 
 
-  constructor(functionCall: ExpanderFunctionCall) {
+  constructor(functionCall: ExpanderFunctionCall, logError: (msg: string) => void) {
     this.functionCall = functionCall;
-    this.pinChangeLogic = new PinChangeLogic(this.simpleRead, this.log.error);
+    this.pinChangeLogic = new PinChangeLogic(this.simpleRead, logError);
 
     this.functionCall.onMessage(this.handleIncomeMessages);
   }
@@ -39,6 +45,13 @@ export default class Digital implements DigitalIo {
       throw new Error(`Port expander on arduino doesn't support a pulldown resistor`);
     }
 
+    this.pinParams[pin] = {
+      direction: PinDirection.input,
+      resistor: inputMode,
+      debounce,
+      edge,
+    };
+
     // make setup
     await this.functionCall.callFunc(
       PORT_EXPANDER_FUNCTIONS.digitalInputSetup,
@@ -57,6 +70,11 @@ export default class Digital implements DigitalIo {
       throw new Error(`Port expander on arduino doesn't support an opendrain resistor`);
     }
 
+    this.pinParams[pin] = {
+      direction: PinDirection.output,
+      resistor: outputMode,
+    };
+
     // make setup
     await this.functionCall.callFunc(
       PORT_EXPANDER_FUNCTIONS.digitalOutputSetup,
@@ -67,17 +85,7 @@ export default class Digital implements DigitalIo {
   }
 
   async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    // if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
-    //
-    // const pinInstance = this.getPinInstance('getPinDirection', pin);
-    //
-    // const modeNum: number = await pinInstance.modeGet();
-    //
-    // if (modeNum === 0) {
-    //   return PinDirection.input;
-    // }
-    //
-    // return PinDirection.output;
+    return this.pinParams[pin]?.direction;
   }
 
   /**
@@ -85,8 +93,7 @@ export default class Digital implements DigitalIo {
    * It throws an error if pin hasn't configured before
    */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    //return this.resistors[pin];
-    // TODO: add
+    return this.pinParams[pin]?.resistor;
   }
 
   async read(pin: number): Promise<boolean> {
@@ -100,14 +107,6 @@ export default class Digital implements DigitalIo {
     );
   }
 
-  async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-    return this.pinChangeLogic.onChange(pin, handler);
-  }
-
-  async removeListener(handlerIndex: number): Promise<void> {
-    this.pinChangeLogic.removeListener(handlerIndex);
-  }
-
   // TODO: add
   async clearPin(pin: number): Promise<void> {
     delete this.resistors[pin];
@@ -118,23 +117,31 @@ export default class Digital implements DigitalIo {
     this.client.clearPin(pin);
   }
 
-  // TODO: add
   async clearAll(): Promise<void> {
-    for (let pin of this.client.getInstantiatedPinList()) {
+    for (let pin of Object.keys(this.pinParams)) {
       await this.clearPin(parseInt(pin));
     }
+  }
+
+  async onChange(pin: number, handler: ChangeHandler): Promise<number> {
+    return this.pinChangeLogic.onChange(pin, handler);
+  }
+
+  async removeListener(handlerIndex: number): Promise<void> {
+    this.pinChangeLogic.removeListener(handlerIndex);
   }
 
 
   private handleIncomeMessages(funcNum: number, args: Uint8Array) {
     if (funcNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
 
-    //this.events.emit(args[0], Boolean(args[1]));
+    const pinNum: number = args[0];
+
     this.pinChangeLogic.handlePinChange(
-      args[0],
+      pinNum,
       Boolean(args[1]),
-      debounce,
-      edge
+      this.pinParams[pinNum].debounce,
+      this.pinParams[pinNum].edge
     );
   }
 
