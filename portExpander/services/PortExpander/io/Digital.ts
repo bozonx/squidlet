@@ -4,30 +4,28 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 import {PORT_EXPANDER_FEEDBACK, PORT_EXPANDER_FUNCTIONS} from '../constants';
 import ExpanderFunctionCall from '../ExpanderFunctionCall';
+import PinChangeLogic from '../../../../system/lib/logic/PinChangeLogic';
 
 
 export default class Digital implements DigitalIo {
   private readonly functionCall: ExpanderFunctionCall;
+  private readonly pinChangeLogic: PinChangeLogic;
 
   //private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
-  private readonly events = new IndexedEventEmitter<ChangeHandler>();
-  // private readonly debounceCall: DebounceCall = new DebounceCall();
-  // private readonly throttleCall: ThrottleCall = new ThrottleCall();
+  //private readonly events = new IndexedEventEmitter<ChangeHandler>();
 
 
   constructor(functionCall: ExpanderFunctionCall) {
     this.functionCall = functionCall;
+    this.pinChangeLogic = new PinChangeLogic(this.simpleRead, this.log.error);
 
     this.functionCall.onMessage(this.handleIncomeMessages);
   }
 
 
   async destroy(): Promise<void> {
+    this.pinChangeLogic.destroy();
     this.functionCall.destroy();
-
-    // this.debounceCall.destroy();
-    // this.throttleCall.destroy();
-    // this.events.destroy();
   }
 
 
@@ -104,21 +102,22 @@ export default class Digital implements DigitalIo {
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-    return this.events.addListener(pin, handler);
+    return this.pinChangeLogic.onChange(pin, handler);
   }
 
   async removeListener(handlerIndex: number): Promise<void> {
-    this.events.removeListener(handlerIndex);
+    this.pinChangeLogic.removeListener(handlerIndex);
   }
 
 
   private handleIncomeMessages(funcNum: number, args: Uint8Array) {
     if (funcNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
 
-    this.events.emit(args[0], Boolean(args[1]));
+    //this.events.emit(args[0], Boolean(args[1]));
+    this.handlePinChange(args[0], Boolean(args[1]), debounce: number, edge: Edge);
   }
 
-  private async simpleRead(pin: number): Promise<boolean> {
+  private simpleRead = async (pin: number): Promise<boolean> => {
     const result: Uint8Array = await this.functionCall.request(
       PORT_EXPANDER_FUNCTIONS.digitalReadForce,
       // TODO: feedback всетаки отдельно или вместе в functions ???
@@ -129,17 +128,7 @@ export default class Digital implements DigitalIo {
     return Boolean(result[0]);
   }
 
-
-
-
-
-
-  ///////////////////////////
-
-
-
-
-
+  // TODO: add
   async clearPin(pin: number): Promise<void> {
     delete this.resistors[pin];
 
@@ -149,59 +138,12 @@ export default class Digital implements DigitalIo {
     this.client.clearPin(pin);
   }
 
+  // TODO: add
   async clearAll(): Promise<void> {
     for (let pin of this.client.getInstantiatedPinList()) {
       await this.clearPin(parseInt(pin));
     }
   }
 
-
-  private handlePinChange(pin: number, numLevel: number, tick: number, debounce: number, edge: Edge) {
-    const level: boolean = Boolean(numLevel);
-
-    // don't handle edge which is not suitable to edge that has been set up
-    if (edge === Edge.rising && !level) {
-      return;
-    }
-    else if (edge === Edge.falling && level) {
-      return;
-    }
-
-    // if undefined or 0 - call handler immediately
-    if (!debounce) {
-      return this.events.emit(pin, level);
-    }
-    // use throttle instead of debounce if rising or falling edge is set
-    else if (edge === Edge.rising || edge === Edge.falling) {
-      this.throttleCall.invoke(() => {
-        this.events.emit(pin, level);
-      }, debounce, pin)
-        .catch((e) => {
-          this.ioContext.log.error(e);
-        });
-
-      return;
-    }
-    // else edge both and debounce is set
-    // wait for debounce and read current level and emit an event
-    // TODO: handleEndOfDebounce will return a promise
-    this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
-      .catch((e) => {
-        this.ioContext.log.error(e);
-      });
-  }
-
-  private async handleEndOfDebounce(pin: number) {
-    let realLevel: boolean;
-
-    try {
-      realLevel = await this.simpleRead(pin);
-    }
-    catch (e) {
-      return this.ioContext.log.error(e);
-    }
-
-    this.events.emit(pin, realLevel);
-  }
 
 }
