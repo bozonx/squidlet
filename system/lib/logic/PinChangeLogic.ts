@@ -1,0 +1,88 @@
+// TODO: test it
+
+import {Edge} from '../../interfaces/gpioTypes';
+import IndexedEventEmitter from '../IndexedEventEmitter';
+import {ChangeHandler} from '../../interfaces/io/DigitalIo';
+import DebounceCall from '../debounceCall/DebounceCall';
+import ThrottleCall from '../debounceCall/ThrottleCall';
+
+
+export default class PinChangeLogic {
+  private readonly logError: (msg: string) => void;
+  private readonly readPin: (pinNum: number) => Promise<boolean>;
+  private readonly events = new IndexedEventEmitter<ChangeHandler>();
+  private readonly debounceCall: DebounceCall = new DebounceCall();
+  private readonly throttleCall: ThrottleCall = new ThrottleCall();
+
+
+  constructor(
+    readPin: (pinNum: number) => Promise<boolean>,
+    logError: (msg: string) => void
+  ) {
+    this.readPin = readPin;
+    this.logError = logError;
+  }
+
+  destroy() {
+    this.debounceCall.destroy();
+    this.throttleCall.destroy();
+    this.events.destroy();
+  }
+
+
+  onChange(pin: number, handler: ChangeHandler): number {
+    return this.events.addListener(pin, handler);
+  }
+
+  removeListener(handlerIndex: number): void {
+    this.events.removeListener(handlerIndex);
+  }
+
+
+  handlePinChange(pin: number, level: boolean, debounce: number, edge: Edge) {
+    // don't handle edge which is not suitable to edge that has been set up
+    if (edge === Edge.rising && !level) {
+      return;
+    }
+    else if (edge === Edge.falling && level) {
+      return;
+    }
+
+    // if undefined or 0 - call handler immediately
+    if (!debounce) {
+      return this.events.emit(pin, level);
+    }
+    // use throttle instead of debounce if rising or falling edge is set
+    else if (edge === Edge.rising || edge === Edge.falling) {
+      this.throttleCall.invoke(() => {
+        this.events.emit(pin, level);
+      }, debounce, pin)
+        .catch((e) => {
+          this.logError(e);
+        });
+
+      return;
+    }
+    // else edge both and debounce is set
+    // wait for debounce and read current level and emit an event
+    // TODO: handleEndOfDebounce will return a promise
+    this.debounceCall.invoke(() => this.handleEndOfDebounce(pin), debounce, pin)
+      .catch((e) => {
+        this.logError(e);
+      });
+  }
+
+  private async handleEndOfDebounce(pin: number) {
+    let realLevel: boolean;
+
+    try {
+      realLevel = await this.readPin(pin);
+    }
+    catch (e) {
+      return this.logError(e);
+    }
+
+    this.events.emit(pin, realLevel);
+  }
+
+}
