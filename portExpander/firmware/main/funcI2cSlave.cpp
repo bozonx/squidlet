@@ -56,7 +56,14 @@ auto i2cSlaveSetup = [](uint8_t data[], int dataLength) {
 };
 
 auto i2cSlaveWrite = [](uint8_t data[], int dataLength) {
-  // TODO: add
+  // param data[0] (sdaPin) isn't used on arduino, it can be just 0
+  Wire.beginTransmission(data[1]);
+
+  for (int i = 0; i < dataLength - 2; i++) {
+    Wire.write(data[i + 2]);
+  }
+
+  Wire.endTransmission();
 };
 
 

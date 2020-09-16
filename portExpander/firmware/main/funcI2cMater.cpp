@@ -33,9 +33,15 @@ auto i2cMasterWrite = [](uint8_t data[], int dataLength) {
   // param data[0] (sdaPin) isn't used on arduino, it can be just 0
   Wire.beginTransmission(data[1]);
 
-  for (int i = 0; i < dataLength - 2; i++) {
+  int argsLength = dataLength - 2; 
+  //uint8_t argsData[100] = {0};
+
+  for (int i = 0; i < argsLength; i++) {
     Wire.write(data[i + 2]);
+    //argsData[i] = data[i + 2];
   }
+
+  //Wire.write(argsData, argsLength);
 
   Wire.endTransmission();
 };

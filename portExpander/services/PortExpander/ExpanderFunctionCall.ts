@@ -37,7 +37,11 @@ export default class ExpanderFunctionCall {
   }
 
   async callFunc(funcNum: number, args: Uint8Array) {
-    await this.connection.send(peerId, funcNum, args);
+    if (!this.activePeerId) {
+      throw new Error(`ExpanderFunctionCall: No peer to send`);
+    }
+
+    await this.connection.send(this.activePeerId, funcNum, args);
   }
 
   async request(
