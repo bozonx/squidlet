@@ -33,6 +33,11 @@ export default class PortExpander extends ServiceBase<Props> implements IoSetBas
     }
 
     this.connection = this.context.service[this.props.connection];
+
+    if (!this.connection) {
+      throw new Error(`PortExpander: No connection`);
+    }
+
     this.functionCall = new ExpanderFunctionCall(this.connection);
   }
 
