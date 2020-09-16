@@ -1,0 +1,7 @@
+name: SemiDuplexFeedback
+main: SemiDuplexFeedback.ts
+
+#drivers:
+#  - I2cMaster
+
+props: {}
