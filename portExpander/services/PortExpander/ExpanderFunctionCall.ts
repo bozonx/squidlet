@@ -1,25 +1,25 @@
-import Connection from '../../../system/interfaces/Connection';
+import Connection from 'system/interfaces/Connection';
+import IndexedEvents from 'system/lib/IndexedEvents';
+
 import {PORT_EXPANDER_FEEDBACK} from './constants';
-import IndexedEvents from '../../../system/lib/IndexedEvents';
 
 
 type IncomeMessageHandler = (feedbackNum: number, args: Uint8Array) => void;
 
 
+// TODO: does it need ???
+
 export default class ExpanderFunctionCall {
+  // TODO: does it need ???
   private messageEvents = new IndexedEvents<IncomeMessageHandler>();
   private readonly connection: Connection;
-  // we work only with one peer
-  private activePeerId?: string;
 
 
   constructor(connection: Connection) {
     this.connection = connection;
 
-    // TODO: как получить peer если он уже был приконекчен ????
-    // TODO: если это общий Ws server ??? могут быть несколько peer
-    this.connection.onPeerConnect(this.handlePeerConnect);
-    this.connection.onPeerDisconnect(this.handlePeerDisconnect);
+    this.connection.onConnect(this.handleConnect);
+    this.connection.onDisconnect(this.handleDisconnect);
     this.connection.onIncomeMessage(this.handleIncomeMessages);
   }
 
@@ -37,11 +37,7 @@ export default class ExpanderFunctionCall {
   }
 
   async callFunc(funcNum: number, args: Uint8Array) {
-    if (!this.activePeerId) {
-      throw new Error(`ExpanderFunctionCall: No peer to send`);
-    }
-
-    await this.connection.send(this.activePeerId, funcNum, args);
+    await this.connection.send(funcNum, args);
   }
 
   async request(
@@ -65,16 +61,15 @@ export default class ExpanderFunctionCall {
   }
 
 
-  private handlePeerConnect(peerId: string) {
-    this.activePeerId = peerId;
-  }
-
-  private handlePeerDisconnect() {
+  private handleConnect() {
     // TODO: what to do ????
   }
 
-  private handleIncomeMessages(peerId: string, port: number, payload: Uint8Array) {
-    // TODO: !!!! что делать с peerId ???
+  private handleDisconnect() {
+    // TODO: what to do ????
+  }
+
+  private handleIncomeMessages(port: number, payload: Uint8Array) {
     this.messageEvents.emit(port, payload);
   }
 
