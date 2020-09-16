@@ -39,7 +39,12 @@ export default class PinChangeLogic {
   }
 
 
-  handlePinChange(pin: number, level: boolean, debounce: number, edge: Edge) {
+  handlePinChange(
+    pin: number,
+    level: boolean,
+    debounce: number = 0,
+    edge: Edge = Edge.both
+  ) {
     // don't handle edge which is not suitable to edge that has been set up
     if (edge === Edge.rising && !level) {
       return;
