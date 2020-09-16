@@ -1,7 +1,22 @@
 import IoItem from './IoItem';
 
 
-export default interface IoSet {
+export interface IoSetBase {
+  /**
+   * It returns the instance of IO which was created on initialization
+   * @param ioName
+   */
+  getIo<T extends IoItem>(ioName: string): T;
+
+  /**
+   * Get all the names of platforms items
+   */
+  getNames(): string[];
+}
+
+
+// TODO: може переименовать в SystemIoSet
+export default interface IoSet extends IoSetBase {
   /**
    * It is called before instantiating System if set.
    */
@@ -15,17 +30,7 @@ export default interface IoSet {
 
   destroy(): Promise<void>;
 
-  /**
-   * It returns the instance of IO which was created on initialization
-   * @param ioName
-   */
-  getIo<T extends IoItem>(ioName: string): T;
-
-  /**
-   * Get all the names of platforms items
-   */
-  getNames(): string[];
-
+  // TODO: зачем ???
   /**
    * Require js|ts file from local disk and execute it.
    */
