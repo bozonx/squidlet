@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include "funcI2cMater.h"
-//#include "global.cpp"
+#include "funcI2cSlave.h"
+#include "global.cpp"
 #include "protocol.h"
 
 
@@ -14,25 +14,44 @@ typedef enum __attribute__ ((packed))  {
   FEEDBACK_READ = 46
 } I2cSlaveFeedbackNum;
 
+boolean i2cSlaveHasBeenSetup = false;
+
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
-void receiveEvent(int howMany)
+void receiveEvent(int dataLength)
 {
-  while(1 < Wire.available()) // loop through all but the last
-  {
-    char c = Wire.read(); // receive byte as a character
-    Serial.print(c);         // print the character
+  uint8_t argsData[dataLength] = {0};
+  int feedbackNum = FEEDBACK_READ;
+  int i = 0;
+  
+  while(Wire.available()) {
+    argsData[i] = Wire.read();
+
+    i++;
   }
-  int x = Wire.read();    // receive byte as an integer
-  Serial.println(x);         // print the integer
+
+  if (dataLength > AVAILABLE_PACKAGE_LENGTH_BYTES) {
+    // do nothing if length of the message is too big
+    return;
+  }
+  else if (i + 1 == dataLength) {
+    // do nothing if data length doesn't match
+    return;
+  }
+
+  addFeedbackMessage(feedbackNum, argsData, dataLength);
 }
 
 // params are: address. Other params sdaPin, slcPin, frequency aren't used on arduino
 auto i2cSlaveSetup = [](uint8_t data[], int dataLength) {
-  Wire.begin(data[0]);
+  if (i2cSlaveHasBeenSetup) {
+    return;
+  }
 
-  // TODO:  не регистрировать при повторном вызове
+  i2cSlaveHasBeenSetup = true;
+  
+  Wire.begin(data[0]);
   Wire.onReceive(receiveEvent);
 };
 

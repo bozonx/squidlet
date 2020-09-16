@@ -131,8 +131,8 @@ export default class Digital implements DigitalIo {
   }
 
 
-  private handleIncomeMessages(funcNum: number, args: Uint8Array) {
-    if (funcNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
+  private handleIncomeMessages(feedbackNum: number, args: Uint8Array) {
+    if (feedbackNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
 
     const pinNum: number = args[0];
 
