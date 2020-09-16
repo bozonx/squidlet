@@ -3,51 +3,28 @@ import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Polling from 'system/lib/Polling';
 import Sender from 'system/lib/Sender';
-import {Handler} from 'system/lib/base/MasterSlaveBaseNodeDriver';
+import {Handler, PollProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
 
-import {ImpulseInput} from '../ImpulseInput/ImpulseInput';
-
-
-// type of feedback - polling or interruption
-//export type FeedbackType = 'poll' | 'int';
-
-// export interface PollPreProps {
-//   // data to write before read or function number to read from
-//   request?: Uint8Array | string | number;
-//   requestCb?: () => Promise<Uint8Array>;
-//   // length of result which will be read. If isn't set then `defaultPollIntervalMs` will be used.
-//   resultLength?: number;
-//   // poll interval if polling is used in ms
-//   intervalMs?: number;
-// }
-//
-// export interface PollProps {
-//   request?: Uint8Array;
-//   requestCb?: () => Promise<Uint8Array>;
-//   // string variant of request. Useful for print into messages. It will be generated in constructor
-//   requestStr?: string;
-//   resultLength?: number;
-//   intervalMs?: number;
-// }
+import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
 
 
 export interface Props {
   feedbackId: string;
   // if you have one interrupt pin you can specify in there
-  //int?: ImpulseInputProps;
-  int?: {[index: string]: any};
-  // length of result which will be read.
-  //resultLength?: number;
-  // poll interval if polling is used in ms.
-  // If isn't set then `defaultPollIntervalMs` will be used.
-  intervalMs?: number;
+  int?: ImpulseInputProps;
+  //int?: {[index: string]: any};
+  // Poll interval in ms.
+  pollIntervalMs: number;
 }
+
+
+// TODO: review int
 
 
 /**
  * It will start polling of listening of interruption.
  * At each poll action the specified callback will be used.
- * To use interruption pin set up "int" props.
+ * To use interruption set up "int" props.
  * To use polling don't defined "int" props.
  */
 export class SemiDuplexFeedback extends DriverBase<Props> {
@@ -60,7 +37,7 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 
   // last received data by polling by function number.
   // it needs to decide to rise change event or not
-  private pollLastData: Uint8Array[] = [];
+  //private pollLastData: Uint8Array[] = [];
 
 
   init = async () => {
@@ -79,9 +56,15 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
     }
   }
 
+  destroy = async () => {
+    this.pollEvents.destroy();
+    this.polling.destroy();
+    this.sender.destroy();
+  }
+
 
   startFeedback(): void {
-    if (this.props.feedback === 'int') {
+    if (this.props.int) {
       if (!this.impulseInput) {
         throw new Error(
           `MasterSlaveBaseNodeDriver.startFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
@@ -92,21 +75,147 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 
       return;
     }
-
-    super.startFeedback();
+    // start polling if feedback is not int
+    this.polling.start(this.doPoll, this.props.pollIntervalMs);
   }
 
   stopFeedBack() {
-    if (this.props.feedback === 'int') {
+    if (this.props.int) {
       if (!this.impulseHandlerIndex) return;
 
       this.impulseInput && this.impulseInput.removeListener(this.impulseHandlerIndex);
 
       return;
     }
-
-    super.stopFeedBack();
+    // stop poling if feedback is not int (poling)
+    this.polling.stop();
   }
+
+  /**
+   * Poll once immediately. And restart current poll if it was specified.
+   * Data address and length you have to specify in poll prop.
+   * It rejects promise on error
+   */
+  async pollOnce(): Promise<void> {
+    if (!this.props.poll) throw new Error(`MasterSlaveBaseNodeDriver.pollOnce: no poll in props`);
+
+    if (this.props.feedback === 'int') {
+      this.pollAllFunctions();
+    }
+    else if (this.props.feedback === 'poll') {
+      // TODO: review indexStr
+      // TODO: review restart - он вообще ожидает выполнения ????
+
+      // restart polling - it will make a new request and restart interval
+      for (let indexStr in this.props.poll) {
+
+        // TODO: не ждет завершения
+        // TODO: нужно ждать ближайшего результата !!!!
+
+        await this.polling.restart(indexStr);
+
+        await new Promise((resolve, reject) => {
+
+          // TODO: add timeout
+
+          this.polling.addListener((err: Error | undefined, result: any) => {
+            if (err) {
+              return reject(err);
+            }
+
+            resolve();
+          }, indexStr);
+        });
+      }
+    }
+    else {
+      throw new Error(
+        `MasterSlaveBaseNodeDriver.pollOnce: Feedback hasn't been configured. `
+        + `Props are "${JSON.stringify(this.props)}"`
+      );
+    }
+
+  }
+
+  /**
+   * Listen to data which received by polling or interruption.
+   */
+  addListener(handler: Handler): number {
+    return this.pollEvents.addListener(handler);
+  }
+
+  removeListener(handlerIndex: number): void {
+    this.pollEvents.removeListener(handlerIndex);
+  }
+
+
+  // TODO: remove
+  /**
+   * Poll all the defined polling to data addresses by turns and don't stop on errors.
+   */
+  private pollAllFunctions = async () => {
+    for (let indexStr in this.props.poll) {
+      try {
+        await this.doPoll(parseInt(indexStr));
+      }
+      catch (err) {
+        const pollProps = this.props.poll[indexStr] as PollProps;
+
+        this.log.error(`Error occur on request ${pollProps.requestStr || indexStr}, ${err}`);
+      }
+    }
+  }
+
+  private doPoll = async (): Promise<void> => {
+    if (!this.props.poll) throw new Error(`No poll in props`);
+
+    const pollProps = this.props.poll[pollIndex] as PollProps;
+    let result: Uint8Array;
+
+    if (pollProps.requestCb) {
+      result = await pollProps.requestCb();
+    }
+    else if (pollProps.request) {
+      const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
+        ? this.props.defaultPollIntervalMs
+        : pollProps.resultLength;
+
+      if (pollProps.request.length) {
+        // write request and read result
+        result = await this.transfer(pollProps.request, resolvedLength);
+      }
+      else {
+        // read for data
+        result = await this.read(resolvedLength);
+      }
+    }
+    else {
+      throw new Error(`Can't resolve request of ${JSON.stringify(pollProps)}`);
+    }
+
+    this.handleIncomeData(result, pollIndex);
+  }
+
+  private handleIncomeData(incomeData: Uint8Array, pollIndex: number) {
+
+
+    // TODO: почему решает что данные одинаковые ????
+    //  наверное потомучто раньше они уже установились
+
+    if (!this.props.poll) return;
+    // do nothing if it isn't polling data address or data is equal to previous data
+    else if (
+      !this.props.poll[pollIndex]
+      // TODO: раскоментировать
+      //|| isEqualUint8Array(this.pollLastData[pollIndex], incomeData)
+    ) return;
+
+    // save data
+    this.pollLastData[pollIndex] = incomeData;
+    // finally rise an event
+    this.pollEvents.emit(incomeData, this.props.poll[pollIndex] as PollProps);
+  }
+
 
   // private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
   //   const resolvedDataAddr: string = this.functionHexToStr(functionHex);
@@ -117,6 +226,7 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   //
   //   return [busNum, this.props.address, resolvedDataAddr, method, ...params].join();
   // }
+
 
 }
 

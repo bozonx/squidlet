@@ -46,7 +46,7 @@ export default class Polling {
     methodWhichWillPoll: MethodWhichPoll,
     // in ms
     pollInterval: number,
-    uniqId: string | undefined,
+    uniqId?: string,
   ): void {
     if (this.isInProgress(uniqId)) {
       throw new Error(`Polling of "${uniqId}" and interval ${pollInterval}: This poll already is in progress`);
