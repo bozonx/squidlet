@@ -26,17 +26,17 @@ auto i2cMasterSetup = [](uint8_t data[], int dataLength) {
 
   i2cMasterHasBeenSetup = true;
   
-  Wire.begin();
+
 };
 
 auto i2cMasterWrite = [](uint8_t data[], int dataLength) {
   // param data[0] (sdaPin) isn't used on arduino, it can be just 0
   Wire.beginTransmission(data[1]);
 
-  int argsLength = dataLength - 2; 
+  //int argsLength = dataLength - 2; 
   //uint8_t argsData[100] = {0};
 
-  for (int i = 0; i < argsLength; i++) {
+  for (int i = 0; i < dataLength - 2; i++) {
     Wire.write(data[i + 2]);
     //argsData[i] = data[i + 2];
   }
@@ -80,4 +80,6 @@ void i2cMasterBegin() {
   registerFunc(FUNC_SETUP, i2cMasterSetup);
   registerFunc(FUNC_WRITE, i2cMasterWrite);
   registerFunc(FUNC_READ, i2cMasterRead);
+
+  //Wire.begin();
 }
