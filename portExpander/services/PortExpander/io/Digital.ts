@@ -89,6 +89,7 @@ export default class Digital implements DigitalIo {
    */
   async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
     //return this.resistors[pin];
+    // TODO: add
   }
 
   async read(pin: number): Promise<boolean> {
@@ -112,7 +113,9 @@ export default class Digital implements DigitalIo {
 
 
   private handleIncomeMessages(funcNum: number, args: Uint8Array) {
-    // TODO: add
+    if (funcNum !== PORT_EXPANDER_FEEDBACK.digitalInputRead) return;
+
+    this.events.emit(args[0], Boolean(args[1]));
   }
 
   private async simpleRead(pin: number): Promise<boolean> {
