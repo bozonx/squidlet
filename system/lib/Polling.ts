@@ -32,7 +32,7 @@ export default class Polling {
   }
 
 
-  isInProgress(uniqId: string | undefined): boolean {
+  isInProgress(uniqId?: string): boolean {
     const id = this.resolveId(uniqId);
 
     return typeof this.currentPolls[id] !== 'undefined';
@@ -130,7 +130,7 @@ export default class Polling {
     delete this.currentPolls[id];
   }
 
-  private resolveId(uniqId: string | undefined): string {
+  private resolveId(uniqId?: string): string {
     return uniqId || DEFAULT_ID;
   }
 

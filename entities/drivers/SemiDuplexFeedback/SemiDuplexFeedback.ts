@@ -3,18 +3,21 @@ import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Polling from 'system/lib/Polling';
 import Sender from 'system/lib/Sender';
-import {Handler, PollProps} from 'system/lib/base/MasterSlaveBaseNodeDriver';
+import {isEqualUint8Array} from 'system/lib/binaryHelpers';
 
 import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
 
 
+export type Handler = (data: Uint8Array) => void;
+export type PollCb = () => Promise<Uint8Array>;
+
 export interface Props {
   feedbackId: string;
-  // if you have one interrupt pin you can specify in there
-  int?: ImpulseInputProps;
-  //int?: {[index: string]: any};
   // Poll interval in ms.
   pollIntervalMs: number;
+  // if you have one interrupt pin you can specify in there.
+  // And listening of interruption will be used instead of polling
+  int?: ImpulseInputProps;
 }
 
 
@@ -30,14 +33,14 @@ export interface Props {
 export class SemiDuplexFeedback extends DriverBase<Props> {
   private impulseInput?: ImpulseInput;
   private impulseHandlerIndex?: number;
+  private pollCb?: PollCb;
+  private readonly pollEvents = new IndexedEvents<Handler>();
+  private readonly polling: Polling = new Polling();
+  private sender!: Sender;
 
-  protected readonly pollEvents = new IndexedEvents<Handler>();
-  protected readonly polling: Polling = new Polling();
-  protected sender!: Sender;
-
-  // last received data by polling by function number.
+  // The latest received data by calling pollCb.
   // it needs to decide to rise change event or not
-  //private pollLastData: Uint8Array[] = [];
+  private pollLastData?: Uint8Array;
 
 
   init = async () => {
@@ -63,7 +66,14 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   }
 
 
-  startFeedback(): void {
+  isFeedbackStarted(): boolean {
+    return typeof this.impulseHandlerIndex !== 'undefined'
+      || this.polling.isInProgress();
+  }
+
+  startFeedback(pollCb: PollCb): void {
+    this.pollCb = pollCb;
+
     if (this.props.int) {
       if (!this.impulseInput) {
         throw new Error(
@@ -71,7 +81,10 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
         );
       }
 
-      this.impulseHandlerIndex = this.impulseInput.onChange(this.pollAllFunctions);
+      this.impulseHandlerIndex = this.impulseInput.onChange(() => {
+        this.doPoll()
+          .catch(this.log.error);
+      });
 
       return;
     }
@@ -85,6 +98,8 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 
       this.impulseInput && this.impulseInput.removeListener(this.impulseHandlerIndex);
 
+      delete this.impulseHandlerIndex;
+
       return;
     }
     // stop poling if feedback is not int (poling)
@@ -97,44 +112,34 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
    * It rejects promise on error
    */
   async pollOnce(): Promise<void> {
-    if (!this.props.poll) throw new Error(`MasterSlaveBaseNodeDriver.pollOnce: no poll in props`);
 
-    if (this.props.feedback === 'int') {
-      this.pollAllFunctions();
-    }
-    else if (this.props.feedback === 'poll') {
-      // TODO: review indexStr
-      // TODO: review restart - он вообще ожидает выполнения ????
+    // TODO: что делать если выключен feedback ???
 
-      // restart polling - it will make a new request and restart interval
-      for (let indexStr in this.props.poll) {
-
-        // TODO: не ждет завершения
-        // TODO: нужно ждать ближайшего результата !!!!
-
-        await this.polling.restart(indexStr);
-
-        await new Promise((resolve, reject) => {
-
-          // TODO: add timeout
-
-          this.polling.addListener((err: Error | undefined, result: any) => {
-            if (err) {
-              return reject(err);
-            }
-
-            resolve();
-          }, indexStr);
-        });
-      }
+    if (this.props.int) {
+      await this.doPoll();
     }
     else {
-      throw new Error(
-        `MasterSlaveBaseNodeDriver.pollOnce: Feedback hasn't been configured. `
-        + `Props are "${JSON.stringify(this.props)}"`
-      );
-    }
+      // restart polling - it will make a new request and restart interval
+      // TODO: review indexStr
+      // TODO: review restart - он вообще ожидает выполнения ????
+      // TODO: не ждет завершения
+      // TODO: нужно ждать ближайшего результата !!!!
 
+      await this.polling.restart();
+
+      // TODO: это не нужно так как должен ожидаться restart();
+      await new Promise((resolve, reject) => {
+        // TODO: add timeout
+
+        this.polling.addListener((err: Error | undefined, result: any) => {
+          if (err) {
+            return reject(err);
+          }
+
+          resolve();
+        });
+      });
+    }
   }
 
   /**
@@ -149,84 +154,21 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   }
 
 
-  // TODO: remove
-  /**
-   * Poll all the defined polling to data addresses by turns and don't stop on errors.
-   */
-  private pollAllFunctions = async () => {
-    for (let indexStr in this.props.poll) {
-      try {
-        await this.doPoll(parseInt(indexStr));
-      }
-      catch (err) {
-        const pollProps = this.props.poll[indexStr] as PollProps;
-
-        this.log.error(`Error occur on request ${pollProps.requestStr || indexStr}, ${err}`);
-      }
-    }
-  }
-
   private doPoll = async (): Promise<void> => {
-    if (!this.props.poll) throw new Error(`No poll in props`);
+    if (!this.pollCb) return;
 
-    const pollProps = this.props.poll[pollIndex] as PollProps;
-    let result: Uint8Array;
+    const result: Uint8Array = await this.pollCb();
 
-    if (pollProps.requestCb) {
-      result = await pollProps.requestCb();
-    }
-    else if (pollProps.request) {
-      const resolvedLength: number = (typeof pollProps.resultLength === 'undefined')
-        ? this.props.defaultPollIntervalMs
-        : pollProps.resultLength;
-
-      if (pollProps.request.length) {
-        // write request and read result
-        result = await this.transfer(pollProps.request, resolvedLength);
-      }
-      else {
-        // read for data
-        result = await this.read(resolvedLength);
-      }
-    }
-    else {
-      throw new Error(`Can't resolve request of ${JSON.stringify(pollProps)}`);
-    }
-
-    this.handleIncomeData(result, pollIndex);
-  }
-
-  private handleIncomeData(incomeData: Uint8Array, pollIndex: number) {
-
-
-    // TODO: почему решает что данные одинаковые ????
+    // TODO: была ОШИБКА!!! почему решает что данные одинаковые ????
     //  наверное потомучто раньше они уже установились
 
-    if (!this.props.poll) return;
     // do nothing if it isn't polling data address or data is equal to previous data
-    else if (
-      !this.props.poll[pollIndex]
-      // TODO: раскоментировать
-      //|| isEqualUint8Array(this.pollLastData[pollIndex], incomeData)
-    ) return;
-
+    if (isEqualUint8Array(this.pollLastData, result)) return;
     // save data
-    this.pollLastData[pollIndex] = incomeData;
+    this.pollLastData = result;
     // finally rise an event
-    this.pollEvents.emit(incomeData, this.props.poll[pollIndex] as PollProps);
+    this.pollEvents.emit(result);
   }
-
-
-  // private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
-  //   const resolvedDataAddr: string = this.functionHexToStr(functionHex);
-  //
-  //   // TODO: bus num and address не нужно так как инстанс драйвера привязан к конкретному bus и address
-  //   //       any way see Sender
-  //   const busNum = (typeof this.props.busNum === 'undefined') ? -1 : this.props.busNum;
-  //
-  //   return [busNum, this.props.address, resolvedDataAddr, method, ...params].join();
-  // }
-
 
 }
 
