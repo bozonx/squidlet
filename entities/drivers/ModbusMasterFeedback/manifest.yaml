@@ -1,0 +1,14 @@
+name: manifest.yaml
+main: manifest.yaml.ts
+system: true
+
+drivers:
+  - ModBusMaster
+
+props: {}
+#  portNum:
+#    type: number
+#    required: true
+#  slaveId:
+#    type: number
+#    required: true
