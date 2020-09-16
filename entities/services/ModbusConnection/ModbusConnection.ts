@@ -12,7 +12,7 @@ interface Props {
 }
 
 
-export default class ModbusRtuConnection extends ServiceBase<Props> implements Connection {
+export default class ModbusConnection extends ServiceBase<Props> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
 
   init = async () => {

@@ -1,8 +1,8 @@
-name: ModbusRtuConnection
-main: ModbusRtuConnection.ts
+name: ModbusConnection
+main: ModbusConnection.ts
 
-#drivers:
-#  - WsServerSessions
+drivers:
+  - ModbusMasterFeedback
 
 props: {}
 #  $base: 'drivers.WsServerSessions'
