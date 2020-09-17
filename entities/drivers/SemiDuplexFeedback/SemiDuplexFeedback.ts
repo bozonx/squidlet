@@ -4,9 +4,9 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import Polling from 'system/lib/Polling';
 import Sender from 'system/lib/Sender';
 import {isEqualUint8Array} from 'system/lib/binaryHelpers';
+import {makeUniqId} from 'system/lib/uniqId';
 
 import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
-import {makeUniqId} from '../../../system/lib/uniqId';
 
 
 export type Handler = (data: Uint8Array) => void;
