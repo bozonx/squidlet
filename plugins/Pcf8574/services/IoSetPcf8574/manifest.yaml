@@ -1,6 +1,6 @@
-name: Pcf8574
-main: Pcf8574.ts
-type: expander
+name: IoSetPcf8574
+main: IoSetPcf8574.ts
+type: ioSet
 
 drivers:
   - Pcf8574

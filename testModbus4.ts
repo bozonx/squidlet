@@ -3,9 +3,9 @@ import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
 import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
-import CallFunctionModbus from './portExpander/services/PortExpander/CallFunctionModbus';
+import CallFunctionModbus from './portExpander/services/IoSetPortExpander/CallFunctionModbus';
 import {uint8ToNum} from './system/lib/binaryHelpers';
-import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/PortExpander/constants';
+import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/IoSetPortExpander/constants';
 import PollOnceModbus from './entities/services/ModbusMasterConnection/PollOnceModbus';
 
 

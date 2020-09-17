@@ -1,5 +1,5 @@
-name: PortExpander
-main: PortExpander.ts
+name: IoSetPortExpander
+main: IoSetPortExpander.ts
 
 #drivers:
 #  - WsServerSessions
