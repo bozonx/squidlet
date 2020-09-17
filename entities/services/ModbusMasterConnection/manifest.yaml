@@ -1,8 +1,9 @@
-name: ModbusConnection
-main: ModbusConnection.ts
+name: ModbusMasterConnection
+main: ModbusMasterConnection.ts
 
 drivers:
-  - ModbusMasterFeedback
+  - ModbusMaster
+  - SemiDuplexFeedback
 
 props: {}
 #  $base: 'drivers.WsServerSessions'

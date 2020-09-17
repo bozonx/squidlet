@@ -16,7 +16,7 @@ interface Props extends SemiDuplexFeedbackBaseProps {
 }
 
 
-export default class ModbusConnection extends ServiceBase<Props> implements Connection {
+export default class ModbusMasterConnection extends ServiceBase<Props> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
 
   private semiDuplexFeedback!: SemiDuplexFeedback;
