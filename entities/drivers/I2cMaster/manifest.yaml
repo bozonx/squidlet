@@ -2,10 +2,12 @@ name: I2cMaster
 main: I2cMaster.ts
 system: true
 
-drivers:
-  - ImpulseInput
-
 ios:
   - I2cMaster
 
-props: props.yaml
+props:
+  busNum:
+    type: number | string
+  address:
+    type: string | number
+    required: true
