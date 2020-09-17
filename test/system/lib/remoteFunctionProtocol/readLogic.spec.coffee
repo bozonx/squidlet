@@ -1,7 +1,7 @@
 readLogic = require('../../../../system/lib/remoteFunctionProtocol/readLogic')
 
 
-describe.only 'entities.services.PortExpander.readLogic', ->
+describe.only 'entities.services.IoSetPortExpander.readLogic', ->
 #  beforeEach ->
 #  it 'parseResult - full message', ->
 #    packagePayload = new Uint8Array([

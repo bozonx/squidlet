@@ -3,5 +3,5 @@ import PluginEnv from '../../hostEnvBuilder/entities/PluginEnv';
 
 
 export default async function systemEntitiesPlugin (env: PluginEnv) {
-  await env.addService(path.resolve(__dirname, './services/PortExpander/manifest.yaml'));
+  await env.addService(path.resolve(__dirname, './services/IoSetPortExpander/manifest.yaml'));
 }

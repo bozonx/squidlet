@@ -2,7 +2,7 @@ import Context from 'system/Context';
 import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
-import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/PortExpander/constants';
+import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/IoSetPortExpander/constants';
 import ModbusMasterConnection from './entities/services/ModbusMasterConnection/ModbusMasterConnection';
 import {SemiDuplexFeedback} from './entities/drivers/SemiDuplexFeedback/SemiDuplexFeedback';
 
