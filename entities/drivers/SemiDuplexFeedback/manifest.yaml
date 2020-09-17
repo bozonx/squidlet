@@ -1,7 +1,17 @@
 name: SemiDuplexFeedback
 main: SemiDuplexFeedback.ts
 
-#drivers:
-#  - I2cMaster
+drivers:
+  - ImpulseInput
 
-props: {}
+props:
+  feedbackId:
+    type: string
+  # Poll interval in ms.
+  pollIntervalMs:
+    type: number
+    default: 1000
+  # if you have one interrupt pin you can specify in there.
+  # And listening of interruption will be used instead of polling
+  int:
+    type: object

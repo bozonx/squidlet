@@ -6,22 +6,18 @@ import Sender from 'system/lib/Sender';
 import {isEqualUint8Array} from 'system/lib/binaryHelpers';
 
 import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
+import {makeUniqId} from '../../../system/lib/uniqId';
 
 
 export type Handler = (data: Uint8Array) => void;
-export type PollCb = () => Promise<Uint8Array>;
+export type RequestDataCb = () => Promise<Uint8Array>;
 
 export interface Props {
   feedbackId: string;
-  // Poll interval in ms.
+
   pollIntervalMs: number;
-  // if you have one interrupt pin you can specify in there.
-  // And listening of interruption will be used instead of polling
   int?: ImpulseInputProps;
 }
-
-
-// TODO: review int
 
 
 /**
@@ -31,14 +27,14 @@ export interface Props {
  * To use polling don't defined "int" props.
  */
 export class SemiDuplexFeedback extends DriverBase<Props> {
-  private impulseInput?: ImpulseInput;
+  private impulseInputDriver?: ImpulseInput;
   private impulseHandlerIndex?: number;
-  private pollCb?: PollCb;
+  private requestDataCb?: RequestDataCb;
   private readonly pollEvents = new IndexedEvents<Handler>();
   private readonly polling: Polling = new Polling();
   private sender!: Sender;
 
-  // The latest received data by calling pollCb.
+  // The latest received data by calling requestDataCb.
   // it needs to decide to rise change event or not
   private pollLastData?: Uint8Array;
 
@@ -52,9 +48,9 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
     );
 
     if (this.props.int) {
-      this.impulseInput = await this.context.getSubDriver<ImpulseInput>(
+      this.impulseInputDriver = await this.context.getSubDriver<ImpulseInput>(
         'ImpulseInput',
-        this.props.int || {}
+        this.props.int
       );
     }
   }
@@ -63,25 +59,34 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
     this.pollEvents.destroy();
     this.polling.destroy();
     this.sender.destroy();
+
+    delete this.impulseInputDriver;
   }
 
 
   isFeedbackStarted(): boolean {
-    return typeof this.impulseHandlerIndex !== 'undefined'
-      || this.polling.isInProgress();
+    if (this.props.int) {
+      return typeof this.impulseHandlerIndex !== 'undefined';
+    }
+
+    return this.polling.isInProgress();
   }
 
-  startFeedback(pollCb: PollCb): void {
-    this.pollCb = pollCb;
+  startFeedback(requestDataCb: RequestDataCb): void {
+    this.requestDataCb = requestDataCb;
 
     if (this.props.int) {
-      if (!this.impulseInput) {
+      if (!this.impulseInputDriver) {
         throw new Error(
-          `MasterSlaveBaseNodeDriver.startFeedback. impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
+          `SemiDuplexFeedback.startFeedback. ` +
+          `impulseInput driver hasn't been set. ${JSON.stringify(this.props)}`
         );
       }
 
-      this.impulseHandlerIndex = this.impulseInput.onChange(() => {
+      this.impulseHandlerIndex = this.impulseInputDriver.onChange(() => {
+
+        // TODO: может не делать новые запросы пока текущий в процессе ???
+
         this.doPoll()
           .catch(this.log.error);
       });
@@ -96,7 +101,8 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
     if (this.props.int) {
       if (!this.impulseHandlerIndex) return;
 
-      this.impulseInput && this.impulseInput.removeListener(this.impulseHandlerIndex);
+      this.impulseInputDriver && this.impulseInputDriver
+        .removeListener(this.impulseHandlerIndex);
 
       delete this.impulseHandlerIndex;
 
@@ -112,10 +118,7 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
    * It rejects promise on error
    */
   async pollOnce(): Promise<void> {
-
-    // TODO: что делать если выключен feedback ???
-
-    if (this.props.int) {
+    if (this.props.int || !this.isFeedbackStarted()) {
       await this.doPoll();
     }
     else {
@@ -155,9 +158,9 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 
 
   private doPoll = async (): Promise<void> => {
-    if (!this.pollCb) return;
+    if (!this.requestDataCb) return;
 
-    const result: Uint8Array = await this.pollCb();
+    const result: Uint8Array = await this.requestDataCb();
 
     // TODO: была ОШИБКА!!! почему решает что данные одинаковые ????
     //  наверное потомучто раньше они уже установились
@@ -176,7 +179,6 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 export default class Factory extends DriverFactoryBase<SemiDuplexFeedback, Props> {
   protected SubDriverClass = SemiDuplexFeedback;
   protected instanceId = (props: Props): string => {
-    // TODO: если нет id то наверное создавать новый всегда
-    return props.feedbackId;
+    return props.feedbackId || makeUniqId();
   }
 }
