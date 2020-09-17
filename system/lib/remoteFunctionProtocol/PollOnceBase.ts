@@ -4,7 +4,7 @@ import {MESSAGE_POSITIONS} from './constants';
 import readLogic from './readLogic';
 
 
-export type FunctionHandler = (funcNum: number, returnData: Uint8Array) => void;
+export type FunctionHandler = (channel: number, payload: Uint8Array) => void;
 
 
 export default abstract class PollOnceBase {

@@ -1,7 +1,7 @@
 import PollOnceBase from 'system/lib/remoteFunctionProtocol/PollOnceBase';
 import {numToUint8Word, uint16ToUint8} from 'system/lib/binaryHelpers';
 
-import {ModbusMaster} from '../../../entities/drivers/ModbusMaster/ModbusMaster';
+import {ModbusMaster} from '../../drivers/ModbusMaster/ModbusMaster';
 
 
 enum READ_REGISTERS {
@@ -24,8 +24,10 @@ export default class PollOnceModbus extends PollOnceBase {
 
 
   protected readLength = async (): Promise<number> => {
-    const result: Uint16Array = await this.modbusMasterDriver
-      .readInputRegisters(READ_REGISTERS.length, READ_PACKAGE_LENGTH_COUNT);
+    const result: Uint16Array = await this.modbusMasterDriver.readInputRegisters(
+      READ_REGISTERS.length,
+      READ_PACKAGE_LENGTH_COUNT
+    );
 
     const bytes: Uint8Array = numToUint8Word(result[0]);
 
@@ -42,8 +44,10 @@ export default class PollOnceModbus extends PollOnceBase {
 
     //return new Uint8Array([2,5,1])
 
-    const result: Uint16Array = await this.modbusMasterDriver
-      .readInputRegisters(READ_REGISTERS.package, length);
+    const result: Uint16Array = await this.modbusMasterDriver.readInputRegisters(
+      READ_REGISTERS.package,
+      length
+    );
 
     console.log(4444444, result)
 

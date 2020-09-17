@@ -8,8 +8,8 @@ import {makeUniqId} from 'system/lib/uniqId';
 import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
 
 
-export type Handler = (data: Uint8Array) => void;
-export type RequestDataCb = () => Promise<Uint8Array>;
+export type Handler = (data: Uint8Array | undefined) => void;
+export type RequestDataCb = () => Promise<Uint8Array | undefined>;
 
 export interface SemiDuplexFeedbackBaseProps {
   pollIntervalMs: number;
@@ -18,6 +18,7 @@ export interface SemiDuplexFeedbackBaseProps {
 
 export interface Props extends SemiDuplexFeedbackBaseProps {
   feedbackId: string;
+  compareResult: boolean;
 }
 
 
@@ -34,9 +35,10 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   private readonly pollEvents = new IndexedEvents<Handler>();
   private readonly polling: Polling = new Polling();
 
+  // TODO: for long data > 8 byte use hash generating
   // The latest received data by calling requestDataCb.
   // it needs to decide to rise change event or not
-  private pollLastData?: Uint8Array;
+  private lastPollResult?: Uint8Array;
 
 
   init = async () => {
@@ -152,15 +154,15 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   private doPoll = async (): Promise<void> => {
     if (!this.requestDataCb) return;
 
-    const result: Uint8Array = await this.requestDataCb();
+    const result: Uint8Array | undefined = await this.requestDataCb();
 
     // TODO: была ОШИБКА!!! почему решает что данные одинаковые ????
     //  наверное потомучто раньше они уже установились
 
-    // do nothing if it isn't polling data address or data is equal to previous data
-    if (isEqualUint8Array(this.pollLastData, result)) return;
+    // do nothing if compareResult is on and the result is the same with the previous one
+    if (this.props.compareResult && isEqualUint8Array(this.lastPollResult, result)) return;
     // save data
-    this.pollLastData = result;
+    this.lastPollResult = result;
     // finally rise an event
     this.pollEvents.emit(result);
   }
