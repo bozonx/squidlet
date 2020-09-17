@@ -16,6 +16,7 @@ import {
   ModbusMaster,
   ModbusMasterDriverProps
 } from '../../drivers/ModbusMaster/ModbusMaster';
+import PollOnceModbus from './PollOnceModbus';
 
 
 interface Props extends SemiDuplexFeedbackBaseProps, ModbusMasterDriverProps {
@@ -29,16 +30,18 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
   private events = new IndexedEventEmitter();
   private semiDuplexFeedback!: SemiDuplexFeedback;
   private modbusMaster!: ModbusMaster;
+  private pollOnce!: PollOnceModbus;
 
 
   init = async () => {
     this.semiDuplexFeedback = await this.context.getSubDriver(
       'SemiDuplexFeedback',
       {
-        // TODO: make feedbackId
-        //feedbackId: `mbc${this.props.}`,
         pollIntervalMs: this.props.pollIntervalMs,
         int: this.props.int,
+        // TODO: make feedbackId
+        //feedbackId: `mbc${this.props.}`,
+        compareResult: false,
       }
     );
     this.modbusMaster = await this.context.getSubDriver(
@@ -48,8 +51,11 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
         slaveId: this.props.slaveId,
       }
     );
+    this.pollOnce = new PollOnceModbus(this.modbusMaster, this.log.warn);
 
     this.semiDuplexFeedback.startFeedback(this.feedbackHandler);
+    this.pollOnce.addEventListener(this.handleIncomeMessage);
+    //this.semiDuplexFeedback.addListener(this.handleIncomeData);
 
     // TODO: когда поднимать события connected|disconnected ????
   }
@@ -97,8 +103,16 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
   }
 
 
-  private feedbackHandler(): Promise<Uint8Array> {
-    // TODO: add - запросить пакеты !!!
+  // TODO: проверить что будет гарантированно дожидаться результата и не будет
+  //       делаться других запросов
+  private async feedbackHandler(): Promise<Uint8Array | undefined> {
+    await this.pollOnce.pollOnce();
+
+    return;
+  }
+
+  private handleIncomeMessage(channel: number, payload: Uint8Array) {
+    this.events.emit(ConnectionsEvents.message, channel, payload);
   }
 
 }
