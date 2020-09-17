@@ -79,17 +79,26 @@ async function start () {
 
   await connection.init();
 
-
-
+  const outputPinNumber: number = 12;
   ////////////////// Do things
   const inputPinNumber: number = 11;
-  const outputPinNumber: number = 12;
+
+  connection.onIncomeMessage(async (channel: number, payload: Uint8Array) => {
+    const ledState = payload[1] !== 8;
+
+    await connection.send(11, new Uint8Array([
+      outputPinNumber,
+      Number(ledState)
+    ]));
+  });
 
   await connection.send(10, new Uint8Array([outputPinNumber]));
-  await connection.send(11, new Uint8Array([outputPinNumber, 1]));
+  await connection.send(12, new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_RESISTOR_MODE.pullup]));
 
-
-
+  // await connection.send(11, new Uint8Array([
+  //   outputPinNumber,
+  //   1
+  // ]));
 
 
 
@@ -136,90 +145,6 @@ async function start () {
   //   41,
   //   new Uint8Array([0, 0x41, 0x09, 0x04])
   // );
-
-
-
-  //
-  // const handler: FunctionHandler = (funcNum: number, returnData: Uint8Array) => {
-  //   console.log('return of funcNum: ', funcNum, ', data is: ', returnData);
-  //
-  //   callFunction.callFunction(
-  //     11,
-  //     new Uint8Array([outputPinNumber, (returnData[1]) ? 0 : 8])
-  //   );
-  //
-  //   // if (!functionsParsers[functionNum]) {
-  //   //   this.logWarn(
-  //   //     `PollOnceLogic: Can't recognize the function handler: ${functionNum}`
-  //   //   );
-  //   //
-  //   //   continue;
-  //   // }
-  //   //
-  //   // let args: Results;
-  //   //
-  //   // try {
-  //   //   args = functionsParsers[functionNum](data);
-  //   // }
-  //   // catch (e) {
-  //   //   this.logWarn(
-  //   //     `PollOnceLogic: an error occurred while parsing ` +
-  //   //     `function ${functionNum} result: ${e}`
-  //   //   );
-  //   //
-  //   //   continue;
-  //   // }
-  //
-  // };
-  //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
-
-
-  //////////////////// READ
-
-
-  // pollOnce.addEventListener(handler);
-  // // setup input pin
-  // await callFunction.callFunction(
-  //   12,
-  //   // pin 11, 1
-  //   new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_RESISTOR_MODE.pullup])
-  // );
-  // await callFunction.callFunction(
-  //   10,
-  //   new Uint8Array([outputPinNumber])
-  // );
-  //
-  // setInterval(() => {
-  //   pollOnce.pollOnce();
-  // }, 1000);
-
-
-  // setTimeout(() => {
-  //   // read pin
-  //   pollOnce.pollOnce();
-  // }, 500);
-
-
-
-  ///////////////// WRITE
-
-  //
-  // let pinState: number = 0;
-  //
-  // callFunction.callFunction(
-  //   10,
-  //   new Uint8Array([outputPinNumber])
-  // );
-  //
-  // while(true) {
-  //   pinState = (pinState) ? 0 : 1;
-  //
-  //   await callFunction.callFunction(
-  //     11,
-  //     new Uint8Array([outputPinNumber, pinState])
-  //   );
-  //   await (new Promise((resolve => setTimeout(resolve, 1000))));
-  // }
 
   // TODO: write не собирается в пакет, отправляется по одной
 

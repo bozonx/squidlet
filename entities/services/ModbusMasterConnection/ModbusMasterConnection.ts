@@ -112,13 +112,13 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
 
   // TODO: проверить что будет гарантированно дожидаться результата и не будет
   //       делаться других запросов
-  private async feedbackHandler(): Promise<Uint8Array | undefined> {
+  private feedbackHandler = async (): Promise<Uint8Array | undefined> => {
     await this.pollOnce.pollOnce();
 
     return;
   }
 
-  private handleIncomeMessage(channel: number, payload: Uint8Array) {
+  private handleIncomeMessage = (channel: number, payload: Uint8Array) => {
     this.events.emit(ConnectionsEvents.message, channel, payload);
   }
 
