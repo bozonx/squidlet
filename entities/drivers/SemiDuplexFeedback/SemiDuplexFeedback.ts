@@ -2,7 +2,6 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Polling from 'system/lib/Polling';
-import Sender from 'system/lib/Sender';
 import {isEqualUint8Array} from 'system/lib/binaryHelpers';
 import {makeUniqId} from 'system/lib/uniqId';
 
@@ -34,7 +33,6 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   private requestDataCb?: RequestDataCb;
   private readonly pollEvents = new IndexedEvents<Handler>();
   private readonly polling: Polling = new Polling();
-  private sender!: Sender;
 
   // The latest received data by calling requestDataCb.
   // it needs to decide to rise change event or not
@@ -42,13 +40,6 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 
 
   init = async () => {
-    this.sender = new Sender(
-      this.context.config.config.requestTimeoutSec,
-      this.context.config.config.senderResendTimeout,
-      this.context.log.debug,
-      this.context.log.warn
-    );
-
     if (this.props.int) {
       this.impulseInputDriver = await this.context.getSubDriver<ImpulseInput>(
         'ImpulseInput',
@@ -60,7 +51,6 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   destroy = async () => {
     this.pollEvents.destroy();
     this.polling.destroy();
-    this.sender.destroy();
 
     delete this.impulseInputDriver;
   }

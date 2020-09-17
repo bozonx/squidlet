@@ -9,7 +9,7 @@ export interface ModbusMasterDriverProps {
 }
 
 
-// TODO: use Sender ???
+// TODO: нужно ли разделять RTU и TCP драйверы ????
 
 
 export class ModbusMaster extends DriverBase<ModbusMasterDriverProps> {
