@@ -8,7 +8,7 @@ export interface ConnectionProps {
 }
 
 
-export type IncomeMessageHandler = (port: number, payload: Uint8Array) => void;
+export type IncomeMessageHandler = (channel: number, payload: Uint8Array) => void;
 export type StatusHandler = () => void;
 export type ConnectionServiceType = 'connection';
 
@@ -30,9 +30,9 @@ export default interface Connection {
 
   /**
    * Send data to peer and don't wait for response.
-   * Port is from 0 and up to 253. Don't use 254 and 255.
+   * Channel is from 0 and up to 253. Don't use 254 and 255.
    */
-  send(port: number, payload: Uint8Array): Promise<void>;
+  send(channel: number, payload: Uint8Array): Promise<void>;
 
   isConnected(): boolean;
 

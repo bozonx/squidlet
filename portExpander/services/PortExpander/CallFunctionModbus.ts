@@ -5,6 +5,8 @@ import {uint8ToUint16} from '../../../system/lib/binaryHelpers';
 
 const WRITE_START_INDEX = 0;
 
+// TODO: remove - use connection
+
 
 export default class CallFunctionModbus extends CallFunctionBase {
   private readonly modbusMasterDriver: ModbusMaster;
