@@ -1,5 +1,5 @@
-name: GpioPcf8574
-main: GpioPcf8574.ts
+name: IoSetPcf8574
+main: IoSetPcf8574.ts
 type: expander
 
 drivers:

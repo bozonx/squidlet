@@ -13,7 +13,6 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDevice(path.join(devicesRoot, 'BinaryState/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'ClickSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'GpioLocal/manifest.yaml'));
-  await env.addDevice(path.join(devicesRoot, 'GpioPcf8574/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'MotionSensor/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'Relay/manifest.yaml'));
   await env.addDevice(path.join(devicesRoot, 'SerialListener/manifest.yaml'));
@@ -36,7 +35,6 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'ImpulseOutput/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'ModbusMaster/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Mqtt/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'Pcf8574/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SemiDuplexFeedback/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SerialNetwork/manifest.yaml'));
@@ -48,6 +46,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addService(path.join(servicesRoot, 'Automation/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'HttpApi/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'IoServer/manifest.yaml'));
+  await env.addService(path.join(servicesRoot, 'IoSetPcf8574/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'ModbusMasterConnection/manifest.yaml'));
   //await env.addService(path.join(servicesRoot, 'Network/manifest.yaml'));
   await env.addService(path.join(servicesRoot, 'MqttApiTopics/manifest.yaml'));

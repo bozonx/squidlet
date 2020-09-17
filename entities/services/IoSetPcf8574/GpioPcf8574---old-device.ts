@@ -21,7 +21,7 @@ interface Props extends Pcf8574ExpanderProps {
  * Don't specify more than one instance in config please.
  * Props of this instance will be defaults of IO devices.
  */
-export default class GpioPcf8574 extends DeviceBase<Props> {
+export default class GpioPcf8574OldDevice extends DeviceBase<Props> {
   get expander(): Pcf8574Driver {
     return this.depsInstances.expander;
   }
