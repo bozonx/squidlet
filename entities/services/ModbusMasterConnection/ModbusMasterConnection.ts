@@ -23,6 +23,7 @@ interface Props extends SemiDuplexFeedbackBaseProps, ModbusMasterDriverProps {
 }
 
 // TODO: use Sender ???
+// TODO: review poll once logic
 
 export default class ModbusMasterConnection extends ServiceBase<Props> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
@@ -53,11 +54,10 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
     );
     this.pollOnce = new PollOnceModbus(this.modbusMaster, this.log.warn);
 
+    this.modbusMaster.onConnect(() => this.events.emit(ConnectionsEvents.connected));
+    this.modbusMaster.onDisconnect(() => this.events.emit(ConnectionsEvents.disconnected));
     this.semiDuplexFeedback.startFeedback(this.feedbackHandler);
     this.pollOnce.addEventListener(this.handleIncomeMessage);
-    //this.semiDuplexFeedback.addListener(this.handleIncomeData);
-
-    // TODO: когда поднимать события connected|disconnected ????
   }
 
   destroy = async () => {
@@ -79,8 +79,7 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
   }
 
   isConnected(): boolean {
-    // TODO: add
-    return true;
+    return this.modbusMaster.isConnected();
   }
 
   onIncomeMessage(cb: IncomeMessageHandler): number {

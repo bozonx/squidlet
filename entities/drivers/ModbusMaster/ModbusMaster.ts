@@ -1,6 +1,7 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import ModBusMasterRtuIo from 'system/interfaces/io/ModBusMasterRtuIo';
+import {StatusHandler} from '../../../system/interfaces/Connection';
 
 
 export interface ModbusMasterDriverProps {
@@ -18,6 +19,23 @@ export class ModbusMaster extends DriverBase<ModbusMasterDriverProps> {
 
   init = async () => {
     this.modBusIo = this.context.getIo('ModBusMasterRtu');
+  }
+
+
+  isConnected(): boolean {
+    // TODO: add
+  }
+
+  onConnect(cb: StatusHandler): number {
+    // TODO: add
+  }
+
+  onDisconnect(cb: StatusHandler): number {
+    // TODO: add
+  }
+
+  removeListener(handlerIndex: number): void {
+    // TODO: add
   }
 
 
