@@ -6,18 +6,43 @@ import Connection, {
   StatusHandler
 } from 'system/interfaces/Connection';
 
+import {
+  SemiDuplexFeedback,
+  SemiDuplexFeedbackBaseProps
+} from '../../drivers/SemiDuplexFeedback/SemiDuplexFeedback';
 
-interface Props {
 
+interface Props extends SemiDuplexFeedbackBaseProps {
 }
 
 
 export default class ModbusConnection extends ServiceBase<Props> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
 
-  init = async () => {
-    //this.depsInstances.wsServer = await this.context.getSubDriver('WsServerSessions', this.props);
+  private semiDuplexFeedback!: SemiDuplexFeedback;
 
+
+  init = async () => {
+    this.semiDuplexFeedback = await this.context.getSubDriver(
+      'SemiDuplexFeedback',
+      {
+        // TODO: make feedbackId
+        //feedbackId: `mbc${this.props.}`,
+        pollIntervalMs: this.props.pollIntervalMs,
+        int: this.props.int,
+      }
+    );
+    this.semiDuplexFeedback = await this.context.getSubDriver(
+      'ModbusMaster',
+      {
+        // TODO: make feedbackId
+        //feedbackId: `mbc${this.props.}`,
+        pollIntervalMs: this.props.pollIntervalMs,
+        int: this.props.int,
+      }
+    );
+
+    this.semiDuplexFeedback.startFeedback(this.feedbackHandler);
   }
 
   destroy = async () => {
@@ -52,6 +77,11 @@ export default class ModbusConnection extends ServiceBase<Props> implements Conn
    * Remove listener of onIncomeData, onConnect or onDisconnect
    */
   removeListener(handlerIndex: number): void {
+    // TODO: add
+  }
+
+
+  private feedbackHandler(): Promise<Uint8Array> {
     // TODO: add
   }
 

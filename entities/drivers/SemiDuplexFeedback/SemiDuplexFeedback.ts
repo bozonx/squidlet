@@ -12,11 +12,13 @@ import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
 export type Handler = (data: Uint8Array) => void;
 export type RequestDataCb = () => Promise<Uint8Array>;
 
-export interface Props {
-  feedbackId: string;
-
+export interface SemiDuplexFeedbackBaseProps {
   pollIntervalMs: number;
   int?: ImpulseInputProps;
+}
+
+export interface Props extends SemiDuplexFeedbackBaseProps {
+  feedbackId: string;
 }
 
 
