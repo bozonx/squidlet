@@ -10,11 +10,14 @@ import {
   SemiDuplexFeedback,
   SemiDuplexFeedbackBaseProps
 } from '../../drivers/SemiDuplexFeedback/SemiDuplexFeedback';
+import {ModbusMasterDriverProps} from '../../drivers/ModbusMaster/ModbusMaster';
 
 
-interface Props extends SemiDuplexFeedbackBaseProps {
+interface Props extends SemiDuplexFeedbackBaseProps, ModbusMasterDriverProps {
 }
 
+
+// TODO: use Sender ???
 
 export default class ModbusMasterConnection extends ServiceBase<Props> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
@@ -35,10 +38,8 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
     this.semiDuplexFeedback = await this.context.getSubDriver(
       'ModbusMaster',
       {
-        // TODO: make feedbackId
-        //feedbackId: `mbc${this.props.}`,
-        pollIntervalMs: this.props.pollIntervalMs,
-        int: this.props.int,
+        portNum: this.props.portNum,
+        slaveId: this.props.slaveId,
       }
     );
 
