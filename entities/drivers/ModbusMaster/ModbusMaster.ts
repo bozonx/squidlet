@@ -24,14 +24,17 @@ export class ModbusMaster extends DriverBase<ModbusMasterDriverProps> {
 
   isConnected(): boolean {
     // TODO: add
+    return true;
   }
 
   onConnect(cb: StatusHandler): number {
     // TODO: add
+    return 0;
   }
 
   onDisconnect(cb: StatusHandler): number {
     // TODO: add
+    return 0;
   }
 
   removeListener(handlerIndex: number): void {

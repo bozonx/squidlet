@@ -6,7 +6,8 @@ import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase'
 import CallFunctionModbus from './portExpander/services/PortExpander/CallFunctionModbus';
 import {uint8ToNum} from './system/lib/binaryHelpers';
 import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/PortExpander/constants';
-import PollOnceModbus from './entities/services/ModbusMasterConnection/PollOnceModbus';
+import ModbusMasterConnection from './entities/services/ModbusMasterConnection/ModbusMasterConnection';
+import {SemiDuplexFeedback} from './entities/drivers/SemiDuplexFeedback/SemiDuplexFeedback';
 
 
 async function start () {
@@ -14,19 +15,47 @@ async function start () {
   const context: Context = {
     getIo() {
       return masterIo;
+    },
+    async getSubDriver(driverName: string, props: {[index: string]: any}): Promise<any> {
+      if (driverName === 'SemiDuplexFeedback') {
+        const driver = new SemiDuplexFeedback(context, {
+          id: 'SemiDuplexFeedback',
+          className: 'SemiDuplexFeedback',
+          props,
+        });
+
+        await driver.init();
+
+        return driver;
+      }
+      else if (driverName === 'ModbusMaster') {
+        const driver = new ModbusMaster(context, {
+          id: 'ModbusMaster',
+          className: 'ModbusMaster',
+          props,
+        });
+
+        await driver.init();
+
+        return driver;
+      }
+    },
+    log: {
+      error: console.error,
+      warn: console.warn,
     }
   } as any;
-  const definition: EntityDefinition = {
-    id: 'ModbusMaster',
-    className: 'ModbusMaster',
+  const modbusConnectionDefinition: EntityDefinition = {
+    id: 'ModbusConnectionDefinition',
+    className: 'ModbusConnectionDefinition',
     props: {
-      portNum: 0,
+      pollIntervalMs: 1000,
+      portNum: '0',
       slaveId: 1,
     }
   };
-  const modbusMasterDriver: ModbusMaster = new ModbusMaster(context, definition);
-  const pollOnce = new PollOnceModbus(modbusMasterDriver, console.warn);
-  const callFunction = new CallFunctionModbus(modbusMasterDriver);
+
+  const connection = new ModbusMasterConnection(context, modbusConnectionDefinition);
 
   await masterIo.configure({
     ports: {
@@ -47,11 +76,28 @@ async function start () {
       error: console.error,
     }
   } as any);
-  await modbusMasterDriver.init();
+
+  await connection.init();
 
 
 
   ////////////////// Do things
+  const inputPinNumber: number = 11;
+  const outputPinNumber: number = 12;
+
+  await connection.send(10, new Uint8Array([outputPinNumber]));
+  await connection.send(11, new Uint8Array([outputPinNumber, 1]));
+
+
+
+
+
+
+
+
+
+
+
   // setup i2c
   // await callFunction.callFunction(
   //   40,
@@ -92,61 +138,60 @@ async function start () {
   // );
 
 
-  const inputPinNumber: number = 11;
-  const outputPinNumber: number = 12;
 
-  const handler: FunctionHandler = (funcNum: number, returnData: Uint8Array) => {
-    console.log('return of funcNum: ', funcNum, ', data is: ', returnData);
-
-    callFunction.callFunction(
-      11,
-      new Uint8Array([outputPinNumber, (returnData[1]) ? 0 : 8])
-    );
-
-    // if (!functionsParsers[functionNum]) {
-    //   this.logWarn(
-    //     `PollOnceLogic: Can't recognize the function handler: ${functionNum}`
-    //   );
-    //
-    //   continue;
-    // }
-    //
-    // let args: Results;
-    //
-    // try {
-    //   args = functionsParsers[functionNum](data);
-    // }
-    // catch (e) {
-    //   this.logWarn(
-    //     `PollOnceLogic: an error occurred while parsing ` +
-    //     `function ${functionNum} result: ${e}`
-    //   );
-    //
-    //   continue;
-    // }
-
-  };
+  //
+  // const handler: FunctionHandler = (funcNum: number, returnData: Uint8Array) => {
+  //   console.log('return of funcNum: ', funcNum, ', data is: ', returnData);
+  //
+  //   callFunction.callFunction(
+  //     11,
+  //     new Uint8Array([outputPinNumber, (returnData[1]) ? 0 : 8])
+  //   );
+  //
+  //   // if (!functionsParsers[functionNum]) {
+  //   //   this.logWarn(
+  //   //     `PollOnceLogic: Can't recognize the function handler: ${functionNum}`
+  //   //   );
+  //   //
+  //   //   continue;
+  //   // }
+  //   //
+  //   // let args: Results;
+  //   //
+  //   // try {
+  //   //   args = functionsParsers[functionNum](data);
+  //   // }
+  //   // catch (e) {
+  //   //   this.logWarn(
+  //   //     `PollOnceLogic: an error occurred while parsing ` +
+  //   //     `function ${functionNum} result: ${e}`
+  //   //   );
+  //   //
+  //   //   continue;
+  //   // }
+  //
+  // };
   //console.log(111, uint8ToNum(new Uint8Array([5, 0])))
 
 
   //////////////////// READ
 
 
-  pollOnce.addEventListener(handler);
-  // setup input pin
-  await callFunction.callFunction(
-    12,
-    // pin 11, 1
-    new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_RESISTOR_MODE.pullup])
-  );
-  await callFunction.callFunction(
-    10,
-    new Uint8Array([outputPinNumber])
-  );
-
-  setInterval(() => {
-    pollOnce.pollOnce();
-  }, 1000);
+  // pollOnce.addEventListener(handler);
+  // // setup input pin
+  // await callFunction.callFunction(
+  //   12,
+  //   // pin 11, 1
+  //   new Uint8Array([inputPinNumber, PORT_EXPANDER_INPUT_RESISTOR_MODE.pullup])
+  // );
+  // await callFunction.callFunction(
+  //   10,
+  //   new Uint8Array([outputPinNumber])
+  // );
+  //
+  // setInterval(() => {
+  //   pollOnce.pollOnce();
+  // }, 1000);
 
 
   // setTimeout(() => {

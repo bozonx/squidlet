@@ -17,10 +17,13 @@ import {
   ModbusMasterDriverProps
 } from '../../drivers/ModbusMaster/ModbusMaster';
 import PollOnceModbus from './PollOnceModbus';
+import {makeCallFunctionMessage} from '../../../system/lib/remoteFunctionProtocol/writeLogic';
 
 
 interface Props extends SemiDuplexFeedbackBaseProps, ModbusMasterDriverProps {
 }
+
+const WRITE_START_INDEX = 0;
 
 // TODO: use Sender ???
 // TODO: review poll once logic
@@ -70,12 +73,17 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
    * Port is from 0 and up to 253. Don't use 254 and 255.
    */
   async send(channel: number, payload: Uint8Array): Promise<void> {
-    const data8Bit = new Uint8Array([
-      channel,
-      ...payload,
-    ]);
 
-    await this.modbusMaster.writeMultipleRegisters(0, uint8ToUint16(data8Bit));
+    // TODO: make packages from buffer
+
+    const data8Bit = makeCallFunctionMessage(channel, payload);
+    // const data8Bit = makeCallFunctionMessage(new Uint8Array([
+    //   channel,
+    //   ...payload,
+    // ]));
+    const package16Bit: Uint16Array = uint8ToUint16(data8Bit);
+
+    await this.modbusMaster.writeMultipleRegisters(WRITE_START_INDEX, package16Bit);
   }
 
   isConnected(): boolean {
