@@ -1,3 +1,5 @@
+import DigitalOutputIo from '../../../system/interfaces/io/DigitalOutputIo';
+
 type Timeout = NodeJS.Timeout;
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
@@ -66,10 +68,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
   private writingEndPromise?: Promise<any>;
   private deferredWritePromise?: Promised<void>;
   private _isInverted: boolean = false;
-
-  private get gpio(): GpioDigital {
-    return this.depsInstances.gpioDevice.gpio;
-  }
+  private digitalOutputIo!: DigitalOutputIo;
 
 
   init = async () => {
@@ -79,11 +78,9 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
       this.props.openDrain
     );
 
-    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+    this.digitalOutputIo = this.context.getIo('DigitalOutput', this.props.ioSet);
 
-    this.depsInstances.gpioDevice = device;
-
-    device.onInit(() => {
+    this.digitalOutputIo.onInit(() => {
       this.handleGpioInit()
         .catch(this.log.error);
     });
@@ -92,7 +89,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
   // setup pin after all the devices has been initialized
   handleGpioInit = async () => {
-    this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
+    this.log.debug(`ImpulseOutput: Setup pin ${this.props.pin} of ${this.props.ioSet}`);
 
     // resolve initial value
     const initialIoValue = invertIfNeed(false, this.isInverted());
@@ -100,11 +97,15 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupOutput(this.props.pin, initialIoValue, this.getResistorMode());
+      await this.digitalOutputIo.setup(
+        this.props.pin,
+        initialIoValue,
+        this.getResistorMode()
+      );
     }
     catch (err) {
       this.log.error(
-        `ImpulseOutput: Can't setup pin ${this.props.pin} of ${this.props.gpio}. ` +
+        `ImpulseOutput: Can't setup pin ${this.props.pin} of ${this.props.ioSet}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
@@ -214,7 +215,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     this.setImpulseTimeout();
     this.changeEvents.emit(true);
 
-    this.writingStartPromise = this.gpio.digitalWrite(this.props.pin, ioValue);
+    this.writingStartPromise = this.digitalOutputIo.write(this.props.pin, ioValue);
 
     try {
       await this.writingStartPromise;
@@ -258,7 +259,7 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 
     const ioValue: boolean = invertIfNeed(false, this.isInverted());
 
-    this.writingEndPromise = this.gpio.digitalWrite(this.props.pin, ioValue);
+    this.writingEndPromise = this.digitalOutputIo.write(this.props.pin, ioValue);
 
     try {
       await this.writingEndPromise;
@@ -340,6 +341,6 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
 export default class Factory extends DriverFactoryBase<ImpulseOutput, ImpulseOutputProps> {
   protected SubDriverClass = ImpulseOutput;
   protected instanceId = (props: ImpulseOutputProps): string => {
-    return `${props.gpio}${props.pin}`;
+    return `${props.ioSet}${props.pin}`;
   }
 }
