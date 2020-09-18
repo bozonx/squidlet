@@ -1,5 +1,5 @@
 import IoItem from '../IoItem';
-import {Edge, InputResistorMode, OutputResistorMode} from '../gpioTypes';
+import {Edge, InputResistorMode} from '../gpioTypes';
 
 
 export type ChangeHandler = (level: boolean) => void;
@@ -24,7 +24,12 @@ export default interface DigitalInputIo extends IoItem {
    * @param debounce - debounce time in ms. 0 or less = no debounce.
    * @param edge - Which value (0 or 1 or both) will rise an event. One of modes: rising | falling | both
    */
-  setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void>;
+  setup(
+    pin: number,
+    inputMode: InputResistorMode,
+    debounce: number,
+    edge: Edge
+  ): Promise<void>;
 
   //getPinDirection(pin: number): Promise<PinDirection | undefined>;
 
@@ -34,10 +39,10 @@ export default interface DigitalInputIo extends IoItem {
    * Results might be:
    * * undefined - pin hasn't been set up
    * * 0 - resistor isn't used
-   * * 1 - pullUp for inputs or openDrain for outputs
-   * * 2 - pullDown for inputs
+   * * 1 - pullUp
+   * * 2 - pullDown
    */
-  getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
+  getPinResistorMode(pin: number): Promise<InputResistorMode | undefined>;
   // output and input pins can be read
   read(pin: number): Promise<boolean>;
 

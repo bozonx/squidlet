@@ -9,6 +9,7 @@ import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
 import {OutputResistorMode} from 'system/interfaces/gpioTypes';
 import DeviceBase from 'system/base/DeviceBase';
+import DigitalOutputIo from 'system/interfaces/io/DigitalOutputIo';
 
 
 export type BlockMode = 'refuse' | 'defer';
@@ -58,10 +59,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
   private currentIoValue?: boolean;
   private blockTimeout?: Timeout;
   private _isInverted: boolean = false;
-
-  private get gpio(): GpioDigital {
-    return this.depsInstances.gpioDevice.gpio;
-  }
+  private digitalOutputIo!: DigitalOutputIo;
 
 
   init = async () => {
@@ -71,11 +69,9 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
       this.props.openDrain
     );
 
-    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+    this.digitalOutputIo = this.context.getIo('DigitalOutput', this.props.ioSet);
 
-    this.depsInstances.gpioDevice = device;
-
-    device.onInit(() => {
+    this.digitalOutputIo.onInit(() => {
       this.handleGpioInit()
         .catch(this.log.error);
     });
@@ -83,7 +79,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
   // setup pin after all the drivers has been initialized
   handleGpioInit = async () => {
-    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
+    this.log.debug(`BinaryOutput: Setup pin ${this.props.pin} of ${this.props.ioSet}`);
 
     // set initial value
     this.currentIoValue = this.resolveInitialLevel();
@@ -91,11 +87,15 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
-      await this.gpio.digitalSetupOutput(this.props.pin, this.currentIoValue, this.getResistorMode());
+      await this.digitalOutputIo.setup(
+        this.props.pin,
+        this.currentIoValue,
+        this.getResistorMode()
+      );
     }
     catch (err) {
       this.log.error(
-        `BinaryOutput: Can't setup pin ${this.props.pin} of ${this.props.gpio}. ` +
+        `BinaryOutput: Can't setup pin ${this.props.pin} of ${this.props.ioSet}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
@@ -159,7 +159,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
    * Read from IO and rise event if need.
    */
   async read(): Promise<boolean> {
-    const ioValue: boolean = await this.gpio.digitalRead(this.props.pin);
+    // TODO: зачем тут read ????
+    const ioValue: boolean = await this.digitalOutputIo.read(this.props.pin);
 
     return invertIfNeed(ioValue, this.isInverted());
   }
@@ -168,7 +169,8 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
    * Read value from IO
    */
   async poll(): Promise<void> {
-    const ioValue: boolean = await this.gpio.digitalRead(this.props.pin);
+    // TODO: зачем read ???
+    const ioValue: boolean = await this.digitalOutputIo.read(this.props.pin);
 
     // update current value and emit change event if need
     if (this.currentIoValue !== ioValue) {
@@ -214,7 +216,7 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 
     // wait for writing
     try {
-      await this.gpio.digitalWrite(this.props.pin, ioValue);
+      await this.digitalOutputIo.write(this.props.pin, ioValue);
     }
     catch (err) {
       this.writing = false;
@@ -316,6 +318,6 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
 export default class Factory extends DriverFactoryBase<BinaryOutput, BinaryOutputProps> {
   protected SubDriverClass = BinaryOutput;
   protected instanceId = (props: BinaryOutputProps): string => {
-    return `${props.gpio}${props.pin}`;
+    return `${props.ioSet}${props.pin}`;
   }
 }

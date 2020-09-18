@@ -1,13 +1,12 @@
 type Timeout = NodeJS.Timeout;
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
+import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import DriverBase from 'system/base/DriverBase';
 import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
-import DeviceBase from 'system/base/DeviceBase';
 
 
 export interface BinaryInputProps extends DigitalPinInputProps {
@@ -35,10 +34,7 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   // has value to be inverted when change event is rising
   private _isInverted: boolean = false;
   private blockTimeout?: Timeout;
-
-  private get gpio(): GpioDigital {
-    return this.depsInstances.gpioDevice.gpio;
-  }
+  private digitalInputIo!: DigitalInputIo;
 
 
   init = async () => {
@@ -48,12 +44,9 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
       this.props.pullup
     );
 
-    // TODO: обработать ошибку чтобы сообщение было более понятно что не такого девайса
-    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+    this.digitalInputIo = this.context.getIo('DigitalInput', this.props.ioSet);
 
-    this.depsInstances.gpioDevice = device;
-
-    device.onInit(() => {
+    this.digitalInputIo.onInit(() => {
       this.handleGpioInit()
         .catch(this.log.error);
     });
@@ -63,23 +56,28 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
   handleGpioInit = async () => {
     const edge: Edge = resolveEdge(this.props.edge, this._isInverted);
 
-    this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
+    this.log.debug(`BinaryInput: Setup pin ${this.props.pin} of ${this.props.ioSet}`);
 
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
       // TODO: debounce and edge могут быть undefined чтобы можно было переопределить в Gpio device
 
-      await this.gpio.digitalSetupInput(this.props.pin, this.getResistorMode(), this.props.debounce, edge);
+      await this.digitalInputIo.setup(
+        this.props.pin,
+        this.getResistorMode(),
+        this.props.debounce,
+        edge
+      );
     }
     catch (err) {
       this.log.error(
-        `BinaryInput ${this.props.pin} of ${this.props.gpio}: Can't setup pin. ` +
+        `BinaryInput ${this.props.pin} of ${this.props.ioSet}: Can't setup pin. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
 
-    await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
+    await this.digitalInputIo.onChange(this.props.pin, this.handleChange);
   }
 
 
@@ -99,14 +97,14 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
    * Just read and return a value
    */
   read(): Promise<boolean> {
-    return this.gpio.digitalRead(this.props.pin);
+    return this.digitalInputIo.read(this.props.pin);
   }
 
   /**
    * Read from IO and rise event if need.
    */
   async poll(): Promise<void> {
-    const level = await this.gpio.digitalRead(this.props.pin);
+    const level = await this.digitalInputIo.read(this.props.pin);
 
     if (level !== this.lastIoLevel) {
       // save last level to compare next time
@@ -165,6 +163,6 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
 export default class Factory extends DriverFactoryBase<BinaryInput, BinaryInputProps> {
   protected SubDriverClass = BinaryInput;
   protected instanceId = (props: BinaryInputProps): string => {
-    return `${props.gpio}${props.pin}`;
+    return `${props.ioSet}${props.pin}`;
   }
 }
