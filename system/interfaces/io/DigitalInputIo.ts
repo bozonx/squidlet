@@ -43,7 +43,7 @@ export default interface DigitalInputIo extends IoItem {
    * * 2 - pullDown
    */
   getPinResistorMode(pin: number): Promise<InputResistorMode | undefined>;
-  // output and input pins can be read
+
   read(pin: number): Promise<boolean>;
 
   // TODO: на самом деле нет смысла навешиваться на отдельный пин когда переделаю api call
