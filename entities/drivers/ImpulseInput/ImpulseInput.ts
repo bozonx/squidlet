@@ -1,5 +1,5 @@
 type Timeout = NodeJS.Timeout;
-import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
+import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
@@ -7,7 +7,6 @@ import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
-import DeviceBase from 'system/base/DeviceBase';
 
 
 type RisingHandler = () => void;
@@ -49,10 +48,7 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   private blockTimeout?: Timeout;
   private impulseTimeout?: Timeout;
   private _isInverted: boolean = false;
-
-  private get gpio(): GpioDigital {
-    return this.depsInstances.gpioDevice.gpio;
-  }
+  private digitalInputIo!: DigitalInputIo;
 
 
   init = async () => {
@@ -62,11 +58,9 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
       this.props.pullup
     );
 
-    const device: DeviceBase = this.context.system.devicesManager.getDevice(this.props.gpio);
+    this.digitalInputIo = this.context.getIo('DigitalInput', this.props.ioSet);
 
-    this.depsInstances.gpioDevice = device;
-
-    device.onInit(() => {
+    this.digitalInputIo.onInit(() => {
       this.handleGpioInit()
         .catch(this.log.error);
     });
@@ -76,13 +70,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
   handleGpioInit = async () => {
     const edge: Edge = resolveEdge('rising', this.isInverted());
 
-    this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.gpio}`);
+    this.log.debug(`ImpulseInput: Setup pin ${this.props.pin} of ${this.props.ioSet}`);
 
     // setup pin as an input with resistor if specified
     // wait for pin has initialized but don't break initialization on error
     try {
       // listen to only high levels
-      await this.gpio.digitalSetupInput(
+      await this.digitalInputIo.setup(
         this.props.pin,
         this.getResistorMode(),
         this.props.debounce,
@@ -92,12 +86,12 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     }
     catch (err) {
       this.log.error(
-        `ImpulseInput: Can't setup pin ${this.props.pin} of ${this.props.gpio}. ` +
+        `ImpulseInput: Can't setup pin ${this.props.pin} of ${this.props.ioSet}. ` +
         `"${JSON.stringify(this.props)}": ${err.toString()}`
       );
     }
 
-    await this.gpio.digitalOnChange(this.props.pin, this.handleChange);
+    await this.digitalInputIo.onChange(this.props.pin, this.handleChange);
   }
 
 
@@ -216,6 +210,6 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
 export default class Factory extends DriverFactoryBase<ImpulseInput, ImpulseInputProps> {
   protected SubDriverClass = ImpulseInput;
   protected instanceId = (props: ImpulseInputProps): string => {
-    return `${props.gpio}${props.pin}`;
+    return `${props.ioSet}${props.pin}`;
   }
 }

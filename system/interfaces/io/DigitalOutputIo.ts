@@ -1,5 +1,5 @@
 import IoItem from '../IoItem';
-import {OutputResistorMode} from '../gpioTypes';
+import {InputResistorMode, OutputResistorMode} from '../gpioTypes';
 
 
 export type ChangeHandler = (level: boolean) => void;
@@ -7,25 +7,36 @@ export type ChangeHandler = (level: boolean) => void;
 
 export const Methods = [
   'setupOutput',
+  'getPinResistorMode',
   'write',
   'clearPin',
   'clearAll',
 ];
 
 
-export default interface DigitalIo extends IoItem {
+export default interface DigitalOutputIo extends IoItem {
   /**
    * Setup pin as an output
    * @param pin - pin number
    * @param initialValue - value which will be set on default. Be careful with inverting and pullup mode.
    * @param outputMode - one of modes: output | output_opendrain
    */
-  setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void>;
+  setup(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void>;
 
   //getPinDirection(pin: number): Promise<PinDirection | undefined>;
 
-  // output and input pins can be read
-  read(pin: number): Promise<boolean>;
+  /**
+   * Get resistor pin mode.
+   * To be sure about direction, please check it before.
+   * Results might be:
+   * * undefined - pin hasn't been set up
+   * * 0 - resistor isn't used
+   * * 1 - openDrain
+   */
+  getPinResistorMode(pin: number): Promise<OutputResistorMode | undefined>;
+
+  // // output and input pins can be read
+  // read(pin: number): Promise<boolean>;
 
   /**
    * Writing is allowed only for output pins

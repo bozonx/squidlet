@@ -121,6 +121,7 @@ export default class DeviceBase<
   }
 
 
+  // TODO: review
   onInit(cb: () => void) {
     const callCb = () => {
       try {

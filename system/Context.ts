@@ -15,6 +15,7 @@ import {AppType} from './interfaces/AppType';
 import {pathJoin} from './lib/paths';
 import StorageIo from './interfaces/io/StorageIo';
 import ServicesObj from './interfaces/ServicesObj';
+import {IoSetBase} from './interfaces/IoSet';
 
 
 export default class Context {
@@ -76,7 +77,23 @@ export default class Context {
   }
 
 
-  getIo<T extends IoItem>(ioName: string): T {
+  /**
+   * Get IO instance.
+   * If virtualIoSet is defined then it will be used else the system's will be used.
+   * @param ioName - name of IO like DigitalInput, I2cMaster etc.
+   * @param virtualIoSet - Name of virtual IO set service
+   */
+  getIo<T extends IoItem>(ioName: string, virtualIoSet?: string): T {
+    if (virtualIoSet) {
+      if (!this.service[ioName]) {
+        throw new Error(`Can't find a virtual IO set "${virtualIoSet}"`);
+      }
+
+      const virtualIoSetService: IoSetBase = this.service[ioName];
+
+      return virtualIoSetService.getIo<T>(ioName);
+    }
+
     return this.system.ioManager.getIo<T>(ioName);
   }
 
