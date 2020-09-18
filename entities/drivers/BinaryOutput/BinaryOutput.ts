@@ -70,12 +70,13 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     );
 
     this.digitalOutputIo = this.context.getIo('DigitalOutput', this.props.ioSet);
-
-    this.digitalOutputIo.onInit(() => {
-      this.handleGpioInit()
-        .catch(this.log.error);
-    });
   }
+
+  protected async servicesDidInit?(): Promise<void> {
+    this.handleGpioInit()
+      .catch(this.log.error);
+  }
+
 
   // setup pin after all the drivers has been initialized
   handleGpioInit = async () => {
