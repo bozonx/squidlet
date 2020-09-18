@@ -3,7 +3,7 @@ import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
 import Connection from 'system/interfaces/Connection';
 
-import Digital from './io/Digital';
+import Digital from './io/DigitalInput';
 import ExpanderFunctionCall from './ExpanderFunctionCall';
 
 

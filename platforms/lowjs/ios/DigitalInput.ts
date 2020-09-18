@@ -14,7 +14,7 @@ interface Listener {
 }
 
 
-export default class Digital implements DigitalInputIo {
+export default class DigitalInput implements DigitalInputIo {
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
   // debounce times by pin number
@@ -25,7 +25,7 @@ export default class Digital implements DigitalInputIo {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupInput(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
+  async setup(pin: number, inputMode: DigitalInputMode, debounce?: number, edge?: Edge): Promise<void> {
     // save debounce time
     this.debounceTimes[pin] = debounce;
 
@@ -33,61 +33,43 @@ export default class Digital implements DigitalInputIo {
     gpio.pins[pin].setType(this.convertInputMode(inputMode));
   }
 
-  /**
-   * Setup pin before using.
-   * It doesn't set an initial value on output pin because a driver have to use it.
-   */
-  async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
-    gpio.pins[pin].setType(gpio.OUTPUT);
-
-    // set initial value if is set
-    if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
-  }
-
-  /**
-   * Get pin mode.
-   * It throws an error if pin hasn't configured before
-   */
-  async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
-    if (!gpio.pins[pin]) {
-      throw new Error(`Lowjs Digital io getPinMode: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
-    }
-
-    const pinType: number = gpio.pins[pin].getType();
-
-    // TODO: check it
-
-    if (pinType === gpio.INPUT) {
-      return 'input';
-    }
-    else if (pinType === gpio.INPUT_PULLUP) {
-      return 'input_pullup';
-    }
-    else if (pinType === gpio.INPUT_PULLDOWN) {
-      return 'input_pulldown';
-    }
-    else if (pinType === gpio.OUTPUT) {
-      return 'output';
-    }
-    else if (pinType === gpio.OUTPUT_OPENDRAIN) {
-      return 'output';
-    }
-    // TODO: what is OUTPUT_OPENDRAIN
-
-    return;
-  }
+  // /**
+  //  * Get pin mode.
+  //  * It throws an error if pin hasn't configured before
+  //  */
+  // async getPinMode(pin: number): Promise<DigitalPinMode | undefined> {
+  //   if (!gpio.pins[pin]) {
+  //     throw new Error(`Lowjs Digital io getPinMode: You have to do setup of local GPIO pin "${pin}" before manipulating it`);
+  //   }
+  //
+  //   const pinType: number = gpio.pins[pin].getType();
+  //
+  //   // TODO: check it
+  //
+  //   if (pinType === gpio.INPUT) {
+  //     return 'input';
+  //   }
+  //   else if (pinType === gpio.INPUT_PULLUP) {
+  //     return 'input_pullup';
+  //   }
+  //   else if (pinType === gpio.INPUT_PULLDOWN) {
+  //     return 'input_pulldown';
+  //   }
+  //   else if (pinType === gpio.OUTPUT) {
+  //     return 'output';
+  //   }
+  //   else if (pinType === gpio.OUTPUT_OPENDRAIN) {
+  //     return 'output';
+  //   }
+  //   // TODO: what is OUTPUT_OPENDRAIN
+  //
+  //   return;
+  // }
 
   async read(pin: number): Promise<boolean> {
     const result: number = await callPromised(gpio.pins[pin].getValue);
 
     return Boolean(result);
-  }
-
-  async write(pin: number, value: boolean): Promise<void> {
-    const numValue = (value) ? 1 : 0;
-
-    // TODO: почему не асинхронно???
-    return gpio.pins[pin].setValue(numValue);
   }
 
   async setWatch(pin: number, handler: WatchHandler): Promise<number> {

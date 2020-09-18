@@ -3,7 +3,7 @@
  */
 
 import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
 import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
@@ -12,10 +12,10 @@ import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
 import PigpioClient from './PigpioClient';
 
 
-export default class Digital implements DigitalInputIo {
+export default class DigitalInput implements DigitalInputIo {
   private _client?: PigpioClient;
   private _ioContext?: IoContext;
-  private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};
+  private readonly resistors: {[index: string]: InputResistorMode} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounceCall: DebounceCall = new DebounceCall();
   private readonly throttleCall: ThrottleCall = new ThrottleCall();
@@ -45,7 +45,7 @@ export default class Digital implements DigitalInputIo {
    * Setup pin before using.
    * It doesn't set an initial value on output pin because a driver have to use it.
    */
-  async setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
+  async setup(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void> {
     if (this.client.isPinInitialized(pin)) {
       throw new Error(
         `Digital IO setupInput(): Pin ${pin} has been set up before. ` +
@@ -70,54 +70,25 @@ export default class Digital implements DigitalInputIo {
     pinInstance.notify(handler);
   }
 
-  /**
-   * Setup pin before using.
-   * It doesn't set an initial value on output pin because a driver have to use it.
-   */
-  async setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
-    if (this.client.isPinInitialized(pin)) {
-      throw new Error(
-        `Digital IO setupOutput(): Pin ${pin} has been set up before. ` +
-        `You should to call \`clearPin(${pin})\` and after that try again.`
-      );
-    }
-    // wait for connection
-    await this.client.connectionPromise;
-    // make instance
-    this.client.makePinInstance(pin);
-
-    const pinInstance = this.getPinInstance('setupOutput', pin);
-    const pullUpDown: number = this.convertOutputResistorMode(outputMode);
-    // save resistor mode
-    this.resistors[pin] = outputMode;
-    // make setup
-    await Promise.all([
-      pinInstance.modeSet('output'),
-      pinInstance.pullUpDown(pullUpDown),
-    ]);
-    // set initial value if it defined
-    if (typeof initialValue !== 'undefined') await this.write(pin, initialValue);
-  }
-
-  async getPinDirection(pin: number): Promise<PinDirection | undefined> {
-    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
-
-    const pinInstance = this.getPinInstance('getPinDirection', pin);
-
-    const modeNum: number = await pinInstance.modeGet();
-
-    if (modeNum === 0) {
-      return PinDirection.input;
-    }
-
-    return PinDirection.output;
-  }
+  // async getPinDirection(pin: number): Promise<PinDirection | undefined> {
+  //   if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
+  //
+  //   const pinInstance = this.getPinInstance('getPinDirection', pin);
+  //
+  //   const modeNum: number = await pinInstance.modeGet();
+  //
+  //   if (modeNum === 0) {
+  //     return PinDirection.input;
+  //   }
+  //
+  //   return PinDirection.output;
+  // }
 
   /**
    * Get pin mode.
    * It throws an error if pin hasn't configured before
    */
-  async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
+  async getPinResistorMode(pin: number): Promise<InputResistorMode | undefined> {
     return this.resistors[pin];
   }
 
@@ -125,15 +96,6 @@ export default class Digital implements DigitalInputIo {
     if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
 
     return this.simpleRead(pin);
-  }
-
-  async write(pin: number, value: boolean): Promise<void> {
-    if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);
-
-    const pinInstance = this.getPinInstance('write', pin);
-    const numValue: number = (value) ? 1 : 0;
-
-    return pinInstance.write(numValue);
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
@@ -224,20 +186,6 @@ export default class Digital implements DigitalInputIo {
       case (InputResistorMode.pulldown):
         return 1;
       case (InputResistorMode.pullup):
-        return 2;
-      default:
-        throw new Error(`Unknown mode "${resistorMode}"`);
-    }
-  }
-
-  private convertOutputResistorMode(resistorMode: OutputResistorMode): number {
-    switch (resistorMode) {
-      case (OutputResistorMode.none):
-        return 0;
-
-      case (OutputResistorMode.opendrain):
-        //throw new Error(`Open-drain mode isn't supported`);
-        // TODO: выяснить можно ли включить open drain? может нужно использовать Gpio.PUD_UP
         return 2;
       default:
         throw new Error(`Unknown mode "${resistorMode}"`);

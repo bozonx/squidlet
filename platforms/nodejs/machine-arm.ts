@@ -12,7 +12,7 @@ const machineConfig: MachineConfig = {
     HttpServer: './ios/HttpServer.ts',
 
     Serial: './ios/Serial-serialport.ts',
-
+    ModBusMasterRtu: './ios/ModBusMasterRtu.ts',
     //'Wifi',
     //'Bluetooth',
   },
