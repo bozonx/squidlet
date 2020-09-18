@@ -59,12 +59,13 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     );
 
     this.digitalInputIo = this.context.getIo('DigitalInput', this.props.ioSet);
-
-    this.digitalInputIo.onInit(() => {
-      this.handleGpioInit()
-        .catch(this.log.error);
-    });
   }
+
+  protected async servicesDidInit?(): Promise<void> {
+    this.handleGpioInit()
+      .catch(this.log.error);
+  }
+
 
   // setup pin after all the drivers has been initialized
   handleGpioInit = async () => {
@@ -107,15 +108,15 @@ export class ImpulseInput extends DriverBase<ImpulseInputProps> {
     return Boolean(this.impulseTimeout);
   }
 
+  isInProgress(): boolean {
+    return this.isImpulseInProgress() || this.isBlocked();
+  }
+
   /**
    * If changes from IO comes inverted
    */
   isInverted(): boolean {
     return this._isInverted;
-  }
-
-  isInProgress(): boolean {
-    return this.isImpulseInProgress() || this.isBlocked();
   }
 
   /**

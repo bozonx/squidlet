@@ -79,11 +79,11 @@ export class ImpulseOutput extends DriverBase<ImpulseOutputProps> {
     );
 
     this.digitalOutputIo = this.context.getIo('DigitalOutput', this.props.ioSet);
+  }
 
-    this.digitalOutputIo.onInit(() => {
-      this.handleGpioInit()
-        .catch(this.log.error);
-    });
+  protected async servicesDidInit?(): Promise<void> {
+    this.handleGpioInit()
+      .catch(this.log.error);
   }
 
 

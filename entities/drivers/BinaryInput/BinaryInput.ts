@@ -45,12 +45,13 @@ export class BinaryInput extends DriverBase<BinaryInputProps> {
     );
 
     this.digitalInputIo = this.context.getIo('DigitalInput', this.props.ioSet);
-
-    this.digitalInputIo.onInit(() => {
-      this.handleGpioInit()
-        .catch(this.log.error);
-    });
   }
+
+  protected async servicesDidInit?(): Promise<void> {
+    this.handleGpioInit()
+      .catch(this.log.error);
+  }
+
 
   // setup pin after all the drivers has been initialized
   handleGpioInit = async () => {

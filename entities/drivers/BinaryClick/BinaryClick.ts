@@ -54,13 +54,13 @@ export class BinaryClick extends DriverBase<BinaryClickProps> {
     );
 
     this.digitalInputIo = this.context.getIo('DigitalInput', this.props.ioSet);
-
-    // TODO: wtf ????
-    this.digitalInputIo.onInit(() => {
-      this.handleGpioInit()
-        .catch(this.log.error);
-    });
   }
+
+  protected async servicesDidInit?(): Promise<void> {
+    this.handleGpioInit()
+      .catch(this.log.error);
+  }
+
 
   // setup pin after all the drivers has been initialized
   handleGpioInit = async () => {
