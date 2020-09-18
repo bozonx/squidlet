@@ -6,7 +6,6 @@ import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digita
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
 import DeviceBase from 'system/base/DeviceBase';
 

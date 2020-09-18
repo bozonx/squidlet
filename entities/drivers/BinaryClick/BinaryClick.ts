@@ -5,7 +5,6 @@ import DriverBase from 'system/base/DriverBase';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';
 import {invertIfNeed, isDigitalPinInverted, resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge, InputResistorMode} from 'system/interfaces/gpioTypes';
 import DeviceBase from 'system/base/DeviceBase';
 
