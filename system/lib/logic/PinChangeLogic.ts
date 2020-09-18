@@ -2,7 +2,7 @@
 
 import {Edge} from '../../interfaces/gpioTypes';
 import IndexedEventEmitter from '../IndexedEventEmitter';
-import {ChangeHandler} from '../../interfaces/io/DigitalIo';
+import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DebounceCall from '../debounceCall/DebounceCall';
 import ThrottleCall from '../debounceCall/ThrottleCall';
 

@@ -1,5 +1,5 @@
 import IoItem from '../IoItem';
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../gpioTypes';
+import {Edge, InputResistorMode, OutputResistorMode} from '../gpioTypes';
 
 
 export type ChangeHandler = (level: boolean) => void;
@@ -7,17 +7,16 @@ export type ChangeHandler = (level: boolean) => void;
 
 export const Methods = [
   'setupInput',
-  'setupOutput',
+  'getPinResistorMode',
   'read',
-  'write',
-  'getPinMode',
   'onChange',
   'removeListener',
-  'removeAllListeners',
+  'clearPin',
+  'clearAll',
 ];
 
 
-export default interface DigitalIo extends IoItem {
+export default interface DigitalInputIo extends IoItem {
   /**
    * Setup pin as an input
    * @param pin - pin number
@@ -27,15 +26,7 @@ export default interface DigitalIo extends IoItem {
    */
   setupInput(pin: number, inputMode: InputResistorMode, debounce: number, edge: Edge): Promise<void>;
 
-  /**
-   * Setup pin as an output
-   * @param pin - pin number
-   * @param initialValue - value which will be set on default. Be careful with inverting and pullup mode.
-   * @param outputMode - one of modes: output | output_opendrain
-   */
-  setupOutput(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void>;
-
-  getPinDirection(pin: number): Promise<PinDirection | undefined>;
+  //getPinDirection(pin: number): Promise<PinDirection | undefined>;
 
   /**
    * Get resistor pin mode.
@@ -49,11 +40,6 @@ export default interface DigitalIo extends IoItem {
   getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined>;
   // output and input pins can be read
   read(pin: number): Promise<boolean>;
-
-  /**
-   * Writing is allowed only for output pins
-   */
-  write(pin: number, value: boolean): Promise<void>;
 
   // TODO: на самом деле нет смысла навешиваться на отдельный пин когда переделаю api call
   /**

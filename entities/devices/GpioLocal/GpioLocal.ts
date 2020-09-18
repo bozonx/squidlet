@@ -1,6 +1,6 @@
 import DeviceBase from 'system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {stringifyPinMode} from 'system/lib/digitalHelpers';
 
@@ -18,7 +18,7 @@ interface GpioLocalProps {
  * Props of this instance will be defaults of IO devices.
  */
 export default class GpioLocal extends DeviceBase<GpioLocalProps> {
-  private get digitalIo(): DigitalIo {
+  private get digitalIo(): DigitalInputIo {
     return this.context.getIo('Digital');
   }
 

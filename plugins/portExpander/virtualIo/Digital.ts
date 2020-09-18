@@ -1,4 +1,4 @@
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import PinChangeLogic from 'system/lib/logic/PinChangeLogic';
 
@@ -14,7 +14,7 @@ interface PinParamItem {
 }
 
 
-export default class Digital implements DigitalIo {
+export default class Digital implements DigitalInputIo {
   private readonly functionCall: ExpanderFunctionCall;
   private readonly pinChangeLogic: PinChangeLogic;
   private pinParams: {[index: string]: PinParamItem} = {};

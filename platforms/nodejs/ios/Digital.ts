@@ -2,7 +2,7 @@
  * It uses a pigpiod daemon via websocket.
  */
 
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import ThrottleCall from 'system/lib/debounceCall/ThrottleCall';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
@@ -12,7 +12,7 @@ import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
 import PigpioClient from './PigpioClient';
 
 
-export default class Digital implements DigitalIo {
+export default class Digital implements DigitalInputIo {
   private _client?: PigpioClient;
   private _ioContext?: IoContext;
   private readonly resistors: {[index: string]: InputResistorMode | OutputResistorMode} = {};

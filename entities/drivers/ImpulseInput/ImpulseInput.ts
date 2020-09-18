@@ -1,5 +1,5 @@
 type Timeout = NodeJS.Timeout;
-import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';

@@ -1,4 +1,4 @@
-import {ChangeHandler} from './io/DigitalIo';
+import {ChangeHandler} from './io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from './gpioTypes';
 
 

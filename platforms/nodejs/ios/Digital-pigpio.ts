@@ -1,7 +1,7 @@
 // @ts-ignore
 import {Gpio} from 'pigpio';
 
-import DigitalIo, {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
@@ -14,7 +14,7 @@ const INTERRUPT_EVENT_NAME = 'interrupt';
 const ALERT_EVENT_NAME = 'alert';
 
 
-export default class DigitalPigpio implements DigitalIo {
+export default class DigitalPigpio implements DigitalInputIo {
   private readonly pinInstances: {[index: string]: Gpio} = {};
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   // pin change listeners by pin

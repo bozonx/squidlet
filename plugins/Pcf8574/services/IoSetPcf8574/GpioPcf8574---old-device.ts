@@ -1,5 +1,5 @@
 import DeviceBase from 'system/base/DeviceBase';
-import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge} from 'system/interfaces/gpioTypes';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
