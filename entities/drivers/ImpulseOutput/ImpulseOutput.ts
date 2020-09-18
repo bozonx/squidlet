@@ -6,7 +6,6 @@ import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
-import {GpioDigital} from 'system/interfaces/Gpio';
 import {OutputResistorMode} from 'system/interfaces/gpioTypes';
 import DeviceBase from 'system/base/DeviceBase';
 
