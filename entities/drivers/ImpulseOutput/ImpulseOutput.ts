@@ -3,7 +3,6 @@ import DriverBase from 'system/base/DriverBase';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from 'system/lib/digitalHelpers';
 import {resolveOutputResistorMode} from 'system/lib/digitalHelpers';
-import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DigitalPinOutputProps from 'system/interfaces/DigitalPinOutputProps';
 import Promised from 'system/lib/Promised';
@@ -13,6 +12,8 @@ import DeviceBase from 'system/base/DeviceBase';
 
 
 type ImpulseOutputMode = 'fixed' | 'defer' | 'increasing';
+export type ChangeHandler = (level: boolean) => void;
+
 
 export interface ImpulseOutputProps extends DigitalPinOutputProps {
   // duration of impulse in ms

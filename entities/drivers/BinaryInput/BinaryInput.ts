@@ -1,7 +1,7 @@
 type Timeout = NodeJS.Timeout;
 import IndexedEvents from 'system/lib/IndexedEvents';
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from 'system/lib/digitalHelpers';
 import {resolveInputResistorMode} from 'system/lib/digitalHelpers';
 import DigitalPinInputProps from 'system/interfaces/DigitalPinInputProps';

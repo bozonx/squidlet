@@ -2,7 +2,7 @@ import {callPromised} from '../../../system/lib/common';
 
 const gpio = require('gpio');
 
-import DigitalIo from 'system/interfaces/io/DigitalIo';
+import DigitalInputIo from 'system/interfaces/io/DigitalInputIo';
 import DebounceCall from 'system/lib/debounceCall/DebounceCall';
 
 
@@ -14,7 +14,7 @@ interface Listener {
 }
 
 
-export default class Digital implements DigitalIo {
+export default class Digital implements DigitalInputIo {
   private readonly alertListeners: Listener[] = [];
   private readonly debounceCall: DebounceCall = new DebounceCall();
   // debounce times by pin number

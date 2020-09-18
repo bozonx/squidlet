@@ -7,7 +7,7 @@ import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {PinDirection} from 'system/interfaces/gpioTypes';
-import {ChangeHandler} from 'system/interfaces/io/DigitalIo';
+import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {omitObj} from 'system/lib/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
 import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
