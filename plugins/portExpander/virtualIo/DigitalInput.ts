@@ -14,7 +14,7 @@ interface PinParamItem {
 }
 
 
-export default class Digital implements DigitalInputIo {
+export default class DigitalInput implements DigitalInputIo {
   private readonly functionCall: ExpanderFunctionCall;
   private readonly pinChangeLogic: PinChangeLogic;
   private pinParams: {[index: string]: PinParamItem} = {};
