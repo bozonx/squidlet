@@ -1,12 +1,14 @@
 import {OutputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalOutputIo from '../../interfaces/io/DigitalOutputIo';
+import DigitalExpanderLogic from './DigitalExpanderLogic';
 
 
 export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
-  private logic: DigitalExpanderOutputLogic;
+  private logic: DigitalExpanderLogic;
 
 
-  constructor(logic: DigitalExpanderOutputLogic) {
+  // TODO: принимать logError ???
+  constructor(logic: DigitalExpanderLogic) {
     this.logic = logic;
   }
 

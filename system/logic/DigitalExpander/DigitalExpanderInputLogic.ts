@@ -1,11 +1,14 @@
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
+import DigitalExpanderLogic from './DigitalExpanderLogic';
+
 
 export default class DigitalExpanderInputLogic {
-  private logic: DigitalExpanderInputLogic;
+  private logic: DigitalExpanderLogic;
 
 
-  constructor(logic: DigitalExpanderInputLogic) {
+  // TODO: принимать logError ???
+  constructor(logic: DigitalExpanderLogic) {
     this.logic = logic;
   }
 
