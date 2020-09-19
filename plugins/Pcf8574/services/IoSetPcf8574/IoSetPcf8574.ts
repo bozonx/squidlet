@@ -1,45 +1,31 @@
 import ServiceBase from 'system/base/ServiceBase';
 import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
-import Connection from 'system/interfaces/Connection';
+import DigitalExpanderInputLogic from 'system/logic/DigitalExpander/DigitalExpanderInputLogic';
 
-import Digital from './io/DigitalInput';
-import ExpanderFunctionCall from './ExpanderFunctionCall';
+import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
+import {Pcf8574} from '../../drivers/Pcf8574';
+import DigitalExpanderOutputLogic from '../../../../system/logic/DigitalExpander/DigitalExpanderOutputLogic';
 
-
-interface Props {
-  // name of connection service to use
-  connection: string;
-}
 
 type ExpanderIoItemClass = new (
-  functionCall: ExpanderFunctionCall,
+  logic: DigitalExpanderInputLogic,
   logError: (msg: string) => void
 ) => void;
 
 const ios: {[index: string]: ExpanderIoItemClass} = {
-  Digital,
+  DigitalInput: DigitalExpanderInputLogic,
+  DigitalOutput: DigitalExpanderOutputLogic,
 };
 
 
-export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBase {
-  private connection!: Connection;
-  //private functionCall!: ExpanderFunctionCall;
+export default class IoSetPcf8574 extends ServiceBase<I2cMasterDriverProps> implements IoSetBase {
+  private driver!: Pcf8574;
   private readonly usedIo: {[index: string]: any} = {};
 
 
   init = async () => {
-    if (!this.context.service[this.props.connection]) {
-      throw new Error(`Connection "${this.props.connection}" hasn't been setup`);
-    }
-
-    this.connection = this.context.service[this.props.connection];
-
-    if (!this.connection) {
-      throw new Error(`PortExpander: No connection`);
-    }
-
-    this.functionCall = new ExpanderFunctionCall(this.connection);
+    this.driver = await this.context.getSubDriver<Pcf8574>('Pcf8574', this.props);
   }
 
   destroy = async () => {
@@ -48,7 +34,7 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.usedIo[ioName]) {
-      this.usedIo[ioName] = new ios[ioName](this.functionCall, this.log.error);
+      this.usedIo[ioName] = new ios[ioName](this.driver, this.log.error);
     }
 
     return this.usedIo[ioName];
