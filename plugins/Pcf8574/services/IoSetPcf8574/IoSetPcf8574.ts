@@ -1,9 +1,9 @@
 import ServiceBase from 'system/base/ServiceBase';
 import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
-import DigitalExpanderLogic from 'system/logic/DigitalExpander/DigitalExpanderLogic';
-import DigitalExpanderInputLogic from 'system/logic/DigitalExpander/DigitalExpanderInputLogic';
-import DigitalExpanderOutputLogic from 'system/logic/DigitalExpander/DigitalExpanderOutputLogic';
+import DigitalExpanderLogic from 'system/logic/digitalExpander/DigitalExpanderLogic';
+import DigitalExpanderInputLogic from 'system/logic/digitalExpander/DigitalExpanderInputLogic';
+import DigitalExpanderOutputLogic from 'system/logic/digitalExpander/DigitalExpanderOutputLogic';
 
 import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
 import {Pcf8574} from '../../drivers/Pcf8574';

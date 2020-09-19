@@ -5,7 +5,7 @@
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import DigitalExpanderDriver from 'system/logic/DigitalExpander/interfaces/DigitalExpanderDriver';
+import DigitalExpanderDriver from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
 
