@@ -1,6 +1,6 @@
 import DigitalInputIo, {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
-import PinChangeLogic from 'system/lib/logic/PinChangeLogic';
+import PinChangeLogic from 'system/logic/PinChangeLogic';
 
 import {PORT_EXPANDER_FEEDBACK, PORT_EXPANDER_FUNCTIONS} from '../constants';
 import ExpanderFunctionCall from '../ExpanderFunctionCall';

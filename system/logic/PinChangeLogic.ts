@@ -1,10 +1,10 @@
 // TODO: test it
 
-import {Edge} from '../../interfaces/gpioTypes';
-import IndexedEventEmitter from '../IndexedEventEmitter';
-import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
-import DebounceCall from '../debounceCall/DebounceCall';
-import ThrottleCall from '../debounceCall/ThrottleCall';
+import {Edge} from '../interfaces/gpioTypes';
+import IndexedEventEmitter from '../lib/IndexedEventEmitter';
+import {ChangeHandler} from '../interfaces/io/DigitalInputIo';
+import DebounceCall from '../lib/debounceCall/DebounceCall';
+import ThrottleCall from '../lib/debounceCall/ThrottleCall';
 
 
 export default class PinChangeLogic {

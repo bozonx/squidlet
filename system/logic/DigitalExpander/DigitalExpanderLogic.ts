@@ -10,6 +10,7 @@ import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
 
 
 export default class DigitalExpanderLogic {
+  // TODO: может лучше использовать isInited и onInit(cb)
   get initIcPromise(): Promise<void> {
     return this.initIcLogic.initPromise;
   }
