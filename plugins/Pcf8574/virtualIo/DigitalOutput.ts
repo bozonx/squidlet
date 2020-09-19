@@ -1,6 +1,5 @@
-import DigitalOutputIo from 'system/interfaces/io/DigitalOutputIo';
+import DigitalExpanderOutputLogic from 'system/logic/DigitalExpander/DigitalExpanderOutputLogic';
 
 
-export default class DigitalInput implements DigitalOutputIo {
-
+export default class DigitalInput extends DigitalExpanderOutputLogic {
 }

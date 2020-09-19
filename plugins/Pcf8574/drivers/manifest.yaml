@@ -7,8 +7,8 @@ drivers:
 props:
   $base: 'drivers.I2cMaster'
 
-  writeBufferMs:
-    type: number
+#  writeBufferMs:
+#    type: number
 
   ### I2cMaster driver props
   #busNum: {}
