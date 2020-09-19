@@ -2,6 +2,7 @@ import {Edge, PinDirection} from '../../../system/interfaces/gpioTypes';
 import InitIcLogic from '../../../system/lib/logic/InitIcLogic';
 import {getBitFromByte, updateBitInByte} from '../../../system/lib/binaryHelpers';
 import {DATA_LENGTH, PINS_COUNT} from './Pcf8574';
+import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
 
 
 // Count of pins which IC has
@@ -13,26 +14,56 @@ export default class DigitalExpanderLogic {
     return this.initIcLogic.initPromise;
   }
 
-  // TODO: review
-  private initIcLogic!: InitIcLogic;
-
+  private readonly driver: DigitalExpanderDriver;
   // Direction of each pin. By default all the pin directions are undefined
   private directions: (PinDirection | undefined)[] = [];
-
-  // TODO: support 2 bytes and more
+  // collection of numbers of ms to use in debounce logic for each pin.
+  private pinDebounces: {[index: string]: number} = {};
   // Bit mask representing the current state on IC of the input and outputs pins.
-  private currentState: number[] = [0];
+  private currentState: number = 0;
+  private _initIcLogic?: InitIcLogic;
+  private _expanderOutput?: DigitalPortExpanderOutputLogic;
+  private _expanderInput?: DigitalPortExpanderInputLogic;
 
+
+  private get initIcLogic(): InitIcLogic {
+    return this._initIcLogic as any;
+  }
+
+  private get expanderOutput(): DigitalPortExpanderOutputLogic {
+    return this._expanderOutput as any;
+  }
+
+  private get expanderInput(): DigitalPortExpanderInputLogic {
+    return this._expanderInput as any;
+  }
+
+
+  constructor(driver: DigitalExpanderDriver) {
+    this.driver = driver;
+  }
 
   init = async () => {
-    // TODO: review
     this._initIcLogic = new InitIcLogic(
       (): Promise<void> => this.expanderOutput.writeState(this.currentState),
       this.log.error,
       this.config.config.requestTimeoutSec
     );
+    this._expanderOutput = new DigitalPortExpanderOutputLogic(
+      this.log.error,
+      this.writeToIc,
+      this.getState,
+      this.setWholeState,
+      this.config.config.queueJobTimeoutSec,
+      this.props.writeBufferMs,
+    );
+    this._expanderInput = new DigitalPortExpanderInputLogic(
+      this.log.error,
+      this.pollOnce,
+      this.getState,
+      this.updateState,
+    );
 
-    // TODO: review
     this.initIcLogic.initPromise
       .then(() => this.startFeedback())
       .catch(this.log.error);
@@ -40,10 +71,15 @@ export default class DigitalExpanderLogic {
 
   destroy = async () => {
     this.initIcLogic.destroy();
+    this.expanderInput.destroy();
+    this.expanderOutput.destroy();
 
     delete this.directions;
+    delete this.pinDebounces;
     delete this.currentState;
     delete this._initIcLogic;
+    delete this._expanderOutput;
+    delete this._expanderInput;
   }
 
   /**
@@ -52,18 +88,13 @@ export default class DigitalExpanderLogic {
    * And you can repeat it if you setup pin after initialization.
    */
   initIc() {
-
-    // TODO: why not async ???
-
     this.initIcLogic.init();
   }
 
-
-  // TODO: review
   /**
    * If you did setup after IC initialized then do `initIc()`.
    */
-  async setupInput(pin: number, debounce?: number, edge?: Edge): Promise<void> {
+  async setupInput(pin: number, debounce?: number): Promise<void> {
     this.checkPinRange(pin);
 
     // TODO: сделать виртуальный edge
@@ -82,25 +113,23 @@ export default class DigitalExpanderLogic {
     this.directions[pin] = PinDirection.input;
   }
 
-  // TODO: review
-  async setupOutput(pin: number, initialValue?: boolean): Promise<void> {
+  async setupOutput(pin: number, outputInitialValue?: boolean): Promise<void> {
     this.checkPinRange(pin);
 
     if (typeof this.directions[pin] !== 'undefined') {
       throw new Error(
-        `PCF8574Driver.setupOutput(${pin}, ${initialValue}). This pin has been already set up` +
+        `PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up` +
         `Call "clearPin()" and try to set up again`
       );
     }
 
     this.directions[pin] = PinDirection.output;
 
-    if (typeof initialValue !== 'undefined') {
-      this.updateState(pin, initialValue);
+    if (typeof outputInitialValue !== 'undefined') {
+      this.updateState(pin, outputInitialValue);
     }
   }
 
-  // TODO: review
   getPinDirection(pin: number): PinDirection | undefined {
     this.checkPinRange(pin);
 
@@ -119,15 +148,47 @@ export default class DigitalExpanderLogic {
     return this.directions.includes(PinDirection.input);
   }
 
+  // /**
+  //  * Returns array like [true, true, false, false, true, true, false, false].
+  //  * It is full state includes values of input and output pins. Input pins are always true.
+  //  * If you did't setup poll or interrupt then call `pollOnce()` before
+  //  * to be sure that you will receive the last actual data.
+  //  */
+  // getState(): boolean[] {
+  //   return byteToBinArr(this.currentState);
+  // }
+
   getState = (): number => {
     return this.currentState;
   }
-
 
   getPinState(pin: number): boolean {
     this.checkPinRange(pin);
 
     return getBitFromByte(this.currentState, pin);
+  }
+
+  /**
+   * Listen to changes of pin after edge and debounce were processed.
+   */
+  onChange(pin: number, handler: ChangeHandler): number {
+    this.checkPinRange(pin);
+
+    return this.expanderInput.onChange(pin, handler);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.expanderInput.removeListener(handlerIndex);
+  }
+
+  /**
+   * Poll expander manually.
+   */
+  pollOnce = (): Promise<void> => {
+    // it is no need to do poll while initialization time because it will be done after initialization
+    if (!this.initIcLogic.wasInitialized) return Promise.resolve();
+
+    return this.i2c.pollOnce();
   }
 
   /**
@@ -211,6 +272,37 @@ export default class DigitalExpanderLogic {
     for (let pin = 0; pin < PINS_COUNT; pin ++) {
       delete this.directions[pin];
       delete this.pinDebounces[pin];
+    }
+  }
+
+
+  private startFeedback() {
+    // if I2C driver doesn't have feedback then it doesn't need to be setup
+    if (!this.i2c.hasFeedback()) return;
+
+    this.i2c.addListener(this.handleIcStateChange);
+    // make first request and start handle feedback
+    this.i2c.startFeedback();
+  }
+
+  private handleIcStateChange = (data: Uint8Array) => {
+
+    console.log('------- handleIcStateChange ---------', data)
+
+    if (!data || data.length !== DATA_LENGTH) {
+      return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
+    }
+
+    const receivedByte: number = data[0];
+
+    // update values add rise change event of input pins which are changed
+    for (let pin = 0; pin < PINS_COUNT; pin++) {
+      // skip not input pins
+      if (this.directions[pin] !== PinDirection.input) continue;
+
+      const newValue: boolean = getBitFromByte(receivedByte, pin);
+
+      this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
     }
   }
 

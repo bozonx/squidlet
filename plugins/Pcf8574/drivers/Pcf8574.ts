@@ -5,6 +5,7 @@
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
+import DigitalExpanderDriver from 'system/logic/DigitalExpander/interfaces/DigitalExpanderDriver';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
 
@@ -13,7 +14,7 @@ import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMast
 export const DATA_LENGTH = 1;
 
 
-export class Pcf8574 extends DriverBase<I2cMasterDriverProps> {
+export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements DigitalExpanderDriver {
   private i2c!: I2cMaster;
 
 
@@ -40,12 +41,12 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> {
    * Write whole state to IC.
    * If IC has 8 pins then pass 1 byte if 16 then 2 bytes.
    */
-  writeState(state: Uint8Array): Promise<void> {
+  async writeState(state: Uint8Array): Promise<void> {
     if (state.length !== DATA_LENGTH) {
       throw new Error(`It is able to write 1 byte of state to IC`);
     }
 
-    return this.i2c.write(state);
+    await this.i2c.write(state);
   }
 
 }
