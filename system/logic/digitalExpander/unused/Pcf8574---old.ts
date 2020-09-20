@@ -9,8 +9,8 @@ import {getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import {PinDirection} from 'system/interfaces/gpioTypes';
 import {ChangeHandler} from 'system/interfaces/io/DigitalInputIo';
 import {omitObj} from 'system/lib/objects';
-import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalPortExpanderInputLogic';
-import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalPortExpanderOutputLogic';
+import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalInputLogic';
+import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalOutputLogic';
 import InitIcLogic from 'system/lib/logic/InitIcLogic';
 import {I2cMaster, I2cMasterDriverProps} from '../I2cMaster/I2cMaster';
 
