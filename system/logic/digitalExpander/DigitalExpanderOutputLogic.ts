@@ -33,6 +33,14 @@ export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
   }
 
 
+  /**
+   * Get the last actual state of all the pins input and output
+   */
+  getState(): {[index: string]: boolean} {
+
+  }
+
+
   setup(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
     return this.logic.setupOutput(pin, initialValue, outputMode);
   }
