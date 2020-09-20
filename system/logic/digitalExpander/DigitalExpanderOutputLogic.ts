@@ -1,16 +1,21 @@
 import {OutputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalOutputIo from '../../interfaces/io/DigitalOutputIo';
-import DigitalExpanderLogic from './DigitalExpanderLogic';
 import QueueOverride from '../../lib/QueueOverride';
 import DebounceCall from '../../lib/debounceCall/DebounceCall';
-import Context from '../../Context';
-import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
+import {DigitalExpanderOutputDriver} from './interfaces/DigitalExpanderDriver';
+//import Context from '../../Context';
+
+
+interface Props {
+  writeBufferMs?: number;
+}
 
 
 export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
-  private readonly context: Context;
-  private readonly logic: DigitalExpanderLogic;
+  //private readonly context: Context;
+  private readonly driver: DigitalExpanderOutputDriver;
   private readonly writeBufferMs?: number;
+  private readonly props: Props;
   private readonly queue: QueueOverride;
   private readonly debounce = new DebounceCall();
   // temporary state while values are buffering before writing
@@ -19,11 +24,14 @@ export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
   private writingTimeBuffer?: number;
 
 
-  // TODO: использовать props ???
-  constructor(driver: DigitalExpanderDriver, logError: (msg: string) => void, writeBufferMs?: number) {
-    this.context = context;
-    this.logic = logic;
-    this.writeBufferMs = writeBufferMs;
+  constructor(
+    driver: DigitalExpanderOutputDriver,
+    logError: (msg: string) => void,
+    props: Props
+  ) {
+    //this.context = context;
+    this.driver = driver;
+    this.props = props;
     this.queue = new QueueOverride(context.config.config.queueJobTimeoutSec);
   }
 
@@ -46,7 +54,7 @@ export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
   }
 
   async getPinResistorMode(pin: number): Promise<OutputResistorMode | undefined> {
-    return this.logic.getPinResistorMode(pin) as OutputResistorMode | undefined;
+    //return this.logic.getPinResistorMode(pin) as OutputResistorMode | undefined;
   }
 
   // // output and input pins can be read
@@ -75,5 +83,62 @@ export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
   clearAll(): Promise<void> {
 
   }
+
+
+
+  ////////////////// FROM driver
+
+  // /**
+  //  * Listen to changes of pin after edge and debounce were processed.
+  //  */
+  // onChange(pin: number, handler: ChangeHandler): number {
+  //   this.checkPinRange(pin);
+  //
+  //   return this.expanderInput.onChange(pin, handler);
+  // }
+  //
+  // removeListener(handlerIndex: number) {
+  //   this.expanderInput.removeListener(handlerIndex);
+  // }
+  //
+  // /**
+  //  * Poll expander manually.
+  //  */
+  // pollOnce = (): Promise<void> => {
+  //   // it is no need to do poll while initialization time because it will be done after initialization
+  //   if (!this.initIcLogic.wasInitialized) return Promise.resolve();
+  //
+  //   return this.i2c.pollOnce();
+  // }
+  //
+  // private startFeedback() {
+  //   // if I2C driver doesn't have feedback then it doesn't need to be setup
+  //   if (!this.i2c.hasFeedback()) return;
+  //
+  //   this.i2c.addListener(this.handleIcStateChange);
+  //   // make first request and start handle feedback
+  //   this.i2c.startFeedback();
+  // }
+  //
+  // private handleIcStateChange = (data: Uint8Array) => {
+  //
+  //   console.log('------- handleIcStateChange ---------', data)
+  //
+  //   if (!data || data.length !== DATA_LENGTH) {
+  //     return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
+  //   }
+  //
+  //   const receivedByte: number = data[0];
+  //
+  //   // update values add rise change event of input pins which are changed
+  //   for (let pin = 0; pin < PINS_COUNT; pin++) {
+  //     // skip not input pins
+  //     if (this.directions[pin] !== PinDirection.input) continue;
+  //
+  //     const newValue: boolean = getBitFromByte(receivedByte, pin);
+  //
+  //     this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
+  //   }
+  // }
 
 }
