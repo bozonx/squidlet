@@ -4,6 +4,7 @@ import DigitalExpanderLogic from './DigitalExpanderLogic';
 import QueueOverride from '../../lib/QueueOverride';
 import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import Context from '../../Context';
+import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
 
 
 export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
@@ -19,7 +20,7 @@ export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
 
 
   // TODO: использовать props ???
-  constructor(context: Context, logic: DigitalExpanderLogic, writeBufferMs?: number) {
+  constructor(driver: DigitalExpanderDriver, logError: (msg: string) => void, writeBufferMs?: number) {
     this.context = context;
     this.logic = logic;
     this.writeBufferMs = writeBufferMs;

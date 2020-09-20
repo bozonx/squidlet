@@ -1,3 +1,4 @@
+// TODO: нужен ли он, если есть DigitalExpanderInputLogic ????
 // TODO: test it
 
 import {Edge} from '../interfaces/gpioTypes';

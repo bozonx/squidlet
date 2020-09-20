@@ -2,6 +2,7 @@ import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DigitalExpanderLogic from './DigitalExpanderLogic';
 import Context from '../../Context';
+import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
 
 
 export default class DigitalExpanderInputLogic {
@@ -10,7 +11,7 @@ export default class DigitalExpanderInputLogic {
 
 
   // TODO: принимать logError ???
-  constructor(context: Context, logic: DigitalExpanderLogic) {
+  constructor(driver: DigitalExpanderDriver, logError: (msg: string) => void) {
     this.context = context;
     this.logic = logic;
   }
