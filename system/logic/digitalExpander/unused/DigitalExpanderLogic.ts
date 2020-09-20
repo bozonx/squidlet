@@ -1,3 +1,5 @@
+// TODO: remove
+
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../system/interfaces/gpioTypes';
 import {getBitFromByte, updateBitInByte} from 'system/lib/binaryHelpers';
 import DigitalExpanderDriver, {DigitalExpanderPinsProps} from './interfaces/DigitalExpanderDriver';
@@ -6,10 +8,6 @@ import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 
 export default class DigitalExpanderLogic {
   private readonly driver: DigitalExpanderDriver;
-  // buffer of pins which has to be set up
-  private setupBuffer: {[index: string]: DigitalExpanderPinsProps} = {};
-  private writeStateBuffer: {[index: string]: boolean} = {};
-  private currentState: {[index: string]: boolean} = {};
 
 
   constructor(driver: DigitalExpanderDriver) {
@@ -106,16 +104,6 @@ export default class DigitalExpanderLogic {
    * @return {Promise}
    */
   write(pin: number, value: boolean): Promise<void> {
-    if (this.directions[pin] !== PinDirection.output) {
-      return Promise.reject(new Error('Pin is not defined as an output'));
-    }
-
-    if (this.initIcLogic.isSetupStep) {
-      // update current value of pin and go out if there is setup step
-      this.updateState(pin, value);
-
-      return Promise.resolve();
-    }
 
     return this.driver.write(pin, value);
   }

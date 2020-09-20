@@ -1,7 +1,10 @@
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../interfaces/gpioTypes';
 
 
-export type DigitalExpanderDriverHandler = (newState: {[index: string]: boolean}) => void;
+export type DigitalExpanderDriverHandler = (
+  pin: number,
+  newState: {[index: string]: boolean}
+) => void;
 
 export interface DigitalExpanderPinsProps {
   direction: PinDirection;
@@ -22,6 +25,16 @@ export default interface DigitalExpanderDriver {
   setup(pinsProps: {[index: string]: DigitalExpanderPinsProps}): Promise<void>;
 
   getPinProps(pin: number): DigitalExpanderPinsProps | undefined;
+
+  /**
+   * Get the last actual state of all the pins input and output
+   */
+  getState(): {[index: string]: boolean};
+
+  /**
+   * Get the last actual state pin
+   */
+  getPinState(): {[index: string]: boolean};
 
   /**
    * Write output pins state

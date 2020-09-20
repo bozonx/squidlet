@@ -5,11 +5,14 @@
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import DigitalExpanderDriver from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
+import DigitalExpanderDriver, {
+  DigitalExpanderDriverHandler,
+  DigitalExpanderPinsProps
+} from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
+import {PinDirection} from 'system/interfaces/gpioTypes';
+import {updateBitInByte} from 'system/lib/binaryHelpers';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
-import {PinDirection} from '../../../system/interfaces/gpioTypes';
-import {updateBitInByte} from '../../../system/lib/binaryHelpers';
 
 
 // length of data to send and receive to IC
@@ -18,6 +21,8 @@ export const DATA_LENGTH = 1;
 
 export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements DigitalExpanderDriver {
   private i2c!: I2cMaster;
+  // buffer of pins which has to be set up
+  private setupBuffer: {[index: string]: DigitalExpanderPinsProps} = {};
 
 
   init = async () => {
@@ -31,6 +36,14 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
   }
 
 
+  async setup(pinsProps: {[index: string]: DigitalExpanderPinsProps}): Promise<void> {
+    // TODO: !!!!!
+  }
+
+  getPinProps(pin: number): DigitalExpanderPinsProps | undefined {
+    // TODO: !!!!!
+  }
+
   /**
    * Read whole state of IC.
    * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
@@ -39,11 +52,19 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
     return this.i2c.read(DATA_LENGTH);
   }
 
+  getState(): {[index: string]: boolean} {
+    // TODO: !!!!!
+  }
+
+  getPinState(): {[index: string]: boolean} {
+    // TODO: !!!!!
+  }
+
   /**
    * Write whole state to IC.
    * If IC has 8 pins then pass 1 byte if 16 then 2 bytes.
    */
-  async writeState(state: Uint8Array): Promise<void> {
+  writeState(state: {[index: string]: boolean}): Promise<void> {
 
     this.checkPinRange(pin);
     if (typeof this.directions[pin] !== 'undefined') {
@@ -86,6 +107,26 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
   }
 
   /**
+   * Read input pins state
+   */
+  doPoll(): Promise<void> {
+    // TODO: !!!!!
+  }
+
+  onChange(cb: DigitalExpanderDriverHandler): number {
+    // TODO: !!!!!
+  }
+
+  removeListener(handlerIndex: number): void {
+    // TODO: !!!!!
+  }
+
+  clearPin(pin: number): Promise<void> {
+    // TODO: !!!!!
+  }
+
+
+  /**
    * Just update state and don't save it to IC
    */
   private updateState = (pin: number, value: boolean) => {
@@ -103,6 +144,19 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
    * Write given state to the IC.
    */
   private writeToIc = (newStateByte: number): Promise<void> => {
+    if (this.directions[pin] !== PinDirection.output) {
+      return Promise.reject(new Error('Pin is not defined as an output'));
+    }
+
+    if (this.initIcLogic.isSetupStep) {
+      // update current value of pin and go out if there is setup step
+      this.updateState(pin, value);
+
+      return Promise.resolve();
+    }
+
+
+
     let preparedState: number = newStateByte;
 
     if (this.hasInputPins()) {
