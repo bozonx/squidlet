@@ -1,14 +1,17 @@
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DigitalExpanderLogic from './DigitalExpanderLogic';
+import Context from '../../Context';
 
 
 export default class DigitalExpanderInputLogic {
-  private logic: DigitalExpanderLogic;
+  private readonly context: Context;
+  private readonly logic: DigitalExpanderLogic;
 
 
   // TODO: принимать logError ???
-  constructor(logic: DigitalExpanderLogic) {
+  constructor(context: Context, logic: DigitalExpanderLogic) {
+    this.context = context;
     this.logic = logic;
   }
 
@@ -19,11 +22,11 @@ export default class DigitalExpanderInputLogic {
     debounce: number,
     edge: Edge
   ): Promise<void> {
-
+    return this.logic.setupInput(pin, inputMode, debounce, edge);
   }
 
-  getPinResistorMode(pin: number): Promise<InputResistorMode | undefined> {
-
+  async getPinResistorMode(pin: number): Promise<InputResistorMode | undefined> {
+    return this.logic.getPinResistorMode(pin) as InputResistorMode | undefined;
   }
 
   read(pin: number): Promise<boolean> {
