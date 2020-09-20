@@ -8,6 +8,8 @@ import DriverBase from 'system/base/DriverBase';
 import DigitalExpanderDriver from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
+import {PinDirection} from '../../../system/interfaces/gpioTypes';
+import {updateBitInByte} from '../../../system/lib/binaryHelpers';
 
 
 // length of data to send and receive to IC
@@ -42,11 +44,80 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
    * If IC has 8 pins then pass 1 byte if 16 then 2 bytes.
    */
   async writeState(state: Uint8Array): Promise<void> {
+
+    this.checkPinRange(pin);
+    if (typeof this.directions[pin] !== 'undefined') {
+      throw new Error(
+        `PCF8574Driver.setupInput(${pin}, ${debounce}). This pin has been already set up.` +
+        `Call "clearPin()" and try to set up again`
+      );
+    }
+
+    if (typeof debounce !== 'undefined') {
+      this.pinDebounces[pin] = debounce;
+    }
+    this.directions[pin] = PinDirection.input;
+
     if (state.length !== DATA_LENGTH) {
       throw new Error(`It is able to write 1 byte of state to IC`);
     }
 
+
+    // TODO: what to do with outputMode ???
+
+    this.checkPinRange(pin);
+
+    if (typeof this.directions[pin] !== 'undefined') {
+      throw new Error(
+        `PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up` +
+        `Call "clearPin()" and try to set up again`
+      );
+    }
+
+    this.directions[pin] = PinDirection.output;
+
+    if (typeof outputInitialValue !== 'undefined') {
+      this.updateState(pin, outputInitialValue);
+    }
+
+
+
     await this.i2c.write(state);
+  }
+
+  /**
+   * Just update state and don't save it to IC
+   */
+  private updateState = (pin: number, value: boolean) => {
+    // TODO: remake
+    this.currentState = updateBitInByte(this.currentState, pin, value);
+  }
+
+  private checkPinRange(pin: number) {
+    if (pin < 0 || pin >= PINS_COUNT) {
+      throw new Error(`Pin "${pin}" out of range`);
+    }
+  }
+
+  /**
+   * Write given state to the IC.
+   */
+  private writeToIc = (newStateByte: number): Promise<void> => {
+    let preparedState: number = newStateByte;
+
+    if (this.hasInputPins()) {
+      for (let pin = 0; pin < PINS_COUNT; pin++) {
+        if (this.directions[pin] !== PinDirection.input) continue;
+        // set height level for inputs. It needs for PCF IC
+        preparedState = updateBitInByte(preparedState, pin, true);
+      }
+    }
+
+    const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
+    // fill data
+    dataToSend[0] = preparedState;
+
+    return this.i2c.write(dataToSend);
   }
 
 }
