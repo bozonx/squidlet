@@ -11,6 +11,8 @@ export interface I2cMasterDriverProps {
 }
 
 
+// TODO: добавить простую очередь общую для write and read
+
 export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
   //protected sender!: Sender;
   // converted address string or number to hex. E.g '5a' => 90, 22 => 34
@@ -37,6 +39,13 @@ export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
   }
 
 
+  // TODO: add connection logic
+  /*
+   * * смотрим isConnected адреса
+   * * если connected то делаем запрос
+   * * если нет (ошибка что нет связи), то навешиваемся на onConnected, ждем 5 сек, если в течении этого времени не был отправлен запрос то rejected. (либо можно сделать повторный запрос)
+   * * если запрос не прошел во всех случаях, то сразу reject - с ошибкой что нет соединения
+   */
   write(data: Uint8Array): Promise<void> {
     this.log.debug(
       `I2cMaster driver write. busNum ${this.props.busNum}, ` +
@@ -53,6 +62,7 @@ export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
     // );
   }
 
+  // TODO: сделать такуюже connection логику что в write
   async read(length: number): Promise<Uint8Array> {
     const result: Uint8Array = await this.i2cMasterIo.i2cReadDevice(
       this.props.busNum,
@@ -73,6 +83,18 @@ export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
     );
 
     return result;
+  }
+
+  isConnected(): boolean {
+    // TODO: add
+  }
+
+  onConnected(cb: () => void): number {
+    // TODO: add
+  }
+
+  removeListener(handlerIndex: number) {
+    // TODO: add
   }
 
   // private makeSenderId(functionHex: number | undefined, method: string, ...params: (string | number)[]) {
