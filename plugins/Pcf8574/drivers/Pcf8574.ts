@@ -5,11 +5,12 @@
 
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
-import DigitalExpanderDriver, {
+import {
   DigitalExpanderDriverHandler,
-  DigitalExpanderPinsProps
+  DigitalExpanderOutputDriver,
+  DigitalExpanderInputDriver
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
-import {PinDirection} from 'system/interfaces/gpioTypes';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {updateBitInByte} from 'system/lib/binaryHelpers';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
@@ -19,7 +20,10 @@ import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMast
 export const DATA_LENGTH = 1;
 
 
-export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements DigitalExpanderDriver {
+export class Pcf8574
+  extends DriverBase<I2cMasterDriverProps>
+  implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
+{
   private i2c!: I2cMaster;
   // buffer of pins which has to be set up
   private setupBuffer: {[index: string]: DigitalExpanderPinsProps} = {};
@@ -36,29 +40,31 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
   }
 
 
-  async setup(pinsProps: {[index: string]: DigitalExpanderPinsProps}): Promise<void> {
+  setupOutput(
+    pin: number,
+    resistor?: OutputResistorMode,
+    initialValue?: boolean
+  ): Promise<void> {
     // TODO: !!!!!
   }
 
-  getPinProps(pin: number): DigitalExpanderPinsProps | undefined {
+  setupInput(
+    pin: number,
+    resistor: InputResistorMode,
+    debounce?: number,
+    edge?: Edge
+  ): Promise<void> {
     // TODO: !!!!!
   }
 
-  /**
-   * Read whole state of IC.
-   * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
-   */
-  async readState(): Promise<Uint8Array> {
-    return this.i2c.read(DATA_LENGTH);
-  }
 
-  getState(): {[index: string]: boolean} {
-    // TODO: !!!!!
-  }
-
-  getPinState(): {[index: string]: boolean} {
-    // TODO: !!!!!
-  }
+  // /**
+  //  * Read whole state of IC.
+  //  * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
+  //  */
+  // async readState(): Promise<Uint8Array> {
+  //   return this.i2c.read(DATA_LENGTH);
+  // }
 
   /**
    * Write whole state to IC.

@@ -1,11 +1,10 @@
 import QueueOverride from '../../lib/QueueOverride';
-import {updateBitInByte} from '../../lib/binaryHelpers';
 import BufferedRequest from '../../lib/BufferedRequest';
 
 
 export default class DigitalOutputLogic {
   private readonly logError: (msg: Error | string) => void;
-  private readonly writeCb: (state: {[index: string]: boolean}) => Promise<void>;
+  private readonly writeCb: (changedState: {[index: string]: boolean}) => Promise<void>;
   private readonly writeBufferMs?: number;
   private readonly queue: QueueOverride;
   private readonly bufferedRequest: BufferedRequest;
@@ -16,7 +15,7 @@ export default class DigitalOutputLogic {
 
   constructor(
     logError: (msg: Error | string) => void,
-    writeCb: (state: {[index: string]: boolean}) => Promise<void>,
+    writeCb: (changedState: {[index: string]: boolean}) => Promise<void>,
     queueJobTimeoutSec?: number,
     writeBufferMs?: number
   ) {
@@ -74,10 +73,9 @@ export default class DigitalOutputLogic {
   }
 
   cancel() {
-    this.debounce.clear();
+    this.bufferedRequest.cancel();
     this.queue.stop();
 
-    delete this.beforeWritingBuffer;
     delete this.writingTimeBuffer;
   }
 
@@ -103,24 +101,23 @@ export default class DigitalOutputLogic {
       throw new Error(`no writingTimeBuffer`);
     }
 
-    const state: number = this.writingTimeBuffer;
+    const changedState: {[index: string]: boolean} = {...this.writingTimeBuffer};
+    const writtenState: {[index: string]: boolean} = {...this.writingTimeBuffer};
 
-    try {
-      await this.writeCb(state);
-    }
-    catch(e) {
-      delete this.writingTimeBuffer;
-      // the queue will be canceled
-      throw e;
-    }
+    delete this.writingTimeBuffer;
 
-    if (!this.queue.hasQueue()) {
-      // remove buffer if there aren't no queue
-      delete this.writingTimeBuffer;
-    }
+    await this.writeCb(changedState);
+
+    // if (!this.queue.hasQueue()) {
+    //   // remove buffer if there aren't no queue
+    //   delete this.writingTimeBuffer;
+    // }
 
     // set a new state which has been just saved
-    this.setState(state);
+    this.state = {
+      ...this.state,
+      ...writtenState,
+    };
   }
 
 }
