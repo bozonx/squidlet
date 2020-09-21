@@ -5,7 +5,7 @@ import Context from '../../Context';
 import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
 
 
-export default class DigitalExpanderInputLogic {
+export default class DigitalExpanderInput {
   private readonly context: Context;
   private readonly logic: DigitalExpanderLogic;
 
