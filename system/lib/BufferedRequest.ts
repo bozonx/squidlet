@@ -29,6 +29,8 @@ export default class BufferedRequest {
   }
 
   async write(state: {[index: string]: any}): Promise<void> {
+    // TODO: если this.writeBufferMs = 0 то можно сразу выполнять
+
     if (this.beforeWritingBuffer) {
       // second and further requests
       // update buffered state
@@ -39,7 +41,7 @@ export default class BufferedRequest {
     }
     else {
       // a new request, make a new buffer
-      if (!this.beforeWritingBuffer) this.beforeWritingBuffer = state;
+      this.beforeWritingBuffer = { ...state };
     }
 
     return this.debounce.invoke(this.doWriteCb, this.writeBufferMs);
