@@ -19,6 +19,8 @@ export default class BufferedRequest {
 
   destroy() {
     this.debounce.destroy();
+
+    delete this.beforeWritingBuffer;
   }
 
 
@@ -27,12 +29,20 @@ export default class BufferedRequest {
   }
 
   async write(state: {[index: string]: any}): Promise<void> {
-    // in case it is writing at the moment - save buffer and add cb to queue
-    if (this.isBuffering()) {
-      return this.invokeBuffering(state);
+    if (this.beforeWritingBuffer) {
+      // second and further requests
+      // update buffered state
+      this.beforeWritingBuffer = {
+        ...this.beforeWritingBuffer,
+        ...state,
+      };
     }
-    // else if buffering doesn't set - just start writing
-    return this.startBuffering(state);
+    else {
+      // a new request, make a new buffer
+      if (!this.beforeWritingBuffer) this.beforeWritingBuffer = state;
+    }
+
+    return this.debounce.invoke(this.doWriteCb, this.writeBufferMs);
   }
 
   cancel() {
@@ -46,28 +56,6 @@ export default class BufferedRequest {
     this.doWriteCb();
   }
 
-
-  private startBuffering(state: {[index: string]: any}) {
-    if (!this.beforeWritingBuffer) this.beforeWritingBuffer = state;
-
-    return this.debounce.invoke(this.doWriteCb, this.writeBufferMs);
-  }
-
-  /**
-   * This method is called while buffering time.
-   * All the changes are buffered and only the last one will be written.
-   */
-  private async invokeBuffering(state: {[index: string]: any}): Promise<void> {
-    // the buffer has to be set
-    if (typeof this.beforeWritingBuffer === 'undefined') return;
-    // set value to buffer
-    this.beforeWritingBuffer = {
-      ...this.beforeWritingBuffer,
-      ...state,
-    };
-    // only the last one cb will be called
-    return this.debounce.invoke(this.doWriteCb, this.writeBufferMs);
-  }
 
   private doWriteCb = () => {
     // the buffer has to be set
