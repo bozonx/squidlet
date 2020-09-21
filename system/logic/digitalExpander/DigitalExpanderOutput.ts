@@ -10,7 +10,7 @@ interface Props {
 }
 
 
-export default class DigitalExpanderOutputLogic implements DigitalOutputIo {
+export default class DigitalExpanderOutput implements DigitalOutputIo {
   private readonly driver: DigitalExpanderOutputDriver;
   private readonly logic: DigitalOutputLogic;
 

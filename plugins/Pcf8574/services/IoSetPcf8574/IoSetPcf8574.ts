@@ -1,8 +1,8 @@
 import ServiceBase from 'system/base/ServiceBase';
 import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
-import DigitalExpanderInputLogic from 'system/logic/digitalExpander/DigitalExpanderInputLogic';
-import DigitalExpanderOutputLogic from 'system/logic/digitalExpander/DigitalExpanderOutputLogic';
+import DigitalExpanderInput from 'system/logic/digitalExpander/DigitalExpanderInput';
+import DigitalExpanderOutput from 'system/logic/digitalExpander/DigitalExpanderOutput';
 import DigitalExpanderDriver from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 
 import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
@@ -15,8 +15,8 @@ type ExpanderIoItemClass = new (
 ) => void;
 
 const ios: {[index: string]: ExpanderIoItemClass} = {
-  DigitalInput: DigitalExpanderInputLogic,
-  DigitalOutput: DigitalExpanderOutputLogic,
+  DigitalInput: DigitalExpanderInput,
+  DigitalOutput: DigitalExpanderOutput,
 };
 
 
