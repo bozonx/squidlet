@@ -76,13 +76,13 @@ export default class DigitalOutput implements DigitalOutputIo {
   //   return PinDirection.output;
   // }
 
-  /**
-   * Get pin mode.
-   * It throws an error if pin hasn't configured before
-   */
-  async getPinResistorMode(pin: number): Promise<OutputResistorMode | undefined> {
-    return this.resistors[pin];
-  }
+  // /**
+  //  * Get pin mode.
+  //  * It throws an error if pin hasn't configured before
+  //  */
+  // async getPinResistorMode(pin: number): Promise<OutputResistorMode | undefined> {
+  //   return this.resistors[pin];
+  // }
 
   // async read(pin: number): Promise<boolean> {
   //   if (!this.client.connected) throw new Error(`Pigpio client hasn't been connected`);

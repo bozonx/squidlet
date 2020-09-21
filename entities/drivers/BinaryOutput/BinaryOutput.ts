@@ -106,6 +106,13 @@ export class BinaryOutput extends DriverBase<BinaryOutputProps> {
     return resolveOutputResistorMode(this.props.openDrain);
   }
 
+  // async getPinResistorMode(pin: number): Promise<OutputResistorMode | undefined> {
+  //   //return this.logic.getPinResistorMode(pin) as OutputResistorMode | undefined;
+  // }
+
+  // // output and input pins can be read
+  // read(pin: number): Promise<boolean>;
+
   isBlocked(): boolean {
     return Boolean(this.blockTimeout);
   }

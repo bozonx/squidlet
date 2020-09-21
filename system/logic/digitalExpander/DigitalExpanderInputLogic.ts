@@ -26,9 +26,9 @@ export default class DigitalExpanderInputLogic {
     return this.logic.setupInput(pin, inputMode, debounce, edge);
   }
 
-  async getPinResistorMode(pin: number): Promise<InputResistorMode | undefined> {
-    return this.logic.getPinResistorMode(pin) as InputResistorMode | undefined;
-  }
+  // async getPinResistorMode(pin: number): Promise<InputResistorMode | undefined> {
+  //   return this.logic.getPinResistorMode(pin) as InputResistorMode | undefined;
+  // }
 
   read(pin: number): Promise<boolean> {
 

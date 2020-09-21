@@ -1,13 +1,13 @@
-import QueueOverride from '../../../lib/QueueOverride';
-import {updateBitInByte} from '../../../lib/binaryHelpers';
-import DebounceCall from '../../../lib/debounceCall/DebounceCall';
+import QueueOverride from '../../lib/QueueOverride';
+import {updateBitInByte} from '../../lib/binaryHelpers';
+import DebounceCall from '../../lib/debounceCall/DebounceCall';
 
 
 export default class DigitalOutputLogic {
   private readonly logError: (msg: Error | string) => void;
-  private readonly writeCb: (state: number) => Promise<void>;
-  private readonly getState: () => number;
-  private readonly setState: (wholeState: number) => void;
+  private readonly writeCb: (state: {[index: string]: boolean}) => Promise<void>;
+  // private readonly getState: () => number;
+  // private readonly setState: (wholeState: number) => void;
   private readonly writeBufferMs?: number;
   private readonly queue: QueueOverride;
   private readonly debounce = new DebounceCall();
@@ -19,16 +19,16 @@ export default class DigitalOutputLogic {
 
   constructor(
     logError: (msg: Error | string) => void,
-    writeCb: (state: number) => Promise<void>,
-    getState: () => number,
-    setState: (wholeState: number) => void,
+    writeCb: (state: {[index: string]: boolean}) => Promise<void>,
+    // getState: () => number,
+    // setState: (wholeState: number) => void,
     queueJobTimeoutSec?: number,
     writeBufferMs?: number
   ) {
     this.logError = logError;
     this.writeCb = writeCb;
-    this.getState = getState;
-    this.setState = setState;
+    // this.getState = getState;
+    // this.setState = setState;
     this.writeBufferMs = writeBufferMs;
     this.queue = new QueueOverride(queueJobTimeoutSec);
   }
@@ -38,6 +38,13 @@ export default class DigitalOutputLogic {
     this.debounce.destroy();
   }
 
+
+  /**
+   * Get the last actual state of all the pins input and output
+   */
+  getState(): {[index: string]: boolean} {
+
+  }
 
   isInProgress(): boolean {
     return this.isBuffering() || this.isWriting();
@@ -67,6 +74,7 @@ export default class DigitalOutputLogic {
     return this.startWriting(stateToWrite);
   }
 
+  // TODO: use state ad {[index: string]: boolean}
   /**
    * Force write full state
    */
@@ -97,6 +105,10 @@ export default class DigitalOutputLogic {
 
     delete this.beforeWritingBuffer;
     delete this.writingTimeBuffer;
+  }
+
+  clearPin(pin: number) {
+    // TODO: add
   }
 
 

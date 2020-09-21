@@ -140,6 +140,22 @@ export class Pcf8574 extends DriverBase<I2cMasterDriverProps> implements Digital
     }
   }
 
+  // write(pin: number, value: boolean): Promise<void> {
+  //   // in case it is writing at the moment - save buffer and add cb to queue
+  //   if (this.isWriting()) {
+  //     return this.invokeAtWritingTime(pin, value);
+  //   }
+  //   // start buffering step or update buffer
+  //   else if(this.writeBufferMs) {
+  //     // in buffering case collect data at the buffering time (before writing)
+  //     return this.invokeBuffering(pin, value);
+  //   }
+  //   // else if buffering doesn't set - just start writing
+  //   const stateToWrite = updateBitInByte(this.getState(), pin, value);
+  //
+  //   return this.startWriting(stateToWrite);
+  // }
+
   /**
    * Write given state to the IC.
    */
