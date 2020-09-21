@@ -7,7 +7,7 @@ export type ChangeHandler = (level: boolean) => void;
 
 export const Methods = [
   'setupInput',
-  'getPinResistorMode',
+  //'getPinResistorMode',
   'read',
   'onChange',
   'removeListener',
@@ -33,16 +33,16 @@ export default interface DigitalInputIo extends IoItem {
 
   //getPinDirection(pin: number): Promise<PinDirection | undefined>;
 
-  /**
-   * Get resistor pin mode.
-   * To be sure about direction, please check it before.
-   * Results might be:
-   * * undefined - pin hasn't been set up
-   * * 0 - resistor isn't used
-   * * 1 - pullUp
-   * * 2 - pullDown
-   */
-  getPinResistorMode(pin: number): Promise<InputResistorMode | undefined>;
+  // /**
+  //  * Get resistor pin mode.
+  //  * To be sure about direction, please check it before.
+  //  * Results might be:
+  //  * * undefined - pin hasn't been set up
+  //  * * 0 - resistor isn't used
+  //  * * 1 - pullUp
+  //  * * 2 - pullDown
+  //  */
+  // getPinResistorMode(pin: number): Promise<InputResistorMode | undefined>;
 
   read(pin: number): Promise<boolean>;
 

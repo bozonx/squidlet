@@ -88,13 +88,13 @@ export default class DigitalInput implements DigitalInputIo {
     return this.pinParams[pin]?.direction;
   }
 
-  /**
-   * Get pin mode.
-   * It throws an error if pin hasn't configured before
-   */
-  async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    return this.pinParams[pin]?.resistor;
-  }
+  // /**
+  //  * Get pin mode.
+  //  * It throws an error if pin hasn't configured before
+  //  */
+  // async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
+  //   return this.pinParams[pin]?.resistor;
+  // }
 
   async read(pin: number): Promise<boolean> {
     return this.simpleRead(pin);

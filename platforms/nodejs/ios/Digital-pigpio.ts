@@ -100,9 +100,9 @@ export default class DigitalPigpio implements DigitalInputIo {
     return this.resolvePinDirection(pin);
   }
 
-  async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
-    return this.resistors[pin];
-  }
+  // async getPinResistorMode(pin: number): Promise<InputResistorMode | OutputResistorMode | undefined> {
+  //   return this.resistors[pin];
+  // }
 
   async read(pin: number): Promise<boolean> {
     return this.simpleRead(pin);
