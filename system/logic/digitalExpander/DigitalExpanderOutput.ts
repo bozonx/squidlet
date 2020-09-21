@@ -17,8 +17,8 @@ export default class DigitalExpanderOutput implements DigitalOutputIo {
 
   constructor(
     driver: DigitalExpanderOutputDriver,
+    logError: (msg: Error | string) => void,
     props: Props,
-    logError: (msg: Error | string) => void
   ) {
     this.driver = driver;
     this.logic = new DigitalOutputLogic(
