@@ -53,37 +53,24 @@ export default class DigitalOutputLogic {
   }
 
   write(pin: number, value: boolean): Promise<void> {
-    // in case it is writing at the moment - save buffer and add cb to queue
-    if (this.isWriting()) {
-      return this.invokeAtWritingTime(pin, value);
-    }
-    // else it is in a buffering state or it is a new request
-    return this.bufferedRequest.write({[pin]: value});
+    return this.writeState({[pin]: value});
   }
 
-  // TODO: review
   /**
-   * Force write full state
+   * Force write full or partial state
    */
-  async writeState(state: {[index: string]: boolean}): Promise<void> {
-    // if buffering time - clear buffer and start write immediately
-    if (this.isBuffering()) {
-      this.debounce.clear();
-
-      delete this.beforeWritingBuffer;
-    }
-
-    // in case it is writing at the moment - replace buffer and add cb to queue
-    if (this.isWriting()) {
-      // TODO: review
-      this.writingTimeBuffer = state;
-      // collect data into buffer
-
-      // add to queue. It will be called after current writing has been done
+  async writeState(partialState: {[index: string]: boolean}): Promise<void> {
+    if (this.writingTimeBuffer) {
+      // Second and further time
+      // update writing buffer
+      this.writingTimeBuffer = {
+        ...this.writingTimeBuffer,
+        ...partialState,
+      };
       return this.queue.add(this.doWriteCb);
     }
-    // else if writing isn't processing - just start a new writing
-    return this.startWriting(state);
+    // else it is in a buffering state or it is a new request
+    return this.bufferedRequest.write(partialState);
   }
 
   cancel() {
@@ -102,60 +89,11 @@ export default class DigitalOutputLogic {
 
 
   /**
-   * This method is called while buffering time.
-   * All the changes are buffered and only the last one will be written.
-   */
-  private invokeBuffering(pin: number, value: boolean): Promise<void> {
-
-    // TODO: сюда попадаем на второй раз, а на первый раз как устанавливается state
-
-    // collect data into buffer
-    if (typeof this.beforeWritingBuffer === 'undefined') {
-      this.beforeWritingBuffer = {
-        ...this.getState(),
-      };
-    }
-    // set value to buffer
-    this.beforeWritingBuffer[pin] = value;
-    // only the last one cb will be called
-    return this.debounce.invoke(() => {
-      if (typeof this.beforeWritingBuffer === 'undefined') {
-        return this.logError(`No buffer`);
-      }
-
-      const lastBufferedState: number = this.beforeWritingBuffer;
-      // remove buffer which was used before writing has been started
-      delete this.beforeWritingBuffer;
-
-      // flush buffer which has been collected at buffering time
-      this.startWriting(lastBufferedState)
-        .catch(this.logError);
-    }, this.writeBufferMs);
-  }
-
-  /**
-   * Add writing to queue while current writing is in progress.
-   * It can be called several times.
-   */
-  private invokeAtWritingTime(pin: number, value: boolean): Promise<void> {
-    if (typeof this.writingTimeBuffer === 'undefined') {
-      throw new Error(`no writingTimeBuffer`);
-    }
-
-    this.writingTimeBuffer = updateBitInByte(this.writingTimeBuffer, pin, value);
-    // collect data into buffer
-
-    // add to queue. It will be called after current writing has been done
-    return this.queue.add(this.doWriteCb);
-  }
-
-  // TODO: это вызывается сразу после буферизации
-  /**
-   * Start a new writing. It has to be called only once.
+   * Start a new writing.
+   * It is called after buffering time.
    */
   private startWriting = (stateToSave: {[index: string]: boolean}): Promise<void> => {
-    // TODO:  почему сюда а не в bufferTime
-    this.writingTimeBuffer = stateToSave;
+    this.writingTimeBuffer = {...stateToSave};
 
     return this.queue.add(this.doWriteCb);
   }
