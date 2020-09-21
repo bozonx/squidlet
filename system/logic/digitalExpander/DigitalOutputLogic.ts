@@ -9,8 +9,6 @@ export default class DigitalOutputLogic {
   private readonly writeBufferMs?: number;
   private readonly queue: QueueOverride;
   private readonly bufferedRequest: BufferedRequest;
-  // temporary state while values are buffering before writing
-  private beforeWritingBuffer?: {[index: string]: boolean};
   // temporary state while writing
   private writingTimeBuffer?: {[index: string]: boolean};
   private state: {[index: string]: boolean} = {};
@@ -31,7 +29,7 @@ export default class DigitalOutputLogic {
 
   destroy() {
     this.queue.destroy();
-    this.debounce.destroy();
+    this.bufferedRequest.destroy();
   }
 
 
@@ -47,7 +45,7 @@ export default class DigitalOutputLogic {
   }
 
   isBuffering(): boolean {
-    return typeof this.beforeWritingBuffer !== 'undefined';
+    return this.bufferedRequest.isBuffering();
   }
 
   isWriting(): boolean {
@@ -59,13 +57,8 @@ export default class DigitalOutputLogic {
     if (this.isWriting()) {
       return this.invokeAtWritingTime(pin, value);
     }
-    // start buffering step or update buffer
-    else if(this.writeBufferMs) {
-      // in buffering case collect data at the buffering time (before writing)
-      return this.invokeBuffering(pin, value);
-    }
-    // else if buffering doesn't set - just start writing
-    return this.startWriting({[pin]: value});
+    // else it is in a buffering state or it is a new request
+    return this.bufferedRequest.write({[pin]: value});
   }
 
   // TODO: review
