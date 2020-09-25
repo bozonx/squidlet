@@ -48,16 +48,6 @@ export class Pcf8574
     // TODO: !!!!!
   }
 
-  setupInput(
-    pin: number,
-    resistor: InputResistorMode,
-    debounce?: number,
-    edge?: Edge
-  ): Promise<void> {
-    // TODO: !!!!!
-  }
-
-
   // /**
   //  * Read whole state of IC.
   //  * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
@@ -112,10 +102,22 @@ export class Pcf8574
     await this.i2c.write(state);
   }
 
+
+  ////////// Input's
+
+  setupInput(
+    pin: number,
+    resistor: InputResistorMode,
+    debounce?: number,
+    edge?: Edge
+  ): Promise<void> {
+    // TODO: !!!!!
+  }
+
   /**
    * Read input pins state
    */
-  doPoll(): Promise<void> {
+  doPoll = async (): Promise<void> => {
     // TODO: !!!!!
   }
 
@@ -126,6 +128,8 @@ export class Pcf8574
   removeListener(handlerIndex: number): void {
     // TODO: !!!!!
   }
+
+  ////////// Common
 
   clearPin(pin: number): Promise<void> {
     // TODO: !!!!!

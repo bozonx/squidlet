@@ -1,14 +1,14 @@
-import DebounceCall from '../debounceCall/DebounceCall';
-import {ChangeHandler} from '../../interfaces/io/DigitalIo';
-import IndexedEventEmitter from '../IndexedEventEmitter';
-import {getBitFromByte} from '../binaryHelpers';
+import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
+import DebounceCall from '../../lib/debounceCall/DebounceCall';
+import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
+import {getBitFromByte} from '../../lib/binaryHelpers';
+import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 
 
-export default class DigitalPortExpanderInputLogic {
+export default class DigitalInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
-  private readonly getState: () => number;
-  private readonly updateState: (pin: number, value: boolean) => void;
+  //private readonly updateState: (pin: number, value: boolean) => void;
   // promise while poll is in progress
   private pollPromise?: Promise<void>;
   // there are stored pins which are changed while polling
@@ -20,14 +20,10 @@ export default class DigitalPortExpanderInputLogic {
 
   constructor(
     logError: (msg: Error | string) => void,
-    pollOnce: () => Promise<void>,
-    getState: () => number,
-    updateState: (pin: number, value: boolean) => void,
+    pollOnce: () => Promise<void>
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;
-    this.getState = getState;
-    this.updateState = updateState;
   }
 
   destroy() {
@@ -39,6 +35,19 @@ export default class DigitalPortExpanderInputLogic {
   }
 
 
+  setupInput(
+    pin: number,
+    resistor: InputResistorMode,
+    debounce?: number,
+    edge?: Edge
+  ): Promise<void> {
+    // TODO: do it
+  }
+
+  getState(): {[index: string]: boolean} {
+    // TODO: do it
+  }
+
   isInProgress(pin: number) {
     return this.debounce.isInvoking(pin) || this.isPollInProgress();
   }
@@ -48,15 +57,24 @@ export default class DigitalPortExpanderInputLogic {
   }
 
   /**
-   * Listen to changes of pin after debounce was processed.
+   * Handle driver's income message
+   * @param pin
+   * @param newState
    */
-  onChange(pin: number, handler: ChangeHandler): number {
-    return this.events.addListener(pin, handler);
+  handleIncomeState = (pin: number, newState: {[index: string]: boolean}) => {
+
   }
 
-  removeListener(handlerIndex: number) {
-    this.events.removeListener(handlerIndex);
-  }
+  // /**
+  //  * Listen to changes of pin after debounce was processed.
+  //  */
+  // onChange(pin: number, handler: ChangeHandler): number {
+  //   return this.events.addListener(pin, handler);
+  // }
+  //
+  // removeListener(handlerIndex: number) {
+  //   this.events.removeListener(handlerIndex);
+  // }
 
   /**
    * State which is income after poling request.
