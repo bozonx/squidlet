@@ -12,7 +12,7 @@ export interface DigitalExpanderInputProps {
 }
 
 
-export default class DigitalExpanderInput implements DigitalInputIo {
+export default class DigitalInput implements DigitalInputIo {
   private readonly driver: DigitalExpanderInputDriver;
   private readonly logic: DigitalInputLogic;
   private readonly useLocalDebounce: boolean;
