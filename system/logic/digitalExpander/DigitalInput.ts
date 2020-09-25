@@ -1,7 +1,7 @@
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
-import DigitalInputLogic from './DigitalInputLogic';
+import DigitalExpanderInputLogic from './DigitalExpanderInputLogic';
 
 
 export interface DigitalExpanderInputProps {
@@ -14,7 +14,7 @@ export interface DigitalExpanderInputProps {
 
 export default class DigitalInput implements DigitalInputIo {
   private readonly driver: DigitalExpanderInputDriver;
-  private readonly logic: DigitalInputLogic;
+  private readonly logic: DigitalExpanderInputLogic;
   private readonly useLocalDebounce: boolean;
 
 
@@ -24,7 +24,7 @@ export default class DigitalInput implements DigitalInputIo {
     props: DigitalExpanderInputProps,
   ) {
     this.driver = driver;
-    this.logic = new DigitalInputLogic(
+    this.logic = new DigitalExpanderInputLogic(
       logError,
       this.driver.doPoll
     );
