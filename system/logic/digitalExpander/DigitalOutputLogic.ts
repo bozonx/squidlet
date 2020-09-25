@@ -6,8 +6,8 @@ export default class DigitalOutputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (changedState: {[index: string]: boolean}) => Promise<void>;
   private readonly writeBufferMs?: number;
-  private readonly queue: QueueOverride;
   private readonly bufferedRequest: BufferedRequest;
+  private readonly queue: QueueOverride;
   // temporary state while writing
   private writingTimeBuffer?: {[index: string]: boolean};
   private state: {[index: string]: boolean} = {};
@@ -22,8 +22,8 @@ export default class DigitalOutputLogic {
     this.logError = logError;
     this.writeCb = writeCb;
     this.writeBufferMs = writeBufferMs;
-    this.queue = new QueueOverride(queueJobTimeoutSec);
     this.bufferedRequest = new BufferedRequest(this.startWriting, writeBufferMs);
+    this.queue = new QueueOverride(queueJobTimeoutSec);
   }
 
   destroy() {
@@ -33,7 +33,7 @@ export default class DigitalOutputLogic {
 
 
   /**
-   * Get the last actual state of all the pins input and output
+   * Get the last actual state of all the output pins
    */
   getState(): {[index: string]: boolean} {
     return this.state;

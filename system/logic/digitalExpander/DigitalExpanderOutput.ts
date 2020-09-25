@@ -4,7 +4,7 @@ import {DigitalExpanderOutputDriver} from './interfaces/DigitalExpanderDriver';
 import DigitalOutputLogic from './DigitalOutputLogic';
 
 
-interface Props {
+export interface DigitalExpanderOutputProps {
   writeBufferMs?: number;
   queueJobTimeoutSec?: number;
 }
@@ -18,7 +18,7 @@ export default class DigitalExpanderOutput implements DigitalOutputIo {
   constructor(
     driver: DigitalExpanderOutputDriver,
     logError: (msg: Error | string) => void,
-    props: Props,
+    props: DigitalExpanderOutputProps,
   ) {
     this.driver = driver;
     this.logic = new DigitalOutputLogic(
