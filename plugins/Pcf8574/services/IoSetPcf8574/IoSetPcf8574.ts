@@ -3,15 +3,18 @@ import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
 import DigitalExpanderInput, {DigitalExpanderInputProps} from 'system/logic/digitalExpander/DigitalExpanderInput';
 import DigitalExpanderOutput, {DigitalExpanderOutputProps} from 'system/logic/digitalExpander/DigitalExpanderOutput';
-import DigitalExpanderDriver from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
+import {
+  DigitalExpanderInputDriver,
+  DigitalExpanderOutputDriver
+} from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 
 import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
 import {Pcf8574} from '../../drivers/Pcf8574';
 
 
 type ExpanderIoItemClass = new (
-  driver: DigitalExpanderDriver,
-  logError: (msg: string) => void,
+  driver: DigitalExpanderOutputDriver | DigitalExpanderInputDriver,
+  logError: (msg: Error | string) => void,
   props: DigitalExpanderOutputProps | DigitalExpanderInputProps
 ) => void;
 

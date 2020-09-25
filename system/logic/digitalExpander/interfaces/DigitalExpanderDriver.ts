@@ -39,12 +39,15 @@ export interface DigitalExpanderOutputDriver {
 export interface DigitalExpanderInputDriver {
   /**
    * Setup one or more pins. It can be called several times.
+   * It isn't possible to handle Edge at microcontroller side because of interface which
+   * is used. Edge is processing at local side.
+   * If debounce exists on microcontroller side then define some number.
+   * If doesn't exist or there no need to use debounce then don't define it or set to undefined.
    */
   setupInput(
     pin: number,
     resistor: InputResistorMode,
-    debounce?: number,
-    edge?: Edge
+    debounce: number,
   ): Promise<void>;
 
   /**

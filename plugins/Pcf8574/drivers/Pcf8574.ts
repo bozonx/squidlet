@@ -108,8 +108,7 @@ export class Pcf8574
   setupInput(
     pin: number,
     resistor: InputResistorMode,
-    debounce?: number,
-    edge?: Edge
+    debounce: number,
   ): Promise<void> {
     // TODO: !!!!!
   }
