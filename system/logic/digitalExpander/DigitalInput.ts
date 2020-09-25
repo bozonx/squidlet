@@ -58,7 +58,7 @@ export default class DigitalInput implements DigitalInputIo {
 
     await this.driver.setupInput(pin, inputMode, remoteDebounce);
 
-    return this.logic.setupInput(pin, inputMode, localDebounce, edge);
+    return this.logic.setupPin(pin, inputMode, localDebounce, edge);
   }
 
   /**
