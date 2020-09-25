@@ -62,19 +62,19 @@ export default class DigitalInputLogic {
    * @param newState
    */
   handleIncomeState = (pin: number, newState: {[index: string]: boolean}) => {
-
+    // TODO: do it !!!
   }
 
-  // /**
-  //  * Listen to changes of pin after debounce was processed.
-  //  */
-  // onChange(pin: number, handler: ChangeHandler): number {
-  //   return this.events.addListener(pin, handler);
-  // }
-  //
-  // removeListener(handlerIndex: number) {
-  //   this.events.removeListener(handlerIndex);
-  // }
+  /**
+   * Listen to changes of pin after debounce was processed.
+   */
+  onChange(pin: number, handler: ChangeHandler): number {
+    return this.events.addListener(pin, handler);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex);
+  }
 
   /**
    * State which is income after poling request.
