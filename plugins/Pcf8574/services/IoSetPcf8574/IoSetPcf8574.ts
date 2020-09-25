@@ -1,8 +1,8 @@
 import ServiceBase from 'system/base/ServiceBase';
 import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
-import DigitalExpanderInput, {DigitalExpanderInputProps} from 'system/logic/digitalExpander/DigitalExpanderInput';
-import DigitalExpanderOutput, {DigitalExpanderOutputProps} from 'system/logic/digitalExpander/DigitalExpanderOutput';
+import DigitalInput, {DigitalExpanderInputProps} from 'system/logic/digitalExpander/DigitalInput';
+import DigitalOutput, {DigitalExpanderOutputProps} from 'system/logic/digitalExpander/DigitalOutput';
 import {
   DigitalExpanderInputDriver,
   DigitalExpanderOutputDriver
@@ -19,8 +19,8 @@ type ExpanderIoItemClass = new (
 ) => void;
 
 const ios: {[index: string]: ExpanderIoItemClass} = {
-  DigitalInput: DigitalExpanderInput,
-  DigitalOutput: DigitalExpanderOutput,
+  DigitalInput,
+  DigitalOutput,
 };
 
 

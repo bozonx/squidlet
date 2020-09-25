@@ -10,7 +10,7 @@ export interface DigitalExpanderOutputProps {
 }
 
 
-export default class DigitalExpanderOutput implements DigitalOutputIo {
+export default class DigitalOutput implements DigitalOutputIo {
   private readonly driver: DigitalExpanderOutputDriver;
   private readonly logic: DigitalOutputLogic;
 
