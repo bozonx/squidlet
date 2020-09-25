@@ -1,4 +1,4 @@
-import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
+import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
 import {getBitFromByte} from '../../lib/binaryHelpers';
@@ -8,14 +8,17 @@ import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 export default class DigitalInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
-  //private readonly updateState: (pin: number, value: boolean) => void;
+
+  // TODO: review
   // promise while poll is in progress
   private pollPromise?: Promise<void>;
   // there are stored pins which are changed while polling
   private polledPinsBuffer?: {[index: string]: boolean};
+
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
+  private state: {[index: string]: boolean} = {};
 
 
   constructor(
@@ -35,6 +38,13 @@ export default class DigitalInputLogic {
   }
 
 
+  /**
+   * To use debounce at microcontroller side set debounce to 0.
+   * @param pin
+   * @param resistor
+   * @param debounce
+   * @param edge
+   */
   setupInput(
     pin: number,
     resistor: InputResistorMode,
@@ -45,7 +55,7 @@ export default class DigitalInputLogic {
   }
 
   getState(): {[index: string]: boolean} {
-    // TODO: do it
+    return this.state;
   }
 
   isInProgress(pin: number) {

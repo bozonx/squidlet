@@ -4,7 +4,11 @@ import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
 import DigitalInputLogic from './DigitalInputLogic';
 
 
-interface Props {
+export interface DigitalExpanderInputProps {
+  // if true then local debounce of pins will be used.
+  // if false then microcontroller's debounce will be used.
+  // default is true.
+  useLocalDebounce?: boolean;
 }
 
 
@@ -16,7 +20,7 @@ export default class DigitalExpanderInput implements DigitalInputIo {
   constructor(
     driver: DigitalExpanderInputDriver,
     logError: (msg: Error | string) => void,
-    props: Props,
+    props: DigitalExpanderInputProps,
   ) {
     this.driver = driver;
     this.logic = new DigitalInputLogic(
@@ -27,13 +31,19 @@ export default class DigitalExpanderInput implements DigitalInputIo {
     this.driver.onChange(this.logic.handleIncomeState);
   }
 
+  destroy = async () => {
+    this.logic.destroy();
+  }
 
-  setup(
+
+  async setup(
     pin: number,
     inputMode: InputResistorMode,
     debounce: number,
     edge: Edge
   ): Promise<void> {
+    await this.driver.setupInput(pin, inputMode, debounce, edge);
+
     return this.logic.setupInput(pin, inputMode, debounce, edge);
   }
 
@@ -43,7 +53,7 @@ export default class DigitalExpanderInput implements DigitalInputIo {
    */
   async read(pin: number): Promise<boolean> {
 
-    // TODO: может сделать запрос в driver и слушать ближайший ответ ???
+    // TODO: сделать driver.doPoll и слушать ближайший ответ + таймаут
 
     return this.logic.getState()[pin];
   }
