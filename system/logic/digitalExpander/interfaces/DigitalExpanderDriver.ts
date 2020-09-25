@@ -50,7 +50,7 @@ export interface DigitalExpanderInputDriver {
   /**
    * Read input pins state
    */
-  doPoll(): Promise<void>;
+  doPoll: () => Promise<void>;
 
   onChange(cb: DigitalExpanderDriverHandler): number;
 
@@ -58,34 +58,3 @@ export interface DigitalExpanderInputDriver {
 
   clearPin(pin: number): Promise<void>;
 }
-
-
-// export default interface DigitalExpanderDriver {
-//   /**
-//    * Setup one or more pins. It can be called several times.
-//    */
-//   setup(pinsProps: {[index: string]: DigitalExpanderPinsProps}): Promise<void>;
-//
-//   getPinProps(pin: number): DigitalExpanderPinsProps | undefined;
-//
-//   /**
-//    * Get the last actual state of all the pins input and output
-//    */
-//   getState(): {[index: string]: boolean};
-//
-//   /**
-//    * Write output pins state
-//    */
-//   writeState(state: {[index: string]: boolean}): Promise<void>;
-//
-//   /**
-//    * Read input pins state
-//    */
-//   doPoll(): Promise<void>;
-//
-//   onChange(cb: DigitalExpanderDriverHandler): number;
-//
-//   removeListener(handlerIndex: number): void;
-//
-//   clearPin(pin: number): Promise<void>;
-// }

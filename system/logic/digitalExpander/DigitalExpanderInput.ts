@@ -1,19 +1,30 @@
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
-import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
-import DigitalExpanderLogic from './DigitalExpanderLogic';
-import Context from '../../Context';
-import DigitalExpanderDriver from './interfaces/DigitalExpanderDriver';
+import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
+import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
+import DigitalInputLogic from './DigitalInputLogic';
 
 
-export default class DigitalExpanderInput {
-  private readonly context: Context;
-  private readonly logic: DigitalExpanderLogic;
+interface Props {
+}
 
 
-  // TODO: принимать logError ???
-  constructor(driver: DigitalExpanderDriver, logError: (msg: string) => void) {
-    this.context = context;
-    this.logic = logic;
+export default class DigitalExpanderInput implements DigitalInputIo {
+  private readonly driver: DigitalExpanderInputDriver;
+  private readonly logic: DigitalInputLogic;
+
+
+  constructor(
+    driver: DigitalExpanderInputDriver,
+    logError: (msg: Error | string) => void,
+    props: Props,
+  ) {
+    this.driver = driver;
+    this.logic = new DigitalInputLogic(
+      logError,
+      this.driver.doPoll
+    );
+
+    this.driver.onChange(this.logic.handleIncomeState);
   }
 
 
@@ -26,29 +37,42 @@ export default class DigitalExpanderInput {
     return this.logic.setupInput(pin, inputMode, debounce, edge);
   }
 
-  // async getPinResistorMode(pin: number): Promise<InputResistorMode | undefined> {
-  //   return this.logic.getPinResistorMode(pin) as InputResistorMode | undefined;
-  // }
+  /**
+   * Just read a current state
+   * @param pin
+   */
+  async read(pin: number): Promise<boolean> {
 
-  read(pin: number): Promise<boolean> {
+    // TODO: может сделать запрос в driver и слушать ближайший ответ ???
 
+    return this.logic.getState()[pin];
   }
 
-  onChange(pin: number, handler: ChangeHandler): Promise<number> {
+  async onChange(pin: number, handler: ChangeHandler): Promise<number> {
 
+    // TODO: make driver's ???
+
+    //return this.logic.onChange(pin, handler);
   }
 
-  removeListener(handlerIndex: number): Promise<void> {
+  async removeListener(handlerIndex: number): Promise<void> {
 
+    // TODO: make driver's ???
+
+    //this.logic.removeListener(handlerIndex);
   }
 
-  clearPin(pin: number): Promise<void> {
+  async clearPin(pin: number): Promise<void> {
+    this.logic.clearPin(pin);
 
+    // TODO: make driver's clear pin
   }
 
-  clearAll(): Promise<void> {
-    for (let pin of Object.keys(this.pinParams)) {
-      await this.clearPin(parseInt(pin));
-    }
+  async clearAll(): Promise<void> {
+    return Promise.all(Object.keys(this.logic.getState()).map((pin: string) => {
+      return this.clearPin(parseInt(pin));
+    }))
+      .then();
   }
+
 }

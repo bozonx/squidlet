@@ -56,7 +56,7 @@ export default class DigitalOutputLogic {
   }
 
   /**
-   * Force write full or partial state
+   * Write full or partial state
    */
   async writeState(partialState: {[index: string]: boolean}): Promise<void> {
     if (this.writingTimeBuffer) {
@@ -92,7 +92,7 @@ export default class DigitalOutputLogic {
    */
   private startWriting = (stateToSave: {[index: string]: boolean}): Promise<void> => {
     this.writingTimeBuffer = {...stateToSave};
-
+    // first write request will be called write now at the current tick
     return this.queue.add(this.doWriteCb);
   }
 
@@ -103,15 +103,22 @@ export default class DigitalOutputLogic {
 
     const changedState: {[index: string]: boolean} = {...this.writingTimeBuffer};
     const writtenState: {[index: string]: boolean} = {...this.writingTimeBuffer};
+    // clear the buffer to collect a new data during writing time
+    this.writingTimeBuffer = {};
 
-    delete this.writingTimeBuffer;
+    try {
+      await this.writeCb(changedState);
+    }
+    catch (e) {
+      delete this.writingTimeBuffer;
 
-    await this.writeCb(changedState);
+      throw e;
+    }
 
-    // if (!this.queue.hasQueue()) {
-    //   // remove buffer if there aren't no queue
-    //   delete this.writingTimeBuffer;
-    // }
+    if (!this.queue.hasQueue()) {
+      // remove buffer if there aren't no queue
+      delete this.writingTimeBuffer;
+    }
 
     // set a new state which has been just saved
     this.state = {
