@@ -49,23 +49,16 @@ export default class DigitalExpanderInput implements DigitalInputIo {
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
-
-    // TODO: make driver's ???
-
-    //return this.logic.onChange(pin, handler);
+    return this.logic.onChange(pin, handler);
   }
 
   async removeListener(handlerIndex: number): Promise<void> {
-
-    // TODO: make driver's ???
-
-    //this.logic.removeListener(handlerIndex);
+    this.logic.removeListener(handlerIndex);
   }
 
   async clearPin(pin: number): Promise<void> {
     this.logic.clearPin(pin);
-
-    // TODO: make driver's clear pin
+    await this.driver.clearPin(pin);
   }
 
   async clearAll(): Promise<void> {
