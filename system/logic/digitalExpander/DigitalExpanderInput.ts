@@ -15,6 +15,7 @@ export interface DigitalExpanderInputProps {
 export default class DigitalExpanderInput implements DigitalInputIo {
   private readonly driver: DigitalExpanderInputDriver;
   private readonly logic: DigitalInputLogic;
+  private readonly useLocalDebounce: boolean;
 
 
   constructor(
@@ -27,6 +28,11 @@ export default class DigitalExpanderInput implements DigitalInputIo {
       logError,
       this.driver.doPoll
     );
+    this.useLocalDebounce = (typeof props.useLocalDebounce === 'undefined')
+      // true is default
+      ? true
+      // or use defined one
+      : props.useLocalDebounce;
 
     this.driver.onChange(this.logic.handleIncomeState);
   }
@@ -42,9 +48,17 @@ export default class DigitalExpanderInput implements DigitalInputIo {
     debounce: number,
     edge: Edge
   ): Promise<void> {
-    await this.driver.setupInput(pin, inputMode, debounce, edge);
+    let localDebounce: number = debounce;
+    let remoteDebounce: number = 0;
 
-    return this.logic.setupInput(pin, inputMode, debounce, edge);
+    if (!this.useLocalDebounce) {
+      localDebounce = 0;
+      remoteDebounce = debounce;
+    }
+
+    await this.driver.setupInput(pin, inputMode, remoteDebounce);
+
+    return this.logic.setupInput(pin, inputMode, localDebounce, edge);
   }
 
   /**
