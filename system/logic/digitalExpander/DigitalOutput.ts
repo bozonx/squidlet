@@ -1,7 +1,7 @@
 import {OutputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalOutputIo from '../../interfaces/io/DigitalOutputIo';
 import {DigitalExpanderOutputDriver} from './interfaces/DigitalExpanderDriver';
-import DigitalOutputLogic from './DigitalOutputLogic';
+import DigitalExpanderOutputLogic from './DigitalExpanderOutputLogic';
 
 
 export interface DigitalExpanderOutputProps {
@@ -12,7 +12,7 @@ export interface DigitalExpanderOutputProps {
 
 export default class DigitalOutput implements DigitalOutputIo {
   private readonly driver: DigitalExpanderOutputDriver;
-  private readonly logic: DigitalOutputLogic;
+  private readonly logic: DigitalExpanderOutputLogic;
 
 
   constructor(
@@ -21,7 +21,7 @@ export default class DigitalOutput implements DigitalOutputIo {
     props: DigitalExpanderOutputProps,
   ) {
     this.driver = driver;
-    this.logic = new DigitalOutputLogic(
+    this.logic = new DigitalExpanderOutputLogic(
       logError,
       this.writeCb,
       props.queueJobTimeoutSec,

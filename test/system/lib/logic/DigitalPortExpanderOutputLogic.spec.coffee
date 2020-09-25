@@ -1,7 +1,7 @@
-DigitalPortExpanderOutputLogic = require('../../../../system/lib/logic/DigitalOutputLogic').default;
+DigitalPortExpanderOutputLogic = require('../../../../system/lib/logic/DigitalExpanderOutputLogic').default;
 
 
-describe 'system.lib.logic.DigitalOutputLogic', ->
+describe 'system.lib.logic.DigitalExpanderOutputLogic', ->
   beforeEach ->
     @pin0 = 0
     @state = 0

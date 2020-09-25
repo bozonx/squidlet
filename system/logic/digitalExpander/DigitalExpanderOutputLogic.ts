@@ -2,7 +2,7 @@ import QueueOverride from '../../lib/QueueOverride';
 import BufferedRequest from '../../lib/BufferedRequest';
 
 
-export default class DigitalOutputLogic {
+export default class DigitalExpanderOutputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (changedState: {[index: string]: boolean}) => Promise<void>;
   private readonly writeBufferMs?: number;

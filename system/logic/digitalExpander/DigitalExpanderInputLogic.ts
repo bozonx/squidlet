@@ -5,7 +5,7 @@ import {getBitFromByte} from '../../lib/binaryHelpers';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 
 
-export default class DigitalInputLogic {
+export default class DigitalExpanderInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
 
