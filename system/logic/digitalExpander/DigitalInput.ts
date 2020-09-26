@@ -9,6 +9,7 @@ export interface DigitalExpanderInputProps {
   // if false then microcontroller's debounce will be used.
   // default is true.
   useLocalDebounce?: boolean;
+  waitResultTimeoutSec: number;
 }
 
 
@@ -26,7 +27,8 @@ export default class DigitalInput implements DigitalInputIo {
     this.driver = driver;
     this.logic = new DigitalExpanderInputLogic(
       logError,
-      this.driver.doPoll
+      this.driver.doPoll,
+      props.waitResultTimeoutSec
     );
     this.useLocalDebounce = (typeof props.useLocalDebounce === 'undefined')
       // true is default

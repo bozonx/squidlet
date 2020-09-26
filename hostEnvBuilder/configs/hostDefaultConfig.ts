@@ -9,6 +9,7 @@ const config: HostConfigConfig = {
   requestTimeoutSec: 60,
   senderResendTimeout: 1,
   rcResponseTimoutSec: 30,
+  responseTimoutSec: 10,
   queueJobTimeoutSec: 120,
   rebootDelaySec: 5,
   // TTL for network, max 255
