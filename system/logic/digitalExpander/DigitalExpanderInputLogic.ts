@@ -3,6 +3,7 @@ import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import Timeout = NodeJS.Timeout;
+import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
 
 
 interface InputPinProps {
@@ -219,47 +220,30 @@ export default class DigitalExpanderInputLogic {
   }
 
   private afterDebounce(pin: number, finalState: boolean) {
+    if (!this.pinProps[pin]) {
+      throw new Error(`Pin "${pin}" hasn't been set up.`);
+    }
 
-    // TODO: handle edge
+    // TODO: проверить логику, само значение мы не должны инвертировать но нужно понять
+    //       какой edge использовать. ??? может правильный edge задавать выше
 
+    const isInverted: boolean = isDigitalPinInverted(
+      false,
+      undefined,
+      this.pinProps[pin].resistor === InputResistorMode.pulldown
+    );
+    const resolvedEdge: Edge = resolveEdge(this.pinProps[pin].edge, isInverted);
+    // don't handle edge which is not suitable to edge that has been set up
+    if (resolvedEdge === Edge.rising && !finalState) {
+      return;
+    }
+    else if (resolvedEdge === Edge.falling && finalState) {
+      return;
+    }
     // set a new value
-    this.updateState(pin, newValue);
-
-
-    // rise a new event even value hasn't been actually changed since first check
-    this.events.emit(pin, newValue);
-
+    this.state[pin] = finalState;
+    // rise a event with the final state
+    this.events.emit(pin, finalState);
   }
 
-
 }
-
-
-// /**
-//  * Is debounce in propgress of poll in propress
-//  * @param pin
-//  */
-// isInProgress(pin: number) {
-//   return this.debounce.isInvoking(pin) || this.isPollInProgress();
-// }
-
-// private setFinalState(pin: number) {
-//   // means that poll has been canceled
-//   if (!this.polledPinsBuffer) return;
-//
-//   // old state
-//   const stateBeforePoll: number = this.getState();
-//
-//   // set all the values which has been received via last poll
-//   for (let pinStr of Object.keys(this.polledPinsBuffer)) {
-//     if (getBitFromByte(stateBeforePoll, pin) === this.polledPinsBuffer[pinStr]) continue;
-//
-//     // set a new value
-//     this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);
-//     // rise a new event even value hasn't been actually changed since first check
-//     this.events.emit(Number(pinStr), this.polledPinsBuffer[pinStr]);
-//   }
-//
-//   delete this.pollPromise;
-//   delete this.polledPinsBuffer;
-// }

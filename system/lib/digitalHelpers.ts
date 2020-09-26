@@ -51,24 +51,25 @@ export function invertIfNeed(value?: boolean, invert?: boolean): boolean {
   return Boolean(value);
 }
 
+// TODO: test with Edge as parameter
 /**
  * Resolve inverted edge.
  */
-export function resolveEdge(edge?: EdgeString, inverted?: boolean): Edge {
+export function resolveEdge(edge?: EdgeString | Edge, inverted?: boolean): Edge {
   if (typeof edge === 'undefined') {
     return Edge.both;
   }
-  else if (inverted && edge === 'rising') {
+  else if (inverted && (edge === 'rising' || edge === Edge.rising)) {
     return Edge.falling;
   }
-  else if (inverted && edge === 'falling') {
+  else if (inverted && (edge === 'falling' || edge === Edge.falling)) {
     return Edge.rising;
   }
 
-  if (edge === 'rising') {
+  if (edge === 'rising' || edge === Edge.rising) {
     return Edge.rising;
   }
-  else if (edge === 'falling') {
+  else if (edge === 'falling' || edge === Edge.falling) {
     return Edge.falling;
   }
   else {
