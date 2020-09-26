@@ -7,9 +7,8 @@ import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
 
 
 interface InputPinProps {
-  resistor: InputResistorMode;
   debounce?: number;
-  edge?: Edge;
+  edge: Edge;
 }
 
 const READ_RESULT_PREFIX = 'result';
@@ -43,6 +42,12 @@ export default class DigitalExpanderInputLogic {
     this.events.destroy();
     this.debounce.destroy();
 
+    for (let pin of Object.keys(this.waitingPollResultTimeouts)) {
+      clearTimeout(this.waitingPollResultTimeouts[pin]);
+    }
+
+    delete this.waitingPollResultTimeouts;
+    delete this.pollPromise;
     delete this.state;
     delete this.pinProps;
   }
@@ -61,10 +66,18 @@ export default class DigitalExpanderInputLogic {
     debounce?: number,
     edge?: Edge
   ) {
+    // convert edge if need to correctly resolve pin level change.
+    // but pin level itself won't be converted
+    const isInverted: boolean = isDigitalPinInverted(
+      false,
+      undefined,
+      resistor === InputResistorMode.pulldown
+    );
+    const resolvedEdge: Edge = resolveEdge(this.pinProps[pin].edge, isInverted);
+
     this.pinProps[pin] = {
-      resistor,
       debounce,
-      edge,
+      edge: resolvedEdge,
     };
   }
 
@@ -84,25 +97,17 @@ export default class DigitalExpanderInputLogic {
   }
 
   /**
-   * It just clears debounce and handlers of pin
+   * Do not handle pin any more
    */
   clearPin(pin: number) {
+    clearTimeout(this.waitingPollResultTimeouts[pin]);
 
-    // TODO: надо удалить таймаут ожидания результата
-
-    // TODO: review
-    if (this.waitingPollResult) delete this.waitingPollResult[pin];
+    delete this.waitingPollResultTimeouts[pin];
+    delete this.pinProps[pin];
+    delete this.state[pin];
 
     this.events.removeAllListeners(pin);
     this.debounce.clear(pin);
-  }
-
-  cancel() {
-
-    // TODO: надо удалить таймаут ожидания результата
-
-    // TODO: review
-    this.debounce.clearAll();
   }
 
   /**
@@ -110,7 +115,7 @@ export default class DigitalExpanderInputLogic {
    * State which is income after poling request.
    * More than one pin can be changed.
    */
-  handleIncomeState = (pin: number, newState: {[index: string]: boolean}) => {
+  handleIncomeState = (pn: number, newState: {[index: string]: boolean}) => {
     // handle logic of all the changed pins
     for (let pin of Object.keys(newState)) {
       // if pin is in debounce time then do nothing
@@ -145,8 +150,7 @@ export default class DigitalExpanderInputLogic {
       // wait for debounce and after than read current level
       this.debounce.invoke(() => {
         // debounce don't handle cb's promise
-        this.handleEndOfDebounce(pin)
-          .catch(this.logError);
+        this.handleEndOfDebounce(pin);
       }, debounceMs, pin)
         .catch(this.logError);
 
@@ -160,21 +164,26 @@ export default class DigitalExpanderInputLogic {
    * While debounce is in progress all other requests are ignored.
    * When debounce is finished then the confirmations is started.
    */
-  private async handleEndOfDebounce(pin: number) {
-    this.doPoll()
+  private handleEndOfDebounce(pin: number) {
+    this.waitForFinalState(pin)
+      .then((finalState: boolean) => {
+        this.afterDebounce(pin, finalState);
+      })
       .catch(this.logError);
 
-    const finalState: boolean = await this.waitForFinalState(pin);
-
-    this.afterDebounce(pin, finalState);
+    this.doPoll()
+      // TODO: на ошибку очистить ожидание - удалить событие и таймаут
+      .catch(this.logError);
   }
 
   private async doPoll() {
 
     // TODO: review может спокойно запускать новый poll - может там очередь отрабатывает
+    //       так даже дожидаься не обязательно
 
     // If poll is in progress then just wait for poll is finished
     if (this.pollPromise) {
+      // TODO: так как мы не ждем окончания, то при ошибке будет их много дублироваться
       await this.pollPromise;
     }
     // It there isn't any poll then make a new one
@@ -197,6 +206,9 @@ export default class DigitalExpanderInputLogic {
   private waitForFinalState(pin: number): Promise<boolean> {
     // it will be called immediately at the current tick.
     return new Promise<boolean>((resolve, reject) => {
+
+      // TODO: нужно ещё удалить событие когда очищаем ожидание
+
       const handlerIndex: number = this.events.addListener(
         `${READ_RESULT_PREFIX}${pin}`,
         (level: boolean) => {
@@ -220,26 +232,19 @@ export default class DigitalExpanderInputLogic {
   }
 
   private afterDebounce(pin: number, finalState: boolean) {
-    if (!this.pinProps[pin]) {
-      throw new Error(`Pin "${pin}" hasn't been set up.`);
-    }
 
-    // TODO: проверить логику, само значение мы не должны инвертировать но нужно понять
-    //       какой edge использовать. ??? может правильный edge задавать выше
+    // TODO: пересмотреть ещё раз, нужна ли зависимость от старого стейта ???
 
-    const isInverted: boolean = isDigitalPinInverted(
-      false,
-      undefined,
-      this.pinProps[pin].resistor === InputResistorMode.pulldown
-    );
-    const resolvedEdge: Edge = resolveEdge(this.pinProps[pin].edge, isInverted);
     // don't handle edge which is not suitable to edge that has been set up
-    if (resolvedEdge === Edge.rising && !finalState) {
+    if (this.pinProps[pin]?.edge === Edge.rising && !finalState) {
       return;
     }
-    else if (resolvedEdge === Edge.falling && finalState) {
+    else if (this.pinProps[pin]?.edge === Edge.falling && finalState) {
       return;
     }
+
+    // TODO: если в итоге не изменилось значение? всеравно поднимать событие ???
+
     // set a new value
     this.state[pin] = finalState;
     // rise a event with the final state
