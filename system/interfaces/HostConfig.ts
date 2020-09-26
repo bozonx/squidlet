@@ -15,6 +15,8 @@ export interface HostConfigConfig {
   senderResendTimeout: number;
   // default response of remote call in seconds
   rcResponseTimoutSec: number;
+  // general timeout for response for such interfaces as I2C, serial etc. Not for HTML.
+  responseTimoutSec: number;
   // default timeout for jobs in queue
   queueJobTimeoutSec: number;
   // delay before rebooting a host in seconds

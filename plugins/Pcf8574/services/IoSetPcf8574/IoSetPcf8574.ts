@@ -30,7 +30,10 @@ export default class IoSetPcf8574 extends ServiceBase<I2cMasterDriverProps> impl
 
 
   init = async () => {
-    this.driver = await this.context.getSubDriver<Pcf8574>('Pcf8574', this.props);
+    this.driver = await this.context.getSubDriver<Pcf8574>('Pcf8574', {
+      ...this.props,
+      waitResultTimeoutSec: this.config.config.responseTimoutSec
+    });
   }
 
   destroy = async () => {
