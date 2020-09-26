@@ -2,6 +2,7 @@ import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
+import Timeout = NodeJS.Timeout;
 
 
 interface InputPinProps {
@@ -23,8 +24,8 @@ export default class DigitalExpanderInputLogic {
   private state: {[index: string]: boolean} = {};
   private pinProps: {[index: string]: InputPinProps} = {};
   private pollPromise?: Promise<void>;
-  // markers that means pin is waiting for poll result after debounce
-  private waitingPollResult: {[index: string]: true} = {};
+  // timeouts for the time when pin is waiting for poll result after debounce
+  private waitingPollResultTimeouts: {[index: string]: Timeout} = {};
 
 
   constructor(
@@ -116,7 +117,7 @@ export default class DigitalExpanderInputLogic {
         continue;
       }
       // if pin is waiting poll result after debounce
-      else if (this.waitingPollResult[pin]) {
+      else if (this.waitingPollResultTimeouts[pin]) {
         this.events.emit(`${READ_RESULT_PREFIX}${pin}`, newState[pin]);
       }
 
@@ -193,24 +194,24 @@ export default class DigitalExpanderInputLogic {
   }
 
   private waitForFinalState(pin: number): Promise<boolean> {
-    this.waitingPollResult[pin] = true;
-
+    // it will be called immediately at the current tick.
     return new Promise<boolean>((resolve, reject) => {
       const handlerIndex: number = this.events.addListener(
         `${READ_RESULT_PREFIX}${pin}`,
         (level: boolean) => {
           this.events.removeListener(handlerIndex);
+          clearTimeout(this.waitingPollResultTimeouts[pin]);
 
-          delete this.waitingPollResult[pin];
+          delete this.waitingPollResultTimeouts[pin];
 
           resolve(level);
         }
       );
 
-      setTimeout(() => {
+      this.waitingPollResultTimeouts[pin] = setTimeout(() => {
         this.events.removeListener(handlerIndex);
 
-        delete this.waitingPollResult[pin];
+        delete this.waitingPollResultTimeouts[pin];
 
         reject(new Error(`Wait pin "${pin}" result timeout`));
       }, this.waitResultTimeoutSec * 1000);
