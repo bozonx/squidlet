@@ -1,7 +1,6 @@
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
-import {getBitFromByte} from '../../lib/binaryHelpers';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 
 
@@ -11,26 +10,31 @@ interface InputPinProps {
   edge?: Edge;
 }
 
+const READ_RESULT_PREFIX = 'result';
+
 
 export default class DigitalExpanderInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
+  private readonly waitResultTimeoutSec: number;
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
   private state: {[index: string]: boolean} = {};
   private pinProps: {[index: string]: InputPinProps} = {};
+  private pollPromise?: Promise<void>;
+  // markers that means pin is waiting for poll result after debounce
+  private waitingPollResult: {[index: string]: true} = {};
 
 
   constructor(
     logError: (msg: Error | string) => void,
-    pollOnce: () => Promise<void>
+    pollOnce: () => Promise<void>,
+    waitResultTimeoutSec: number
   ) {
-    // TODO: зачем он нужен ?????
     this.logError = logError;
-
-    // TODO: зачем он нужен ?????
     this.pollOnce = pollOnce;
+    this.waitResultTimeoutSec = waitResultTimeoutSec;
   }
 
   destroy() {
@@ -78,6 +82,28 @@ export default class DigitalExpanderInputLogic {
   }
 
   /**
+   * It just clears debounce and handlers of pin
+   */
+  clearPin(pin: number) {
+
+    // TODO: надо удалить таймаут ожидания результата
+
+    // TODO: review
+    if (this.waitingPollResult) delete this.waitingPollResult[pin];
+
+    this.events.removeAllListeners(pin);
+    this.debounce.clear(pin);
+  }
+
+  cancel() {
+
+    // TODO: надо удалить таймаут ожидания результата
+
+    // TODO: review
+    this.debounce.clearAll();
+  }
+
+  /**
    * Handle driver's income message
    * State which is income after poling request.
    * More than one pin can be changed.
@@ -85,71 +111,47 @@ export default class DigitalExpanderInputLogic {
   handleIncomeState = (pin: number, newState: {[index: string]: boolean}) => {
     // handle logic of all the changed pins
     for (let pin of Object.keys(newState)) {
-      // TODO: а если идет debounce??? то нет смысла обрабатывать
+      // if pin is in debounce time then do nothing
+      if (this.debounce.isInvoking(pin)) {
+        continue;
+      }
+      // if pin is waiting poll result after debounce
+      else if (this.waitingPollResult[pin]) {
+        this.events.emit(`${READ_RESULT_PREFIX}${pin}`, newState[pin]);
+      }
+
       // Don't handle not changed pins.
       // It means they not changed but was delivered on poll.
       if (newState[pin] === this.state[pin]) continue;
 
-      this.handleChangedPin(parseInt(pin), newState[pin]);
+      this.startDebounce(parseInt(pin), newState[pin]);
     }
   }
 
-  /**
-   * It just clears debounce and handlers of pin
-   */
-  clearPin(pin: number) {
-    // TODO: review
-    if (this.polledPinsBuffer) delete this.polledPinsBuffer[pin];
-
-    this.events.removeAllListeners(pin);
-    this.debounce.clear(pin);
-  }
-
-  cancel() {
-    // TODO: review
-    this.debounce.clearAll();
-
-    delete this.pollPromise;
-    // it means don't handle poll result
-    delete this.polledPinsBuffer;
-  }
-
 
   /**
-   * Handle pin which has been changed and isn't in debounce progress.
+   * Start a new debounce for pin which has been changed and isn't in debounce progress.
    */
-  private handleChangedPin(pin: number, newValue: boolean) {
+  private startDebounce(pin: number, newValue: boolean) {
     if (!this.pinProps[pin]) {
       throw new Error(`Pin "${pin}" hasn't been set up.`);
     }
 
-    const debounce: number = this.pinProps[pin].debounce || 0;
+    const debounceMs: number = this.pinProps[pin].debounce || 0;
     // make debounced call if it was set
-    if (debounce > 0) {
+    if (debounceMs > 0) {
       // wait for debounce and after than read current level
       this.debounce.invoke(() => {
-        // TODO: почему не дожидаемся окончания ???
+        // debounce don't handle cb's promise
         this.handleEndOfDebounce(pin)
           .catch(this.logError);
-      }, debounce, pin)
+      }, debounceMs, pin)
         .catch(this.logError);
 
       return;
     }
-
-    // TODO: start debounce and after that use edge logic
-
-
     // else emit right now if there isn't any debounce
-    // clear debounce if set
-    if (this.debounce.isInvoking(pin)) this.debounce.clear(pin);
-    // set a new value
-    this.updateState(pin, newValue);
-
-    // TODO: handle edge
-
-    // rise a new event even value hasn't been actually changed since first check
-    this.events.emit(pin, newValue);
+    this.afterDebounce(pin, newValue);
   }
 
   /**
@@ -157,20 +159,24 @@ export default class DigitalExpanderInputLogic {
    * When debounce is finished then the confirmations is started.
    */
   private async handleEndOfDebounce(pin: number) {
-    // TODO: что если этот буфер уже был создан ????
-    // TODO: поидее другие пины должны дождаться ответа
-    // TODO: после pollOnce НЕ вызывается incomeState
+    this.doPoll()
+      .catch(this.logError);
+
+    const finalState: boolean = await this.waitForFinalState(pin);
+
+    this.afterDebounce(pin, finalState);
+  }
+
+  private async doPoll() {
 
     // TODO: review может спокойно запускать новый poll - может там очередь отрабатывает
 
     // If poll is in progress then just wait for poll is finished
-    if (this.polledPinsBuffer) {
+    if (this.pollPromise) {
       await this.pollPromise;
     }
     // It there isn't any poll then make a new one
     else {
-      this.polledPinsBuffer = {};
-
       try {
         this.pollPromise = this.pollOnce();
 
@@ -178,92 +184,52 @@ export default class DigitalExpanderInputLogic {
       }
       catch (e) {
         delete this.pollPromise;
-        delete this.polledPinsBuffer;
 
         throw e;
       }
+
+      delete this.pollPromise;
     }
+  }
+
+  private waitForFinalState(pin: number): Promise<boolean> {
+    this.waitingPollResult[pin] = true;
+
+    return new Promise<boolean>((resolve, reject) => {
+      const handlerIndex: number = this.events.addListener(
+        `${READ_RESULT_PREFIX}${pin}`,
+        (level: boolean) => {
+          this.events.removeListener(handlerIndex);
+
+          delete this.waitingPollResult[pin];
+
+          resolve(level);
+        }
+      );
+
+      setTimeout(() => {
+        this.events.removeListener(handlerIndex);
+
+        delete this.waitingPollResult[pin];
+
+        reject(new Error(`Wait pin "${pin}" result timeout`));
+      }, this.waitResultTimeoutSec * 1000);
+    });
+  }
+
+  private afterDebounce(pin: number, finalState: boolean) {
 
     // TODO: handle edge
 
-    this.setFinalState(pin);
+    // set a new value
+    this.updateState(pin, newValue);
+
+
+    // rise a new event even value hasn't been actually changed since first check
+    this.events.emit(pin, newValue);
+
   }
 
-  private setFinalState(pin: number) {
-    // means that poll has been canceled
-    if (!this.polledPinsBuffer) return;
-
-    // old state
-    const stateBeforePoll: number = this.getState();
-
-    // set all the values which has been received via last poll
-    for (let pinStr of Object.keys(this.polledPinsBuffer)) {
-      if (getBitFromByte(stateBeforePoll, pin) === this.polledPinsBuffer[pinStr]) continue;
-
-      // set a new value
-      this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);
-      // rise a new event even value hasn't been actually changed since first check
-      this.events.emit(Number(pinStr), this.polledPinsBuffer[pinStr]);
-    }
-
-    delete this.pollPromise;
-    delete this.polledPinsBuffer;
-  }
-
-  ////////////////// FROM driver
-
-  // /**
-  //  * Listen to changes of pin after edge and debounce were processed.
-  //  */
-  // onChange(pin: number, handler: ChangeHandler): number {
-  //   this.checkPinRange(pin);
-  //
-  //   return this.expanderInput.onChange(pin, handler);
-  // }
-  //
-  // removeListener(handlerIndex: number) {
-  //   this.expanderInput.removeListener(handlerIndex);
-  // }
-  //
-  // /**
-  //  * Poll expander manually.
-  //  */
-  // pollOnce = (): Promise<void> => {
-  //   // it is no need to do poll while initialization time because it will be done after initialization
-  //   if (!this.initIcLogic.wasInitialized) return Promise.resolve();
-  //
-  //   return this.i2c.pollOnce();
-  // }
-  //
-  // private startFeedback() {
-  //   // if I2C driver doesn't have feedback then it doesn't need to be setup
-  //   if (!this.i2c.hasFeedback()) return;
-  //
-  //   this.i2c.addListener(this.handleIcStateChange);
-  //   // make first request and start handle feedback
-  //   this.i2c.startFeedback();
-  // }
-  //
-  // private handleIcStateChange = (data: Uint8Array) => {
-  //
-  //   console.log('------- handleIcStateChange ---------', data)
-  //
-  //   if (!data || data.length !== DATA_LENGTH) {
-  //     return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
-  //   }
-  //
-  //   const receivedByte: number = data[0];
-  //
-  //   // update values add rise change event of input pins which are changed
-  //   for (let pin = 0; pin < PINS_COUNT; pin++) {
-  //     // skip not input pins
-  //     if (this.directions[pin] !== PinDirection.input) continue;
-  //
-  //     const newValue: boolean = getBitFromByte(receivedByte, pin);
-  //
-  //     this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
-  //   }
-  // }
 
 }
 
@@ -274,4 +240,25 @@ export default class DigitalExpanderInputLogic {
 //  */
 // isInProgress(pin: number) {
 //   return this.debounce.isInvoking(pin) || this.isPollInProgress();
+// }
+
+// private setFinalState(pin: number) {
+//   // means that poll has been canceled
+//   if (!this.polledPinsBuffer) return;
+//
+//   // old state
+//   const stateBeforePoll: number = this.getState();
+//
+//   // set all the values which has been received via last poll
+//   for (let pinStr of Object.keys(this.polledPinsBuffer)) {
+//     if (getBitFromByte(stateBeforePoll, pin) === this.polledPinsBuffer[pinStr]) continue;
+//
+//     // set a new value
+//     this.updateState(Number(pinStr), this.polledPinsBuffer[pinStr]);
+//     // rise a new event even value hasn't been actually changed since first check
+//     this.events.emit(Number(pinStr), this.polledPinsBuffer[pinStr]);
+//   }
+//
+//   delete this.pollPromise;
+//   delete this.polledPinsBuffer;
 // }

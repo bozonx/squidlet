@@ -31,13 +31,18 @@ export default class DebounceCall {
     return Boolean(this.items[id]);
   }
 
+  /**
+   * Try to invoke a cb.
+   * It returns promise that will be resolved when time is up.
+   * But it won't wait for cb's promise!
+   */
   invoke(
     cb: DebounceCb,
     debounceMs: number | undefined,
     id: string | number = DEFAULT_ID,
   ): Promise<void> {
     // if there isn't debounce time - call immediately
-    if (!debounceMs) return this.callCbImmediately(id, cb);
+    if (!debounceMs || debounceMs < 0) return this.callCbImmediately(id, cb);
 
     // it there is debounce in progress then just update cb
     if (this.items[id]) {
@@ -97,7 +102,7 @@ export default class DebounceCall {
     if (!this.items[id]) return;
 
     try {
-      // just call cb and don't handle the result
+      // just call cb and don't handle the result and don't wait for promise
       this.items[id][ItemPosition.lastCbToCall]();
     }
     catch (err) {
