@@ -1,10 +1,7 @@
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../interfaces/gpioTypes';
 
 
-export type DigitalExpanderDriverHandler = (
-  pin: number,
-  newState: {[index: string]: boolean}
-) => void;
+export type DigitalExpanderDriverHandler = (newState: {[index: string]: boolean}) => void;
 
 // export interface DigitalExpanderPinsProps {
 //   direction: PinDirection;

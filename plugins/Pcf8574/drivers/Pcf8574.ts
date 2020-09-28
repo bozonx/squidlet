@@ -10,12 +10,19 @@ import {
   DigitalExpanderOutputDriver,
   DigitalExpanderInputDriver
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {updateBitInByte} from 'system/lib/binaryHelpers';
+import BinaryState from 'system/lib/BinaryState';
+import QueueOverride from 'system/lib/QueueOverride';
+import IndexedEvents from 'system/lib/IndexedEvents';
+import {isEmptyObject} from 'system/lib/objects';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
 
 
+export const PINS_COUNT = 8;
+const WRITE_ID = 0;
+// TODO: caclucate using PINS_COUNT
 // length of data to send and receive to IC
 export const DATA_LENGTH = 1;
 
@@ -25,8 +32,15 @@ export class Pcf8574
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private i2c!: I2cMaster;
+  private events = new IndexedEvents<DigitalExpanderDriverHandler>();
+  private inputPins: {[index: string]: true} = {};
+  private writeQueue!: QueueOverride;
+  // state of pins which has been written to IC before
+  private writtenState: {[index: string]: boolean} = {};
+  // which pins are input
   // buffer of pins which has to be set up
-  private setupBuffer: {[index: string]: DigitalExpanderPinsProps} = {};
+  //private setupBuffer: {[index: string]: DigitalExpanderPinsProps} = {};
+  private writeBuffer?: {[index: string]: boolean};
 
 
   init = async () => {
@@ -34,6 +48,8 @@ export class Pcf8574
       'I2cMaster',
       this.props
     );
+
+    this.writeQueue = new QueueOverride(this.config.config.queueJobTimeoutSec);
   }
 
   destroy = async () => {
@@ -58,48 +74,19 @@ export class Pcf8574
 
   /**
    * Write whole state to IC.
-   * If IC has 8 pins then pass 1 byte if 16 then 2 bytes.
+   * State is {pinNumber: true | false}. Pin number starts from 0.
    */
   writeState(state: {[index: string]: boolean}): Promise<void> {
 
-    this.checkPinRange(pin);
-    if (typeof this.directions[pin] !== 'undefined') {
-      throw new Error(
-        `PCF8574Driver.setupInput(${pin}, ${debounce}). This pin has been already set up.` +
-        `Call "clearPin()" and try to set up again`
-      );
-    }
+    // TODO: расслоение буфера
+    // TODO: новую запись не нужно хранить в буфере
 
-    if (typeof debounce !== 'undefined') {
-      this.pinDebounces[pin] = debounce;
-    }
-    this.directions[pin] = PinDirection.input;
+    this.writeBuffer = {
+      ...this.writeBuffer,
+      ...state,
+    };
 
-    if (state.length !== DATA_LENGTH) {
-      throw new Error(`It is able to write 1 byte of state to IC`);
-    }
-
-
-    // TODO: what to do with outputMode ???
-
-    this.checkPinRange(pin);
-
-    if (typeof this.directions[pin] !== 'undefined') {
-      throw new Error(
-        `PCF8574Driver.setupOutput(${pin}, ${outputInitialValue}). This pin has been already set up` +
-        `Call "clearPin()" and try to set up again`
-      );
-    }
-
-    this.directions[pin] = PinDirection.output;
-
-    if (typeof outputInitialValue !== 'undefined') {
-      this.updateState(pin, outputInitialValue);
-    }
-
-
-
-    await this.i2c.write(state);
+    return this.writeQueue.add(this.doWrite, WRITE_ID);
   }
 
 
@@ -110,6 +97,12 @@ export class Pcf8574
     resistor: InputResistorMode,
     debounce: number,
   ): Promise<void> {
+    this.inputPins[pin] = true;
+
+    delete this.writtenState[pin];
+
+    if (this.writeBuffer) delete this.writeBuffer[pin];
+
     // TODO: !!!!!
   }
 
@@ -117,15 +110,28 @@ export class Pcf8574
    * Read input pins state
    */
   doPoll = async (): Promise<void> => {
-    // TODO: !!!!!
+    const result: Uint8Array = await this.i2c.read(DATA_LENGTH);
+    const state: BinaryState = new BinaryState(DATA_LENGTH, result);
+    const objState = state.getObjectState();
+    const inputChanges: {[index: string]: boolean} = {};
+
+    for (let pinStr of Object.keys(objState)) {
+      if (!this.inputPins[pinStr]) continue;
+
+      inputChanges[pinStr] = objState[pinStr];
+    }
+
+    if (isEmptyObject(inputChanges)) return;
+
+    this.events.emit(inputChanges);
   }
 
   onChange(cb: DigitalExpanderDriverHandler): number {
-    // TODO: !!!!!
+    return this.events.addListener(cb);
   }
 
   removeListener(handlerIndex: number): void {
-    // TODO: !!!!!
+    this.events.removeListener(handlerIndex);
   }
 
   ////////// Common
@@ -135,19 +141,43 @@ export class Pcf8574
   }
 
 
-  /**
-   * Just update state and don't save it to IC
-   */
-  private updateState = (pin: number, value: boolean) => {
-    // TODO: remake
-    this.currentState = updateBitInByte(this.currentState, pin, value);
+  private async doWrite() {
+    const data: Uint8Array = this.collectWriteData();
+
+
+    // TODO: сохранить в буфер
+    //       после успешной записи сохранить в стейт
+    //       запись делать в очереди. При ошибке очистить буфер
+
+    try {
+      await this.i2c.write(data);
+    }
+    catch (e) {
+      delete this.writeBuffer;
+
+      throw e;
+    }
+
+    delete this.writeBuffer;
   }
 
-  private checkPinRange(pin: number) {
-    if (pin < 0 || pin >= PINS_COUNT) {
-      throw new Error(`Pin "${pin}" out of range`);
-    }
+  private collectWriteData(): Uint8Array {
+    // TODO: !!! get input pins, old state, buffer
   }
+
+  // /**
+  //  * Just update state and don't save it to IC
+  //  */
+  // private updateState = (pin: number, value: boolean) => {
+  //   // TODO: remake
+  //   this.currentState = updateBitInByte(this.currentState, pin, value);
+  // }
+  //
+  // private checkPinRange(pin: number) {
+  //   if (pin < 0 || pin >= PINS_COUNT) {
+  //     throw new Error(`Pin "${pin}" out of range`);
+  //   }
+  // }
 
   // write(pin: number, value: boolean): Promise<void> {
   //   // in case it is writing at the moment - save buffer and add cb to queue
@@ -198,6 +228,7 @@ export class Pcf8574
 
     return this.i2c.write(dataToSend);
   }
+
 
 
 

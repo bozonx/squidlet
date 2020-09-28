@@ -115,7 +115,7 @@ export default class DigitalExpanderInputLogic {
    * State which is income after poling request.
    * More than one pin can be changed.
    */
-  handleIncomeState = (pn: number, newState: {[index: string]: boolean}) => {
+  handleIncomeState = (newState: {[index: string]: boolean}) => {
     // handle logic of all the changed pins
     for (let pin of Object.keys(newState)) {
       // if pin is in debounce time then do nothing
