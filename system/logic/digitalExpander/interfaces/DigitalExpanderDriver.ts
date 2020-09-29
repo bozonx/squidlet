@@ -7,6 +7,7 @@ export enum DigitalExpanderEvents {
 }
 
 export type DigitalExpanderDriverHandler = (newState: {[index: string]: boolean}) => void;
+export type DigitalExpanderPinInitHandler = (initializedPins: number[]) => void;
 
 export interface DigitalExpanderPinSetup {
   direction: PinDirection;
