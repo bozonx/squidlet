@@ -10,7 +10,7 @@ import {
   DigitalExpanderOutputDriver,
   DigitalExpanderInputDriver,
   DigitalExpanderPinSetup,
-  DigitalExpanderEvents
+  DigitalExpanderEvents, DigitalExpanderPinInitHandler
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {
   InputResistorMode,
@@ -83,14 +83,6 @@ export class Pcf8574
       initialValue,
     });
   }
-
-  // /**
-  //  * Read whole state of IC.
-  //  * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
-  //  */
-  // async readState(): Promise<Uint8Array> {
-  //   return this.i2c.read(DATA_LENGTH);
-  // }
 
   /**
    * Write whole state to IC.
@@ -174,8 +166,14 @@ export class Pcf8574
       || typeof this.writtenState[pin] !== 'undefined';
   }
 
+  onPinInitialized(cb: DigitalExpanderPinInitHandler): number {
+    return this.events.addListener(DigitalExpanderEvents.setup, cb);
+  }
 
 
+  /**
+   * It waits forever while pin has been initialized.
+   */
   private startSetupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
     return new Promise<void>(((resolve, reject) => {
       if (!this.setupBuffer) this.setupBuffer = {};
@@ -183,11 +181,22 @@ export class Pcf8574
       this.setupBuffer[pin] = pinSetup;
 
       this.setupDebounce.invoke(() => {
-        this.doSetup()
-          .then(resolve)
-          .catch(reject);
+        const handlerIndex = this.onPinInitialized((initializedPins: number[]) => {
+          if (!initializedPins.includes(pin)) return;
 
-        // TODO: ждать события
+          this.events.removeListener(handlerIndex);
+          resolve();
+        });
+
+        this.doSetup()
+          .catch(this.log.debug);
+          // .catch((e) => {
+          //
+          //   // TODO: разве оно должно режектить ???
+          //
+          //   this.events.removeListener(handlerIndex);
+          //   reject(e);
+          // });
       }, SETUP_DEBOUNCE_MS)
         .catch(reject);
     }));
@@ -207,20 +216,25 @@ export class Pcf8574
       await this.writeQueue.add(() => this.i2c.write(data), QUEUE_IDS.setup);
     }
     catch (e) {
-      // TODO: сделать повтор но так чтобы не дожидаться или дожидаться ???
-      //       если дожидаться то будет расходоваться память
-
       // put back setupBuffer
       this.setupBuffer = {
         ...setupBuffer,
         ...this.setupBuffer || {},
       };
 
+      // do setup again and don't wait for result
+      this.doSetup()
+        .catch(this.log.debug);
+
       throw e;
     }
 
+    const initializedPins: number[] = [];
+
     for (let pinStr of Object.keys(setupBuffer)) {
       const pin: number = parseInt(pinStr);
+
+      initializedPins.push(pin);
 
       if (setupBuffer[pin].direction === PinDirection.input) {
         this.inputPins[pin] = true;
@@ -229,6 +243,8 @@ export class Pcf8574
         this.writtenState[pin] = setupBuffer[pin].initialValue || false;
       }
     }
+
+    this.events.emit(DigitalExpanderEvents.setup, initializedPins);
   }
 
   private async doWrite() {
@@ -383,6 +399,14 @@ export class Pcf8574
   //
   //     this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
   //   }
+  // }
+
+  // /**
+  //  * Read whole state of IC.
+  //  * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
+  //  */
+  // async readState(): Promise<Uint8Array> {
+  //   return this.i2c.read(DATA_LENGTH);
   // }
 
 }
