@@ -11,7 +11,11 @@ import {
   DigitalExpanderInputDriver,
   ExpanderPinSetup
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
-import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import {
+  InputResistorMode,
+  OutputResistorMode,
+  PinDirection
+} from 'system/interfaces/gpioTypes';
 import {updateBitInByte} from 'system/lib/binaryHelpers';
 import BinaryState from 'system/lib/BinaryState';
 import QueueOverride from 'system/lib/QueueOverride';
@@ -24,7 +28,7 @@ import DebounceCallIncreasing from '../../../system/lib/debounceCall/DebounceCal
 
 export const PINS_COUNT = 8;
 const SETUP_DEBOUNCE_MS = 10;
-// TODO: caclucate using PINS_COUNT
+// TODO: calculate using PINS_COUNT
 // length of data to send and receive to IC
 export const DATA_LENGTH = 1;
 enum QUEUE_IDS {
@@ -72,22 +76,11 @@ export class Pcf8574
     resistor?: OutputResistorMode,
     initialValue?: boolean
   ): Promise<void> {
-    return new Promise<void>(((resolve, reject) => {
-      if (!this.setupBuffer) this.setupBuffer = {};
-
-      this.setupBuffer[pin] = {
-        direction: PinDirection.output,
-        resistor,
-        initialValue,
-      };
-
-      this.setupDebounce.invoke(() => {
-        this.doSetup()
-          .then(resolve)
-          .catch(reject);
-      }, SETUP_DEBOUNCE_MS)
-        .catch(reject);
-    }));
+    return this.startSetupPin(pin, {
+      direction: PinDirection.output,
+      resistor,
+      initialValue,
+    });
   }
 
   // /**
@@ -110,6 +103,7 @@ export class Pcf8574
 
 
     // TODO: нельзя запускать пока идет setup этого пина
+    // TODO: нельзя записывать input pins
 
     this.writeBuffer = {
       ...this.writeBuffer,
@@ -130,22 +124,11 @@ export class Pcf8574
       return Promise.reject(`PCF expander board can't handle a debounce`);
     }
 
-    return new Promise<void>(((resolve, reject) => {
-      if (!this.setupBuffer) this.setupBuffer = {};
-
-      this.setupBuffer[pin] = {
-        direction: PinDirection.input,
-        resistor,
-        debounce,
-      };
-
-      this.setupDebounce.invoke(() => {
-        this.doSetup()
-          .then(resolve)
-          .catch(reject);
-      }, SETUP_DEBOUNCE_MS)
-        .catch(reject);
-    }));
+    return this.startSetupPin(pin, {
+      direction: PinDirection.input,
+      resistor,
+      debounce,
+    });
   }
 
   /**
@@ -185,12 +168,37 @@ export class Pcf8574
     // TODO: !!!!!
   }
 
+  wasPinInitialized(pin: number): boolean {
+    return typeof this.inputPins[pin] !== 'undefined'
+      || typeof this.writtenState[pin] !== 'undefined';
+  }
+
+
+
+  private startSetupPin(pin: number, pinSetup: ExpanderPinSetup): Promise<void> {
+    return new Promise<void>(((resolve, reject) => {
+      if (!this.setupBuffer) this.setupBuffer = {};
+
+      this.setupBuffer[pin] = pinSetup;
+
+      this.setupDebounce.invoke(() => {
+        this.doSetup()
+          .then(resolve)
+          .catch(reject);
+
+        // TODO: ждать события
+      }, SETUP_DEBOUNCE_MS)
+        .catch(reject);
+    }));
+  }
 
   private async doSetup() {
     if (!this.setupBuffer) throw new Error(`No setupBuffer`);
 
     const data: Uint8Array = this.collectSetupData();
-    const setupBuffer: {[index: string]: ExpanderPinSetup} = cloneDeepObject(this.setupBuffer);
+    const setupBuffer: {[index: string]: ExpanderPinSetup} = cloneDeepObject(
+      this.setupBuffer
+    );
 
     delete this.setupBuffer;
 
