@@ -8,7 +8,8 @@ import DriverBase from 'system/base/DriverBase';
 import {
   DigitalExpanderDriverHandler,
   DigitalExpanderOutputDriver,
-  DigitalExpanderInputDriver
+  DigitalExpanderInputDriver,
+  ExpanderPinSetup
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {updateBitInByte} from 'system/lib/binaryHelpers';
@@ -18,10 +19,12 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import {isEmptyObject} from 'system/lib/objects';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
+import DebounceCallIncreasing from '../../../system/lib/debounceCall/DebounceCallIncreasing';
 
 
 export const PINS_COUNT = 8;
 const WRITE_ID = 0;
+const SETUP_DEBOUNCE_MS = 10;
 // TODO: caclucate using PINS_COUNT
 // length of data to send and receive to IC
 export const DATA_LENGTH = 1;
@@ -39,8 +42,9 @@ export class Pcf8574
   private writtenState: {[index: string]: boolean} = {};
   // which pins are input
   // buffer of pins which has to be set up
-  //private setupBuffer: {[index: string]: DigitalExpanderPinsProps} = {};
+  private setupBuffer?: {[index: string]: ExpanderPinSetup};
   private writeBuffer?: {[index: string]: boolean};
+  private setupDebounce = new DebounceCallIncreasing();
 
 
   init = async () => {
@@ -53,6 +57,9 @@ export class Pcf8574
   }
 
   destroy = async () => {
+    this.events.destroy();
+    this.writeQueue.destroy();
+    this.setupDebounce.destroy();
   }
 
 
@@ -61,7 +68,22 @@ export class Pcf8574
     resistor?: OutputResistorMode,
     initialValue?: boolean
   ): Promise<void> {
-    // TODO: !!!!!
+    return new Promise<void>(((resolve, reject) => {
+      if (!this.setupBuffer) this.setupBuffer = {};
+
+      this.setupBuffer[pin] = {
+        direction: PinDirection.output,
+        resistor,
+        initialValue,
+      };
+
+      this.setupDebounce.invoke(() => {
+        this.doSetup()
+          .then(resolve)
+          .catch(reject);
+      }, SETUP_DEBOUNCE_MS)
+        .catch(reject);
+    }));
   }
 
   // /**
@@ -80,6 +102,10 @@ export class Pcf8574
 
     // TODO: расслоение буфера
     // TODO: новую запись не нужно хранить в буфере
+    // TODO: пока идет setup сохранять в буфер, после сделать запись
+
+
+    // TODO: нельзя запускать пока идет setup этого пина
 
     this.writeBuffer = {
       ...this.writeBuffer,
@@ -91,19 +117,31 @@ export class Pcf8574
 
 
   ////////// Input's
-
   setupInput(
     pin: number,
     resistor: InputResistorMode,
     debounce: number,
   ): Promise<void> {
-    this.inputPins[pin] = true;
+    if (debounce) {
+      return Promise.reject(`PCF expander board can't handle a debounce`);
+    }
 
-    delete this.writtenState[pin];
+    return new Promise<void>(((resolve, reject) => {
+      if (!this.setupBuffer) this.setupBuffer = {};
 
-    if (this.writeBuffer) delete this.writeBuffer[pin];
+      this.setupBuffer[pin] = {
+        direction: PinDirection.input,
+        resistor,
+        debounce,
+      };
 
-    // TODO: !!!!!
+      this.setupDebounce.invoke(() => {
+        this.doSetup()
+          .then(resolve)
+          .catch(reject);
+      }, SETUP_DEBOUNCE_MS)
+        .catch(reject);
+    }));
   }
 
   /**
@@ -141,6 +179,35 @@ export class Pcf8574
   }
 
 
+  private async doSetup() {
+    const data: Uint8Array = this.collectSetupData();
+
+    try {
+      await this.i2c.write(data);
+    }
+    catch (e) {
+      // TODO: сделать повтор но так чтобы не дожидаться или дожидаться ???
+      //       если дожидаться то будет расходоваться память
+
+      throw e;
+    }
+
+    if (!this.setupBuffer) throw new Error(`No setupBuffer`);
+
+    for (let pinStr of Object.keys(this.setupBuffer)) {
+      const pin: number = parseInt(pinStr);
+
+      if (this.setupBuffer[pin].direction === PinDirection.input) {
+        this.inputPins[pin] = true;
+      }
+      else {
+        this.writtenState = this.setupBuffer[pin].initialValue || 0;
+      }
+    }
+
+    delete this.setupBuffer;
+  }
+
   private async doWrite() {
     const data: Uint8Array = this.collectWriteData();
 
@@ -163,6 +230,14 @@ export class Pcf8574
 
   private collectWriteData(): Uint8Array {
     // TODO: !!! get input pins, old state, buffer
+
+
+    // TODO: вычистить input пины - их нельзя записывать
+
+  }
+
+  private collectSetupData(): Uint8Array {
+    // TODO: !!!
   }
 
   // /**
