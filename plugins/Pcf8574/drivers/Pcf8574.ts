@@ -16,18 +16,22 @@ import {updateBitInByte} from 'system/lib/binaryHelpers';
 import BinaryState from 'system/lib/BinaryState';
 import QueueOverride from 'system/lib/QueueOverride';
 import IndexedEvents from 'system/lib/IndexedEvents';
-import {isEmptyObject} from 'system/lib/objects';
+import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
 import DebounceCallIncreasing from '../../../system/lib/debounceCall/DebounceCallIncreasing';
 
 
 export const PINS_COUNT = 8;
-const WRITE_ID = 0;
 const SETUP_DEBOUNCE_MS = 10;
 // TODO: caclucate using PINS_COUNT
 // length of data to send and receive to IC
 export const DATA_LENGTH = 1;
+enum QUEUE_IDS {
+  setup,
+  write,
+  read,
+}
 
 
 export class Pcf8574
@@ -112,7 +116,7 @@ export class Pcf8574
       ...state,
     };
 
-    return this.writeQueue.add(this.doWrite, WRITE_ID);
+    return this.writeQueue.add(this.doWrite, QUEUE_IDS.write);
   }
 
 
@@ -148,6 +152,9 @@ export class Pcf8574
    * Read input pins state
    */
   doPoll = async (): Promise<void> => {
+
+    // TODO: может тоже ставить в очередь ???
+
     const result: Uint8Array = await this.i2c.read(DATA_LENGTH);
     const state: BinaryState = new BinaryState(DATA_LENGTH, result);
     const objState = state.getObjectState();
@@ -180,32 +187,39 @@ export class Pcf8574
 
 
   private async doSetup() {
+    if (!this.setupBuffer) throw new Error(`No setupBuffer`);
+
     const data: Uint8Array = this.collectSetupData();
+    const setupBuffer: {[index: string]: ExpanderPinSetup} = cloneDeepObject(this.setupBuffer);
+
+    delete this.setupBuffer;
 
     try {
-      await this.i2c.write(data);
+      await this.writeQueue.add(() => this.i2c.write(data), QUEUE_IDS.setup);
     }
     catch (e) {
       // TODO: сделать повтор но так чтобы не дожидаться или дожидаться ???
       //       если дожидаться то будет расходоваться память
 
+      // put back setupBuffer
+      this.setupBuffer = {
+        ...setupBuffer,
+        ...this.setupBuffer || {},
+      };
+
       throw e;
     }
 
-    if (!this.setupBuffer) throw new Error(`No setupBuffer`);
-
-    for (let pinStr of Object.keys(this.setupBuffer)) {
+    for (let pinStr of Object.keys(setupBuffer)) {
       const pin: number = parseInt(pinStr);
 
-      if (this.setupBuffer[pin].direction === PinDirection.input) {
+      if (setupBuffer[pin].direction === PinDirection.input) {
         this.inputPins[pin] = true;
       }
       else {
-        this.writtenState = this.setupBuffer[pin].initialValue || 0;
+        this.writtenState[pin] = setupBuffer[pin].initialValue || false;
       }
     }
-
-    delete this.setupBuffer;
   }
 
   private async doWrite() {
