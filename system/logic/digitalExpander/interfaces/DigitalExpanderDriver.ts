@@ -3,16 +3,14 @@ import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../.
 
 export type DigitalExpanderDriverHandler = (newState: {[index: string]: boolean}) => void;
 
-// export interface DigitalExpanderPinsProps {
-//   direction: PinDirection;
-//   resistor?: InputResistorMode | OutputResistorMode;
-//   // for output pins
-//   initialValue?: boolean;
-//   // for input pin
-//   debounce?: number;
-//   // for input pin
-//   edge?: Edge;
-// }
+export interface ExpanderPinSetup {
+  direction: PinDirection;
+  resistor?: InputResistorMode | OutputResistorMode;
+  // for output pins
+  initialValue?: boolean;
+  // for input pin which will be handled at microcontroller side
+  debounce?: number;
+}
 
 
 export interface DigitalExpanderOutputDriver {
