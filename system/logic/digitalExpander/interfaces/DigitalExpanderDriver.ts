@@ -1,9 +1,14 @@
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../interfaces/gpioTypes';
+import {InputResistorMode, OutputResistorMode, PinDirection} from '../../../interfaces/gpioTypes';
 
+
+export enum DigitalExpanderEvents {
+  setup,
+  change
+}
 
 export type DigitalExpanderDriverHandler = (newState: {[index: string]: boolean}) => void;
 
-export interface ExpanderPinSetup {
+export interface DigitalExpanderPinSetup {
   direction: PinDirection;
   resistor?: InputResistorMode | OutputResistorMode;
   // for output pins
