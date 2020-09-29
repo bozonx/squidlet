@@ -416,6 +416,46 @@ export function extract2NumbersFromByte(byte: number): [number, number] {
   return [one, two];
 }
 
+// TODO: test
+/**
+ * Get number of octet.
+ * Octet number starts from 0.
+ * bitNum starts from 0
+ * * bitNum = 0 returns 0
+ * * bitNum = 7 returns 0
+ * * bitNum = 8 returns 1
+ * * bitNum = 25 returns 3
+ */
+export function getOctetNum(bitNum: number): number {
+  return Math.floor(bitNum / 8);
+}
+
+// TODO: test
+/**
+ * How many octets needs for specified bits count.
+ * Octet number starts from 1.
+ * bitNum starts from 1.
+ * * bitNum = 1 returns 1
+ * * bitNum = 8 returns 1
+ * * bitNum = 9 returns 2
+ * * bitNum = 25 returns 4
+ */
+export function howManyOctets(bitCount: number): number {
+  return Math.ceil(bitCount / 8);
+}
+
+// TODO: test
+/**
+ * Get bit number in one octet even bit number points to not the first octet
+ * * bitNum = 0 returns 0
+ * * bitNum = 7 returns 7
+ * * bitNum = 8 returns 0
+ * * bitNum = 9 returns 1
+ * @param bitNum
+ */
+export function getBitNumInOctet(bitNum: number) {
+  return bitNum - (Math.floor(bitNum / 8) * 8);
+}
 
 // export function isUint8Array(value: any): boolean {
 //   if (typeof value !== 'object') return false;

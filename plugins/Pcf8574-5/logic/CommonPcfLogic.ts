@@ -2,13 +2,14 @@ import {
   DigitalExpanderDriverHandler,
   DigitalExpanderEvents,
   DigitalExpanderInputDriver,
-  DigitalExpanderOutputDriver, DigitalExpanderPinInitHandler, DigitalExpanderPinSetup
+  DigitalExpanderOutputDriver,
+  DigitalExpanderPinInitHandler,
+  DigitalExpanderPinSetup
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import BinaryState from 'system/lib/BinaryState';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
-import {updateBitInByte} from 'system/lib/binaryHelpers';
-import {DATA_LENGTH, PINS_COUNT} from '../drivers/Pcf8574';
+import {howManyOctets, updateBitInByte} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
@@ -25,15 +26,16 @@ enum QUEUE_IDS {
 const SETUP_DEBOUNCE_MS = 10;
 
 
-
 export default class CommonPcfLogic
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private readonly context: Context;
   private readonly i2c: I2cMaster;
+  // length of data to send and receive to IC
+  private readonly dataLength: number;
   private events = new IndexedEventEmitter();
   private inputPins: {[index: string]: true} = {};
-  private writeQueue: QueueOverride;
+  private queue: QueueOverride;
   // state of pins which has been written to IC before
   private writtenState: {[index: string]: boolean} = {};
   // which pins are input
@@ -46,16 +48,13 @@ export default class CommonPcfLogic
   constructor(context: Context, i2c: I2cMaster, pinsCount: number) {
     this.i2c = i2c;
     this.context = context;
-    this.writeQueue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
-
-    // TODO: calculate using PINS_COUNT
-    // length of data to send and receive to IC
-    const DATA_LENGTH = 1;
+    this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
+    this.dataLength = howManyOctets(pinsCount);
   }
 
   destroy() {
     this.events.destroy();
-    this.writeQueue.destroy();
+    this.queue.destroy();
     this.setupDebounce.destroy();
   }
 
@@ -77,20 +76,16 @@ export default class CommonPcfLogic
    */
   writeState(state: {[index: string]: boolean}): Promise<void> {
 
-    // TODO: расслоение буфера
-    // TODO: новую запись не нужно хранить в буфере
     // TODO: пока идет setup сохранять в буфер, после сделать запись
-
-
     // TODO: нельзя запускать пока идет setup этого пина
     // TODO: нельзя записывать input pins
 
     this.writeBuffer = {
-      ...this.writeBuffer,
+      ...this.writeBuffer || {},
       ...state,
     };
 
-    return this.writeQueue.add(this.doWrite, QUEUE_IDS.write);
+    return this.queue.add(this.doWrite, QUEUE_IDS.write);
   }
 
 
@@ -115,10 +110,17 @@ export default class CommonPcfLogic
    */
   doPoll = async (): Promise<void> => {
 
-    // TODO: может тоже ставить в очередь ???
+    // TODO: нельзя делать пока не сделался setup хоть одного пина
+    //       это случай если вообще не была запущенна конфигурация или она в процессе
+    //       если закончилась инициализация то просто ставим в очередь
 
-    const result: Uint8Array = await this.i2c.read(DATA_LENGTH);
-    const state: BinaryState = new BinaryState(DATA_LENGTH, result);
+    // add to common queue
+    // TODO: если cb будет переписан то конкремно он может не выполниться
+    const result: Uint8Array = await this.queue.add(
+      () => this.i2c.read(this.dataLength),
+      QUEUE_IDS.read
+    );
+    const state: BinaryState = new BinaryState(this.dataLength, result);
     const objState = state.getObjectState();
     const inputChanges: {[index: string]: boolean} = {};
 
@@ -192,7 +194,7 @@ export default class CommonPcfLogic
     delete this.setupBuffer;
 
     try {
-      await this.writeQueue.add(() => this.i2c.write(data), QUEUE_IDS.setup);
+      await this.queue.add(() => this.i2c.write(data), QUEUE_IDS.setup);
     }
     catch (e) {
       // put back setupBuffer
