@@ -79,7 +79,6 @@ export class Pcf8574
   ): Promise<void> {
     return this.startSetupPin(pin, {
       direction: PinDirection.output,
-      resistor,
       initialValue,
     });
   }
@@ -116,10 +115,9 @@ export class Pcf8574
     if (debounce) {
       return Promise.reject(`PCF expander board can't handle a debounce`);
     }
-
+    // resistor doesn't mater.
     return this.startSetupPin(pin, {
       direction: PinDirection.input,
-      resistor,
       debounce,
     });
   }
@@ -190,13 +188,6 @@ export class Pcf8574
 
         this.doSetup()
           .catch(this.log.debug);
-          // .catch((e) => {
-          //
-          //   // TODO: разве оно должно режектить ???
-          //
-          //   this.events.removeListener(handlerIndex);
-          //   reject(e);
-          // });
       }, SETUP_DEBOUNCE_MS)
         .catch(reject);
     }));
