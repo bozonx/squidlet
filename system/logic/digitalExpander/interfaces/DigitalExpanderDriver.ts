@@ -3,7 +3,8 @@ import {InputResistorMode, OutputResistorMode, PinDirection} from '../../../inte
 
 export enum DigitalExpanderEvents {
   setup,
-  change
+  change,
+  incomeRawData,
 }
 
 export type DigitalExpanderDriverHandler = (newState: {[index: string]: boolean}) => void;
