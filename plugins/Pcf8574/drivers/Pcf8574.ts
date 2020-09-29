@@ -9,7 +9,8 @@ import {
   DigitalExpanderDriverHandler,
   DigitalExpanderOutputDriver,
   DigitalExpanderInputDriver,
-  ExpanderPinSetup
+  DigitalExpanderPinSetup,
+  DigitalExpanderEvents
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {
   InputResistorMode,
@@ -19,11 +20,11 @@ import {
 import {updateBitInByte} from 'system/lib/binaryHelpers';
 import BinaryState from 'system/lib/BinaryState';
 import QueueOverride from 'system/lib/QueueOverride';
-import IndexedEvents from 'system/lib/IndexedEvents';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
+import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
+import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../entities/drivers/I2cMaster/I2cMaster';
-import DebounceCallIncreasing from '../../../system/lib/debounceCall/DebounceCallIncreasing';
 
 
 export const PINS_COUNT = 8;
@@ -43,14 +44,14 @@ export class Pcf8574
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private i2c!: I2cMaster;
-  private events = new IndexedEvents<DigitalExpanderDriverHandler>();
+  private events = new IndexedEventEmitter();
   private inputPins: {[index: string]: true} = {};
   private writeQueue!: QueueOverride;
   // state of pins which has been written to IC before
   private writtenState: {[index: string]: boolean} = {};
   // which pins are input
   // buffer of pins which has to be set up
-  private setupBuffer?: {[index: string]: ExpanderPinSetup};
+  private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
   private writeBuffer?: {[index: string]: boolean};
   private setupDebounce = new DebounceCallIncreasing();
 
@@ -151,11 +152,11 @@ export class Pcf8574
 
     if (isEmptyObject(inputChanges)) return;
 
-    this.events.emit(inputChanges);
+    this.events.emit(DigitalExpanderEvents.change, inputChanges);
   }
 
   onChange(cb: DigitalExpanderDriverHandler): number {
-    return this.events.addListener(cb);
+    return this.events.addListener(DigitalExpanderEvents.change, cb);
   }
 
   removeListener(handlerIndex: number): void {
@@ -175,7 +176,7 @@ export class Pcf8574
 
 
 
-  private startSetupPin(pin: number, pinSetup: ExpanderPinSetup): Promise<void> {
+  private startSetupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
     return new Promise<void>(((resolve, reject) => {
       if (!this.setupBuffer) this.setupBuffer = {};
 
@@ -196,7 +197,7 @@ export class Pcf8574
     if (!this.setupBuffer) throw new Error(`No setupBuffer`);
 
     const data: Uint8Array = this.collectSetupData();
-    const setupBuffer: {[index: string]: ExpanderPinSetup} = cloneDeepObject(
+    const setupBuffer: {[index: string]: DigitalExpanderPinSetup} = cloneDeepObject(
       this.setupBuffer
     );
 
