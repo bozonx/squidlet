@@ -85,7 +85,7 @@ export default class CommonPcfLogic
       ...state,
     };
 
-    return this.queue.add(this.doWrite, QUEUE_IDS.write);
+    return this.queue.add(this.writeIc, QUEUE_IDS.write);
   }
 
 
@@ -114,12 +114,8 @@ export default class CommonPcfLogic
     //       это случай если вообще не была запущенна конфигурация или она в процессе
     //       если закончилась инициализация то просто ставим в очередь
 
-    // add to common queue
-    // TODO: если cb будет переписан то конкремно он может не выполниться
-    const result: Uint8Array = await this.queue.add(
-      () => this.i2c.read(this.dataLength),
-      QUEUE_IDS.read
-    );
+    const result: Uint8Array = await this.readIc();
+    // TODO: не обязательно тогда использовать BinaryState
     const state: BinaryState = new BinaryState(this.dataLength, result);
     const objState = state.getObjectState();
     const inputChanges: {[index: string]: boolean} = {};
@@ -163,6 +159,9 @@ export default class CommonPcfLogic
    * It waits forever while pin has been initialized.
    */
   private startSetupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
+
+    // TODO: очистить пин сначла
+
     return new Promise<void>(((resolve, reject) => {
       if (!this.setupBuffer) this.setupBuffer = {};
 
@@ -177,7 +176,7 @@ export default class CommonPcfLogic
         });
 
         this.doSetup()
-          .catch(this.log.debug);
+          .catch(this.context.log.debug);
       }, SETUP_DEBOUNCE_MS)
         .catch(reject);
     }));
@@ -205,7 +204,7 @@ export default class CommonPcfLogic
 
       // do setup again and don't wait for result
       this.doSetup()
-        .catch(this.log.debug);
+        .catch(this.context.log.debug);
 
       throw e;
     }
@@ -228,7 +227,7 @@ export default class CommonPcfLogic
     this.events.emit(DigitalExpanderEvents.setup, initializedPins);
   }
 
-  private async doWrite() {
+  private async writeIc() {
     const data: Uint8Array = this.collectWriteData();
 
 
@@ -246,6 +245,28 @@ export default class CommonPcfLogic
     }
 
     delete this.writeBuffer;
+  }
+
+  private readIc(): Promise<Uint8Array> {
+    return new Promise<Uint8Array>(((resolve, reject) =>  {
+      const handlerIndex = this.events.once(
+        DigitalExpanderEvents.incomeRawData,
+        resolve
+      );
+      // this handler can be overwritten by others
+      // because of that we use events here
+      const readHandler = async () => {
+        const data: Uint8Array = await this.i2c.read(this.dataLength);
+
+        this.events.emit(DigitalExpanderEvents.incomeRawData, data);
+      };
+
+      this.queue.add(readHandler, QUEUE_IDS.read)
+        .catch((e) => {
+          this.events.removeListener(handlerIndex);
+          reject(e);
+        });
+    }));
   }
 
   private collectWriteData(): Uint8Array {
