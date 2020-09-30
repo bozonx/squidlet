@@ -37,7 +37,11 @@ export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
     }
 
     this.i2cMasterIo = this.context.getIo('I2cMaster');
-    this.peerConnection = new PeerConnectionLogic(this.ping);
+    this.peerConnection = new PeerConnectionLogic(
+      this.ping,
+      // means all errors are connection error
+      (e: Error) => true
+    );
     //this.queue = new Queue(this.config.config.queueJobTimeoutSec);
   }
 
