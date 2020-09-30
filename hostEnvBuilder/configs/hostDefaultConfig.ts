@@ -7,13 +7,19 @@ const config: HostConfigConfig = {
   // timeout in seconds to send a request. It resend on failure or brake connection if timout is finished.
   connectionTimeoutSec: 20,
   requestTimeoutSec: 60,
+  // TODO: remove
   senderResendTimeout: 1,
+
   rcResponseTimoutSec: 30,
   responseTimoutSec: 10,
   queueJobTimeoutSec: 120,
   rebootDelaySec: 5,
   // TTL for network, max 255
   defaultTtl: 10,
+
+  reconnectTimes: 60,
+  reconnectTimeoutSec: 1,
+
   //appSwitchLock: false,
   // default params for connections
   // connections: {

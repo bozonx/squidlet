@@ -22,6 +22,10 @@ export interface HostConfigConfig {
   // delay before rebooting a host in seconds
   rebootDelaySec: number;
   defaultTtl: number;
+
+  reconnectTimes: number;
+  reconnectTimeoutSec: number;
+
   // allow or disallow to switch app into IoServer and back. Default is false
   //appSwitchLock: boolean;
   // custom params
