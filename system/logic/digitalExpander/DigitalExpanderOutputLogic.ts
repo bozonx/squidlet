@@ -2,6 +2,9 @@ import QueueOverride from '../../lib/QueueOverride';
 import BufferedRequest from '../../lib/BufferedRequest';
 
 
+/**
+ * Buffer write requests for 10ms and put requests to queue.
+ */
 export default class DigitalExpanderOutputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (changedState: {[index: string]: boolean}) => Promise<void>;

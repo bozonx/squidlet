@@ -40,8 +40,9 @@ export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
     this.peerConnection = new PeerConnectionLogic(
       this.ping,
       // means all errors are connection error
-      (e: Error) => true
-      // TODO: add pingIntervalMs adn pingCount
+      (e: Error) => true,
+      this.config.config.reconnectTimeoutSec * 1000,
+      this.config.config.reconnectTimes,
     );
     //this.queue = new Queue(this.config.config.queueJobTimeoutSec);
   }
