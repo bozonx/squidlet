@@ -9,7 +9,7 @@ import {
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import BinaryState from 'system/lib/BinaryState';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
-import {bitsToBytes, howManyOctets, updateBitInByte} from 'system/lib/binaryHelpers';
+import {bitsToBytes, howManyOctets} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
@@ -266,9 +266,12 @@ export default class CommonPcfLogic
       const readHandler = async () => {
         const data: Uint8Array = await this.i2c.read(this.dataLength);
 
-        //   if (!data || data.length !== DATA_LENGTH) {
-        //     return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
-        //   }
+        if (data.length !== this.dataLength) {
+          this.events.removeListener(handlerIndex);
+          reject(`Incorrect data length has been received`);
+
+          return;
+        }
 
         this.events.emit(DigitalExpanderEvents.incomeRawData, data);
       };
@@ -285,18 +288,7 @@ export default class CommonPcfLogic
     const result: boolean[] = new Array(this.pinsCount);
 
     for (let pin = 0; pin < this.pinsCount; pin++) {
-      // if pin is input switch it to HIGH state
-      if (this.inputPins[pin]) {
-        result[pin] = true;
-      }
-      // if pin is going to be saved
-      else if (this.writeBuffer && typeof this.writeBuffer[pin] !== 'undefined') {
-        result[pin] = this.writeBuffer[pin];
-      }
-      // not changed
-      else {
-        result[pin] = this.writtenState[pin] || false;
-      }
+      result[pin] = this.resolvePinBitState(pin);
     }
 
     return bitsToBytes(result);
@@ -307,23 +299,34 @@ export default class CommonPcfLogic
 
     for (let pin = 0; pin < this.pinsCount; pin++) {
       if (this.setupBuffer && this.setupBuffer[pin]) {
-
+        if (this.setupBuffer[pin].direction === PinDirection.input) {
+          result[pin] = true;
+        }
+        else {
+          result[pin] = this.setupBuffer[pin].initialValue || false;
+        }
       }
-      // if pin is input switch it to HIGH state
-      else if (this.inputPins[pin]) {
-        result[pin] = true;
-      }
-      // if pin is going to be saved
-      else if (this.writeBuffer && typeof this.writeBuffer[pin] !== 'undefined') {
-        result[pin] = this.writeBuffer[pin];
-      }
-      // not changed
       else {
-        result[pin] = this.writtenState[pin] || false;
+        result[pin] = this.resolvePinBitState(pin);
       }
     }
 
     return bitsToBytes(result);
+  }
+
+  private resolvePinBitState(pin: number): boolean {
+    // if pin is input switch it to HIGH state
+    if (this.inputPins[pin]) {
+      return true;
+    }
+    // if pin is going to be saved
+    else if (this.writeBuffer && typeof this.writeBuffer[pin] !== 'undefined') {
+      return this.writeBuffer[pin];
+    }
+    // not changed
+    else {
+      return this.writtenState[pin] || false;
+    }
   }
 
 

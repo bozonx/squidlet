@@ -1,8 +1,8 @@
+import Timeout = NodeJS.Timeout;
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
-import Timeout = NodeJS.Timeout;
 import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
 
 
