@@ -11,3 +11,7 @@ props:
   writeBufferMs:
     type: number
     default: 10
+
+  pollInterval:
+    type: number
+    default: 100

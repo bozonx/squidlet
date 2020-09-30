@@ -18,6 +18,7 @@ export default class DigitalExpanderInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
   private readonly waitResultTimeoutSec: number;
+  private readonly pollInterval: number;
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
@@ -31,11 +32,13 @@ export default class DigitalExpanderInputLogic {
   constructor(
     logError: (msg: Error | string) => void,
     pollOnce: () => Promise<void>,
-    waitResultTimeoutSec: number
+    waitResultTimeoutSec: number,
+    pollInterval: number
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;
     this.waitResultTimeoutSec = waitResultTimeoutSec;
+    this.pollInterval = pollInterval;
   }
 
   destroy() {
@@ -83,6 +86,15 @@ export default class DigitalExpanderInputLogic {
 
   getState(): {[index: string]: boolean} {
     return this.state;
+  }
+
+  /**
+   * Do poll and read a current state
+   */
+  async read(pin: number): Promise<boolean> {
+    // TODO: сделать driver.doPoll и слушать ближайший ответ + таймаут
+
+    return this.getState()[pin];
   }
 
   /**

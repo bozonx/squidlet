@@ -10,6 +10,7 @@ export interface DigitalExpanderInputProps {
   // default is true.
   useLocalDebounce?: boolean;
   waitResultTimeoutSec: number;
+  pollInterval: number;
 }
 
 
@@ -28,7 +29,8 @@ export default class DigitalInput implements DigitalInputIo {
     this.logic = new DigitalExpanderInputLogic(
       logError,
       this.driver.doPoll,
-      props.waitResultTimeoutSec
+      props.waitResultTimeoutSec,
+      props.pollInterval
     );
     this.useLocalDebounce = (typeof props.useLocalDebounce === 'undefined')
       // true is default
@@ -63,15 +65,8 @@ export default class DigitalInput implements DigitalInputIo {
     return this.logic.setupPin(pin, inputMode, localDebounce, edge);
   }
 
-  /**
-   * Just read a current state
-   * @param pin
-   */
-  async read(pin: number): Promise<boolean> {
-
-    // TODO: сделать driver.doPoll и слушать ближайший ответ + таймаут
-
-    return this.logic.getState()[pin];
+  read(pin: number): Promise<boolean> {
+    return this.logic.read(pin);
   }
 
   async onChange(pin: number, handler: ChangeHandler): Promise<number> {
