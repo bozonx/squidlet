@@ -41,6 +41,7 @@ export class I2cMaster extends DriverBase<I2cMasterDriverProps> {
       this.ping,
       // means all errors are connection error
       (e: Error) => true
+      // TODO: add pingIntervalMs adn pingCount
     );
     //this.queue = new Queue(this.config.config.queueJobTimeoutSec);
   }
