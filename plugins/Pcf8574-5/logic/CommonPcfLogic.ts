@@ -9,7 +9,7 @@ import {
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import BinaryState from 'system/lib/BinaryState';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
-import {howManyOctets, updateBitInByte} from 'system/lib/binaryHelpers';
+import {bitsToBytes, howManyOctets, updateBitInByte} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
@@ -31,6 +31,7 @@ export default class CommonPcfLogic
 {
   private readonly context: Context;
   private readonly i2c: I2cMaster;
+  private readonly pinsCount: number;
   // length of data to send and receive to IC
   private readonly dataLength: number;
   private events = new IndexedEventEmitter();
@@ -46,10 +47,11 @@ export default class CommonPcfLogic
 
 
   constructor(context: Context, i2c: I2cMaster, pinsCount: number) {
-    this.i2c = i2c;
     this.context = context;
-    this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
+    this.i2c = i2c;
+    this.pinsCount = pinsCount;
     this.dataLength = howManyOctets(pinsCount);
+    this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
   }
 
   destroy() {
@@ -239,6 +241,8 @@ export default class CommonPcfLogic
     //       после успешной записи сохранить в стейт
     //       запись делать в очереди. При ошибке очистить буфер
 
+    // TODO: когда очистить writeBuffer
+
     try {
       await this.i2c.write(data);
     }
@@ -262,6 +266,10 @@ export default class CommonPcfLogic
       const readHandler = async () => {
         const data: Uint8Array = await this.i2c.read(this.dataLength);
 
+        //   if (!data || data.length !== DATA_LENGTH) {
+        //     return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
+        //   }
+
         this.events.emit(DigitalExpanderEvents.incomeRawData, data);
       };
 
@@ -274,110 +282,57 @@ export default class CommonPcfLogic
   }
 
   private collectWriteData(): Uint8Array {
-    // TODO: !!! get input pins, old state, buffer
+    const result: boolean[] = new Array(this.pinsCount);
 
-    // TODO: write buffer может быть и чистый
+    for (let pin = 0; pin < this.pinsCount; pin++) {
+      // if pin is input switch it to HIGH state
+      if (this.inputPins[pin]) {
+        result[pin] = true;
+      }
+      // if pin is going to be saved
+      else if (this.writeBuffer && typeof this.writeBuffer[pin] !== 'undefined') {
+        result[pin] = this.writeBuffer[pin];
+      }
+      // not changed
+      else {
+        result[pin] = this.writtenState[pin] || false;
+      }
+    }
 
-    // TODO: вычистить input пины - их нельзя записывать
-
+    return bitsToBytes(result);
   }
 
   private collectSetupData(): Uint8Array {
-    // TODO: !!!
+    const result: boolean[] = [];
+
+    for (let pin = 0; pin < this.pinsCount; pin++) {
+      if (this.setupBuffer && this.setupBuffer[pin]) {
+
+      }
+      // if pin is input switch it to HIGH state
+      else if (this.inputPins[pin]) {
+        result[pin] = true;
+      }
+      // if pin is going to be saved
+      else if (this.writeBuffer && typeof this.writeBuffer[pin] !== 'undefined') {
+        result[pin] = this.writeBuffer[pin];
+      }
+      // not changed
+      else {
+        result[pin] = this.writtenState[pin] || false;
+      }
+    }
+
+    return bitsToBytes(result);
   }
 
-  // /**
-  //  * Just update state and don't save it to IC
-  //  */
-  // private updateState = (pin: number, value: boolean) => {
-  //   // TODO: remake
-  //   this.currentState = updateBitInByte(this.currentState, pin, value);
-  // }
-  //
+
   // private checkPinRange(pin: number) {
   //   if (pin < 0 || pin >= PINS_COUNT) {
   //     throw new Error(`Pin "${pin}" out of range`);
   //   }
   // }
 
-  // write(pin: number, value: boolean): Promise<void> {
-  //   // in case it is writing at the moment - save buffer and add cb to queue
-  //   if (this.isWriting()) {
-  //     return this.invokeAtWritingTime(pin, value);
-  //   }
-  //   // start buffering step or update buffer
-  //   else if(this.writeBufferMs) {
-  //     // in buffering case collect data at the buffering time (before writing)
-  //     return this.invokeBuffering(pin, value);
-  //   }
-  //   // else if buffering doesn't set - just start writing
-  //   const stateToWrite = updateBitInByte(this.getState(), pin, value);
-  //
-  //   return this.startWriting(stateToWrite);
-  // }
-
-  /**
-   * Write given state to the IC.
-   */
-  private writeToIc = (newStateByte: number): Promise<void> => {
-    if (this.directions[pin] !== PinDirection.output) {
-      return Promise.reject(new Error('Pin is not defined as an output'));
-    }
-
-    if (this.initIcLogic.isSetupStep) {
-      // update current value of pin and go out if there is setup step
-      this.updateState(pin, value);
-
-      return Promise.resolve();
-    }
-
-
-
-    let preparedState: number = newStateByte;
-
-    if (this.hasInputPins()) {
-      for (let pin = 0; pin < PINS_COUNT; pin++) {
-        if (this.directions[pin] !== PinDirection.input) continue;
-        // set height level for inputs. It needs for PCF IC
-        preparedState = updateBitInByte(preparedState, pin, true);
-      }
-    }
-
-    const dataToSend: Uint8Array = new Uint8Array(DATA_LENGTH);
-    // fill data
-    dataToSend[0] = preparedState;
-
-    return this.i2c.write(dataToSend);
-  }
-
-
-
-
-  ////////////////// FROM driver
-
-  // /**
-  //  * Listen to changes of pin after edge and debounce were processed.
-  //  */
-  // onChange(pin: number, handler: ChangeHandler): number {
-  //   this.checkPinRange(pin);
-  //
-  //   return this.expanderInput.onChange(pin, handler);
-  // }
-  //
-  // removeListener(handlerIndex: number) {
-  //   this.expanderInput.removeListener(handlerIndex);
-  // }
-  //
-  // /**
-  //  * Poll expander manually.
-  //  */
-  // pollOnce = (): Promise<void> => {
-  //   // it is no need to do poll while initialization time because it will be done after initialization
-  //   if (!this.initIcLogic.wasInitialized) return Promise.resolve();
-  //
-  //   return this.i2c.pollOnce();
-  // }
-  //
   // private startFeedback() {
   //   // if I2C driver doesn't have feedback then it doesn't need to be setup
   //   if (!this.i2c.hasFeedback()) return;
@@ -385,35 +340,6 @@ export default class CommonPcfLogic
   //   this.i2c.addListener(this.handleIcStateChange);
   //   // make first request and start handle feedback
   //   this.i2c.startFeedback();
-  // }
-  //
-  // private handleIcStateChange = (data: Uint8Array) => {
-  //
-  //   console.log('------- handleIcStateChange ---------', data)
-  //
-  //   if (!data || data.length !== DATA_LENGTH) {
-  //     return this.log.error(`PCF8574Driver: Incorrect data length has been received`);
-  //   }
-  //
-  //   const receivedByte: number = data[0];
-  //
-  //   // update values add rise change event of input pins which are changed
-  //   for (let pin = 0; pin < PINS_COUNT; pin++) {
-  //     // skip not input pins
-  //     if (this.directions[pin] !== PinDirection.input) continue;
-  //
-  //     const newValue: boolean = getBitFromByte(receivedByte, pin);
-  //
-  //     this.expanderInput.incomeState(pin, newValue, this.pinDebounces[pin]);
-  //   }
-  // }
-
-  // /**
-  //  * Read whole state of IC.
-  //  * If IC has 8 pins then one byte will be returned if 16 then 2 bytes.
-  //  */
-  // async readState(): Promise<Uint8Array> {
-  //   return this.i2c.read(DATA_LENGTH);
   // }
 
 }
