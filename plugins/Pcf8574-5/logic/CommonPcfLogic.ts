@@ -141,8 +141,12 @@ export default class CommonPcfLogic
 
   ////////// Common
 
-  clearPin(pin: number): Promise<void> {
-    // TODO: !!!!!
+  async clearPin(pin: number): Promise<void> {
+    delete this.inputPins[pin];
+    delete this.writtenState[pin];
+
+    if (this.setupBuffer) delete this.setupBuffer[pin];
+    if (this.writeBuffer) delete this.writeBuffer[pin];
   }
 
   wasPinInitialized(pin: number): boolean {
@@ -183,7 +187,8 @@ export default class CommonPcfLogic
   }
 
   private async doSetup() {
-    if (!this.setupBuffer) throw new Error(`No setupBuffer`);
+    // it means some pins has been cleaned
+    if (!this.setupBuffer || isEmptyObject(this.setupBuffer)) return;
 
     const data: Uint8Array = this.collectSetupData();
     const setupBuffer: {[index: string]: DigitalExpanderPinSetup} = cloneDeepObject(
@@ -230,7 +235,6 @@ export default class CommonPcfLogic
   private async writeIc() {
     const data: Uint8Array = this.collectWriteData();
 
-
     // TODO: сохранить в буфер
     //       после успешной записи сохранить в стейт
     //       запись делать в очереди. При ошибке очистить буфер
@@ -272,6 +276,7 @@ export default class CommonPcfLogic
   private collectWriteData(): Uint8Array {
     // TODO: !!! get input pins, old state, buffer
 
+    // TODO: write buffer может быть и чистый
 
     // TODO: вычистить input пины - их нельзя записывать
 
