@@ -3,13 +3,9 @@ import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
 import DigitalInput, {DigitalExpanderInputProps} from 'system/logic/digitalExpander/DigitalInput';
 import DigitalOutput, {DigitalExpanderOutputProps} from 'system/logic/digitalExpander/DigitalOutput';
-import {
-  DigitalExpanderInputDriver,
-  DigitalExpanderOutputDriver
-} from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 
 import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
-import {Pcf8574} from '../../drivers/Pcf8574';
+import {Pcf8574} from '../../drivers/Pcf8574/Pcf8574';
 
 
 interface Props extends I2cMasterDriverProps,
@@ -37,7 +33,6 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
 
   init = async () => {
     this.driver = await this.context.getSubDriver<Pcf8574>('Pcf8574', {
-      // TODO: передават не все props
       ...this.props,
       waitResultTimeoutSec: this.config.config.responseTimoutSec
     });
@@ -49,7 +44,6 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.usedIo[ioName]) {
-      // TODO: передават не все props
       this.usedIo[ioName] = new ios[ioName](this.driver, this.log.error, this.props);
     }
 
