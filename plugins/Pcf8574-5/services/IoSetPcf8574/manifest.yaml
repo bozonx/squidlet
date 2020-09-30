@@ -8,19 +8,6 @@ drivers:
 props:
   $base: 'drivers.Pcf8574'
 
-#  writeBufferMs:
-#    default: 10
-#
-#  defaultDebounce:
-#    type: number
-
-  ###### Other props
-  ### I2cMasterDriverProps
-  # busNum: {}
-  # address: {}
-  #
-  ## MasterSlaveBusProps
-  # int: {}
-  # poll: {}
-  # feedback: {}
-  # defaultPollIntervalMs: {}
+  writeBufferMs:
+    type: number
+    default: 10
