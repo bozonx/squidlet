@@ -11,7 +11,9 @@ import {Pcf8574} from '../../drivers/Pcf8574/Pcf8574';
 
 interface Props extends I2cMasterDriverProps {
   writeBufferMs: number;
-  pollInterval: number;
+  pollIntervalMs: number;
+  // TODO: use int props ???
+  interrupt?: {[index: string]: any};
 }
 
 type ExpanderIoItemClass = new (
@@ -46,7 +48,8 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
     if (!this.usedIo[ioName]) {
       this.usedIo[ioName] = new ios[ioName](this.driver, this.log.error, {
         writeBufferMs: this.props.writeBufferMs,
-        pollInterval: this.props.pollInterval,
+        pollIntervalMs: this.props.pollIntervalMs,
+        interrupt: this.props.interrupt,
         useLocalDebounce: true,
         waitResultTimeoutSec: this.config.config.responseTimoutSec,
         queueJobTimeoutSec: this.config.config.queueJobTimeoutSec,

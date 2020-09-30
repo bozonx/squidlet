@@ -4,6 +4,7 @@ import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
+import Polling from '../../lib/Polling';
 
 
 interface InputPinProps {
@@ -18,10 +19,11 @@ export default class DigitalExpanderInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
   private readonly waitResultTimeoutSec: number;
-  private readonly pollInterval: number;
+  private readonly pollIntervalMs: number;
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
+  private polling?: Polling;
   private state: {[index: string]: boolean} = {};
   private pinProps: {[index: string]: InputPinProps} = {};
   private pollPromise?: Promise<void>;
@@ -33,17 +35,24 @@ export default class DigitalExpanderInputLogic {
     logError: (msg: Error | string) => void,
     pollOnce: () => Promise<void>,
     waitResultTimeoutSec: number,
-    pollInterval: number
+    pollIntervalMs: number,
+    usePolling: boolean
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;
     this.waitResultTimeoutSec = waitResultTimeoutSec;
-    this.pollInterval = pollInterval;
+    this.pollIntervalMs = pollIntervalMs;
+
+    if (usePolling) {
+      this.polling = new Polling();
+    }
   }
 
   destroy() {
     this.events.destroy();
     this.debounce.destroy();
+
+    if (this.polling) this.polling.destroy();
 
     for (let pin of Object.keys(this.waitingPollResultTimeouts)) {
       clearTimeout(this.waitingPollResultTimeouts[pin]);
@@ -58,6 +67,7 @@ export default class DigitalExpanderInputLogic {
 
   /**
    * To use debounce at microcontroller side set debounce to 0.
+   * At time this method called setup data has been sent to remote host.
    * @param pin
    * @param resistor
    * @param debounce
@@ -82,6 +92,11 @@ export default class DigitalExpanderInputLogic {
       debounce,
       edge: resolvedEdge,
     };
+
+    if (this.polling && !this.polling.isInProgress()) {
+      // TODO: правильно ли использовать doPoll ???
+      this.polling.start(this.doPoll, this.pollIntervalMs);
+    }
   }
 
   getState(): {[index: string]: boolean} {
@@ -92,7 +107,7 @@ export default class DigitalExpanderInputLogic {
    * Do poll and read a current state
    */
   async read(pin: number): Promise<boolean> {
-    // TODO: сделать driver.doPoll и слушать ближайший ответ + таймаут
+    // TODO: сделать poll restart и слушать ближайший ответ + таймаут
 
     return this.getState()[pin];
   }
@@ -183,6 +198,7 @@ export default class DigitalExpanderInputLogic {
       })
       .catch(this.logError);
 
+    // TODO: нужно использовать polling.restart если используется polling
     this.doPoll()
       // TODO: на ошибку очистить ожидание - удалить событие и таймаут
       .catch(this.logError);

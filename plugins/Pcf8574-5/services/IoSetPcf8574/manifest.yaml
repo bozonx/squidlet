@@ -12,6 +12,9 @@ props:
     type: number
     default: 10
 
-  pollInterval:
+  pollIntervalMs:
     type: number
     default: 100
+
+  interrupt:
+    type: object

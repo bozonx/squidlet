@@ -41,6 +41,7 @@ export interface DigitalExpanderOutputDriver {
 export interface DigitalExpanderInputDriver {
   /**
    * Setup one or more pins. It can be called several times.
+   * It will be wait for setup done forever.
    * It isn't possible to handle Edge at microcontroller side because of interface which
    * is used. Edge is processing at local side.
    * If debounce exists on microcontroller side then define some number.
