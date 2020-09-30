@@ -10,7 +10,9 @@ export interface DigitalExpanderInputProps {
   // default is true.
   useLocalDebounce?: boolean;
   waitResultTimeoutSec: number;
-  pollInterval: number;
+  pollIntervalMs: number;
+  // TODO: use int props ???
+  interrupt?: Object;
 }
 
 
@@ -30,13 +32,16 @@ export default class DigitalInput implements DigitalInputIo {
       logError,
       this.driver.doPoll,
       props.waitResultTimeoutSec,
-      props.pollInterval
+      props.pollIntervalMs,
+      !props.interrupt
     );
     this.useLocalDebounce = (typeof props.useLocalDebounce === 'undefined')
       // true is default
       ? true
       // or use defined one
       : props.useLocalDebounce;
+
+    // TODO: использовать input драйвер + логику impulseInput
 
     this.driver.onChange(this.logic.handleIncomeState);
   }
