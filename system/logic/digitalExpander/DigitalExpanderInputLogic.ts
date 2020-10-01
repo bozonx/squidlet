@@ -23,12 +23,12 @@ export default class DigitalExpanderInputLogic {
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
-  private polling?: Polling;
+  private readonly polling?: Polling;
   private state: {[index: string]: boolean} = {};
   private pinProps: {[index: string]: InputPinProps} = {};
   private pollPromise?: Promise<void>;
   // timeouts for the time when pin is waiting for poll result after debounce
-  private waitingPollResultTimeouts: {[index: string]: Timeout} = {};
+  private waitingFinalStateTimeouts: {[index: string]: Timeout} = {};
 
 
   constructor(
@@ -54,11 +54,11 @@ export default class DigitalExpanderInputLogic {
 
     if (this.polling) this.polling.destroy();
 
-    for (let pin of Object.keys(this.waitingPollResultTimeouts)) {
-      clearTimeout(this.waitingPollResultTimeouts[pin]);
+    for (let pin of Object.keys(this.waitingFinalStateTimeouts)) {
+      clearTimeout(this.waitingFinalStateTimeouts[pin]);
     }
 
-    delete this.waitingPollResultTimeouts;
+    delete this.waitingFinalStateTimeouts;
     delete this.pollPromise;
     delete this.state;
     delete this.pinProps;
@@ -127,9 +127,9 @@ export default class DigitalExpanderInputLogic {
    * Do not handle pin any more
    */
   clearPin(pin: number) {
-    clearTimeout(this.waitingPollResultTimeouts[pin]);
+    clearTimeout(this.waitingFinalStateTimeouts[pin]);
 
-    delete this.waitingPollResultTimeouts[pin];
+    delete this.waitingFinalStateTimeouts[pin];
     delete this.pinProps[pin];
     delete this.state[pin];
 
@@ -144,21 +144,22 @@ export default class DigitalExpanderInputLogic {
    */
   handleIncomeState = (newState: {[index: string]: boolean}) => {
     // handle logic of all the changed pins
-    for (let pin of Object.keys(newState)) {
-      // if pin is in debounce time then do nothing
+    for (let pinStr of Object.keys(newState)) {
+      const pin: number = parseInt(pinStr);
+      // if pin is in debounce time then do nothing. State doesn't matter.
       if (this.debounce.isInvoking(pin)) {
         continue;
       }
-      // if pin is waiting poll result after debounce
-      else if (this.waitingPollResultTimeouts[pin]) {
+      // if pin is waiting final state after debounce
+      else if (this.waitingFinalStateTimeouts[pin]) {
         this.events.emit(`${READ_RESULT_PREFIX}${pin}`, newState[pin]);
       }
-
+      // Else a fresh request.
       // Don't handle not changed pins.
       // It means they not changed but was delivered on poll.
       if (newState[pin] === this.state[pin]) continue;
 
-      this.startDebounce(parseInt(pin), newState[pin]);
+      this.startDebounce(pin, newState[pin]);
     }
   }
 
@@ -168,43 +169,51 @@ export default class DigitalExpanderInputLogic {
    */
   private startDebounce(pin: number, newValue: boolean) {
     if (!this.pinProps[pin]) {
-      throw new Error(`Pin "${pin}" hasn't been set up.`);
+      this.logError(`Pin "${pin}" hasn't been set up.`);
+
+      return;
     }
 
     const debounceMs: number = this.pinProps[pin].debounce || 0;
     // make debounced call if it was set
     if (debounceMs > 0) {
       // wait for debounce and after than read current level
-      this.debounce.invoke(() => {
-        // debounce don't handle cb's promise
-        this.handleEndOfDebounce(pin);
-      }, debounceMs, pin)
+      // debounce don't handle cb's promise
+      this.debounce.invoke(() => this.handleEndOfDebounce(pin), debounceMs, pin)
         .catch(this.logError);
 
       return;
     }
     // else emit right now if there isn't any debounce
-    this.afterDebounce(pin, newValue);
+    this.setFinalState(pin, newValue);
   }
 
   /**
    * While debounce is in progress all other requests are ignored.
-   * When debounce is finished then the confirmations is started.
+   * When debounce is finished then the confirmation is started.
+   * Debounce's callbacks doesn't wait for result.
    */
   private handleEndOfDebounce(pin: number) {
-    this.waitForFinalState(pin)
-      .then((finalState: boolean) => {
-        this.afterDebounce(pin, finalState);
-      })
+    // start waiting for confirmation
+    this.waitForConfirmation(pin)
+      // on success set state and rise an event
+      .then((finalState: boolean) => this.setFinalState(pin, finalState))
       .catch(this.logError);
-
-    // TODO: нужно использовать polling.restart если используется polling
-    this.doPoll()
-      // TODO: на ошибку очистить ожидание - удалить событие и таймаут
-      .catch(this.logError);
+    // do new poll
+    if (this.polling) {
+      // if polling is used then just restart it and don't wait for result
+      this.polling.restart()
+        .catch(this.logError);
+    }
+    else {
+      // if polling isn't used then just do new poll
+      this.doPoll()
+        .catch(this.logError);
+    }
   }
 
   private async doPoll() {
+    // TODO: на ошибку очистить ожидание - удалить событие и таймаут
 
     // TODO: review может спокойно запускать новый poll - может там очередь отрабатывает
     //       так даже дожидаься не обязательно
@@ -231,7 +240,11 @@ export default class DigitalExpanderInputLogic {
     }
   }
 
-  private waitForFinalState(pin: number): Promise<boolean> {
+  private waitForConfirmation(pin: number): Promise<boolean> {
+
+    // TODO: не поднимать события пинов которые не были засетапены
+
+
     // it will be called immediately at the current tick.
     return new Promise<boolean>((resolve, reject) => {
 
@@ -241,25 +254,25 @@ export default class DigitalExpanderInputLogic {
         `${READ_RESULT_PREFIX}${pin}`,
         (level: boolean) => {
           this.events.removeListener(handlerIndex);
-          clearTimeout(this.waitingPollResultTimeouts[pin]);
+          clearTimeout(this.waitingFinalStateTimeouts[pin]);
 
-          delete this.waitingPollResultTimeouts[pin];
+          delete this.waitingFinalStateTimeouts[pin];
 
           resolve(level);
         }
       );
 
-      this.waitingPollResultTimeouts[pin] = setTimeout(() => {
+      this.waitingFinalStateTimeouts[pin] = setTimeout(() => {
         this.events.removeListener(handlerIndex);
 
-        delete this.waitingPollResultTimeouts[pin];
+        delete this.waitingFinalStateTimeouts[pin];
 
         reject(new Error(`Wait pin "${pin}" result timeout`));
       }, this.waitResultTimeoutSec * 1000);
     });
   }
 
-  private afterDebounce(pin: number, finalState: boolean) {
+  private setFinalState(pin: number, finalState: boolean) {
 
     // TODO: пересмотреть ещё раз, нужна ли зависимость от старого стейта ???
 
