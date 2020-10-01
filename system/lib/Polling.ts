@@ -52,6 +52,9 @@ export default class Polling {
       throw new Error(`Polling of "${uniqId}" and interval ${pollInterval}: This poll already is in progress`);
     }
 
+    // TODO: проверить чтобы небыло накладываний запросов
+    //       если 1 запрос завис и превысил pollIntervalMs
+
     const id = this.resolveId(uniqId);
     const pollingCbWrapper: MethodWrapper = () => {
       // TODO: почему не ждем завершения ????
