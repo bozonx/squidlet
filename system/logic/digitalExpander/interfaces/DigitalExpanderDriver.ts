@@ -54,7 +54,8 @@ export interface DigitalExpanderInputDriver {
   ): Promise<void>;
 
   /**
-   * Read input pins state
+   * Read input pins state.
+   * It has to use QueueOverride to not do unnecessary requests.
    */
   doPoll: () => Promise<void>;
 
