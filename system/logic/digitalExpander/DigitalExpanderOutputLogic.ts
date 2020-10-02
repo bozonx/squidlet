@@ -90,22 +90,16 @@ export default class DigitalExpanderOutputLogic {
    * Write full or partial state
    */
   async writeState(partialState: {[index: string]: boolean}): Promise<void> {
-    // if (this.isWriting()) {
-    //   // TODO: what to do ????
-    // }
-    if (this.writingState) {
-      // TODO: более точное условие ожидания writing
-      // waiting for writing
-      // If second and further times
-      // update writing buffer
-      this.writingState = {
-        ...this.writingState,
+    // If there is some cb waiting - just update buffer
+    // Or if there is writing one job but no queue
+    if (this.queue.isPending() || this.queue.hasQueue()) {
+      // make buffer
+      this.writingQueueBuffer = {
+        ...this.writingQueueBuffer,
         ...partialState,
       };
+      // add job to queue
       return this.queue.add(this.doWriteCb);
-    }
-    else if (this.writingQueueBuffer) {
-      // TODO: what to do ????
     }
     // else it is in a buffering state or it is a new request
     return this.bufferedRequest.write(partialState);
@@ -117,6 +111,7 @@ export default class DigitalExpanderOutputLogic {
    */
   private startWriting = (stateToSave: {[index: string]: boolean}): Promise<void> => {
     // at buffering time writingState is undefined
+    if (this.writingState) throw new Error(`writingState exists at start new writing time`);
     // use it to pass data to doWriteCb() and get this state in getState()
     this.writingState = {...stateToSave};
     // first write request will be called write now at the current tick
@@ -124,54 +119,48 @@ export default class DigitalExpanderOutputLogic {
   }
 
   private doWriteCb = async () => {
-    let stateToWrite: {[index: string]: boolean};
-    // if is going to queue
+    if (!this.writingState && !this.writingQueueBuffer) {
+      throw new Error(`no state to write`);
+    }
+
+    // if is writing queued job
     if (this.writingQueueBuffer) {
       if (isEmptyObject(this.writingQueueBuffer)) return;
 
-      stateToWrite = {...this.writingQueueBuffer};
+      this.writingState = {...this.writingQueueBuffer};
 
       this.writingState = this.writingQueueBuffer;
 
       delete this.writingQueueBuffer;
     }
-    // if first time
-    else if (this.writingState) {
-      if (isEmptyObject(this.writingState)) return;
+    // else first time - use writingState
+    // Let writingState exist while the writing process is finished because
+    // it will be used in getState()
 
-      stateToWrite = {...this.writingState};
-    }
-    else {
-      throw new Error(`no state to write`);
-    }
+    if (!this.writingState || isEmptyObject(this.writingState)) return;
 
     try {
-      await this.writeCb(stateToWrite);
+      await this.writeCb(this.writingState);
     }
     catch (e) {
-      // remove buffer because the queue will be cancelled
+      // remove all buffers because the queue will be cancelled
       delete this.writingState;
       delete this.writingQueueBuffer;
 
       throw e;
     }
 
-    delete this.writingState;
-
     // TODO: надо поднять событие что было изменение стейта
     //       инача переключатели в UI не отработают
     //       либо это делать уровнем выше на ошибку
 
-    // if (!this.queue.hasQueue()) {
-    //   // remove buffer if there aren't no queue
-    //   delete this.writingState;
-    // }
-
     // set a new state which has been just saved
     this.savedState = {
       ...this.savedState,
-      ...stateToWrite,
+      ...this.writingState,
     };
+
+    delete this.writingState;
   }
 
 }
