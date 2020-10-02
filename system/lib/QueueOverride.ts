@@ -111,7 +111,7 @@ export default class QueueOverride {
       // return promise which will be resolved after queued cb finished
       return (item[ItemPosition.finishPromised] as Promised<void>).promise;
     }
-    // else no one is in queue or pending - just start cb and return is't promise
+    // else no one is in queue or pending - just start cb and return it's promise
     this.items[id] = [new Promised<void>()];
 
     this.startCb(cb, id);
