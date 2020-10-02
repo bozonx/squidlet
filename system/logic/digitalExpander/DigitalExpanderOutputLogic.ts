@@ -46,6 +46,7 @@ export default class DigitalExpanderOutputLogic {
   getState(): {[index: string]: boolean} {
     return {
       ...this.savedState,
+      // TODO: а то что в буфере ???
       ...this.writingState || {},
       ...this.writingQueueBuffer || {},
     };
@@ -93,7 +94,7 @@ export default class DigitalExpanderOutputLogic {
     // If there is some cb waiting - just update buffer
     // Or if there is writing one job but no queue
     if (this.queue.isPending() || this.queue.hasQueue()) {
-      // make buffer
+      // make or update queue buffer
       this.writingQueueBuffer = {
         ...this.writingQueueBuffer,
         ...partialState,
