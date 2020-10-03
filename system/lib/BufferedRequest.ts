@@ -28,6 +28,10 @@ export default class BufferedRequest {
     return !!this.beforeWritingBuffer;
   }
 
+  getState(): {[index: string]: any} | undefined {
+    return this.beforeWritingBuffer;
+  }
+
   async write(state: {[index: string]: any}): Promise<void> {
     // TODO: если this.writeBufferMs = 0 то можно сразу выполнять
 
