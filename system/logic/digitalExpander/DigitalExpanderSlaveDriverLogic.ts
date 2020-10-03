@@ -15,8 +15,12 @@ import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
 import Context from 'system/Context';
 
-import {I2cMaster} from '../../../entities/drivers/I2cMaster/I2cMaster';
 
+export interface DigitalExpanderSlaveDriverProps {
+  pinsCount: number;
+  write: (data: Uint8Array) => Promise<void>;
+  read: (dataLength: number) => Promise<Uint8Array>;
+}
 
 enum QUEUE_IDS {
   setup,
@@ -30,9 +34,7 @@ export default class DigitalExpanderSlaveDriverLogic
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private readonly context: Context;
-  // TODO: use interface
-  private readonly i2c: I2cMaster;
-  private readonly pinsCount: number;
+  private readonly props: DigitalExpanderSlaveDriverProps;
   // length of data to send and receive to IC
   private readonly dataLength: number;
   private events = new IndexedEventEmitter();
@@ -47,12 +49,10 @@ export default class DigitalExpanderSlaveDriverLogic
   private setupDebounce = new DebounceCallIncreasing();
 
 
-  // TODO: use props
-  constructor(context: Context, i2c: I2cMaster, pinsCount: number) {
+  constructor(context: Context, props: DigitalExpanderSlaveDriverProps) {
     this.context = context;
-    this.i2c = i2c;
-    this.pinsCount = pinsCount;
-    this.dataLength = howManyOctets(pinsCount);
+    this.props = props;
+    this.dataLength = howManyOctets(this.props.pinsCount);
     this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
   }
 
@@ -202,7 +202,7 @@ export default class DigitalExpanderSlaveDriverLogic
     delete this.setupBuffer;
 
     try {
-      await this.queue.add(() => this.i2c.write(data), QUEUE_IDS.setup);
+      await this.queue.add(() => this.props.write(data), QUEUE_IDS.setup);
     }
     catch (e) {
       // put back setupBuffer
@@ -246,7 +246,7 @@ export default class DigitalExpanderSlaveDriverLogic
     // TODO: когда очистить writeBuffer
 
     try {
-      await this.i2c.write(data);
+      await this.props.write(data);
     }
     catch (e) {
       delete this.writeBuffer;
@@ -266,7 +266,7 @@ export default class DigitalExpanderSlaveDriverLogic
       // this handler can be overwritten by others
       // because of that we use events here
       const readHandler = async () => {
-        const data: Uint8Array = await this.i2c.read(this.dataLength);
+        const data: Uint8Array = await this.props.read(this.dataLength);
 
         if (data.length !== this.dataLength) {
           this.events.removeListener(handlerIndex);
@@ -287,9 +287,9 @@ export default class DigitalExpanderSlaveDriverLogic
   }
 
   private collectWriteData(): Uint8Array {
-    const result: boolean[] = new Array(this.pinsCount);
+    const result: boolean[] = new Array(this.props.pinsCount);
 
-    for (let pin = 0; pin < this.pinsCount; pin++) {
+    for (let pin = 0; pin < this.props.pinsCount; pin++) {
       result[pin] = this.resolvePinBitState(pin);
     }
 
@@ -299,7 +299,7 @@ export default class DigitalExpanderSlaveDriverLogic
   private collectSetupData(): Uint8Array {
     const result: boolean[] = [];
 
-    for (let pin = 0; pin < this.pinsCount; pin++) {
+    for (let pin = 0; pin < this.props.pinsCount; pin++) {
       if (this.setupBuffer && this.setupBuffer[pin]) {
         if (this.setupBuffer[pin].direction === PinDirection.input) {
           result[pin] = true;

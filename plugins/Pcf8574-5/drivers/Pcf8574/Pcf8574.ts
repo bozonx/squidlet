@@ -23,21 +23,23 @@ export class Pcf8574
   extends DriverBase<I2cMasterDriverProps>
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
+  private i2cMasterDriver!: I2cMaster;
   private expander!: DigitalExpanderSlaveDriverLogic;
 
 
   init = async () => {
-    const i2cMasterDriver = await this.context.getSubDriver<I2cMaster>(
+    this.i2cMasterDriver = await this.context.getSubDriver<I2cMaster>(
       'I2cMaster',
       this.props
     );
 
-    // TODO: вместо драйвера передать метод write и конвертировать тут
-
     this.expander = new DigitalExpanderSlaveDriverLogic(
       this.context,
-      i2cMasterDriver,
-      PINS_COUNT
+      {
+        pinsCount: PINS_COUNT,
+        write: this.doWrite,
+        read: this.doRead,
+      }
     );
   }
 
@@ -80,6 +82,15 @@ export class Pcf8574
 
   clearPin(pin: number): Promise<void> {
     return this.expander.clearPin(pin);
+  }
+
+
+  private doWrite = (data: Uint8Array): Promise<void> => {
+    return this.i2cMasterDriver.write(data);
+  }
+
+  private doRead = (dataLength: number): Promise<Uint8Array> => {
+    return this.i2cMasterDriver.read(dataLength);
   }
 
 }
