@@ -39,7 +39,7 @@ export default class DigitalExpanderOutputLogic {
   getState(): {[index: string]: boolean} {
     return {
       ...this.bufferedQueue.getState(),
-      ...this.bufferedRequest.getState(),
+      ...this.bufferedRequest.getBuffer(),
     };
   }
 
