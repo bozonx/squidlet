@@ -26,10 +26,11 @@ enum QUEUE_IDS {
 const SETUP_DEBOUNCE_MS = 10;
 
 
-export default class CommonPcfLogic
+export default class DigitalExpanderSlaveDriverLogic
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private readonly context: Context;
+  // TODO: use interface
   private readonly i2c: I2cMaster;
   private readonly pinsCount: number;
   // length of data to send and receive to IC

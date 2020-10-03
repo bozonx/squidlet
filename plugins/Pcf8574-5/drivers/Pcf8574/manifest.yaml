@@ -6,15 +6,3 @@ drivers:
 
 props:
   $base: 'drivers.I2cMaster'
-
-#  writeBufferMs:
-#    type: number
-
-  ### I2cMaster driver props
-  #busNum: {}
-  #address: {}
-  #int: {}
-  #feedback: {}
-  #defaultPollIntervalMs:
-  #  default: 100
-  #poll: {}
