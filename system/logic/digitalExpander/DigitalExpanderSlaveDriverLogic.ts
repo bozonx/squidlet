@@ -47,6 +47,7 @@ export default class DigitalExpanderSlaveDriverLogic
   private setupDebounce = new DebounceCallIncreasing();
 
 
+  // TODO: use props
   constructor(context: Context, i2c: I2cMaster, pinsCount: number) {
     this.context = context;
     this.i2c = i2c;

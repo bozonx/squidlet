@@ -32,7 +32,13 @@ export class Pcf8574
       this.props
     );
 
-    this.expander = new DigitalExpanderSlaveDriverLogic(this.context, i2cMasterDriver, PINS_COUNT);
+    // TODO: вместо драйвера передать метод write и конвертировать тут
+
+    this.expander = new DigitalExpanderSlaveDriverLogic(
+      this.context,
+      i2cMasterDriver,
+      PINS_COUNT
+    );
   }
 
   destroy = async () => {
