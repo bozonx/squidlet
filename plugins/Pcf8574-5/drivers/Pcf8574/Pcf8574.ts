@@ -10,9 +10,9 @@ import {
   DigitalExpanderInputDriver,
   DigitalExpanderDriverHandler,
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
+import DigitalExpanderSlaveDriverLogic from 'system/logic/digitalExpander/DigitalExpanderSlaveDriverLogic';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
-import CommonPcfLogic from '../../logic/CommonPcfLogic';
 import {InputResistorMode, OutputResistorMode} from '../../../../system/interfaces/gpioTypes';
 
 
@@ -23,20 +23,20 @@ export class Pcf8574
   extends DriverBase<I2cMasterDriverProps>
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
-  private pcf!: CommonPcfLogic;
+  private expander!: DigitalExpanderSlaveDriverLogic;
 
 
   init = async () => {
-    const i2c = await this.context.getSubDriver<I2cMaster>(
+    const i2cMasterDriver = await this.context.getSubDriver<I2cMaster>(
       'I2cMaster',
       this.props
     );
 
-    this.pcf = new CommonPcfLogic(this.context, i2c, PINS_COUNT);
+    this.expander = new DigitalExpanderSlaveDriverLogic(this.context, i2cMasterDriver, PINS_COUNT);
   }
 
   destroy = async () => {
-    this.pcf.destroy();
+    this.expander.destroy();
   }
 
 
@@ -45,11 +45,11 @@ export class Pcf8574
     resistor?: OutputResistorMode,
     initialValue?: boolean
   ): Promise<void> {
-    return this.pcf.setupOutput(pin, resistor, initialValue);
+    return this.expander.setupOutput(pin, resistor, initialValue);
   }
 
   writeState(state: {[index: string]: boolean}): Promise<void> {
-    return this.pcf.writeState(state);
+    return this.expander.writeState(state);
   }
 
   setupInput(
@@ -57,23 +57,23 @@ export class Pcf8574
     resistor: InputResistorMode,
     debounce: number,
   ): Promise<void> {
-    return this.pcf.setupInput(pin, resistor, debounce);
+    return this.expander.setupInput(pin, resistor, debounce);
   }
 
   doPoll = async (): Promise<void> => {
-    return this.pcf.doPoll();
+    return this.expander.doPoll();
   }
 
   onChange(cb: DigitalExpanderDriverHandler): number {
-    return this.pcf.onChange(cb);
+    return this.expander.onChange(cb);
   }
 
   removeListener(handlerIndex: number) {
-    this.pcf.removeListener(handlerIndex);
+    this.expander.removeListener(handlerIndex);
   }
 
   clearPin(pin: number): Promise<void> {
-    return this.pcf.clearPin(pin);
+    return this.expander.clearPin(pin);
   }
 
 }
