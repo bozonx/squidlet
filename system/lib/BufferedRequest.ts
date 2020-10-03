@@ -3,15 +3,15 @@ import DebounceCall from './debounceCall/DebounceCall';
 
 export default class BufferedRequest {
   private readonly writeCb: (state: {[index: string]: boolean}) => void;
-  private readonly writeBufferMs?: number;
+  private readonly writeBufferMs: number;
   private readonly debounce = new DebounceCall();
   // temporary state while values are buffering before writing
-  private beforeWritingBuffer?: {[index: string]: any};
+  private buffer?: {[index: string]: any};
 
 
   constructor(
     writeCb: (state: {[index: string]: boolean}) => void,
-    writeBufferMs?: number
+    writeBufferMs: number = 0
   ) {
     this.writeCb = writeCb;
     this.writeBufferMs = writeBufferMs;
@@ -20,32 +20,39 @@ export default class BufferedRequest {
   destroy() {
     this.debounce.destroy();
 
-    delete this.beforeWritingBuffer;
+    delete this.buffer;
   }
 
 
   isBuffering(): boolean {
-    return !!this.beforeWritingBuffer;
+    return !!this.buffer;
   }
 
-  getState(): {[index: string]: any} | undefined {
-    return this.beforeWritingBuffer;
+  getBuffer(): {[index: string]: any} | undefined {
+    return this.buffer;
   }
 
+  /**
+   * Call this as many times as you wish
+   */
   async write(state: {[index: string]: any}): Promise<void> {
-    // TODO: если this.writeBufferMs = 0 то можно сразу выполнять
+    // if cb has to be called right now
+    if (this.writeBufferMs <= 0) {
+      this.writeCb(state);
 
-    if (this.beforeWritingBuffer) {
-      // second and further requests
+      return;
+    }
+    // second and further requests
+    else if (this.buffer) {
       // update buffered state
-      this.beforeWritingBuffer = {
-        ...this.beforeWritingBuffer,
+      this.buffer = {
+        ...this.buffer,
         ...state,
       };
     }
+    // a new request, make a new buffer
     else {
-      // a new request, make a new buffer
-      this.beforeWritingBuffer = { ...state };
+      this.buffer = { ...state };
     }
 
     return this.debounce.invoke(this.doWriteCb, this.writeBufferMs);
@@ -54,7 +61,7 @@ export default class BufferedRequest {
   cancel() {
     this.debounce.clear();
 
-    delete this.beforeWritingBuffer;
+    delete this.buffer;
   }
 
   flush() {
@@ -64,12 +71,12 @@ export default class BufferedRequest {
 
 
   private doWriteCb = () => {
-    // the buffer has to be set
-    if (typeof this.beforeWritingBuffer === 'undefined') return;
+    // if it was cancelled
+    if (typeof this.buffer === 'undefined') return;
 
-    const lastBufferedState = this.beforeWritingBuffer;
+    const lastBufferedState = this.buffer;
     // remove buffer which was used before writing has been started
-    delete this.beforeWritingBuffer;
+    delete this.buffer;
 
     this.writeCb(lastBufferedState);
   }
