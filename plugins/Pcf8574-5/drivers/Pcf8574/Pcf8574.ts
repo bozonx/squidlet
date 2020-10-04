@@ -8,15 +8,18 @@ import DriverBase from 'system/base/DriverBase';
 import {
   DigitalExpanderOutputDriver,
   DigitalExpanderInputDriver,
-  DigitalExpanderDriverHandler,
+  DigitalExpanderDriverHandler, DigitalExpanderPinSetup,
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
-import DigitalExpanderSlaveDriverLogic from 'system/logic/digitalExpander/DigitalExpanderSlaveDriverLogic';
+import DigitalExpanderDriverLogic from 'system/logic/digitalExpander/DigitalExpanderDriverLogic';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
 import {InputResistorMode, OutputResistorMode} from '../../../../system/interfaces/gpioTypes';
+import {howManyOctets} from '../../../../system/lib/binaryHelpers';
 
 
 export const PINS_COUNT = 8;
+// length of data to send and receive to IC
+export const DATA_LENGTH = howManyOctets(PINS_COUNT);
 
 
 export class Pcf8574
@@ -24,7 +27,7 @@ export class Pcf8574
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private i2cMasterDriver!: I2cMaster;
-  private expander!: DigitalExpanderSlaveDriverLogic;
+  private expander!: DigitalExpanderDriverLogic;
 
 
   init = async () => {
@@ -33,12 +36,13 @@ export class Pcf8574
       this.props
     );
 
-    this.expander = new DigitalExpanderSlaveDriverLogic(
+    this.expander = new DigitalExpanderDriverLogic(
       this.context,
       {
-        pinsCount: PINS_COUNT,
-        write: this.doWrite,
-        read: this.doRead,
+        //pinsCount: PINS_COUNT,
+        setup: this.doSetup,
+        writeOutput: this.writeOutput,
+        readInput: this.readInput,
       }
     );
   }
@@ -85,13 +89,31 @@ export class Pcf8574
   }
 
 
-  private doWrite = (data: Uint8Array): Promise<void> => {
+  private doSetup = (pins: {[index: string]: DigitalExpanderPinSetup}): Promise<void> => {
+
+    // TODO: составить пакет и записать
+
+  }
+
+  private writeOutput = (outputPinsData: {[index: string]: boolean}): Promise<void> => {
+    // TODO: составить пакет где output указанны как HIGH а не используемые пины LOW
+
     return this.i2cMasterDriver.write(data);
   }
 
-  private doRead = (dataLength: number): Promise<Uint8Array> => {
+  private readInput = (): Promise<{[index: string]: boolean}> => {
+
+    // TODO: отфильтровать только input pins
+
     return this.i2cMasterDriver.read(dataLength);
   }
+
+
+  // private checkPinRange(pin: number) {
+  //   if (pin < 0 || pin >= PINS_COUNT) {
+  //     throw new Error(`Pin "${pin}" out of range`);
+  //   }
+  // }
 
 }
 
