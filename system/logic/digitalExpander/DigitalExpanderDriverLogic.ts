@@ -7,7 +7,6 @@ import {
   DigitalExpanderPinSetup
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
-import BinaryState from 'system/lib/BinaryState';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
 import {bitsToBytes} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
@@ -45,13 +44,10 @@ export default class DigitalExpanderDriverLogic
 
   private queue: QueueOverride;
   private events = new IndexedEventEmitter();
-
-  // TODO: add outputPins ??? или брать из стейта?
-
+  // which pins are input
   private inputPins: {[index: string]: true} = {};
   // state of pins which has been written to IC before
   private writtenState: {[index: string]: boolean} = {};
-  // which pins are input
   // buffer of pins which has to be set up
   private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
   private writeBuffer?: {[index: string]: boolean};
@@ -102,7 +98,7 @@ export default class DigitalExpanderDriverLogic
       ...state,
     };
 
-    return this.queue.add(this.writeIc, QUEUE_IDS.write);
+    return this.queue.add(this.doWrite, QUEUE_IDS.write);
   }
 
 
@@ -131,17 +127,7 @@ export default class DigitalExpanderDriverLogic
     //       это случай если вообще не была запущенна конфигурация или она в процессе
     //       если закончилась инициализация то просто ставим в очередь
 
-    const result: Uint8Array = await this.readIc();
-    // TODO: не обязательно тогда использовать BinaryState
-    const state: BinaryState = new BinaryState(this.dataLength, result);
-    const objState = state.getObjectState();
-    const inputChanges: {[index: string]: boolean} = {};
-
-    for (let pinStr of Object.keys(objState)) {
-      if (!this.inputPins[pinStr]) continue;
-
-      inputChanges[pinStr] = objState[pinStr];
-    }
+    const inputChanges: {[index: string]: boolean} = await this.doRead();
 
     if (isEmptyObject(inputChanges)) return;
 
@@ -171,8 +157,26 @@ export default class DigitalExpanderDriverLogic
       || typeof this.writtenState[pin] !== 'undefined';
   }
 
+  getWrittenState(): {[index: string]: boolean} {
+    return this.writtenState;
+  }
+
   onPinInitialized(cb: DigitalExpanderPinInitHandler): number {
     return this.events.addListener(DigitalExpanderEvents.setup, cb);
+  }
+
+  getPinDirection(pin: number): PinDirection | undefined {
+    if (this.inputPins[pin]) {
+      return PinDirection.input;
+    }
+    else if (this.setupBuffer && this.setupBuffer[pin]) {
+      return this.setupBuffer[pin].direction;
+    }
+    else if (typeof this.writtenState[pin] !== 'undefined') {
+      return PinDirection.output;
+    }
+    // or hasn't been set
+    return;
   }
 
 
@@ -203,11 +207,11 @@ export default class DigitalExpanderDriverLogic
     }));
   }
 
+  // TODO: review
   private async doSetup() {
     // it means some pins has been cleaned
     if (!this.setupBuffer || isEmptyObject(this.setupBuffer)) return;
 
-    const data: Uint8Array = this.collectSetupData();
     const setupBuffer: {[index: string]: DigitalExpanderPinSetup} = cloneDeepObject(
       this.setupBuffer
     );
@@ -215,7 +219,7 @@ export default class DigitalExpanderDriverLogic
     delete this.setupBuffer;
 
     try {
-      await this.queue.add(() => this.props.write(data), QUEUE_IDS.setup);
+      await this.queue.add(() => this.props.setup(setupBuffer), QUEUE_IDS.setup);
     }
     catch (e) {
       // put back setupBuffer
@@ -249,17 +253,17 @@ export default class DigitalExpanderDriverLogic
     this.events.emit(DigitalExpanderEvents.setup, initializedPins);
   }
 
-  private async writeIc() {
-    const data: Uint8Array = this.collectWriteData();
-
+  private async doWrite() {
     // TODO: сохранить в буфер
     //       после успешной записи сохранить в стейт
     //       запись делать в очереди. При ошибке очистить буфер
 
     // TODO: когда очистить writeBuffer
 
+    if (!this.writeBuffer) throw new Error(`No writeBuffer`);
+
     try {
-      await this.props.write(data);
+      await this.props.writeOutput(this.writeBuffer);
     }
     catch (e) {
       delete this.writeBuffer;
@@ -270,8 +274,9 @@ export default class DigitalExpanderDriverLogic
     delete this.writeBuffer;
   }
 
-  private readIc(): Promise<Uint8Array> {
-    return new Promise<Uint8Array>(((resolve, reject) =>  {
+  // TODO: review
+  private doRead(): Promise<{[index: string]: boolean}> {
+    return new Promise<{[index: string]: boolean}>(((resolve, reject) =>  {
       const handlerIndex = this.events.once(
         DigitalExpanderEvents.incomeRawData,
         resolve
@@ -279,16 +284,9 @@ export default class DigitalExpanderDriverLogic
       // this handler can be overwritten by others
       // because of that we use events here
       const readHandler = async () => {
-        const data: Uint8Array = await this.props.read(this.dataLength);
+        const result: {[index: string]: boolean} = await this.props.readInput();
 
-        if (data.length !== this.dataLength) {
-          this.events.removeListener(handlerIndex);
-          reject(`Incorrect data length has been received`);
-
-          return;
-        }
-
-        this.events.emit(DigitalExpanderEvents.incomeRawData, data);
+        this.events.emit(DigitalExpanderEvents.incomeRawData, result);
       };
 
       this.queue.add(readHandler, QUEUE_IDS.read)
@@ -297,51 +295,6 @@ export default class DigitalExpanderDriverLogic
           reject(e);
         });
     }));
-  }
-
-  private collectWriteData(): Uint8Array {
-    const result: boolean[] = new Array(this.props.pinsCount);
-
-    for (let pin = 0; pin < this.props.pinsCount; pin++) {
-      result[pin] = this.resolvePinBitState(pin);
-    }
-
-    return bitsToBytes(result);
-  }
-
-  private collectSetupData(): Uint8Array {
-    const result: boolean[] = [];
-
-    for (let pin = 0; pin < this.props.pinsCount; pin++) {
-      if (this.setupBuffer && this.setupBuffer[pin]) {
-        if (this.setupBuffer[pin].direction === PinDirection.input) {
-          result[pin] = true;
-        }
-        else {
-          result[pin] = this.setupBuffer[pin].initialValue || false;
-        }
-      }
-      else {
-        result[pin] = this.resolvePinBitState(pin);
-      }
-    }
-
-    return bitsToBytes(result);
-  }
-
-  private resolvePinBitState(pin: number): boolean {
-    // if pin is input switch it to HIGH state
-    if (this.inputPins[pin]) {
-      return true;
-    }
-    // if pin is going to be saved
-    else if (this.writeBuffer && typeof this.writeBuffer[pin] !== 'undefined') {
-      return this.writeBuffer[pin];
-    }
-    // not changed
-    else {
-      return this.writtenState[pin] || false;
-    }
   }
 
 }
