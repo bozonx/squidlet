@@ -6,15 +6,16 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {
-  DigitalExpanderOutputDriver,
+  DigitalExpanderDriverHandler,
   DigitalExpanderInputDriver,
-  DigitalExpanderDriverHandler, DigitalExpanderPinSetup,
+  DigitalExpanderOutputDriver,
+  DigitalExpanderPinSetup,
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import DigitalExpanderDriverLogic from 'system/logic/digitalExpander/DigitalExpanderDriverLogic';
+import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
+import {bitsToBytes, bytesToBits, howManyOctets} from 'system/lib/binaryHelpers';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
-import {InputResistorMode, OutputResistorMode} from '../../../../system/interfaces/gpioTypes';
-import {howManyOctets} from '../../../../system/lib/binaryHelpers';
 
 
 export const PINS_COUNT = 8;
@@ -39,7 +40,6 @@ export class Pcf8574
     this.expander = new DigitalExpanderDriverLogic(
       this.context,
       {
-        //pinsCount: PINS_COUNT,
         setup: this.doSetup,
         writeOutput: this.writeOutput,
         readInput: this.readInput,
@@ -90,22 +90,75 @@ export class Pcf8574
 
 
   private doSetup = (pins: {[index: string]: DigitalExpanderPinSetup}): Promise<void> => {
+    const result: boolean[] = [];
 
-    // TODO: составить пакет и записать
+    for (let pin = 0; pin < PINS_COUNT; pin++) {
+      // if pin is going to set up
+      if (pins[pin]) {
+        if (pins[pin].direction === PinDirection.input) {
+          result[pin] = true;
+        }
+        else {
+          result[pin] = pins[pin].initialValue || false;
+        }
+      }
+      // pin has been set up before or hasn't been set. Try to resolve it's state
+      else {
+        result[pin] = this.resolvePinBitState(pin);
+      }
+    }
 
+    return this.i2cMasterDriver.write(bitsToBytes(result));
   }
 
   private writeOutput = (outputPinsData: {[index: string]: boolean}): Promise<void> => {
-    // TODO: составить пакет где output указанны как HIGH а не используемые пины LOW
+    const result: boolean[] = new Array(PINS_COUNT);
 
-    return this.i2cMasterDriver.write(data);
+    for (let pin = 0; pin < PINS_COUNT; pin++) {
+      result[pin] = this.resolvePinBitState(pin, outputPinsData[pin]);
+    }
+
+    return this.i2cMasterDriver.write(bitsToBytes(result));
   }
 
-  private readInput = (): Promise<{[index: string]: boolean}> => {
+  private readInput = async (): Promise<{[index: string]: boolean}> => {
+    const icData: Uint8Array = await this.i2cMasterDriver.read(DATA_LENGTH);
 
-    // TODO: отфильтровать только input pins
+    if (icData.length !== DATA_LENGTH) {
+      throw new Error(`Incorrect data length has been received`);
+    }
 
-    return this.i2cMasterDriver.read(dataLength);
+    const bitsData: boolean[] = bytesToBits(icData);
+    // filtered only input pins values
+    const inputChanges: {[index: string]: boolean} = {};
+
+    for (let pinStr in bitsData) {
+      if (this.expander.getPinDirection(parseInt(pinStr)) !== PinDirection.input) continue;
+
+      inputChanges[pinStr] = bitsData[pinStr];
+    }
+
+    return inputChanges;
+  }
+
+  private resolvePinBitState(pin: number, outputState?: boolean): boolean {
+    const direction: PinDirection | undefined = this.expander.getPinDirection(pin);
+    // if pin is input switch it to HIGH state
+    if (direction === PinDirection.input) {
+      return true;
+    }
+    else if (direction === PinDirection.output) {
+      if (typeof outputState === 'undefined') {
+        // pin hasn't been changed - return previously changed state
+        return this.expander.getWrittenState()[pin] || false;
+      }
+      else {
+        // return new state
+        return outputState;
+      }
+    }
+    // use LOW state for pins which hasn't been set up.
+    return false;
   }
 
 
