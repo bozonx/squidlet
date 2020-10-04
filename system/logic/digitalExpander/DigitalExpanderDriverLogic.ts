@@ -9,7 +9,7 @@ import {
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import BinaryState from 'system/lib/BinaryState';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
-import {bitsToBytes, howManyOctets} from 'system/lib/binaryHelpers';
+import {bitsToBytes} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
@@ -17,9 +17,13 @@ import Context from 'system/Context';
 
 
 export interface DigitalExpanderSlaveDriverProps {
-  pinsCount: number;
-  write: (data: Uint8Array) => Promise<void>;
-  read: (dataLength: number) => Promise<Uint8Array>;
+  setupDebounceMs?: number;
+  //pinsCount: number;
+  setup: (pins: {[index: string]: DigitalExpanderPinSetup}) => Promise<void>;
+  // write only output pins
+  writeOutput: (outputPinsData: {[index: string]: boolean}) => Promise<void>;
+  // read only input pins
+  readInput: () => Promise<{[index: string]: boolean}>;
 }
 
 enum QUEUE_IDS {
@@ -27,19 +31,24 @@ enum QUEUE_IDS {
   write,
   read,
 }
-const SETUP_DEBOUNCE_MS = 10;
+const DEFAULT_SETUP_DEBOUNCE_MS = 10;
 
 
-export default class DigitalExpanderSlaveDriverLogic
+export default class DigitalExpanderDriverLogic
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private readonly context: Context;
   private readonly props: DigitalExpanderSlaveDriverProps;
-  // length of data to send and receive to IC
-  private readonly dataLength: number;
-  private events = new IndexedEventEmitter();
-  private inputPins: {[index: string]: true} = {};
+
+  // TODO: тут нужна очередь ???? может обычная???
+  // TODO: для очереди чтения поидее нужно сбрасывать новые запросы пока идет текущий
+
   private queue: QueueOverride;
+  private events = new IndexedEventEmitter();
+
+  // TODO: add outputPins ??? или брать из стейта?
+
+  private inputPins: {[index: string]: true} = {};
   // state of pins which has been written to IC before
   private writtenState: {[index: string]: boolean} = {};
   // which pins are input
@@ -51,8 +60,12 @@ export default class DigitalExpanderSlaveDriverLogic
 
   constructor(context: Context, props: DigitalExpanderSlaveDriverProps) {
     this.context = context;
-    this.props = props;
-    this.dataLength = howManyOctets(this.props.pinsCount);
+    this.props = {
+      ...props,
+      setupDebounceMs: (typeof props.setupDebounceMs === 'undefined')
+        ? DEFAULT_SETUP_DEBOUNCE_MS
+        : props.setupDebounceMs,
+    };
     this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
   }
 
@@ -185,7 +198,7 @@ export default class DigitalExpanderSlaveDriverLogic
 
         this.doSetup()
           .catch(this.context.log.debug);
-      }, SETUP_DEBOUNCE_MS)
+      }, this.props.setupDebounceMs)
         .catch(reject);
     }));
   }
@@ -330,21 +343,5 @@ export default class DigitalExpanderSlaveDriverLogic
       return this.writtenState[pin] || false;
     }
   }
-
-
-  // private checkPinRange(pin: number) {
-  //   if (pin < 0 || pin >= PINS_COUNT) {
-  //     throw new Error(`Pin "${pin}" out of range`);
-  //   }
-  // }
-
-  // private startFeedback() {
-  //   // if I2C driver doesn't have feedback then it doesn't need to be setup
-  //   if (!this.i2c.hasFeedback()) return;
-  //
-  //   this.i2c.addListener(this.handleIcStateChange);
-  //   // make first request and start handle feedback
-  //   this.i2c.startFeedback();
-  // }
 
 }
