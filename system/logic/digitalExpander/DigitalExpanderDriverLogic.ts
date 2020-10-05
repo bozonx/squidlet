@@ -145,11 +145,7 @@ export default class DigitalExpanderDriverLogic
   ////////// Common
 
   async clearPin(pin: number): Promise<void> {
-    delete this.inputPins[pin];
-    delete this.writtenState[pin];
-
-    if (this.setupBuffer) delete this.setupBuffer[pin];
-    if (this.writeBuffer) delete this.writeBuffer[pin];
+    this.doClearPin(pin);
   }
 
   wasPinInitialized(pin: number): boolean {
@@ -184,24 +180,25 @@ export default class DigitalExpanderDriverLogic
    * It waits forever while pin has been initialized.
    */
   private startSetupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
-
-    // TODO: очистить пин сначла
-
     return new Promise<void>(((resolve, reject) => {
+      // clear pin before start setup
+      this.doClearPin(pin);
+
       if (!this.setupBuffer) this.setupBuffer = {};
 
       this.setupBuffer[pin] = pinSetup;
 
+      // listen to event which means pin has been initialized and resolve the promise
+      const handlerIndex = this.onPinInitialized((initializedPins: number[]) => {
+        if (!initializedPins.includes(pin)) return;
+
+        this.events.removeListener(handlerIndex);
+        resolve();
+      });
+
       this.setupDebounce.invoke(() => {
-        const handlerIndex = this.onPinInitialized((initializedPins: number[]) => {
-          if (!initializedPins.includes(pin)) return;
-
-          this.events.removeListener(handlerIndex);
-          resolve();
-        });
-
         this.doSetup()
-          .catch(this.context.log.debug);
+          .catch(this.context.log.error);
       }, this.props.setupDebounceMs)
         .catch(reject);
     }));
@@ -295,6 +292,14 @@ export default class DigitalExpanderDriverLogic
           reject(e);
         });
     }));
+  }
+
+  doClearPin(pin: number) {
+    delete this.inputPins[pin];
+    delete this.writtenState[pin];
+
+    if (this.setupBuffer) delete this.setupBuffer[pin];
+    if (this.writeBuffer) delete this.writeBuffer[pin];
   }
 
 }
