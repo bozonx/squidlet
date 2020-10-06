@@ -1,5 +1,5 @@
-name: I2cConnection
-main: I2cConnection.ts
+name: I2cMasterConnection
+main: I2cMasterConnection.ts
 
 drivers:
   - I2cMaster

@@ -9,7 +9,6 @@ export interface ConnectionProps {
 
 
 export type IncomeMessageHandler = (channel: number, payload: Uint8Array) => void;
-export type StatusHandler = () => void;
 export type ConnectionServiceType = 'connection';
 
 export enum ConnectionsEvents {
@@ -37,8 +36,8 @@ export default interface Connection {
   isConnected(): boolean;
 
   onIncomeMessage(cb: IncomeMessageHandler): number;
-  onConnect(cb: StatusHandler): number;
-  onDisconnect(cb: StatusHandler): number;
+  onConnect(cb: () => void): number;
+  onDisconnect(cb: () => void): number;
 
   /**
    * Remove listener of onIncomeData, onConnect or onDisconnect

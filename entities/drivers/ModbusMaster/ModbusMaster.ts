@@ -27,11 +27,13 @@ export class ModbusMaster extends DriverBase<ModbusMasterDriverProps> {
     return true;
   }
 
+  // TODO: rename to onConnected
   onConnect(cb: StatusHandler): number {
     // TODO: add
     return 0;
   }
 
+  // TODO: rename to onDisconnected
   onDisconnect(cb: StatusHandler): number {
     // TODO: add
     return 0;

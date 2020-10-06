@@ -55,6 +55,7 @@ export default class ModbusMasterConnection extends ServiceBase<Props> implement
         slaveId: this.props.slaveId,
       }
     );
+    // TODO: когда выкачиваются пакеты то отключать polling на это время
     this.pollOnce = new PollOnceModbus(this.modbusMaster, this.log.warn);
 
     this.modbusMaster.onConnect(() => this.events.emit(ConnectionsEvents.connected));

@@ -7,16 +7,16 @@ import Connection, {
 } from 'system/interfaces/Connection';
 import {uint8ToUint16} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
+import {makeCallFunctionMessage} from 'system/lib/remoteFunctionProtocol/writeLogic';
 
 import {
   SemiDuplexFeedback,
   SemiDuplexFeedbackBaseProps
 } from '../../drivers/SemiDuplexFeedback/SemiDuplexFeedback';
-import {makeCallFunctionMessage} from '../../../system/lib/remoteFunctionProtocol/writeLogic';
-import {I2cMaster} from '../../drivers/I2cMaster/I2cMaster';
+import {I2cMaster, I2cMasterDriverProps} from '../../drivers/I2cMaster/I2cMaster';
 
 
-interface Props extends SemiDuplexFeedbackBaseProps, ModbusMasterDriverProps {
+interface Props extends SemiDuplexFeedbackBaseProps, I2cMasterDriverProps {
 }
 
 const WRITE_START_INDEX = 0;
@@ -24,13 +24,13 @@ const WRITE_START_INDEX = 0;
 // TODO: use Sender ???
 // TODO: review poll once logic
 
-export default class I2cConnection extends ServiceBase<Props> implements Connection {
+export default class I2cMasterConnection extends ServiceBase<Props> implements Connection {
   serviceType: ConnectionServiceType = CONNECTION_SERVICE_TYPE;
 
   private events = new IndexedEventEmitter();
   private semiDuplexFeedback!: SemiDuplexFeedback;
   private i2cMaster!: I2cMaster;
-  private pollOnce!: PollOnceModbus;
+  //private pollOnce!: PollOnceModbus;
 
 
   init = async () => {
@@ -47,16 +47,17 @@ export default class I2cConnection extends ServiceBase<Props> implements Connect
     this.i2cMaster = await this.context.getSubDriver(
       'I2cMaster',
       {
+        // TODO: add props
         portNum: this.props.portNum,
         slaveId: this.props.slaveId,
       }
     );
-    this.pollOnce = new PollOnceModbus(this.i2cMaster, this.log.warn);
+    //this.pollOnce = new PollOnceModbus(this.i2cMaster, this.log.warn);
 
-    this.i2cMaster.onConnect(() => this.events.emit(ConnectionsEvents.connected));
-    this.i2cMaster.onDisconnect(() => this.events.emit(ConnectionsEvents.disconnected));
+    this.i2cMaster.onConnected(() => this.events.emit(ConnectionsEvents.connected));
+    this.i2cMaster.onDisconnected(() => this.events.emit(ConnectionsEvents.disconnected));
     this.semiDuplexFeedback.startFeedback(this.feedbackHandler);
-    this.pollOnce.addEventListener(this.handleIncomeMessage);
+    //this.pollOnce.addEventListener(this.handleIncomeMessage);
   }
 
   destroy = async () => {

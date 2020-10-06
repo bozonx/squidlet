@@ -67,6 +67,9 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   }
 
   startFeedback(requestDataCb: RequestDataCb): void {
+
+    // TODO: очистить предыдущий feedback если был запущен
+
     this.requestDataCb = requestDataCb;
 
     if (this.props.int) {
@@ -108,7 +111,6 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
 
   /**
    * Poll once immediately. And restart current poll if it was specified.
-   * Data address and length you have to specify in poll prop.
    * It rejects promise on error
    */
   async pollOnce(): Promise<void> {
