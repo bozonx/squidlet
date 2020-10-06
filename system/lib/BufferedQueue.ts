@@ -83,6 +83,9 @@ export default class BufferedQueue {
     if (this.queueBuffer) delete this.queueBuffer[itemKey];
   }
 
+  /**
+   * If you add some object or array please clone it deeply before.
+   */
   async add(cb: QueuedCb, partialState: {[index: string]: any}): Promise<void> {
     // if some cb is in process and other is in queue - just update queue buffer and cb.
     if (this.hasQueue()) {
@@ -130,11 +133,12 @@ export default class BufferedQueue {
     }
     catch (e) {
       if (this.queuePromised) {
+        // At promise's catch handler you can have access to buffer.
         this.queuePromised.reject(
           new Error(`Cancelled because current write has returned an error: ${e}`)
         );
       }
-      // clear fully
+      // clear fully after rejecting
       this.clearWholeJob();
 
       throw e;
@@ -180,9 +184,10 @@ export default class BufferedQueue {
         this.onSuccess();
       })
       .catch((e) => {
+        // At promise's catch handler you can have access to buffer.
         queuePromised.reject(e);
         this.queuePromised && this.queuePromised.reject(e);
-        // finish the whole job
+        // finish the whole job after rejecting.
         this.clearWholeJob();
       });
   }
