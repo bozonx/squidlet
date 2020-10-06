@@ -8,7 +8,6 @@ import {
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
-import {bitsToBytes} from 'system/lib/binaryHelpers';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
@@ -27,7 +26,6 @@ export interface DigitalExpanderSlaveDriverProps {
 }
 
 enum QUEUE_IDS {
-  setup,
   write,
   read,
 }
@@ -53,8 +51,6 @@ export default class DigitalExpanderDriverLogic
   // buffer of pins which has to be set up
   // during debounce time or while current setup is writing
   private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
-  // pin setup which are writing at the moment
-  private writingSetupBuffer?: {[index: string]: DigitalExpanderPinSetup};
   private writeBuffer?: {[index: string]: boolean};
   private setupDebounce = new DebounceCallIncreasing();
 
@@ -79,7 +75,6 @@ export default class DigitalExpanderDriverLogic
     delete this.inputPins;
     delete this.writtenState;
     delete this.setupBuffer;
-    delete this.writingSetupBuffer;
     delete this.writeBuffer;
   }
 
@@ -216,7 +211,11 @@ export default class DigitalExpanderDriverLogic
 
         return;
       }
+
+      // TODO: может использовать BufferedRequest ???
+
       // if there isn't any setup process then start a new one via debounce
+      // or update debounce cb if some debounce in progress.
       this.setupDebounce.invoke(() => {
         this.doSetup()
           .catch(reject);
@@ -232,11 +231,15 @@ export default class DigitalExpanderDriverLogic
    * @private
    */
   private async doSetup() {
-    // if there isn't pint to be setup then do nothing.
-    if (!this.setupBuffer) return;
+    // if there aren't any pins to be setup then do nothing.
+    if (isEmptyObject(this.setupBuffer)) {
+      delete this.setupBuffer;
+
+      return;
+    }
 
     const setupBuffer = cloneDeepObject(this.setupBuffer);
-
+    // delete current buffer that means that it moves to saving buffer
     delete this.setupBuffer;
 
     try {
@@ -265,91 +268,6 @@ export default class DigitalExpanderDriverLogic
           .catch(this.context.log.debug);
       }, 0);
     }
-
-
-
-    ////////////////////////////
-
-    // if (this.writingSetupBuffer) {
-    //   // rewrite it
-    //   //if (isEmptyObject(this.setupBuffer)) return;
-    //   this.writingSetupBuffer = {
-    //     ...this.writingSetupBuffer,
-    //     ...cloneDeepObject(this.setupBuffer),
-    //   };
-    //
-    //   delete this.setupBuffer;
-    // }
-    // else if (this.setupBuffer && !isEmptyObject(this.setupBuffer)) {
-    //   // start a new one
-    //   this.writingSetupBuffer = cloneDeepObject(this.setupBuffer);
-    // }
-    // else {
-    //   return;
-    // }
-    //
-    // try {
-    //   await this.queue.add(async () => {
-    //     if (!this.writingSetupBuffer) return;
-    //
-    //     await this.props.setup(this.writingSetupBuffer);
-    //     this.onSetupSuccess(cloneDeepObject(this.writingSetupBuffer));
-    //
-    //     delete this.writingSetupBuffer;
-    //   }, QUEUE_IDS.setup);
-    // }
-    // catch (e) {
-    //   // // put back setupBuffer
-    //   // this.setupBuffer = {
-    //   //   ...setupBuffer,
-    //   //   ...this.setupBuffer || {},
-    //   // };
-    //
-    //   // do setup again and don't wait for result
-    //   this.doSetup()
-    //     .catch(this.context.log.debug);
-    //
-    //   //throw e;
-    // }
-
-
-    ///////////////
-
-
-    // it means some pins has been cleaned while debounce time
-    //if (!this.setupBuffer || isEmptyObject(this.setupBuffer)) return;
-
-    // TODO: нужно сохранить буфер который сейчас записывается
-
-    // const setupBuffer: {[index: string]: DigitalExpanderPinSetup} = cloneDeepObject(
-    //   this.setupBuffer
-    // );
-    //
-    // delete this.setupBuffer;
-
-    // TODO: если делается setup второй раз одного и тогоже пина с другими параметрами
-    //       то они могут записаться не в том порядке.
-
-    // TODO: очередь то override - значит локальный setupBuffer затрется
-
-    // try {
-    //   await this.queue.add(() => this.props.setup(this.setupBuffer!), QUEUE_IDS.setup);
-    // }
-    // catch (e) {
-    //   // // put back setupBuffer
-    //   // this.setupBuffer = {
-    //   //   ...setupBuffer,
-    //   //   ...this.setupBuffer || {},
-    //   // };
-    //
-    //   // do setup again and don't wait for result
-    //   this.doSetup()
-    //     .catch(this.context.log.debug);
-    //
-    //   throw e;
-    // }
-    //
-    // this.onSetupSuccess();
   }
 
   private onSetupSuccess(pins: {[index: string]: DigitalExpanderPinSetup}) {
@@ -420,7 +338,6 @@ export default class DigitalExpanderDriverLogic
     delete this.writtenState[pin];
 
     if (this.setupBuffer) delete this.setupBuffer[pin];
-    //if (this.writingSetupBuffer) delete this.writingSetupBuffer[pin];
     if (this.writeBuffer) delete this.writeBuffer[pin];
   }
 
