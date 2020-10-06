@@ -56,6 +56,15 @@ export default class BufferedQueue {
     return this.savedState;
   }
 
+  getSavingState(): {[index: string]: any} | undefined {
+    if (!this.writingState && this.queueBuffer) return;
+
+    return {
+      ...this.writingState,
+      ...this.queueBuffer,
+    };
+  }
+
   /**
    * It means only some job is pending
    */
