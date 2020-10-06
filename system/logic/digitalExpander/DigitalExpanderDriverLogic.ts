@@ -25,10 +25,10 @@ export interface DigitalExpanderSlaveDriverProps {
   readInput: () => Promise<{[index: string]: boolean}>;
 }
 
-enum QUEUE_IDS {
-  write,
-  read,
-}
+// enum QUEUE_IDS {
+//   write,
+//   read,
+// }
 const DEFAULT_SETUP_DEBOUNCE_MS = 10;
 
 
@@ -41,18 +41,20 @@ export default class DigitalExpanderDriverLogic
   // TODO: тут нужна очередь ???? может обычная???
   // TODO: для очереди чтения поидее нужно сбрасывать новые запросы пока идет текущий
 
-  private queue: QueueOverride;
-  private setupQueue: BufferedQueue;
   private events = new IndexedEventEmitter();
+  //private queue: QueueOverride;
+  private setupQueue: BufferedQueue;
+  private writeQueue: BufferedQueue;
+  private setupDebounce = new DebounceCallIncreasing();
   // which pins are input
   private inputPins: {[index: string]: true} = {};
   // state of pins which has been written to IC before
-  private writtenState: {[index: string]: boolean} = {};
+  //private writtenState: {[index: string]: boolean} = {};
   // buffer of pins which has to be set up
   // during debounce time or while current setup is writing
   private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
-  private writeBuffer?: {[index: string]: boolean};
-  private setupDebounce = new DebounceCallIncreasing();
+  //private writeBuffer?: {[index: string]: boolean};
+
 
 
   constructor(context: Context, props: DigitalExpanderSlaveDriverProps) {
@@ -63,19 +65,19 @@ export default class DigitalExpanderDriverLogic
         ? DEFAULT_SETUP_DEBOUNCE_MS
         : props.setupDebounceMs,
     };
-    this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
+    //this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
     this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
+    this.writeQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
   }
 
   destroy() {
     this.events.destroy();
-    this.queue.destroy();
+    this.setupQueue.destroy();
+    this.writeQueue.destroy();
     this.setupDebounce.destroy();
 
     delete this.inputPins;
-    delete this.writtenState;
     delete this.setupBuffer;
-    delete this.writeBuffer;
   }
 
 
@@ -91,22 +93,25 @@ export default class DigitalExpanderDriverLogic
   }
 
   /**
-   * Write whole state to IC.
+   * Write state of several pins.
+   * It skip input pins and pins which hasn't been initialized.
    * State is {pinNumber: true | false}. Pin number starts from 0.
    */
-  writeState(state: {[index: string]: boolean}): Promise<void> {
+  async writeState(state: {[index: string]: boolean}): Promise<void> {
+    const filteredState: {[index: string]: boolean} = {};
+    // filter only initialized output pins
+    for (let pinStr of Object.keys(state)) {
+      const pin: number = parseInt(pinStr);
+      // skip pins which are hasn't been setup or in setup process and input pins.
+      if (this.wasPinInitialized(pin) && !this.inputPins[pin]) {
+        filteredState[pin] = state[pin];
+      }
+    }
 
-    // TODO: пока идет setup сохранять в буфер, после сделать запись
-    // TODO: нельзя запускать пока идет setup этого пина
-    // TODO: нельзя записывать input pins
-    // TODO: наверное не записывать если не был инициализирован пин
-
-    this.writeBuffer = {
-      ...this.writeBuffer || {},
-      ...state,
-    };
-
-    return this.queue.add(this.doWrite, QUEUE_IDS.write);
+    await this.writeQueue.add(
+      (stateToSave) => this.props.writeOutput(stateToSave),
+      filteredState
+    );
   }
 
 
@@ -130,6 +135,12 @@ export default class DigitalExpanderDriverLogic
    * Read input pins state
    */
   doPoll = async (): Promise<void> => {
+
+    // TODO: как работает:
+    //       * делается чтение
+    //       * пока идет новые запросы сбрасываются, но будут выполнены их промисы с
+    //         результатом текущего чтения
+    //       * при ошибке режектятся все текущие промисы
 
     // TODO: нельзя делать пока не сделался setup хоть одного пина
     //       это случай если вообще не была запущенна конфигурация или она в процессе
@@ -156,11 +167,30 @@ export default class DigitalExpanderDriverLogic
     this.doClearPin(pin);
   }
 
+  // TODO: можно брать сохраненный setup пина
+
+  // TODO: review
   wasPinInitialized(pin: number): boolean {
     return typeof this.inputPins[pin] !== 'undefined'
       || typeof this.writtenState[pin] !== 'undefined';
   }
 
+  // TODO: review - может брать весь стейт который записывается
+  isPinSettingUp(pin: number): boolean {
+    if (this.setupBuffer) {
+      return !!this.setupBuffer[pin];
+    }
+
+    const savingState = this.setupQueue.getSavingState();
+
+    if (savingState) {
+      return !!savingState[pin];
+    }
+
+    return false;
+  }
+
+  // TODO: review
   getWrittenState(): {[index: string]: boolean} {
     return this.writtenState;
   }
@@ -173,6 +203,8 @@ export default class DigitalExpanderDriverLogic
     if (this.inputPins[pin]) {
       return PinDirection.input;
     }
+    // TODO: а нужно ли брать пин который не был инициализирован ????
+    // TODO: или тогда брать то что записывается тоже
     else if (this.setupBuffer && this.setupBuffer[pin]) {
       return this.setupBuffer[pin].direction;
     }
@@ -231,6 +263,9 @@ export default class DigitalExpanderDriverLogic
    * @private
    */
   private async doSetup() {
+
+    // TODO: BufferedQueue сохраняет последний записанный стейт это вообще нужно ???
+
     // if there aren't any pins to be setup then do nothing.
     if (isEmptyObject(this.setupBuffer)) {
       delete this.setupBuffer;
@@ -282,32 +317,12 @@ export default class DigitalExpanderDriverLogic
         this.inputPins[pin] = true;
       }
       else {
+        // TODO: надо как-то просто записать в writeQueue
         this.writtenState[pin] = pins[pin].initialValue || false;
       }
     }
 
     this.events.emit(DigitalExpanderEvents.setup, initializedPins);
-  }
-
-  private async doWrite() {
-    // TODO: сохранить в буфер
-    //       после успешной записи сохранить в стейт
-    //       запись делать в очереди. При ошибке очистить буфер
-
-    // TODO: когда очистить writeBuffer
-
-    if (!this.writeBuffer) throw new Error(`No writeBuffer`);
-
-    try {
-      await this.props.writeOutput(this.writeBuffer);
-    }
-    catch (e) {
-      delete this.writeBuffer;
-
-      throw e;
-    }
-
-    delete this.writeBuffer;
   }
 
   // TODO: review
@@ -333,6 +348,7 @@ export default class DigitalExpanderDriverLogic
     }));
   }
 
+  // TODO: review
   private doClearPin(pin: number) {
     delete this.inputPins[pin];
     delete this.writtenState[pin];
