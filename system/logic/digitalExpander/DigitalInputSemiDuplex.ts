@@ -46,6 +46,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
     );
     this.logic = new DigitalExpanderInputLogic(
       context.log.error,
+      // TODO: does it really need ???
       this.feedback.pollOnce,
       props.waitResultTimeoutSec,
       //props.pollIntervalMs,
@@ -58,10 +59,6 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
       : props.useLocalDebounce;
 
     this.feedback.addListener(this.logic.handleIncomeState);
-  }
-
-  init = async () => {
-    this.feedback.startFeedback();
   }
 
   destroy = async () => {
@@ -85,6 +82,10 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
     }
 
     await this.props.driver.setupInput(pin, inputMode, remoteDebounce);
+
+    // TODO: запустить как только засетапится 1й инпут (закончит сетап)
+    // TODO: !!!!!
+    //this.feedback.startFeedback();
 
     return this.logic.setupPin(pin, inputMode, localDebounce, edge);
   }
