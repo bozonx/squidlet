@@ -1,3 +1,5 @@
+import Context from 'system/Context';
+
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
@@ -5,6 +7,7 @@ import DigitalExpanderInputLogic from './DigitalExpanderInputLogic';
 
 
 export interface DigitalExpanderInputProps {
+  driver: DigitalExpanderInputDriver;
   // if true then local debounce of pins will be used.
   // if false then microcontroller's debounce will be used.
   // default is true.
@@ -17,20 +20,21 @@ export interface DigitalExpanderInputProps {
 
 
 export default class DigitalInputSemiDuplex implements DigitalInputIo {
-  private readonly driver: DigitalExpanderInputDriver;
+  //private readonly context: Context;
+  private readonly props: DigitalExpanderInputProps;
   private readonly logic: DigitalExpanderInputLogic;
   private readonly useLocalDebounce: boolean;
 
 
   constructor(
-    driver: DigitalExpanderInputDriver,
-    logError: (msg: Error | string) => void,
+    context: Context,
     props: DigitalExpanderInputProps,
   ) {
-    this.driver = driver;
+    //this.context = context;
+    this.props = props;
     this.logic = new DigitalExpanderInputLogic(
-      logError,
-      this.driver.doPoll,
+      context.log.error,
+      this.props.driver.doPoll,
       props.waitResultTimeoutSec,
       props.pollIntervalMs,
       !props.interrupt
@@ -43,7 +47,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
 
     // TODO: использовать input драйвер + логику impulseInput
 
-    this.driver.onChange(this.logic.handleIncomeState);
+    this.props.driver.onChange(this.logic.handleIncomeState);
   }
 
   destroy = async () => {
@@ -65,7 +69,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
       remoteDebounce = debounce;
     }
 
-    await this.driver.setupInput(pin, inputMode, remoteDebounce);
+    await this.props.driver.setupInput(pin, inputMode, remoteDebounce);
 
     return this.logic.setupPin(pin, inputMode, localDebounce, edge);
   }
@@ -84,7 +88,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
 
   async clearPin(pin: number): Promise<void> {
     this.logic.clearPin(pin);
-    await this.driver.clearPin(pin);
+    await this.props.driver.clearPin(pin);
   }
 
   async clearAll(): Promise<void> {

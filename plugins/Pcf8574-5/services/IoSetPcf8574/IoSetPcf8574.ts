@@ -16,17 +16,6 @@ interface Props extends I2cMasterDriverProps {
   interrupt?: {[index: string]: any};
 }
 
-type ExpanderIoItemClass = new (
-  driver: any,
-  logError: (msg: Error | string) => void,
-  props: any
-) => void;
-
-const ios: {[index: string]: ExpanderIoItemClass} = {
-  DigitalInput: DigitalInputSemiDuplex,
-  DigitalOutput,
-};
-
 
 export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBase {
   private driver!: Pcf8574;
@@ -46,24 +35,32 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.usedIo[ioName]) {
-
-      // TODO: лучше сделать просто выбор
-
-      this.usedIo[ioName] = new ios[ioName](this.driver, this.log.error, {
-        writeBufferMs: this.props.writeBufferMs,
-        pollIntervalMs: this.props.pollIntervalMs,
-        interrupt: this.props.interrupt,
-        useLocalDebounce: true,
-        waitResultTimeoutSec: this.config.config.responseTimoutSec,
-        queueJobTimeoutSec: this.config.config.queueJobTimeoutSec,
-      });
+      if (ioName === 'DigitalOutput') {
+        this.usedIo[ioName] = new DigitalOutput(this.context, {
+          driver: this.driver,
+          writeBufferMs: this.props.writeBufferMs,
+          queueJobTimeoutSec: this.config.config.queueJobTimeoutSec,
+        });
+      }
+      else if (ioName === 'DigitalInput') {
+        this.usedIo[ioName] = new DigitalInputSemiDuplex(this.context, {
+          driver: this.driver,
+          useLocalDebounce: true,
+          waitResultTimeoutSec: this.config.config.responseTimoutSec,
+          pollIntervalMs: this.props.pollIntervalMs,
+          interrupt: this.props.interrupt,
+        });
+      }
+      else {
+        throw new Error(`IO "${ioName}" isn't supported on IoSetPcf8574 service`);
+      }
     }
 
     return this.usedIo[ioName];
   }
 
   getNames(): string[] {
-    return Object.keys(ios);
+    return ['DigitalOutput', 'DigitalInput'];
   }
 
 }
