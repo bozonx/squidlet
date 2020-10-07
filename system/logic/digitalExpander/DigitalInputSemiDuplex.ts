@@ -86,6 +86,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
     // TODO: запустить как только засетапится 1й инпут (закончит сетап)
     // TODO: !!!!!
     //this.feedback.startFeedback();
+    // if (this.polling && !this.polling.isInProgress()) {
 
     return this.logic.setupPin(pin, inputMode, localDebounce, edge);
   }

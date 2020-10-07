@@ -18,7 +18,6 @@ export default class DigitalExpanderInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
   private readonly waitResultTimeoutSec: number;
-  //private readonly pollIntervalMs: number;
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
@@ -33,24 +32,15 @@ export default class DigitalExpanderInputLogic {
     logError: (msg: Error | string) => void,
     pollOnce: () => Promise<void>,
     waitResultTimeoutSec: number,
-    //pollIntervalMs: number,
-    //usePolling: boolean
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;
     this.waitResultTimeoutSec = waitResultTimeoutSec;
-    //this.pollIntervalMs = pollIntervalMs;
-
-    // if (usePolling) {
-    //   this.polling = new Polling();
-    // }
   }
 
   destroy() {
     this.events.destroy();
     this.debounce.destroy();
-
-    //if (this.polling) this.polling.destroy();
 
     for (let pin of Object.keys(this.waitingNewStateTimeouts)) {
       clearTimeout(this.waitingNewStateTimeouts[pin]);
@@ -89,10 +79,6 @@ export default class DigitalExpanderInputLogic {
       debounce,
       edge: resolvedEdge,
     };
-
-    // if (this.polling && !this.polling.isInProgress()) {
-    //   this.polling.start(this.pollOnce, this.pollIntervalMs);
-    // }
   }
 
   getState(): {[index: string]: boolean} {
@@ -141,6 +127,9 @@ export default class DigitalExpanderInputLogic {
    * More than one pin can be changed.
    */
   handleIncomeState = (newState: {[index: string]: boolean}) => {
+
+    // TODO: review
+
     // handle logic of all the changed pins
     for (let pinStr of Object.keys(newState)) {
       const pin: number = parseInt(pinStr);
@@ -166,6 +155,9 @@ export default class DigitalExpanderInputLogic {
    * Start a new debounce for pin which has been changed and isn't in debounce progress.
    */
   private startDebounce(pin: number, newValue: boolean) {
+
+    // TODO: review
+
     if (!this.pinProps[pin]) {
       this.logError(`Pin "${pin}" hasn't been set up.`);
 
@@ -195,28 +187,22 @@ export default class DigitalExpanderInputLogic {
    * Debounce's callbacks doesn't wait for result.
    */
   private async readPinState(pin: number) {
+
+    // TODO: review
+
     // do new poll
-    this.doPoll();
+    this.pollOnce()
+      .catch(this.logError);
     // start waiting for confirmation
     const finalState: boolean = await this.waitForPinNewState(pin);
     // on success set state and rise an event
     this.setFinalState(pin, finalState);
   }
 
-  private doPoll() {
-    if (this.polling) {
-      // if polling is used then just restart it and don't wait for result
-      this.polling.restart()
-        .catch(this.logError);
-    }
-    else {
-      // if polling isn't used then just do a new poll
-      this.pollOnce()
-        .catch(this.logError);
-    }
-  }
-
   private waitForPinNewState(pin: number): Promise<boolean> {
+
+    // TODO: review
+
     // it will be called immediately at the current tick.
     return new Promise<boolean>((resolve, reject) => {
       const handlerIndex = this.events.once(
