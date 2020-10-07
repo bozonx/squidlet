@@ -35,7 +35,7 @@ describe 'nodejs.IoSetDevelopSrc', ->
     sinon.assert.calledWith(@ioSrc.instantiateIo, machineConfig.ios[0], helpers.resolvePlatformDir('nodejs'))
 
   it 'instantiateIo - common platforms', ->
-    ioPath = './platforms/DigitalInput.ts'
+    ioPath = './platforms/DigitalInputSemiDuplex.ts'
     platformDir = helpers.resolvePlatformDir('nodejs')
     class DigitalClass
     @ioSrc.os = {

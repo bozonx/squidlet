@@ -1,7 +1,7 @@
 import ServiceBase from 'system/base/ServiceBase';
 import IoItem from 'system/interfaces/IoItem';
 import {IoSetBase} from 'system/interfaces/IoSet';
-import DigitalInput from 'system/logic/digitalExpander/DigitalInput';
+import DigitalInputSemiDuplex from 'system/logic/digitalExpander/DigitalInputSemiDuplex';
 import DigitalOutput from 'system/logic/digitalExpander/DigitalOutput';
 import {omitObj} from 'system/lib/objects';
 
@@ -23,7 +23,7 @@ type ExpanderIoItemClass = new (
 ) => void;
 
 const ios: {[index: string]: ExpanderIoItemClass} = {
-  DigitalInput,
+  DigitalInput: DigitalInputSemiDuplex,
   DigitalOutput,
 };
 
@@ -46,6 +46,9 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
 
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.usedIo[ioName]) {
+
+      // TODO: лучше сделать просто выбор
+
       this.usedIo[ioName] = new ios[ioName](this.driver, this.log.error, {
         writeBufferMs: this.props.writeBufferMs,
         pollIntervalMs: this.props.pollIntervalMs,

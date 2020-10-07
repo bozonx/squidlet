@@ -80,7 +80,7 @@ export default class Context {
   /**
    * Get IO instance.
    * If virtualIoSet is defined then it will be used else the system's will be used.
-   * @param ioName - name of IO like DigitalInput, I2cMaster etc.
+   * @param ioName - name of IO like Serial, I2cMaster etc.
    * @param virtualIoSet - Name of virtual IO set service
    */
   getIo<T extends IoItem>(ioName: string, virtualIoSet?: string): T {

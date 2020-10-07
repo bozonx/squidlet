@@ -1,4 +1,4 @@
-// TODO: нужен ли он, если есть DigitalInput ????
+// TODO: нужен ли он, если есть DigitalInputSemiDuplex ????
 // TODO: test it
 
 import {Edge} from '../interfaces/gpioTypes';
