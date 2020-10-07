@@ -4,6 +4,8 @@ import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderInputLogic from './DigitalExpanderInputLogic';
+import SemiDuplexFeedbackLogic from '../SemiDuplexFeedbackLogic';
+import {ImpulseInputProps} from '../../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
 export interface DigitalExpanderInputProps {
@@ -14,14 +16,14 @@ export interface DigitalExpanderInputProps {
   useLocalDebounce?: boolean;
   waitResultTimeoutSec: number;
   pollIntervalMs: number;
-  // TODO: use int props ???
-  interrupt?: Object;
+  interrupt?: ImpulseInputProps;
 }
 
 
 export default class DigitalInputSemiDuplex implements DigitalInputIo {
   //private readonly context: Context;
   private readonly props: DigitalExpanderInputProps;
+  private readonly feedback: SemiDuplexFeedbackLogic;
   private readonly logic: DigitalExpanderInputLogic;
   private readonly useLocalDebounce: boolean;
 
@@ -32,9 +34,19 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
   ) {
     //this.context = context;
     this.props = props;
+    this.feedback = new SemiDuplexFeedbackLogic(
+      context,
+      {
+        // TODO: use compareResult ???
+        compareResult: true,
+        read: this.props.driver.read,
+        interrupt: props.interrupt,
+        pollIntervalMs: props.pollIntervalMs,
+      }
+    );
     this.logic = new DigitalExpanderInputLogic(
       context.log.error,
-      this.props.driver.doPoll,
+      this.feedback.pollOnce,
       props.waitResultTimeoutSec,
       props.pollIntervalMs,
       !props.interrupt
@@ -46,11 +58,16 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
       : props.useLocalDebounce;
 
     // TODO: использовать input драйвер + логику impulseInput
+    // TODO: нужно сделать this.feedback.init() либо сразу передать готовый драйвер int
 
-    this.props.driver.onChange(this.logic.handleIncomeState);
+    //this.props.driver.onChange(this.feedback.handleIncomeState);
+    this.feedback.addListener(this.logic.handleIncomeState);
+    // TODO: здесь делать старт или в init() ????
+    this.feedback.startFeedback();
   }
 
   destroy = async () => {
+    this.feedback.destroy();
     this.logic.destroy();
   }
 
