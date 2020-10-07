@@ -4,8 +4,9 @@ import IndexedEvents from 'system/lib/IndexedEvents';
 import Polling from 'system/lib/Polling';
 import {isEqualUint8Array} from 'system/lib/binaryHelpers';
 import {makeUniqId} from 'system/lib/uniqId';
+import Context from 'system/Context';
 
-import {ImpulseInput, ImpulseInputProps} from '../ImpulseInput/ImpulseInput';
+import {ImpulseInput, ImpulseInputProps} from '../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
 export type Handler = (data: Uint8Array | undefined) => void;
@@ -15,8 +16,8 @@ export interface SemiDuplexFeedbackBaseProps {
   pollIntervalMs: number;
   int?: ImpulseInputProps;
 }
-
-export interface Props extends SemiDuplexFeedbackBaseProps {
+// TODO: review
+export interface SemiDuplexFeedbackProps extends SemiDuplexFeedbackBaseProps {
   feedbackId: string;
   compareResult: boolean;
 }
@@ -28,7 +29,10 @@ export interface Props extends SemiDuplexFeedbackBaseProps {
  * To use interruption set up "int" props.
  * To use polling don't defined "int" props.
  */
-export class SemiDuplexFeedback extends DriverBase<Props> {
+export default class SemiDuplexFeedbackLogic {
+  private readonly context: Context;
+  private readonly props: SemiDuplexFeedbackProps;
+
   private impulseInputDriver?: ImpulseInput;
   private impulseHandlerIndex?: number;
   private requestDataCb?: RequestDataCb;
@@ -41,7 +45,16 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
   private lastPollResult?: Uint8Array;
 
 
+  constructor(context: Context, props: SemiDuplexFeedbackProps) {
+    this.context = context;
+    this.props = props;
+  }
+
+
   init = async () => {
+
+    // TODO: move to startFeedback ????
+
     if (this.props.int) {
       this.impulseInputDriver = await this.context.getSubDriver<ImpulseInput>(
         'ImpulseInput',
@@ -85,7 +98,7 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
         // TODO: может не делать новые запросы пока текущий в процессе ???
 
         this.doPoll()
-          .catch(this.log.error);
+          .catch(this.context.log.error);
       });
 
       return;
@@ -169,12 +182,4 @@ export class SemiDuplexFeedback extends DriverBase<Props> {
     this.pollEvents.emit(result);
   }
 
-}
-
-
-export default class Factory extends DriverFactoryBase<SemiDuplexFeedback, Props> {
-  protected SubDriverClass = SemiDuplexFeedback;
-  protected instanceId = (props: Props): string => {
-    return props.feedbackId || makeUniqId();
-  }
 }
