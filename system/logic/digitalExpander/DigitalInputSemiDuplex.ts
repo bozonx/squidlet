@@ -5,18 +5,18 @@ import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo'
 import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderInputLogic from './DigitalExpanderInputLogic';
 import SemiDuplexFeedbackLogic from '../SemiDuplexFeedbackLogic';
-import {ImpulseInputProps} from '../../../entities/drivers/ImpulseInput/ImpulseInput';
+import {ImpulseInput} from '../../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
 export interface DigitalExpanderInputProps {
   driver: DigitalExpanderInputDriver;
+  intDriver?: ImpulseInput;
   // if true then local debounce of pins will be used.
   // if false then microcontroller's debounce will be used.
   // default is true.
   useLocalDebounce?: boolean;
   waitResultTimeoutSec: number;
   pollIntervalMs: number;
-  interrupt?: ImpulseInputProps;
 }
 
 
@@ -37,10 +37,10 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
     this.feedback = new SemiDuplexFeedbackLogic(
       context,
       {
+        intDriver: this.props.intDriver,
         // TODO: use compareResult ???
         compareResult: true,
         read: this.props.driver.read,
-        interrupt: props.interrupt,
         pollIntervalMs: props.pollIntervalMs,
       }
     );
@@ -48,8 +48,8 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
       context.log.error,
       this.feedback.pollOnce,
       props.waitResultTimeoutSec,
-      props.pollIntervalMs,
-      !props.interrupt
+      //props.pollIntervalMs,
+      //!props.intDriver
     );
     this.useLocalDebounce = (typeof props.useLocalDebounce === 'undefined')
       // true is default

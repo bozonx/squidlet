@@ -7,6 +7,7 @@ import {omitObj} from 'system/lib/objects';
 
 import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
 import {Pcf8574} from '../../drivers/Pcf8574/Pcf8574';
+import {ImpulseInput} from '../../../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
 interface Props extends I2cMasterDriverProps {
@@ -19,6 +20,7 @@ interface Props extends I2cMasterDriverProps {
 
 export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBase {
   private driver!: Pcf8574;
+  private intDriver?: ImpulseInput;
   private readonly usedIo: {[index: string]: any} = {};
 
 
@@ -27,6 +29,13 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
       'Pcf8574',
       omitObj(this.props, 'writeBufferMs')
     );
+
+    if (this.props.interrupt) {
+      this.intDriver = await this.context.getSubDriver<ImpulseInput>(
+        'ImpulseInput',
+        this.props.interrupt
+      );
+    }
   }
 
   destroy = async () => {
@@ -45,6 +54,7 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
       else if (ioName === 'DigitalInput') {
         this.usedIo[ioName] = new DigitalInputSemiDuplex(this.context, {
           driver: this.driver,
+          intDriver: this.intDriver,
           useLocalDebounce: true,
           waitResultTimeoutSec: this.config.config.responseTimoutSec,
           pollIntervalMs: this.props.pollIntervalMs,
