@@ -53,15 +53,22 @@ export interface DigitalExpanderInputDriver {
     debounce: number,
   ): Promise<void>;
 
+  // TODO: не делать ни doPoll, onChange, removeListener, просто read
+
   /**
-   * Read input pins state.
-   * It has to use QueueOverride to not do unnecessary requests.
+   * Read only input pins. Or return undefined if there isn't any new data.
    */
-  doPoll: () => Promise<void>;
+  read(): Promise<Uint8Array | undefined>;
 
-  onChange(cb: DigitalExpanderDriverHandler): number;
-
-  removeListener(handlerIndex: number): void;
+  // /**
+  //  * Read input pins state.
+  //  * It has to use QueueOverride to not do unnecessary requests.
+  //  */
+  // doPoll: () => Promise<void>;
+  //
+  // onChange(cb: DigitalExpanderDriverHandler): number;
+  //
+  // removeListener(handlerIndex: number): void;
 
   clearPin(pin: number): Promise<void>;
 }

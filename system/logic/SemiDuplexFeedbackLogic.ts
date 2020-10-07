@@ -1,25 +1,23 @@
-import DriverFactoryBase from 'system/base/DriverFactoryBase';
-import DriverBase from 'system/base/DriverBase';
 import IndexedEvents from 'system/lib/IndexedEvents';
 import Polling from 'system/lib/Polling';
 import {isEqualUint8Array} from 'system/lib/binaryHelpers';
-import {makeUniqId} from 'system/lib/uniqId';
 import Context from 'system/Context';
 
 import {ImpulseInput, ImpulseInputProps} from '../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
 export type Handler = (data: Uint8Array | undefined) => void;
-export type RequestDataCb = () => Promise<Uint8Array | undefined>;
+// TODO: почему undefined ???? может лучше пустой массив ???
+export type ReadCb = () => Promise<Uint8Array | undefined>;
 
 export interface SemiDuplexFeedbackBaseProps {
   pollIntervalMs: number;
-  int?: ImpulseInputProps;
+  interrupt?: ImpulseInputProps;
 }
 // TODO: review
 export interface SemiDuplexFeedbackProps extends SemiDuplexFeedbackBaseProps {
-  feedbackId: string;
   compareResult: boolean;
+  read: ReadCb;
 }
 
 
@@ -35,7 +33,6 @@ export default class SemiDuplexFeedbackLogic {
 
   private impulseInputDriver?: ImpulseInput;
   private impulseHandlerIndex?: number;
-  private requestDataCb?: RequestDataCb;
   private readonly pollEvents = new IndexedEvents<Handler>();
   private readonly polling: Polling = new Polling();
 
@@ -55,15 +52,20 @@ export default class SemiDuplexFeedbackLogic {
 
     // TODO: move to startFeedback ????
 
-    if (this.props.int) {
+    if (this.props.interrupt) {
       this.impulseInputDriver = await this.context.getSubDriver<ImpulseInput>(
         'ImpulseInput',
-        this.props.int
+        this.props.interrupt
       );
     }
+
+
   }
 
-  destroy = async () => {
+  destroy = () => {
+
+    // TODO: review
+
     this.pollEvents.destroy();
     this.polling.destroy();
 
@@ -79,13 +81,11 @@ export default class SemiDuplexFeedbackLogic {
     return this.polling.isInProgress();
   }
 
-  startFeedback(requestDataCb: RequestDataCb): void {
+  startFeedback(): void {
 
-    // TODO: очистить предыдущий feedback если был запущен
+    // TODO: очистить предыдущий feedback если был запущен ???
 
-    this.requestDataCb = requestDataCb;
-
-    if (this.props.int) {
+    if (this.props.interrupt) {
       if (!this.impulseInputDriver) {
         throw new Error(
           `SemiDuplexFeedback.startFeedback. ` +
@@ -126,8 +126,8 @@ export default class SemiDuplexFeedbackLogic {
    * Poll once immediately. And restart current poll if it was specified.
    * It rejects promise on error
    */
-  async pollOnce(): Promise<void> {
-    if (this.props.int || !this.isFeedbackStarted()) {
+  pollOnce = async (): Promise<void> => {
+    if (this.props.interrupt || !this.isFeedbackStarted()) {
       await this.doPoll();
     }
     else {
@@ -167,9 +167,10 @@ export default class SemiDuplexFeedbackLogic {
 
 
   private doPoll = async (): Promise<void> => {
-    if (!this.requestDataCb) return;
 
-    const result: Uint8Array | undefined = await this.requestDataCb();
+    // TODO: могут быть любые данные, не обязательно Uint8Array
+
+    const result: Uint8Array | undefined = await this.props.read();
 
     // TODO: была ОШИБКА!!! почему решает что данные одинаковые ????
     //  наверное потомучто раньше они уже установились
