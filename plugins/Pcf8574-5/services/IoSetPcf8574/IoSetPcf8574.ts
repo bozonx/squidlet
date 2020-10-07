@@ -60,6 +60,9 @@ export default class IoSetPcf8574 extends ServiceBase<Props> implements IoSetBas
           pollIntervalMs: this.props.pollIntervalMs,
           interrupt: this.props.interrupt,
         });
+
+        this.usedIo[ioName].init()
+          .catch(this.log.error);
       }
       else {
         throw new Error(`IO "${ioName}" isn't supported on IoSetPcf8574 service`);

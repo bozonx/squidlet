@@ -6,10 +6,10 @@ import Context from 'system/Context';
 import {ImpulseInput, ImpulseInputProps} from '../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
-type Data = Uint8Array | {[index: string]: any};
+//type Data = Uint8Array | {[index: string]: any};
 
-
-export type Handler = (data: Data | undefined) => void;
+// undefined means no new data
+export type Handler = (data: any | undefined) => void;
 
 export interface SemiDuplexFeedbackBaseProps {
   pollIntervalMs: number;
@@ -18,7 +18,7 @@ export interface SemiDuplexFeedbackBaseProps {
 // TODO: review
 export interface SemiDuplexFeedbackProps extends SemiDuplexFeedbackBaseProps {
   intDriver?: ImpulseInput;
-  read: () => Promise<Data | undefined>;
+  read: () => Promise<any | undefined>;
   compareResult: boolean;
 }
 
@@ -158,7 +158,9 @@ export default class SemiDuplexFeedbackLogic {
 
     // TODO: могут быть любые данные, не обязательно Uint8Array
 
-    const result: Data | undefined = await this.props.read();
+    const result: any | undefined = await this.props.read();
+
+    // TODO: undefined means no new data
 
     // TODO: была ОШИБКА!!! почему решает что данные одинаковые ????
     //  наверное потомучто раньше они уже установились
