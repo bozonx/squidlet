@@ -4,7 +4,6 @@ import DebounceCall from '../../lib/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
-import Polling from '../../lib/Polling';
 
 
 interface InputPinProps {
@@ -19,11 +18,11 @@ export default class DigitalExpanderInputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly pollOnce: () => Promise<void>;
   private readonly waitResultTimeoutSec: number;
-  private readonly pollIntervalMs: number;
+  //private readonly pollIntervalMs: number;
   // change events of input pins
   private readonly events = new IndexedEventEmitter<ChangeHandler>();
   private readonly debounce = new DebounceCall();
-  private readonly polling?: Polling;
+  //private readonly polling?: Polling;
   private state: {[index: string]: boolean} = {};
   private pinProps: {[index: string]: InputPinProps} = {};
   // timeouts for the time when pin is waiting for poll result after debounce
@@ -40,18 +39,18 @@ export default class DigitalExpanderInputLogic {
     this.logError = logError;
     this.pollOnce = pollOnce;
     this.waitResultTimeoutSec = waitResultTimeoutSec;
-    this.pollIntervalMs = pollIntervalMs;
+    //this.pollIntervalMs = pollIntervalMs;
 
-    if (usePolling) {
-      this.polling = new Polling();
-    }
+    // if (usePolling) {
+    //   this.polling = new Polling();
+    // }
   }
 
   destroy() {
     this.events.destroy();
     this.debounce.destroy();
 
-    if (this.polling) this.polling.destroy();
+    //if (this.polling) this.polling.destroy();
 
     for (let pin of Object.keys(this.waitingNewStateTimeouts)) {
       clearTimeout(this.waitingNewStateTimeouts[pin]);
@@ -91,9 +90,9 @@ export default class DigitalExpanderInputLogic {
       edge: resolvedEdge,
     };
 
-    if (this.polling && !this.polling.isInProgress()) {
-      this.polling.start(this.pollOnce, this.pollIntervalMs);
-    }
+    // if (this.polling && !this.polling.isInProgress()) {
+    //   this.polling.start(this.pollOnce, this.pollIntervalMs);
+    // }
   }
 
   getState(): {[index: string]: boolean} {
