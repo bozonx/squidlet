@@ -34,8 +34,8 @@ export default class DigitalExpanderInputLogic {
     logError: (msg: Error | string) => void,
     pollOnce: () => Promise<void>,
     waitResultTimeoutSec: number,
-    pollIntervalMs: number,
-    usePolling: boolean
+    //pollIntervalMs: number,
+    //usePolling: boolean
   ) {
     this.logError = logError;
     this.pollOnce = pollOnce;

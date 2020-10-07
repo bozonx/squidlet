@@ -6,9 +6,10 @@ import Context from 'system/Context';
 import {ImpulseInput, ImpulseInputProps} from '../../entities/drivers/ImpulseInput/ImpulseInput';
 
 
-export type Handler = (data: Uint8Array | undefined) => void;
-// TODO: почему undefined ???? может лучше пустой массив ???
-export type ReadCb = () => Promise<Uint8Array | undefined>;
+type Data = Uint8Array | {[index: string]: any};
+
+
+export type Handler = (data: Data | undefined) => void;
 
 export interface SemiDuplexFeedbackBaseProps {
   pollIntervalMs: number;
@@ -16,8 +17,9 @@ export interface SemiDuplexFeedbackBaseProps {
 }
 // TODO: review
 export interface SemiDuplexFeedbackProps extends SemiDuplexFeedbackBaseProps {
+  intDriver?: ImpulseInput;
+  read: () => Promise<Data | undefined>;
   compareResult: boolean;
-  read: ReadCb;
 }
 
 
@@ -47,20 +49,6 @@ export default class SemiDuplexFeedbackLogic {
     this.props = props;
   }
 
-
-  init = async () => {
-
-    // TODO: move to startFeedback ????
-
-    if (this.props.interrupt) {
-      this.impulseInputDriver = await this.context.getSubDriver<ImpulseInput>(
-        'ImpulseInput',
-        this.props.interrupt
-      );
-    }
-
-
-  }
 
   destroy = () => {
 
@@ -108,7 +96,7 @@ export default class SemiDuplexFeedbackLogic {
   }
 
   stopFeedBack() {
-    if (this.props.int) {
+    if (this.props.intDriver) {
       if (!this.impulseHandlerIndex) return;
 
       this.impulseInputDriver && this.impulseInputDriver
@@ -170,7 +158,7 @@ export default class SemiDuplexFeedbackLogic {
 
     // TODO: могут быть любые данные, не обязательно Uint8Array
 
-    const result: Uint8Array | undefined = await this.props.read();
+    const result: Data | undefined = await this.props.read();
 
     // TODO: была ОШИБКА!!! почему решает что данные одинаковые ????
     //  наверное потомучто раньше они уже установились
