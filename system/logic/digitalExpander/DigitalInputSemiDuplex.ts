@@ -57,12 +57,10 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
       // or use defined one
       : props.useLocalDebounce;
 
-    // TODO: использовать input драйвер + логику impulseInput
-    // TODO: нужно сделать this.feedback.init() либо сразу передать готовый драйвер int
-
-    //this.props.driver.onChange(this.feedback.handleIncomeState);
     this.feedback.addListener(this.logic.handleIncomeState);
-    // TODO: здесь делать старт или в init() ????
+  }
+
+  init = async () => {
     this.feedback.startFeedback();
   }
 

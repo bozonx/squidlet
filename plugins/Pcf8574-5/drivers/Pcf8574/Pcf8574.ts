@@ -84,6 +84,7 @@ export class Pcf8574
     this.expander.removeListener(handlerIndex);
   }
 
+  // TODO: это вообще зачем ???
   clearPin(pin: number): Promise<void> {
     return this.expander.clearPin(pin);
   }
