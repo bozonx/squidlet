@@ -2,27 +2,28 @@ import {OutputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalOutputIo from '../../interfaces/io/DigitalOutputIo';
 import {DigitalExpanderOutputDriver} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderOutputLogic from './DigitalExpanderOutputLogic';
+import Context from '../../Context';
 
 
 export interface DigitalExpanderOutputProps {
+  driver: DigitalExpanderOutputDriver;
   writeBufferMs?: number;
   queueJobTimeoutSec?: number;
 }
 
 
 export default class DigitalOutput implements DigitalOutputIo {
-  private readonly driver: DigitalExpanderOutputDriver;
+  private readonly props: DigitalExpanderOutputProps;
   private readonly logic: DigitalExpanderOutputLogic;
 
 
   constructor(
-    driver: DigitalExpanderOutputDriver,
-    logError: (msg: Error | string) => void,
+    context: Context,
     props: DigitalExpanderOutputProps,
   ) {
-    this.driver = driver;
+    this.props = props;
     this.logic = new DigitalExpanderOutputLogic(
-      logError,
+      context.log.error,
       this.writeCb,
       props.queueJobTimeoutSec,
       props.writeBufferMs
@@ -35,7 +36,7 @@ export default class DigitalOutput implements DigitalOutputIo {
 
 
   setup(pin: number, initialValue: boolean, outputMode: OutputResistorMode): Promise<void> {
-    return this.driver.setupOutput(pin, outputMode, initialValue);
+    return this.props.driver.setupOutput(pin, outputMode, initialValue);
   }
 
   write(pin: number, value: boolean): Promise<void> {
@@ -44,7 +45,7 @@ export default class DigitalOutput implements DigitalOutputIo {
 
   async clearPin(pin: number): Promise<void> {
     this.logic.clearPin(pin);
-    await this.driver.clearPin(pin);
+    await this.props.driver.clearPin(pin);
   }
 
   clearAll(): Promise<void> {
@@ -56,7 +57,7 @@ export default class DigitalOutput implements DigitalOutputIo {
 
 
   private writeCb = (state: {[index: string]: boolean}): Promise<void> => {
-    return this.driver.writeState(state);
+    return this.props.driver.writeState(state);
   }
 
 }
