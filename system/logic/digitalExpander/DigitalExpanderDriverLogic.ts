@@ -38,7 +38,7 @@ export default class DigitalExpanderDriverLogic {
   // TODO: для очереди чтения поидее нужно сбрасывать новые запросы пока идет текущий
   //private queue: QueueOverride;
   private setupQueue: BufferedQueue;
-  private writeQueue: BufferedQueue;
+  //private writeQueue: BufferedQueue;
   private setupDebounce = new DebounceCallIncreasing();
   // TODO: наверное лучше их запрашивать выше или вообще не исползовать
   // which pins are input
@@ -62,13 +62,13 @@ export default class DigitalExpanderDriverLogic {
     };
     //this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
     this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
-    this.writeQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
+    //this.writeQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
   }
 
   destroy() {
     this.events.destroy();
     this.setupQueue.destroy();
-    this.writeQueue.destroy();
+    //this.writeQueue.destroy();
     this.setupDebounce.destroy();
 
     delete this.inputPins;
@@ -87,12 +87,14 @@ export default class DigitalExpanderDriverLogic {
     });
   }
 
+  // TODO: можно не делать, вызывать cb выше
   /**
    * Write state of several pins.
    * It skip input pins and pins which hasn't been initialized.
    * State is {pinNumber: true | false}. Pin number starts from 0.
    */
   async writeState(state: {[index: string]: boolean}): Promise<void> {
+    // TODO: move logic to output pin logic
     const filteredState: {[index: string]: boolean} = {};
     // filter only initialized output pins
     for (let pinStr of Object.keys(state)) {
@@ -102,7 +104,7 @@ export default class DigitalExpanderDriverLogic {
         filteredState[pin] = state[pin];
       }
     }
-
+    // TODO: просто записать, верхний уровень гарантирует что не будет накладок
     await this.writeQueue.add(
       (stateToSave) => this.props.writeOutput(stateToSave),
       filteredState
