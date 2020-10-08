@@ -72,17 +72,21 @@ export class Pcf8574
     return this.expander.setupInput(pin, resistor, debounce);
   }
 
-  doPoll = async (): Promise<void> => {
-    return this.expander.doPoll();
+  readInputPins(): Promise<{[index: string]: boolean} | undefined> {
+    // TODO: вернуть все инпуты, можно даже неизмененные
   }
 
-  onChange(cb: DigitalExpanderDriverHandler): number {
-    return this.expander.onChange(cb);
-  }
-
-  removeListener(handlerIndex: number) {
-    this.expander.removeListener(handlerIndex);
-  }
+  // doPoll = async (): Promise<void> => {
+  //   return this.expander.doPoll();
+  // }
+  //
+  // onChange(cb: DigitalExpanderDriverHandler): number {
+  //   return this.expander.onChange(cb);
+  // }
+  //
+  // removeListener(handlerIndex: number) {
+  //   this.expander.removeListener(handlerIndex);
+  // }
 
   // TODO: это вообще зачем ???
   clearPin(pin: number): Promise<void> {
