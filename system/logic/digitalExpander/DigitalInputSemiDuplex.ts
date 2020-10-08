@@ -40,7 +40,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
         intDriver: this.props.intDriver,
         // TODO: use compareResult ???
         compareResult: true,
-        read: this.props.driver.read,
+        read: this.props.driver.readInputPins,
         pollIntervalMs: props.pollIntervalMs,
       }
     );

@@ -57,8 +57,9 @@ export interface DigitalExpanderInputDriver {
 
   /**
    * Read only input pins. Or return undefined if there isn't any new data.
+   * It can return not changed pins too.
    */
-  read(): Promise<Uint8Array | undefined>;
+  readInputPins(): Promise<{[index: string]: boolean} | undefined>;
 
   // /**
   //  * Read input pins state.

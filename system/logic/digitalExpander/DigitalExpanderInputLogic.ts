@@ -23,6 +23,7 @@ export default class DigitalExpanderInputLogic {
   private readonly debounce = new DebounceCall();
   //private readonly polling?: Polling;
   private state: {[index: string]: boolean} = {};
+  // TODO: зачем их тут хранить??? может брать у драйвера ???
   private pinProps: {[index: string]: InputPinProps} = {};
   // timeouts for the time when pin is waiting for poll result after debounce
   private waitingNewStateTimeouts: {[index: string]: Timeout} = {};
@@ -122,14 +123,12 @@ export default class DigitalExpanderInputLogic {
   }
 
   /**
-   * Handle driver's income message
-   * State which is income after poling request.
-   * More than one pin can be changed.
+   * Handle poling income data of input pins.
+   * There are can be changed and not changed input pins.
    */
-  handleIncomeState = (newState: {[index: string]: boolean}) => {
-
-    // TODO: review
-
+  handleIncomeState = (newState: {[index: string]: boolean} | undefined) => {
+    // means no new state
+    if (!newState) return;
     // handle logic of all the changed pins
     for (let pinStr of Object.keys(newState)) {
       const pin: number = parseInt(pinStr);
@@ -155,9 +154,6 @@ export default class DigitalExpanderInputLogic {
    * Start a new debounce for pin which has been changed and isn't in debounce progress.
    */
   private startDebounce(pin: number, newValue: boolean) {
-
-    // TODO: review
-
     if (!this.pinProps[pin]) {
       this.logError(`Pin "${pin}" hasn't been set up.`);
 
