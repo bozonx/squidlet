@@ -22,6 +22,7 @@ export interface SemiDuplexFeedbackProps extends SemiDuplexFeedbackBaseProps {
   compareResult: boolean;
 }
 
+// TODO: добавить очередь с отменой
 
 /**
  * It will start polling of listening of interruption.

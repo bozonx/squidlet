@@ -1,8 +1,5 @@
 import {
-  DigitalExpanderDriverHandler,
   DigitalExpanderEvents,
-  DigitalExpanderInputDriver,
-  DigitalExpanderOutputDriver,
   DigitalExpanderPinInitHandler,
   DigitalExpanderPinSetup
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
@@ -31,9 +28,7 @@ export interface DigitalExpanderSlaveDriverProps {
 const DEFAULT_SETUP_DEBOUNCE_MS = 10;
 
 
-export default class DigitalExpanderDriverLogic
-  implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
-{
+export default class DigitalExpanderDriverLogic {
   private readonly context: Context;
   private readonly props: DigitalExpanderSlaveDriverProps;
 
@@ -45,6 +40,7 @@ export default class DigitalExpanderDriverLogic
   private setupQueue: BufferedQueue;
   private writeQueue: BufferedQueue;
   private setupDebounce = new DebounceCallIncreasing();
+  // TODO: наверное лучше их запрашивать выше или вообще не исползовать
   // which pins are input
   private inputPins: {[index: string]: true} = {};
   // state of pins which has been written to IC before
@@ -128,20 +124,6 @@ export default class DigitalExpanderDriverLogic
       direction: PinDirection.input,
       debounce,
     });
-  }
-
-  async readInputPins(): Promise<{[index: string]: boolean} | undefined> {
-    // TODO: нельзя делать пока не сделался setup хоть одного пина
-    //       это случай если вообще не была запущенна конфигурация или она в процессе
-    //       если закончилась инициализация то просто ставим в очередь
-    // TODO: вернуть все инпуты, можно даже неизмененные
-
-    const inputChanges: {[index: string]: boolean} = await this.props.readAllInputs();
-
-    // TODO: не обязательно
-    //if (isEmptyObject(inputChanges)) return;
-
-    return inputChanges;
   }
 
   ////////// Common
@@ -344,7 +326,6 @@ export default class DigitalExpanderDriverLogic
   //   this.events.removeListener(handlerIndex);
   // }
 
-  // TODO: review
   // private doRead(): Promise<{[index: string]: boolean}> {
   //   return new Promise<{[index: string]: boolean}>(((resolve, reject) =>  {
   //     const handlerIndex = this.events.once(

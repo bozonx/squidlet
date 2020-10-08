@@ -6,7 +6,6 @@
 import DriverFactoryBase from 'system/base/DriverFactoryBase';
 import DriverBase from 'system/base/DriverBase';
 import {
-  DigitalExpanderDriverHandler,
   DigitalExpanderInputDriver,
   DigitalExpanderOutputDriver,
   DigitalExpanderPinSetup,
@@ -73,20 +72,8 @@ export class Pcf8574
   }
 
   readInputPins(): Promise<{[index: string]: boolean} | undefined> {
-    return this.expander.readInputPins();
+    return this.readAllInputs();
   }
-
-  // doPoll = async (): Promise<void> => {
-  //   return this.expander.doPoll();
-  // }
-  //
-  // onChange(cb: DigitalExpanderDriverHandler): number {
-  //   return this.expander.onChange(cb);
-  // }
-  //
-  // removeListener(handlerIndex: number) {
-  //   this.expander.removeListener(handlerIndex);
-  // }
 
   // TODO: это вообще зачем ???
   clearPin(pin: number): Promise<void> {
@@ -171,6 +158,18 @@ export class Pcf8574
   //   if (pin < 0 || pin >= PINS_COUNT) {
   //     throw new Error(`Pin "${pin}" out of range`);
   //   }
+  // }
+
+  // doPoll = async (): Promise<void> => {
+  //   return this.expander.doPoll();
+  // }
+  //
+  // onChange(cb: DigitalExpanderDriverHandler): number {
+  //   return this.expander.onChange(cb);
+  // }
+  //
+  // removeListener(handlerIndex: number) {
+  //   this.expander.removeListener(handlerIndex);
   // }
 
 }
