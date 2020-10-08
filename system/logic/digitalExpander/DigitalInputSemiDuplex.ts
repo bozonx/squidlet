@@ -40,6 +40,7 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
         intDriver: this.props.intDriver,
         // TODO: use compareResult ???
         compareResult: true,
+        // TODO: если не был сделан setup хоть одного пина - то возвращать undefined
         read: this.props.driver.readInputPins,
         pollIntervalMs: props.pollIntervalMs,
       }
@@ -104,6 +105,9 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
   }
 
   async clearPin(pin: number): Promise<void> {
+
+    // TODO: если не осталось input пинов то отстановить feedback
+
     this.logic.clearPin(pin);
     await this.props.driver.clearPin(pin);
   }

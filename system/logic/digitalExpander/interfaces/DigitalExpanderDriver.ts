@@ -58,6 +58,8 @@ export interface DigitalExpanderInputDriver {
   /**
    * Read only input pins. Or return undefined if there isn't any new data.
    * It can return not changed pins too.
+   * It is called at feedback logic.
+   * But it mustn't be called if almost one input pin has been fully set up.
    */
   readInputPins(): Promise<{[index: string]: boolean} | undefined>;
 
