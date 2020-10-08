@@ -42,7 +42,7 @@ export class Pcf8574
       {
         setup: this.doSetup,
         writeOutput: this.writeOutput,
-        readInput: this.readInput,
+        readAllInputs: this.readAllInputs,
       }
     );
   }
@@ -73,7 +73,7 @@ export class Pcf8574
   }
 
   readInputPins(): Promise<{[index: string]: boolean} | undefined> {
-    // TODO: вернуть все инпуты, можно даже неизмененные
+    return this.expander.readInputPins();
   }
 
   // doPoll = async (): Promise<void> => {
@@ -126,7 +126,7 @@ export class Pcf8574
     return this.i2cMasterDriver.write(bitsToBytes(result));
   }
 
-  private readInput = async (): Promise<{[index: string]: boolean}> => {
+  private readAllInputs = async (): Promise<{[index: string]: boolean}> => {
     const icData: Uint8Array = await this.i2cMasterDriver.read(DATA_LENGTH);
 
     if (icData.length !== DATA_LENGTH) {

@@ -9,7 +9,6 @@ import {
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {cloneDeepObject, isEmptyObject} from 'system/lib/objects';
 import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
-import QueueOverride from 'system/lib/QueueOverride';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
 import Context from 'system/Context';
 import BufferedQueue from '../../lib/BufferedQueue';
@@ -22,7 +21,7 @@ export interface DigitalExpanderSlaveDriverProps {
   // write only output pins
   writeOutput: (outputPinsData: {[index: string]: boolean}) => Promise<void>;
   // read only input pins
-  readInput: () => Promise<{[index: string]: boolean}>;
+  readAllInputs: () => Promise<{[index: string]: boolean}>;
 }
 
 // enum QUEUE_IDS {
@@ -38,10 +37,10 @@ export default class DigitalExpanderDriverLogic
   private readonly context: Context;
   private readonly props: DigitalExpanderSlaveDriverProps;
 
+  // TODO: review
+  private events = new IndexedEventEmitter();
   // TODO: тут нужна очередь ???? может обычная???
   // TODO: для очереди чтения поидее нужно сбрасывать новые запросы пока идет текущий
-
-  private events = new IndexedEventEmitter();
   //private queue: QueueOverride;
   private setupQueue: BufferedQueue;
   private writeQueue: BufferedQueue;
@@ -131,28 +130,18 @@ export default class DigitalExpanderDriverLogic
     });
   }
 
-  /**
-   * Read input pins state
-   */
-  doPoll = async (): Promise<void> => {
-
+  async readInputPins(): Promise<{[index: string]: boolean} | undefined> {
     // TODO: нельзя делать пока не сделался setup хоть одного пина
     //       это случай если вообще не была запущенна конфигурация или она в процессе
     //       если закончилась инициализация то просто ставим в очередь
+    // TODO: вернуть все инпуты, можно даже неизмененные
 
-    const inputChanges: {[index: string]: boolean} = await this.doRead();
+    const inputChanges: {[index: string]: boolean} = await this.props.readAllInputs();
 
-    if (isEmptyObject(inputChanges)) return;
+    // TODO: не обязательно
+    //if (isEmptyObject(inputChanges)) return;
 
-    this.events.emit(DigitalExpanderEvents.change, inputChanges);
-  }
-
-  onChange(cb: DigitalExpanderDriverHandler): number {
-    return this.events.addListener(DigitalExpanderEvents.change, cb);
-  }
-
-  removeListener(handlerIndex: number): void {
-    this.events.removeListener(handlerIndex);
+    return inputChanges;
   }
 
   ////////// Common
@@ -319,28 +308,7 @@ export default class DigitalExpanderDriverLogic
     this.events.emit(DigitalExpanderEvents.setup, initializedPins);
   }
 
-  // TODO: review
-  private doRead(): Promise<{[index: string]: boolean}> {
-    return new Promise<{[index: string]: boolean}>(((resolve, reject) =>  {
-      const handlerIndex = this.events.once(
-        DigitalExpanderEvents.incomeRawData,
-        resolve
-      );
-      // this handler can be overwritten by others
-      // because of that we use events here
-      const readHandler = async () => {
-        const result: {[index: string]: boolean} = await this.props.readInput();
 
-        this.events.emit(DigitalExpanderEvents.incomeRawData, result);
-      };
-
-      this.queue.add(readHandler, QUEUE_IDS.read)
-        .catch((e) => {
-          this.events.removeListener(handlerIndex);
-          reject(e);
-        });
-    }));
-  }
 
   // TODO: review
   private doClearPin(pin: number) {
@@ -351,4 +319,51 @@ export default class DigitalExpanderDriverLogic
     if (this.writeBuffer) delete this.writeBuffer[pin];
   }
 
+
+  // /**
+  //  * Read input pins state
+  //  */
+  // doPoll = async (): Promise<void> => {
+  //
+  //   // TODO: нельзя делать пока не сделался setup хоть одного пина
+  //   //       это случай если вообще не была запущенна конфигурация или она в процессе
+  //   //       если закончилась инициализация то просто ставим в очередь
+  //
+  //   const inputChanges: {[index: string]: boolean} = await this.doRead();
+  //
+  //   if (isEmptyObject(inputChanges)) return;
+  //
+  //   this.events.emit(DigitalExpanderEvents.change, inputChanges);
+  // }
+  //
+  // onChange(cb: DigitalExpanderDriverHandler): number {
+  //   return this.events.addListener(DigitalExpanderEvents.change, cb);
+  // }
+  //
+  // removeListener(handlerIndex: number): void {
+  //   this.events.removeListener(handlerIndex);
+  // }
+
+  // TODO: review
+  // private doRead(): Promise<{[index: string]: boolean}> {
+  //   return new Promise<{[index: string]: boolean}>(((resolve, reject) =>  {
+  //     const handlerIndex = this.events.once(
+  //       DigitalExpanderEvents.incomeRawData,
+  //       resolve
+  //     );
+  //     // this handler can be overwritten by others
+  //     // because of that we use events here
+  //     const readHandler = async () => {
+  //       const result: {[index: string]: boolean} = await this.props.readInput();
+  //
+  //       this.events.emit(DigitalExpanderEvents.incomeRawData, result);
+  //     };
+  //
+  //     this.queue.add(readHandler, QUEUE_IDS.read)
+  //       .catch((e) => {
+  //         this.events.removeListener(handlerIndex);
+  //         reject(e);
+  //       });
+  //   }));
+  // }
 }
