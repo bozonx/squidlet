@@ -20,6 +20,9 @@ export interface DigitalExpanderInputProps {
 }
 
 
+/**
+ * It connects driver with input logic
+ */
 export default class DigitalInputSemiDuplex implements DigitalInputIo {
   //private readonly context: Context;
   private readonly props: DigitalExpanderInputProps;

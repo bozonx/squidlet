@@ -41,6 +41,7 @@ export default class DigitalExpanderDriverLogic {
   //private writeQueue: BufferedQueue;
   private setupDebounce = new DebounceCallIncreasing();
   // TODO: наверное лучше их запрашивать выше или вообще не исползовать
+  // TODO: зачем надо если можно запросить pins props???
   // which pins are input
   private inputPins: {[index: string]: true} = {};
   // state of pins which has been written to IC before
