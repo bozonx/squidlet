@@ -15,6 +15,7 @@ import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interf
 import {bitsToBytes, bytesToBits, howManyOctets} from 'system/lib/binaryHelpers';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
+import DigitalExpanderSetupLogic from '../../../../system/logic/digitalExpander/DigitalExpanderSetupLogic';
 
 
 export const PINS_COUNT = 8;
@@ -27,7 +28,9 @@ export class Pcf8574
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private i2cMasterDriver!: I2cMaster;
-  private expander!: DigitalExpanderDriverLogic;
+  //private expander!: DigitalExpanderDriverLogic;
+  private setupLogic!: DigitalExpanderSetupLogic;
+  //private writeQueue: BufferedQueue;
 
 
   init = async () => {
@@ -36,14 +39,16 @@ export class Pcf8574
       this.props
     );
 
-    this.expander = new DigitalExpanderDriverLogic(
-      this.context,
-      {
-        setup: this.doSetup,
-        writeOutput: this.writeOutput,
-        readAllInputs: this.readAllInputs,
-      }
-    );
+    // TODO: pass callbacks
+    this.setupLogic = new DigitalExpanderSetupLogic(this.context);
+    // this.expander = new DigitalExpanderDriverLogic(
+    //   this.context,
+    //   {
+    //     setup: this.doSetup,
+    //     writeOutput: this.writeOutput,
+    //     readAllInputs: this.readAllInputs,
+    //   }
+    // );
   }
 
   destroy = async () => {
@@ -56,11 +61,33 @@ export class Pcf8574
     resistor?: OutputResistorMode,
     initialValue?: boolean
   ): Promise<void> {
-    return this.expander.setupOutput(pin, resistor, initialValue);
+    return this.setupLogic.setupPin(pin, {
+      direction: PinDirection.output,
+      initialValue,
+    });
   }
 
-  writeState(state: {[index: string]: boolean}): Promise<void> {
-    return this.expander.writeState(state);
+  /**
+   * Write state of several pins.
+   * It skip input pins and pins which hasn't been initialized.
+   * State is {pinNumber: true | false}. Pin number starts from 0.
+   */
+  async writeState(state: {[index: string]: boolean}): Promise<void> {
+    // TODO: move logic to output pin logic
+    const filteredState: {[index: string]: boolean} = {};
+    // filter only initialized output pins
+    for (let pinStr of Object.keys(state)) {
+      const pin: number = parseInt(pinStr);
+      // skip pins which are hasn't been setup or in setup process and input pins.
+      if (this.wasPinInitialized(pin) && !this.inputPins[pin]) {
+        filteredState[pin] = state[pin];
+      }
+    }
+    // TODO: просто записать, верхний уровень гарантирует что не будет накладок
+    await this.writeQueue.add(
+      (stateToSave) => this.props.writeOutput(stateToSave),
+      filteredState
+    );
   }
 
   setupInput(
@@ -68,7 +95,14 @@ export class Pcf8574
     resistor: InputResistorMode,
     debounce: number,
   ): Promise<void> {
-    return this.expander.setupInput(pin, resistor, debounce);
+    if (debounce) {
+      return Promise.reject(`PCF expander board can't handle a debounce`);
+    }
+
+    return this.setupLogic.setupPin(pin, {
+      direction: PinDirection.input,
+      debounce,
+    });
   }
 
   readInputPins(): Promise<{[index: string]: boolean} | undefined> {
@@ -77,7 +111,7 @@ export class Pcf8574
 
   // TODO: это вообще зачем ???
   clearPin(pin: number): Promise<void> {
-    return this.expander.clearPin(pin);
+    return this.setupLogic.clearPin(pin);
   }
 
 
@@ -113,6 +147,7 @@ export class Pcf8574
     return this.i2cMasterDriver.write(bitsToBytes(result));
   }
 
+  // TODO: move to readInputPins
   private readAllInputs = async (): Promise<{[index: string]: boolean}> => {
     const icData: Uint8Array = await this.i2cMasterDriver.read(DATA_LENGTH);
 
