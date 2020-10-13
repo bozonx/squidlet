@@ -1,12 +1,17 @@
-import {DigitalExpanderEvents, DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
+import {DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
 import {cloneDeepObject, isEmptyObject} from '../../lib/objects';
 import {PinDirection} from '../../interfaces/gpioTypes';
 import BufferedQueue from '../../lib/BufferedQueue';
 import DebounceCallIncreasing from '../../lib/debounceCall/DebounceCallIncreasing';
 import Context from 'system/Context';
+import IndexedEvents from '../../lib/IndexedEvents';
+
+
+type SetupHandler = (initializedPins: number[]) => void;
 
 
 export default class DigitalExpanderSetupLogic {
+  private setupEvent = new IndexedEvents<SetupHandler>();
   private readonly context: Context;
   private setupQueue: BufferedQueue;
   //private writeQueue: BufferedQueue;
@@ -22,10 +27,28 @@ export default class DigitalExpanderSetupLogic {
   }
 
 
+  isPinInitialized(): boolean {
+    // TODO: add
+  }
+
+  getPinProps(pin: number): DigitalExpanderPinSetup {
+    // TODO: add
+  }
+
+  onSetup(handler: SetupHandler): number {
+    return this.setupEvent.addListener(handler);
+  }
+
+  removeListener(handlerIndex: number) {
+    this.setupEvent.removeListener(handlerIndex);
+  }
+
   /**
-   * It waits forever while pin has been initialized.
+   * Start setup pin.
+   * It waits forever while pin has been initialized successfully.
+   * Errors are ignored.
    */
-  private startSetupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
+  setupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
     return new Promise<void>(((resolve, reject) => {
       // clear pin before start setup
       this.doClearPin(pin);
@@ -128,6 +151,6 @@ export default class DigitalExpanderSetupLogic {
       }
     }
 
-    this.events.emit(DigitalExpanderEvents.setup, initializedPins);
+    this.setupEvent.emit(initializedPins);
   }
 }
