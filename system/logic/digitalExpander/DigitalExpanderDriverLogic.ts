@@ -9,6 +9,7 @@ import IndexedEventEmitter from 'system/lib/IndexedEventEmitter';
 import DebounceCallIncreasing from 'system/lib/debounceCall/DebounceCallIncreasing';
 import Context from 'system/Context';
 import BufferedQueue from '../../lib/BufferedQueue';
+import DigitalExpanderSetupLogic from './DigitalExpanderSetupLogic';
 
 
 export interface DigitalExpanderSlaveDriverProps {
@@ -31,24 +32,25 @@ const DEFAULT_SETUP_DEBOUNCE_MS = 10;
 export default class DigitalExpanderDriverLogic {
   private readonly context: Context;
   private readonly props: DigitalExpanderSlaveDriverProps;
+  private setupLogic!: DigitalExpanderSetupLogic;
 
   // TODO: review
   private events = new IndexedEventEmitter();
   // TODO: тут нужна очередь ???? может обычная???
   // TODO: для очереди чтения поидее нужно сбрасывать новые запросы пока идет текущий
   //private queue: QueueOverride;
-  private setupQueue: BufferedQueue;
+  //private setupQueue: BufferedQueue;
   //private writeQueue: BufferedQueue;
-  private setupDebounce = new DebounceCallIncreasing();
+  //private setupDebounce = new DebounceCallIncreasing();
   // TODO: наверное лучше их запрашивать выше или вообще не исползовать
   // TODO: зачем надо если можно запросить pins props???
   // which pins are input
-  private inputPins: {[index: string]: true} = {};
+  //private inputPins: {[index: string]: true} = {};
   // state of pins which has been written to IC before
   //private writtenState: {[index: string]: boolean} = {};
   // buffer of pins which has to be set up
   // during debounce time or while current setup is writing
-  private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
+  //private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
   //private writeBuffer?: {[index: string]: boolean};
 
 
@@ -61,19 +63,20 @@ export default class DigitalExpanderDriverLogic {
         ? DEFAULT_SETUP_DEBOUNCE_MS
         : props.setupDebounceMs,
     };
+    this.setupLogic = new DigitalExpanderSetupLogic(this.context);
     //this.queue = new QueueOverride(this.context.config.config.queueJobTimeoutSec);
-    this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
+    //this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
     //this.writeQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
   }
 
   destroy() {
     this.events.destroy();
-    this.setupQueue.destroy();
+    //this.setupQueue.destroy();
     //this.writeQueue.destroy();
-    this.setupDebounce.destroy();
+    //this.setupDebounce.destroy();
 
-    delete this.inputPins;
-    delete this.setupBuffer;
+    //delete this.inputPins;
+    //delete this.setupBuffer;
   }
 
 
@@ -82,7 +85,7 @@ export default class DigitalExpanderDriverLogic {
     resistor?: OutputResistorMode,
     initialValue?: boolean
   ): Promise<void> {
-    return this.startSetupPin(pin, {
+    return this.setupLogic.setupPin(pin, {
       direction: PinDirection.output,
       initialValue,
     });
@@ -123,7 +126,7 @@ export default class DigitalExpanderDriverLogic {
       return Promise.reject(`PCF expander board can't handle a debounce`);
     }
     // resistor doesn't mater.
-    return this.startSetupPin(pin, {
+    return this.setupLogic.setupPin(pin, {
       direction: PinDirection.input,
       debounce,
     });
@@ -135,29 +138,6 @@ export default class DigitalExpanderDriverLogic {
     this.doClearPin(pin);
   }
 
-  // TODO: можно брать сохраненный setup пина
-
-  // TODO: review
-  wasPinInitialized(pin: number): boolean {
-    return typeof this.inputPins[pin] !== 'undefined'
-      || typeof this.writtenState[pin] !== 'undefined';
-  }
-
-  // TODO: review - может брать весь стейт который записывается
-  isPinSettingUp(pin: number): boolean {
-    if (this.setupBuffer) {
-      return !!this.setupBuffer[pin];
-    }
-
-    const savingState = this.setupQueue.getSavingState();
-
-    if (savingState) {
-      return !!savingState[pin];
-    }
-
-    return false;
-  }
-
   // TODO: review
   getWrittenState(): {[index: string]: boolean} {
     return this.writtenState;
@@ -165,22 +145,6 @@ export default class DigitalExpanderDriverLogic {
 
   onPinsInitialized(cb: DigitalExpanderPinInitHandler): number {
     return this.events.addListener(DigitalExpanderEvents.setup, cb);
-  }
-
-  getPinDirection(pin: number): PinDirection | undefined {
-    if (this.inputPins[pin]) {
-      return PinDirection.input;
-    }
-    // TODO: а нужно ли брать пин который не был инициализирован ????
-    // TODO: или тогда брать то что записывается тоже
-    else if (this.setupBuffer && this.setupBuffer[pin]) {
-      return this.setupBuffer[pin].direction;
-    }
-    else if (typeof this.writtenState[pin] !== 'undefined') {
-      return PinDirection.output;
-    }
-    // or hasn't been set
-    return;
   }
 
 
@@ -193,6 +157,45 @@ export default class DigitalExpanderDriverLogic {
     if (this.writeBuffer) delete this.writeBuffer[pin];
   }
 
+
+  // getPinDirection(pin: number): PinDirection | undefined {
+  //   if (this.inputPins[pin]) {
+  //     return PinDirection.input;
+  //   }
+  //   // TODO: а нужно ли брать пин который не был инициализирован ????
+  //   // TODO: или тогда брать то что записывается тоже
+  //   else if (this.setupBuffer && this.setupBuffer[pin]) {
+  //     return this.setupBuffer[pin].direction;
+  //   }
+  //   else if (typeof this.writtenState[pin] !== 'undefined') {
+  //     return PinDirection.output;
+  //   }
+  //   // or hasn't been set
+  //   return;
+  // }
+
+  // TODO: можно брать сохраненный setup пина
+
+  // // TODO: review
+  // wasPinInitialized(pin: number): boolean {
+  //   return typeof this.inputPins[pin] !== 'undefined'
+  //     || typeof this.writtenState[pin] !== 'undefined';
+  // }
+
+  // // TODO: review - может брать весь стейт который записывается
+  // isPinSettingUp(pin: number): boolean {
+  //   if (this.setupBuffer) {
+  //     return !!this.setupBuffer[pin];
+  //   }
+  //
+  //   const savingState = this.setupQueue.getSavingState();
+  //
+  //   if (savingState) {
+  //     return !!savingState[pin];
+  //   }
+  //
+  //   return false;
+  // }
 
   //
   // /**

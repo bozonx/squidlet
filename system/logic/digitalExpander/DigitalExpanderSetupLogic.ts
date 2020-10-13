@@ -26,9 +26,48 @@ export default class DigitalExpanderSetupLogic {
     this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
   }
 
+  destroy() {
+    this.setupEvent.destroy();
+    this.setupQueue.destroy();
+    this.setupDebounce.destroy();
+  }
 
-  isPinInitialized(): boolean {
-    // TODO: add
+
+  // TODO: review
+  wasPinInitialized(pin: number): boolean {
+    return typeof this.inputPins[pin] !== 'undefined'
+      || typeof this.writtenState[pin] !== 'undefined';
+  }
+
+  // TODO: review - может брать весь стейт который записывается
+  isPinSettingUp(pin: number): boolean {
+    if (this.setupBuffer) {
+      return !!this.setupBuffer[pin];
+    }
+
+    const savingState = this.setupQueue.getSavingState();
+
+    if (savingState) {
+      return !!savingState[pin];
+    }
+
+    return false;
+  }
+
+  getPinDirection(pin: number): PinDirection | undefined {
+    if (this.inputPins[pin]) {
+      return PinDirection.input;
+    }
+      // TODO: а нужно ли брать пин который не был инициализирован ????
+    // TODO: или тогда брать то что записывается тоже
+    else if (this.setupBuffer && this.setupBuffer[pin]) {
+      return this.setupBuffer[pin].direction;
+    }
+    else if (typeof this.writtenState[pin] !== 'undefined') {
+      return PinDirection.output;
+    }
+    // or hasn't been set
+    return;
   }
 
   getPinProps(pin: number): DigitalExpanderPinSetup {
