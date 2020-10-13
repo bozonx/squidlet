@@ -1,6 +1,7 @@
 import {InputResistorMode, OutputResistorMode, PinDirection} from '../../../interfaces/gpioTypes';
 
 
+// TODO: remove ???
 export enum DigitalExpanderEvents {
   setup,
   change,
