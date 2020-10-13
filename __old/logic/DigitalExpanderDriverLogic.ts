@@ -80,16 +80,16 @@ export default class DigitalExpanderDriverLogic {
   }
 
 
-  setupOutput(
-    pin: number,
-    resistor?: OutputResistorMode,
-    initialValue?: boolean
-  ): Promise<void> {
-    return this.setupLogic.setupPin(pin, {
-      direction: PinDirection.output,
-      initialValue,
-    });
-  }
+  // setupOutput(
+  //   pin: number,
+  //   resistor?: OutputResistorMode,
+  //   initialValue?: boolean
+  // ): Promise<void> {
+  //   return this.setupLogic.setupPin(pin, {
+  //     direction: PinDirection.output,
+  //     initialValue,
+  //   });
+  // }
 
   // TODO: можно не делать, вызывать cb выше
   /**
@@ -117,45 +117,43 @@ export default class DigitalExpanderDriverLogic {
 
 
   ////////// Input's
-  setupInput(
-    pin: number,
-    resistor: InputResistorMode,
-    debounce: number,
-  ): Promise<void> {
-    if (debounce) {
-      return Promise.reject(`PCF expander board can't handle a debounce`);
-    }
-    // resistor doesn't mater.
-    return this.setupLogic.setupPin(pin, {
-      direction: PinDirection.input,
-      debounce,
-    });
-  }
+  // setupInput(
+  //   pin: number,
+  //   resistor: InputResistorMode,
+  //   debounce: number,
+  // ): Promise<void> {
+  //
+  //   // resistor doesn't mater.
+  //   return this.setupLogic.setupPin(pin, {
+  //     direction: PinDirection.input,
+  //     debounce,
+  //   });
+  // }
 
   ////////// Common
 
-  async clearPin(pin: number): Promise<void> {
-    this.doClearPin(pin);
-  }
+  // async clearPin(pin: number): Promise<void> {
+  //   this.doClearPin(pin);
+  // }
 
   // TODO: review
   getWrittenState(): {[index: string]: boolean} {
     return this.writtenState;
   }
 
-  onPinsInitialized(cb: DigitalExpanderPinInitHandler): number {
-    return this.events.addListener(DigitalExpanderEvents.setup, cb);
-  }
+  // onPinsInitialized(cb: DigitalExpanderPinInitHandler): number {
+  //   return this.events.addListener(DigitalExpanderEvents.setup, cb);
+  // }
 
 
   // TODO: review
-  private doClearPin(pin: number) {
-    delete this.inputPins[pin];
-    delete this.writtenState[pin];
-
-    if (this.setupBuffer) delete this.setupBuffer[pin];
-    if (this.writeBuffer) delete this.writeBuffer[pin];
-  }
+  // private doClearPin(pin: number) {
+  //   delete this.inputPins[pin];
+  //   delete this.writtenState[pin];
+  //
+  //   if (this.setupBuffer) delete this.setupBuffer[pin];
+  //   if (this.writeBuffer) delete this.writeBuffer[pin];
+  // }
 
 
   // getPinDirection(pin: number): PinDirection | undefined {

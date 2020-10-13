@@ -24,6 +24,13 @@ export default class DigitalExpanderSetupLogic {
   constructor(context: Context) {
     this.context = context;
     this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
+
+    // this.props = {
+    //   ...props,
+    //   setupDebounceMs: (typeof props.setupDebounceMs === 'undefined')
+    //     ? DEFAULT_SETUP_DEBOUNCE_MS
+    //     : props.setupDebounceMs,
+    // };
   }
 
   destroy() {
@@ -123,6 +130,16 @@ export default class DigitalExpanderSetupLogic {
         .catch(reject);
     }));
   }
+
+  // TODO: review
+  async clearPin(pin: number): Promise<void> {
+    delete this.inputPins[pin];
+    delete this.writtenState[pin];
+
+    if (this.setupBuffer) delete this.setupBuffer[pin];
+    if (this.writeBuffer) delete this.writeBuffer[pin];
+  }
+
 
   /**
    * Do setup of several buffered pins.
