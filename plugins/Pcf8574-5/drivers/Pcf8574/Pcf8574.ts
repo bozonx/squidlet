@@ -37,18 +37,9 @@ export class Pcf8574
       this.props
     );
 
-    // TODO: pass callbacks
     this.setupLogic = new DigitalExpanderSetupLogic(this.context, {
       doSetup: this.doSetup,
     });
-    // this.expander = new DigitalExpanderDriverLogic(
-    //   this.context,
-    //   {
-    //     setup: this.doSetup,
-    //     writeOutput: this.writeOutput,
-    //     readAllInputs: this.readAllInputs,
-    //   }
-    // );
   }
 
   destroy = async () => {
@@ -88,7 +79,7 @@ export class Pcf8574
     }
     // TODO: просто записать, верхний уровень гарантирует что не будет накладок
     await this.writeQueue.add(
-      (stateToSave) => this.props.writeOutput(stateToSave),
+      (stateToSave) => this.writeOutput(stateToSave),
       filteredState
     );
   }
@@ -143,6 +134,7 @@ export class Pcf8574
     return this.i2cMasterDriver.write(bitsToBytes(result));
   }
 
+  // TODO: review
   private writeOutput = (outputPinsData: {[index: string]: boolean}): Promise<void> => {
     const result: boolean[] = new Array(PINS_COUNT);
 
@@ -177,6 +169,7 @@ export class Pcf8574
 
   // TODO: review
   private resolvePinBitState(pin: number, outputState?: boolean): boolean {
+    // TODO: что делать с пинами которые ещё в процессе инициализации
     const direction: PinDirection | undefined = this.expander.getPinDirection(pin);
     // if pin is input switch it to HIGH state
     if (direction === PinDirection.input) {
