@@ -11,13 +11,17 @@ type SetupHandler = (initializedPins: number[]) => void;
 
 interface Props {
   doSetup: (pins: {[index: string]: DigitalExpanderPinSetup}) => Promise<void>;
+  setupDebounceMs?: number;
 }
+
+const DEFAULT_SETUP_DEBOUNCE_MS: number = 10;
 
 
 export default class DigitalExpanderSetupLogic {
   private setupEvent = new IndexedEvents<SetupHandler>();
   private readonly context: Context;
   private readonly props: Props;
+  private readonly setupDebounceMs: number;
   private setupQueue: BufferedQueue;
   //private writeQueue: BufferedQueue;
   private setupDebounce = new DebounceCallIncreasing();
@@ -29,14 +33,10 @@ export default class DigitalExpanderSetupLogic {
   constructor(context: Context, props: Props) {
     this.context = context;
     this.props = props;
+    this.setupDebounceMs = (typeof props.setupDebounceMs === 'undefined')
+      ? DEFAULT_SETUP_DEBOUNCE_MS
+      : props.setupDebounceMs;
     this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
-
-    // this.props = {
-    //   ...props,
-    //   setupDebounceMs: (typeof props.setupDebounceMs === 'undefined')
-    //     ? DEFAULT_SETUP_DEBOUNCE_MS
-    //     : props.setupDebounceMs,
-    // };
   }
 
   destroy() {
