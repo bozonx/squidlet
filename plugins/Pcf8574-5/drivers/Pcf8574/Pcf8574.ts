@@ -10,12 +10,11 @@ import {
   DigitalExpanderOutputDriver,
   DigitalExpanderPinSetup,
 } from 'system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
-import DigitalExpanderDriverLogic from 'system/logic/digitalExpander/DigitalExpanderDriverLogic';
 import {InputResistorMode, OutputResistorMode, PinDirection} from 'system/interfaces/gpioTypes';
 import {bitsToBytes, bytesToBits, howManyOctets} from 'system/lib/binaryHelpers';
+import DigitalExpanderSetupLogic from 'system/logic/digitalExpander/DigitalExpanderSetupLogic';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
-import DigitalExpanderSetupLogic from '../../../../system/logic/digitalExpander/DigitalExpanderSetupLogic';
 
 
 export const PINS_COUNT = 8;
@@ -28,7 +27,6 @@ export class Pcf8574
   implements DigitalExpanderOutputDriver, DigitalExpanderInputDriver
 {
   private i2cMasterDriver!: I2cMaster;
-  //private expander!: DigitalExpanderDriverLogic;
   private setupLogic!: DigitalExpanderSetupLogic;
   //private writeQueue: BufferedQueue;
 
@@ -40,7 +38,9 @@ export class Pcf8574
     );
 
     // TODO: pass callbacks
-    this.setupLogic = new DigitalExpanderSetupLogic(this.context);
+    this.setupLogic = new DigitalExpanderSetupLogic(this.context, {
+      doSetup: this.doSetup,
+    });
     // this.expander = new DigitalExpanderDriverLogic(
     //   this.context,
     //   {
@@ -52,10 +52,13 @@ export class Pcf8574
   }
 
   destroy = async () => {
-    this.expander.destroy();
+    this.setupLogic.destroy();
   }
 
 
+  /**
+   * Resistor will be skipped
+   */
   setupOutput(
     pin: number,
     resistor?: OutputResistorMode,
@@ -90,6 +93,9 @@ export class Pcf8574
     );
   }
 
+  /**
+   * Resistor will be skipped
+   */
   setupInput(
     pin: number,
     resistor: InputResistorMode,
@@ -148,6 +154,7 @@ export class Pcf8574
   }
 
   // TODO: move to readInputPins
+  // TODO: review
   private readAllInputs = async (): Promise<{[index: string]: boolean}> => {
     const icData: Uint8Array = await this.i2cMasterDriver.read(DATA_LENGTH);
 
@@ -168,6 +175,7 @@ export class Pcf8574
     return inputChanges;
   }
 
+  // TODO: review
   private resolvePinBitState(pin: number, outputState?: boolean): boolean {
     const direction: PinDirection | undefined = this.expander.getPinDirection(pin);
     // if pin is input switch it to HIGH state

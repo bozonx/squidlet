@@ -9,10 +9,15 @@ import IndexedEvents from '../../lib/IndexedEvents';
 
 type SetupHandler = (initializedPins: number[]) => void;
 
+interface Props {
+  doSetup: (pins: {[index: string]: DigitalExpanderPinSetup}) => Promise<void>;
+}
+
 
 export default class DigitalExpanderSetupLogic {
   private setupEvent = new IndexedEvents<SetupHandler>();
   private readonly context: Context;
+  private readonly props: Props;
   private setupQueue: BufferedQueue;
   //private writeQueue: BufferedQueue;
   private setupDebounce = new DebounceCallIncreasing();
@@ -21,8 +26,9 @@ export default class DigitalExpanderSetupLogic {
   private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
 
 
-  constructor(context: Context) {
+  constructor(context: Context, props: Props) {
     this.context = context;
+    this.props = props;
     this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
 
     // this.props = {
