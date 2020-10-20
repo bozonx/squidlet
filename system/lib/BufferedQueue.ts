@@ -72,6 +72,10 @@ export default class BufferedQueue {
     return Boolean(this.writingState);
   }
 
+  isItemPending(key: number | string): boolean {
+    return Boolean(this.writingState && this.writingState[key]);
+  }
+
   /**
    * It means is pending and has queue
    */

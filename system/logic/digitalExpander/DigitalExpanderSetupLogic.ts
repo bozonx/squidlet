@@ -17,10 +17,10 @@ const DEFAULT_SETUP_DEBOUNCE_MS: number = 10;
 
 
 export default class DigitalExpanderSetupLogic {
-  private setupEvent = new IndexedEvents<SetupHandler>();
   private readonly context: Context;
   private readonly props: Props;
-  private setupQueue: BufferedQueue;
+  private readonly setupEvent = new IndexedEvents<SetupHandler>();
+  private readonly setupQueue: BufferedQueue;
   private readonly bufferedRequest: BufferedRequest;
 
   //private setupDebounce = new DebounceCallIncreasing();
@@ -44,29 +44,19 @@ export default class DigitalExpanderSetupLogic {
   destroy() {
     this.setupEvent.destroy();
     this.setupQueue.destroy();
-    this.setupDebounce.destroy();
+    this.bufferedRequest.destroy();
   }
 
 
-  // TODO: review
   wasPinInitialized(pin: number): boolean {
-    return typeof this.inputPins[pin] !== 'undefined'
-      || typeof this.writtenState[pin] !== 'undefined';
+    return Boolean(this.setupQueue.getSavedState()[pin]);
   }
 
-  // TODO: review - может брать весь стейт который записывается
   isPinSettingUp(pin: number): boolean {
-    if (this.setupBuffer) {
-      return !!this.setupBuffer[pin];
-    }
-
-    const savingState = this.setupQueue.getSavingState();
-
-    if (savingState) {
-      return !!savingState[pin];
-    }
-
-    return false;
+    return Boolean(
+      this.bufferedRequest.isItemBuffering(pin)
+      || this.setupQueue.isItemPending(pin)
+    );
   }
 
   getPinDirection(pin: number): PinDirection | undefined {
