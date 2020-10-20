@@ -53,33 +53,42 @@ export default class DigitalExpanderSetupLogic {
   }
 
   isPinSettingUp(pin: number): boolean {
-    return Boolean(
-      this.bufferedRequest.isItemBuffering(pin)
-      || this.setupQueue.isItemPending(pin)
-    );
+    return this.bufferedRequest.isItemBuffering(pin)
+      || this.setupQueue.isItemPending(pin);
   }
 
+  isPinBuffering(pin: number): boolean {
+    return this.bufferedRequest.isItemBuffering(pin);
+  }
+
+
+  /**
+   * It returns state which is buffering or writing or which has been written.
+   * Check the state via wasPinInitialized() and isPinSettingUp()
+   */
+  getPinProps(pin: number): DigitalExpanderPinSetup {
+    const buffer = this.bufferedRequest.getBuffer();
+
+    if (buffer) return buffer[pin];
+
+    return this.setupQueue.getState()[pin];
+  }
+
+  /**
+   * It returns state which is buffering or writing or which has been written.
+   * Check the state via wasPinInitialized() and isPinSettingUp()
+   */
   getPinDirection(pin: number): PinDirection | undefined {
-    if (this.inputPins[pin]) {
-      return PinDirection.input;
+    const pinProps = this.getPinProps(pin);
+
+    if (pinProps) {
+      return pinProps.direction;
     }
-      // TODO: а нужно ли брать пин который не был инициализирован ????
-    // TODO: или тогда брать то что записывается тоже
-    else if (this.setupBuffer && this.setupBuffer[pin]) {
-      return this.setupBuffer[pin].direction;
-    }
-    else if (typeof this.writtenState[pin] !== 'undefined') {
-      return PinDirection.output;
-    }
-    // or hasn't been set
+
     return;
   }
 
-  getPinProps(pin: number): DigitalExpanderPinSetup {
-    // TODO: add
-  }
-
-  onSetup(handler: SetupHandler): number {
+  onSetupDone(handler: SetupHandler): number {
     return this.setupEvent.addListener(handler);
   }
 
