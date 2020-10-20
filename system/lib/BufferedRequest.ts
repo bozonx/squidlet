@@ -28,6 +28,10 @@ export default class BufferedRequest {
     return !!this.buffer;
   }
 
+  isItemBuffering(key: number | string): boolean {
+    return Boolean(this.buffer && this.buffer[key]);
+  }
+
   getBuffer(): {[index: string]: any} | undefined {
     return this.buffer;
   }
