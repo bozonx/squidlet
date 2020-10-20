@@ -1,10 +1,9 @@
 import {DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
-import {cloneDeepObject, isEmptyObject} from '../../lib/objects';
 import {PinDirection} from '../../interfaces/gpioTypes';
 import BufferedQueue from '../../lib/BufferedQueue';
-import DebounceCallIncreasing from '../../lib/debounceCall/DebounceCallIncreasing';
 import Context from 'system/Context';
 import IndexedEvents from '../../lib/IndexedEvents';
+import BufferedRequest from '../../lib/BufferedRequest';
 
 
 type SetupHandler = (initializedPins: number[]) => void;
@@ -21,22 +20,25 @@ export default class DigitalExpanderSetupLogic {
   private setupEvent = new IndexedEvents<SetupHandler>();
   private readonly context: Context;
   private readonly props: Props;
-  private readonly setupDebounceMs: number;
   private setupQueue: BufferedQueue;
-  //private writeQueue: BufferedQueue;
-  private setupDebounce = new DebounceCallIncreasing();
+  private readonly bufferedRequest: BufferedRequest;
+
+  //private setupDebounce = new DebounceCallIncreasing();
   // buffer of pins which has to be set up
   // during debounce time or while current setup is writing
-  private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
+  //private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
 
 
   constructor(context: Context, props: Props) {
     this.context = context;
     this.props = props;
-    this.setupDebounceMs = (typeof props.setupDebounceMs === 'undefined')
+    this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
+
+    const setupDebounceMs = (typeof props.setupDebounceMs === 'undefined')
       ? DEFAULT_SETUP_DEBOUNCE_MS
       : props.setupDebounceMs;
-    this.setupQueue = new BufferedQueue(this.context.config.config.queueJobTimeoutSec);
+
+    this.bufferedRequest = new BufferedRequest(this.handleDebounceEnd, setupDebounceMs);
   }
 
   destroy() {
@@ -101,9 +103,11 @@ export default class DigitalExpanderSetupLogic {
    * Errors are ignored.
    */
   setupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
-    return new Promise<void>(((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       // clear pin before start setup
       this.doClearPin(pin);
+
+      // TODO: use setup buffer
 
       if (!this.setupBuffer) this.setupBuffer = {};
 
@@ -134,54 +138,18 @@ export default class DigitalExpanderSetupLogic {
           .catch(reject);
       }, this.props.setupDebounceMs)
         .catch(reject);
-    }));
+    });
   }
 
-  // TODO: review
   async clearPin(pin: number): Promise<void> {
-    delete this.inputPins[pin];
-    delete this.writtenState[pin];
-
-    if (this.setupBuffer) delete this.setupBuffer[pin];
-    if (this.writeBuffer) delete this.writeBuffer[pin];
+    this.doClearPin(pin);
   }
 
 
-  /**
-   * Do setup of several buffered pins.
-   * If can't do request then it tries it forever.
-   * It can be called several times
-   * @private
-   */
-  private async doSetup() {
-
-    // TODO: BufferedQueue сохраняет последний записанный стейт это вообще нужно ???
-
-    // if there aren't any pins to be setup then do nothing.
-    if (isEmptyObject(this.setupBuffer)) {
-      delete this.setupBuffer;
-
-      return;
-    }
-
-    const setupBuffer = cloneDeepObject(this.setupBuffer);
-    // delete current buffer that means that it moves to saving buffer
-    delete this.setupBuffer;
-
+  private handleDebounceEnd = async (setupBuffer: {[index: string]: DigitalExpanderPinSetup}) => {
     try {
       await this.setupQueue.add(async (setupPins) => {
-        try {
-          await this.props.setup(setupPins);
-        }
-        catch (e) {
-          // ignore error and restore setupBuffer;
-          this.setupBuffer = {
-            ...setupPins,
-            ...this.setupBuffer,
-          };
-
-          return;
-        }
+        await this.props.doSetup(setupPins);
 
         this.onSetupSuccess(setupPins);
       }, setupBuffer);
@@ -190,12 +158,23 @@ export default class DigitalExpanderSetupLogic {
       // Queue is cancelled at the moment.
       // Repeat at the next tick.
       setTimeout(() => {
-        this.doSetup()
+        // TODO: нужно взять весь последний стейт очереди
+        this.handleDebounceEnd()
           .catch(this.context.log.debug);
       }, 0);
     }
   }
 
+  // TODO: review
+  private doClearPin(pin: number) {
+    delete this.inputPins[pin];
+    delete this.writtenState[pin];
+
+    if (this.setupBuffer) delete this.setupBuffer[pin];
+    if (this.writeBuffer) delete this.writeBuffer[pin];
+  }
+
+  // TODO: strong review
   private onSetupSuccess(pins: {[index: string]: DigitalExpanderPinSetup}) {
     const initializedPins: number[] = [];
 

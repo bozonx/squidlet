@@ -2,7 +2,7 @@ import DebounceCall from './debounceCall/DebounceCall';
 
 
 export default class BufferedRequest {
-  private readonly writeCb: (state: {[index: string]: boolean}) => void;
+  private readonly writeCb: (state: {[index: string]: any}) => void;
   private readonly writeBufferMs: number;
   private readonly debounce = new DebounceCall();
   // temporary state while values are buffering before writing
@@ -10,7 +10,7 @@ export default class BufferedRequest {
 
 
   constructor(
-    writeCb: (state: {[index: string]: boolean}) => void,
+    writeCb: (state: {[index: string]: any}) => void,
     writeBufferMs: number = 0
   ) {
     this.writeCb = writeCb;
