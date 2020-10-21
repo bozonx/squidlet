@@ -4,6 +4,7 @@ import BufferedQueue from '../../lib/BufferedQueue';
 import Context from 'system/Context';
 import IndexedEvents from '../../lib/IndexedEvents';
 import BufferedRequest from '../../lib/BufferedRequest';
+import {cloneDeepObject} from '../../lib/objects';
 
 
 type SetupHandler = (initializedPins: number[]) => void;
@@ -22,11 +23,6 @@ export default class DigitalExpanderSetupLogic {
   private readonly setupEvent = new IndexedEvents<SetupHandler>();
   private readonly setupQueue: BufferedQueue;
   private readonly bufferedRequest: BufferedRequest;
-
-  //private setupDebounce = new DebounceCallIncreasing();
-  // buffer of pins which has to be set up
-  // during debounce time or while current setup is writing
-  //private setupBuffer?: {[index: string]: DigitalExpanderPinSetup};
 
 
   constructor(context: Context, props: Props) {
@@ -103,40 +99,18 @@ export default class DigitalExpanderSetupLogic {
    */
   setupPin(pin: number, pinSetup: DigitalExpanderPinSetup): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      // clear pin before start setup
-      this.doClearPin(pin);
-
-      // TODO: use setup buffer
-
-      if (!this.setupBuffer) this.setupBuffer = {};
-
-      this.setupBuffer[pin] = pinSetup;
-
+      // TODO: зависнет если очистить pin
       // listen to event which means pin has been initialized and resolve the promise
-      const handlerIndex = this.onPinsInitialized((initializedPins: number[]) => {
+      const handlerIndex = this.onSetupDone((initializedPins: number[]) => {
         if (!initializedPins.includes(pin)) return;
 
-        this.events.removeListener(handlerIndex);
+        this.removeListener(handlerIndex);
         resolve();
       });
 
-      // if setup process is in progress then just add a new cb to queue
-      if (this.setupQueue.isPending()) {
-        this.doSetup()
-          .catch(reject);
-
-        return;
-      }
-
-      // TODO: может использовать BufferedRequest ???
-
-      // if there isn't any setup process then start a new one via debounce
-      // or update debounce cb if some debounce in progress.
-      this.setupDebounce.invoke(() => {
-        this.doSetup()
-          .catch(reject);
-      }, this.props.setupDebounceMs)
-        .catch(reject);
+      // add pin to buffer. After timeout the writing process will be started.
+      this.bufferedRequest.write({[pin]: pinSetup})
+        .catch(this.context.log.debug);
     });
   }
 
@@ -150,47 +124,25 @@ export default class DigitalExpanderSetupLogic {
       await this.setupQueue.add(async (setupPins) => {
         await this.props.doSetup(setupPins);
 
-        this.onSetupSuccess(setupPins);
+        this.setupEvent.emit(Object.keys(setupPins).map(Number));
       }, setupBuffer);
     }
     catch (e) {
+      const prevState = cloneDeepObject(this.setupQueue.getSavingState());
+
+      if (!prevState) return;
       // Queue is cancelled at the moment.
       // Repeat at the next tick.
       setTimeout(() => {
-        // TODO: нужно взять весь последний стейт очереди
-        this.handleDebounceEnd()
+        this.handleDebounceEnd(prevState)
           .catch(this.context.log.debug);
       }, 0);
     }
   }
 
-  // TODO: review
   private doClearPin(pin: number) {
-    delete this.inputPins[pin];
-    delete this.writtenState[pin];
-
-    if (this.setupBuffer) delete this.setupBuffer[pin];
-    if (this.writeBuffer) delete this.writeBuffer[pin];
+    this.bufferedRequest.clearItem(pin);
+    this.setupQueue.clearItem(pin);
   }
 
-  // TODO: strong review
-  private onSetupSuccess(pins: {[index: string]: DigitalExpanderPinSetup}) {
-    const initializedPins: number[] = [];
-
-    for (let pinStr of Object.keys(pins)) {
-      const pin: number = parseInt(pinStr);
-
-      initializedPins.push(pin);
-
-      if (pins[pin].direction === PinDirection.input) {
-        this.inputPins[pin] = true;
-      }
-      else {
-        // TODO: надо как-то просто записать в writeQueue
-        this.writtenState[pin] = pins[pin].initialValue || false;
-      }
-    }
-
-    this.setupEvent.emit(initializedPins);
-  }
 }

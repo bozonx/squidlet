@@ -62,6 +62,12 @@ export default class BufferedRequest {
     return this.debounce.invoke(this.doWriteCb, this.writeBufferMs);
   }
 
+  clearItem(key: number | string) {
+    if (!this.buffer) return;
+
+    delete this.buffer[key];
+  }
+
   cancel() {
     this.debounce.clear();
 
