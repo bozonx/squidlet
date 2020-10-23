@@ -1,5 +1,8 @@
 import BufferedRequest from '../../lib/BufferedRequest';
 import BufferedQueue from '../../lib/BufferedQueue';
+import {PinDirection} from '../../interfaces/gpioTypes';
+import {DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
+import {stringArrayToNumber} from '../../lib/arrays';
 
 
 /**
@@ -8,6 +11,8 @@ import BufferedQueue from '../../lib/BufferedQueue';
 export default class DigitalExpanderOutputLogic {
   private readonly logError: (msg: Error | string) => void;
   private readonly writeCb: (changedState: {[index: string]: boolean}) => Promise<void>;
+  private readonly wasPinInitialized: (pin: number) => boolean;
+  private readonly getPinProps: (pin: number) => DigitalExpanderPinSetup | undefined;
   private readonly writeBufferMs?: number;
   private readonly bufferedRequest: BufferedRequest;
   private readonly bufferedQueue: BufferedQueue;
@@ -16,11 +21,15 @@ export default class DigitalExpanderOutputLogic {
   constructor(
     logError: (msg: Error | string) => void,
     writeCb: (changedState: {[index: string]: boolean}) => Promise<void>,
+    wasPinInitialized: (pin: number) => boolean,
+    getPinProps: (pin: number) => DigitalExpanderPinSetup | undefined,
     queueJobTimeoutSec?: number,
     writeBufferMs?: number
   ) {
     this.logError = logError;
     this.writeCb = writeCb;
+    this.wasPinInitialized = wasPinInitialized;
+    this.getPinProps = getPinProps;
     this.writeBufferMs = writeBufferMs;
     this.bufferedRequest = new BufferedRequest(this.startWriting, writeBufferMs);
     this.bufferedQueue = new BufferedQueue(queueJobTimeoutSec);
@@ -68,10 +77,21 @@ export default class DigitalExpanderOutputLogic {
     this.bufferedQueue.clearItem(pin);
   }
 
-  write(pin: number, value: boolean): Promise<void> {
-    // TODO: нужно ли сначала проверить был ли пин инициализирован ???
-    //       иначе он просто пропустится и ошибка не поднимится
-    return this.writeState({[pin]: value});
+  async write(pin: number, value: boolean): Promise<void> {
+    if (this.wasPinInitialized(pin)) {
+      throw new Error(
+        `DigitalExpanderOutputLogic.write: ` +
+        `Pin "${pin}" hasn't been initialized yet`
+      );
+    }
+
+    const pinProps = this.getPinProps(pin);
+
+    if (pinProps && pinProps.direction !== PinDirection.output) {
+      throw new Error(`DigitalExpanderOutputLogic.write: Pin "${pin}" isn't output`);
+    }
+
+    await this.writeState({[pin]: value});
   }
 
   /**
@@ -80,16 +100,17 @@ export default class DigitalExpanderOutputLogic {
    * Returns pin numbers which has been successfully written
    */
   async writeState(partialState: {[index: string]: boolean}): Promise<number[]> {
-
-
+    const filteredState = this.filterInitializedPinsState(partialState);
 
     // If there is some cb writing or there is a queue then update buffer
     if (this.bufferedQueue.hasQueue()) {
       // add to queue or update queued cb and buffer
-      return this.bufferedQueue.add(this.writeCb, partialState);
+      await this.bufferedQueue.add(this.writeCb, filteredState);
     }
     // else it is in a buffering state or it is a new request
-    return this.bufferedRequest.write(partialState);
+    await this.bufferedRequest.write(filteredState);
+
+    return stringArrayToNumber(Object.keys(filteredState));
   }
 
 
@@ -100,6 +121,26 @@ export default class DigitalExpanderOutputLogic {
     // first write request will be called write now at the current tick
     this.bufferedQueue.add(this.writeCb, stateToSave)
       .catch(this.logError);
+  }
+
+  private filterInitializedPinsState(
+    partialState: {[index: string]: boolean}
+  ): {[index: string]: boolean} {
+    const filteredState: {[index: string]: boolean} = {};
+    // filter only initialized output pins
+    for (let pinStr of Object.keys(partialState)) {
+      const pin: number = parseInt(pinStr);
+      // skip pins which are hasn't been setup or in setup process and input pins.
+      if (this.wasPinInitialized(pin)) {
+        const pinProps = this.getPinProps(pin);
+
+        if (pinProps && pinProps.direction === PinDirection.output) {
+          filteredState[pin] = partialState[pin];
+        }
+      }
+    }
+
+    return filteredState;
   }
 
 }
