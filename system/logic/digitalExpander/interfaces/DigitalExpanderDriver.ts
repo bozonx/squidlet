@@ -36,6 +36,8 @@ export interface DigitalExpanderOutputDriver {
   writeState(state: {[index: string]: boolean}): Promise<void>;
 
   clearPin(pin: number): Promise<void>;
+  wasPinInitialized(pin: number): boolean;
+  getPinProps(pin: number): DigitalExpanderPinSetup | undefined;
 }
 
 export interface DigitalExpanderInputDriver {
@@ -74,4 +76,7 @@ export interface DigitalExpanderInputDriver {
   // removeListener(handlerIndex: number): void;
 
   clearPin(pin: number): Promise<void>;
+  // TODO: does it need here ???
+  //wasPinInitialized(pin: number): boolean;
+  //getPinProps(pin: number): DigitalExpanderPinSetup | undefined;
 }
