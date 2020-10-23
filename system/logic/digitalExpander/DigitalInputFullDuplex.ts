@@ -88,6 +88,9 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
   }
 
   async clearAll(): Promise<void> {
+
+    // TODO: better to use race ???
+
     return Promise.all(Object.keys(this.logic.getState()).map((pin: string) => {
       return this.clearPin(parseInt(pin));
     }))

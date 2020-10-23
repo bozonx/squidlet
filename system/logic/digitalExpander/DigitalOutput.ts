@@ -49,6 +49,9 @@ export default class DigitalOutput implements DigitalOutputIo {
   }
 
   clearAll(): Promise<void> {
+
+    // TODO: better to use race ???
+
     return Promise.all(Object.keys(this.logic.getState()).map((pin: string) => {
       return this.clearPin(parseInt(pin));
     }))

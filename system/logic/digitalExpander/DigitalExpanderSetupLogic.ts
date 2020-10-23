@@ -62,7 +62,7 @@ export default class DigitalExpanderSetupLogic {
    * It returns state which is buffering or writing or which has been written.
    * Check the state via wasPinInitialized() and isPinSettingUp()
    */
-  getPinProps(pin: number): DigitalExpanderPinSetup {
+  getPinProps(pin: number): DigitalExpanderPinSetup | undefined {
     const buffer = this.bufferedRequest.getBuffer();
 
     if (buffer) return buffer[pin];
