@@ -63,27 +63,11 @@ export class Pcf8574
 
   /**
    * Write state of several pins.
-   * It skips pins which hasn't been initialized.
    * State is {pinNumber: true | false}. Pin number starts from 0.
-   * Returns pin numbers which has been successfully written
+   * it relies to upper level logic which has a queue and buffer
    */
-  async writeState(state: {[index: string]: boolean}): Promise<void> {
-    // TODO: move logic to output pin logic
-    const filteredState: {[index: string]: boolean} = {};
-    // filter only initialized output pins
-    for (let pinStr of Object.keys(state)) {
-      const pin: number = parseInt(pinStr);
-      // skip pins which are hasn't been setup or in setup process and input pins.
-      if (this.setupLogic.wasPinInitialized(pin)) {
-        const pinProps = this.setupLogic.getPinProps(pin);
-
-        if (pinProps && pinProps.direction === PinDirection.output) {
-          filteredState[pin] = state[pin];
-        }
-      }
-    }
-    // it relies to upper level logic which has a queue and buffer
-    await this.writeOutput(state);
+  writeState(state: {[index: string]: boolean}): Promise<void> {
+    return this.writeOutput(state);
   }
 
   /**

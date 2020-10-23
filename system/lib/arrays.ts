@@ -136,6 +136,10 @@ export function cloneDeepArray(arr?: any[]): any[] {
   return result;
 }
 
+export function stringArrayToNumber(arr: string[]): number[] {
+  return arr.map((item) => Number(item));
+}
+
 // /**
 //  * Like lodash's compact. It removes undefined, null and '' from array.
 //  * It make a new array.
