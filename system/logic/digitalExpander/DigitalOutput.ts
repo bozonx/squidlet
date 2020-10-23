@@ -1,6 +1,6 @@
 import {OutputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalOutputIo from '../../interfaces/io/DigitalOutputIo';
-import {DigitalExpanderOutputDriver} from './interfaces/DigitalExpanderDriver';
+import {DigitalExpanderOutputDriver, DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderOutputLogic from './DigitalExpanderOutputLogic';
 import Context from '../../Context';
 
@@ -25,6 +25,9 @@ export default class DigitalOutput implements DigitalOutputIo {
     this.logic = new DigitalExpanderOutputLogic(
       context.log.error,
       this.writeCb,
+      (pin: number): boolean => this.props.driver.wasPinInitialized(pin),
+      (pin: number): DigitalExpanderPinSetup | undefined =>
+        this.props.driver.getPinProps(pin),
       props.queueJobTimeoutSec,
       props.writeBufferMs
     );

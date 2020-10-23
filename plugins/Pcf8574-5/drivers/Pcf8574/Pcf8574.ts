@@ -97,6 +97,14 @@ export class Pcf8574
     return this.setupLogic.clearPin(pin);
   }
 
+  wasPinInitialized(pin: number): boolean {
+    return this.setupLogic.wasPinInitialized(pin);
+  }
+
+  getPinProps(pin: number): DigitalExpanderPinSetup | undefined {
+    return this.setupLogic.getPinProps(pin);
+  }
+
 
   private doSetup = (pins: {[index: string]: DigitalExpanderPinSetup}): Promise<void> => {
     const result: boolean[] = [];
