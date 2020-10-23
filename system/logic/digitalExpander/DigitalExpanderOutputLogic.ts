@@ -69,13 +69,20 @@ export default class DigitalExpanderOutputLogic {
   }
 
   write(pin: number, value: boolean): Promise<void> {
+    // TODO: нужно ли сначала проверить был ли пин инициализирован ???
+    //       иначе он просто пропустится и ошибка не поднимится
     return this.writeState({[pin]: value});
   }
 
   /**
-   * Write full or partial state
+   * Write full or partial state.
+   * It skips pins which hasn't been initialized.
+   * Returns pin numbers which has been successfully written
    */
-  async writeState(partialState: {[index: string]: boolean}): Promise<void> {
+  async writeState(partialState: {[index: string]: boolean}): Promise<number[]> {
+
+
+
     // If there is some cb writing or there is a queue then update buffer
     if (this.bufferedQueue.hasQueue()) {
       // add to queue or update queued cb and buffer
