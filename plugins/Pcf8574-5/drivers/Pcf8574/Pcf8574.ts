@@ -101,6 +101,10 @@ export class Pcf8574
     return this.setupLogic.wasPinInitialized(pin);
   }
 
+  getAllPinsProps(): {[index: string]: DigitalExpanderPinSetup} {
+    return this.setupLogic.getAllPinsProps();
+  }
+
   getPinProps(pin: number): DigitalExpanderPinSetup | undefined {
     return this.setupLogic.getPinProps(pin);
   }
