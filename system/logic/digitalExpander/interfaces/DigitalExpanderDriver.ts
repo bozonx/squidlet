@@ -76,7 +76,5 @@ export interface DigitalExpanderInputDriver {
   // removeListener(handlerIndex: number): void;
 
   clearPin(pin: number): Promise<void>;
-  // TODO: does it need here ???
-  //wasPinInitialized(pin: number): boolean;
-  //getPinProps(pin: number): DigitalExpanderPinSetup | undefined;
+  getAllPinsProps(): {[index: string]: DigitalExpanderPinSetup};
 }

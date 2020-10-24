@@ -1,8 +1,8 @@
 import Context from 'system/Context';
 
-import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
+import {Edge, InputResistorMode, PinDirection} from '../../interfaces/gpioTypes';
 import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
-import {DigitalExpanderInputDriver} from './interfaces/DigitalExpanderDriver';
+import {DigitalExpanderInputDriver, DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderInputLogic from './DigitalExpanderInputLogic';
 import SemiDuplexFeedbackLogic from '../SemiDuplexFeedbackLogic';
 import {ImpulseInput} from '../../../entities/drivers/ImpulseInput/ImpulseInput';
@@ -86,13 +86,10 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
     }
 
     await this.props.driver.setupInput(pin, inputMode, remoteDebounce);
+    await this.logic.setupPin(pin, inputMode, localDebounce, edge);
 
-    // TODO: запустить как только засетапится 1й инпут (закончит сетап)
-    // TODO: !!!!!
-    //this.feedback.startFeedback();
-    // if (this.polling && !this.polling.isInProgress()) {
-
-    return this.logic.setupPin(pin, inputMode, localDebounce, edge);
+    // start feedback after the first input pin has been set up
+    if (!this.feedback.isFeedbackStarted()) this.feedback.startFeedback();
   }
 
   read(pin: number): Promise<boolean> {
@@ -108,11 +105,12 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
   }
 
   async clearPin(pin: number): Promise<void> {
-
-    // TODO: если не осталось input пинов то отстановить feedback
-
-    this.logic.clearPin(pin);
     await this.props.driver.clearPin(pin);
+    this.logic.clearPin(pin);
+
+    if (!this.areThereAnyInputs()) {
+      this.feedback.stopFeedBack();
+    }
   }
 
   async clearAll(): Promise<void> {
@@ -123,6 +121,20 @@ export default class DigitalInputSemiDuplex implements DigitalInputIo {
       return this.clearPin(parseInt(pin));
     }))
       .then();
+  }
+
+
+  private areThereAnyInputs(): boolean {
+    const pinsProps: {[index: string]: DigitalExpanderPinSetup} = this.props.driver
+      .getAllPinsProps();
+
+    for (let pinStr of Object.keys(pinsProps)) {
+      if (pinsProps[pinStr].direction === PinDirection.input) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }
