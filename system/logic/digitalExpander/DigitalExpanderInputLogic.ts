@@ -6,10 +6,10 @@ import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
 import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
 
 
-interface InputPinProps {
-  debounce?: number;
-  edge: Edge;
-}
+// interface InputPinProps {
+//   debounce?: number;
+//   edge: Edge;
+// }
 
 const READ_RESULT_PREFIX = 'result';
 
@@ -24,7 +24,7 @@ export default class DigitalExpanderInputLogic {
   //private readonly polling?: Polling;
   private state: {[index: string]: boolean} = {};
   // TODO: зачем их тут хранить??? может брать у драйвера ???
-  private pinProps: {[index: string]: InputPinProps} = {};
+  //private pinProps: {[index: string]: InputPinProps} = {};
   // timeouts for the time when pin is waiting for poll result after debounce
   private waitingNewStateTimeouts: {[index: string]: Timeout} = {};
 
