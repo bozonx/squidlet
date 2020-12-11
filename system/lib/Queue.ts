@@ -49,7 +49,7 @@ export default class Queue {
   destroy() {
     this.events.destroy();
 
-    delete this.queue;
+    this.queue = [];
 
     if (this.runningTimeout) {
       clearTimeout(this.runningTimeout);
