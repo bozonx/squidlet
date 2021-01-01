@@ -7,7 +7,7 @@ import GroupConfigParser from '../../shared/GroupConfigParser';
 import {APP_WORK_DIR, BUILD_WORK_DIR, REPO_BUILD_DIR} from '../../shared/constants';
 import {getOsMachine, REPO_ROOT} from '../../shared/helpers';
 import NodejsMachines, {nodejsSupportedMachines} from '../../nodejs/interfaces/NodejsMachines';
-import {isKindOfNumber} from '../../system/lib/common';
+import {isKindOfNumber} from '../../../../squidlet-lib/src/common';
 import LogLevel, {LOG_LEVELS} from '../../system/interfaces/LogLevel';
 
 

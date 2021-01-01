@@ -1,5 +1,5 @@
 import {Primitives} from '../interfaces/Types';
-import {isKindOfNumber} from './common';
+import {isKindOfNumber} from '../../../../squidlet-lib/src/common';
 
 
 export interface ParsedType {

@@ -5,11 +5,11 @@ import SerialIo, {
   SerialParams,
   SerialPortLike
 } from '../../interfaces/io/SerialIo';
-import {ENCODE} from '../constants';
-import IndexedEventEmitter, {DefaultHandler} from '../IndexedEventEmitter';
+import {ENCODE} from '../../../../../squidlet-lib/src/constants';
+import IndexedEventEmitter, {DefaultHandler} from '../../../../../squidlet-lib/src/IndexedEventEmitter';
 import IoContext from '../../interfaces/IoContext';
 import {SERVER_STARTING_TIMEOUT_SEC} from '../../constants';
-import Promised from '../Promised';
+import Promised from '../../../../../squidlet-lib/src/Promised';
 
 
 export type SerialItem = [

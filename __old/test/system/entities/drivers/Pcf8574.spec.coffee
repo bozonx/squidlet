@@ -1,6 +1,6 @@
 Pcf8574 = require('../../../../entities/drivers/Pcf8574/Pcf8574').default;
 {PinDirection} = require('../../../../system/interfaces/gpioTypes');
-IndexedEvents = require('../../../../system/lib/IndexedEvents').default;
+IndexedEvents = require('../../../../../../squidlet-lib/src/IndexedEvents').default;
 
 
 describe 'entities.drivers.Pcf8574', ->

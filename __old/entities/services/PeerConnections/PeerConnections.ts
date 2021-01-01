@@ -1,4 +1,4 @@
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import Connection, {
   CONNECTION_SERVICE_TYPE,
   ConnectionsEvents,

@@ -5,7 +5,7 @@ import Connection, {
   IncomeMessageHandler, PeerStatusHandler
 } from '__old/system/interfaces/Connection';
 import {WebSocketClientProps} from '__old/system/interfaces/io/WebSocketClientIo';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 
 import {WsClient} from '../../drivers/WsClient/WsClient';
 

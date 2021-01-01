@@ -2,7 +2,7 @@ import * as path from 'path';
 import _defaultsDeep = require('lodash/defaultsDeep');
 import _uniq = require('lodash/uniq');
 
-import {isPlainObject} from '../../system/lib/objects';
+import {isPlainObject} from '../../../../squidlet-lib/src/objects';
 import PreHostConfig from '../../hostEnvBuilder/interfaces/PreHostConfig';
 import Os from './Os';
 import GroupConfig from '../interfaces/GroupConfig';

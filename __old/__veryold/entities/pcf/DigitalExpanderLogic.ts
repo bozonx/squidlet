@@ -1,7 +1,7 @@
 // TODO: remove
 
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../system/interfaces/gpioTypes';
-import {getBitFromByte, updateBitInByte} from '__old/system/lib/binaryHelpers';
+import {getBitFromByte, updateBitInByte} from '../squidlet-lib/src/binaryHelpers';
 import DigitalExpanderDriver, {DigitalExpanderPinsProps} from './interfaces/DigitalExpanderDriver';
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
 

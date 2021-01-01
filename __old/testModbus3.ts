@@ -1,5 +1,5 @@
 // create a tcp modbus client
-import {uint8ToNum} from './system/lib/binaryHelpers';
+import {uint8ToNum} from '../../squidlet-lib/src/binaryHelpers';
 import {IUserRequestResolve} from 'jsmodbus/dist/user-request';
 import ModbusRTURequest from 'jsmodbus/dist/rtu-request';
 

@@ -1,7 +1,7 @@
 import I2cMasterIo, {I2cDefinition} from '__old/system/interfaces/io/I2cMasterIo';
-import {isKindOfNumber} from '__old/system/lib/common';
+import {isKindOfNumber} from '../squidlet-lib/src/common';
 import IoContext from '__old/system/interfaces/IoContext';
-import Promised from '__old/system/lib/Promised';
+import Promised from '../squidlet-lib/src/Promised';
 import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
 
 

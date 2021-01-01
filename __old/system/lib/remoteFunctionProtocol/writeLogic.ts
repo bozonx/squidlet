@@ -1,4 +1,4 @@
-import {uint8ToNum} from '../binaryHelpers';
+import {uint8ToNum} from '../../../../../squidlet-lib/src/binaryHelpers';
 import {MAX_FUNCTION_CALL_MESSAGE_LENGTH_BYTES} from './constants';
 
 

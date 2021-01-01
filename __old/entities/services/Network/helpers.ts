@@ -1,4 +1,4 @@
-import {asciiToUint8Array, deserializeStringArray, serializeStringArray, uint8ArrayToAscii} from '__old/system/lib/serialize';
+import {asciiToUint8Array, deserializeStringArray, serializeStringArray, uint8ArrayToAscii} from '../squidlet-lib/src/serialize';
 import NetworkMessage from './interfaces/NetworkMessage';
 
 

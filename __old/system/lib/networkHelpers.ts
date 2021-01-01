@@ -1,5 +1,5 @@
 import {NetworkRequest, NetworkResponse} from '../interfaces/NetworkDriver';
-import {concatUint8Arr, numToUint8Word, uint8ToNum} from './binaryHelpers';
+import {concatUint8Arr, numToUint8Word, uint8ToNum} from '../../../../squidlet-lib/src/binaryHelpers';
 
 
 export enum COMMANDS {

@@ -7,7 +7,7 @@ import Platforms from '../../../system/interfaces/Platforms';
 import HostInfo from '../../../system/interfaces/HostInfo';
 import HttpApiClient from '../../../shared/helpers/HttpApiClient';
 import Main from '../../../system/Main';
-import Sender from '../../../system/lib/Sender';
+import Sender from '../../../../../squidlet-lib/src/Sender';
 import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../../system/constants';
 import ConsoleLoggerColorful from '../../../shared/helpers/ConsoleLoggerColorful';
 

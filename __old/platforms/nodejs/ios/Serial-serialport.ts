@@ -2,10 +2,10 @@ import * as SerialPort from 'serialport';
 import {OpenOptions} from 'serialport';
 
 import SerialIo, {SerialParams, SerialPortItemEvent, SerialPortLike} from '__old/system/interfaces/io/SerialIo';
-import {omitObj} from '__old/system/lib/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 import SerialIoBase from '__old/system/lib/base/SerialIoBase';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
-import {callPromised} from '__old/system/lib/common';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
+import {callPromised} from '../squidlet-lib/src/common';
 
 
 export default class Serial extends SerialIoBase implements SerialIo {

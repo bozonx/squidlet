@@ -3,11 +3,11 @@ import DigitalOutputIo from '../../../system/interfaces/io/DigitalOutputIo';
 type Timeout = NodeJS.Timeout;
 import DriverBase from '__old/system/base/DriverBase';
 import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
-import {invertIfNeed, isDigitalPinInverted} from '__old/system/lib/digitalHelpers';
-import {resolveOutputResistorMode} from '__old/system/lib/digitalHelpers';
-import IndexedEvents from '__old/system/lib/IndexedEvents';
+import {invertIfNeed, isDigitalPinInverted} from '../squidlet-lib/src/digitalHelpers';
+import {resolveOutputResistorMode} from '../squidlet-lib/src/digitalHelpers';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import DigitalPinOutputProps from '__old/system/interfaces/DigitalPinOutputProps';
-import Promised from '__old/system/lib/Promised';
+import Promised from '../squidlet-lib/src/Promised';
 import {OutputResistorMode} from '__old/system/interfaces/gpioTypes';
 import DeviceBase from '__old/system/base/DeviceBase';
 

@@ -2,7 +2,7 @@ import Context from '__old/system/Context';
 
 import ValueDefinition from '../interfaces/ValueDefinition';
 import {makeValue} from './allValues';
-import {invertIfNeed} from '../../../../system/lib/digitalHelpers';
+import {invertIfNeed} from '../../../../../../squidlet-lib/src/digitalHelpers';
 
 
 interface AndDefinition extends ValueDefinition {

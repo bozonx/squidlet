@@ -1,10 +1,10 @@
 //import pigpioClient from 'pigpio-client';
-import {normalizeHexString} from '../../../system/lib/binaryHelpers';
+import {normalizeHexString} from '../../../../../squidlet-lib/src/binaryHelpers';
 
 const pigpioClient = require('pigpio-client');
 
-import Promised from '__old/system/lib/Promised';
-import {compactUndefined} from '__old/system/lib/arrays';
+import Promised from '../squidlet-lib/src/Promised';
+import {compactUndefined} from '../squidlet-lib/src/arrays';
 import IoContext from '__old/system/interfaces/IoContext';
 import PigpioPinWrapper, {PigpioInfo, PigpioOptions} from '../helpers/PigpioPinWrapper';
 import PigpioClientIo from '../../../system/interfaces/io/PigpioClientIo';

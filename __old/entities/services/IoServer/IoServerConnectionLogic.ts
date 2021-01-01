@@ -1,7 +1,7 @@
-import Promised from '../../../system/lib/Promised';
+import Promised from '../../../../../squidlet-lib/src/Promised';
 import RemoteCall from '../../../system/lib/remoteCall/RemoteCall';
-import {makeUniqId} from '../../../system/lib/uniqId';
-import {deserializeJson, serializeJson} from '../../../system/lib/serialize';
+import {makeUniqId} from '../../../../../squidlet-lib/src/uniqId';
+import {deserializeJson, serializeJson} from '../../../../../squidlet-lib/src/serialize';
 import RemoteCallMessage from '../../../system/interfaces/RemoteCallMessage';
 import {METHOD_DELIMITER} from '../../../system/constants';
 import Context from '__old/system/Context';

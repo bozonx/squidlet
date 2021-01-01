@@ -4,7 +4,7 @@ import CommandUpdate from './CommandUpdate';
 import CommandStart from './CommandStart';
 import HttpApiCall from './HttpApiCall';
 import WsApiCall from './WsApiCall';
-import {omitObj} from '../system/lib/objects';
+import {omitObj} from '../../../squidlet-lib/src/objects';
 
 
 const httpApiCall = new HttpApiCall();

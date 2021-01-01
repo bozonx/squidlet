@@ -1,5 +1,5 @@
 import DeviceBase from '__old/system/base/DeviceBase';
-import {resolveLevel, invertIfNeed} from '__old/system/lib/digitalHelpers';
+import {resolveLevel, invertIfNeed} from '../squidlet-lib/src/digitalHelpers';
 import {Dictionary} from '__old/system/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 

@@ -6,9 +6,9 @@ import WebSocketServerIo, {
   WebSocketServerProps,
   WsServerEvent,
 } from '__old/system/interfaces/io/WebSocketServerIo';
-import IndexedEventEmitter, {DefaultHandler} from '__old/system/lib/IndexedEventEmitter';
-import {callPromised} from '__old/system/lib/common';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
+import IndexedEventEmitter, {DefaultHandler} from '../squidlet-lib/src/IndexedEventEmitter';
+import {callPromised} from '../squidlet-lib/src/common';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import {WsCloseStatus} from '__old/system/interfaces/io/WebSocketClientIo';
 
 

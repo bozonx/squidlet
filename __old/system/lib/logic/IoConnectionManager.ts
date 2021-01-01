@@ -1,7 +1,7 @@
-import Promised from '../Promised';
+import Promised from '../../../../../squidlet-lib/src/Promised';
 import Context from '../../Context';
-import Sender from '../Sender';
-import {CError} from '../CError';
+import Sender from '../../../../../squidlet-lib/src/Sender';
+import {CError} from '../../../../../squidlet-lib/src/CError';
 
 
 interface ControlledIo {

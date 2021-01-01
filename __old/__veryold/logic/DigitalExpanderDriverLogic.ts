@@ -4,9 +4,9 @@ import {
   DigitalExpanderPinSetup
 } from '__old/system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/interfaces/gpioTypes';
-import {cloneDeepObject, isEmptyObject} from '__old/system/lib/objects';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
-import DebounceCallIncreasing from '__old/system/lib/debounceCall/DebounceCallIncreasing';
+import {cloneDeepObject, isEmptyObject} from '../squidlet-lib/src/objects';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
+import DebounceCallIncreasing from '../../../../squidlet-lib/src/debounceCall/DebounceCallIncreasing';
 import Context from '__old/system/Context';
 import BufferedQueue from '../../lib/BufferedQueue';
 import DigitalExpanderSetupLogic from './DigitalExpanderSetupLogic';

@@ -1,5 +1,5 @@
 DigitalPortExpanderInputLogic = require('../../../../system/lib/logic/DigitalExpanderInputLogic').default;
-binaryHelpers = require('../../../../system/lib/binaryHelpers');
+binaryHelpers = require('../../../../../../squidlet-lib/src/binaryHelpers');
 
 
 describe 'system.lib.logic.DigitalExpanderInputLogic', ->

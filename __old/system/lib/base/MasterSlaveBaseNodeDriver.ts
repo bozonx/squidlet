@@ -2,14 +2,14 @@
 // TODO: remove - use SemiDuplexFeedback driver
 
 import DriverBase from '../../base/DriverBase';
-import IndexedEvents from '../IndexedEvents';
-import Polling from '../Polling';
-import Sender from '../Sender';
+import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
+import Polling from '../../../../../squidlet-lib/src/Polling';
+import Sender from '../../../../../squidlet-lib/src/Sender';
 import {
   hexNumToString,
   isEqualUint8Array,
   stringToUint8Array
-} from '../binaryHelpers';
+} from '../../../../../squidlet-lib/src/binaryHelpers';
 import Context from '../../Context';
 import EntityDefinition from '../../interfaces/EntityDefinition';
 

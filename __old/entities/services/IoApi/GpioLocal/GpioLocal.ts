@@ -2,7 +2,7 @@ import DeviceBase from '__old/system/base/DeviceBase';
 import Gpio from 'system/interfaces/Gpio';
 import DigitalInputIo, {ChangeHandler} from '__old/system/interfaces/io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/interfaces/gpioTypes';
-import {stringifyPinMode} from '__old/system/lib/digitalHelpers';
+import {stringifyPinMode} from '../squidlet-lib/src/digitalHelpers';
 
 
 interface GpioLocalProps {

@@ -4,10 +4,10 @@ import Storage from '../platforms/nodejs/ios/Storage';
 import StorageEnvMemoryWrapper from '../shared/helpers/StorageEnvMemoryWrapper';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import StorageIo from '../system/interfaces/io/StorageIo';
-import {PATH_SEP} from '../system/lib/paths';
+import {PATH_SEP} from '../../../squidlet-lib/src/paths';
 import systemConfig from '../system/systemConfig';
 import {EntityTypePlural} from '../system/interfaces/EntityTypes';
-import {trimChar} from '../system/lib/strings';
+import {trimChar} from '../../../squidlet-lib/src/strings';
 
 
 interface MainFiles {

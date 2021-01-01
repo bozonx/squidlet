@@ -4,7 +4,7 @@ import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
 import StorageIo from '../../system/interfaces/io/StorageIo';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
-import {splitFirstElement, trimCharStart} from '../../system/lib/strings';
+import {splitFirstElement, trimCharStart} from '../../../../squidlet-lib/src/strings';
 import systemConfig from '../../system/systemConfig';
 import {getFileNameOfPath} from './helpers';
 

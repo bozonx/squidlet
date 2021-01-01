@@ -3,7 +3,7 @@
 // TODO: test
 
 
-import {fill} from './arrays';
+import {fill} from '../../../../squidlet-lib/src/arrays';
 
 export default class BinaryState {
   // Bit mask representing the current state

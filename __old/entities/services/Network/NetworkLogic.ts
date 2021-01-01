@@ -1,6 +1,6 @@
-import {asciiToUint8Array, uint8ArrayToAscii} from '__old/system/lib/serialize';
-import {callSafely} from '__old/system/lib/common';
-import Promised from '__old/system/lib/Promised';
+import {asciiToUint8Array, uint8ArrayToAscii} from '../squidlet-lib/src/serialize';
+import {callSafely} from '../squidlet-lib/src/common';
+import Promised from '../squidlet-lib/src/Promised';
 import Connection from '__old/system/interfaces/Connection';
 
 import NetworkMessage from './interfaces/NetworkMessage';

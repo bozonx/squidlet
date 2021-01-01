@@ -1,5 +1,5 @@
 import ServiceBase from '__old/system/base/ServiceBase';
-import {omitObj} from '__old/system/lib/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 import {Mqtt, MqttProps} from '../../drivers/Mqtt/Mqtt';
 import ApiTopicsLogic from './ApiTopicsLogic';
 

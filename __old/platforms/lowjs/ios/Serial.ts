@@ -2,7 +2,7 @@ const uart = require('uart');
 
 import SerialIo, {SerialParams, SerialPortLike} from '__old/system/interfaces/io/SerialIo';
 import SerialIoBase from '__old/system/lib/base/SerialIoBase';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 
 
 export default class Serial extends SerialIoBase implements SerialIo {

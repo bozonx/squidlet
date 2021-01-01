@@ -2,10 +2,10 @@ import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
 import DriverBase from '__old/system/base/DriverBase';
 import {ConnectionParams} from '__old/system/interfaces/io/WebSocketServerIo';
 import {WebSocketServerProps} from '__old/system/interfaces/io/WebSocketServerIo';
-import {parseCookie} from '__old/system/lib/cookies';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
-import {getKeyOfObject} from '__old/system/lib/objects';
-import {omitObj} from '__old/system/lib/objects';
+import {parseCookie} from '../squidlet-lib/src/cookies';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
+import {getKeyOfObject} from '../squidlet-lib/src/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 import {WsServer} from '../WsServer/WsServer';
 
 

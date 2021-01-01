@@ -3,8 +3,8 @@ import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
 import DigitalInputIo, {ChangeHandler} from '__old/system/interfaces/io/DigitalInputIo';
 import DriverBase from '__old/system/base/DriverBase';
 import DigitalPinInputProps from '__old/system/interfaces/DigitalPinInputProps';
-import {invertIfNeed, isDigitalPinInverted, resolveInputResistorMode} from '__old/system/lib/digitalHelpers';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
+import {invertIfNeed, isDigitalPinInverted, resolveInputResistorMode} from '../squidlet-lib/src/digitalHelpers';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '__old/system/interfaces/gpioTypes';
 
 

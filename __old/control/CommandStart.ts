@@ -4,7 +4,7 @@ import StartRemoteDevelop from '../platforms/nodejs/starters/StartRemoteDevelop'
 import {listenScriptEnd} from '../shared/helpers/helpers';
 import Starter from '../platforms/nodejs/interfaces/Starter';
 import StarterProps from '../platforms/nodejs/interfaces/StarterProps';
-import {omitObj} from '../system/lib/objects';
+import {omitObj} from '../../../squidlet-lib/src/objects';
 
 
 export default class CommandStart {

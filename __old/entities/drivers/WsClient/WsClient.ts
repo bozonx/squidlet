@@ -2,7 +2,7 @@ import WebSocketClientIo, {OnMessageHandler} from '__old/system/interfaces/io/We
 import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
 import DriverBase from '__old/system/base/DriverBase';
 import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
-import IndexedEvents from '__old/system/lib/IndexedEvents';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 
 
 /**

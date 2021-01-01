@@ -1,8 +1,8 @@
 import {SerialParams, SerialPortLike} from '__old/system/interfaces/io/SerialIo';
-import {omitObj} from '__old/system/lib/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 import {SERVER_STARTING_TIMEOUT_SEC} from '__old/system/constants';
 import SerialIoBase from '__old/system/lib/base/SerialIoBase';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import IoContext from '__old/system/interfaces/IoContext';
 import PigpioClient from './PigpioClient';
 

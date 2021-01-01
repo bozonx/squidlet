@@ -1,8 +1,8 @@
 import DriverBase from '../../../system/base/DriverBase';
 import DuplexDriver from '../../../system/interfaces/DuplexDriver';
 import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
-import {omitObj} from '../../../system/lib/objects';
-import {addFirstItemUint8Arr} from '../../../system/lib/binaryHelpers';
+import {omitObj} from '../../../../../squidlet-lib/src/objects';
+import {addFirstItemUint8Arr} from '../../../../../squidlet-lib/src/binaryHelpers';
 
 
 export interface ChannelsProps {

@@ -1,5 +1,5 @@
 import Os, {SpawnCmdResult} from './Os';
-import {isKindOfNumber} from '../../system/lib/common';
+import {isKindOfNumber} from '../../../../squidlet-lib/src/common';
 
 
 // TODO: test

@@ -2,15 +2,15 @@ import path from 'path';
 import fs from 'fs';
 
 import RemoteCall from '../../system/lib/remoteCall/RemoteCall';
-import {deserializeJson, serializeJson} from '../../system/lib/serialize';
+import {deserializeJson, serializeJson} from '../../../../squidlet-lib/src/serialize';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../../platforms/nodejs/ios/WebSocketClient';
-import {makeUniqId} from '../../system/lib/uniqId';
+import {makeUniqId} from '../../../../squidlet-lib/src/uniqId';
 import {WsCloseStatus} from '../../system/interfaces/io/WebSocketClientIo';
 import hostDefaultConfig from '../../hostEnvBuilder/configs/hostDefaultConfig';
 import {METHOD_DELIMITER} from '../../system/constants';
-import {ENCODE} from '../../system/lib/constants';
+import {ENCODE} from '../../../../squidlet-lib/src/constants';
 import * as yaml from 'js-yaml';
 import {collectPropsDefaults} from '../../system/lib/helpers';
 

@@ -3,9 +3,9 @@ import {ChangeHandler} from '__old/system/interfaces/io/DigitalInputIo';
 //import {GpioDigital} from 'system/interfaces/Gpio';
 import {Edge} from '__old/system/interfaces/gpioTypes';
 import {InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/interfaces/gpioTypes';
-import {omitObj} from '__old/system/lib/objects';
-import {stringifyPinMode} from '__old/system/lib/digitalHelpers';
-import {normalizeHexString} from '__old/system/lib/binaryHelpers';
+import {omitObj} from '../squidlet-lib/src/objects';
+import {stringifyPinMode} from '../squidlet-lib/src/digitalHelpers';
+import {normalizeHexString} from '../squidlet-lib/src/binaryHelpers';
 
 import {Pcf8574ExpanderProps, Pcf8574 as Pcf8574Driver} from '../../drivers/Pcf8574/Pcf8574';
 

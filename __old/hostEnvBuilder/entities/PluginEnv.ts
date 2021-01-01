@@ -1,5 +1,5 @@
 import {EntityType} from '../../system/interfaces/EntityTypes';
-import IndexedEvents from '../../system/lib/IndexedEvents';
+import IndexedEvents from '../../../../squidlet-lib/src/IndexedEvents';
 import Register from './Register';
 import ConfigManager from '../hostConfig/ConfigManager';
 import {HostEntitiesSet} from '../interfaces/HostEntitySet';

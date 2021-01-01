@@ -1,5 +1,5 @@
 import DeviceBase from '__old/system/base/DeviceBase';
-import {omitObj} from '__old/system/lib/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 import {Dictionary} from '__old/system/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 

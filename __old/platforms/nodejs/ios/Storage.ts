@@ -3,11 +3,11 @@ import {Stats} from 'fs';
 import * as path from 'path';
 
 import StorageIo, {StatsSimplified, ConfigParams} from '__old/system/interfaces/io/StorageIo';
-import {callPromised} from '__old/system/lib/common';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
-import {ENCODE} from '__old/system/lib/constants';
-import {trimCharEnd} from '__old/system/lib/strings';
-import {PATH_SEP} from '__old/system/lib/paths';
+import {callPromised} from '../squidlet-lib/src/common';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
+import {ENCODE} from '../squidlet-lib/src/constants';
+import {trimCharEnd} from '../squidlet-lib/src/strings';
+import {PATH_SEP} from '../squidlet-lib/src/paths';
 
 
 let config: ConfigParams | undefined;

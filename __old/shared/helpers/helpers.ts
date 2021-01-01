@@ -6,8 +6,8 @@ import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
 import NodejsMachines from '../../platforms/nodejs/interfaces/NodejsMachines';
-import {callPromised} from '../../system/lib/common';
-import {ENCODE} from '../../system/lib/constants';
+import {callPromised} from '../../../../squidlet-lib/src/common';
+import {ENCODE} from '../../../../squidlet-lib/src/constants';
 
 
 export const REPO_ROOT = path.resolve(__dirname, '../../');

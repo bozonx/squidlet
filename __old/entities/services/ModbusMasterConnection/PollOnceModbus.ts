@@ -1,5 +1,5 @@
 import PollOnceBase from '__old/system/lib/remoteFunctionProtocol/PollOnceBase';
-import {numToUint8Word, uint16ToUint8} from '__old/system/lib/binaryHelpers';
+import {numToUint8Word, uint16ToUint8} from '../squidlet-lib/src/binaryHelpers';
 
 import {ModbusMaster} from '../../drivers/ModbusMaster/ModbusMaster';
 

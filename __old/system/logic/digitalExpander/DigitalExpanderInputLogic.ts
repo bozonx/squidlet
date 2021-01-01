@@ -1,9 +1,9 @@
 import Timeout = NodeJS.Timeout;
 import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
-import DebounceCall from '../../lib/debounceCall/DebounceCall';
-import IndexedEventEmitter from '../../lib/IndexedEventEmitter';
+import DebounceCall from '../../../../../squidlet-lib/src/debounceCall/DebounceCall';
+import IndexedEventEmitter from '../../../../../squidlet-lib/src/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';
-import {isDigitalPinInverted, resolveEdge} from '../../lib/digitalHelpers';
+import {isDigitalPinInverted, resolveEdge} from '../../../../../squidlet-lib/src/digitalHelpers';
 
 
 // interface InputPinProps {

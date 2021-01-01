@@ -1,5 +1,5 @@
 import {makeCallFunctionMessage} from './writeLogic';
-import {clearArray} from '../arrays';
+import {clearArray} from '../../../../../squidlet-lib/src/arrays';
 
 
 export default abstract class CallFunctionBase {

@@ -1,5 +1,5 @@
 import Connection from '__old/system/interfaces/Connection';
-import IndexedEvents from '__old/system/lib/IndexedEvents';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 
 import {PORT_EXPANDER_FEEDBACK} from './constants';
 

@@ -6,10 +6,10 @@ import {
   HttpServerIo,
   HttpServerProps
 } from '__old/system/interfaces/io/HttpServerIo';
-import IndexedEventEmitter, {DefaultHandler} from '__old/system/lib/IndexedEventEmitter';
+import IndexedEventEmitter, {DefaultHandler} from '../squidlet-lib/src/IndexedEventEmitter';
 import {WAIT_RESPONSE_TIMEOUT_SEC} from '__old/system/constants';
-import {makeUniqNumber} from '__old/system/lib/uniqId';
-import {callPromised} from '__old/system/lib/common';
+import {makeUniqNumber} from '../squidlet-lib/src/uniqId';
+import {callPromised} from '../squidlet-lib/src/common';
 import {HttpRequest, HttpResponse} from '__old/system/interfaces/Http';
 
 

@@ -3,11 +3,11 @@ import WebSocketClientIo, {
   OnMessageHandler, WebSocketClientProps, WsClientEvent, WsCloseStatus,
 } from '__old/system/interfaces/io/WebSocketClientIo';
 import {ConnectionParams} from '__old/system/interfaces/io/WebSocketServerIo';
-import IndexedEvents from '__old/system/lib/IndexedEvents';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {Primitives} from '__old/system/interfaces/Types';
-import {mergeDeepObjects} from '__old/system/lib/objects';
-import {parseCookie, stringifyCookie} from '__old/system/lib/cookies';
-import Promised from '__old/system/lib/Promised';
+import {mergeDeepObjects} from '../squidlet-lib/src/objects';
+import {parseCookie, stringifyCookie} from '../squidlet-lib/src/cookies';
+import Promised from '../squidlet-lib/src/Promised';
 
 import {SETCOOKIE_LABEL} from '../WsServer/WsServerLogic';
 

@@ -1,11 +1,11 @@
 import Context from '../Context';
-import IndexedEvents from '../lib/IndexedEvents';
+import IndexedEvents from '../../../../squidlet-lib/src/IndexedEvents';
 import RemoteCall from '../lib/remoteCall/RemoteCall';
 import RemoteCallMessage from '../interfaces/RemoteCallMessage';
-import {makeUniqId} from '../lib/uniqId';
+import {makeUniqId} from '../../../../squidlet-lib/src/uniqId';
 import {METHOD_DELIMITER} from '../constants';
 import StandardApi from '../StandardApi';
-import {getAllTheClassMembers} from '../lib/objects';
+import {getAllTheClassMembers} from '../../../../squidlet-lib/src/objects';
 
 
 export type RcOutcomeHandler = (sessionId: string, message: RemoteCallMessage) => void;

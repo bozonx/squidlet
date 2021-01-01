@@ -1,5 +1,5 @@
 import PreHostConfig from '../../../hostEnvBuilder/interfaces/PreHostConfig';
-import {pickObj} from '../../../system/lib/objects';
+import {pickObj} from '../../../../../squidlet-lib/src/objects';
 import StartDevelop from './StartDevelop';
 
 

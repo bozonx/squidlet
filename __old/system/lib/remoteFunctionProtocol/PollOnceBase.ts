@@ -1,4 +1,4 @@
-import IndexedEvents from '__old/system/lib/IndexedEvents';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 
 import {MESSAGE_POSITIONS} from './constants';
 import readLogic from './readLogic';

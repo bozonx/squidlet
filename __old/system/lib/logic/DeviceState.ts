@@ -1,7 +1,7 @@
 import SchemaElement from '../../interfaces/SchemaElement';
-import {isEmptyObject} from '../objects';
+import {isEmptyObject} from '../../../../../squidlet-lib/src/objects';
 import {validateParam} from '../validate';
-import ConsistentState, {Getter, Setter, Initialize} from '../ConsistentState';
+import ConsistentState, {Getter, Setter, Initialize} from '../../../../../squidlet-lib/src/ConsistentState';
 import {collectPropsDefaults} from '../helpers';
 import {Dictionary} from '../../interfaces/Types';
 

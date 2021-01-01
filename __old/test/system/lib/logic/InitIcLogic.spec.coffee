@@ -1,5 +1,5 @@
 InitIcLogic = require('../../../../system/lib/logic/InitIcLogic').default;
-Promised = require('../../../../system/lib/Promised').default;
+Promised = require('../../../../../../squidlet-lib/src/Promised').default;
 
 
 describe 'system.lib.InitIcLogic', ->

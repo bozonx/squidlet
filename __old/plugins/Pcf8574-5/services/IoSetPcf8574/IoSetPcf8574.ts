@@ -3,7 +3,7 @@ import IoItem from '__old/system/interfaces/IoItem';
 import {IoSetBase} from '__old/system/interfaces/IoSet';
 import DigitalInputSemiDuplex from '__old/system/logic/digitalExpander/DigitalInputSemiDuplex';
 import DigitalOutput from '__old/system/logic/digitalExpander/DigitalOutput';
-import {omitObj} from '__old/system/lib/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 
 import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
 import {Pcf8574} from '../../drivers/Pcf8574/Pcf8574';

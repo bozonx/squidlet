@@ -1,10 +1,10 @@
 import {DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
 import {PinDirection} from '../../interfaces/gpioTypes';
-import BufferedQueue from '../../lib/BufferedQueue';
+import BufferedQueue from '../../../../../squidlet-lib/src/BufferedQueue';
 import Context from '__old/system/Context';
-import IndexedEvents from '../../lib/IndexedEvents';
-import BufferedRequest from '../../lib/BufferedRequest';
-import {cloneDeepObject} from '../../lib/objects';
+import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
+import BufferedRequest from '../../../../../squidlet-lib/src/BufferedRequest';
+import {cloneDeepObject} from '../../../../../squidlet-lib/src/objects';
 
 
 type SetupHandler = (initializedPins: number[]) => void;

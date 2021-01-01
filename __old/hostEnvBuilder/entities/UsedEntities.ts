@@ -11,7 +11,7 @@ import SchemaElement from '../../system/interfaces/SchemaElement';
 import validateRules from '../hostConfig/validateRules';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 import {convertEntityTypePluralToSingle} from '../helpers';
-import {omitObj} from '../../system/lib/objects';
+import {omitObj} from '../../../../squidlet-lib/src/objects';
 
 
 const baseParamName = '$base';

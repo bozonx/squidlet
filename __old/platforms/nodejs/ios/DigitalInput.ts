@@ -4,9 +4,9 @@
 
 import DigitalInputIo, {ChangeHandler} from '__old/system/interfaces/io/DigitalInputIo';
 import {Edge, InputResistorMode} from '__old/system/interfaces/gpioTypes';
-import ThrottleCall from '__old/system/lib/debounceCall/ThrottleCall';
-import DebounceCall from '__old/system/lib/debounceCall/DebounceCall';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
+import ThrottleCall from '../../../../../squidlet-lib/src/debounceCall/ThrottleCall';
+import DebounceCall from '../../../../../squidlet-lib/src/debounceCall/DebounceCall';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import IoContext from '__old/system/interfaces/IoContext';
 import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
 import PigpioClient from './PigpioClient';

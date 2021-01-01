@@ -4,7 +4,7 @@ import {HttpServerProps} from '__old/system/interfaces/io/HttpServerIo';
 import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from '__old/system/lib/logic/HttpRouterLogic';
 import {JsonTypes} from '__old/system/interfaces/Types';
 import {HttpMethods} from '__old/system/interfaces/Http';
-import {URL_DELIMITER} from '__old/system/lib/url';
+import {URL_DELIMITER} from '../squidlet-lib/src/url';
 
 import {HttpServer} from '../HttpServer/HttpServer';
 import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';

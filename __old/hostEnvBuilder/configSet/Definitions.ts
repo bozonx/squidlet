@@ -8,7 +8,7 @@ import UsedEntities, {EntitiesNames} from '../entities/UsedEntities';
 import {validateProps} from '../../system/lib/validate';
 import {IoDefinitions} from '../../system/interfaces/IoItem';
 import {collectPropsDefaults} from '../../system/lib/helpers';
-import {omitObj} from '../../system/lib/objects';
+import {omitObj} from '../../../../squidlet-lib/src/objects';
 
 
 /**

@@ -1,10 +1,10 @@
-import IndexedEvents from '../../../system/lib/IndexedEvents';
+import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 import Network from './';
 import DriverEnv from '../../system/baseDrivers/DriverEnv';
 import Destinations from './Destinations';
 import RouterMessage from './interfaces/RouterMessage';
 import Destination from './interfaces/Destination';
-import {lastItem} from '../../../system/lib/arrays';
+import {lastItem} from '../../../../../squidlet-lib/src/arrays';
 
 
 type RouterHandler = (error: Error | null, payload?: any) => void;

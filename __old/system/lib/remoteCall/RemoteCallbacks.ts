@@ -2,9 +2,9 @@ import RemoteCallMessage, {
   CallCbPayload,
   ResultCbPayload,
 } from '../../interfaces/RemoteCallMessage';
-import IndexedEvents from '../IndexedEvents';
+import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 import {waitForResponse} from './helpers';
-import {clearObject} from '../objects';
+import {clearObject} from '../../../../../squidlet-lib/src/objects';
 
 
 type CbResultHandler = (payload: ResultCbPayload) => void;

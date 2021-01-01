@@ -1,8 +1,8 @@
-import BufferedRequest from '../../lib/BufferedRequest';
-import BufferedQueue from '../../lib/BufferedQueue';
+import BufferedRequest from '../../../../../squidlet-lib/src/BufferedRequest';
+import BufferedQueue from '../../../../../squidlet-lib/src/BufferedQueue';
 import {PinDirection} from '../../interfaces/gpioTypes';
 import {DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
-import {stringArrayToNumber} from '../../lib/arrays';
+import {stringArrayToNumber} from '../../../../../squidlet-lib/src/arrays';
 
 
 /**

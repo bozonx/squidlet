@@ -1,4 +1,4 @@
-import {lastItem} from '__old/system/lib/arrays';
+import {lastItem} from '../squidlet-lib/src/arrays';
 
 
 // TODO: если нет маршрута то делаем ping (наверное широковещательный на все подключения)

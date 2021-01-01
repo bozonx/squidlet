@@ -1,7 +1,7 @@
 import {combineTopic, parseArgs} from '__old/system/lib/helpers';
 import {Dictionary, JsonTypes} from '__old/system/interfaces/Types';
 import {StateCategories} from '__old/system/interfaces/States';
-import IndexedEvents from '__old/system/lib/IndexedEvents';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 import Context from '__old/system/Context';
 

@@ -1,8 +1,8 @@
 import RemoteCallMessage from '__old/system/interfaces/RemoteCallMessage';
 import Context from '__old/system/Context';
 import NetworkDriver, {NetworkRequest, NetworkResponse, NetworkStatus} from '__old/system/interfaces/NetworkDriver';
-import IndexedEvents from '__old/system/lib/IndexedEvents';
-import {omitObj} from '__old/system/lib/objects';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
+import {omitObj} from '../squidlet-lib/src/objects';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 import {deserializeMessage, serializeMessage} from './helpers';
 import {NETWORK_PORT, NetworkProps} from './Network';

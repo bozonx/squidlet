@@ -1,4 +1,4 @@
-import {pathJoin} from '__old/system/lib/paths';
+import {pathJoin} from '../squidlet-lib/src/paths';
 import systemConfig from '__old/system/systemConfig';
 import Context from '__old/system/Context';
 import StorageIo from '__old/system/interfaces/io/StorageIo';

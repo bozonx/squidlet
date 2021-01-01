@@ -1,9 +1,9 @@
 import {I2cBus, openSync} from 'i2c-bus';
 
 import I2cMasterIo, {I2cMasterBusLike, I2cParams} from '__old/system/interfaces/io/I2cMasterIo';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import I2cMasterIoBase from 'system/lib/base/I2cMasterIoBase';
-import {callPromised} from '__old/system/lib/common';
+import {callPromised} from '../squidlet-lib/src/common';
 
 
 /**

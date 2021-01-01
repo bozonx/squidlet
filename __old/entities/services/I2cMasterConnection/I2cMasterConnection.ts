@@ -5,8 +5,8 @@ import Connection, {
   IncomeMessageHandler,
   StatusHandler
 } from '__old/system/interfaces/Connection';
-import {uint8ToUint16} from '__old/system/lib/binaryHelpers';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
+import {uint8ToUint16} from '../squidlet-lib/src/binaryHelpers';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {makeCallFunctionMessage} from '__old/system/lib/remoteFunctionProtocol/writeLogic';
 
 import {

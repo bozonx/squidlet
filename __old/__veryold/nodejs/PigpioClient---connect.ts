@@ -1,7 +1,7 @@
-import {callPromised} from '../../system/lib/common';
+import {callPromised} from '../../../../squidlet-lib/src/common';
 import PigpioWrapper, {PigpioInfo, PigpioOptions} from '../../nodejs/helpers/PigpioWrapper';
-import Promised from '../../system/lib/Promised';
-import {compactUndefined} from '../../system/lib/arrays';
+import Promised from '../../../../squidlet-lib/src/Promised';
+import {compactUndefined} from '../../../../squidlet-lib/src/arrays';
 import Logger from '../../system/interfaces/Logger';
 
 const pigpioClient = require('pigpio-client');

@@ -3,13 +3,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import RemoteCall from '../../system/lib/remoteCall/RemoteCall';
-import {deserializeJson, serializeJson} from '../../system/lib/serialize';
+import {deserializeJson, serializeJson} from '../../../../squidlet-lib/src/serialize';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
 import WsClientLogic, {WsClientLogicProps} from '../../entities/drivers/WsClient/WsClientLogic';
 import WebSocketClient from '../../platforms/nodejs/ios/WebSocketClient';
-import {ENCODE} from '../../system/lib/constants';
+import {ENCODE} from '../../../../squidlet-lib/src/constants';
 import {collectPropsDefaults} from '../../system/lib/helpers';
-import {makeUniqId} from '../../system/lib/uniqId';
+import {makeUniqId} from '../../../../squidlet-lib/src/uniqId';
 import {WsCloseStatus} from '../../system/interfaces/io/WebSocketClientIo';
 
 

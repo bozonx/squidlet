@@ -8,8 +8,8 @@ import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
 import {StatsSimplified} from '../../system/interfaces/io/StorageIo';
-import {callPromised} from '../../system/lib/common';
-import {ENCODE} from '../../system/lib/constants';
+import {callPromised} from '../../../../squidlet-lib/src/common';
+import {ENCODE} from '../../../../squidlet-lib/src/constants';
 import {OwnerOptions} from '../interfaces/OnwerOptions';
 
 

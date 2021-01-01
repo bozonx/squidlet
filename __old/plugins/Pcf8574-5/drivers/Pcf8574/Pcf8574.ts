@@ -11,7 +11,7 @@ import {
   DigitalExpanderPinSetup,
 } from '__old/system/logic/digitalExpander/interfaces/DigitalExpanderDriver';
 import {InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/interfaces/gpioTypes';
-import {bitsToBytes, bytesToBits, howManyOctets} from '__old/system/lib/binaryHelpers';
+import {bitsToBytes, bytesToBits, howManyOctets} from '../squidlet-lib/src/binaryHelpers';
 import DigitalExpanderSetupLogic from '__old/system/logic/digitalExpander/DigitalExpanderSetupLogic';
 
 import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';

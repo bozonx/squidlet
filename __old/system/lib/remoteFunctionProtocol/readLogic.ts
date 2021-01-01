@@ -1,4 +1,4 @@
-import {deserializeUint8Array} from '../serialize';
+import {deserializeUint8Array} from '../../../../../squidlet-lib/src/serialize';
 import {NEXT_PACKAGE_MARKER} from './constants';
 
 export type ReadLengthCb = () => Promise<number>;

@@ -1,5 +1,5 @@
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
-import {compactUndefined} from './arrays';
+import {compactUndefined} from '../../../../squidlet-lib/src/arrays';
 import {EntityType, EntityTypePlural} from '../interfaces/EntityTypes';
 import {JsonTypes, Primitives} from '../interfaces/Types';
 

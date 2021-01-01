@@ -1,7 +1,7 @@
-import IndexedEvents from '__old/system/lib/IndexedEvents';
-import {makeUniqId} from '__old/system/lib/uniqId';
-import {omitObj} from '__old/system/lib/objects';
-import {lastItem} from '__old/system/lib/arrays';
+import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
+import {makeUniqId} from '../squidlet-lib/src/uniqId';
+import {omitObj} from '../squidlet-lib/src/objects';
+import {lastItem} from '../squidlet-lib/src/arrays';
 import Connection from '__old/system/interfaces/Connection';
 
 import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import HttpClient from '../../platforms/nodejs/ios/HttpClient';
 import HttpClientLogic from '../../entities/drivers/HttpClient/HttpClientLogic';
-import {ENCODE} from '../../system/lib/constants';
+import {ENCODE} from '../../../../squidlet-lib/src/constants';
 import * as yaml from 'js-yaml';
 import {collectPropsDefaults} from '../../system/lib/helpers';
 import {HttpDriverRequest} from '../../entities/drivers/HttpServer/HttpServerLogic';

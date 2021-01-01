@@ -1,7 +1,7 @@
 import ServiceBase from '__old/system/base/ServiceBase';
 import RemoteCallMessage from '__old/system/interfaces/RemoteCallMessage';
-import {deserializeJson, serializeJson} from '__old/system/lib/serialize';
-import {removeItemFromArray} from '__old/system/lib/arrays';
+import {deserializeJson, serializeJson} from '../squidlet-lib/src/serialize';
+import {removeItemFromArray} from '../squidlet-lib/src/arrays';
 import {WsServerSessions, WsServerSessionsProps} from '../../drivers/WsServerSessions/WsServerSessions';
 
 

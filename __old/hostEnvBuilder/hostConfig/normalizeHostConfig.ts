@@ -3,7 +3,7 @@ import {defaultServices, servicesShortcut} from '../dict';
 import systemConfig from '../configs/systemConfig';
 import {EntityType} from '../../system/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
-import {cloneDeepObject, omitObj} from '../../system/lib/objects';
+import {cloneDeepObject, omitObj} from '../../../../squidlet-lib/src/objects';
 import {DEVICE_ID_SEPARATOR} from '../constants';
 
 

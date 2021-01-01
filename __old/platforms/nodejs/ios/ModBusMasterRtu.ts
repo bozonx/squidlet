@@ -12,7 +12,7 @@ import {OpenOptions} from 'serialport';
 
 import ModBusMasterRtuIo, {ModbusDefinition, ModbusParams} from '__old/system/interfaces/io/ModBusMasterRtuIo';
 import IoContext from '__old/system/interfaces/IoContext';
-import {omitObj} from '__old/system/lib/objects';
+import {omitObj} from '../squidlet-lib/src/objects';
 
 
 // TODO: handle errors

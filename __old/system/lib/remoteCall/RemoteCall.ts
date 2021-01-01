@@ -3,8 +3,8 @@ import RemoteCallMessage, {
   ResultMethodPayload,
   REMOTE_CALL_MESSAGE_TYPES
 } from '../../interfaces/RemoteCallMessage';
-import IndexedEvents from '../IndexedEvents';
-import {isPlainObject} from '../objects';
+import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
+import {isPlainObject} from '../../../../../squidlet-lib/src/objects';
 import RemoteCallbacks from './RemoteCallbacks';
 import {waitForResponse} from './helpers';
 

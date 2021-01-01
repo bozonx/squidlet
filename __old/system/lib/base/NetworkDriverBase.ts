@@ -5,7 +5,7 @@ import NetworkDriver, {
   NetworkResponse,
   NetworkStatus
 } from '../../interfaces/NetworkDriver';
-import IndexedEventEmitter from '../IndexedEventEmitter';
+import IndexedEventEmitter from '../../../../../squidlet-lib/src/IndexedEventEmitter';
 import {
   COMMANDS, deserializeRequest, deserializeResponse, makeRequestId,
   MESSAGE_POSITION,
@@ -13,8 +13,8 @@ import {
   serializeRequest,
   serializeResponse
 } from '../networkHelpers';
-import Promised from '../Promised';
-import {hexNumToString, stringToUint8Array} from '../binaryHelpers';
+import Promised from '../../../../../squidlet-lib/src/Promised';
+import {hexNumToString, stringToUint8Array} from '../../../../../squidlet-lib/src/binaryHelpers';
 
 
 type Timeout = NodeJS.Timeout;

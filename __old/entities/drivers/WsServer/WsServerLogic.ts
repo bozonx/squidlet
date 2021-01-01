@@ -3,8 +3,8 @@ import WebSocketServerIo, {
   WebSocketServerProps,
   WsServerEvent
 } from '__old/system/interfaces/io/WebSocketServerIo';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
-import Promised from '__old/system/lib/Promised';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
+import Promised from '../squidlet-lib/src/Promised';
 import {SERVER_STARTING_TIMEOUT_SEC} from '__old/system/constants';
 import {WsCloseStatus} from '../../../system/interfaces/io/WebSocketClientIo';
 

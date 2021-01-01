@@ -3,7 +3,7 @@ import {JsonTypes} from '__old/system/interfaces/Types';
 import {Dictionary} from '__old/system/interfaces/Types';
 import {StateCategories} from '__old/system/interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
-import {invertIfNeed} from '__old/system/lib/digitalHelpers';
+import {invertIfNeed} from '../squidlet-lib/src/digitalHelpers';
 import ValueDefinition from '../interfaces/ValueDefinition';
 
 

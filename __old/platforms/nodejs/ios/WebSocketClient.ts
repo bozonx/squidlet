@@ -6,11 +6,11 @@ import WebSocketClientIo, {
   WsClientEvent,
   WsCloseStatus
 } from '__old/system/interfaces/io/WebSocketClientIo';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
-import {callPromised} from '__old/system/lib/common';
-import {omitObj} from '__old/system/lib/objects';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
+import {callPromised} from '../squidlet-lib/src/common';
+import {omitObj} from '../squidlet-lib/src/objects';
 import {ConnectionParams} from '__old/system/interfaces/io/WebSocketServerIo';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import {makeConnectionParams} from './WebSocketServer';
 
 

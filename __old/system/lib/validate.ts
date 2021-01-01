@@ -1,6 +1,6 @@
 import SchemaElement from '../interfaces/SchemaElement';
 import {ParsedType, parseType} from './typesHelpers';
-import {arraysDifference} from './arrays';
+import {arraysDifference} from '../../../../squidlet-lib/src/arrays';
 
 
 function isCorrectTypedArray(type: string, arr: any[]): boolean {

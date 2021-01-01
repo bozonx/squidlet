@@ -1,7 +1,7 @@
 import Timeout = NodeJS.Timeout;
 
-import IndexedEventEmitter from '../lib/IndexedEventEmitter';
-import Promised from '../lib/Promised';
+import IndexedEventEmitter from '../../../../squidlet-lib/src/IndexedEventEmitter';
+import Promised from '../../../../squidlet-lib/src/Promised';
 
 
 enum EVENTS {

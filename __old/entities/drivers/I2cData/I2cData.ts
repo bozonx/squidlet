@@ -4,7 +4,7 @@ import {
   uint8ArrToHexString,
   numToWord,
   hexStringToHexNum
-} from '__old/system/lib/binaryHelpers';
+} from '../squidlet-lib/src/binaryHelpers';
 import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
 import DriverBase from '__old/system/base/DriverBase';
 

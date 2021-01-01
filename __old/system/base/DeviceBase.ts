@@ -1,11 +1,11 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from './EntityBase';
 import {Dictionary, JsonTypes} from '../interfaces/Types';
-import {Getter, Initialize, Setter} from '../lib/ConsistentState';
+import {Getter, Initialize, Setter} from '../../../../squidlet-lib/src/ConsistentState';
 import DeviceState from '../lib/logic/DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '../constants';
-import Promised from '../lib/Promised';
+import Promised from '../../../../squidlet-lib/src/Promised';
 import Context from '../Context';
 import EntityDefinition from '../interfaces/EntityDefinition';
 

@@ -2,10 +2,10 @@
 import * as mqtt from 'mqtt';
 
 import MqttIo, {MqttIoEvents, MqttOptions} from '__old/system/interfaces/io/MqttIo';
-import IndexedEventEmitter from '__old/system/lib/IndexedEventEmitter';
-import {callPromised} from '__old/system/lib/common';
-import {convertBufferToUint8Array} from '__old/system/lib/buffer';
-import {CError} from '__old/system/lib/CError';
+import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
+import {callPromised} from '../squidlet-lib/src/common';
+import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
+import {CError} from '../squidlet-lib/src/CError';
 import IoContext from '__old/system/interfaces/IoContext';
 
 require('mqtt-packet').writeToStream.cacheNumbers = false;

@@ -2,10 +2,10 @@
 // TODO: test it
 
 import {Edge} from '../interfaces/gpioTypes';
-import IndexedEventEmitter from '../lib/IndexedEventEmitter';
+import IndexedEventEmitter from '../../../../squidlet-lib/src/IndexedEventEmitter';
 import {ChangeHandler} from '../interfaces/io/DigitalInputIo';
-import DebounceCall from '../lib/debounceCall/DebounceCall';
-import ThrottleCall from '../lib/debounceCall/ThrottleCall';
+import DebounceCall from '../../../../squidlet-lib/src/debounceCall/DebounceCall';
+import ThrottleCall from '../../../../squidlet-lib/src/debounceCall/ThrottleCall';
 
 
 export default class PinChangeLogic {

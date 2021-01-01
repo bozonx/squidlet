@@ -1,6 +1,6 @@
 import {HttpClientIo} from '__old/system/interfaces/io/HttpClientIo';
-import {prepareBody, resolveBodyType} from '__old/system/lib/httpBody';
-import {omitUndefined} from '__old/system/lib/objects';
+import {prepareBody, resolveBodyType} from '../squidlet-lib/src/httpBody';
+import {omitUndefined} from '../squidlet-lib/src/objects';
 import {HttpContentType, HttpRequest, HttpResponse} from '__old/system/interfaces/Http';
 import {HttpDriverRequest} from '../HttpServer/HttpServerLogic';
 

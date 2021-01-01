@@ -1,4 +1,4 @@
-import IndexedEvents from '../IndexedEvents';
+import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 
 
 export function waitForResponse(

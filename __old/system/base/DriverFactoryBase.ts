@@ -2,7 +2,7 @@ import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from './DriverBase';
 import {validateProps, validateRequiredProps} from '../lib/validate';
-import {mergeDeepObjects} from '../lib/objects';
+import {mergeDeepObjects} from '../../../../squidlet-lib/src/objects';
 import Context from '../Context';
 
 
