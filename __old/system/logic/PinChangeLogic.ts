@@ -3,7 +3,7 @@
 
 import {Edge} from '../interfaces/gpioTypes';
 import IndexedEventEmitter from '../../../../squidlet-lib/src/IndexedEventEmitter';
-import {ChangeHandler} from '../interfaces/io/DigitalInputIo';
+import {ChangeHandler} from '../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import DebounceCall from '../../../../squidlet-lib/src/debounceCall/DebounceCall';
 import ThrottleCall from '../../../../squidlet-lib/src/debounceCall/ThrottleCall';
 

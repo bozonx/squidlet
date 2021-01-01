@@ -1,5 +1,5 @@
 import ServiceBase from 'system/baseServices/ServiceBase';
-import MqttIo, {MqttConnection} from '__old/system/interfaces/io/MqttIo';
+import MqttIo, {MqttConnection} from '../../../../squidlet-networking/src/interfaces/__old/io/MqttIo';
 import {ApiTypes} from 'system/Api';
 
 

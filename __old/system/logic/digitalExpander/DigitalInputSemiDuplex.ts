@@ -1,7 +1,7 @@
 import Context from '__old/system/Context';
 
 import {Edge, InputResistorMode, PinDirection} from '../../interfaces/gpioTypes';
-import DigitalInputIo, {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
+import DigitalInputIo, {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import {DigitalExpanderInputDriver, DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderInputLogic from './DigitalExpanderInputLogic';
 import SemiDuplexFeedbackLogic from '../SemiDuplexFeedbackLogic';

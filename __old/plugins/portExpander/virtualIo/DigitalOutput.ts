@@ -1,4 +1,4 @@
-import DigitalOutputIo from '__old/system/interfaces/io/DigitalOutputIo';
+import DigitalOutputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalOutputIo';
 
 
 export default class DigitalInput implements DigitalOutputIo {

@@ -1,4 +1,4 @@
-import HttpApiClient from '../shared/helpers/HttpApiClient';
+import HttpApiClient from '../../../squidlet-networking/src/bridges/__old/HttpApiClient';
 import {AppType} from '../system/interfaces/AppType';
 
 

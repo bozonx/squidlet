@@ -1,4 +1,4 @@
-import DigitalInputIo, {ChangeHandler} from '__old/system/interfaces/io/DigitalInputIo';
+import DigitalInputIo, {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/interfaces/gpioTypes';
 import PinChangeLogic from '__old/system/logic/PinChangeLogic';
 

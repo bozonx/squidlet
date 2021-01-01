@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node __old/control/index.ts",
-    "buildPigpio": "cd __old/platforms/nodejs/pigpioImage && docker build -t 'bozonx/pigpio' .",
+    "buildPigpio": "cd ../squidlet-networking/src/io/nodejs/pigpioImage && docker build -t 'bozonx/pigpio' .",
     "buildProdImage-x86": "__old/updater/buildProdImage.sh x86",
     "buildProdImage-rpi": "__old/updater/buildProdImage.sh rpi",
     "buildProdImage-arm": "__old/updater/buildProdImage.sh arm",

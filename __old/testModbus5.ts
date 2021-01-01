@@ -1,9 +1,9 @@
 import Context from '__old/system/Context';
-import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
-import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
+import ModBusMasterRtu from '../../squidlet-networking/src/io/nodejs/ios/ModBusMasterRtu';
+import {ModbusMaster} from '../../squidlet-networking/src/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
 import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/IoSetPortExpander/constants';
-import ModbusMasterConnection from './entities/services/ModbusMasterConnection/ModbusMasterConnection';
+import ModbusMasterConnection from '../../squidlet-networking/src/bridges/__old/ModbusMasterConnection/ModbusMasterConnection';
 import {SemiDuplexFeedback} from './__old/entities/drivers/SemiDuplexFeedback/SemiDuplexFeedback';
 
 

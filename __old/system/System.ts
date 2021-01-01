@@ -10,7 +10,7 @@ import IndexedEventEmitter from '../../../squidlet-lib/src/IndexedEventEmitter';
 import {SystemEvents} from './constants';
 import {AnyHandler} from '../../../squidlet-lib/src/IndexedEvents';
 import HostConfig from './interfaces/HostConfig';
-import StorageIo from './interfaces/io/StorageIo';
+import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import systemConfig from './systemConfig';
 
 

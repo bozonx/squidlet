@@ -1,4 +1,4 @@
-import DigitalOutputIo from '../../../system/interfaces/io/DigitalOutputIo';
+import DigitalOutputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalOutputIo';
 
 type Timeout = NodeJS.Timeout;
 import DriverBase from '__old/system/base/DriverBase';

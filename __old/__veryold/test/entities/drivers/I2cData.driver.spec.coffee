@@ -1,4 +1,4 @@
-I2cData = require('../../../../entities/drivers/I2cData/I2cData').default
+I2cData = require('../../../../../../squidlet-networking/src/drivers/I2cData/I2cData').default
 helpers = require('../../../../system/helpers/helpers')
 
 

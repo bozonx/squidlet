@@ -1,4 +1,4 @@
-import WsApi from '../../../entities/services/WsApi/WsApi';
+import WsApi from '../../../../../squidlet-networking/src/bridges/__old/WsApi/WsApi';
 
 
 export default class Backdoor extends WsApi {

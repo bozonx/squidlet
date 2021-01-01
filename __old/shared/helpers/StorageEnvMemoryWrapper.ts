@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import {EntityTypePlural} from '../../system/interfaces/EntityTypes';
 import ManifestBase from '../../system/interfaces/ManifestBase';
-import StorageIo from '../../system/interfaces/io/StorageIo';
+import StorageIo from '../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement, trimCharStart} from '../../../../squidlet-lib/src/strings';
 import systemConfig from '../../system/systemConfig';

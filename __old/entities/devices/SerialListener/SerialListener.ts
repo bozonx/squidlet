@@ -1,5 +1,5 @@
 import DeviceBase from '__old/system/base/DeviceBase';
-import {Serial, SerialProps} from '../../drivers/Serial/Serial';
+import {Serial, SerialProps} from '../../../../../squidlet-networking/src/drivers/Serial/Serial';
 
 
 interface Props extends SerialProps {

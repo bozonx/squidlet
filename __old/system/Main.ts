@@ -1,7 +1,7 @@
 import IoSet from './interfaces/IoSet';
 import HostConfig from './interfaces/HostConfig';
-import StorageIo from './interfaces/io/StorageIo';
-import SysIo from './interfaces/io/SysIo';
+import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
+import SysIo from '../../../squidlet-networking/src/interfaces/__old/io/SysIo';
 import {APP_DESTROY_TIMEOUT_SEC, SystemEvents} from './constants';
 import Logger from './interfaces/Logger';
 import System from './System';

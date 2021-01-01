@@ -1,9 +1,9 @@
-import StartDevelop from '../platforms/nodejs/starters/StartDevelop';
-import StartIoServerStandalone from '../platforms/nodejs/starters/StartIoServerStandalone';
-import StartRemoteDevelop from '../platforms/nodejs/starters/StartRemoteDevelop';
+import StartDevelop from '../../../squidlet-networking/src/io/nodejs/starters/StartDevelop';
+import StartIoServerStandalone from '../../../squidlet-networking/src/io/nodejs/starters/StartIoServerStandalone';
+import StartRemoteDevelop from '../../../squidlet-networking/src/io/nodejs/starters/StartRemoteDevelop';
 import {listenScriptEnd} from '../shared/helpers/helpers';
-import Starter from '../platforms/nodejs/interfaces/Starter';
-import StarterProps from '../platforms/nodejs/interfaces/StarterProps';
+import Starter from '../../../squidlet-networking/src/io/nodejs/interfaces/Starter';
+import StarterProps from '../../../squidlet-networking/src/io/nodejs/interfaces/StarterProps';
 import {omitObj} from '../../../squidlet-lib/src/objects';
 
 

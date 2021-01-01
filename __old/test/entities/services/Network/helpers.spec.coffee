@@ -1,4 +1,4 @@
-helpers = require('../../../../entities/services/Network/helpers')
+helpers = require('../../../../../../squidlet-networking/src/bridges/__old/Network/helpers')
 
 
 describe 'entities.services.Network.helpers', ->

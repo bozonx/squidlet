@@ -1,7 +1,7 @@
 import ServiceBase from '__old/system/base/ServiceBase';
 import IoItem from '__old/system/interfaces/IoItem';
 import {IoSetBase} from '__old/system/interfaces/IoSet';
-import Connection from '__old/system/interfaces/Connection';
+import Connection from '../squidlet-networking/src/interfaces/__old/Connection';
 
 import Digital from '../../virtualIo/Digital';
 import ExpanderFunctionCall from './ExpanderFunctionCall';

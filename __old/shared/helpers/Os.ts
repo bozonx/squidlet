@@ -7,7 +7,7 @@ import yaml from 'js-yaml';
 import * as childProcess from 'child_process';
 import {ChildProcess} from 'child_process';
 
-import {StatsSimplified} from '../../system/interfaces/io/StorageIo';
+import {StatsSimplified} from '../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import {callPromised} from '../../../../squidlet-lib/src/common';
 import {ENCODE} from '../../../../squidlet-lib/src/constants';
 import {OwnerOptions} from '../interfaces/OnwerOptions';

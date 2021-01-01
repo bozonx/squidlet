@@ -1,4 +1,4 @@
-import WifiIo, {WifiParams} from '__old/system/interfaces/io/WifiIo';
+import WifiIo, {WifiParams} from '../../../../../squidlet-networking/src/interfaces/__old/io/WifiIo';
 
 
 export default class Wifi implements WifiIo {

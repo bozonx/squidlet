@@ -1,7 +1,7 @@
 import {pathJoin} from '../squidlet-lib/src/paths';
 import systemConfig from '__old/system/systemConfig';
 import Context from '__old/system/Context';
-import StorageIo from '__old/system/interfaces/io/StorageIo';
+import StorageIo from '../../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 
 
 let transactionLastId: number = 0;

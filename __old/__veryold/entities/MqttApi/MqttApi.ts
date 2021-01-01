@@ -1,7 +1,7 @@
 import ServiceBase from 'base/ServiceBase';
 import {deserializeJson, serializeJson} from 'lib/serialize';
 import RemoteCallMessage from 'interfaces/RemoteCallMessage';
-import {Mqtt, MqttProps} from '../../../entities/drivers/Mqtt/Mqtt';
+import {Mqtt, MqttProps} from '../../../../../squidlet-networking/src/drivers/Mqtt/Mqtt';
 
 
 const REMOTE_CALL_TOPIC = 'remoteCall';

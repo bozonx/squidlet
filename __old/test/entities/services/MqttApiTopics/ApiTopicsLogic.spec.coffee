@@ -1,4 +1,4 @@
-ApiTopicsLogic = require('../../../../entities/services/MqttApiTopics/ApiTopicsLogic').default
+ApiTopicsLogic = require('../../../../../../squidlet-networking/src/bridges/__old/MqttApiTopics/ApiTopicsLogic').default
 
 
 describe 'services.MqttApiTopics.ApiTopicsLogic', ->

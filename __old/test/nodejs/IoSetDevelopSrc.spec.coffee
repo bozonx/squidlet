@@ -1,4 +1,4 @@
-IoSetDevelopSrc = require('../../platforms/nodejs/ioSets/IoSetDevelopSrc').default
+IoSetDevelopSrc = require('../../../../squidlet-networking/src/io/nodejs/ioSets/IoSetDevelopSrc').default
 helpers = require('../../shared/helpers/helpers')
 
 

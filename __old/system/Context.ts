@@ -13,7 +13,7 @@ import systemConfig from './systemConfig';
 import {mergeDeepObjects} from '../../../squidlet-lib/src/objects';
 import {AppType} from './interfaces/AppType';
 import {pathJoin} from '../../../squidlet-lib/src/paths';
-import StorageIo from './interfaces/io/StorageIo';
+import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import ServicesObj from './interfaces/ServicesObj';
 import {IoSetBase} from './interfaces/IoSet';
 

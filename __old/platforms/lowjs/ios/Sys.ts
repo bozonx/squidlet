@@ -1,4 +1,4 @@
-import SysIo from '__old/system/interfaces/io/SysIo';
+import SysIo from '../../../../../squidlet-networking/src/interfaces/__old/io/SysIo';
 
 
 export default class Sys implements SysIo {

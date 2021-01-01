@@ -5,7 +5,7 @@ import DigitalInputSemiDuplex from '__old/system/logic/digitalExpander/DigitalIn
 import DigitalOutput from '__old/system/logic/digitalExpander/DigitalOutput';
 import {omitObj} from '../squidlet-lib/src/objects';
 
-import {I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
+import {I2cMasterDriverProps} from '../../../../../../squidlet-networking/src/drivers/I2cMaster/I2cMaster';
 import {Pcf8574} from '../../drivers/Pcf8574/Pcf8574';
 import {ImpulseInput} from '../../../../entities/drivers/ImpulseInput/ImpulseInput';
 

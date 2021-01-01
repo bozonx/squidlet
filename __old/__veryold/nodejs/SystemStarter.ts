@@ -5,10 +5,10 @@ import IoSet from '../../system/interfaces/IoSet';
 import Props from '../../nodejs/starters/Props';
 import Os from '../../shared/Os';
 import {listenScriptEnd} from '../../shared/helpers';
-import StorageIo from '../../system/interfaces/io/StorageIo';
+import StorageIo from '../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import ConsoleLogger from '../../system/ConsoleLogger';
 import Logger from '../../system/interfaces/Logger';
-import SysIo from '../../system/interfaces/io/SysIo';
+import SysIo from '../../../../squidlet-networking/src/interfaces/__old/io/SysIo';
 import SolidStarter from '../../system/SolidStarter';
 import HostConfig from '../../system/interfaces/HostConfig';
 

@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
 import Platforms from '../../system/interfaces/Platforms';
 import Os, {SpawnCmdResult} from './Os';
-import NodejsMachines from '../../platforms/nodejs/interfaces/NodejsMachines';
+import NodejsMachines from '../../../../squidlet-networking/src/io/nodejs/interfaces/NodejsMachines';
 import {callPromised} from '../../../../squidlet-lib/src/common';
 import {ENCODE} from '../../../../squidlet-lib/src/constants';
 

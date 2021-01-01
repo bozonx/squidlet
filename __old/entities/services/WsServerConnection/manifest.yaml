@@ -1,8 +1,0 @@
-name: WsServerConnection
-main: WsServerConnection.ts
-
-props:
-  $base: 'drivers.WsServerSessions'
-  port:
-    type: number
-    default: 8088

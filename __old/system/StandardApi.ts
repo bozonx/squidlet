@@ -5,7 +5,7 @@ import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostInfo from './interfaces/HostInfo';
 import {calcAllowedLogLevels} from './lib/helpers';
-import SysIo from './interfaces/io/SysIo';
+import SysIo from '../../../squidlet-networking/src/interfaces/__old/io/SysIo';
 import Automation from '../entities/services/Automation/Automation';
 import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
 import DeviceBase from './base/DeviceBase';

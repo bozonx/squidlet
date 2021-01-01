@@ -2,7 +2,7 @@ import {callPromised} from '../../../../../squidlet-lib/src/common';
 
 const gpio = require('gpio');
 
-import DigitalInputIo from '__old/system/interfaces/io/DigitalInputIo';
+import DigitalInputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import DebounceCall from '../../../../../squidlet-lib/src/debounceCall/DebounceCall';
 
 

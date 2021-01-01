@@ -1,5 +1,0 @@
-{
-  "name": "squidlet-host",
-  "version": "${version}",
-  "dependencies": ${dependencies}
-}

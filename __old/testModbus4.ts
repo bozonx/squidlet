@@ -1,12 +1,12 @@
 import Context from '__old/system/Context';
-import ModBusMasterRtu from './platforms/nodejs/ios/ModBusMasterRtu';
-import {ModbusMaster} from './entities/drivers/ModbusMaster/ModbusMaster';
+import ModBusMasterRtu from '../../squidlet-networking/src/io/nodejs/ios/ModBusMasterRtu';
+import {ModbusMaster} from '../../squidlet-networking/src/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
 import {FunctionHandler} from './system/lib/remoteFunctionProtocol/PollOnceBase';
 import CallFunctionModbus from './portExpander/services/IoSetPortExpander/CallFunctionModbus';
 import {uint8ToNum} from '../../squidlet-lib/src/binaryHelpers';
 import {PORT_EXPANDER_INPUT_RESISTOR_MODE} from './portExpander/services/IoSetPortExpander/constants';
-import PollOnceModbus from './entities/services/ModbusMasterConnection/PollOnceModbus';
+import PollOnceModbus from '../../squidlet-networking/src/bridges/__old/ModbusMasterConnection/PollOnceModbus';
 
 
 async function start () {

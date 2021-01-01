@@ -4,7 +4,7 @@ import SerialIo, {
   SerialEvents,
   SerialParams,
   SerialPortLike
-} from '../../interfaces/io/SerialIo';
+} from '../../../../../squidlet-networking/src/interfaces/__old/io/SerialIo';
 import {ENCODE} from '../../../../../squidlet-lib/src/constants';
 import IndexedEventEmitter, {DefaultHandler} from '../../../../../squidlet-lib/src/IndexedEventEmitter';
 import IoContext from '../../interfaces/IoContext';

@@ -2,10 +2,10 @@ import {JsonTypes, Primitives} from '../../interfaces/Types';
 import {ParsedUrl, parseUrl} from '../../../../../squidlet-lib/src/url';
 import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 import {matchRoute, MatchRouteResult, prepareRoute} from '../../../../../squidlet-lib/src/route';
-import {HttpMethods} from '../../interfaces/Http';
+import {HttpMethods} from '../../../../../squidlet-networking/src/interfaces/__old/Http';
 import {clearArray} from '../../../../../squidlet-lib/src/arrays';
 // TODO: don't use dependencies
-import {HttpDriverRequest, HttpDriverResponse} from '../../../entities/drivers/HttpServer/HttpServerLogic';
+import {HttpDriverRequest, HttpDriverResponse} from '../../../../../squidlet-networking/src/drivers/HttpServer/HttpServerLogic';
 import {omitUndefined} from '../../../../../squidlet-lib/src/objects';
 
 

@@ -1,10 +1,10 @@
 const i2c = require('i2c');
 
-import I2cMasterIo from '__old/system/interfaces/io/I2cMasterIo';
+import I2cMasterIo from '../../../../../squidlet-networking/src/interfaces/__old/io/I2cMasterIo';
 import {callPromised} from '../squidlet-lib/src/common';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import I2cMasterIoBase from '__old/platforms/lowjs/I2cMasterIoBase';
-import {I2cMasterBusLike, I2cParams} from '__old/system/interfaces/io/I2cMasterIo';
+import {I2cMasterBusLike, I2cParams} from '../../../../../squidlet-networking/src/interfaces/__old/io/I2cMasterIo';
 
 
 export default class I2cMaster extends I2cMasterIoBase implements I2cMasterIo {

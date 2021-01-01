@@ -3,7 +3,7 @@ import ManifestBase from './interfaces/ManifestBase';
 import {EntityType} from './interfaces/EntityTypes';
 import {EntityClassType} from './managers/EntityManagerBase';
 import {pathJoin} from '../../../squidlet-lib/src/paths';
-import StorageIo from './interfaces/io/StorageIo';
+import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import {splitFirstElement} from '../../../squidlet-lib/src/strings';
 import {convertEntityTypeToPlural} from './lib/helpers';
 import systemConfig from './systemConfig';

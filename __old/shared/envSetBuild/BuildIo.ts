@@ -13,7 +13,7 @@ import {
   MODERN_DIR,
   ORIGINAL_DIR,
 } from '../constants';
-import {StatsSimplified} from '../../system/interfaces/io/StorageIo';
+import {StatsSimplified} from '../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import {OwnerOptions} from '../interfaces/OnwerOptions';
 
 

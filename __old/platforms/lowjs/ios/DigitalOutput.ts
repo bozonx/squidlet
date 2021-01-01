@@ -2,10 +2,10 @@ import {callPromised} from '../../../../../squidlet-lib/src/common';
 
 const gpio = require('gpio');
 
-import DigitalInputIo from '__old/system/interfaces/io/DigitalInputIo';
+import DigitalInputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import DebounceCall from '../../../../../squidlet-lib/src/debounceCall/DebounceCall';
-import DigitalOutput from '../../nodejs/ios/DigitalOutput';
-import DigitalOutputIo from '../../../system/interfaces/io/DigitalOutputIo';
+import DigitalOutput from '../../../../../squidlet-networking/src/io/nodejs/ios/DigitalOutput';
+import DigitalOutputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalOutputIo';
 
 
 type GpioHandler = (level: number) => void;

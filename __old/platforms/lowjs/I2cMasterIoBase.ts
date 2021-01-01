@@ -2,7 +2,7 @@
 // TODO: remove ???
 
 
-import {defaultI2cParams, I2cDefinition, I2cMasterBusLike, I2cParams} from '../../system/interfaces/io/I2cMasterIo';
+import {defaultI2cParams, I2cDefinition, I2cMasterBusLike, I2cParams} from '../../../../squidlet-networking/src/interfaces/__old/io/I2cMasterIo';
 
 
 let preDefinedBusesParams: {[index: string]: I2cParams} = {};

@@ -1,4 +1,4 @@
-import Connection from '__old/system/interfaces/Connection';
+import Connection from '../squidlet-networking/src/interfaces/__old/Connection';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 
 import {PORT_EXPANDER_FEEDBACK} from './constants';

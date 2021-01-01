@@ -1,5 +1,5 @@
 import Timeout = NodeJS.Timeout;
-import {ChangeHandler} from '../../interfaces/io/DigitalInputIo';
+import {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import DebounceCall from '../../../../../squidlet-lib/src/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../../../../../squidlet-lib/src/IndexedEventEmitter';
 import {Edge, InputResistorMode} from '../../interfaces/gpioTypes';

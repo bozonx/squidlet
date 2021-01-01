@@ -1,4 +1,4 @@
-import {NetworkRequest, NetworkResponse} from '../interfaces/NetworkDriver';
+import {NetworkRequest, NetworkResponse} from '../../../../squidlet-networking/src/interfaces/__old/NetworkDriver';
 import {concatUint8Arr, numToUint8Word, uint8ToNum} from '../../../../squidlet-lib/src/binaryHelpers';
 
 

@@ -7,7 +7,7 @@ import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
 import DriverBase from '__old/system/base/DriverBase';
 import {getBitFromByte, updateBitInByte} from '../squidlet-lib/src/binaryHelpers';
 import {PinDirection} from '__old/system/interfaces/gpioTypes';
-import {ChangeHandler} from '__old/system/interfaces/io/DigitalInputIo';
+import {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
 import {omitObj} from '../squidlet-lib/src/objects';
 import DigitalPortExpanderInputLogic from 'system/lib/logic/DigitalExpanderInputLogic';
 import DigitalPortExpanderOutputLogic from 'system/lib/logic/DigitalExpanderOutputLogic';

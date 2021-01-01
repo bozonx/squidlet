@@ -4,7 +4,7 @@ import NetworkDriver, {
   NetworkRequest,
   NetworkResponse,
   NetworkStatus
-} from '../../interfaces/NetworkDriver';
+} from '../../../../../squidlet-networking/src/interfaces/__old/NetworkDriver';
 import IndexedEventEmitter from '../../../../../squidlet-lib/src/IndexedEventEmitter';
 import {
   COMMANDS, deserializeRequest, deserializeResponse, makeRequestId,

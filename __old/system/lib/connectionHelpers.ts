@@ -1,4 +1,4 @@
-import {ConnectionRequest, ConnectionResponse, ConnectionStatus} from '../interfaces/Connection';
+import {ConnectionRequest, ConnectionResponse, ConnectionStatus} from '../../../../squidlet-networking/src/interfaces/__old/Connection';
 
 
 export function makeConnectionRequest(

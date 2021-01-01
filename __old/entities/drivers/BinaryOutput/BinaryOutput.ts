@@ -9,7 +9,7 @@ import DigitalPinOutputProps from '__old/system/interfaces/DigitalPinOutputProps
 import Promised from '../squidlet-lib/src/Promised';
 import {OutputResistorMode} from '__old/system/interfaces/gpioTypes';
 import DeviceBase from '__old/system/base/DeviceBase';
-import DigitalOutputIo from '__old/system/interfaces/io/DigitalOutputIo';
+import DigitalOutputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalOutputIo';
 
 
 export type BlockMode = 'refuse' | 'defer';

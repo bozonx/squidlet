@@ -1,4 +1,4 @@
-import StorageIo, {StatsSimplified} from '__old/system/interfaces/io/StorageIo';
+import StorageIo, {StatsSimplified} from '../../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import {pathDirname, pathJoin} from '../squidlet-lib/src/paths';
 import systemConfig from '__old/system/systemConfig';
 import ServiceBase from '__old/system/base/ServiceBase';

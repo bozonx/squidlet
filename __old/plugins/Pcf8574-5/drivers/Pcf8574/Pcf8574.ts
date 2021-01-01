@@ -14,7 +14,7 @@ import {InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/
 import {bitsToBytes, bytesToBits, howManyOctets} from '../squidlet-lib/src/binaryHelpers';
 import DigitalExpanderSetupLogic from '__old/system/logic/digitalExpander/DigitalExpanderSetupLogic';
 
-import {I2cMaster, I2cMasterDriverProps} from '../../../../entities/drivers/I2cMaster/I2cMaster';
+import {I2cMaster, I2cMasterDriverProps} from '../../../../../../squidlet-networking/src/drivers/I2cMaster/I2cMaster';
 
 
 export const PINS_COUNT = 8;

@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import Os from '../shared/helpers/Os';
-import WsApiClient from '../shared/helpers/WsApiClient';
+import WsApiClient from '../../../squidlet-networking/src/bridges/__old/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
 import {consoleError} from '../system/lib/helpers';
 import HostInfo from '../system/interfaces/HostInfo';

@@ -1,6 +1,6 @@
 const uart = require('uart');
 
-import SerialIo, {SerialParams, SerialPortLike} from '__old/system/interfaces/io/SerialIo';
+import SerialIo, {SerialParams, SerialPortLike} from '../../../../../squidlet-networking/src/interfaces/__old/io/SerialIo';
 import SerialIoBase from '__old/system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 
