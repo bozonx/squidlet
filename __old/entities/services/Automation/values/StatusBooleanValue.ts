@@ -1,0 +1,27 @@
+import Context from '__old/system/Context';
+import {JsonTypes} from '__old/system/interfaces/Types';
+import {Dictionary} from '__old/system/interfaces/Types';
+import {StateCategories} from '__old/system/interfaces/States';
+import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
+import {invertIfNeed} from '__old/system/lib/digitalHelpers';
+import ValueDefinition from '../interfaces/ValueDefinition';
+
+
+interface StatusBooleanDefinition extends ValueDefinition {
+  id: string;
+  statusName: string;
+  invert?: boolean;
+}
+
+
+export default function (context: Context, definition: StatusBooleanDefinition): boolean {
+  const state: Dictionary | undefined = context.state.getState(StateCategories.devicesStatus, definition.id);
+
+  if (!state) return false;
+
+  const value: JsonTypes | undefined = (definition.statusName)
+    ? state[definition.statusName]
+    : state[DEFAULT_DEVICE_STATUS];
+
+  return invertIfNeed(Boolean(value), definition.invert);
+}
