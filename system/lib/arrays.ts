@@ -23,6 +23,11 @@ export function lastItem(arr: any[]): any {
   return arr[arr.length - ARRAY_INDEX_SHIFT];
 }
 
+// TODO: test
+export function withoutLastItem(arr: any[]): any[] {
+  return arr.slice(0, arr.length - 1)
+}
+q
 /**
  * Make a new array which contains items which are different in samples.
  * Examples:
@@ -103,6 +108,9 @@ export function removeItemFromArray(arr: any[] | undefined, item: any, firstEntr
  * Concat arrays and remove duplicates
  */
 export function concatUniqStrArrays(...arrays: string[][]): string[] {
+  // TODO: add checks for arrays, objects, and functions
+  // TODO: похерятся цифры и boolean
+
   const result: {[index: string]: true} = {};
 
   for (let arr of arrays) {
@@ -112,6 +120,20 @@ export function concatUniqStrArrays(...arrays: string[][]): string[] {
   }
 
   return Object.keys(result);
+}
+
+// TODO: test
+export function uniqueArray(arr: any[]): any[] {
+  const result: any[] = []
+
+  for (const item of arr) {
+
+    // TODO: add checks for arrays, objects, and functions
+
+    if (!result.includes(item)) result.push(item)
+  }
+
+  return result
 }
 
 export function cloneDeepArray(arr?: any[]): any[] {

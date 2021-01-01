@@ -1,7 +1,4 @@
-# idea's files
-.idea
 build
-__example
 
 *.csv
 *.dat
