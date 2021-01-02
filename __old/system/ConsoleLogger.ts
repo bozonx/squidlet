@@ -1,4 +1,4 @@
-import Logger from './interfaces/Logger';
+import Logger from '../../../squidlet-networking/src/interfaces/Logger';
 import LogLevel from './interfaces/LogLevel';
 import {calcAllowedLogLevels} from './lib/helpers';
 

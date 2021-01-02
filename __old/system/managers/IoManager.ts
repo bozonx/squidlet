@@ -2,7 +2,7 @@ import IoSet from '../interfaces/IoSet';
 import IoItem, {IoDefinitions} from '../interfaces/IoItem';
 import Context from '../Context';
 import systemConfig from '../systemConfig';
-import Logger from '../interfaces/Logger';
+import Logger from '../../../../squidlet-networking/src/interfaces/Logger';
 
 
 export default class IoManager {

@@ -1,4 +1,4 @@
-import Logger from './Logger';
+import Logger from '../../../../squidlet-networking/src/interfaces/Logger';
 import IoItem from './IoItem';
 
 

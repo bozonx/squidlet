@@ -5,7 +5,7 @@ import ConfigsSet from './configSet/ConfigsSet';
 import ConfigsWriter from './configSet/ConfigsWriter';
 import Os from '../shared/helpers/Os';
 import * as defaultLogger from './defaultLogger';
-import Logger from '../system/interfaces/Logger';
+import Logger from '../../../squidlet-networking/src/interfaces/Logger';
 import HostEnvSet from './interfaces/HostEnvSet';
 import EntitiesWriter from './entities/EntitiesWriter';
 import PreHostConfig from './interfaces/PreHostConfig';

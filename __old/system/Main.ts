@@ -3,7 +3,7 @@ import HostConfig from './interfaces/HostConfig';
 import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import SysIo from '../../../squidlet-networking/src/interfaces/__old/io/SysIo';
 import {APP_DESTROY_TIMEOUT_SEC, SystemEvents} from './constants';
-import Logger from './interfaces/Logger';
+import Logger from '../../../squidlet-networking/src/interfaces/Logger';
 import System from './System';
 import LogLevel from './interfaces/LogLevel';
 
