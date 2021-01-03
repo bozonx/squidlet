@@ -1,6 +1,8 @@
 import {IoBase} from '../IoBase'
 
 
+export const CONNECTION_ID_DELIMITER = '|'
+
 // see https://github.com/Luka967/websocket-close-codes
 export enum WsCloseStatus {
   // Successful operation / regular socket shutdown
@@ -19,6 +21,8 @@ export enum WsServerEvent {
   newConnection,
   connectionClose,
   incomeMessage,
+  // server's or connection's errors
+  error,
   // TODO: может просто общий канал ошибок
   //connectionError,
   // TODO: review
@@ -34,10 +38,10 @@ export interface WsServerProps {
 }
 
 interface CommonHeaders {
-  Authorization?: string
-  Cookie?: string
-  'Set-Cookie'?: string
-  'User-Agent'?: string
+  authorization?: string
+  cookie?: string
+  'set-cookie'?: string
+  'user-agent'?: string
 }
 
 export interface WsServerConnectionParams {
@@ -57,30 +61,17 @@ export default interface WsServerIo extends IoBase {
    */
   destroy: () => Promise<void>
 
-  /**
-   * make new server and return serverId
-   * If server has been ran then it just returns it serverId and doesn't create
-   * a new server with the same host:port
-   */
-  newServer(props: WsServerProps): Promise<string>
-
-  /**
-   * Shut down a server which has been previously created.
-   * After that a close event will be risen.
-   */
-  closeServer(serverId: string): Promise<void>
-
   on(
     eventName: WsServerEvent.serverStarted,
     cb: (serverId: string) => void
   ): Promise<number>
   on(
     eventName: WsServerEvent.serverClosed,
-    cb: (connectionId: string) => void
+    cb: (serverId: string) => void
   ): Promise<number>
   on(
     eventName: WsServerEvent.newConnection,
-    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
+    cb: (connectionId: string, params: WsServerConnectionParams, serverId: string) => void
   ): Promise<number>
   on(
     eventName: WsServerEvent.incomeMessage,
@@ -102,25 +93,32 @@ export default interface WsServerIo extends IoBase {
 
 
   /**
+   * make new server and return serverId
+   * If server has been ran then it just returns it serverId and doesn't create
+   * a new server with the same host:port
+   */
+  newServer(props: WsServerProps): Promise<string>
+
+  /**
    * Send message from server to the client.
    * It waits while message has been sent but it doesn't wait for response.
    */
-  sendMessage(
-    serverId: string,
-    connectionId: string,
-    data: string | Uint8Array
-  ): Promise<void>
+  sendMessage(connectionId: string, data: string | Uint8Array): Promise<void>
 
   closeConnection(
-    serverId: string,
     connectionId: string,
     code: WsCloseStatus,
     reason: string
   ): Promise<void>
 
-  // TODO: почему бы не указать параметр silent?
   /**
-   * Destroy the connection and not rise an close event
+   * Shut down a server which has been previously created.
+   * After that a close event will be risen.
    */
-  destroyConnection(serverId: string, connectionId: string): Promise<void>
+  destroyServer(serverId: string): Promise<void>
+
+  // /**
+  //  * Destroy the connection and not rise an close event
+  //  */
+  // destroyConnection(serverId: string, connectionId: string): Promise<void>
 }

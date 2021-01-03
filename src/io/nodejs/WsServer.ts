@@ -3,6 +3,7 @@ import {ClientRequest, IncomingMessage} from 'http';
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 
 import WsServerIo, {
+  CONNECTION_ID_DELIMITER,
   WsCloseStatus,
   WsServerConnectionParams, WsServerEvent, WsServerProps
 } from '../../interfaces/io/WsServerIo';
@@ -11,8 +12,6 @@ import WsServerIo, {
 type ServerItem = [
   // server instance
   WebSocket.Server,
-  // server's events
-  IndexedEventEmitter,
   // connection instances
   WebSocket[],
   // is server listening.
@@ -21,14 +20,12 @@ type ServerItem = [
 
 enum ITEM_POSITION {
   wsServer,
-  events,
   // saved Socket instances
   connections,
   listeningState,
 }
 
 
-// TODO: review
 export function makeConnectionParams(request: IncomingMessage): WsServerConnectionParams {
   return {
     url: request.url as string,
@@ -36,18 +33,17 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
     statusCode: request.statusCode as number,
     statusMessage: request.statusMessage as string,
     headers: {
-      Authorization: request.headers.authorization,
-      Cookie: request.headers.cookie,
-      'User-Agent': request.headers['User-Agent'],
+      authorization: request.headers.authorization,
+      cookie: request.headers.cookie,
+      'user-agent': request.headers['user-agent'],
     },
   };
 }
 
 
 export default class WsServer implements WsServerIo {
-  // TODO: события общие
-
-  private readonly servers: Record<string, ServerItem> = {};
+  private readonly events = new IndexedEventEmitter()
+  private readonly servers: Record<string, ServerItem> = {}
 
 
   async destroy() {
@@ -56,108 +52,28 @@ export default class WsServer implements WsServerIo {
     }
   }
 
+  async on(eventName: WsServerEvent, cb: (...params: any[]) => void): Promise<number> {
+    return this.events.addListener(WsServerEvent.serverClosed, cb);
+  }
+
+  async off(handlerIndex: number): Promise<void> {
+    this.events.removeListener(handlerIndex)
+  }
+
 
   async newServer(props: WsServerProps): Promise<string> {
     const serverId: string = this.makeServerId(props)
 
     if (!this.servers[serverId]) {
-      this.servers[serverId] = this.makeServer(props)
+      this.servers[serverId] = this.makeServer(serverId, props)
     }
 
     return serverId;
   }
 
-  async closeServer(serverId: string): Promise<void> {
-    // TODO: review
-    const events = this.servers[Number(serverId)][ITEM_POSITION.events];
-
-    await this.destroyServer(serverId);
-
-    events.destroy();
-  }
-
-
-  async on(
-    eventName: WsServerEvent.serverStarted,
-    cb: (serverId: string) => void
-  ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    if (serverItem[ITEM_POSITION.listeningState]) {
-      cb();
-
-      return -1;
-    }
-
-    return serverItem[ITEM_POSITION.events].once(WsServerEvent.listening, cb);
-  }
-
-  async on(
-    eventName: WsServerEvent.serverClosed,
-    cb: (connectionId: string) => void
-  ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.serverClose, cb);
-  }
-
-  async on(
-    eventName: WsServerEvent.newConnection,
-    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
-  ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.newConnection, cb);
-  }
-
-  // async onServerError(serverId: string, cb: (err: Error) => void): Promise<number> {
-  //   const serverItem = this.getServerItem(serverId);
-  //
-  //   return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.serverError, cb);
-  // }
-
-  async on(
-    eventName: WsServerEvent.incomeMessage,
-    cb: (connectionId: string, data: string | Uint8Array) => void
-  ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientMessage, cb);
-  }
-
-  async on(
-    eventName: WsServerEvent.connectionClose,
-    cb: (serverId: string, connectionId: string) => void
-  ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientClose, cb);
-  }
-
-  // async onError(serverId: string, cb: (connectionId: string, err: Error) => void): Promise<number> {
-  //   const serverItem = this.getServerItem(serverId);
-  //
-  //   return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientError, cb);
-  // }
-  //
-  // async onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
-  //   const serverItem = this.getServerItem(serverId);
-  //
-  //   return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientUnexpectedResponse, cb);
-  // }
-
-  async off(handlerIndex: number): Promise<void> {
-    if (!this.servers[Number(serverId)]) return;
-
-    return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(handlerIndex);
-  }
-
-
-  async sendMessage(
-    serverId: string,
-    connectionId: string,
-    data: string | Uint8Array
-  ): Promise<void> {
+  async sendMessage(connectionId: string, data: string | Uint8Array): Promise<void> {
+    // TODO: что если connection уже закрылся?? - нужно дать определенно понять это
+    //       драйверу чтобы тот ожидал нового подключения с того же клиента
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -172,7 +88,6 @@ export default class WsServer implements WsServerIo {
   }
 
   async closeConnection(
-    serverId: string,
     connectionId: string,
     code: WsCloseStatus,
     reason: string
@@ -194,45 +109,9 @@ export default class WsServer implements WsServerIo {
     // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
   }
 
-  async destroyConnection(serverId: string, connectionId: string): Promise<void> {
-    // TODO: удалить обработчики событий close на это connection
-    // TODO: закрыть
-    // TODO: зачем принимать serverId ???
-  }
+  async destroyServer(serverId: string): Promise<void> {
+    // TODO: remove all the server's events
 
-
-  private makeServer(props: WebSocketServerProps): ServerItem {
-    // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
-    //       обычные http роуты
-    const events = new IndexedEventEmitter();
-    const server = new WebSocket.Server(props);
-
-    server.on('close', () => events.emit(WsServerEvent.serverClose));
-    server.on('listening', () => this.handleServerStartListening(serverId));
-    server.on('error', (err) => events.emit(WsServerEvent.serverError, err));
-    server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
-      this.handleIncomeConnection(serverId, socket, request);
-    });
-
-    return [
-      server,
-      events,
-      // an empty connections
-      [],
-      // not listening at the moment
-      false
-    ];
-  }
-
-  private handleServerStartListening = (serverId: string) => {
-    const serverItem = this.getServerItem(serverId);
-
-    serverItem[ITEM_POSITION.listeningState] = true;
-
-    serverItem[ITEM_POSITION.events].emit(WsServerEvent.listening);
-  }
-
-  private async destroyServer(serverId: string) {
     if (!this.servers[Number(serverId)]) return;
     // destroy events of server
     this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
@@ -246,11 +125,55 @@ export default class WsServer implements WsServerIo {
     delete this.servers[Number(serverId)];
   }
 
-  private handleIncomeConnection(serverId: string, socket: WebSocket, request: IncomingMessage) {
+  // async destroyConnection(serverId: string, connectionId: string): Promise<void> {
+  //   // TODO: удалить обработчики событий close на это connection
+  //   // TODO: закрыть
+  //   // TODO: зачем принимать serverId ???
+  // }
+
+
+  private makeServer(serverId: string, props: WsServerProps): ServerItem {
+    // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
+    //       обычные http роуты
+    const server = new WebSocket.Server(props);
+
+    server.on('close', () => {
+      this.events.emit(WsServerEvent.serverClosed, serverId)
+    });
+    server.on('listening', () => this.handleServerStarted(serverId));
+    server.on('error', (err) => {
+      this.events.emit(WsServerEvent.error, `Server ${serverId} error: ${err}`)
+    });
+    server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
+      this.handleIncomeConnection(serverId, socket, request);
+    });
+
+    return [
+      server,
+      // an empty connections
+      [],
+      // not listening at the moment
+      false
+    ];
+  }
+
+  private handleServerStarted = (serverId: string) => {
+    const serverItem = this.getServerItem(serverId);
+
+    serverItem[ITEM_POSITION.listeningState] = true;
+
+    this.events.emit(WsServerEvent.serverStarted, serverId);
+  }
+
+  private handleIncomeConnection(
+    serverId: string,
+    socket: WebSocket,
+    request: IncomingMessage
+  ) {
     const serverItem = this.getServerItem(serverId);
     const connections = serverItem[ITEM_POSITION.connections];
-    const connectionId: string = String(connections.length);
-    const requestParams: ConnectionParams = makeConnectionParams(request);
+    const connectionId: string = this.makeConnectionId(serverId, connections.length);
+    const requestParams: WsServerConnectionParams = makeConnectionParams(request);
 
     connections.push(socket);
 
@@ -297,6 +220,10 @@ export default class WsServer implements WsServerIo {
 
   private makeServerId(props: WsServerProps): string {
     return `${props.host}:${props.port}`
+  }
+
+  private makeConnectionId(serverId: string, connectionsLength: number) {
+    return `${serverId}${CONNECTION_ID_DELIMITER}${connectionsLength}`
   }
 
 }
