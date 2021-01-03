@@ -39,16 +39,6 @@ export enum WsClientEvent {
   unexpectedResponse,
 }
 
-// see https://github.com/Luka967/websocket-close-codes
-export enum WsCloseStatus {
-  // Successful operation / regular socket shutdown
-  closeNormal = 1000,
-  // Client is leaving (browser tab closing)
-  closeGoingAway,
-  // Internal server error while operating
-  serverError = 1011,
-}
-
 export type OnMessageHandler = (data: string | Uint8Array) => void;
 
 export interface WebSocketClientProps {

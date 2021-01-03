@@ -1,6 +1,16 @@
 import {IoBase} from '../IoBase'
 
 
+// see https://github.com/Luka967/websocket-close-codes
+export enum WsCloseStatus {
+  // Successful operation / regular socket shutdown
+  closeNormal = 1000,
+  // Client is leaving (browser tab closing)
+  closeGoingAway,
+  // Internal server error while operating
+  serverError = 1011,
+}
+
 export enum WsServerEvent {
   serverStarted,
   serverClosed,
@@ -9,7 +19,8 @@ export enum WsServerEvent {
   newConnection,
   connectionClose,
   incomeMessage,
-  connectionError,
+  // TODO: может просто общий канал ошибок
+  //connectionError,
   // TODO: review
   //clientUnexpectedResponse,
 }
@@ -60,40 +71,28 @@ export default interface WsServerIo extends IoBase {
   closeServer(serverId: string): Promise<void>
 
   on(
+    eventName: WsServerEvent.serverStarted,
+    cb: (serverId: string) => void
+  ): Promise<number>
+  on(
     eventName: WsServerEvent.serverClosed,
     cb: (connectionId: string) => void
+  ): Promise<number>
+  on(
+    eventName: WsServerEvent.newConnection,
+    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
   ): Promise<number>
   on(
     eventName: WsServerEvent.incomeMessage,
     cb: (connectionId: string, data: string | Uint8Array) => void
   ): Promise<number>
+  // on(
+  //   eventName: WsServerEvent.connectionError,
+  //   cb: (connectionId: string, err: Error) => void
+  // ): Promise<number>
   on(
-    eventName: WsServerEvent.connectionError,
-    cb: (connectionId: string, err: Error) => void
-  ): Promise<number>
-
-  /**
-   * When new client is connected
-   */
-  on(
-    eventName: WsServerEvent.newConnection,
-    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
-  ): Promise<number>
-
-  /**
-   * when server starts listening
-   */
-  on(
-    eventName: WsServerEvent.serverStarted,
-    cb: (serverId: string) => void
-  ): Promise<number>
-
-  /**
-   * on server close. Depend on http server close
-   */
-  on(
-    eventName: WsServerEvent.serverClosed,
-    cb: (serverId: string) => void
+    eventName: WsServerEvent.connectionClose,
+    cb: (serverId: string, connectionId: string) => void
   ): Promise<number>
 
   //onServerError(serverId: string, cb: (err: Error) => void): Promise<number>
@@ -115,7 +114,7 @@ export default interface WsServerIo extends IoBase {
   closeConnection(
     serverId: string,
     connectionId: string,
-    code: number,
+    code: WsCloseStatus,
     reason: string
   ): Promise<void>
 

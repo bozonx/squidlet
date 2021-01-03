@@ -1,10 +1,11 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
-import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter'
+import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 
 import WsServerIo, {
-  WsServerConnectionParams, WsServerProps
-} from '../../../interfaces/io/WsServerIo'
+  WsCloseStatus,
+  WsServerConnectionParams, WsServerEvent, WsServerProps
+} from '../../interfaces/io/WsServerIo';
 
 
 type ServerItem = [
@@ -44,6 +45,8 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
 
 
 export default class WsServer implements WsServerIo {
+  // TODO: события общие
+
   private readonly servers: Record<string, ServerItem> = {};
 
 
@@ -73,16 +76,11 @@ export default class WsServer implements WsServerIo {
     events.destroy();
   }
 
-  async onConnection(
-    serverId: string,
-    cb: (connectionId: string, request: ConnectionParams) => void
+
+  async on(
+    eventName: WsServerEvent.serverStarted,
+    cb: (serverId: string) => void
   ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.newConnection, cb);
-  }
-
-  async onServerListening(serverId: string, cb: () => void): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
     if (serverItem[ITEM_POSITION.listeningState]) {
@@ -94,52 +92,72 @@ export default class WsServer implements WsServerIo {
     return serverItem[ITEM_POSITION.events].once(WsServerEvent.listening, cb);
   }
 
-  async onServerClose(serverId: string, cb: () => void): Promise<number> {
+  async on(
+    eventName: WsServerEvent.serverClosed,
+    cb: (connectionId: string) => void
+  ): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
     return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.serverClose, cb);
   }
 
-  async onServerError(serverId: string, cb: (err: Error) => void): Promise<number> {
+  async on(
+    eventName: WsServerEvent.newConnection,
+    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
+  ): Promise<number> {
     const serverItem = this.getServerItem(serverId);
 
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.serverError, cb);
+    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.newConnection, cb);
   }
 
-  async removeListener(serverId: string, handlerIndex: number): Promise<void> {
+  // async onServerError(serverId: string, cb: (err: Error) => void): Promise<number> {
+  //   const serverItem = this.getServerItem(serverId);
+  //
+  //   return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.serverError, cb);
+  // }
+
+  async on(
+    eventName: WsServerEvent.incomeMessage,
+    cb: (connectionId: string, data: string | Uint8Array) => void
+  ): Promise<number> {
+    const serverItem = this.getServerItem(serverId);
+
+    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientMessage, cb);
+  }
+
+  async on(
+    eventName: WsServerEvent.connectionClose,
+    cb: (serverId: string, connectionId: string) => void
+  ): Promise<number> {
+    const serverItem = this.getServerItem(serverId);
+
+    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientClose, cb);
+  }
+
+  // async onError(serverId: string, cb: (connectionId: string, err: Error) => void): Promise<number> {
+  //   const serverItem = this.getServerItem(serverId);
+  //
+  //   return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientError, cb);
+  // }
+  //
+  // async onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
+  //   const serverItem = this.getServerItem(serverId);
+  //
+  //   return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientUnexpectedResponse, cb);
+  // }
+
+  async off(handlerIndex: number): Promise<void> {
     if (!this.servers[Number(serverId)]) return;
 
     return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(handlerIndex);
   }
 
 
-  ////////// Connection's methods like client's, but without onOpen
-
-  async onClose(serverId: string, cb: (connectionId: string) => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientClose, cb);
-  }
-
-  async onMessage(serverId: string, cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientMessage, cb);
-  }
-
-  async onError(serverId: string, cb: (connectionId: string, err: Error) => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientError, cb);
-  }
-
-  async onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.clientUnexpectedResponse, cb);
-  }
-
-  async send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
+  async sendMessage(
+    serverId: string,
+    connectionId: string,
+    data: string | Uint8Array
+  ): Promise<void> {
 
     // TODO: is it need support of null or undefined, number, boolean ???
 
@@ -153,7 +171,12 @@ export default class WsServer implements WsServerIo {
     await callPromised(socket.send.bind(socket), data);
   }
 
-  async close(serverId: string, connectionId: string, code: WsCloseStatus, reason: string): Promise<void> {
+  async closeConnection(
+    serverId: string,
+    connectionId: string,
+    code: WsCloseStatus,
+    reason: string
+  ): Promise<void> {
     if (
       !this.servers[Number(serverId)]
       || !this.servers[Number(serverId)][ITEM_POSITION.connections][Number(connectionId)]
@@ -174,6 +197,7 @@ export default class WsServer implements WsServerIo {
   async destroyConnection(serverId: string, connectionId: string): Promise<void> {
     // TODO: удалить обработчики событий close на это connection
     // TODO: закрыть
+    // TODO: зачем принимать serverId ???
   }
 
 
