@@ -16,17 +16,11 @@ export enum WsCloseStatus {
 export enum WsServerEvent {
   serverStarted,
   serverClosed,
-  // TODO: в какой момент возникает, может лучше с промисом отдать или с событием
-  //serverError,
   newConnection,
-  connectionClose,
+  connectionClosed,
   incomeMessage,
   // server's or connection's errors
   error,
-  // TODO: может просто общий канал ошибок
-  //connectionError,
-  // TODO: review
-  //clientUnexpectedResponse,
 }
 
 
@@ -55,9 +49,8 @@ export interface WsServerConnectionParams {
 
 
 export default interface WsServerIo extends IoBase {
-  // TODO: почему не поднимается событие ??
   /**
-   * Destroy server and don't rise a close event.
+   * Destroy all the servers.
    */
   destroy: () => Promise<void>
 
@@ -75,19 +68,16 @@ export default interface WsServerIo extends IoBase {
   ): Promise<number>
   on(
     eventName: WsServerEvent.incomeMessage,
-    cb: (connectionId: string, data: string | Uint8Array) => void
+    cb: (connectionId: string, data: string | Uint8Array, serverId: string) => void
   ): Promise<number>
-  // on(
-  //   eventName: WsServerEvent.connectionError,
-  //   cb: (connectionId: string, err: Error) => void
-  // ): Promise<number>
   on(
-    eventName: WsServerEvent.connectionClose,
-    cb: (serverId: string, connectionId: string) => void
+    eventName: WsServerEvent.connectionClosed,
+    cb: (connectionId: string, code: number, reason: string, serverId: string) => void
   ): Promise<number>
-
-  //onServerError(serverId: string, cb: (err: Error) => void): Promise<number>
-  //onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>
+  on(
+    eventName: WsServerEvent.error,
+    cb: (err: string, serverId: string, connectionId?: string) => void
+  ): Promise<number>
 
   off(handlerIndex: number): Promise<void>
 
@@ -116,9 +106,4 @@ export default interface WsServerIo extends IoBase {
    * After that a close event will be risen.
    */
   destroyServer(serverId: string): Promise<void>
-
-  // /**
-  //  * Destroy the connection and not rise an close event
-  //  */
-  // destroyConnection(serverId: string, connectionId: string): Promise<void>
 }

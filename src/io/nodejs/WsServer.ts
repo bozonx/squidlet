@@ -1,6 +1,8 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
+import {convertBufferToUint8Array} from 'squidlet-lib/src/buffer'
+import {callPromised} from 'squidlet-lib/src/common';
 
 import WsServerIo, {
   CONNECTION_ID_DELIMITER,
@@ -9,11 +11,12 @@ import WsServerIo, {
 } from '../../interfaces/io/WsServerIo';
 
 
+// TODO: почему бы и не сделать объектом ??
 type ServerItem = [
   // server instance
   WebSocket.Server,
   // connection instances
-  WebSocket[],
+  (WebSocket | undefined)[],
   // is server listening.
   boolean
 ];
@@ -40,6 +43,21 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
   };
 }
 
+export function makeServerId(props: WsServerProps): string {
+  return `${props.host}:${props.port}`
+}
+export function makeConnectionId(serverId: string, socketId: number): string {
+  return `${serverId}${CONNECTION_ID_DELIMITER}${socketId}`
+}
+
+export function splitConnectionId(
+  connectionId: string
+): { serverId: string, socketId: number } {
+  const splat = connectionId.split(CONNECTION_ID_DELIMITER)
+
+  return { serverId: splat[0], socketId: parseInt(splat[1]) }
+}
+
 
 export default class WsServer implements WsServerIo {
   private readonly events = new IndexedEventEmitter()
@@ -47,8 +65,12 @@ export default class WsServer implements WsServerIo {
 
 
   async destroy() {
+    this.events.destroy()
+
     for (const serverId of Object.keys(this.servers)) {
       await this.destroyServer(serverId);
+
+      delete this.servers[serverId]
     }
   }
 
@@ -62,7 +84,7 @@ export default class WsServer implements WsServerIo {
 
 
   async newServer(props: WsServerProps): Promise<string> {
-    const serverId: string = this.makeServerId(props)
+    const serverId: string = makeServerId(props)
 
     if (!this.servers[serverId]) {
       this.servers[serverId] = this.makeServer(serverId, props)
@@ -72,19 +94,17 @@ export default class WsServer implements WsServerIo {
   }
 
   async sendMessage(connectionId: string, data: string | Uint8Array): Promise<void> {
-    // TODO: что если connection уже закрылся?? - нужно дать определенно понять это
-    //       драйверу чтобы тот ожидал нового подключения с того же клиента
-
-    // TODO: is it need support of null or undefined, number, boolean ???
-
     if (typeof data !== 'string' && !(data instanceof Uint8Array)) {
-      throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`);
+      throw new Error(`Unsupported type of data: "${JSON.stringify(data)}"`)
     }
 
-    const serverItem = this.getServerItem(serverId);
-    const socket = serverItem[ITEM_POSITION.connections][Number(connectionId)];
+    const {serverId, socketId} = splitConnectionId(connectionId)
+    const serverItem = this.getServerItem(serverId)
+    const socket = serverItem[ITEM_POSITION.connections][socketId]
 
-    await callPromised(socket.send.bind(socket), data);
+    if (!socket) throw new Error(`Can't find socket "${socketId}`)
+
+    await callPromised(socket.send.bind(socket), data)
   }
 
   async closeConnection(
@@ -92,44 +112,27 @@ export default class WsServer implements WsServerIo {
     code: WsCloseStatus,
     reason: string
   ): Promise<void> {
-    if (
-      !this.servers[Number(serverId)]
-      || !this.servers[Number(serverId)][ITEM_POSITION.connections][Number(connectionId)]
-    ) {
-      return;
-    }
+    const {serverId, socketId} = splitConnectionId(connectionId)
+    const socket = this.servers[serverId]?.[ITEM_POSITION.connections][socketId]
 
-    const connectionItem = this.servers[Number(serverId)][ITEM_POSITION.connections][Number(connectionId)];
+    if (!socket) return
 
-    connectionItem.close(code, reason);
+    socket.close(code, reason)
 
-    delete this.servers[Number(serverId)][ITEM_POSITION.connections][Number(connectionId)];
-
-    // TODO: проверить не будет ли ошибки если соединение уже закрыто
-    // TODO: нужно ли отписываться от навешанных колбэков - open, close etc ???
+    this.servers[serverId][ITEM_POSITION.connections][socketId] = undefined
   }
 
   async destroyServer(serverId: string): Promise<void> {
-    // TODO: remove all the server's events
+    if (!this.servers[serverId]) return;
 
-    if (!this.servers[Number(serverId)]) return;
-    // destroy events of server
-    this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
-
-    const server = this.servers[Number(serverId)][ITEM_POSITION.wsServer];
+    const server = this.servers[serverId][ITEM_POSITION.wsServer];
 
     // call server close
-    // TODO: если раскоментировать то будет ошибка при дестрое
-    //await callPromised(server.close.bind(server));
+    // TODO: может быть ошибка при дестрое
+    await callPromised(server.close.bind(server));
 
-    delete this.servers[Number(serverId)];
+    delete this.servers[serverId];
   }
-
-  // async destroyConnection(serverId: string, connectionId: string): Promise<void> {
-  //   // TODO: удалить обработчики событий close на это connection
-  //   // TODO: закрыть
-  //   // TODO: зачем принимать serverId ???
-  // }
 
 
   private makeServer(serverId: string, props: WsServerProps): ServerItem {
@@ -142,7 +145,11 @@ export default class WsServer implements WsServerIo {
     });
     server.on('listening', () => this.handleServerStarted(serverId));
     server.on('error', (err) => {
-      this.events.emit(WsServerEvent.error, `Server ${serverId} error: ${err}`)
+      this.events.emit(
+        WsServerEvent.error,
+        `Server ${serverId} error: ${err}`,
+        serverId
+      )
     });
     server.on('connection', (socket: WebSocket, request: IncomingMessage) => {
       this.handleIncomeConnection(serverId, socket, request);
@@ -170,60 +177,65 @@ export default class WsServer implements WsServerIo {
     socket: WebSocket,
     request: IncomingMessage
   ) {
-    const serverItem = this.getServerItem(serverId);
-    const connections = serverItem[ITEM_POSITION.connections];
-    const connectionId: string = this.makeConnectionId(serverId, connections.length);
-    const requestParams: WsServerConnectionParams = makeConnectionParams(request);
+    const serverItem = this.getServerItem(serverId)
+    const connections = serverItem[ITEM_POSITION.connections]
+    const socketId = connections.length
+    const connectionId: string = makeConnectionId(serverId, socketId)
+    const requestParams: WsServerConnectionParams = makeConnectionParams(request)
 
-    connections.push(socket);
+    connections.push(socket)
 
     socket.on('error', (err: Error) => {
-      serverItem[ITEM_POSITION.events].emit(WsServerEvent.clientError, connectionId, err);
-    });
-
-    socket.on('close', (code: number, reason: string) => {
-      serverItem[ITEM_POSITION.events].emit(WsServerEvent.clientClose, connectionId, code, reason);
-    });
-
-    socket.on('message', (data: string | Buffer) => {
-      let resolvedData: string | Uint8Array;
-
-      if (Buffer.isBuffer(data)) {
-        resolvedData = convertBufferToUint8Array(data);
-      }
-      else {
-        resolvedData = data;
-      }
-
-      serverItem[ITEM_POSITION.events].emit(WsServerEvent.clientMessage, connectionId, resolvedData);
-    });
+      this.events.emit(
+        WsServerEvent.error,
+        `Server ${serverId} connection ${connectionId} error: ${err}`,
+        serverId,
+        connectionId
+      )
+    })
 
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      serverItem[ITEM_POSITION.events].emit(
-        WsServerEvent.clientUnexpectedResponse,
+      this.events.emit(
+        WsServerEvent.error,
+        `Server ${serverId} connection ${connectionId} unexpected response: ` +
+          `${JSON.stringify(makeConnectionParams(response))}`,
+        serverId,
         connectionId,
-        makeConnectionParams(response)
-      );
+      )
+    })
+
+    socket.on('close', (code: number, reason: string) => {
+      if (this.servers[serverId]?.[ITEM_POSITION.connections][socketId]) {
+        this.servers[serverId][ITEM_POSITION.connections][socketId] = undefined
+      }
+
+      this.events.emit(
+        WsServerEvent.connectionClosed,
+        connectionId,
+        code,
+        reason,
+        serverId
+      )
+    })
+
+    socket.on('message', (data: string | Buffer) => {
+      const resolvedData: string | Uint8Array = (Buffer.isBuffer(data))
+        ? convertBufferToUint8Array(data)
+        : data
+
+      this.events.emit(WsServerEvent.incomeMessage, connectionId, resolvedData, serverId)
     });
 
     // emit new connection
-    serverItem[ITEM_POSITION.events].emit(WsServerEvent.newConnection, connectionId, requestParams);
+    this.events.emit(WsServerEvent.newConnection, connectionId, requestParams, serverId)
   }
 
   private getServerItem(serverId: string): ServerItem {
     if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+      throw new Error(`WsServer IO: Server "${serverId}" hasn't been found`);
     }
 
     return this.servers[Number(serverId)];
-  }
-
-  private makeServerId(props: WsServerProps): string {
-    return `${props.host}:${props.port}`
-  }
-
-  private makeConnectionId(serverId: string, connectionsLength: number) {
-    return `${serverId}${CONNECTION_ID_DELIMITER}${connectionsLength}`
   }
 
 }
