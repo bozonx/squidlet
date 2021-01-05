@@ -22,7 +22,7 @@
     "postinstall": "cd node_modules && ln -s ../system ./"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "immutable": "^4.0.0-rc.12",
     "js-yaml": "^3.14.0",
     "jsmodbus": "^4.0.4",
