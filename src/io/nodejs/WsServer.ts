@@ -107,11 +107,7 @@ export default class WsServer implements WsServerIo {
     await callPromised(socket.send.bind(socket), data)
   }
 
-  async closeConnection(
-    connectionId: string,
-    code: WsCloseStatus,
-    reason: string
-  ): Promise<void> {
+  async closeConnection(connectionId: string, code: WsCloseStatus, reason: string) {
     const {serverId, socketId} = splitConnectionId(connectionId)
     const socket = this.servers[serverId]?.[ITEM_POSITION.connections][socketId]
 

@@ -35,11 +35,15 @@ export default interface WsClientIo extends IoBase {
     cb: (connectionId: string, err: string) => void
   ): Promise<number>
 
-  newConnection       (props: WsClientProps): Promise<string>
+  /**
+   * Make new connection to server.
+   * It returns a connection id to use with other methods
+   */
+  newConnection(props: WsClientProps): Promise<string>
 
-  send                (connectionId: string, data: string | Uint8Array): Promise<void>
-  close               (connectionId: string, code: number, reason?: string): Promise<void>
-  destroyConnection   (connectionId: string): Promise<void>
+  sendMessage(connectionId: string, data: string | Uint8Array): Promise<void>
+  closeConnection(connectionId: string, code: number, reason?: string): Promise<void>
 
+  //destroyConnection(connectionId: string): Promise<void>
   //reConnect           (connectionId: string, props: WebSocketClientProps): Promise<void>
 }
