@@ -41,10 +41,9 @@ interface CommonHeaders {
 export interface WsServerConnectionParams {
   url: string
   method: string
-  // TODO: а это будет? это же запрос а не ответ
-  statusCode: number
-  statusMessage: string
   headers: CommonHeaders
+  statusCode?: number
+  statusMessage?: string
 }
 
 

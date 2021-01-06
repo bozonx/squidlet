@@ -2,14 +2,11 @@ import {IoBase} from '../IoBase'
 
 
 export enum WsClientEvent {
-  open,
-  close,
-  incomeMessage,
+  opened,
+  closed,
   error,
-  //unexpectedResponse,
+  incomeMessage,
 }
-
-//export type OnMessageHandler = (data: string | Uint8Array) => void;
 
 export interface WsClientProps {
   url: string
@@ -19,20 +16,20 @@ export interface WsClientProps {
 
 export default interface WsClientIo extends IoBase {
   on(
-    eventName: WsClientEvent.open,
+    eventName: WsClientEvent.opened,
     cb: (connectionId: string) => void
   ): Promise<number>
   on(
-    eventName: WsClientEvent.close,
+    eventName: WsClientEvent.closed,
     cb: (connectionId: string) => void
-  ): Promise<number>
-  on(
-    eventName: WsClientEvent.incomeMessage,
-    cb: (connectionId: string, data: string | Uint8Array) => void
   ): Promise<number>
   on(
     eventName: WsClientEvent.error,
     cb: (connectionId: string, err: string) => void
+  ): Promise<number>
+  on(
+    eventName: WsClientEvent.incomeMessage,
+    cb: (connectionId: string, data: string | Uint8Array) => void
   ): Promise<number>
 
   /**
@@ -40,7 +37,6 @@ export default interface WsClientIo extends IoBase {
    * It returns a connection id to use with other methods
    */
   newConnection(props: WsClientProps): Promise<string>
-
   sendMessage(connectionId: string, data: string | Uint8Array): Promise<void>
   closeConnection(connectionId: string, code: number, reason?: string): Promise<void>
 

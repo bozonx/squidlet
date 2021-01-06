@@ -3,9 +3,11 @@ import {ClientRequest, IncomingMessage} from 'http'
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 import {callPromised} from 'squidlet-lib/src/common'
 import {omitObj} from 'squidlet-lib/src/objects'
+import {convertBufferToUint8Array} from 'squidlet-lib/src/buffer'
 
 import WsClientIo, {WsClientEvent, WsClientProps} from '../../interfaces/io/WsClientIo'
 import {WsCloseStatus} from '../../interfaces/io/WsServerIo'
+import {makeConnectionParams} from './WsServer'
 
 
 export default class WsClient implements WsClientIo {
@@ -17,7 +19,11 @@ export default class WsClient implements WsClientIo {
     this.events.destroy()
 
     for (let connectionId in this.connections) {
-      await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy')
+      await this.closeConnection(
+        connectionId,
+        WsCloseStatus.closeGoingAway,
+        'destroy'
+      )
     }
 
     delete this.connections
@@ -66,31 +72,38 @@ export default class WsClient implements WsClientIo {
   private connectToServer(connectionId: string, props: WsClientProps): WebSocket {
     const socket = new WebSocket(props.url, omitObj(props, 'url'));
 
-    socket.on('open', () => this.events.emit(WsClientEvent.open, connectionId));
+    socket.on('open', () => {
+      this.events.emit(WsClientEvent.opened, connectionId)
+    });
     socket.on('close', () => {
       if (this.connections[Number(connectionId)]) {
         this.connections[Number(connectionId)] = undefined
       }
 
-      this.events.emit(WsClientEvent.close, connectionId)
-    });
-    socket.on('message', (data: string | Uint8Array) => {
-      let resolvedData: string | Uint8Array;
-
-      if (Buffer.isBuffer(data)) {
-        resolvedData = convertBufferToUint8Array(data);
-      }
-      else {
-        resolvedData = data;
-      }
-
-      this.events.emit(WsClientEvent.message, connectionId, resolvedData);
+      this.events.emit(WsClientEvent.closed, connectionId)
     });
     socket.on('error', (err: Error) => {
-      this.events.emit(WsClientEvent.error, connectionId, err);
+      this.events.emit(
+        WsClientEvent.error,
+        connectionId,
+        `Connection ${connectionId} error: ${err}`
+      );
     });
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      this.events.emit(WsClientEvent.unexpectedResponse, connectionId, makeConnectionParams(response));
+      this.events.emit(
+        WsClientEvent.error,
+        connectionId,
+        `Connection ${connectionId} unexpected response: ` +
+        `${JSON.stringify(makeConnectionParams(response))}`,
+      );
+    });
+
+    socket.on('message', (data: string | Buffer) => {
+      const resolvedData: string | Uint8Array = (Buffer.isBuffer(data))
+        ? convertBufferToUint8Array(data)
+        : data
+
+      this.events.emit(WsClientEvent.incomeMessage, connectionId, resolvedData);
     });
 
     return socket;
