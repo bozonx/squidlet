@@ -1,5 +1,5 @@
 import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverBase from '../../../base/DriverBase';
 import {HttpClientIo} from '../../../../../squidlet/__old/system/interfaces/io/HttpClientIo';
 import {HttpResponse} from '../../../../../squidlet/__old/system/interfaces/Http';
 import HttpClientLogic, {HttpClientProps} from './HttpClientLogic';

@@ -1,4 +1,4 @@
-import DriverBase from '../../../system/base/DriverBase';
+import DriverBase from '../../../../src/base/DriverBase';
 import DuplexDriver from '../../../system/interfaces/DuplexDriver';
 import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
 import {omitObj} from '../../../../../squidlet-lib/src/objects';

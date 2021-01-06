@@ -5,7 +5,7 @@ import DigitalInputIo, {ChangeHandler} from '../../../../../squidlet-networking/
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from '../squidlet-lib/src/digitalHelpers';
 import {resolveInputResistorMode} from '../squidlet-lib/src/digitalHelpers';
 import DigitalPinInputProps from '__old/system/interfaces/DigitalPinInputProps';
-import DriverBase from '__old/system/base/DriverBase';
+import DriverBase from 'src/base/DriverBase';
 import {Edge, InputResistorMode} from '__old/system/interfaces/gpioTypes';
 
 

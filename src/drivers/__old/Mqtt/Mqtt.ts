@@ -1,4 +1,4 @@
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverBase from '../../../base/DriverBase';
 import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
 import MqttIo from '../../../../../squidlet/__old/system/interfaces/io/MqttIo';
 import {omitObj} from '../squidlet-lib/src/objects';

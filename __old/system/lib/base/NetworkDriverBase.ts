@@ -1,4 +1,4 @@
-import DriverBase from '../../base/DriverBase';
+import DriverBase from '../../../../src/base/DriverBase';
 import NetworkDriver, {
   IncomeRequestHandler, IncomeResponseHandler,
   NetworkRequest,

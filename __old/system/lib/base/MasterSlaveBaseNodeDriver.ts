@@ -1,7 +1,7 @@
 
 // TODO: remove - use SemiDuplexFeedback driver
 
-import DriverBase from '../../base/DriverBase';
+import DriverBase from '../../../../src/base/DriverBase';
 import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 import Polling from '../../../../../squidlet-lib/src/Polling';
 import Sender from '../../../../../squidlet-lib/src/Sender';

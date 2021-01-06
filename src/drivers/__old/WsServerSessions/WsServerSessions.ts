@@ -1,5 +1,5 @@
 import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverBase from '../../../base/DriverBase';
 import {ConnectionParams} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {WebSocketServerProps} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {parseCookie} from '../squidlet-lib/src/cookies';

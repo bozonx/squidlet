@@ -1,6 +1,6 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import ServiceBase from '../base/ServiceBase';
+import ServiceBase from '../../../src/base/ServiceBase';
 import systemConfig from '../systemConfig';
 import {EntityType} from '../interfaces/EntityTypes';
 import ServicesObj from '../interfaces/ServicesObj';

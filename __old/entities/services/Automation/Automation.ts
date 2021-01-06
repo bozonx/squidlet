@@ -1,4 +1,4 @@
-import ServiceBase from '__old/system/base/ServiceBase';
+import ServiceBase from 'src/base/ServiceBase';
 
 import RuleItem from './interfaces/RuleItem';
 import RuleDefinition from './interfaces/RuleDefinition';

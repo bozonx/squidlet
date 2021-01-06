@@ -1,4 +1,4 @@
-import ServiceBase from '__old/system/base/ServiceBase';
+import ServiceBase from 'src/base/ServiceBase';
 import IoItem from '__old/system/interfaces/IoItem';
 import {IoSetBase} from '__old/system/interfaces/IoSet';
 import DigitalInputSemiDuplex from '__old/system/logic/digitalExpander/DigitalInputSemiDuplex';

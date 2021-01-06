@@ -1,5 +1,5 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
-import EntityBase from './EntityBase';
+import EntityBase from '../../../src/base/EntityBase';
 import {Dictionary, JsonTypes} from '../interfaces/Types';
 import {Getter, Initialize, Setter} from '../../../../squidlet-lib/src/ConsistentState';
 import DeviceState from '../lib/logic/DeviceState';

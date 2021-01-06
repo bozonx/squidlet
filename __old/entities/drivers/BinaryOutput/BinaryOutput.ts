@@ -1,6 +1,6 @@
 type Timeout = NodeJS.Timeout;
 import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
-import DriverBase from '__old/system/base/DriverBase';
+import DriverBase from 'src/base/DriverBase';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from '../squidlet-lib/src/digitalHelpers';
 import {InitialLevel} from '__old/system/interfaces/Types';

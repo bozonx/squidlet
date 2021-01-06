@@ -1,5 +1,5 @@
 import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverBase from '../../../base/DriverBase';
 import SerialIo from '../../../../../squidlet/__old/system/interfaces/io/SerialIo';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {SerialMessageHandler} from '../../../../../squidlet/__old/system/interfaces/io/SerialIo';

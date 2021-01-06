@@ -4,7 +4,7 @@
  */
 
 import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
-import DriverBase from '__old/system/base/DriverBase';
+import DriverBase from 'src/base/DriverBase';
 import {
   DigitalExpanderInputDriver,
   DigitalExpanderOutputDriver,

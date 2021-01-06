@@ -1,5 +1,5 @@
 import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverBase from '../../../base/DriverBase';
 import {HttpServerProps} from '../../../../../squidlet/__old/system/interfaces/io/HttpServerIo';
 import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from '../../../../../squidlet/__old/system/lib/logic/HttpRouterLogic';
 import {JsonTypes} from '../../../../../squidlet/__old/system/interfaces/Types';

@@ -1,9 +1,9 @@
-import EntityDefinition from '../interfaces/EntityDefinition';
-import ManifestBase from '../interfaces/ManifestBase';
-import Context from '../Context';
-import LogPublisher from '../LogPublisher';
-import HostConfig from '../interfaces/HostConfig';
-import {EntityType} from '../interfaces/EntityTypes';
+import EntityDefinition from '../../__old/system/interfaces/EntityDefinition';
+import ManifestBase from '../../__old/system/interfaces/ManifestBase';
+import Context from '../../__old/system/Context';
+import LogPublisher from '../../__old/system/LogPublisher';
+import HostConfig from '../../__old/system/interfaces/HostConfig';
+import {EntityType} from '../../__old/system/interfaces/EntityTypes';
 
 
 export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {

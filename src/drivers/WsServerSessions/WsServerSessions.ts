@@ -1,5 +1,5 @@
 import DriverFactoryBase from '../../../__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../__old/system/base/DriverBase';
+import DriverBase from '../../base/DriverBase';
 import WebSocketServerIo, {ConnectionParams} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {WebSocketServerProps} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import WsServerDriver, {WS_SERVER_EVENTS} from '../../lib/logic/WsServerDriver';

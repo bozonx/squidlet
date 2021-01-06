@@ -4,7 +4,7 @@
  */
 
 import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
-import DriverBase from '__old/system/base/DriverBase';
+import DriverBase from 'src/base/DriverBase';
 import {getBitFromByte, updateBitInByte} from '../squidlet-lib/src/binaryHelpers';
 import {PinDirection} from '__old/system/interfaces/gpioTypes';
 import {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
