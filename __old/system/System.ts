@@ -5,7 +5,7 @@ import EnvSet from './EnvSet';
 import IoSet from './interfaces/IoSet';
 import IoManager from './managers/IoManager';
 import ApiManager from './managers/ApiManager';
-import Context from './Context';
+import Context from '../../src/system/Context';
 import IndexedEventEmitter from '../../../squidlet-lib/src/IndexedEventEmitter';
 import {SystemEvents} from './constants';
 import {AnyHandler} from '../../../squidlet-lib/src/IndexedEvents';

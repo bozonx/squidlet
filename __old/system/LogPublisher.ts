@@ -1,5 +1,5 @@
 import LogLevel from './interfaces/LogLevel';
-import Context from './Context';
+import Context from '../../src/system/Context';
 import {SystemEvents} from './constants';
 
 

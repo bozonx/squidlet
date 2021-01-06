@@ -1,7 +1,7 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import {EntityType} from '../interfaces/EntityTypes';
 import EntityBase from '../../../src/base/EntityBase';
-import Context from '../Context';
+import Context from '../../../src/system/Context';
 
 
 export type EntityClassType = new (context: Context, definition: EntityDefinition) => EntityBase;

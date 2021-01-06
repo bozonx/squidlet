@@ -3,7 +3,7 @@ import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from '../../../src/base/DriverBase';
 import {validateProps, validateRequiredProps} from '../lib/validate';
 import {mergeDeepObjects} from '../../../../squidlet-lib/src/objects';
-import Context from '../Context';
+import Context from '../../../src/system/Context';
 
 
 /**

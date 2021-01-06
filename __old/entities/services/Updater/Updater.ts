@@ -1,6 +1,6 @@
 import ServiceBase from 'src/base/ServiceBase';
 import StorageIo from '../../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import EntityDefinition from '__old/system/interfaces/EntityDefinition';
 import BundleUpdate from './BundleUpdate';
 

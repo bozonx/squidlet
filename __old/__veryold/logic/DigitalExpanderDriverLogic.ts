@@ -7,7 +7,7 @@ import {InputResistorMode, OutputResistorMode, PinDirection} from '__old/system/
 import {cloneDeepObject, isEmptyObject} from '../squidlet-lib/src/objects';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import DebounceCallIncreasing from '../../../../squidlet-lib/src/debounceCall/DebounceCallIncreasing';
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import BufferedQueue from '../../lib/BufferedQueue';
 import DigitalExpanderSetupLogic from './DigitalExpanderSetupLogic';
 

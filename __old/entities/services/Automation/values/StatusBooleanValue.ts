@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import {JsonTypes} from '__old/system/interfaces/Types';
 import {Dictionary} from '__old/system/interfaces/Types';
 import {StateCategories} from '__old/system/interfaces/States';

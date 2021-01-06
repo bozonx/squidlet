@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 
 import {Edge, InputResistorMode, PinDirection} from '../../interfaces/gpioTypes';
 import DigitalInputIo, {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';

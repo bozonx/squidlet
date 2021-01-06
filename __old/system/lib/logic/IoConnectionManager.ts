@@ -1,5 +1,5 @@
 import Promised from '../../../../../squidlet-lib/src/Promised';
-import Context from '../../Context';
+import Context from '../../../../src/system/Context';
 import Sender from '../../../../../squidlet-lib/src/Sender';
 import {CError} from '../../../../../squidlet-lib/src/CError';
 

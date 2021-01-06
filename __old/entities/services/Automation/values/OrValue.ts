@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 
 import ValueDefinition from '../interfaces/ValueDefinition';
 import {makeValue} from './allValues';

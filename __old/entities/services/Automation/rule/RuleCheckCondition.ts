@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import RuleItem from '../interfaces/RuleItem';
 import RuleDefinition from '../interfaces/RuleDefinition';
 import AndValue from '../values/AndValue';

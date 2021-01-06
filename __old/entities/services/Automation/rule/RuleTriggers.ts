@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import RuleDefinition, {TriggerDefinition} from '../interfaces/RuleDefinition';
 import TriggerItem, {TriggerItemClass} from '../interfaces/TriggerItem';
 import RuleItem from '../interfaces/RuleItem';

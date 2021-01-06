@@ -2,7 +2,7 @@ import StatusBooleanValue from './StatusBooleanValue';
 import StatusValue from './StatusValue';
 import AndValue from './AndValue';
 import OrValue from './OrValue';
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import {JsonTypes} from '__old/system/interfaces/Types';
 import Value from './Value';
 

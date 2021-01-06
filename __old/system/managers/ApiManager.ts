@@ -1,4 +1,4 @@
-import Context from '../Context';
+import Context from '../../../src/system/Context';
 import IndexedEvents from '../../../../squidlet-lib/src/IndexedEvents';
 import RemoteCall from '../lib/remoteCall/RemoteCall';
 import RemoteCallMessage from '../interfaces/RemoteCallMessage';

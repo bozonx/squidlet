@@ -6,7 +6,7 @@ import DeviceState from '../lib/logic/DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '../constants';
 import Promised from '../../../../squidlet-lib/src/Promised';
-import Context from '../Context';
+import Context from '../../../src/system/Context';
 import EntityDefinition from '../interfaces/EntityDefinition';
 
 

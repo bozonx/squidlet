@@ -10,7 +10,7 @@ import {
   isEqualUint8Array,
   stringToUint8Array
 } from '../../../../../squidlet-lib/src/binaryHelpers';
-import Context from '../../Context';
+import Context from '../../../../src/system/Context';
 import EntityDefinition from '../../interfaces/EntityDefinition';
 
 

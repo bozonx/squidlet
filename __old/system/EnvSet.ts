@@ -1,4 +1,4 @@
-import Context from './Context';
+import Context from '../../src/system/Context';
 import ManifestBase from './interfaces/ManifestBase';
 import {EntityType} from './interfaces/EntityTypes';
 import {EntityClassType} from './managers/EntityManagerBase';

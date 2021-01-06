@@ -1,7 +1,7 @@
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import Polling from '../squidlet-lib/src/Polling';
 import {isEqualUint8Array} from '../squidlet-lib/src/binaryHelpers';
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 
 import {ImpulseInput, ImpulseInputProps} from '../../entities/drivers/ImpulseInput/ImpulseInput';
 

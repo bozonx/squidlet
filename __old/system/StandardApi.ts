@@ -1,6 +1,6 @@
 import {Dictionary, JsonTypes} from './interfaces/Types';
 import {pickObj} from '../../../squidlet-lib/src/objects';
-import Context from './Context';
+import Context from '../../src/system/Context';
 import {StateCategories} from './interfaces/States';
 import LogLevel from './interfaces/LogLevel';
 import HostInfo from './interfaces/HostInfo';

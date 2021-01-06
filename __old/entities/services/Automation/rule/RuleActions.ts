@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import RuleDefinition, {ActionDefinition} from '../interfaces/RuleDefinition';
 import ActionItem, {ActionItemClass} from '../interfaces/ActionItem';
 import RuleItem from '../interfaces/RuleItem';

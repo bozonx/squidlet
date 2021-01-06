@@ -1,21 +1,24 @@
-import DriverFactoryBase from './base/DriverFactoryBase';
-import LogPublisher from './LogPublisher';
+import DriverFactoryBase from '../../__old/system/base/DriverFactoryBase';
+import LogPublisher from '../../__old/system/LogPublisher';
 import Sessions from '../../../squidlet-lib/src/Sessions';
 import State from '../../../squidlet-lib/src/State';
-import HostConfig from './interfaces/HostConfig';
-import System from './System';
+import HostConfig from '../../__old/system/interfaces/HostConfig';
+import System from '../../__old/system/System';
 import {makeUniqId} from '../../../squidlet-lib/src/uniqId';
-import {START_APP_TYPE_FILE_NAME, SystemEvents} from './constants';
-import IoItem from './interfaces/IoItem';
-import DriverBase from '../../src/base/DriverBase';
-import ServiceBase from '../../src/base/ServiceBase';
-import systemConfig from './systemConfig';
+import {START_APP_TYPE_FILE_NAME, SystemEvents} from '../../__old/system/constants';
+import IoItem from '../../__old/system/interfaces/IoItem';
+import DriverBase from '../base/DriverBase';
+import ServiceBase from '../base/ServiceBase';
+import systemConfig from '../../__old/system/systemConfig';
 import {mergeDeepObjects} from '../../../squidlet-lib/src/objects';
-import {AppType} from './interfaces/AppType';
+import {AppType} from '../../__old/system/interfaces/AppType';
 import {pathJoin} from '../../../squidlet-lib/src/paths';
 import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
-import ServicesObj from './interfaces/ServicesObj';
-import {IoSetBase} from './interfaces/IoSet';
+import ServicesObj from '../../__old/system/interfaces/ServicesObj';
+import {IoSetBase} from '../../__old/system/interfaces/IoSet';
+
+
+// TODO: rename to EntityContext
 
 
 export default class Context {

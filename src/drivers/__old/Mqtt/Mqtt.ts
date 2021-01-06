@@ -5,7 +5,7 @@ import {omitObj} from '../squidlet-lib/src/objects';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {uint8ArrayToAscii} from '../squidlet-lib/src/serialize';
 import IoConnectionManager from '../../../../../squidlet/__old/system/lib/logic/IoConnectionManager';
-import Context from '../../../../../squidlet/__old/system/Context';
+import Context from '../../../system/Context';
 import EntityDefinition from '../../../../../squidlet/__old/system/interfaces/EntityDefinition';
 
 

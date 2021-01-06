@@ -1,2 +1,2 @@
-export type EntityType = 'device' | 'driver' | 'service';
-export type EntityTypePlural = 'devices' | 'drivers' | 'services';
+export type EntityType = 'driver' | 'service';
+export type EntityTypePlural = 'drivers' | 'services';

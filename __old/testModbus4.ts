@@ -1,4 +1,4 @@
-import Context from '__old/system/Context';
+import Context from 'src/system/Context';
 import ModBusMasterRtu from '../../squidlet-networking/src/io/nodejs/ios/ModBusMasterRtu';
 import {ModbusMaster} from '../../squidlet-networking/src/drivers/ModbusMaster/ModbusMaster';
 import EntityDefinition from './system/interfaces/EntityDefinition';
