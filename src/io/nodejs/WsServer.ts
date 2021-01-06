@@ -75,7 +75,7 @@ export default class WsServer implements WsServerIo {
   }
 
   async on(eventName: WsServerEvent, cb: (...params: any[]) => void): Promise<number> {
-    return this.events.addListener(WsServerEvent.serverClosed, cb);
+    return this.events.addListener(eventName, cb);
   }
 
   async off(handlerIndex: number): Promise<void> {

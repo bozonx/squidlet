@@ -49,11 +49,6 @@ export interface WsServerConnectionParams {
 
 
 export default interface WsServerIo extends IoBase {
-  /**
-   * Destroy all the servers.
-   */
-  destroy: () => Promise<void>
-
   on(
     eventName: WsServerEvent.serverStarted,
     cb: (serverId: string) => void
@@ -78,8 +73,6 @@ export default interface WsServerIo extends IoBase {
     eventName: WsServerEvent.error,
     cb: (err: string, serverId: string, connectionId?: string) => void
   ): Promise<number>
-
-  off(handlerIndex: number): Promise<void>
 
 
   /**

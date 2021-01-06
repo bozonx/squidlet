@@ -1,22 +1,32 @@
-import WebSocket from 'ws';
-import {ClientRequest, IncomingMessage} from 'http';
+import WebSocket from 'ws'
+import {ClientRequest, IncomingMessage} from 'http'
+import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
+
+import WsClientIo, {WsClientEvent, WsClientProps} from '../../interfaces/io/WsClientIo'
+import {WsCloseStatus} from '../../interfaces/io/WsServerIo'
 
 
-
-/**
- * The same for lowjs and nodejs
- */
-export default class WsClient implements WebSocketClientIo {
-  private readonly events = new IndexedEventEmitter();
-  private readonly connections: WebSocket[] = [];
+export default class WsClient implements WsClientIo {
+  private readonly events = new IndexedEventEmitter()
+  private readonly connections: (WebSocket | undefined)[] = []
 
 
   async destroy() {
-    this.events.destroy();
+    this.events.destroy()
 
     for (let connectionId in this.connections) {
-      await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy');
+      await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy')
+
+      this.connections[connectionId] = undefined
     }
+  }
+
+  async on(eventName: WsClientEvent, cb: (...params: any[]) => void): Promise<number> {
+    return this.events.addListener(eventName, cb);
+  }
+
+  async off(handlerIndex: number): Promise<void> {
+    this.events.removeListener(handlerIndex)
   }
 
 
@@ -24,50 +34,12 @@ export default class WsClient implements WebSocketClientIo {
    * Make new connection to server.
    * It returns a connection id to use with other methods
    */
-  async newConnection(props: WebSocketClientProps): Promise<string> {
+  async newConnection(props: WsClientProps): Promise<string> {
     const connectionId = String(this.connections.length);
 
     this.connections.push( this.connectToServer(connectionId, props) );
 
     return connectionId;
-  }
-
-  /**
-   * It is used to reconnect on connections lost.
-   * It closes previous connection and makes new one with the same id.
-   */
-  async reConnect(connectionId: string, props: WebSocketClientProps) {
-    await this.close(connectionId, WsCloseStatus.closeNormal);
-
-    this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
-  }
-
-  async onOpen(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.open, cb);
-  }
-
-  async onClose(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.close, cb);
-  }
-
-  async onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.message, cb);
-  }
-
-  async onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.error, cb);
-  }
-
-  async onUnexpectedResponse(cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.unexpectedResponse, cb);
-  }
-
-  async removeListener(connectionId: string, handlerIndex: number) {
-    const connectionItem = this.connections[Number(connectionId)];
-
-    if (!connectionItem) return;
-
-    this.events.removeListener(handlerIndex);
   }
 
   async send(connectionId: string, data: string | Uint8Array) {
@@ -132,3 +104,13 @@ export default class WsClient implements WebSocketClientIo {
   }
 
 }
+
+// /**
+//  * It is used to reconnect on connections lost.
+//  * It closes previous connection and makes new one with the same id.
+//  */
+// async reConnect(connectionId: string, props: WebSocketClientProps) {
+//   await this.close(connectionId, WsCloseStatus.closeNormal);
+//
+//   this.connections[Number(connectionId)] = this.connectToServer(connectionId, props);
+// }
