@@ -17,7 +17,7 @@ const HANDLER_INDEX_POSITION = 1;
 // TODO: наверное прикрутить сессию чтобы считать что клиент ещё подключен
 
 
-export default class WsServerDriver {
+export default class WsServerDriverLogic {
   // it fulfils when server is start listening
   get startedPromise(): Promise<void> {
     return this._startedPromised.promise;

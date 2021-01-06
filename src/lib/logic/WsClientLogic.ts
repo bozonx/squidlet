@@ -9,7 +9,7 @@ import {mergeDeepObjects} from '../squidlet-lib/src/objects';
 import {parseCookie, stringifyCookie} from '../squidlet-lib/src/cookies';
 import Promised from '../squidlet-lib/src/Promised';
 
-import {SETCOOKIE_LABEL} from '../WsServer/WsServerDriver';
+import {SETCOOKIE_LABEL} from './WsServerDriver';
 
 
 // TODO: review
