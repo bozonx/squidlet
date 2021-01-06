@@ -6,7 +6,7 @@ import * as yaml from 'js-yaml';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import WsClientLogic, {WsClientLogicProps} from '../../../../squidlet-networking/src/drivers/WsClient/WsClientLogic';
+import WsClientLogic, {WsClientLogicProps} from '../../../../squidlet-networking/src/drivers/WsClientSessions/WsClientLogic';
 import WebSocketClient from '../../nodejs/ios/WebSocketClient';
 import {BACKDOOR_MSG_TYPE, BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
 import {decodeBackdoorMessage, makeMessage, validateMessage} from './helpers';

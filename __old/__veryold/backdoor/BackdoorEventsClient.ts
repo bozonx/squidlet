@@ -1,7 +1,7 @@
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 
-import WsClientLogic, {WsClientLogicProps} from '../../../../squidlet-networking/src/drivers/WsClient/WsClientLogic';
+import WsClientLogic, {WsClientLogicProps} from '../../../../squidlet-networking/src/drivers/WsClientSessions/WsClientLogic';
 import WebSocketClient from '../shared/nodeJsLikeIo/WebSocketClient';
 import {BACKDOOR_ACTION, BackdoorMessage} from '../../entities/services/Backdoor/Backdoor';
 import {decodeBackdoorMessage, makeMessage} from '../entities/services/Backdoor/helpers';

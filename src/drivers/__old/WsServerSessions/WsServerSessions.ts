@@ -6,7 +6,7 @@ import {parseCookie} from '../squidlet-lib/src/cookies';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {getKeyOfObject} from '../squidlet-lib/src/objects';
 import {omitObj} from '../squidlet-lib/src/objects';
-import {WsServer} from '../../WsServer/WsServer';
+import {WsServerSessions} from '../../WsServerSessions/WsServerSessions';
 
 
 export enum WS_SESSIONS_EVENTS {
@@ -29,7 +29,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   private readonly events = new IndexedEventEmitter();
-  private get server(): WsServer {
+  private get server(): WsServerSessions {
     return this.depsInstances.server;
   }
   // like {sessionId: connectionId}

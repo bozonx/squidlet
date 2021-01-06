@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import RemoteCall from '../../system/lib/remoteCall/RemoteCall';
 import {deserializeJson, serializeJson} from '../../../../squidlet-lib/src/serialize';
 import RemoteCallMessage from '../../system/interfaces/RemoteCallMessage';
-import WsClientLogic, {WsClientLogicProps} from '../../../../squidlet-networking/src/drivers/WsClient/WsClientLogic';
+import WsClientLogic, {WsClientLogicProps} from '../../../../squidlet-networking/src/drivers/WsClientSessions/WsClientLogic';
 import WebSocketClient from '../../platforms/nodejs/ios/WebSocketClient';
 import {ENCODE} from '../../../../squidlet-lib/src/constants';
 import {collectPropsDefaults} from '../../system/lib/helpers';

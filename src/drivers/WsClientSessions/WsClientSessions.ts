@@ -10,7 +10,7 @@ import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
  * If autoReconnect if set it holds connection for ever and reconnects if it lost.
  * By calling getInstance() you will get always a new one. There isn't any sessions.
  */
-export class WsClient extends DriverBase<WsClientLogicProps> {
+export class WsClientSessions extends DriverBase<WsClientLogicProps> {
   get connectedPromise(): Promise<void> {
     if (!this.client) {
       throw new Error(`WebSocketClient.connectedPromise: ${this.closedMsg}`);
@@ -94,7 +94,7 @@ export class WsClient extends DriverBase<WsClientLogicProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<WsClient, WsClientLogicProps> {
-  protected SubDriverClass = WsClient;
+export default class Factory extends DriverFactoryBase<WsClientSessions, WsClientLogicProps> {
+  protected SubDriverClass = WsClientSessions;
   protected instanceId = (props: WsClientLogicProps) => props.url;
 }

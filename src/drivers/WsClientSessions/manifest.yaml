@@ -1,5 +1,5 @@
-name: WsClient
-main: WsClient.ts
+name: WsClientSessions
+main: WsClientSessions.ts
 system: true
 
 ios:

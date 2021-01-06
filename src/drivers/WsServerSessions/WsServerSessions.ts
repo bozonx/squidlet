@@ -5,7 +5,7 @@ import {WebSocketServerProps} from '../../../../../squidlet/__old/system/interfa
 import WsServerDriver, {WS_SERVER_EVENTS} from '../../lib/logic/WsServerDriver';
 
 
-export class WsServer extends DriverBase<WebSocketServerProps> {
+export class WsServerSessions extends DriverBase<WebSocketServerProps> {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     if (!this.server) {
@@ -115,8 +115,8 @@ export class WsServer extends DriverBase<WebSocketServerProps> {
 
 }
 
-export default class Factory extends DriverFactoryBase<WsServer, WebSocketServerProps> {
-  protected SubDriverClass = WsServer;
+export default class Factory extends DriverFactoryBase<WsServerSessions, WebSocketServerProps> {
+  protected SubDriverClass = WsServerSessions;
   protected instanceId = (props: WebSocketServerProps): string => {
     return `${props.host}:${props.port}`;
   }

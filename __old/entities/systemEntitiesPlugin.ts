@@ -37,7 +37,7 @@ export default async function systemEntitiesPlugin (env: PluginEnv) {
   await env.addDriver(path.join(driversRoot, 'SemiDuplexFeedback/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'Serial/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'SerialNetwork/manifest.yaml'));
-  await env.addDriver(path.join(driversRoot, 'WsClient/manifest.yaml'));
+  await env.addDriver(path.join(driversRoot, 'WsClientSessions/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServer/manifest.yaml'));
   await env.addDriver(path.join(driversRoot, 'WsServerSessions/manifest.yaml'));
 
