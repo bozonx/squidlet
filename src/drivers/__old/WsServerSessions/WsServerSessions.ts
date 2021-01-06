@@ -6,7 +6,7 @@ import {parseCookie} from '../squidlet-lib/src/cookies';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {getKeyOfObject} from '../squidlet-lib/src/objects';
 import {omitObj} from '../squidlet-lib/src/objects';
-import {WsServer} from '../WsServer/WsServer';
+import {WsServer} from '../../WsServer/WsServer';
 
 
 export enum WS_SESSIONS_EVENTS {

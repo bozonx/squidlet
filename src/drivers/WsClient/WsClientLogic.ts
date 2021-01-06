@@ -4,12 +4,12 @@ import WebSocketClientIo, {
 } from '../../../../../squidlet/__old/system/interfaces/io/WsClientIo';
 import {ConnectionParams} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
-import {Primitives} from '../../../../../squidlet/__old/system/interfaces/Types';
+import {Primitives} from '../../../__old/system/interfaces/Types';
 import {mergeDeepObjects} from '../squidlet-lib/src/objects';
 import {parseCookie, stringifyCookie} from '../squidlet-lib/src/cookies';
 import Promised from '../squidlet-lib/src/Promised';
 
-import {SETCOOKIE_LABEL} from '../../WsServerDriver';
+import {SETCOOKIE_LABEL} from '../WsServer/WsServerDriver';
 
 
 // TODO: review

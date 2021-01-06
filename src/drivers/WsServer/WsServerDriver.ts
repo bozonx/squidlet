@@ -1,6 +1,6 @@
-import WsServerIo, {WsServerProps} from '../../../interfaces/io/WsServerIo'
-import Logger from 'squidlet-lib/src/interfaces/Logger'
-import Promised from 'squidlet-lib/src/Promised'
+import WsServerIo, {WsServerProps} from '../../interfaces/io/WsServerIo'
+import Logger from '../squidlet-lib/src/interfaces/Logger'
+import Promised from '../squidlet-lib/src/Promised'
 
 
 export enum WS_SERVER_EVENTS {
