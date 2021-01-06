@@ -7,7 +7,7 @@ import {EntityType} from '../../__old/system/interfaces/EntityTypes';
 
 
 export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
-  abstract readonly entityType: EntityType
+  //abstract readonly entityType: EntityType
   readonly context: Context
   readonly definition: EntityDefinition
 
@@ -61,7 +61,7 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
    * Load manifest of this entity
    */
   protected async getManifest(): Promise<ManifestType> {
-    return this.context.system.envSet.loadManifest<ManifestType>(this.entityType, this.className)
+    return this.context.system.envSet.loadManifest<ManifestType>(this.definition.entityType, this.className)
   }
 
   /**
