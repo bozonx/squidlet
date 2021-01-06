@@ -1,5 +1,8 @@
+import {JsonTypes, PropTypes} from './Types'
+
+
 export default interface PropElement {
-  type: string;
-  default?: any;
-  required?: boolean;
+  type: PropTypes
+  default?: JsonTypes
+  required?: boolean
 }
