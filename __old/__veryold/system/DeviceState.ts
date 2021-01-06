@@ -1,4 +1,4 @@
-import SchemaElement from '../interfaces/SchemaElement';
+import SchemaElement from '../interfaces/PropElement';
 import {isEmpty} from '../helpers/lodashLike';
 import {validateParam} from '../helpers/validate';
 import ConsistentState, {Getter, Setter, Initialize} from '../helpers/ConsistentState';

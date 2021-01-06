@@ -7,7 +7,7 @@ import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import ManifestBase from '../../../src/interfaces/ManifestBase';
-import SchemaElement from '../../../src/interfaces/SchemaElement';
+import PropElement from '../../../src/interfaces/PropElement';
 import validateRules from '../hostConfig/validateRules';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 import {convertEntityTypePluralToSingle} from '../helpers';
@@ -172,7 +172,7 @@ export default class UsedEntities {
       'props'
     ) as ManifestBase;
 
-    let props: {[index: string]: SchemaElement} | undefined;
+    let props: {[index: string]: PropElement} | undefined;
 
     try {
       props = this.mergePropsSchema(preManifest.props);
@@ -200,7 +200,7 @@ export default class UsedEntities {
   /**
    * Read $base param and merge props with base props
    */
-  private mergePropsSchema(props: {[index: string]: any} | undefined): {[index: string]: SchemaElement} | undefined {
+  private mergePropsSchema(props: {[index: string]: any} | undefined): {[index: string]: PropElement} | undefined {
     if (!props) return;
     // no necessary to merge
     if (!props[baseParamName]) return props;
@@ -213,7 +213,7 @@ export default class UsedEntities {
 
     const entityType = convertEntityTypePluralToSingle(rawPluralType);
     const topLayer = omitObj(props, baseParamName);
-    const bottomLayer: {[index: string]: SchemaElement} | undefined = this.resolveEntityProps(
+    const bottomLayer: {[index: string]: PropElement} | undefined = this.resolveEntityProps(
       entityType,
       entityName
     );
@@ -227,7 +227,7 @@ export default class UsedEntities {
   private resolveEntityProps(
     entityType: EntityType,
     entityName: string
-  ): {[index: string]: SchemaElement} | undefined {
+  ): {[index: string]: PropElement} | undefined {
     const entityTypePlural = convertEntityTypeToPlural(entityType);
     const entitySet: HostEntitySet | undefined = this.entitiesSet[entityTypePlural][entityName];
 

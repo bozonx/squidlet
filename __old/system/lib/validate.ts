@@ -1,4 +1,4 @@
-import SchemaElement from '../../../src/interfaces/SchemaElement';
+import PropElement from '../../../src/interfaces/PropElement';
 import {ParsedType, parseType} from './typesHelpers';
 import {arraysDifference} from '../../../../squidlet-lib/src/arrays';
 
@@ -49,7 +49,7 @@ export function isValueOfType(fullType: string, value: any): string | undefined 
  * Validate value which corresponds to part of schema
  */
 export function validateParam(schema: {[index: string]: any}, pathToParam: string, value: any): string | undefined {
-  const itemSchema: SchemaElement | undefined = schema[pathToParam];
+  const itemSchema: PropElement | undefined = schema[pathToParam];
 
   if (!itemSchema) return `Can't find schema's param ${pathToParam}`;
 
@@ -61,7 +61,7 @@ export function validateParam(schema: {[index: string]: any}, pathToParam: strin
  */
 export function validateProps (
   props: {[index: string]: any},
-  schema?: {[index: string]: SchemaElement}
+  schema?: {[index: string]: PropElement}
 ): string | undefined {
   if (!schema) return;
 
@@ -80,7 +80,7 @@ export function validateProps (
 
 export function validateRequiredProps (
   props: {[index: string]: any},
-  schema?: {[index: string]: SchemaElement}
+  schema?: {[index: string]: PropElement}
 ): string | undefined {
   if (!schema) return;
 
