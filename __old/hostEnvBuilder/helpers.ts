@@ -1,4 +1,4 @@
-import {EntityType, EntityTypePlural} from '../system/interfaces/EntityTypes';
+import {EntityType, EntityTypePlural} from '../../src/interfaces/EntityTypes';
 import {arraysDifference} from '../../../squidlet-lib/src/arrays';
 
 

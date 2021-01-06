@@ -3,7 +3,7 @@ import {
   required,
   sequence
 } from './validationHelpers';
-import SchemaElement from '../../system/interfaces/SchemaElement';
+import SchemaElement from '../../../src/interfaces/SchemaElement';
 import {parseType} from '../../system/lib/typesHelpers';
 import {isValueOfType, whiteList} from '../../system/lib/validate';
 

@@ -1,5 +1,5 @@
 import Context from 'src/system/Context';
-import {JsonTypes} from '__old/system/interfaces/Types';
+import {JsonTypes} from 'src/interfaces/Types';
 import ValueDefinition from '../interfaces/ValueDefinition';
 
 

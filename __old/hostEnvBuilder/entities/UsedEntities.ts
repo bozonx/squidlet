@@ -1,13 +1,13 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import {EntityType} from '../../system/interfaces/EntityTypes';
+import {EntityType} from '../../../src/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../hostConfig/ConfigManager';
 import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import ManifestBase from '../../system/interfaces/ManifestBase';
-import SchemaElement from '../../system/interfaces/SchemaElement';
+import ManifestBase from '../../../src/interfaces/ManifestBase';
+import SchemaElement from '../../../src/interfaces/SchemaElement';
 import validateRules from '../hostConfig/validateRules';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 import {convertEntityTypePluralToSingle} from '../helpers';

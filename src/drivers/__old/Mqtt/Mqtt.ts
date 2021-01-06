@@ -6,7 +6,7 @@ import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {uint8ArrayToAscii} from '../squidlet-lib/src/serialize';
 import IoConnectionManager from '../../../../../squidlet/__old/system/lib/logic/IoConnectionManager';
 import Context from '../../../system/Context';
-import EntityDefinition from '../../../../../squidlet/__old/system/interfaces/EntityDefinition';
+import EntityDefinition from '../../../interfaces/EntityDefinition';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;

@@ -7,7 +7,7 @@ import {makeFileCheckSum, REPO_ROOT} from '../shared/helpers/helpers';
 import Platforms from '../system/interfaces/Platforms';
 import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import HostEntitySet from '../hostEnvBuilder/interfaces/HostEntitySet';
-import {EntityTypePlural} from '../system/interfaces/EntityTypes';
+import {EntityTypePlural} from '../../src/interfaces/EntityTypes';
 import {
   makeExportString,
   rollupBuild,

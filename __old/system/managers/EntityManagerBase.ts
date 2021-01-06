@@ -1,5 +1,5 @@
-import EntityDefinition from '../interfaces/EntityDefinition';
-import {EntityType} from '../interfaces/EntityTypes';
+import EntityDefinition from '../../../src/interfaces/EntityDefinition';
+import {EntityType} from '../../../src/interfaces/EntityTypes';
 import EntityBase from '../../../src/base/EntityBase';
 import Context from '../../../src/system/Context';
 

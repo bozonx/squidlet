@@ -1,9 +1,9 @@
-import SchemaElement from '../../interfaces/SchemaElement';
+import SchemaElement from '../../../../src/interfaces/SchemaElement';
 import {isEmptyObject} from '../../../../../squidlet-lib/src/objects';
 import {validateParam} from '../validate';
 import ConsistentState, {Getter, Setter, Initialize} from '../../../../../squidlet-lib/src/ConsistentState';
 import {collectPropsDefaults} from '../helpers';
-import {Dictionary} from '../../interfaces/Types';
+import {Dictionary} from '../../../../src/interfaces/Types';
 
 
 export type Schema = {[index: string]: SchemaElement};

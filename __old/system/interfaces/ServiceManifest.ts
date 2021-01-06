@@ -1,4 +1,4 @@
-import ManifestBase from './ManifestBase';
+import ManifestBase from '../../../src/interfaces/ManifestBase';
 
 
 export default interface ServiceManifest extends ManifestBase {

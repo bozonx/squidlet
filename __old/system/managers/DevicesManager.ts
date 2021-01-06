@@ -1,8 +1,8 @@
-import EntityDefinition from '../interfaces/EntityDefinition';
+import EntityDefinition from '../../../src/interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
 import DeviceBase from '../base/DeviceBase';
 import systemConfig from '../systemConfig';
-import {EntityType} from '../interfaces/EntityTypes';
+import {EntityType} from '../../../src/interfaces/EntityTypes';
 
 
 /**

@@ -1,4 +1,4 @@
-import {Primitives} from '../interfaces/Types';
+import {Primitives} from '../../../src/interfaces/Types';
 import {isKindOfNumber} from '../../../../squidlet-lib/src/common';
 
 

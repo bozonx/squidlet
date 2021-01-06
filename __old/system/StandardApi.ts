@@ -1,4 +1,4 @@
-import {Dictionary, JsonTypes} from './interfaces/Types';
+import {Dictionary, JsonTypes} from '../../src/interfaces/Types';
 import {pickObj} from '../../../squidlet-lib/src/objects';
 import Context from '../../src/system/Context';
 import {StateCategories} from './interfaces/States';

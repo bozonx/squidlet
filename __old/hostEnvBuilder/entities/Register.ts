@@ -9,7 +9,7 @@ import PluginEnv from './PluginEnv';
 import PreManifestBase from '../interfaces/PreManifestBase';
 import Os from '../../shared/helpers/Os';
 import systemConfig from '../configs/systemConfig';
-import {EntityType} from '../../system/interfaces/EntityTypes';
+import {EntityType} from '../../../src/interfaces/EntityTypes';
 import validateManifest from '../hostConfig/validateManifests';
 import {clearRelativePath} from '../helpers';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';

@@ -1,13 +1,13 @@
 import DeviceManifest from '../interfaces/DeviceManifest';
 import EntityBase from '../../../src/base/EntityBase';
-import {Dictionary, JsonTypes} from '../interfaces/Types';
+import {Dictionary, JsonTypes} from '../../../src/interfaces/Types';
 import {Getter, Initialize, Setter} from '../../../../squidlet-lib/src/ConsistentState';
 import DeviceState from '../lib/logic/DeviceState';
 import {StateCategories} from '../interfaces/States';
 import {DEFAULT_DEVICE_STATUS} from '../constants';
 import Promised from '../../../../squidlet-lib/src/Promised';
 import Context from '../../../src/system/Context';
-import EntityDefinition from '../interfaces/EntityDefinition';
+import EntityDefinition from '../../../src/interfaces/EntityDefinition';
 
 
 export type DeviceAction = (...param: any[]) => JsonTypes | void | Promise<JsonTypes | void>;

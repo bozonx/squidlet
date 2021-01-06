@@ -1,4 +1,4 @@
-import EntityDefinition from '../interfaces/EntityDefinition';
+import EntityDefinition from '../../../src/interfaces/EntityDefinition';
 import DriverManifest from '../interfaces/DriverManifest';
 import DriverBase from '../../../src/base/DriverBase';
 import {validateProps, validateRequiredProps} from '../lib/validate';

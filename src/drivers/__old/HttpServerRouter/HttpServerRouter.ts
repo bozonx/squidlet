@@ -2,7 +2,7 @@ import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverF
 import DriverBase from '../../../base/DriverBase';
 import {HttpServerProps} from '../../../../../squidlet/__old/system/interfaces/io/HttpServerIo';
 import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from '../../../../../squidlet/__old/system/lib/logic/HttpRouterLogic';
-import {JsonTypes} from '../../../../../squidlet/__old/system/interfaces/Types';
+import {JsonTypes} from '../../../interfaces/Types';
 import {HttpMethods} from '../../../../../squidlet/__old/system/interfaces/Http';
 import {URL_DELIMITER} from '../squidlet-lib/src/url';
 

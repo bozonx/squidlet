@@ -11,7 +11,7 @@ import {
   stringToUint8Array
 } from '../../../../../squidlet-lib/src/binaryHelpers';
 import Context from '../../../../src/system/Context';
-import EntityDefinition from '../../interfaces/EntityDefinition';
+import EntityDefinition from '../../../../src/interfaces/EntityDefinition';
 
 
 export interface PollPreProps {

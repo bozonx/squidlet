@@ -1,4 +1,4 @@
-import SchemaElement from '../interfaces/SchemaElement';
+import SchemaElement from '../../../src/interfaces/SchemaElement';
 import {ParsedType, parseType} from './typesHelpers';
 import {arraysDifference} from '../../../../squidlet-lib/src/arrays';
 

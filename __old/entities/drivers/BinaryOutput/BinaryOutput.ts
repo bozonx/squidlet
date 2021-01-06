@@ -3,7 +3,7 @@ import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
 import DriverBase from 'src/base/DriverBase';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {resolveLevel, invertIfNeed, isDigitalPinInverted} from '../squidlet-lib/src/digitalHelpers';
-import {InitialLevel} from '__old/system/interfaces/Types';
+import {InitialLevel} from 'src/interfaces/Types';
 import {resolveOutputResistorMode} from '../squidlet-lib/src/digitalHelpers';
 import DigitalPinOutputProps from '__old/system/interfaces/DigitalPinOutputProps';
 import Promised from '../squidlet-lib/src/Promised';

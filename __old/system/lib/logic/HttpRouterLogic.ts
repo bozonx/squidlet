@@ -1,4 +1,4 @@
-import {JsonTypes, Primitives} from '../../interfaces/Types';
+import {JsonTypes, Primitives} from '../../../../src/interfaces/Types';
 import {ParsedUrl, parseUrl} from '../../../../../squidlet-lib/src/url';
 import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 import {matchRoute, MatchRouteResult, prepareRoute} from '../../../../../squidlet-lib/src/route';

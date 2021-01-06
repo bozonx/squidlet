@@ -12,6 +12,8 @@ export default interface ManifestBase {
   // dir where manifest and other entity files are placed.
   // It uses in development environment to load source ts files.
   srcDir?: string;
+  // is it system entity or regular
+  system?: boolean;
   // custom values of manifest
   [index: string]: any;
 }

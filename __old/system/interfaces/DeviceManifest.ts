@@ -1,5 +1,5 @@
 // parsed manifest of device
-import ManifestBase from './ManifestBase';
+import ManifestBase from '../../../src/interfaces/ManifestBase';
 
 
 export default interface DeviceManifest extends ManifestBase {

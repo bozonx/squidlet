@@ -1,4 +1,4 @@
-import {JsonTypes} from './Types';
+import {JsonTypes} from '../../../src/interfaces/Types';
 
 
 export const REMOTE_CALL_MESSAGE_TYPES = [
