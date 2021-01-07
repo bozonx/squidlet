@@ -1,6 +1,8 @@
 export type IncomeMessageHandler = (channel: number, payload: Uint8Array) => void;
 
 export enum BridgeConnectionState {
+  // initial state, before starting of connection
+  initial,
   connected,
   // tries to connect or wait for the next try
   connecting,
@@ -8,10 +10,10 @@ export enum BridgeConnectionState {
   closed,
 }
 
-// export enum ConnectionsEvents {
-//   message,
-//   connected,
-// }
+export enum ConnectionsEvents {
+  incomeMessage,
+  connectionStateChanged,
+}
 
 // export interface NetworkDriverProps {
 //   busId: number | string;
@@ -29,8 +31,14 @@ export interface BridgeDriver {
    */
   sendMessage(channel: number, body: Uint8Array): Promise<void>
 
-  onIncomeMessage(cb: IncomeMessageHandler): number
-  onConnectionState(cb: (state: BridgeConnectionState) => void): number
+  on(
+    eventName: ConnectionsEvents.incomeMessage,
+    cb: IncomeMessageHandler
+  ): number
+  on(
+    eventName: ConnectionsEvents.connectionStateChanged,
+    cb: (state: BridgeConnectionState) => void
+  ): number
+  off(handlerIndex: number): void
 
-  removeListener(handlerIndex: number): void
 }

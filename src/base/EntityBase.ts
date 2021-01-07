@@ -6,6 +6,8 @@ import HostConfig from '../../__old/system/interfaces/HostConfig';
 import {EntityType} from '../interfaces/EntityTypes';
 
 
+// TODO: может просто расширить контекст
+
 export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
   //abstract readonly entityType: EntityType
   readonly context: Context

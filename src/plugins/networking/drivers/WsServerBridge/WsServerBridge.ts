@@ -1,9 +1,11 @@
 import {
   BridgeConnectionState,
   BridgeDriver,
-  IncomeMessageHandler
+  ConnectionsEvents,
 } from '../../interfaces/BridgeDriver'
 import EntityBase from '../../../../base/EntityBase'
+import IndexedEventEmitter from '../../../../../../squidlet-lib/src/IndexedEventEmitter'
+import {WsServerInstance} from '../../../../drivers/WsServerDriver/WsServerDriver'
 
 
 interface WsServerBridgeProps {
@@ -12,24 +14,34 @@ interface WsServerBridgeProps {
 
 
 export class WsServerBridge extends EntityBase<WsServerBridgeProps> implements BridgeDriver {
-  getConnectionState(): BridgeConnectionState {
+  private events = new IndexedEventEmitter()
+  private connectionState: BridgeConnectionState = BridgeConnectionState.initial
+  private driver!: WsServerInstance
 
+
+  async init(): Promise<void> {
+    this.driver = this.context.getDriver('WsServerDriver')
+  }
+
+  async destroy(): Promise<void> {
+    this.events.destroy()
+  }
+
+
+  getConnectionState(): BridgeConnectionState {
+    return this.connectionState
   }
 
   sendMessage(channel: number, body: Uint8Array): Promise<void> {
-
+    // TODO: add
   }
 
-  onIncomeMessage(cb: IncomeMessageHandler): number {
-
+  on(eventName: ConnectionsEvents, cb: (...params: any[]) => void): number {
+    return this.events.addListener(eventName, cb)
   }
 
-  onConnectionState(cb: (state: BridgeConnectionState) => void): number {
-
-  }
-
-  removeListener(handlerIndex: number): void {
-
+  off(handlerIndex: number): void {
+    this.events.removeListener(handlerIndex)
   }
 
 }
