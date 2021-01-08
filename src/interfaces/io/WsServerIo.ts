@@ -66,7 +66,7 @@ export default interface WsServerIo extends IoBase {
   ): Promise<number>
   on(
     eventName: WsServerEvent.connectionClosed,
-    cb: (connectionId: string, code: number, reason: string, serverId: string) => void
+    cb: (connectionId: string, code: WsCloseStatus, reason: string, serverId: string) => void
   ): Promise<number>
   on(
     eventName: WsServerEvent.error,
