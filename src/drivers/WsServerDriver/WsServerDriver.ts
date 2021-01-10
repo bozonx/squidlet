@@ -1,6 +1,7 @@
 import EntityBase from '../../base/EntityBase'
 import WsServerIo from '../../interfaces/io/WsServerIo'
 import IndexedEventEmitter from '../../../../squidlet-lib/src/IndexedEventEmitter'
+import DriverFactoryBase from '../../base/DriverFactoryBase'
 
 
 export enum WS_SERVER_DRIVER_EVENTS {
@@ -39,5 +40,9 @@ export class WsServerInstance extends EntityBase {
   async sendMessage(connectionId: string, data: string | Uint8Array) {
     await this.wsServerIo.sendMessage(connectionId, data)
   }
+
+}
+
+export class WsServerDriver extends DriverFactoryBase {
 
 }

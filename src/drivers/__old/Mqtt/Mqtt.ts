@@ -1,5 +1,5 @@
 import DriverBase from '../../../base/DriverBase';
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import MqttIo from '../../../../../squidlet/__old/system/interfaces/io/MqttIo';
 import {omitObj} from '../squidlet-lib/src/objects';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';

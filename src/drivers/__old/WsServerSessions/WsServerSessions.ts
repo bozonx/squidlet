@@ -1,4 +1,4 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import DriverBase from '../../../base/DriverBase';
 import {ConnectionParams} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {WebSocketServerProps} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';

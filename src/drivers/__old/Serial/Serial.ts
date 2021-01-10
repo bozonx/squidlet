@@ -1,4 +1,4 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import DriverBase from '../../../base/DriverBase';
 import SerialIo from '../../../../../squidlet/__old/system/interfaces/io/SerialIo';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';

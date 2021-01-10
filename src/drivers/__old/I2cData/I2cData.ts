@@ -5,7 +5,7 @@ import {
   numToWord,
   hexStringToHexNum
 } from '../squidlet-lib/src/binaryHelpers';
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import DriverBase from '../../../base/DriverBase';
 
 

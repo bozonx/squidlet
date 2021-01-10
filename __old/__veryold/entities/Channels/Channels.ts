@@ -1,6 +1,6 @@
 import DriverBase from '../../../../src/base/DriverBase';
 import DuplexDriver from '../../../system/interfaces/DuplexDriver';
-import DriverFactoryBase from '../../../system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../../src/base/DriverFactoryBase';
 import {omitObj} from '../../../../../squidlet-lib/src/objects';
 import {addFirstItemUint8Arr} from '../../../../../squidlet-lib/src/binaryHelpers';
 

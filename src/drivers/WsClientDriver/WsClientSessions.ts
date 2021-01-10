@@ -1,5 +1,5 @@
 import WebSocketClientIo, {OnMessageHandler} from '../../../../../squidlet/__old/system/interfaces/io/WsClientIo';
-import DriverFactoryBase from '../../../__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../base/DriverFactoryBase';
 import DriverBase from '../../base/DriverBase';
 import WsClientLogic, {WsClientLogicProps} from './WsClientLogic';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';

@@ -2,7 +2,7 @@ import DigitalOutputIo from '../../../../../squidlet-networking/src/interfaces/_
 
 type Timeout = NodeJS.Timeout;
 import DriverBase from 'src/base/DriverBase';
-import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from 'src/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted} from '../squidlet-lib/src/digitalHelpers';
 import {resolveOutputResistorMode} from '../squidlet-lib/src/digitalHelpers';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';

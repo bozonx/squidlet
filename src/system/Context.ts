@@ -1,4 +1,4 @@
-import DriverFactoryBase from '../../__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../base/DriverFactoryBase';
 import LogPublisher from '../../__old/system/LogPublisher';
 import Sessions from '../../../squidlet-lib/src/Sessions';
 import State from '../../../squidlet-lib/src/State';

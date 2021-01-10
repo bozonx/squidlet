@@ -3,7 +3,7 @@
  * Handling a PCF8574/PCF8574A IC.
  */
 
-import DriverFactoryBase from '__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from 'src/base/DriverFactoryBase';
 import DriverBase from 'src/base/DriverBase';
 import {getBitFromByte, updateBitInByte} from '../squidlet-lib/src/binaryHelpers';
 import {PinDirection} from '__old/system/interfaces/gpioTypes';

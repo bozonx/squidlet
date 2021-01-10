@@ -1,4 +1,4 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import DriverBase from '../../../base/DriverBase';
 import ModBusMasterRtuIo from '../../../../../squidlet/__old/system/interfaces/io/ModBusMasterRtuIo';
 import {StatusHandler} from '../../../../../squidlet/__old/system/interfaces/Connection';
