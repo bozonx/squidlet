@@ -1,9 +1,9 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverManifest from '../../__old/system/interfaces/DriverManifest';
-import DriverBase from './DriverBase';
 import {validateProps, validateRequiredProps} from '../../__old/system/lib/validate';
 import {mergeDeepObjects} from '../../../squidlet-lib/src/objects';
 import Context from '../system/Context';
+import EntityBase from './EntityBase'
 
 
 /**
@@ -14,9 +14,9 @@ import Context from '../system/Context';
  * and never be saved.
  */
 export default abstract class DriverFactoryBase<
-  Instance extends DriverBase = DriverBase,
-  Props = {[index: string]: any}
-> extends DriverBase {
+  Instance extends EntityBase = EntityBase,
+  Props = any
+> extends EntityBase {
   // there instances are kept
   protected instances: {[index: string]: Instance} = {};
   // Specify your sub driver class. It's required.
