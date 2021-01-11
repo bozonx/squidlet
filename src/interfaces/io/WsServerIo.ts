@@ -2,6 +2,7 @@ import {IoBase} from '../IoBase'
 
 
 export const CONNECTION_ID_DELIMITER = '|'
+export const WS_SERVER_CONNECTION_TIMEOUT_SEC = 20
 
 // see https://github.com/Luka967/websocket-close-codes
 export enum WsCloseStatus {

@@ -1,5 +1,10 @@
 import EntityBase from '../../base/EntityBase'
-import WsServerIo, {WsCloseStatus, WsServerEvent, WsServerProps} from '../../interfaces/io/WsServerIo'
+import WsServerIo, {
+  WS_SERVER_CONNECTION_TIMEOUT_SEC,
+  WsCloseStatus, WsServerConnectionParams,
+  WsServerEvent,
+  WsServerProps,
+} from '../../interfaces/io/WsServerIo'
 import IndexedEventEmitter from '../../../../squidlet-lib/src/IndexedEventEmitter'
 import DriverFactoryBase from '../../base/DriverFactoryBase'
 
@@ -24,20 +29,21 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
     this.wsServerIo = this.context.getIo('WsServer')
     this.serverId = await this.wsServerIo.newServer(this.props)
 
-    this.wsServerIo.on(WsServerEvent.serverStarted, (serverId: string) => {
-      if (serverId !== this.serverId) return
-
-      // TODO: resolve INIT promise with timeout
-    })
+    await this.waitForServerStarted()
 
     this.wsServerIo.on(WsServerEvent.serverClosed, (serverId: string) => {
       if (serverId !== this.serverId) return
-      // TODO: what to do ????
+      // TODO: запустить дестрой инстанса????
     })
 
-    this.wsServerIo.on(WsServerEvent.newConnection, (serverId: string) => {
+    this.wsServerIo.on(WsServerEvent.newConnection, (
+      connectionId: string,
+      params: WsServerConnectionParams,
+      serverId: string
+    ) => {
       if (serverId !== this.serverId) return
-      // TODO: what to do ????
+
+      this.events.emit(WS_SERVER_DRIVER_EVENTS.newConnection, serverId)
     })
 
     this.wsServerIo.on(WsServerEvent.incomeMessage, (
@@ -91,14 +97,72 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
   }
 
 
-  $incomeEvent(eventName: WS_SERVER_DRIVER_EVENTS, ...params: any[]) {
-    this.events.emit(eventName, ...params)
-  }
-
   async sendMessage(connectionId: string, data: string | Uint8Array) {
     await this.wsServerIo.sendMessage(connectionId, data)
   }
 
+  async closeConnection(
+    connectionId: string,
+    code: WsCloseStatus,
+    reason: string
+  ): Promise<void> {
+    await this.wsServerIo.closeConnection(connectionId, code, reason)
+  }
+
+
+  private waitForServerStarted(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      (async () => {
+        let wasInited = false
+
+        const serverCloseHandlerIndex = await this.wsServerIo.on(
+          WsServerEvent.serverClosed,
+          (serverId: string) => {
+            if (serverId !== this.serverId) return
+
+            clearTimeout(timeout)
+            this.wsServerIo.off(serverCloseHandlerIndex)
+              .catch(this.log.error)
+            this.wsServerIo.off(serverStartedHandlerIndex)
+              .catch(this.log.error)
+
+            if (!wasInited) {
+              reject(
+                `Server "${this.serverId}" has been closed at start up time.`
+              )
+            }
+          }
+        )
+
+        const serverStartedHandlerIndex = await this.wsServerIo.on(
+          WsServerEvent.serverStarted,
+          (serverId: string) => {
+            if (serverId !== this.serverId) return
+
+            wasInited = true
+
+            clearTimeout(timeout)
+            this.wsServerIo.off(serverCloseHandlerIndex)
+              .catch(this.log.error)
+            this.wsServerIo.off(serverStartedHandlerIndex)
+              .catch(this.log.error)
+            resolve()
+          }
+        )
+
+        const timeout = setTimeout(() => {
+          reject(
+            `Timeout has been exceeded starting server "${this.serverId}"`
+          )
+
+          this.wsServerIo.off(serverCloseHandlerIndex)
+            .catch(this.log.error)
+          this.wsServerIo.off(serverStartedHandlerIndex)
+            .catch(this.log.error)
+        }, WS_SERVER_CONNECTION_TIMEOUT_SEC)
+      })()
+    })
+  }
 }
 
 export class WsServerDriver extends DriverFactoryBase {
