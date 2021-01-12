@@ -10,6 +10,8 @@ import WsServerIo, {
 import DriverFactoryBase from '../../base/DriverFactoryBase'
 
 
+const SERVER_EVENT_PREFIX = 's'
+
 export enum WS_SERVER_DRIVER_EVENTS {
   newConnection,
   connectionClosed,
@@ -26,63 +28,83 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
   private serverId!: string
 
 
+  $incomeEvent(eventName: WsServerEvent, ...params: any[]) {
+    this.events.emit(`${SERVER_EVENT_PREFIX}${eventName}`, ...params)
+  }
+
   async init(): Promise<void> {
     this.wsServerIo = this.context.getIo('WsServer')
     this.serverId = await this.wsServerIo.newServer(this.props)
 
     await this.waitForServerStarted()
 
-    this.wsServerIo.on(WsServerEvent.serverClosed, (serverId: string) => {
-      if (serverId !== this.serverId) return
-      // TODO: запустить дестрой инстанса????
-    })
+    // this.events.addListener(
+    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.serverClosed}`,
+    //   () => {
+    //     // TODO: запустить дестрой инстанса????
+    //   }
+    // )
 
-    this.wsServerIo.on(WsServerEvent.newConnection, (
-      connectionId: string,
-      params: WsServerConnectionParams,
-      serverId: string
-    ) => {
-      if (serverId !== this.serverId) return
+    this.events.addListener(
+      `${SERVER_EVENT_PREFIX}${WsServerEvent.newConnection}`,
+      (
+        connectionId: string,
+        params: WsServerConnectionParams,
+        serverId: string
+      ) => {
+        this.events.emit(
+          WS_SERVER_DRIVER_EVENTS.newConnection,
+          connectionId,
+          params,
+          serverId
+        )
+      }
+    )
 
-      this.events.emit(WS_SERVER_DRIVER_EVENTS.newConnection, connectionId, params)
-    })
+    this.events.addListener(
+      `${SERVER_EVENT_PREFIX}${WsServerEvent.incomeMessage}`,
+      (
+        connectionId: string,
+        data: string | Uint8Array,
+        serverId: string
+      ) => {
+        this.events.emit(
+          WS_SERVER_DRIVER_EVENTS.message,
+          connectionId,
+          data,
+          serverId
+        )
+      }
+    )
 
-    this.wsServerIo.on(WsServerEvent.incomeMessage, (
-      connectionId: string,
-      data: string | Uint8Array,
-      serverId: string
-    ) => {
-      if (serverId !== this.serverId) return
+    this.events.addListener(
+      `${SERVER_EVENT_PREFIX}${WsServerEvent.connectionClosed}`,
+      (
+        connectionId: string,
+        code: WsCloseStatus,
+        reason: string,
+        serverId: string
+      ) => {
+        this.events.emit(
+          WS_SERVER_DRIVER_EVENTS.connectionClosed,
+          connectionId,
+          code,
+          reason,
+          serverId
+        )
+      }
+    )
 
-      this.events.emit(WS_SERVER_DRIVER_EVENTS.message, connectionId, data, serverId)
-    })
-
-    this.wsServerIo.on(WsServerEvent.connectionClosed, (
-      connectionId: string,
-      code: WsCloseStatus,
-      reason: string,
-      serverId: string
-    ) => {
-      if (serverId !== this.serverId) return
-
-      this.events.emit(
-        WS_SERVER_DRIVER_EVENTS.connectionClosed,
-        connectionId,
-        code,
-        reason,
-        serverId
-      )
-    })
-
-    this.wsServerIo.on(WsServerEvent.error, (
-      err: string,
-      serverId: string,
-      connectionId?: string
-    ) => {
-      if (serverId !== this.serverId) return
-
-      this.log.error(`WsServerInstance: connection "${connectionId}" error: ${err}`)
-    })
+    this.events.addListener(
+      `${SERVER_EVENT_PREFIX}${WsServerEvent.error}`,
+      (
+        err: string,
+        serverId: string,
+        connectionId?: string
+      ) => {
+        this.log.error(`WsServerInstance: connection "${connectionId}" error: ${err}`)
+      }
+    )
   }
 
   async destroy(): Promise<void> {
@@ -113,55 +135,42 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
 
   private waitForServerStarted(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      (async () => {
-        let wasInited = false
+      let wasInited = false
 
-        const serverCloseHandlerIndex = await this.wsServerIo.on(
-          WsServerEvent.serverClosed,
-          (serverId: string) => {
-            if (serverId !== this.serverId) return
+      const serverCloseHandlerIndex = this.events.addListener(
+        `${SERVER_EVENT_PREFIX}${WsServerEvent.serverClosed}`,
+        () => {
+          clearTimeout(timeout)
+          this.events.removeListener(serverCloseHandlerIndex)
+          this.events.removeListener(serverStartedHandlerIndex)
 
-            clearTimeout(timeout)
-            this.wsServerIo.off(serverCloseHandlerIndex)
-              .catch(this.log.error)
-            this.wsServerIo.off(serverStartedHandlerIndex)
-              .catch(this.log.error)
-
-            if (!wasInited) {
-              reject(
-                `Server "${this.serverId}" has been closed at start up time.`
-              )
-            }
+          if (!wasInited) {
+            reject(
+              `Server "${this.serverId}" has been closed at start up time.`
+            )
           }
+        }
+      )
+
+      const serverStartedHandlerIndex = this.events.addListener(
+        `${SERVER_EVENT_PREFIX}${WsServerEvent.serverStarted}`,
+        () => {
+          wasInited = true
+
+          clearTimeout(timeout)
+          this.events.removeListener(serverCloseHandlerIndex)
+          this.events.removeListener(serverStartedHandlerIndex)
+          resolve()
+        }
+      )
+
+      const timeout = setTimeout(() => {
+        this.events.removeListener(serverCloseHandlerIndex)
+        this.events.removeListener(serverStartedHandlerIndex)
+        reject(
+          `Timeout has been exceeded starting server "${this.serverId}"`
         )
-
-        const serverStartedHandlerIndex = await this.wsServerIo.on(
-          WsServerEvent.serverStarted,
-          (serverId: string) => {
-            if (serverId !== this.serverId) return
-
-            wasInited = true
-
-            clearTimeout(timeout)
-            this.wsServerIo.off(serverCloseHandlerIndex)
-              .catch(this.log.error)
-            this.wsServerIo.off(serverStartedHandlerIndex)
-              .catch(this.log.error)
-            resolve()
-          }
-        )
-
-        const timeout = setTimeout(() => {
-          reject(
-            `Timeout has been exceeded starting server "${this.serverId}"`
-          )
-
-          this.wsServerIo.off(serverCloseHandlerIndex)
-            .catch(this.log.error)
-          this.wsServerIo.off(serverStartedHandlerIndex)
-            .catch(this.log.error)
-        }, WS_SERVER_CONNECTION_TIMEOUT_SEC)
-      })()
+      }, WS_SERVER_CONNECTION_TIMEOUT_SEC)
     })
   }
 }
