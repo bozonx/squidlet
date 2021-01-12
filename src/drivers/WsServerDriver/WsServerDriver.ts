@@ -1,3 +1,5 @@
+import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
+
 import EntityBase from '../../base/EntityBase'
 import WsServerIo, {
   WS_SERVER_CONNECTION_TIMEOUT_SEC,
@@ -5,7 +7,6 @@ import WsServerIo, {
   WsServerEvent,
   WsServerProps,
 } from '../../interfaces/io/WsServerIo'
-import IndexedEventEmitter from '../../../../squidlet-lib/src/IndexedEventEmitter'
 import DriverFactoryBase from '../../base/DriverFactoryBase'
 
 
@@ -43,7 +44,7 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
     ) => {
       if (serverId !== this.serverId) return
 
-      this.events.emit(WS_SERVER_DRIVER_EVENTS.newConnection, serverId)
+      this.events.emit(WS_SERVER_DRIVER_EVENTS.newConnection, connectionId, params)
     })
 
     this.wsServerIo.on(WsServerEvent.incomeMessage, (
