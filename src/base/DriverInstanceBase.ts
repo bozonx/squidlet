@@ -1,26 +1,29 @@
-import EntityDefinition from '../interfaces/EntityDefinition';
-import ManifestBase from '../interfaces/ManifestBase';
 import Context from '../system/Context';
 import LogPublisher from '../../__old/system/LogPublisher';
 import HostConfig from '../../__old/system/interfaces/HostConfig';
-import {EntityType} from '../interfaces/EntityTypes';
+import DriverFactoryBase from './DriverFactoryBase'
 
 
-// TODO: может просто расширить контекст
+export interface DriverInstanceParams<Props> {
+  instanceId: string | number
+  // instance props
+  props: Props
+  // base driver instance
+  driver: DriverFactoryBase
+  [index: string]: any
+}
 
-export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
+
+export default abstract class DriverInstanceBase<Props = Record<string, any>> {
   //abstract readonly entityType: EntityType
   readonly context: Context
-  readonly definition: EntityDefinition
+  readonly params: DriverInstanceParams<Props>
 
-  get id(): string {
-    return this.definition.id
-  }
-  get className(): string {
-    return this.definition.className
+  get instanceId(): string | number {
+    return this.params.instanceId
   }
   get props(): Props {
-    return this.definition.props as Props
+    return this.params.props
   }
 
   protected get log(): LogPublisher {
@@ -34,9 +37,9 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
   protected validateProps?: (props: Props) => string | undefined;
 
 
-  constructor(context: Context, definition: EntityDefinition) {
+  constructor(context: Context, params: DriverInstanceParams<Props>) {
     this.context = context
-    this.definition = definition
+    this.params = params
 
     this.doPropsValidation()
 
@@ -44,25 +47,19 @@ export default abstract class EntityBase<Props = {}, ManifestType extends Manife
     if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit.bind(this))
     if (this.appDidInit) this.context.onAppInit(this.appDidInit.bind(this))
   }
-  // define this method and it will be called on system init
-  init?(): Promise<void>
+  // it has to return the instanceId
+  abstract init(): Promise<string>
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
-  destroy?(): Promise<void>
+  destroy = async () => {
+    this.params.driver.destroyInstance(this.params.instanceId)
+  }
 
   // it will be called after all the entities of entityType have been inited
   protected driversDidInit?(): Promise<void>
   protected servicesDidInit?(): Promise<void>
   // it will be risen after app init or immediately if app was inited
   protected appDidInit?(): Promise<void>
-
-  // TODO: review
-  /**
-   * Load manifest of this entity
-   */
-  protected async getManifest(): Promise<ManifestType> {
-    return this.context.system.envSet.loadManifest<ManifestType>(this.definition.entityType, this.className)
-  }
 
   /**
    * Print errors to console of async functions

@@ -18,18 +18,18 @@ export default abstract class DriverFactoryBase<
   Props = any
 > extends EntityBase {
   // there instances are kept
-  protected instances: {[index: string]: Instance} = {};
+  protected instances: Record<string, Instance> = {}
   // Specify your sub driver class. It's required.
-  protected abstract SubDriverClass: new (context: Context, definition: EntityDefinition) => Instance;
+  protected abstract SubDriverClass: new (context: Context, definition: EntityDefinition) => Instance
   // Specify it to calculate an id of the new instance of sub driver
-  protected instanceId?: (props: Props) => string;
+  //protected instanceId?: (props: Props) => string;
 
 
   destroy = async () => {
     for (let name of Object.keys(this.instances)) {
-      const instance: Instance = this.instances[name];
+      const instance = this.instances[name]
 
-      if (instance.destroy) await instance.destroy();
+      if (instance.destroy) await instance.destroy()
     }
   }
 
@@ -38,9 +38,9 @@ export default abstract class DriverFactoryBase<
    * Get existent or create a new sub driver instance.
    * It subDriver has an id you shouldn't destroy the subDriver.
    */
-  async subDriver(instanceProps: {[index: string]: any} = {}): Promise<Instance> {
+  async subDriver(instanceProps: Record<string, any> = {}): Promise<Instance> {
     // combined instance and definition props
-    const props = mergeDeepObjects(instanceProps, this.definition.props) as Props;
+    const props = mergeDeepObjects(instanceProps, this.definition.props) as Props
 
     await this.validateInstanceProps(instanceProps, props);
 
@@ -59,6 +59,10 @@ export default abstract class DriverFactoryBase<
     this.instances[instanceId] = await this.makeInstance(props);
     // return just created instance
     return this.instances[instanceId];
+  }
+
+  destroyInstance(instanceId: string | number) {
+    // TODO: add
   }
 
 

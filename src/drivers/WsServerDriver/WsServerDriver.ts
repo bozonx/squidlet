@@ -8,6 +8,7 @@ import WsServerIo, {
   WsServerProps,
 } from '../../interfaces/io/WsServerIo'
 import DriverFactoryBase from '../../base/DriverFactoryBase'
+import DriverInstanceBase from '../../base/DriverInstanceBase'
 
 
 const SERVER_EVENT_PREFIX = 's'
@@ -22,7 +23,7 @@ interface WsServerDriverProps extends WsServerProps {
 }
 
 
-export class WsServerInstance extends EntityBase<WsServerDriverProps> {
+export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps> {
   private events = new IndexedEventEmitter()
   private wsServerIo!: WsServerIo
   private serverId!: string
@@ -33,6 +34,7 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
   }
 
   async init(): Promise<void> {
+    // TODO: получить от базового драйвера
     this.wsServerIo = this.context.getIo('WsServer')
     this.serverId = await this.wsServerIo.newServer(this.props)
 
@@ -95,16 +97,6 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
       }
     )
 
-    this.events.addListener(
-      `${SERVER_EVENT_PREFIX}${WsServerEvent.error}`,
-      (
-        err: string,
-        serverId: string,
-        connectionId?: string
-      ) => {
-        this.log.error(`WsServerInstance: connection "${connectionId}" error: ${err}`)
-      }
-    )
   }
 
   async destroy(): Promise<void> {
@@ -177,7 +169,88 @@ export class WsServerInstance extends EntityBase<WsServerDriverProps> {
 
 export class WsServerDriver extends DriverFactoryBase {
   protected SubDriverClass = WsServerInstance
-  protected instanceId = (props: WsServerDriverProps): string => {
-    return `${props.host}:${props.port}`
+  // protected instanceId = (props: WsServerDriverProps): string => {
+  //   return `${props.host}:${props.port}`
+  // }
+
+  private wsServerIo!: WsServerIo
+
+  // TODO: при дестрое наверное отписываться от все собитый
+  // TODO: нужно при создании инстанса передавать туда io
+
+  async init() {
+    this.wsServerIo = this.context.getIo('WsServer')
+
+    this.wsServerIo.on(
+      `${SERVER_EVENT_PREFIX}${WsServerEvent.error}`,
+      (
+        err: string,
+        serverId: string,
+        connectionId?: string
+      ) => {
+        // TODO: может быть лдя серверва не только для соединения
+        this.log.error(`WsServerInstance: connection "${connectionId}" error: ${err}`)
+      }
+    )
+
+
+    // this.events.addListener(
+    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.serverClosed}`,
+    //   () => {
+    //     // TODO: запустить дестрой инстанса????
+    //   }
+    // )
+
+    this.wsServerIo.on(
+      WsServerEvent.newConnection,
+      (
+        connectionId: string,
+        params: WsServerConnectionParams,
+        serverId: string
+      ) => {
+        this.events.emit(
+          WS_SERVER_DRIVER_EVENTS.newConnection,
+          connectionId,
+          params,
+          serverId
+        )
+      }
+    )
+
+    this.wsServerIo.on(
+      WsServerEvent.incomeMessage,
+      (
+        connectionId: string,
+        data: string | Uint8Array,
+        serverId: string
+      ) => {
+        this.events.emit(
+          WS_SERVER_DRIVER_EVENTS.message,
+          connectionId,
+          data,
+          serverId
+        )
+      }
+    )
+
+    this.wsServerIo.on(
+      WsServerEvent.connectionClosed,
+      (
+        connectionId: string,
+        code: WsCloseStatus,
+        reason: string,
+        serverId: string
+      ) => {
+        this.events.emit(
+          WS_SERVER_DRIVER_EVENTS.connectionClosed,
+          connectionId,
+          code,
+          reason,
+          serverId
+        )
+      }
+    )
+
   }
+
 }
