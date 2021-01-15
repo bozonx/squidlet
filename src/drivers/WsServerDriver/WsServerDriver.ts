@@ -167,11 +167,11 @@ export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps> {
   }
 }
 
-export class WsServerDriver extends DriverFactoryBase {
+export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
   protected SubDriverClass = WsServerInstance
-  // protected instanceId = (props: WsServerDriverProps): string => {
-  //   return `${props.host}:${props.port}`
-  // }
+  protected makeInstanceId = (props: WsServerDriverProps): string => {
+    return `${props.host}:${props.port}`
+  }
 
   private wsServerIo!: WsServerIo
 

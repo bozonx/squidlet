@@ -9,7 +9,7 @@ export interface DriverInstanceParams<Props> {
   // instance props
   props: Props
   // base driver instance
-  driver: DriverFactoryBase
+  driver: DriverFactoryBase<Props>
   [index: string]: any
 }
 
@@ -47,8 +47,8 @@ export default abstract class DriverInstanceBase<Props = Record<string, any>> {
     if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit.bind(this))
     if (this.appDidInit) this.context.onAppInit(this.appDidInit.bind(this))
   }
-  // it has to return the instanceId
-  abstract init(): Promise<string>
+
+  init?(): Promise<void>
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
   destroy = async () => {

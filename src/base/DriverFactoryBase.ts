@@ -18,20 +18,21 @@ export default abstract class DriverFactoryBase<
   Props = Record<string, any>
 > extends EntityBase {
   // there instances are kept
-  protected instances: Record<string, Instance> = {}
+  protected instances: Record<string, DriverInstanceBase<Props>> = {}
   // Specify your sub driver class. It's required.
   protected abstract SubDriverClass: new (
     context: Context,
     params: DriverInstanceParams<Props>
   ) => DriverInstanceBase<Props>
   // Specify it to calculate an id of the new instance of sub driver
-  //protected instanceId?: (props: Props) => string;
+  protected makeInstanceId: (props: Props) => string
 
 
   destroy = async () => {
     for (let name of Object.keys(this.instances)) {
       const instance = this.instances[name]
 
+      // TODO: review - use doDestory
       if (instance.destroy) await instance.destroy()
     }
   }
@@ -47,40 +48,30 @@ export default abstract class DriverFactoryBase<
     // combined instance and definition props
     const props = mergeDeepObjects(instanceProps, this.definition.props) as Props
 
-    await this.validateInstanceProps(instanceProps, props);
+    await this.validateInstanceProps(instanceProps, props)
 
-    // // just create a new instance and don't save it
-    // if (!this.instanceId) return this.makeInstance(props);
-    //
-    // const instanceId: string | undefined = this.instanceId(props);
-    //
-    // if (typeof instanceId !== 'string') throw new Error(`instanceId() method has to return a string`);
-    //
-    // // else in case if specified any id includes the same id each time
-    // // return previously instantiated instance if it is
-    // if (this.instances[instanceId]) return this.instances[instanceId];
-    //
-    // // create and save instance
-    // this.instances[instanceId] = await this.makeInstance(props);
-    // // return just created instance
-    // return this.instances[instanceId];
+    const instanceId = this.makeInstanceId(props)
+    // return previously instantiated instance if it exists
+    if (this.instances[instanceId]) return this.instances[instanceId]
+
+    const instanceParams: DriverInstanceParams<Props> = {
+      instanceId,
+      props,
+      driver: this,
+    }
+
+    this.instances[instanceId] = new this.SubDriverClass(this.context, instanceParams)
+
+    if (this.instances[instanceId].init) await this.instances[instanceId].init()
+
+    // return just created instance
+    return this.instances[instanceId]
   }
 
   destroyInstance(instanceId: string | number) {
     // TODO: add
   }
 
-
-  protected async makeInstance(
-    instanceParams: DriverInstanceParams<Props>
-  ): Promise<DriverInstanceBase<Props>> {
-    const instance = new this.SubDriverClass(this.context, instanceParams);
-
-    // init it right now
-    if (instance.init) await instance.init();
-
-    return instance;
-  }
 
   private async validateInstanceProps(
     instanceProps: {[index: string]: any},
