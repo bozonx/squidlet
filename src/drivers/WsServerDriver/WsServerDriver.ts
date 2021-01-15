@@ -1,6 +1,5 @@
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 
-import EntityBase from '../../base/EntityBase'
 import WsServerIo, {
   WS_SERVER_CONNECTION_TIMEOUT_SEC,
   WsCloseStatus, WsServerConnectionParams,
@@ -33,7 +32,7 @@ export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps> {
     this.events.emit(`${SERVER_EVENT_PREFIX}${eventName}`, ...params)
   }
 
-  async init(): Promise<void> {
+  async init(): Promise<string> {
     // TODO: получить от базового драйвера
     this.wsServerIo = this.context.getIo('WsServer')
     this.serverId = await this.wsServerIo.newServer(this.props)
@@ -97,6 +96,7 @@ export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps> {
       }
     )
 
+    return this.serverId
   }
 
   async destroy(): Promise<void> {

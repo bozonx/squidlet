@@ -4,6 +4,7 @@ import {validateProps, validateRequiredProps} from '../../__old/system/lib/valid
 import {mergeDeepObjects} from '../../../squidlet-lib/src/objects';
 import Context from '../system/Context';
 import EntityBase from './EntityBase'
+import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase'
 
 
 /**
@@ -14,13 +15,15 @@ import EntityBase from './EntityBase'
  * and never be saved.
  */
 export default abstract class DriverFactoryBase<
-  Instance extends EntityBase = EntityBase,
-  Props = any
+  Props = Record<string, any>
 > extends EntityBase {
   // there instances are kept
   protected instances: Record<string, Instance> = {}
   // Specify your sub driver class. It's required.
-  protected abstract SubDriverClass: new (context: Context, definition: EntityDefinition) => Instance
+  protected abstract SubDriverClass: new (
+    context: Context,
+    params: DriverInstanceParams<Props>
+  ) => DriverInstanceBase<Props>
   // Specify it to calculate an id of the new instance of sub driver
   //protected instanceId?: (props: Props) => string;
 
@@ -38,27 +41,29 @@ export default abstract class DriverFactoryBase<
    * Get existent or create a new sub driver instance.
    * It subDriver has an id you shouldn't destroy the subDriver.
    */
-  async subDriver(instanceProps: Record<string, any> = {}): Promise<Instance> {
+  async subDriver(
+    instanceProps: Record<string, any> = {}
+  ): Promise<DriverInstanceBase<Props>> {
     // combined instance and definition props
     const props = mergeDeepObjects(instanceProps, this.definition.props) as Props
 
     await this.validateInstanceProps(instanceProps, props);
 
-    // just create a new instance and don't save it
-    if (!this.instanceId) return this.makeInstance(props);
-
-    const instanceId: string | undefined = this.instanceId(props);
-
-    if (typeof instanceId !== 'string') throw new Error(`instanceId() method has to return a string`);
-
-    // else in case if specified any id includes the same id each time
-    // return previously instantiated instance if it is
-    if (this.instances[instanceId]) return this.instances[instanceId];
-
-    // create and save instance
-    this.instances[instanceId] = await this.makeInstance(props);
-    // return just created instance
-    return this.instances[instanceId];
+    // // just create a new instance and don't save it
+    // if (!this.instanceId) return this.makeInstance(props);
+    //
+    // const instanceId: string | undefined = this.instanceId(props);
+    //
+    // if (typeof instanceId !== 'string') throw new Error(`instanceId() method has to return a string`);
+    //
+    // // else in case if specified any id includes the same id each time
+    // // return previously instantiated instance if it is
+    // if (this.instances[instanceId]) return this.instances[instanceId];
+    //
+    // // create and save instance
+    // this.instances[instanceId] = await this.makeInstance(props);
+    // // return just created instance
+    // return this.instances[instanceId];
   }
 
   destroyInstance(instanceId: string | number) {
@@ -66,14 +71,10 @@ export default abstract class DriverFactoryBase<
   }
 
 
-  private async makeInstance(props: Props): Promise<Instance> {
-    // make a definition where preps are merged props of definition's and instance's
-    const definition = {
-      ...this.definition,
-      props,
-    };
-
-    const instance: Instance = new this.SubDriverClass(this.context, definition);
+  protected async makeInstance(
+    instanceParams: DriverInstanceParams<Props>
+  ): Promise<DriverInstanceBase<Props>> {
+    const instance = new this.SubDriverClass(this.context, instanceParams);
 
     // init it right now
     if (instance.init) await instance.init();
