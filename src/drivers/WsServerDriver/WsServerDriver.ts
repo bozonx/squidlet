@@ -43,13 +43,6 @@ export class WsServerInstance
 
     await this.waitForServerStarted()
 
-    // this.events.addListener(
-    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.serverClosed}`,
-    //   () => {
-    //     // TODO: запустить дестрой инстанса????
-    //   }
-    // )
-
     this.events.addListener(
       `${SERVER_EVENT_PREFIX}${WsServerEvent.newConnection}`,
       (
@@ -185,75 +178,33 @@ export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
     this.wsServerIo = this.context.getIo('WsServer')
 
     this.wsServerIo.on(
-      `${SERVER_EVENT_PREFIX}${WsServerEvent.error}`,
-      (
-        err: string,
-        serverId: string,
-        connectionId?: string
-      ) => {
-        // TODO: может быть лдя серверва не только для соединения
-        this.log.error(`WsServerInstance: connection "${connectionId}" error: ${err}`)
+      WsServerEvent.error,
+      (err: string, serverId: string, connectionId?: string) => {
+        this.log.error(err)
       }
     )
 
+    this.wsServerIo.on(WsServerEvent.serverClosed,(...params: any[]) => {
+      // TODO: запустить дестрой инстанса
+      this.destroyInstance(instanceId)
+    })
 
-    // this.events.addListener(
-    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.serverClosed}`,
-    //   () => {
-    //     // TODO: запустить дестрой инстанса????
-    //   }
-    // )
+    this.wsServerIo.on(WsServerEvent.newConnection,(...params: any[]) => {
+      this.passEventToInstance(WsServerEvent.newConnection, ...params)
+    })
 
-    this.wsServerIo.on(
-      WsServerEvent.newConnection,
-      (
-        connectionId: string,
-        params: WsServerConnectionParams,
-        serverId: string
-      ) => {
-        this.events.emit(
-          WS_SERVER_DRIVER_EVENTS.newConnection,
-          connectionId,
-          params,
-          serverId
-        )
-      }
-    )
+    this.wsServerIo.on(WsServerEvent.incomeMessage,(...params: any[]) => {
+      this.passEventToInstance(WsServerEvent.incomeMessage, ...params)
+    })
 
-    this.wsServerIo.on(
-      WsServerEvent.incomeMessage,
-      (
-        connectionId: string,
-        data: string | Uint8Array,
-        serverId: string
-      ) => {
-        this.events.emit(
-          WS_SERVER_DRIVER_EVENTS.message,
-          connectionId,
-          data,
-          serverId
-        )
-      }
-    )
+    this.wsServerIo.on(WsServerEvent.connectionClosed,(...params: any[]) => {
+      this.passEventToInstance(WsServerEvent.connectionClosed, ...params)
+    })
+  }
 
-    this.wsServerIo.on(
-      WsServerEvent.connectionClosed,
-      (
-        connectionId: string,
-        code: WsCloseStatus,
-        reason: string,
-        serverId: string
-      ) => {
-        this.events.emit(
-          WS_SERVER_DRIVER_EVENTS.connectionClosed,
-          connectionId,
-          code,
-          reason,
-          serverId
-        )
-      }
-    )
 
+  private passEventToInstance(eventName: WsServerEvent, ...params: any[]) {
+    // TODO: add
   }
 
 }

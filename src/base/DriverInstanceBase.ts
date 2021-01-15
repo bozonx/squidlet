@@ -57,7 +57,7 @@ export default abstract class DriverInstanceBase<
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
   destroy = async () => {
-    this.params.driver.destroyInstance(this.params.instanceId)
+    await this.params.driver.destroyInstance(this.params.instanceId)
   }
 
   // it will be called after all the entities of entityType have been inited

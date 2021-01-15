@@ -7,6 +7,9 @@ import EntityBase from './EntityBase'
 import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase'
 
 
+let defaultInstanceIdCounter = 0
+
+
 /**
  * This factory creates instances of sub drivers and keeps them in the memory.
  * After the next request of instance it returns previously created one.
@@ -27,10 +30,8 @@ export default abstract class DriverFactoryBase<
 
 
   destroy = async () => {
-    for (let name of Object.keys(this.instances)) {
-      const instance = this.instances[name]
-
-      if (instance.$doDestroy) await instance.$doDestroy()
+    for (const instanceId of Object.keys(this.instances)) {
+      await this.destroyInstance(instanceId)
     }
   }
 
@@ -67,13 +68,17 @@ export default abstract class DriverFactoryBase<
     return this.instances[instanceId]
   }
 
-  destroyInstance(instanceId: string) {
-    // TODO: add
+  async destroyInstance(instanceId: string) {
+    const instance = this.instances[instanceId]
+
+    if (instance.$doDestroy) await instance.$doDestroy()
+
+    delete this.instances[instanceId]
   }
 
   // Specify it to calculate an id of the new instance of sub driver
   protected makeInstanceId(props: Props): string {
-    return
+    return String(defaultInstanceIdCounter++)
   }
 
 
