@@ -1,7 +1,7 @@
 import Context from '../system/Context'
+import DriverFactoryBase from './DriverFactoryBase'
 import LogPublisher from '../../__old/system/LogPublisher'
 import HostConfig from '../../__old/system/interfaces/HostConfig'
-import DriverFactoryBase from './DriverFactoryBase'
 
 
 export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> {

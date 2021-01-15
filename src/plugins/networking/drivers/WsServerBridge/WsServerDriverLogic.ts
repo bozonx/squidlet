@@ -1,4 +1,4 @@
-import WsServerIo, {WsServerProps} from '../../interfaces/io/WsServerIo'
+import WsServerIo, {WsServerProps} from '../../../../interfaces/io/WsServerIo'
 import Logger from '../squidlet-lib/src/interfaces/Logger'
 import Promised from '../squidlet-lib/src/Promised'
 
