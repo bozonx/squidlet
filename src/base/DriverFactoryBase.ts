@@ -1,4 +1,3 @@
-import EntityDefinition from '../interfaces/EntityDefinition';
 import DriverManifest from '../../__old/system/interfaces/DriverManifest';
 import {validateProps, validateRequiredProps} from '../../__old/system/lib/validate';
 import {mergeDeepObjects} from '../../../squidlet-lib/src/objects';
@@ -24,8 +23,6 @@ export default abstract class DriverFactoryBase<
     context: Context,
     params: DriverInstanceParams<Props>
   ) => DriverInstanceBase<Props>
-  // Specify it to calculate an id of the new instance of sub driver
-  protected makeInstanceId: (props: Props) => string
 
 
   destroy = async () => {
@@ -60,9 +57,11 @@ export default abstract class DriverFactoryBase<
       driver: this,
     }
 
-    this.instances[instanceId] = new this.SubDriverClass(this.context, instanceParams)
+    const instance = new this.SubDriverClass(this.context, instanceParams)
 
-    if (this.instances[instanceId].init) await this.instances[instanceId].init()
+    this.instances[instanceId] = instance
+
+    if (instance.init) await instance.init()
 
     // return just created instance
     return this.instances[instanceId]
@@ -70,6 +69,11 @@ export default abstract class DriverFactoryBase<
 
   destroyInstance(instanceId: string | number) {
     // TODO: add
+  }
+
+  // Specify it to calculate an id of the new instance of sub driver
+  protected makeInstanceId(props: Props): string {
+
   }
 
 

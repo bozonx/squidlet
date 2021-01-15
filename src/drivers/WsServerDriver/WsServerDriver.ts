@@ -22,9 +22,13 @@ interface WsServerDriverProps extends WsServerProps {
 }
 
 
-export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps> {
+export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps, WsServerDriver> {
   private events = new IndexedEventEmitter()
-  private wsServerIo!: WsServerIo
+
+  private get wsServerIo(): WsServerIo {
+    return this.params.driver.wsServerIo
+  }
+
   private serverId!: string
 
 
@@ -34,7 +38,7 @@ export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps> {
 
   async init(): Promise<string> {
     // TODO: получить от базового драйвера
-    this.wsServerIo = this.context.getIo('WsServer')
+    //this.wsServerIo = this.context.getIo('WsServer')
     this.serverId = await this.wsServerIo.newServer(this.props)
 
     await this.waitForServerStarted()
@@ -173,7 +177,7 @@ export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
     return `${props.host}:${props.port}`
   }
 
-  private wsServerIo!: WsServerIo
+  wsServerIo!: WsServerIo
 
   // TODO: при дестрое наверное отписываться от все собитый
   // TODO: нужно при создании инстанса передавать туда io

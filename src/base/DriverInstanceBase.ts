@@ -4,20 +4,23 @@ import HostConfig from '../../__old/system/interfaces/HostConfig';
 import DriverFactoryBase from './DriverFactoryBase'
 
 
-export interface DriverInstanceParams<Props> {
+export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> {
   instanceId: string | number
   // instance props
   props: Props
   // base driver instance
-  driver: DriverFactoryBase<Props>
+  driver: Driver
   [index: string]: any
 }
 
 
-export default abstract class DriverInstanceBase<Props = Record<string, any>> {
+export default abstract class DriverInstanceBase<
+  Props = Record<string, any>,
+  Driver = DriverFactoryBase<Props>
+> {
   //abstract readonly entityType: EntityType
   readonly context: Context
-  readonly params: DriverInstanceParams<Props>
+  readonly params: DriverInstanceParams<Props, Driver>
 
   get instanceId(): string | number {
     return this.params.instanceId
@@ -48,7 +51,7 @@ export default abstract class DriverInstanceBase<Props = Record<string, any>> {
     if (this.appDidInit) this.context.onAppInit(this.appDidInit.bind(this))
   }
 
-  init?(): Promise<void>
+  abstract init?(): Promise<void>
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
   destroy = async () => {
