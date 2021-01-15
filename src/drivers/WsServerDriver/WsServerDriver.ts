@@ -136,30 +136,30 @@ export class WsServerDriver
   async init() {
     this.wsServerIo = this.context.getIo('WsServer')
 
-    this.wsServerIo.on(
+    await this.wsServerIo.on(
       WsServerEvent.error,
       (err: string, serverId: string, connectionId?: string) => {
         this.log.error(err)
       }
     )
 
-    this.wsServerIo.on(WsServerEvent.serverStarted,(serverId: string) => {
+    await this.wsServerIo.on(WsServerEvent.serverStarted,(serverId: string) => {
       this.passEventToInstance(WsServerEvent.serverStarted, serverId)
     })
 
-    this.wsServerIo.on(WsServerEvent.serverClosed,(serverId: string) => {
+    await this.wsServerIo.on(WsServerEvent.serverClosed,(serverId: string) => {
       this.passEventToInstance(WsServerEvent.serverClosed, serverId)
     })
 
-    this.wsServerIo.on(WsServerEvent.newConnection,(...params: any[]) => {
+    await this.wsServerIo.on(WsServerEvent.newConnection,(...params: any[]) => {
       this.passEventToInstance(WsServerEvent.newConnection, ...params)
     })
 
-    this.wsServerIo.on(WsServerEvent.incomeMessage,(...params: any[]) => {
+    await this.wsServerIo.on(WsServerEvent.incomeMessage,(...params: any[]) => {
       this.passEventToInstance(WsServerEvent.incomeMessage, ...params)
     })
 
-    this.wsServerIo.on(WsServerEvent.connectionClosed,(...params: any[]) => {
+    await this.wsServerIo.on(WsServerEvent.connectionClosed,(...params: any[]) => {
       this.passEventToInstance(WsServerEvent.connectionClosed, ...params)
     })
   }
