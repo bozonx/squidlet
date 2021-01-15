@@ -26,13 +26,13 @@ interface WsServerDriverProps extends WsServerProps {
 export class WsServerInstance
   extends DriverInstanceBase<WsServerDriverProps, WsServerDriver>
 {
+  serverId!: string
+
   private events = new IndexedEventEmitter()
 
   private get wsServerIo(): WsServerIo {
     return this.params.driver.wsServerIo
   }
-
-  private serverId!: string
 
 
   $incomeEvent(eventName: WsServerEvent, ...params: any[]) {
@@ -175,7 +175,6 @@ export class WsServerDriver
 
   wsServerIo!: WsServerIo
 
-  // TODO: при дестрое наверное отписываться от все собитый
 
   async init() {
     this.wsServerIo = this.context.getIo('WsServer')
@@ -227,7 +226,13 @@ export class WsServerDriver
   }
 
   private resolveInstanceIdByServerId(serverId: string): string | undefined {
-    // TODO: add
+    for (const instanceId of Object.keys(this.instances)) {
+      if (this.instances[instanceId].serverId === serverId) {
+        return this.instances[instanceId].instanceId
+      }
+    }
+
+    return
   }
 
 }
