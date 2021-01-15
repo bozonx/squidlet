@@ -18,15 +18,16 @@ let defaultInstanceIdCounter = 0
  * and never be saved.
  */
 export default abstract class DriverFactoryBase<
-  Props = Record<string, any>
+  Props = Record<string, any>,
+  Instance = DriverInstanceBase<Props>
 > extends EntityBase {
   // there instances are kept
-  protected instances: Record<string, DriverInstanceBase<Props>> = {}
+  protected instances: Record<string, Instance> = {}
   // Specify your sub driver class. It's required.
   protected abstract SubDriverClass: new (
     context: Context,
     params: DriverInstanceParams<Props>
-  ) => DriverInstanceBase<Props>
+  ) => Instance
 
   private instanceUses: Record<string, number> = {}
 
@@ -44,7 +45,7 @@ export default abstract class DriverFactoryBase<
    */
   async subDriver(
     instanceProps: Record<string, any> = {}
-  ): Promise<DriverInstanceBase<Props>> {
+  ): Promise<Instance> {
     // combined instance and definition props
     const props = mergeDeepObjects(instanceProps, this.definition.props) as Props
 

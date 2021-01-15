@@ -1,4 +1,5 @@
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
+import {lastItem} from 'squidlet-lib/src/arrays'
 
 import WsServerIo, {
   WS_SERVER_CONNECTION_TIMEOUT_SEC,
@@ -164,7 +165,9 @@ export class WsServerInstance
   }
 }
 
-export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
+export class WsServerDriver
+  extends DriverFactoryBase<WsServerDriverProps, WsServerInstance>
+{
   protected SubDriverClass = WsServerInstance
   protected makeInstanceId = (props: WsServerDriverProps): string => {
     return `${props.host}:${props.port}`
@@ -184,8 +187,15 @@ export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
       }
     )
 
-    this.wsServerIo.on(WsServerEvent.serverClosed,(...params: any[]) => {
-      // TODO: запустить дестрой инстанса насильно
+    this.wsServerIo.on(WsServerEvent.serverClosed,(serverId: string) => {
+      const instanceId = this.resolveInstanceIdByServerId(serverId)
+
+      if (!instanceId) {
+        this.log.error(`Can't find instance of server "${serverId}"`)
+
+        return
+      }
+
       this.destroyInstance(instanceId, true)
     })
 
@@ -204,6 +214,19 @@ export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
 
 
   private passEventToInstance(eventName: WsServerEvent, ...params: any[]) {
+    const serverId = lastItem(params)
+    const instanceId = this.resolveInstanceIdByServerId(serverId)
+
+    if (!instanceId) {
+      this.log.error(`Can't find instance of server "${serverId}"`)
+
+      return
+    }
+
+    this.instances[instanceId].$incomeEvent(eventName, ...params)
+  }
+
+  private resolveInstanceIdByServerId(serverId: string): string | undefined {
     // TODO: add
   }
 
