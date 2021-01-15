@@ -6,7 +6,7 @@ import ConfigManager from '../hostConfig/ConfigManager';
 import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import ManifestBase from '../../../src/interfaces/ManifestBase';
+import EntityManifest from '../../../src/interfaces/EntityManifest';
 import PropElement from '../../../src/interfaces/PropElement';
 import validateRules from '../hostConfig/validateRules';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
@@ -150,7 +150,7 @@ export default class UsedEntities {
   }
 
   private async makeEntitySet(preManifest: PreManifestBase): Promise<HostEntitySet> {
-    const finalManifest: ManifestBase = await this.finalizeManifest(preManifest);
+    const finalManifest: EntityManifest = await this.finalizeManifest(preManifest);
 
     return {
       srcDir: preManifest.baseDir,
@@ -160,7 +160,7 @@ export default class UsedEntities {
     };
   }
 
-  private async finalizeManifest(preManifest: PreManifestBase): Promise<ManifestBase> {
+  private async finalizeManifest(preManifest: PreManifestBase): Promise<EntityManifest> {
     const finalManifest = omitObj(
       preManifest,
       'files',
@@ -170,7 +170,7 @@ export default class UsedEntities {
       'drivers',
       'ios',
       'props'
-    ) as ManifestBase;
+    ) as EntityManifest;
 
     let props: {[index: string]: PropElement} | undefined;
 

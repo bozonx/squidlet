@@ -2,7 +2,7 @@
 import PropElement from './PropElement';
 
 
-export default interface ManifestBase<Props = Record<string, PropElement>> {
+export default interface EntityManifest<Props = Record<string, PropElement>> {
   // TODO: почему не className ??
   // unique name. Usually it is ClassName of main class
   name: string

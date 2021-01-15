@@ -1,10 +1,10 @@
 import {mergeDeepObjects} from 'squidlet-lib/src/objects'
 
-import DriverManifest from '../../__old/system/interfaces/DriverManifest'
 import {validateProps, validateRequiredProps} from '../../__old/system/lib/validate'
 import Context from '../system/Context'
 import EntityBase from './EntityBase'
 import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase'
+import EntityManifest from '../interfaces/EntityManifest'
 
 
 let defaultInstanceIdCounter = 0
@@ -103,7 +103,7 @@ export default abstract class DriverFactoryBase<
     mergedProps: {[index: string]: any}
   ) {
     // TODO: а нужно ли повторно загружать манифест, он же должен быть заружен в drivers manager
-    const manifest: DriverManifest = await this.context.system.envSet.loadManifest(
+    const manifest: EntityManifest = await this.context.system.envSet.loadManifest(
       'driver',
       this.definition.id
     );

@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import {EntityTypePlural} from '../../../src/interfaces/EntityTypes';
-import ManifestBase from '../../../src/interfaces/ManifestBase';
+import EntityManifest from '../../../src/interfaces/EntityManifest';
 import StorageIo from '../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement, trimCharStart} from '../../../../squidlet-lib/src/strings';
@@ -85,7 +85,7 @@ export default class StorageEnvMemoryWrapper {
   /**
    * Get builtin manifest
    */
-  private loadManifest(entityString: string): ManifestBase {
+  private loadManifest(entityString: string): EntityManifest {
     const [pluralTypeStr, rest] = splitFirstElement(entityString, path.sep);
     const pluralType = pluralTypeStr as EntityTypePlural;
 
@@ -113,13 +113,13 @@ export default class StorageEnvMemoryWrapper {
 // /**
 //  * Make all the paths absolute
 //  */
-// private prepareManifest(pluralType: EntityTypePlural, entityName: string): ManifestBase {
+// private prepareManifest(pluralType: EntityTypePlural, entityName: string): EntityManifest {
 //   if (!entityName || !this.envSet || !this.envSet.entities[pluralType][entityName]) {
 //     throw new Error(`StorageEnvMemoryWrapper.prepareManifest("${pluralType}", "${entityName}"): Can't find an entity`);
 //   }
 //
 //   const entitySet: HostEntitySet = this.envSet.entities[pluralType][entityName];
-//   const manifest: ManifestBase = _cloneDeep(this.envSet.entities[pluralType][entityName].manifest);
+//   const manifest: EntityManifest = _cloneDeep(this.envSet.entities[pluralType][entityName].manifest);
 //
 //   manifest.main = path.join(entitySet.srcDir, manifest.main);
 //

@@ -1,5 +1,5 @@
 import EntityDefinition from '../interfaces/EntityDefinition';
-import ManifestBase from '../interfaces/ManifestBase';
+import EntityManifest from '../interfaces/EntityManifest';
 import Context from '../system/Context';
 import LogPublisher from '../../__old/system/LogPublisher';
 import HostConfig from '../../__old/system/interfaces/HostConfig';
@@ -8,7 +8,7 @@ import {EntityType} from '../interfaces/EntityTypes';
 
 // TODO: может просто расширить контекст
 
-export default abstract class EntityBase<Props = {}, ManifestType extends ManifestBase = ManifestBase> {
+export default abstract class EntityBase<Props = {}, ManifestType extends EntityManifest = EntityManifest> {
   //abstract readonly entityType: EntityType
   readonly context: Context
   readonly definition: EntityDefinition

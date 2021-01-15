@@ -1,8 +1,8 @@
 // parsed manifest of device
-import ManifestBase from '../../../src/interfaces/ManifestBase';
+import EntityManifest from '../../../src/interfaces/EntityManifest';
 
 
-export default interface DeviceManifest extends ManifestBase {
+export default interface DeviceManifest extends EntityManifest {
   // generic type of device
   type: string;
   // schema of statuses of device

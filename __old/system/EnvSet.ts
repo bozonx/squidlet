@@ -1,5 +1,5 @@
 import Context from '../../src/system/Context';
-import ManifestBase from '../../src/interfaces/ManifestBase';
+import EntityManifest from '../../src/interfaces/EntityManifest';
 import {EntityType} from '../../src/interfaces/EntityTypes';
 import {EntityClassType} from './managers/EntityManagerBase';
 import {pathJoin} from '../../../squidlet-lib/src/paths';
@@ -86,7 +86,7 @@ export default class EnvSet {
    * @param entityType - device, driver or service
    * @param entityName - name of entity
    */
-  loadManifest<T extends ManifestBase>(entityType: EntityType, entityName: string) : Promise<T> {
+  loadManifest<T extends EntityManifest>(entityType: EntityType, entityName: string) : Promise<T> {
     const pathToFile = pathJoin(
       systemConfig.rootDirs.envSet,
       systemConfig.envSetDirs.entities,
@@ -107,7 +107,7 @@ export default class EnvSet {
     entityType: EntityType,
     entityName: string
   ): Promise<T> {
-    const manifest: ManifestBase = await this.loadManifest(entityType, entityName);
+    const manifest: EntityManifest = await this.loadManifest(entityType, entityName);
     const mainFileName: string = splitFirstElement(manifest.main, '.')[0];
     const filePath: string = this.resolveEntityFilePath(entityType, entityName, mainFileName, manifest.srcDir);
 
@@ -125,7 +125,7 @@ export default class EnvSet {
     entityName: string,
     fileName: string
   ): Promise<string> {
-    const manifest: ManifestBase = await this.loadManifest(entityType, entityName);
+    const manifest: EntityManifest = await this.loadManifest(entityType, entityName);
     const filePath: string = this.resolveEntityFilePath(entityType, entityName, fileName, manifest.srcDir);
 
     return this.storageIo.readFile(filePath);
@@ -142,7 +142,7 @@ export default class EnvSet {
     entityName: string,
     fileName: string
   ): Promise<Uint8Array> {
-    const manifest: ManifestBase = await this.loadManifest(entityType, entityName);
+    const manifest: EntityManifest = await this.loadManifest(entityType, entityName);
     const filePath: string = this.resolveEntityFilePath(entityType, entityName, fileName, manifest.srcDir);
 
     return this.storageIo.readBinFile(filePath);
