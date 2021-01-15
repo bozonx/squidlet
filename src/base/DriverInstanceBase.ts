@@ -16,7 +16,7 @@ export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> 
 
 export default abstract class DriverInstanceBase<
   Props = Record<string, any>,
-  Driver = DriverFactoryBase<Props>
+  Driver extends DriverFactoryBase<Props> = DriverFactoryBase<Props>
 > {
   //abstract readonly entityType: EntityType
   readonly context: Context
@@ -40,7 +40,7 @@ export default abstract class DriverInstanceBase<
   protected validateProps?: (props: Props) => string | undefined;
 
 
-  constructor(context: Context, params: DriverInstanceParams<Props>) {
+  constructor(context: Context, params: DriverInstanceParams<Props, Driver>) {
     this.context = context
     this.params = params
 
@@ -52,6 +52,8 @@ export default abstract class DriverInstanceBase<
   }
 
   abstract init?(): Promise<void>
+  // destroy logic of instance
+  abstract $doDestroy(): Promise<void>
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
   destroy = async () => {

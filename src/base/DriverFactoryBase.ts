@@ -1,6 +1,7 @@
+import {mergeDeepObjects} from 'squidlet-lib/src/objects';
+
 import DriverManifest from '../../__old/system/interfaces/DriverManifest';
 import {validateProps, validateRequiredProps} from '../../__old/system/lib/validate';
-import {mergeDeepObjects} from '../../../squidlet-lib/src/objects';
 import Context from '../system/Context';
 import EntityBase from './EntityBase'
 import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase'
@@ -29,8 +30,7 @@ export default abstract class DriverFactoryBase<
     for (let name of Object.keys(this.instances)) {
       const instance = this.instances[name]
 
-      // TODO: review - use doDestory
-      if (instance.destroy) await instance.destroy()
+      if (instance.$doDestroy) await instance.$doDestroy()
     }
   }
 
