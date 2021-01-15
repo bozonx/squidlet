@@ -3,7 +3,7 @@ import {lastItem} from 'squidlet-lib/src/arrays'
 
 import WsServerIo, {
   WS_SERVER_CONNECTION_TIMEOUT_SEC,
-  WsCloseStatus, WsServerConnectionParams,
+  WsCloseStatus,
   WsServerEvent,
   WsServerProps,
 } from '../../interfaces/io/WsServerIo'
@@ -28,77 +28,33 @@ export class WsServerInstance
     return this._serverId
   }
 
-  private events = new IndexedEventEmitter()
-
   private get wsServerIo(): WsServerIo {
     return this.params.driver.wsServerIo
   }
 
+  private events = new IndexedEventEmitter()
   private _serverId!: string
 
 
-  $incomeEvent(eventName: WS_SERVER_DRIVER_EVENTS, ...params: any[]) {
+  $incomeEvent(eventName: WsServerEvent, ...params: any[]) {
     this.events.emit(eventName, ...params)
   }
 
   async init(): Promise<void> {
     this._serverId = await this.wsServerIo.newServer(this.props)
 
-    await this.waitForServerStarted()
-    //
-    // this.events.addListener(
-    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.newConnection}`,
-    //   (
-    //     connectionId: string,
-    //     params: WsServerConnectionParams,
-    //     serverId: string
-    //   ) => {
-    //     this.events.emit(
-    //       WS_SERVER_DRIVER_EVENTS.newConnection,
-    //       connectionId,
-    //       params,
-    //       serverId
-    //     )
-    //   }
-    // )
-    //
-    // this.events.addListener(
-    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.incomeMessage}`,
-    //   (
-    //     connectionId: string,
-    //     data: string | Uint8Array,
-    //     serverId: string
-    //   ) => {
-    //     this.events.emit(
-    //       WS_SERVER_DRIVER_EVENTS.message,
-    //       connectionId,
-    //       data,
-    //       serverId
-    //     )
-    //   }
-    // )
-    //
-    // this.events.addListener(
-    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.connectionClosed}`,
-    //   (
-    //     connectionId: string,
-    //     code: WsCloseStatus,
-    //     reason: string,
-    //     serverId: string
-    //   ) => {
-    //     this.events.emit(
-    //       WS_SERVER_DRIVER_EVENTS.connectionClosed,
-    //       connectionId,
-    //       code,
-    //       reason,
-    //       serverId
-    //     )
-    //   }
-    // )
+    try {
+      await this.waitForServerStarted()
+    }
+    catch (e) {
+      await this.destroy()
+
+      throw e
+    }
   }
 
   async $doDestroy(): Promise<void> {
-    // TODO: дестроить
+    this.events.destroy()
   }
 
   on(eventName: WS_SERVER_DRIVER_EVENTS, cb: (...params: any[]) => void): number {
@@ -128,7 +84,7 @@ export class WsServerInstance
       let wasInited = false
 
       const serverCloseHandlerIndex = this.events.addListener(
-        `${SERVER_EVENT_PREFIX}${WsServerEvent.serverClosed}`,
+        WsServerEvent.serverClosed,
         () => {
           clearTimeout(timeout)
           this.events.removeListener(serverCloseHandlerIndex)
@@ -143,7 +99,7 @@ export class WsServerInstance
       )
 
       const serverStartedHandlerIndex = this.events.addListener(
-        `${SERVER_EVENT_PREFIX}${WsServerEvent.serverStarted}`,
+        WsServerEvent.serverStarted,
         () => {
           wasInited = true
 
@@ -164,6 +120,7 @@ export class WsServerInstance
     })
   }
 }
+
 
 export class WsServerDriver
   extends DriverFactoryBase<WsServerDriverProps, WsServerInstance>
@@ -186,16 +143,12 @@ export class WsServerDriver
       }
     )
 
+    this.wsServerIo.on(WsServerEvent.serverStarted,(serverId: string) => {
+      this.passEventToInstance(WsServerEvent.serverStarted, serverId)
+    })
+
     this.wsServerIo.on(WsServerEvent.serverClosed,(serverId: string) => {
-      const instanceId = this.resolveInstanceIdByServerId(serverId)
-
-      if (!instanceId) {
-        this.log.error(`Can't find instance of server "${serverId}"`)
-
-        return
-      }
-
-      this.destroyInstance(instanceId, true)
+      this.passEventToInstance(WsServerEvent.serverClosed, serverId)
     })
 
     this.wsServerIo.on(WsServerEvent.newConnection,(...params: any[]) => {
