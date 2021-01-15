@@ -22,7 +22,9 @@ interface WsServerDriverProps extends WsServerProps {
 }
 
 
-export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps, WsServerDriver> {
+export class WsServerInstance
+  extends DriverInstanceBase<WsServerDriverProps, WsServerDriver>
+{
   private events = new IndexedEventEmitter()
 
   private get wsServerIo(): WsServerIo {
@@ -36,9 +38,7 @@ export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps, Ws
     this.events.emit(`${SERVER_EVENT_PREFIX}${eventName}`, ...params)
   }
 
-  async init(): Promise<string> {
-    // TODO: получить от базового драйвера
-    //this.wsServerIo = this.context.getIo('WsServer')
+  async init(): Promise<void> {
     this.serverId = await this.wsServerIo.newServer(this.props)
 
     await this.waitForServerStarted()
@@ -103,8 +103,8 @@ export class WsServerInstance extends DriverInstanceBase<WsServerDriverProps, Ws
     return this.serverId
   }
 
-  async destroy(): Promise<void> {
-    // TODO: дестроить только есть больше никто не использует
+  async $doDestroy(): Promise<void> {
+    // TODO: дестроить
   }
 
   on(eventName: WS_SERVER_DRIVER_EVENTS, cb: (...params: any[]) => void): number {
@@ -180,7 +180,6 @@ export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
   wsServerIo!: WsServerIo
 
   // TODO: при дестрое наверное отписываться от все собитый
-  // TODO: нужно при создании инстанса передавать туда io
 
   async init() {
     this.wsServerIo = this.context.getIo('WsServer')

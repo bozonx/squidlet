@@ -5,7 +5,7 @@ import DriverFactoryBase from './DriverFactoryBase'
 
 
 export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> {
-  instanceId: string | number
+  instanceId: string
   // instance props
   props: Props
   // base driver instance
@@ -22,7 +22,7 @@ export default abstract class DriverInstanceBase<
   readonly context: Context
   readonly params: DriverInstanceParams<Props, Driver>
 
-  get instanceId(): string | number {
+  get instanceId(): string {
     return this.params.instanceId
   }
   get props(): Props {

@@ -67,13 +67,13 @@ export default abstract class DriverFactoryBase<
     return this.instances[instanceId]
   }
 
-  destroyInstance(instanceId: string | number) {
+  destroyInstance(instanceId: string) {
     // TODO: add
   }
 
   // Specify it to calculate an id of the new instance of sub driver
   protected makeInstanceId(props: Props): string {
-
+    return
   }
 
 
