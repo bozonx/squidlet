@@ -28,10 +28,12 @@ export default abstract class DriverFactoryBase<
     params: DriverInstanceParams<Props>
   ) => DriverInstanceBase<Props>
 
+  private instanceUses: Record<string, number> = {}
+
 
   destroy = async () => {
     for (const instanceId of Object.keys(this.instances)) {
-      await this.destroyInstance(instanceId)
+      await this.destroyInstance(instanceId, true)
     }
   }
 
@@ -50,7 +52,13 @@ export default abstract class DriverFactoryBase<
 
     const instanceId = this.makeInstanceId(props)
     // return previously instantiated instance if it exists
-    if (this.instances[instanceId]) return this.instances[instanceId]
+    if (this.instances[instanceId]) {
+      this.instanceUses[instanceId]++
+
+      return this.instances[instanceId]
+    }
+    // else create a new instance
+    this.instanceUses[instanceId] = 0
 
     const instanceParams: DriverInstanceParams<Props> = {
       instanceId,
@@ -68,12 +76,19 @@ export default abstract class DriverFactoryBase<
     return this.instances[instanceId]
   }
 
-  async destroyInstance(instanceId: string) {
-    const instance = this.instances[instanceId]
+  async destroyInstance(instanceId: string, force: boolean = false) {
+    if (force || !this.instanceUses[instanceId]) {
+      const instance = this.instances[instanceId]
 
-    if (instance.$doDestroy) await instance.$doDestroy()
+      if (instance.$doDestroy) await instance.$doDestroy()
 
-    delete this.instances[instanceId]
+      delete this.instances[instanceId]
+      delete this.instanceUses[instanceId]
+
+      return
+    }
+    // decrement uses of instance
+    this.instanceUses[instanceId]--
   }
 
   // Specify it to calculate an id of the new instance of sub driver

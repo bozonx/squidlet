@@ -185,8 +185,8 @@ export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps> {
     )
 
     this.wsServerIo.on(WsServerEvent.serverClosed,(...params: any[]) => {
-      // TODO: запустить дестрой инстанса
-      this.destroyInstance(instanceId)
+      // TODO: запустить дестрой инстанса насильно
+      this.destroyInstance(instanceId, true)
     })
 
     this.wsServerIo.on(WsServerEvent.newConnection,(...params: any[]) => {
