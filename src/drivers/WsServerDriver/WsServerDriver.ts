@@ -11,12 +11,10 @@ import DriverFactoryBase from '../../base/DriverFactoryBase'
 import DriverInstanceBase from '../../base/DriverInstanceBase'
 
 
-const SERVER_EVENT_PREFIX = 's'
-
 export enum WS_SERVER_DRIVER_EVENTS {
   newConnection,
   connectionClosed,
-  message,
+  incomeMessage,
 }
 
 interface WsServerDriverProps extends WsServerProps {
@@ -26,7 +24,9 @@ interface WsServerDriverProps extends WsServerProps {
 export class WsServerInstance
   extends DriverInstanceBase<WsServerDriverProps, WsServerDriver>
 {
-  serverId!: string
+  get serverId(): string {
+    return this._serverId
+  }
 
   private events = new IndexedEventEmitter()
 
@@ -34,67 +34,67 @@ export class WsServerInstance
     return this.params.driver.wsServerIo
   }
 
+  private _serverId!: string
 
-  $incomeEvent(eventName: WsServerEvent, ...params: any[]) {
-    this.events.emit(`${SERVER_EVENT_PREFIX}${eventName}`, ...params)
+
+  $incomeEvent(eventName: WS_SERVER_DRIVER_EVENTS, ...params: any[]) {
+    this.events.emit(eventName, ...params)
   }
 
   async init(): Promise<void> {
-    this.serverId = await this.wsServerIo.newServer(this.props)
+    this._serverId = await this.wsServerIo.newServer(this.props)
 
     await this.waitForServerStarted()
-
-    this.events.addListener(
-      `${SERVER_EVENT_PREFIX}${WsServerEvent.newConnection}`,
-      (
-        connectionId: string,
-        params: WsServerConnectionParams,
-        serverId: string
-      ) => {
-        this.events.emit(
-          WS_SERVER_DRIVER_EVENTS.newConnection,
-          connectionId,
-          params,
-          serverId
-        )
-      }
-    )
-
-    this.events.addListener(
-      `${SERVER_EVENT_PREFIX}${WsServerEvent.incomeMessage}`,
-      (
-        connectionId: string,
-        data: string | Uint8Array,
-        serverId: string
-      ) => {
-        this.events.emit(
-          WS_SERVER_DRIVER_EVENTS.message,
-          connectionId,
-          data,
-          serverId
-        )
-      }
-    )
-
-    this.events.addListener(
-      `${SERVER_EVENT_PREFIX}${WsServerEvent.connectionClosed}`,
-      (
-        connectionId: string,
-        code: WsCloseStatus,
-        reason: string,
-        serverId: string
-      ) => {
-        this.events.emit(
-          WS_SERVER_DRIVER_EVENTS.connectionClosed,
-          connectionId,
-          code,
-          reason,
-          serverId
-        )
-      }
-    )
-
-    return this.serverId
+    //
+    // this.events.addListener(
+    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.newConnection}`,
+    //   (
+    //     connectionId: string,
+    //     params: WsServerConnectionParams,
+    //     serverId: string
+    //   ) => {
+    //     this.events.emit(
+    //       WS_SERVER_DRIVER_EVENTS.newConnection,
+    //       connectionId,
+    //       params,
+    //       serverId
+    //     )
+    //   }
+    // )
+    //
+    // this.events.addListener(
+    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.incomeMessage}`,
+    //   (
+    //     connectionId: string,
+    //     data: string | Uint8Array,
+    //     serverId: string
+    //   ) => {
+    //     this.events.emit(
+    //       WS_SERVER_DRIVER_EVENTS.message,
+    //       connectionId,
+    //       data,
+    //       serverId
+    //     )
+    //   }
+    // )
+    //
+    // this.events.addListener(
+    //   `${SERVER_EVENT_PREFIX}${WsServerEvent.connectionClosed}`,
+    //   (
+    //     connectionId: string,
+    //     code: WsCloseStatus,
+    //     reason: string,
+    //     serverId: string
+    //   ) => {
+    //     this.events.emit(
+    //       WS_SERVER_DRIVER_EVENTS.connectionClosed,
+    //       connectionId,
+    //       code,
+    //       reason,
+    //       serverId
+    //     )
+    //   }
+    // )
   }
 
   async $doDestroy(): Promise<void> {

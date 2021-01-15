@@ -19,7 +19,7 @@ let defaultInstanceIdCounter = 0
  */
 export default abstract class DriverFactoryBase<
   Props = Record<string, any>,
-  Instance = DriverInstanceBase<Props>
+  Instance extends DriverInstanceBase = any
 > extends EntityBase {
   // there instances are kept
   protected instances: Record<string, Instance> = {}

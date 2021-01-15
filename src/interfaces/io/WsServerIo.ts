@@ -15,13 +15,14 @@ export enum WsCloseStatus {
 }
 
 export enum WsServerEvent {
-  serverStarted,
-  serverClosed,
+  // these events like WS_SERVER_DRIVER_EVENTS
   newConnection,
   connectionClosed,
   incomeMessage,
   // server's or connection's errors
   error,
+  serverStarted,
+  serverClosed,
 }
 
 
