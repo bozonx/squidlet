@@ -1,8 +1,8 @@
-import {mergeDeepObjects} from 'squidlet-lib/src/objects';
+import {mergeDeepObjects} from 'squidlet-lib/src/objects'
 
-import DriverManifest from '../../__old/system/interfaces/DriverManifest';
-import {validateProps, validateRequiredProps} from '../../__old/system/lib/validate';
-import Context from '../system/Context';
+import DriverManifest from '../../__old/system/interfaces/DriverManifest'
+import {validateProps, validateRequiredProps} from '../../__old/system/lib/validate'
+import Context from '../system/Context'
 import EntityBase from './EntityBase'
 import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase'
 
@@ -26,7 +26,7 @@ export default abstract class DriverFactoryBase<
   // Specify your sub driver class. It's required.
   protected abstract SubDriverClass: new (
     context: Context,
-    params: DriverInstanceParams<Props>
+    params: any
   ) => Instance
 
   private instanceUses: Record<string, number> = {}

@@ -1,6 +1,6 @@
-import Context from '../system/Context';
-import LogPublisher from '../../__old/system/LogPublisher';
-import HostConfig from '../../__old/system/interfaces/HostConfig';
+import Context from '../system/Context'
+import LogPublisher from '../../__old/system/LogPublisher'
+import HostConfig from '../../__old/system/interfaces/HostConfig'
 import DriverFactoryBase from './DriverFactoryBase'
 
 
@@ -16,7 +16,7 @@ export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> 
 
 export default abstract class DriverInstanceBase<
   Props = Record<string, any>,
-  Driver extends DriverFactoryBase<Props> = DriverFactoryBase<Props>
+  Driver extends DriverFactoryBase<Props, any> = any
 > {
   //abstract readonly entityType: EntityType
   readonly context: Context

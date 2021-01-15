@@ -123,7 +123,7 @@ export class WsServerInstance
 
 
 export class WsServerDriver
-  extends DriverFactoryBase<WsServerDriverProps, WsServerInstance>
+  extends DriverFactoryBase<WsServerDriverProps>
 {
   protected SubDriverClass = WsServerInstance
   protected makeInstanceId = (props: WsServerDriverProps): string => {
