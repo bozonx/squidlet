@@ -17,7 +17,7 @@ export enum WS_SERVER_DRIVER_EVENTS {
   incomeMessage,
 }
 
-interface WsServerDriverProps extends WsServerProps {
+export interface WsServerDriverProps extends WsServerProps {
 }
 
 
@@ -123,9 +123,7 @@ export class WsServerInstance
 }
 
 
-export class WsServerDriver
-  extends DriverFactoryBase<WsServerDriverProps>
-{
+export class WsServerDriver extends DriverFactoryBase<WsServerDriverProps>{
   protected SubDriverClass = WsServerInstance
   protected makeInstanceId = (props: WsServerDriverProps): string => {
     return `${props.host}:${props.port}`

@@ -1,27 +1,38 @@
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'squidlet-lib/src/binaryHelpers'
 
+import Context from '../../../../system/Context'
 import {BridgeConnectionState, BridgeDriver, ConnectionsEvents} from '../../interfaces/BridgeDriver'
 import EntityBase from '../../../../base/EntityBase'
-import {WS_SERVER_DRIVER_EVENTS, WsServerInstance} from '../../../../drivers/WsServerDriver/WsServerDriver'
+import {
+  WS_SERVER_DRIVER_EVENTS,
+  WsServerDriverProps,
+  WsServerInstance,
+} from '../../../../drivers/WsServerDriver/WsServerDriver'
 import {WsCloseStatus, WsServerConnectionParams} from '../../../../interfaces/io/WsServerIo'
+import DriverFactoryBase from '../../../../base/DriverFactoryBase'
+import DriverInstanceBase from '../../../../base/DriverInstanceBase'
 
 
-interface WsServerBridgeProps {
+interface WsServerBridgeProps extends WsServerDriverProps {
 }
 
 
-export class WsServerBridge extends EntityBase<WsServerBridgeProps> implements BridgeDriver {
+export class WsServerBridgeInstance
+  extends DriverInstanceBase<WsServerBridgeProps> implements BridgeDriver
+{
   private events = new IndexedEventEmitter()
   private connectionState: BridgeConnectionState = BridgeConnectionState.initial
-  private authorizedConnectionId?: string
-  private connectionsWaitForHostData: Record<string, true> = {}
-  private driver!: WsServerInstance
+  private currentConnectionId?: string
+  //private connectionsWaitForHostData: Record<string, true> = {}
+  driver!: WsServerInstance
 
 
   async init(): Promise<void> {
-    // TODO: Сделать инстанс сервера и передать ему параметры
-    this.driver = this.context.getDriver('WsServerDriver')
+    this.driver = await this.context.getSubDriver<WsServerInstance>(
+      'WsServerDriver',
+      this.props
+    )
 
     this.driver.on(WS_SERVER_DRIVER_EVENTS.newConnection, this.handleNewConnection)
     this.driver.on(
@@ -31,7 +42,7 @@ export class WsServerBridge extends EntityBase<WsServerBridgeProps> implements B
     this.driver.on(WS_SERVER_DRIVER_EVENTS.message, this.handleNewMessage)
   }
 
-  async destroy(): Promise<void> {
+  async $doDestroy(): Promise<void> {
     this.events.destroy()
     await this.driver.destroy()
   }
@@ -122,4 +133,12 @@ export class WsServerBridge extends EntityBase<WsServerBridgeProps> implements B
     )
   }
 
+}
+
+
+export class WsServerBridgeDriver extends DriverFactoryBase<WsServerBridgeProps> {
+  protected SubDriverClass = WsServerBridgeInstance
+  protected makeInstanceId = (props: WsServerBridgeProps): string => {
+    return `${props.host}:${props.port}`
+  }
 }

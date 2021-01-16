@@ -16,6 +16,8 @@ import {pathJoin} from '../../../squidlet-lib/src/paths';
 import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import ServicesObj from '../../__old/system/interfaces/ServicesObj';
 import {IoSetBase} from '../../__old/system/interfaces/IoSet';
+import EntityBase from '../base/EntityBase'
+import DriverInstanceBase from '../base/DriverInstanceBase'
 
 
 // TODO: rename to EntityContext
@@ -111,7 +113,7 @@ export default class Context {
    * Ask the driver which is factory to create or get an instance of sub driver e.g. http server.
    * It will return an instance according to props.
    */
-  async getSubDriver<T extends DriverBase = DriverBase>(
+  async getSubDriver<T extends DriverInstanceBase<any> = DriverInstanceBase>(
     driverName: string,
     props: {[index: string]: any}
   ): Promise<T> {
