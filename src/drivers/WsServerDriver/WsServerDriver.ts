@@ -55,6 +55,7 @@ export class WsServerInstance
 
   async $doDestroy(): Promise<void> {
     this.events.destroy()
+    await this.wsServerIo.destroyServer(this.serverId)
   }
 
   on(eventName: WS_SERVER_DRIVER_EVENTS, cb: (...params: any[]) => void): number {

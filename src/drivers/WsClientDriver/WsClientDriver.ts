@@ -7,10 +7,11 @@ import WsClientIo, {WsClientEvent, WsClientProps} from '../../interfaces/io/WsCl
 import {WsCloseStatus} from '../../interfaces/io/WsServerIo'
 
 
+// TODO: use config
+const WS_CLIENT_CONNECTION_TIMEOUT_SEC = 60
+
 export enum WS_CLIENT_DRIVER_EVENTS {
-  // newConnection,
-  // connectionClosed,
-  // incomeMessage,
+  incomeMessage,
 }
 
 interface WsClientDriverProps extends WsClientProps {
@@ -20,9 +21,8 @@ interface WsClientDriverProps extends WsClientProps {
 export class WsClientInstance
   extends DriverInstanceBase<WsClientDriverProps, WsClientDriver>
 {
-  // TODO: review
-  get serverId(): string {
-    return this._serverId
+  get connectionId(): string {
+    return this._connectionId
   }
 
   private get wsClientIo(): WsClientIo {
@@ -30,8 +30,7 @@ export class WsClientInstance
   }
 
   private events = new IndexedEventEmitter()
-  // TODO: review
-  private _serverId!: string
+  private _connectionId!: string
 
 
   $incomeEvent(eventName: WsClientEvent, ...params: any[]) {
@@ -39,12 +38,10 @@ export class WsClientInstance
   }
 
   async init(): Promise<void> {
-    // TODO: review
-    this._serverId = await this.wsClientIo.newServer(this.props)
+    this._connectionId = await this.wsClientIo.newConnection(this.props)
 
-    // TODO: review
     try {
-      await this.waitForServerStarted()
+      await this.waitForConnectionOpened()
     }
     catch (e) {
       await this.destroy()
@@ -55,6 +52,11 @@ export class WsClientInstance
 
   async $doDestroy(): Promise<void> {
     this.events.destroy()
+    await this.wsClientIo.closeConnection(
+      this.connectionId,
+      WsCloseStatus.closeGoingAway,
+      `Instance destroy`
+    )
   }
 
   on(eventName: WS_CLIENT_DRIVER_EVENTS, cb: (...params: any[]) => void): number {
@@ -70,53 +72,45 @@ export class WsClientInstance
     await this.wsClientIo.sendMessage(connectionId, data)
   }
 
-  async closeConnection(
-    connectionId: string,
-    code: WsCloseStatus,
-    reason?: string
-  ): Promise<void> {
-    await this.wsClientIo.closeConnection(connectionId, code, reason)
-  }
 
-  // TODO: review
-  private waitForServerStarted(): Promise<void> {
+  private waitForConnectionOpened(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       let wasInited = false
 
-      const serverCloseHandlerIndex = this.events.addListener(
-        WsClientEvent.serverClosed,
+      const connectionCloseHandlerIndex = this.events.addListener(
+        WsClientEvent.closed,
         () => {
           clearTimeout(timeout)
-          this.events.removeListener(serverCloseHandlerIndex)
-          this.events.removeListener(serverStartedHandlerIndex)
+          this.events.removeListener(connectionCloseHandlerIndex)
+          this.events.removeListener(openConnectionHandlerIndex)
 
           if (!wasInited) {
             reject(
-              `Server "${this.serverId}" has been closed at start up time.`
+              `Connection "${this.connectionId}" has been closed at start up time.`
             )
           }
         }
       )
 
-      const serverStartedHandlerIndex = this.events.addListener(
-        WsClientEvent.serverStarted,
+      const openConnectionHandlerIndex = this.events.addListener(
+        WsClientEvent.opened,
         () => {
           wasInited = true
 
           clearTimeout(timeout)
-          this.events.removeListener(serverCloseHandlerIndex)
-          this.events.removeListener(serverStartedHandlerIndex)
+          this.events.removeListener(connectionCloseHandlerIndex)
+          this.events.removeListener(openConnectionHandlerIndex)
           resolve()
         }
       )
 
       const timeout = setTimeout(() => {
-        this.events.removeListener(serverCloseHandlerIndex)
-        this.events.removeListener(serverStartedHandlerIndex)
+        this.events.removeListener(connectionCloseHandlerIndex)
+        this.events.removeListener(openConnectionHandlerIndex)
         reject(
-          `Timeout has been exceeded starting server "${this.serverId}"`
+          `Timeout has been exceeded opening a connection "${this.connectionId}"`
         )
-      }, WS_SERVER_CONNECTION_TIMEOUT_SEC)
+      }, WS_CLIENT_CONNECTION_TIMEOUT_SEC)
     })
   }
 }
@@ -126,9 +120,7 @@ export class WsClientDriver
   extends DriverFactoryBase<WsClientDriverProps>
 {
   protected SubDriverClass = WsClientInstance
-  protected makeInstanceId = (props: WsClientDriverProps): string => {
-    return props.url
-  }
+  protected makeInstanceId = (props: WsClientDriverProps): string => props.url
 
   wsClientIo!: WsClientIo
 
@@ -143,12 +135,12 @@ export class WsClientDriver
       }
     )
 
-    await this.wsClientIo.on(WsClientEvent.opened,(serverId: string) => {
-      this.passEventToInstance(WsClientEvent.opened, serverId)
+    await this.wsClientIo.on(WsClientEvent.opened,(connectionId: string) => {
+      this.passEventToInstance(WsClientEvent.opened, connectionId)
     })
 
-    await this.wsClientIo.on(WsClientEvent.closed,(serverId: string) => {
-      this.passEventToInstance(WsClientEvent.closed, serverId)
+    await this.wsClientIo.on(WsClientEvent.closed,(connectionId: string) => {
+      this.passEventToInstance(WsClientEvent.closed, connectionId)
     })
 
     await this.wsClientIo.on(WsClientEvent.incomeMessage,(...params: any[]) => {
@@ -158,13 +150,12 @@ export class WsClientDriver
   }
 
 
-  // TODO: review
   private passEventToInstance(eventName: WsClientEvent, ...params: any[]) {
-    const serverId = lastItem(params)
-    const instanceId = this.resolveInstanceIdByServerId(serverId)
+    const connectionId = lastItem(params)
+    const instanceId = this.resolveInstanceIdByConnectionId(connectionId)
 
     if (!instanceId) {
-      this.log.error(`Can't find instance of server "${serverId}"`)
+      this.log.error(`Can't find instance of connection "${connectionId}"`)
 
       return
     }
@@ -172,10 +163,9 @@ export class WsClientDriver
     this.instances[instanceId].$incomeEvent(eventName, ...params)
   }
 
-  // TODO: review
-  private resolveInstanceIdByServerId(serverId: string): string | undefined {
+  private resolveInstanceIdByConnectionId(connectionId: string): string | undefined {
     for (const instanceId of Object.keys(this.instances)) {
-      if (this.instances[instanceId].serverId === serverId) {
+      if (this.instances[instanceId].connectionId === connectionId) {
         return this.instances[instanceId].instanceId
       }
     }

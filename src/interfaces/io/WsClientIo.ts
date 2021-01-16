@@ -3,10 +3,10 @@ import {WsCloseStatus} from './WsServerIo'
 
 
 export enum WsClientEvent {
+  incomeMessage,
   opened,
   closed,
   error,
-  incomeMessage,
 }
 
 export interface WsClientProps {
