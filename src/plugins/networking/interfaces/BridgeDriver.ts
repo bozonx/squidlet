@@ -10,7 +10,7 @@ export enum BridgeConnectionState {
   closed,
 }
 
-export enum ConnectionsEvents {
+export enum BRIDGE_EVENT {
   incomeMessage,
   connectionStateChanged,
 }
@@ -32,11 +32,11 @@ export interface BridgeDriver {
   sendMessage(channel: number, body: Uint8Array): Promise<void>
 
   on(
-    eventName: ConnectionsEvents.incomeMessage,
+    eventName: BRIDGE_EVENT.incomeMessage,
     cb: IncomeMessageHandler
   ): number
   on(
-    eventName: ConnectionsEvents.connectionStateChanged,
+    eventName: BRIDGE_EVENT.connectionStateChanged,
     cb: (state: BridgeConnectionState) => void
   ): number
   off(handlerIndex: number): void

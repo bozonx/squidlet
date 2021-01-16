@@ -2,8 +2,7 @@ import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 import {addFirstItemUint8Arr, withoutFirstItemUint8Arr} from 'squidlet-lib/src/binaryHelpers'
 
 import Context from '../../../../system/Context'
-import {BridgeConnectionState, BridgeDriver, ConnectionsEvents} from '../../interfaces/BridgeDriver'
-import EntityBase from '../../../../base/EntityBase'
+import {BRIDGE_EVENT, BridgeConnectionState, BridgeDriver} from '../../interfaces/BridgeDriver'
 import {
   WS_SERVER_DRIVER_EVENTS,
   WsServerDriverProps,
@@ -39,7 +38,7 @@ export class WsServerBridgeInstance
       WS_SERVER_DRIVER_EVENTS.connectionClosed,
       this.handleConnectionClosed
     )
-    this.driver.on(WS_SERVER_DRIVER_EVENTS.message, this.handleNewMessage)
+    this.driver.on(WS_SERVER_DRIVER_EVENTS.incomeMessage, this.handleNewMessage)
   }
 
   async $doDestroy(): Promise<void> {
@@ -47,21 +46,7 @@ export class WsServerBridgeInstance
     await this.driver.destroy()
   }
 
-
-  getConnectionState(): BridgeConnectionState {
-    return this.connectionState
-  }
-
-  async sendMessage(channel: number, body: Uint8Array): Promise<void> {
-    if (!this.authorizedConnectionId) throw new Error(`Connection is inactive`)
-
-    await this.driver.sendMessage(
-      this.authorizedConnectionId,
-      addFirstItemUint8Arr(body, channel)
-    )
-  }
-
-  on(eventName: ConnectionsEvents, cb: (...params: any[]) => void): number {
+  on(eventName: BRIDGE_EVENT, cb: (...params: any[]) => void): number {
     return this.events.addListener(eventName, cb)
   }
 
@@ -70,18 +55,35 @@ export class WsServerBridgeInstance
   }
 
 
+  getConnectionState(): BridgeConnectionState {
+    return this.connectionState
+  }
+
+  async sendMessage(channel: number, body: Uint8Array): Promise<void> {
+    if (!this.currentConnectionId) throw new Error(`Connection is inactive`)
+
+    await this.driver.sendMessage(
+      this.currentConnectionId,
+      addFirstItemUint8Arr(body, channel)
+    )
+  }
+
   private handleNewConnection = (connectionId: string, params: WsServerConnectionParams) => {
-    if (params.headers.cookie) {
-      // TODO: проверить сессию - если совпадает то это просто переподключение
-    }
 
-    // TODO: add timeout
-
-    // marks that this connection is waited for the host data
-    this.connectionsWaitForHostData[connectionId] = true
+    // if (params.headers.cookie) {
+    //   // TODO: проверить сессию - если совпадает то это просто переподключение
+    // }
+    //
+    // // TODO: add timeout
+    //
+    // // marks that this connection is waited for the host data
+    // this.connectionsWaitForHostData[connectionId] = true
   }
 
   private handleConnectionClosed = (connectionId: string, code: WsCloseStatus) => {
+
+    // TODO: поидее нужно закрывать инстанс
+
     if (this.authorizedConnectionId !== connectionId) return
 
     delete this.authorizedConnectionId
