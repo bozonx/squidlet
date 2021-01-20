@@ -29,6 +29,8 @@ export default class Network extends EntityBase {
 
   async send(host: string, uri: string, payload: Uint8Array): Promise<void> {
     const connectionId: string = this.hostResolver.resoveConnection(host)
+    // TODO: нужно ещё message id и тип сообщения - обыное или возврат ошибки
+    // TODO: хотя для ошибок можно использовать отдельный канал
     const completePayload = encodeNetworkPayload(
       host,
       this.config.hostId,
@@ -38,6 +40,8 @@ export default class Network extends EntityBase {
     )
 
     await this.bridgesManager.send(connectionId, completePayload)
+
+    // TODO: нужно ещё ждать сообщение об ошибке если придет
   }
 
   onIncomeMessage(cb: NetworkIncomeRequestHandler): number {
