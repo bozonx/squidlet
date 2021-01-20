@@ -1,6 +1,6 @@
 import DeviceBase from '__old/system/base/DeviceBase';
 import {omitObj} from '../squidlet-lib/src/objects';
-import {Dictionary} from 'src/interfaces/Types';
+import {Dictionary} from '../squidlet-lib/src/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 
 import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';

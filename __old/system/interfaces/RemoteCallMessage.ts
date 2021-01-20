@@ -1,4 +1,4 @@
-import {JsonTypes} from '../../../src/interfaces/Types';
+import {JsonTypes} from '../../../../squidlet-lib/src/interfaces/Types';
 
 
 export const REMOTE_CALL_MESSAGE_TYPES = [

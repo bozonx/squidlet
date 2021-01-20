@@ -1,4 +1,4 @@
-import {JsonTypes} from '../../../interfaces/Types'
+import {JsonTypes} from '../../../../../squidlet-lib/src/interfaces/Types'
 
 
 export interface ApiRequest {

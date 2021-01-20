@@ -1,7 +1,7 @@
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {compactUndefined} from '../../../../squidlet-lib/src/arrays';
 import {EntityType, EntityTypePlural} from '../../../src/interfaces/EntityTypes';
-import {JsonTypes, Primitives} from '../../../src/interfaces/Types';
+import {JsonTypes, Primitives} from '../../../../squidlet-lib/src/interfaces/Types';
 
 
 export function waitMs(ms: number): Promise<void> {

@@ -3,7 +3,7 @@ import StatusValue from './StatusValue';
 import AndValue from './AndValue';
 import OrValue from './OrValue';
 import Context from 'src/system/Context';
-import {JsonTypes} from 'src/interfaces/Types';
+import {JsonTypes} from '../squidlet-lib/src/interfaces/Types';
 import Value from './Value';
 
 

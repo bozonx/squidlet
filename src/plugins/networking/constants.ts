@@ -1,1 +1,1 @@
-export const NETWORK_ACtION_SEPARATOR = '.'
+export const NETWORK_ACTION_SEPARATOR = '.'

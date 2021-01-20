@@ -1,6 +1,6 @@
 import WsApiClient from '../../../squidlet-networking/src/bridges/__old/WsApiClient';
 import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
-import {Dictionary} from '../../src/interfaces/Types';
+import {Dictionary} from '../../../squidlet-lib/src/interfaces/Types';
 import {listenScriptEnd} from '../shared/helpers/helpers';
 import {consoleError} from '../system/lib/helpers';
 

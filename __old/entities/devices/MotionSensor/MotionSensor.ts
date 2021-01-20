@@ -1,5 +1,5 @@
 import DeviceBase from '__old/system/base/DeviceBase';
-import {Dictionary} from 'src/interfaces/Types';
+import {Dictionary} from '../squidlet-lib/src/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 
 import {ImpulseInput, ImpulseInputProps} from '../../drivers/ImpulseInput/ImpulseInput';

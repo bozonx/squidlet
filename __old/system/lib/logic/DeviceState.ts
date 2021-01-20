@@ -3,7 +3,7 @@ import {isEmptyObject} from '../../../../../squidlet-lib/src/objects';
 import {validateParam} from '../validate';
 import ConsistentState, {Getter, Setter, Initialize} from '../../../../../squidlet-lib/src/ConsistentState';
 import {collectPropsDefaults} from '../helpers';
-import {Dictionary} from '../../../../src/interfaces/Types';
+import {Dictionary} from '../../../../../squidlet-lib/src/interfaces/Types';
 
 
 export type Schema = {[index: string]: PropElement};
