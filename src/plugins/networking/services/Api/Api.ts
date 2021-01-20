@@ -18,6 +18,9 @@ export default class Api extends EntityBase {
 
   async init() {
     this.network.onIncomeRequest(this.handleIncomeRequests)
+    this.remoteCall.on(() => {
+
+    })
   }
 
 
@@ -59,6 +62,7 @@ export default class Api extends EntityBase {
 
 
     // TODO: add
+    // TODO: сделать вызов локального api
   }
 
 }

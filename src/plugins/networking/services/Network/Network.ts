@@ -1,5 +1,11 @@
+import IndexedEvents from 'squidlet-lib/src/IndexedEvents'
+
 import EntityBase from '../../../../base/EntityBase'
-import IndexedEvents from '../../../../../../squidlet-lib/src/IndexedEvents'
+import {
+  decodeNetworkMessage,
+  encodeNetworkPayload,
+  extractToHostIdFromPayload
+} from '../../network/networkHelpers'
 
 
 export type NetworkIncomeRequestHandler = (
@@ -8,27 +14,6 @@ export type NetworkIncomeRequestHandler = (
   fromHost: string,
   //fromConnectionId: string
 ) => void
-
-
-export function encodeNetworkPayload(
-  toHostId: string,
-  fromHostId: string,
-  uri: string,
-  payload: Uint8Array
-): Uint8Array {
-  // TODO: add TTL
-}
-
-export function decodeNetworkMessage(
-  data: Uint8Array
-): [string, string, string, Uint8Array] {
-  // TODO: validate message
-
-}
-
-export function extractToHostIdFromPayload(data: Uint8Array): string {
-
-}
 
 
 export default class Network extends EntityBase {
@@ -44,7 +29,13 @@ export default class Network extends EntityBase {
 
   async send(host: string, uri: string, payload: Uint8Array): Promise<void> {
     const connectionId: string = this.hostResolver.resoveConnection(host)
-    const completePayload = encodeNetworkPayload(host, this.config.hostId, uri, payload)
+    const completePayload = encodeNetworkPayload(
+      host,
+      this.config.hostId,
+      uri,
+      payload,
+      this.config.config.defaultTtl
+    )
 
     await this.bridgesManager.send(connectionId, completePayload)
   }
