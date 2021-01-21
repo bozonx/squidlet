@@ -4,7 +4,7 @@ export function encodeNetworkPayload(
   fromHostId: string,
   toHostId: string,
   messageId: string,
-  ttl: number,
+  initialTtl: number,
   uri?: string,
   payload?: Uint8Array
 ): Uint8Array {

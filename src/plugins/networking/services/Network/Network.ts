@@ -39,6 +39,13 @@ export default class Network extends EntityBase {
     )
   }
 
+  async destroy() {
+    await this.hostResolver.destroy()
+    async this.bridgesManager.destroy()
+
+    this.uriHandlers = {}
+  }
+
 
   async request(hostName: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
     const {connectionId, hostId} = this.hostResolver.resoveConnectionByName(hostName)

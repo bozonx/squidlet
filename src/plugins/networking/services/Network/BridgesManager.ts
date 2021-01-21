@@ -15,6 +15,15 @@ export class BridgesManager {
   private events = new IndexedEventEmitter()
 
 
+  async init() {
+
+  }
+
+  async destroy() {
+    this.events.destroy()
+  }
+
+
   async send(connectionId: string, channel: number, payload: Uint8Array) {
     // TODO: add
   }
