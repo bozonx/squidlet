@@ -3,9 +3,9 @@ import {makeUniqId} from 'squidlet-lib/src/uniqId'
 
 import EntityBase from '../../../../base/EntityBase'
 import {
-  decodeNetworkMessage,
+  decodeNetworkMessage, encodeErrorPayload,
   encodeNetworkPayload,
-  extractToHostIdFromPayload
+  extractToHostIdFromPayload,
 } from './networkHelpers'
 import {NETWORK_CHANNELS, NETWORK_ERROR_TYPE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
@@ -41,7 +41,7 @@ export default class Network extends EntityBase {
 
   async destroy() {
     await this.hostResolver.destroy()
-    async this.bridgesManager.destroy()
+    await this.bridgesManager.destroy()
 
     this.uriHandlers = {}
   }
@@ -51,7 +51,7 @@ export default class Network extends EntityBase {
     const hostId = this.hostResolver.resoveHostIdByName(hostName)
     const messageId = makeUniqId()
 
-    await this.sendMessage(messageId, hostId, uri, payload)
+    await this.sendMessage(NETWORK_CHANNELS.request, messageId, hostId, payload, uri)
 
     return this.waitForResponse(messageId)
   }
@@ -153,25 +153,26 @@ export default class Network extends EntityBase {
     errorType: NETWORK_ERROR_TYPE,
     message?: string
   ) {
-    const errorPayload = new Uint8Array(errorType)
+    const errorPayload = encodeErrorPayload(errorType, message)
     // TODO: Add message to payload
 
-    this.sendMessage(messageId, toHostId, errorPayload)
+    this.sendMessage(NETWORK_CHANNELS.errorResponse, messageId, toHostId, errorPayload)
       .catch((e: Error) => {
         this.log.error(`Error sending error back: "${e}"`)
       })
   }
 
   private async sendMessage(
+    channel: NETWORK_CHANNELS,
     messageId: string,
-    hostId: string,
+    toHostId: string,
     payload?: Uint8Array,
     uri?: string,
   ): Promise<void> {
-    const connectionId = this.hostResolver.resoveConnection(hostId)
+    const connectionId = this.hostResolver.resoveConnection(toHostId)
     const completePayload = encodeNetworkPayload(
       this.config.hostId,
-      hostId,
+      toHostId,
       messageId,
       this.config.config.defaultTtl,
       uri,
@@ -180,13 +181,16 @@ export default class Network extends EntityBase {
 
     await this.bridgesManager.send(
       connectionId,
-      NETWORK_CHANNELS.request,
+      channel,
       completePayload
     )
   }
 
   private waitForResponse(messageId: string): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
+
+      // TODO: слушать оба канала
+
       const handlerIndex = this.bridgesManager.on(
         BRIDGE_MANAGER_EVENTS.incomeMessage,
         (connectionId: string, channel: number, payload: Uint8Array) => {
