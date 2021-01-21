@@ -7,7 +7,7 @@ import {
   encodeNetworkPayload,
   extractToHostIdFromPayload
 } from './networkHelpers'
-import {NETWORK_CHANNELS, NETWORK_MESSAGE_TYPE} from '../../constants'
+import {NETWORK_CHANNELS} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
 
@@ -34,24 +34,14 @@ export default class Network extends EntityBase {
     this.bridgesManager = new BridgesManager()
 
     this.bridgesManager.on(
-      BRIDGE_MANAGER_EVENTS.incomeRequest,
-      this.handleIncomeRequest
-    )
-    this.bridgesManager.on(
-      BRIDGE_MANAGER_EVENTS.incomeSuccessResponse,
-      this.handleIncomeSuccessResponse
-    )
-    this.bridgesManager.on(
-      BRIDGE_MANAGER_EVENTS.incomeErrorResponse,
-      this.handleIncomeErrorResponse
+      BRIDGE_MANAGER_EVENTS.incomeMessage,
+      this.handleIncomeMessage
     )
   }
 
 
   async request(hostName: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
     const {connectionId, hostId} = this.hostResolver.resoveConnectionByName(hostName)
-    // TODO: нужно ещё message id и тип сообщения - обыное или возврат ошибки
-    // TODO: хотя для ошибок можно использовать отдельный канал
     const messageId = makeUniqId()
     const completePayload = encodeNetworkPayload(
       this.config.hostId,
@@ -67,8 +57,6 @@ export default class Network extends EntityBase {
       NETWORK_CHANNELS.request,
       completePayload
     )
-
-
 
     // TODO: нужно ещё ждать сообщение об ошибке если придет
   }
@@ -93,17 +81,17 @@ export default class Network extends EntityBase {
   //   this.incomeMessagesEvent.removeListener(handlerIndex)
   // }
 
-  private handleIncomeRequest = () => {
-    // TODO: add
-  }
-
-  private handleIncomeSuccessResponse = () => {
-    // TODO: add
-  }
-
-  private handleIncomeErrorResponse = () => {
-    // TODO: add
-  }
+  // private handleIncomeRequest = () => {
+  //   // TODO: add
+  // }
+  //
+  // private handleIncomeSuccessResponse = () => {
+  //   // TODO: add
+  // }
+  //
+  // private handleIncomeErrorResponse = () => {
+  //   // TODO: add
+  // }
 
   private handleIncomeMessage = (completePayload: Uint8Array, connectionId: string) => {
     // TODO: validate message - если не валидное то пишим в локальный лог
