@@ -7,7 +7,7 @@ import {
   encodeNetworkPayload,
   extractToHostIdFromPayload
 } from './networkHelpers'
-import {NETWORK_CHANNELS} from '../../constants'
+import {NETWORK_CHANNELS, NETWORK_ERROR_TYPE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
 
@@ -48,40 +48,12 @@ export default class Network extends EntityBase {
 
 
   async request(hostName: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
-    const {connectionId, hostId} = this.hostResolver.resoveConnectionByName(hostName)
+    const hostId = this.hostResolver.resoveHostIdByName(hostName)
     const messageId = makeUniqId()
-    const completePayload = encodeNetworkPayload(
-      this.config.hostId,
-      hostId,
-      messageId,
-      this.config.config.defaultTtl,
-      uri,
-      payload,
-    )
 
-    await this.bridgesManager.send(
-      connectionId,
-      NETWORK_CHANNELS.request,
-      completePayload
-    )
+    await this.sendMessage(messageId, hostId, uri, payload)
 
-    return new Promise((resolve, reject) => {
-      const handlerIndex = this.bridgesManager.on(
-        BRIDGE_MANAGER_EVENTS.incomeMessage,
-        (connectionId: string, channel: number, payload: Uint8Array) => {
-          if (
-            channel !== NETWORK_CHANNELS.errorResponse
-            && channel !== NETWORK_CHANNELS.successResponse
-          ) return
-
-          // TODO: сверить messageId
-
-          this.bridgesManager.off(handlerIndex)
-        }
-      )
-    })
-
-    // TODO: add timeout
+    return this.waitForResponse(messageId)
   }
 
   registerUriHandler(uri: string, cb: UriHandler) {
@@ -176,26 +148,61 @@ export default class Network extends EntityBase {
   }
 
   private sendErrorBack(
-    fromHostId: string,
+    toHostId: string,
     messageId: string,
-    errorType: NETWORK_MESSAGE_TYPE,
+    errorType: NETWORK_ERROR_TYPE,
     message?: string
   ) {
-    const connectionId = this.hostResolver.resoveConnection(hostId)
-    const completePayload = encodeNetworkPayload(
-      hostId,
-      this.config.hostId,
-      uri,
-      result,
-      NETWORK_MESSAGE_TYPE.request,
-      messageId,
-      this.config.config.defaultTtl
-    )
+    const errorPayload = new Uint8Array(errorType)
+    // TODO: Add message to payload
 
-    this.bridgesManager.send(connectionId, completePayload)
+    this.sendMessage(messageId, toHostId, errorPayload)
       .catch((e: Error) => {
         this.log.error(`Error sending error back: "${e}"`)
       })
+  }
+
+  private async sendMessage(
+    messageId: string,
+    hostId: string,
+    payload?: Uint8Array,
+    uri?: string,
+  ): Promise<void> {
+    const connectionId = this.hostResolver.resoveConnection(hostId)
+    const completePayload = encodeNetworkPayload(
+      this.config.hostId,
+      hostId,
+      messageId,
+      this.config.config.defaultTtl,
+      uri,
+      payload,
+    )
+
+    await this.bridgesManager.send(
+      connectionId,
+      NETWORK_CHANNELS.request,
+      completePayload
+    )
+  }
+
+  private waitForResponse(messageId: string): Promise<Uint8Array> {
+    return new Promise((resolve, reject) => {
+      const handlerIndex = this.bridgesManager.on(
+        BRIDGE_MANAGER_EVENTS.incomeMessage,
+        (connectionId: string, channel: number, payload: Uint8Array) => {
+          if (
+            channel !== NETWORK_CHANNELS.errorResponse
+            && channel !== NETWORK_CHANNELS.successResponse
+          ) return
+
+          // TODO: сверить messageId
+
+          this.bridgesManager.off(handlerIndex)
+        }
+      )
+    })
+
+    // TODO: add timeout
   }
 
 }

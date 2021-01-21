@@ -6,6 +6,15 @@ export enum NETWORK_CHANNELS {
   errorResponse,
 }
 
+export enum NETWORK_ERROR_TYPE {
+  // Can't resolve root to host
+  noRoot,
+  // uri handler hasn't been found at destination host
+  noHandler,
+  // error which handler has risen while executing
+  handlerError,
+}
+
 
 // export enum NETWORK_MESSAGE_TYPE {
 //   request,
