@@ -8,6 +8,7 @@ import {
 } from '../../network/networkHelpers'
 import {NETWORK_MESSAGE_TYPE} from '../../constants'
 import {callSafely} from '../../../../../../squidlet-lib/src/common'
+import {makeUniqId} from '../../../../../../squidlet-lib/src/uniqId'
 
 
 // export type NetworkIncomeRequestHandler = (
@@ -36,14 +37,17 @@ export default class Network extends EntityBase {
 
 
   async request(hostName: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
-    const {connectionId, hostId} = this.hostResolver.resoveConnection(hostName)
+    const {connectionId, hostId} = this.hostResolver.resoveConnectionByName(hostName)
     // TODO: нужно ещё message id и тип сообщения - обыное или возврат ошибки
     // TODO: хотя для ошибок можно использовать отдельный канал
+    const messageId = makeUniqId()
     const completePayload = encodeNetworkPayload(
       hostId,
       this.config.hostId,
       uri,
       payload,
+      NETWORK_MESSAGE_TYPE.request,
+      messageId,
       this.config.config.defaultTtl
     )
 
@@ -112,8 +116,22 @@ export default class Network extends EntityBase {
 
     callSafely(() => this.uriHandlers[uri](payload, fromHostId))
       .then((result: Uint8Array | void) => {
-        // TODO: send response back
         // TODO: обратные payload может быть и void
+        const connectionId = this.hostResolver.resoveConnection(hostId)
+        const completePayload = encodeNetworkPayload(
+          hostId,
+          this.config.hostId,
+          uri,
+          result,
+          NETWORK_MESSAGE_TYPE.request,
+          messageId,
+          this.config.config.defaultTtl
+        )
+
+        this.bridgesManager.send(connectionId, completePayload)
+          .catch((e: Error) => {
+            this.log.error(`Error sending message back: "${e}"`)
+          })
       })
       .catch((e: Error) => {
         this.sendErrorBack(fromHostId, messageId, NETWORK_MESSAGE_TYPE.noHandler)
@@ -126,7 +144,21 @@ export default class Network extends EntityBase {
     errorType: NETWORK_MESSAGE_TYPE,
     message?: string
   ) {
-    // TODO: add
+    const connectionId = this.hostResolver.resoveConnection(hostId)
+    const completePayload = encodeNetworkPayload(
+      hostId,
+      this.config.hostId,
+      uri,
+      result,
+      NETWORK_MESSAGE_TYPE.request,
+      messageId,
+      this.config.config.defaultTtl
+    )
+
+    this.bridgesManager.send(connectionId, completePayload)
+      .catch((e: Error) => {
+        this.log.error(`Error sending error back: "${e}"`)
+      })
   }
 
 }
