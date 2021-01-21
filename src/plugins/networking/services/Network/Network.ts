@@ -7,7 +7,7 @@ import {
   encodeNetworkPayload,
   extractToHostIdFromPayload
 } from './networkHelpers'
-import {NETWORK_MESSAGE_TYPE} from '../../constants'
+import {NETWORK_CHANNELS, NETWORK_MESSAGE_TYPE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
 
@@ -62,7 +62,11 @@ export default class Network extends EntityBase {
       payload,
     )
 
-    await this.bridgesManager.sendRequest(connectionId, completePayload)
+    await this.bridgesManager.send(
+      connectionId,
+      NETWORK_CHANNELS.request,
+      completePayload
+    )
 
 
 

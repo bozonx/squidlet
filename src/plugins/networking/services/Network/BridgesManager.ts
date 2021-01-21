@@ -1,33 +1,30 @@
+import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
+
+type BridgesManagerHandler = (
+  connectionId: string,
+  channel: number,
+  payload: Uint8Array
+) => void
+
 export enum BRIDGE_MANAGER_EVENTS {
-  incomeRequest,
-  incomeSuccessResponse,
-  incomeErrorResponse
+  incomeMessage,
 }
 
 
 export class BridgesManager {
-  async sendRequest(connectionId: string, payload: Uint8Array) {
+  private events = new IndexedEventEmitter()
 
+
+  async send(connectionId: string, channel: number, payload: Uint8Array) {
+    // TODO: add
   }
 
-  async sendSuccessResponse(connectionId: string, payload: Uint8Array) {
-
+  on(eventName: BRIDGE_MANAGER_EVENTS, cb: BridgesManagerHandler): number {
+    return this.events.addListener(BRIDGE_MANAGER_EVENTS.incomeMessage, cb)
   }
 
-  async sendErrorResponse(connectionId: string, payload: Uint8Array) {
-
-  }
-
-  on(eventName: BRIDGE_MANAGER_EVENTS, cb: (...params: any[]) => void) {
-
-  }
-
-  once(eventName: BRIDGE_MANAGER_EVENTS, cb: (...params: any[]) => void) {
-
-  }
-
-  off() {
-
+  off(handlerIndex: number) {
+    this.events.removeListener(handlerIndex)
   }
 
 }
