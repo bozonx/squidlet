@@ -136,7 +136,6 @@ export default class Network extends EntityBase {
     message?: string
   ) {
     const errorPayload = encodeErrorPayload(errorCode, message)
-    // TODO: Add message to payload
 
     this.sendMessage(NETWORK_CHANNELS.errorResponse, messageId, toHostId, errorPayload)
       .catch((e: Error) => {
@@ -197,7 +196,8 @@ export default class Network extends EntityBase {
       )
 
       const timeout = setTimeout(() =>  {
-        // TODO: add timeout
+        this.bridgesManager.off(handlerIndex)
+        reject(`Timeout has been exceeded`)
       }, this.config.config.responseTimoutSec)
     })
   }
