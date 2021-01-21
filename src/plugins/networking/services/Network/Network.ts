@@ -56,14 +56,13 @@ export default class Network extends EntityBase {
     const completePayload = encodeNetworkPayload(
       this.config.hostId,
       hostId,
-      NETWORK_MESSAGE_TYPE.request,
       messageId,
       this.config.config.defaultTtl,
       uri,
       payload,
     )
 
-    await this.bridgesManager.send(connectionId, completePayload)
+    await this.bridgesManager.sendRequest(connectionId, completePayload)
 
 
 

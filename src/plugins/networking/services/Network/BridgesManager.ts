@@ -6,15 +6,15 @@ export enum BRIDGE_MANAGER_EVENTS {
 
 
 export class BridgesManager {
-  async sendRequest() {
+  async sendRequest(connectionId: string, payload: Uint8Array) {
 
   }
 
-  async sendSuccessResponse() {
+  async sendSuccessResponse(connectionId: string, payload: Uint8Array) {
 
   }
 
-  async sendErrorResponse() {
+  async sendErrorResponse(connectionId: string, payload: Uint8Array) {
 
   }
 
