@@ -6,7 +6,7 @@ export enum NETWORK_CHANNELS {
   errorResponse,
 }
 
-export enum NETWORK_ERROR_TYPE {
+export enum NETWORK_ERROR_CODE {
   // Can't resolve root to host
   noRoot,
   // uri handler hasn't been found at destination host

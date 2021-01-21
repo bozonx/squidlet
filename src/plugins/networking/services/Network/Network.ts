@@ -3,11 +3,12 @@ import {makeUniqId} from 'squidlet-lib/src/uniqId'
 
 import EntityBase from '../../../../base/EntityBase'
 import {
+  decodeErrorPayload,
   decodeNetworkMessage, encodeErrorPayload,
-  encodeNetworkPayload,
+  encodeNetworkPayload, extractMessageId,
   extractToHostIdFromPayload,
 } from './networkHelpers'
-import {NETWORK_CHANNELS, NETWORK_ERROR_TYPE} from '../../constants'
+import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
 
@@ -68,25 +69,6 @@ export default class Network extends EntityBase {
     delete this.uriHandlers[uri]
   }
 
-  // onIncomeMessage(cb: NetworkIncomeRequestHandler): number {
-  //   return this.incomeMessagesEvent.addListener(cb)
-  // }
-  //
-  // off(handlerIndex: number) {
-  //   this.incomeMessagesEvent.removeListener(handlerIndex)
-  // }
-
-  // private handleIncomeRequest = () => {
-  //   // TODO: add
-  // }
-  //
-  // private handleIncomeSuccessResponse = () => {
-  //   // TODO: add
-  // }
-  //
-  // private handleIncomeErrorResponse = () => {
-  //   // TODO: add
-  // }
 
   private handleIncomeMessage = (completePayload: Uint8Array, connectionId: string) => {
     // TODO: validate message - если не валидное то пишим в локальный лог
@@ -150,10 +132,10 @@ export default class Network extends EntityBase {
   private sendErrorBack(
     toHostId: string,
     messageId: string,
-    errorType: NETWORK_ERROR_TYPE,
+    errorCode: NETWORK_ERROR_CODE,
     message?: string
   ) {
-    const errorPayload = encodeErrorPayload(errorType, message)
+    const errorPayload = encodeErrorPayload(errorCode, message)
     // TODO: Add message to payload
 
     this.sendMessage(NETWORK_CHANNELS.errorResponse, messageId, toHostId, errorPayload)
@@ -188,25 +170,36 @@ export default class Network extends EntityBase {
 
   private waitForResponse(messageId: string): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
-
-      // TODO: слушать оба канала
-
       const handlerIndex = this.bridgesManager.on(
         BRIDGE_MANAGER_EVENTS.incomeMessage,
         (connectionId: string, channel: number, payload: Uint8Array) => {
           if (
-            channel !== NETWORK_CHANNELS.errorResponse
-            && channel !== NETWORK_CHANNELS.successResponse
+            channel !== NETWORK_CHANNELS.successResponse
+            && channel !== NETWORK_CHANNELS.errorResponse
           ) return
 
-          // TODO: сверить messageId
+          if (extractMessageId(payload) !== messageId) return
 
           this.bridgesManager.off(handlerIndex)
+          clearTimeout(timeout)
+
+          if (channel === NETWORK_CHANNELS.successResponse) {
+            resolve(payload)
+          }
+          else {
+            const [errorCode, message] = decodeErrorPayload(payload)
+
+            reject(
+              `Error "${errorCode}"${(message) ? ': ' + message : ''}`
+            )
+          }
         }
       )
-    })
 
-    // TODO: add timeout
+      const timeout = setTimeout(() =>  {
+        // TODO: add timeout
+      }, this.config.config.responseTimoutSec)
+    })
   }
 
 }

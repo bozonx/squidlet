@@ -1,4 +1,4 @@
-import {NETWORK_ERROR_TYPE, NETWORK_MESSAGE_TYPE} from '../../constants'
+import {NETWORK_ERROR_CODE, NETWORK_MESSAGE_TYPE} from '../../constants'
 
 export function encodeNetworkPayload(
   fromHostId: string,
@@ -23,12 +23,16 @@ export function extractToHostIdFromPayload(data: Uint8Array): string {
 }
 
 export function encodeErrorPayload(
-  errorType: NETWORK_ERROR_TYPE,
+  errorType: NETWORK_ERROR_CODE,
   message?: string
 ): Uint8Array {
   // TODO: add
 }
 
-export function decodeErrorPayload(payload: Uint8Array): [NETWORK_ERROR_TYPE, string] {
+export function decodeErrorPayload(payload: Uint8Array): [NETWORK_ERROR_CODE, string] {
+  // TODO: add
+}
+
+export function extractMessageId(payload: Uint8Array): string | undefined {
   // TODO: add
 }
