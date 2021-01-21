@@ -1,4 +1,5 @@
-import IndexedEvents from 'squidlet-lib/src/IndexedEvents'
+import {callSafely} from 'squidlet-lib/src/common'
+import {makeUniqId} from 'squidlet-lib/src/uniqId'
 
 import EntityBase from '../../../../base/EntityBase'
 import {
@@ -7,8 +8,6 @@ import {
   extractToHostIdFromPayload
 } from '../../network/networkHelpers'
 import {NETWORK_MESSAGE_TYPE} from '../../constants'
-import {callSafely} from '../../../../../../squidlet-lib/src/common'
-import {makeUniqId} from '../../../../../../squidlet-lib/src/uniqId'
 
 
 // export type NetworkIncomeRequestHandler = (
@@ -27,7 +26,6 @@ export type UriHandler = (
 export default class Network extends EntityBase {
   private bridgesManager: BridgesManager
   private hostResolver: HostResolver
-  //private incomeMessagesEvent = new IndexedEvents<NetworkIncomeRequestHandler>()
   private uriHandlers: Record<string, UriHandler> = {}
 
 
@@ -42,13 +40,13 @@ export default class Network extends EntityBase {
     // TODO: хотя для ошибок можно использовать отдельный канал
     const messageId = makeUniqId()
     const completePayload = encodeNetworkPayload(
-      hostId,
       this.config.hostId,
-      uri,
-      payload,
+      hostId,
       NETWORK_MESSAGE_TYPE.request,
       messageId,
-      this.config.config.defaultTtl
+      this.config.config.defaultTtl,
+      uri,
+      payload,
     )
 
     await this.bridgesManager.send(connectionId, completePayload)

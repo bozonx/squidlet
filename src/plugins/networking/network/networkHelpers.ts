@@ -1,13 +1,13 @@
 import {NETWORK_MESSAGE_TYPE} from '../constants'
 
 export function encodeNetworkPayload(
-  toHostId: string,
   fromHostId: string,
-  uri: string,
-  payload: Uint8Array,
+  toHostId: string,
   messageType: NETWORK_MESSAGE_TYPE,
-  messaageId: string,
-  ttl: number
+  messageId: string,
+  ttl: number,
+  uri?: string,
+  payload?: Uint8Array
 ): Uint8Array {
   // TODO: add
 }
