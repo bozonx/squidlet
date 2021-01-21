@@ -65,7 +65,23 @@ export default class Network extends EntityBase {
       completePayload
     )
 
-    // TODO: нужно ещё ждать сообщение об ошибке если придет
+    return new Promise((resolve, reject) => {
+      const handlerIndex = this.bridgesManager.on(
+        BRIDGE_MANAGER_EVENTS.incomeMessage,
+        (connectionId: string, channel: number, payload: Uint8Array) => {
+          if (
+            channel !== NETWORK_CHANNELS.errorResponse
+            && channel !== NETWORK_CHANNELS.successResponse
+          ) return
+
+          // TODO: сверить messageId
+
+          this.bridgesManager.off(handlerIndex)
+        }
+      )
+    })
+
+    // TODO: add timeout
   }
 
   registerUriHandler(uri: string, cb: UriHandler) {
