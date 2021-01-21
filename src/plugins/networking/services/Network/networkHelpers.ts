@@ -1,4 +1,4 @@
-import {NETWORK_MESSAGE_TYPE} from '../constants'
+import {NETWORK_MESSAGE_TYPE} from '../../constants'
 
 export function encodeNetworkPayload(
   fromHostId: string,

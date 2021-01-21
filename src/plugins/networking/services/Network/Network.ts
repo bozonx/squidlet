@@ -6,8 +6,9 @@ import {
   decodeNetworkMessage,
   encodeNetworkPayload,
   extractToHostIdFromPayload
-} from '../../network/networkHelpers'
+} from './networkHelpers'
 import {NETWORK_MESSAGE_TYPE} from '../../constants'
+import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
 
 // export type NetworkIncomeRequestHandler = (
@@ -24,13 +25,26 @@ export type UriHandler = (
 
 
 export default class Network extends EntityBase {
-  private bridgesManager: BridgesManager
+  private bridgesManager!: BridgesManager
   private hostResolver: HostResolver
   private uriHandlers: Record<string, UriHandler> = {}
 
 
   async init() {
-    this.bridgesManager.onIncomeMessage(this.handleIncomeMessage)
+    this.bridgesManager = new BridgesManager()
+
+    this.bridgesManager.on(
+      BRIDGE_MANAGER_EVENTS.incomeRequest,
+      this.handleIncomeRequest
+    )
+    this.bridgesManager.on(
+      BRIDGE_MANAGER_EVENTS.incomeSuccessResponse,
+      this.handleIncomeSuccessResponse
+    )
+    this.bridgesManager.on(
+      BRIDGE_MANAGER_EVENTS.incomeErrorResponse,
+      this.handleIncomeErrorResponse
+    )
   }
 
 
@@ -76,6 +90,17 @@ export default class Network extends EntityBase {
   //   this.incomeMessagesEvent.removeListener(handlerIndex)
   // }
 
+  private handleIncomeRequest = () => {
+    // TODO: add
+  }
+
+  private handleIncomeSuccessResponse = () => {
+    // TODO: add
+  }
+
+  private handleIncomeErrorResponse = () => {
+    // TODO: add
+  }
 
   private handleIncomeMessage = (completePayload: Uint8Array, connectionId: string) => {
     // TODO: validate message - если не валидное то пишим в локальный лог
