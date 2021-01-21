@@ -15,11 +15,14 @@ export type NetworkIncomeRequestHandler = (
   //fromConnectionId: string
 ) => void
 
+export type UriHandler = (payload: Uint8Array, fromHostId: string) => void
+
 
 export default class Network extends EntityBase {
   private bridgesManager: BridgesManager
   private hostResolver: HostResolver
-  private incomeMessagesEvent = new IndexedEvents<NetworkIncomeRequestHandler>()
+  //private incomeMessagesEvent = new IndexedEvents<NetworkIncomeRequestHandler>()
+  private uriHandlers: Record<string, UriHandler> = {}
 
 
   async init() {
@@ -27,7 +30,8 @@ export default class Network extends EntityBase {
   }
 
 
-  async send(host: string, uri: string, payload: Uint8Array): Promise<void> {
+  async request(host: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
+    // TODO: надо имя хоста резолвить в id
     const connectionId: string = this.hostResolver.resoveConnection(host)
     // TODO: нужно ещё message id и тип сообщения - обыное или возврат ошибки
     // TODO: хотя для ошибок можно использовать отдельный канал
@@ -44,13 +48,25 @@ export default class Network extends EntityBase {
     // TODO: нужно ещё ждать сообщение об ошибке если придет
   }
 
-  onIncomeMessage(cb: NetworkIncomeRequestHandler): number {
-    return this.incomeMessagesEvent.addListener(cb)
+  registerUriHandler(uri: string, cb: UriHandler) {
+    if (this.uriHandlers[uri]) {
+      throw new Error(`Uri "${uri}" has been already registered.`)
+    }
+
+    this.uriHandlers[uri] = cb
   }
 
-  off(handlerIndex: number) {
-    this.incomeMessagesEvent.removeListener(handlerIndex)
+  removeUriHandler(uri: string) {
+    delete this.uriHandlers[uri]
   }
+
+  // onIncomeMessage(cb: NetworkIncomeRequestHandler): number {
+  //   return this.incomeMessagesEvent.addListener(cb)
+  // }
+  //
+  // off(handlerIndex: number) {
+  //   this.incomeMessagesEvent.removeListener(handlerIndex)
+  // }
 
 
   private handleIncomeMessage = (completePayload: Uint8Array, connectionId: string) => {
@@ -61,7 +77,12 @@ export default class Network extends EntityBase {
     if (this.config.hostId === toHostId) {
       const [, fromHostId, uri, payload] = decodeNetworkMessage(completePayload)
 
-      this.incomeMessagesEvent.emit(uri, payload, fromHostId)
+      if (!this.uriHandlers[uri]) {
+        // TODO: вернуть обратно ошибку
+        return
+      }
+
+      this.uriHandlers[uri](payload, fromHostId)
     }
     else {
       // pass the message further
