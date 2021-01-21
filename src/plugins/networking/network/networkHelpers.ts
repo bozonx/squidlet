@@ -11,7 +11,7 @@ export function encodeNetworkPayload(
 
 export function decodeNetworkMessage(
   data: Uint8Array
-): [string, string, string, Uint8Array] {
+): [string, string, string, string, Uint8Array] {
   // TODO: validate message
 
 }

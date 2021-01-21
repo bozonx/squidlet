@@ -6,16 +6,21 @@ import {
   encodeNetworkPayload,
   extractToHostIdFromPayload
 } from '../../network/networkHelpers'
+import {NETWORK_MESSAGE_TYPE} from '../../constants'
+import {callSafely} from '../../../../../../squidlet-lib/src/common'
 
 
-export type NetworkIncomeRequestHandler = (
-  uri: string,
+// export type NetworkIncomeRequestHandler = (
+//   uri: string,
+//   payload: Uint8Array,
+//   fromHost: string,
+//   //fromConnectionId: string
+// ) => void
+
+export type UriHandler = (
   payload: Uint8Array,
-  fromHost: string,
-  //fromConnectionId: string
-) => void
-
-export type UriHandler = (payload: Uint8Array, fromHostId: string) => void
+  fromHostId: string
+) => Promise<Uint8Array | void>
 
 
 export default class Network extends EntityBase {
@@ -30,13 +35,12 @@ export default class Network extends EntityBase {
   }
 
 
-  async request(host: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
-    // TODO: надо имя хоста резолвить в id
-    const connectionId: string = this.hostResolver.resoveConnection(host)
+  async request(hostName: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
+    const {connectionId, hostId} = this.hostResolver.resoveConnection(hostName)
     // TODO: нужно ещё message id и тип сообщения - обыное или возврат ошибки
     // TODO: хотя для ошибок можно использовать отдельный канал
     const completePayload = encodeNetworkPayload(
-      host,
+      hostId,
       this.config.hostId,
       uri,
       payload,
@@ -44,6 +48,8 @@ export default class Network extends EntityBase {
     )
 
     await this.bridgesManager.send(connectionId, completePayload)
+
+
 
     // TODO: нужно ещё ждать сообщение об ошибке если придет
   }
@@ -70,26 +76,19 @@ export default class Network extends EntityBase {
 
 
   private handleIncomeMessage = (completePayload: Uint8Array, connectionId: string) => {
-    // TODO: validate message
+    // TODO: validate message - если не валидное то пишим в локальный лог
 
     const toHostId: string = extractToHostIdFromPayload(completePayload)
 
     if (this.config.hostId === toHostId) {
-      const [, fromHostId, uri, payload] = decodeNetworkMessage(completePayload)
-
-      if (!this.uriHandlers[uri]) {
-        // TODO: вернуть обратно ошибку
-        return
-      }
-
-      this.uriHandlers[uri](payload, fromHostId)
+      this.callLocalUriHandler(completePayload)
     }
     else {
       // pass the message further
       const connectionId: string = this.hostResolver.resoveConnection(toHostId)
 
       // TODO: уменьшить TTL
-      // TODO: если TTL уже 0 то поднять ошибку
+      // TODO: если TTL уже 0 то вообще ничего не делать
 
       this.bridgesManager.send(connectionId, completePayload)
         .catch((e: Error) => {
@@ -98,6 +97,36 @@ export default class Network extends EntityBase {
           this.log.error(e)
         })
     }
+  }
+
+  private callLocalUriHandler(completePayload: Uint8Array) {
+    const [, fromHostId, uri, messageId, payload] = decodeNetworkMessage(
+      completePayload
+    )
+
+    if (!this.uriHandlers[uri]) {
+      this.sendErrorBack(fromHostId, messageId, NETWORK_MESSAGE_TYPE.noHandler)
+
+      return
+    }
+
+    callSafely(() => this.uriHandlers[uri](payload, fromHostId))
+      .then((result: Uint8Array | void) => {
+        // TODO: send response back
+        // TODO: обратные payload может быть и void
+      })
+      .catch((e: Error) => {
+        this.sendErrorBack(fromHostId, messageId, NETWORK_MESSAGE_TYPE.noHandler)
+      })
+  }
+
+  private sendErrorBack(
+    fromHostId: string,
+    messageId: string,
+    errorType: NETWORK_MESSAGE_TYPE,
+    message?: string
+  ) {
+    // TODO: add
   }
 
 }
