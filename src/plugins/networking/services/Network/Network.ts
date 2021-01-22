@@ -6,7 +6,6 @@ import {
   decodeErrorPayload,
   decodeNetworkMessage, encodeErrorPayload,
   encodeNetworkPayload, extractMessageId,
-  extractToHostIdFromPayload, validatePayload,
 } from './networkHelpers'
 import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
@@ -73,12 +72,17 @@ export default class Network extends EntityBase {
   private handleIncomeMessage = (
     connectionId: string,
     channel: number,
-    payload: Uint8Array
+    messagePayload: Uint8Array
   ) => {
+
+    // TODO: переотправку то надо делать и для других каналов
+
     if (channel !== NETWORK_CHANNELS.request) return
 
+    let decodedMessage: [string, string, string, number, Uint8Array, string]
+
     try {
-      validatePayload(payload)
+      decodedMessage = decodeNetworkMessage(messagePayload)
     }
     catch (e) {
       // TODO: maybe return it back to the sender
@@ -87,21 +91,29 @@ export default class Network extends EntityBase {
       return
     }
 
-    const [
-      fromHostId, toHostId, messageId, initialTtl, uri, payload
-    ] = decodeNetworkMessage(payload)
+    const [fromHostId, toHostId, messageId, ttl, payload, uri] = decodedMessage
 
     if (this.config.hostId === toHostId) {
-      this.callLocalUriHandler(payload)
+      this.callLocalUriHandler(uri, payload)
     }
     else {
+      if (ttl <= 0) {
+        // TODO: или отправить ошибку обратно
+        //       Тогда если ошибка о ttl тогда уже не посылать ошибку
+        //       чтобы не было зацикливания
+        // do noting on ttl 0
+        return
+      }
       // pass the message further
-      const connectionId: string = this.hostResolver.resoveConnection(toHostId)
-
-      // TODO: уменьшить TTL
-      // TODO: если TTL уже 0 то вообще ничего не делать
-
-      this.bridgesManager.send(connectionId, completePayload)
+      this.sendMessage(
+        NETWORK_CHANNELS.request,
+        messageId,
+        toHostId,
+        payload,
+        uri,
+        fromHostId,
+        ttl - 1
+      )
         .catch((e: Error) => {
           // TODO: вместо записи в лог надо отправить назад ошибку,
           //       но как-то связать ее с этим сообщением
@@ -110,7 +122,7 @@ export default class Network extends EntityBase {
     }
   }
 
-  private callLocalUriHandler(completePayload: Uint8Array) {
+  private callLocalUriHandler(uri: string, payload: Uint8Array) {
     const [, fromHostId, uri, messageId, payload] = decodeNetworkMessage(
       completePayload
     )
@@ -165,13 +177,15 @@ export default class Network extends EntityBase {
     toHostId: string,
     payload?: Uint8Array,
     uri?: string,
+    fromHostId?: string,
+    ttl?: number
   ): Promise<void> {
     const connectionId = this.hostResolver.resoveConnection(toHostId)
     const completePayload = encodeNetworkPayload(
-      this.config.hostId,
+      (fromHostId) ? fromHostId : this.config.hostId,
       toHostId,
       messageId,
-      this.config.config.defaultTtl,
+      (ttl) ? ttl : this.config.config.defaultTtl,
       payload,
       uri
     )
