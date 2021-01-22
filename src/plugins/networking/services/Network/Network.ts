@@ -74,10 +74,11 @@ export default class Network extends EntityBase {
     channel: number,
     messagePayload: Uint8Array
   ) => {
-
-    // TODO: переотправку то надо делать и для других каналов
-
-    if (channel !== NETWORK_CHANNELS.request) return
+    if (![
+      NETWORK_CHANNELS.request,
+      NETWORK_CHANNELS.successResponse,
+      NETWORK_CHANNELS.errorResponse
+    ].includes(channel)) return
 
     let decodedMessage: [string, string, string, number, Uint8Array, string]
 
@@ -94,6 +95,10 @@ export default class Network extends EntityBase {
     const [fromHostId, toHostId, messageId, ttl, payload, uri] = decodedMessage
 
     if (this.config.hostId === toHostId) {
+
+
+      // TODO: переотправку то надо делать и для других каналов
+
       this.callLocalUriHandler(uri, payload)
     }
     else {
@@ -106,7 +111,7 @@ export default class Network extends EntityBase {
       }
       // pass the message further
       this.sendMessage(
-        NETWORK_CHANNELS.request,
+        channel,
         messageId,
         toHostId,
         payload,
