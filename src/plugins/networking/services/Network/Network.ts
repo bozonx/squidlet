@@ -104,7 +104,7 @@ export default class Network extends EntityBase {
       // the destination is current host
       if (channel === NETWORK_CHANNELS.request) {
         // call local handler
-        this.callLocalUriHandler(uri, payload)
+        this.callLocalUriHandler(fromHostId, messageId, uri, payload)
       }
       else {
         // rise event with parsed message for responses
@@ -142,13 +142,14 @@ export default class Network extends EntityBase {
     }
   }
 
-  private callLocalUriHandler(uri: string, payload: Uint8Array) {
-    const [, fromHostId, uri, messageId, payload] = decodeNetworkMessage(
-      completePayload
-    )
-
+  private callLocalUriHandler(
+    fromHostId: string,
+    messageId: string,
+    uri: string,
+    payload: Uint8Array
+  ) {
     if (!this.uriHandlers[uri]) {
-      this.sendErrorBack(fromHostId, messageId, NETWORK_MESSAGE_TYPE.noHandler)
+      this.sendErrorBack(fromHostId, messageId, NETWORK_ERROR_CODE.noHandler)
 
       return
     }
@@ -235,6 +236,8 @@ export default class Network extends EntityBase {
         }
         else {
           const [errorCode, message] = decodeErrorPayload(payload)
+
+          // TODO: добавить message для noRoute и noHandler
 
           reject(
             `Error "${errorCode}"${(message) ? ': ' + message : ''}`

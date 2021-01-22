@@ -7,8 +7,8 @@ export enum NETWORK_CHANNELS {
 }
 
 export enum NETWORK_ERROR_CODE {
-  // Can't resolve root to host
-  noRoot,
+  // Can't resolve route to host
+  noRoute,
   // uri handler hasn't been found at destination host
   noHandler,
   // error which handler has risen while executing
