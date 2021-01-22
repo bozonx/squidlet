@@ -1,33 +1,36 @@
 import {callSafely} from 'squidlet-lib/src/common'
 import {makeUniqId} from 'squidlet-lib/src/uniqId'
+import IndexedEvents from 'squidlet-lib/src/IndexedEvents'
 
 import EntityBase from '../../../../base/EntityBase'
 import {
   decodeErrorPayload,
-  decodeNetworkMessage, encodeErrorPayload,
-  encodeNetworkPayload, extractMessageId,
+  decodeNetworkMessage,
+  encodeErrorPayload,
+  encodeNetworkMessage,
 } from './networkHelpers'
 import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
-
-// export type NetworkIncomeRequestHandler = (
-//   uri: string,
-//   payload: Uint8Array,
-//   fromHost: string,
-//   //fromConnectionId: string
-// ) => void
 
 export type UriHandler = (
   payload: Uint8Array,
   fromHostId: string
 ) => Promise<Uint8Array | void>
 
+type IncomeResponseHandler = (
+  channel: NETWORK_CHANNELS,
+  fromHostId: string,
+  messageId: string,
+  payload: Uint8Array
+) => void
+
 
 export default class Network extends EntityBase {
   private bridgesManager!: BridgesManager
   private hostResolver: HostResolver
   private uriHandlers: Record<string, UriHandler> = {}
+  private incomeResponsesEvents = new IndexedEvents<IncomeResponseHandler>()
 
 
   async init() {
@@ -74,6 +77,7 @@ export default class Network extends EntityBase {
     channel: number,
     messagePayload: Uint8Array
   ) => {
+    // skip odd channels
     if (![
       NETWORK_CHANNELS.request,
       NETWORK_CHANNELS.successResponse,
@@ -86,8 +90,10 @@ export default class Network extends EntityBase {
       decodedMessage = decodeNetworkMessage(messagePayload)
     }
     catch (e) {
-      // TODO: maybe return it back to the sender
-      this.log.error(`Invalid request has been received`)
+      this.log.error(
+        `Invalid request has been received. ` +
+        `Connection id: ${connectionId}.channel: ${channel}`
+      )
 
       return
     }
@@ -95,11 +101,20 @@ export default class Network extends EntityBase {
     const [fromHostId, toHostId, messageId, ttl, payload, uri] = decodedMessage
 
     if (this.config.hostId === toHostId) {
-
-
-      // TODO: переотправку то надо делать и для других каналов
-
-      this.callLocalUriHandler(uri, payload)
+      // the destination is current host
+      if (channel === NETWORK_CHANNELS.request) {
+        // call local handler
+        this.callLocalUriHandler(uri, payload)
+      }
+      else {
+        // rise event with parsed message for responses
+        this.incomeResponsesEvents.emit(
+          channel,
+          fromHostId,
+          messageId,
+          payload
+        )
+      }
     }
     else {
       if (ttl <= 0) {
@@ -142,7 +157,7 @@ export default class Network extends EntityBase {
       .then((result: Uint8Array | void) => {
         // TODO: обратные payload может быть и void
         const connectionId = this.hostResolver.resoveConnection(hostId)
-        const completePayload = encodeNetworkPayload(
+        const completePayload = encodeNetworkMessage(
           hostId,
           this.config.hostId,
           uri,
@@ -186,7 +201,7 @@ export default class Network extends EntityBase {
     ttl?: number
   ): Promise<void> {
     const connectionId = this.hostResolver.resoveConnection(toHostId)
-    const completePayload = encodeNetworkPayload(
+    const completePayload = encodeNetworkMessage(
       (fromHostId) ? fromHostId : this.config.hostId,
       toHostId,
       messageId,
@@ -202,36 +217,33 @@ export default class Network extends EntityBase {
     )
   }
 
-  private waitForResponse(messageId: string): Promise<Uint8Array> {
+  private waitForResponse(requestMessageId: string): Promise<Uint8Array> {
     return new Promise((resolve, reject) => {
-      const handlerIndex = this.bridgesManager.on(
-        BRIDGE_MANAGER_EVENTS.incomeMessage,
-        (connectionId: string, channel: number, payload: Uint8Array) => {
-          if (
-            channel !== NETWORK_CHANNELS.successResponse
-            && channel !== NETWORK_CHANNELS.errorResponse
-          ) return
+      const handlerIndex = this.incomeResponsesEvents.addListener((
+        channel: NETWORK_CHANNELS,
+        fromHostId: string,
+        incomeMessageId: string,
+        payload: Uint8Array
+      ) => {
+        if (incomeMessageId !== requestMessageId) return
 
-          if (extractMessageId(payload) !== messageId) return
+        this.incomeResponsesEvents.removeListener(handlerIndex)
+        clearTimeout(timeout)
 
-          this.bridgesManager.off(handlerIndex)
-          clearTimeout(timeout)
-
-          if (channel === NETWORK_CHANNELS.successResponse) {
-            resolve(payload)
-          }
-          else {
-            const [errorCode, message] = decodeErrorPayload(payload)
-
-            reject(
-              `Error "${errorCode}"${(message) ? ': ' + message : ''}`
-            )
-          }
+        if (channel === NETWORK_CHANNELS.successResponse) {
+          resolve(payload)
         }
-      )
+        else {
+          const [errorCode, message] = decodeErrorPayload(payload)
+
+          reject(
+            `Error "${errorCode}"${(message) ? ': ' + message : ''}`
+          )
+        }
+      })
 
       const timeout = setTimeout(() =>  {
-        this.bridgesManager.off(handlerIndex)
+        this.incomeResponsesEvents.removeListener(handlerIndex)
         reject(`Timeout has been exceeded`)
       }, this.config.config.responseTimoutSec)
     })

@@ -1,6 +1,6 @@
 import {NETWORK_ERROR_CODE} from '../../constants'
 
-export function encodeNetworkPayload(
+export function encodeNetworkMessage(
   fromHostId: string,
   toHostId: string,
   messageId: string,
@@ -26,9 +26,5 @@ export function encodeErrorPayload(
 }
 
 export function decodeErrorPayload(payload: Uint8Array): [NETWORK_ERROR_CODE, string] {
-  // TODO: add
-}
-
-export function extractMessageId(payload: Uint8Array): string | undefined {
   // TODO: add
 }
