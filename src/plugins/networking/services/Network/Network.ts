@@ -6,7 +6,7 @@ import {
   decodeErrorPayload,
   decodeNetworkMessage, encodeErrorPayload,
   encodeNetworkPayload, extractMessageId,
-  extractToHostIdFromPayload,
+  extractToHostIdFromPayload, validatePayload,
 } from './networkHelpers'
 import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
@@ -70,13 +70,29 @@ export default class Network extends EntityBase {
   }
 
 
-  private handleIncomeMessage = (completePayload: Uint8Array, connectionId: string) => {
-    // TODO: validate message - если не валидное то пишим в локальный лог
+  private handleIncomeMessage = (
+    connectionId: string,
+    channel: number,
+    payload: Uint8Array
+  ) => {
+    if (channel !== NETWORK_CHANNELS.request) return
 
-    const toHostId: string = extractToHostIdFromPayload(completePayload)
+    try {
+      validatePayload(payload)
+    }
+    catch (e) {
+      // TODO: maybe return it back to the sender
+      this.log.error(`Invalid request has been received`)
+
+      return
+    }
+
+    const [
+      fromHostId, toHostId, messageId, initialTtl, uri, payload
+    ] = decodeNetworkMessage(payload)
 
     if (this.config.hostId === toHostId) {
-      this.callLocalUriHandler(completePayload)
+      this.callLocalUriHandler(payload)
     }
     else {
       // pass the message further
@@ -156,8 +172,8 @@ export default class Network extends EntityBase {
       toHostId,
       messageId,
       this.config.config.defaultTtl,
-      uri,
       payload,
+      uri
     )
 
     await this.bridgesManager.send(
