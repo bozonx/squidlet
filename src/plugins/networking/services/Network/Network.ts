@@ -1,6 +1,7 @@
 import {callSafely} from 'squidlet-lib/src/common'
 import {makeUniqId} from 'squidlet-lib/src/uniqId'
 import IndexedEvents from 'squidlet-lib/src/IndexedEvents'
+import {JsonTypes} from 'squidlet-lib/src/interfaces/Types'
 
 import EntityBase from '../../../../base/EntityBase'
 import {
@@ -14,9 +15,9 @@ import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 
 
 export type UriHandler = (
-  payload: Uint8Array,
+  data: JsonTypes | Uint8Array,
   fromHostId: string
-) => Promise<Uint8Array | void>
+) => Promise<JsonTypes | Uint8Array>
 
 type IncomeResponseHandler = (
   channel: NETWORK_CHANNELS,
@@ -154,27 +155,32 @@ export default class Network extends EntityBase {
       return
     }
 
-    callSafely(() => this.uriHandlers[uri](payload, fromHostId))
-      .then((result: Uint8Array | void) => {
-        // TODO: обратные payload может быть и void
-        const connectionId = this.hostResolver.resoveConnection(hostId)
-        const completePayload = encodeNetworkMessage(
-          hostId,
-          this.config.hostId,
-          uri,
-          result,
-          NETWORK_MESSAGE_TYPE.request,
-          messageId,
-          this.config.config.defaultTtl
-        )
+    const handlerData = uint8ArrToJson(payload)
 
-        this.bridgesManager.send(connectionId, completePayload)
+    callSafely(() => this.uriHandlers[uri](handlerData, fromHostId))
+      .then((result: JsonTypes | Uint8Array) => {
+        this.sendMessage(
+          NETWORK_CHANNELS.successResponse,
+          messageId,
+          fromHostId,
+          jsonToUint8Arr(result),
+          uri,
+        )
           .catch((e: Error) => {
-            this.log.error(`Error sending message back: "${e}"`)
+            this.log.error(
+              `Error sending success response back: ` +
+              `to host "${fromHostId}", uri "${uri}", messageId "${messageId}"` +
+              `. "${e}"`
+            )
           })
       })
       .catch((e: Error) => {
-        this.sendErrorBack(fromHostId, messageId, NETWORK_MESSAGE_TYPE.noHandler)
+        this.sendErrorBack(
+          fromHostId,
+          messageId,
+          NETWORK_ERROR_CODE.handlerError,
+          String(e)
+        )
       })
   }
 
