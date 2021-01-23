@@ -12,6 +12,7 @@ import {
 } from './networkHelpers'
 import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
+import {HostResolver} from './HostResolver'
 
 
 export type UriHandler = (
@@ -29,13 +30,14 @@ type IncomeResponseHandler = (
 
 export default class Network extends EntityBase {
   private bridgesManager!: BridgesManager
-  private hostResolver: HostResolver
+  private hostResolver!: HostResolver
   private uriHandlers: Record<string, UriHandler> = {}
   private incomeResponsesEvents = new IndexedEvents<IncomeResponseHandler>()
 
 
   async init() {
     this.bridgesManager = new BridgesManager()
+    this.hostResolver = new HostResolver()
 
     this.bridgesManager.on(
       BRIDGE_MANAGER_EVENTS.incomeMessage,
@@ -52,7 +54,7 @@ export default class Network extends EntityBase {
 
 
   async request(hostName: string, uri: string, payload: Uint8Array): Promise<Uint8Array> {
-    const hostId = this.hostResolver.resoveHostIdByName(hostName)
+    const hostId = this.hostResolver.resolveHostIdByName(hostName)
     const messageId = makeUniqId()
 
     await this.sendMessage(NETWORK_CHANNELS.request, messageId, hostId, payload, uri)
@@ -207,7 +209,7 @@ export default class Network extends EntityBase {
     fromHostId?: string,
     ttl?: number
   ): Promise<void> {
-    const connectionId = this.hostResolver.resoveConnection(toHostId)
+    const connectionId = this.hostResolver.resolveConnection(toHostId)
     const completePayload = encodeNetworkMessage(
       (fromHostId) ? fromHostId : this.config.hostId,
       toHostId,
