@@ -13,6 +13,7 @@ import {
 import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
 import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
 import {HostResolver} from './HostResolver'
+import {UriEvents} from './UriEvents'
 
 
 export type UriHandler = (
@@ -31,6 +32,7 @@ type IncomeResponseHandler = (
 export default class Network extends EntityBase {
   private bridgesManager!: BridgesManager
   private hostResolver!: HostResolver
+  private uriEvents!: UriEvents
   private uriHandlers: Record<string, UriHandler> = {}
   private incomeResponsesEvents = new IndexedEvents<IncomeResponseHandler>()
 
@@ -38,6 +40,7 @@ export default class Network extends EntityBase {
   async init() {
     this.bridgesManager = new BridgesManager()
     this.hostResolver = new HostResolver()
+    this.uriEvents = new UriEvents()
 
     this.bridgesManager.on(
       BRIDGE_MANAGER_EVENTS.incomeMessage,
@@ -72,6 +75,32 @@ export default class Network extends EntityBase {
 
   removeUriHandler(uri: string) {
     delete this.uriHandlers[uri]
+  }
+
+  emitUriEvent(
+    hostName: string,
+    uri: string,
+    eventName: string | number,
+    ...params: any[]
+  ) {
+    this.uriEvents.emit(hostName, uri, eventName, ...params)
+  }
+
+  onUriEvent(
+    hostName: string,
+    uri: string,
+    eventName: string | number,
+    cb: (...params: any[]) => void
+  ): Promise<number> {
+    return this.uriEvents.on(hostName, uri, eventName, cb)
+  }
+
+  offUriEvent(
+    hostName: string,
+    uri: string,
+    handlerIndex: number
+  ): Promise<void> {
+    return this.uriEvents.off(hostName, uri, handlerIndex)
   }
 
 
