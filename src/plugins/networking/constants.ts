@@ -1,9 +1,17 @@
 export const NETWORK_ACTION_SEPARATOR = '.'
 
 export enum NETWORK_CHANNELS {
-  request = 250,
+  request = 240,
   successResponse,
   errorResponse,
+
+  eventRegisterRequest,
+  eventRegisterResponseOk,
+  eventRegisterResponseFail,
+  eventOffRequest,
+  eventOffResponseOk,
+  eventOffResponseFail,
+  eventEmit,
 }
 
 export enum NETWORK_ERROR_CODE {

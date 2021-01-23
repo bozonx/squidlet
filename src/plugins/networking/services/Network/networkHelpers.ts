@@ -28,3 +28,31 @@ export function encodeErrorPayload(
 export function decodeErrorPayload(payload: Uint8Array): [NETWORK_ERROR_CODE, string] {
   // TODO: add
 }
+
+export function encodeEventRegisterPayload(eventName: string, handlerId: string): Uint8Array {
+  // TODO: add
+}
+
+export function decodeEventRegisterPayload(payload: Uint8Array): [string, string] {
+  // TODO: add
+}
+
+export function encodeEventOffPayload(handlerId: string): Uint8Array {
+  // TODO: add
+}
+
+export function decodeEventOffPayload(payload: Uint8Array): string {
+  // TODO: add
+}
+
+export function encodeEventEmitPayload(
+  eventName: string | number,
+  ...params: any[]
+): Uint8Array {
+  // TODO: add
+}
+
+export function вуcodeEventEmitPayload(payload: Uint8Array): [string, any[]] {
+  // TODO: add
+}
+

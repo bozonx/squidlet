@@ -30,8 +30,9 @@ type IncomeResponseHandler = (
 
 
 export default class Network extends EntityBase {
-  private bridgesManager!: BridgesManager
-  private hostResolver!: HostResolver
+  hostResolver!: HostResolver
+  bridgesManager!: BridgesManager
+
   private uriEvents!: UriEvents
   private uriHandlers: Record<string, UriHandler> = {}
   private incomeResponsesEvents = new IndexedEvents<IncomeResponseHandler>()
@@ -40,7 +41,7 @@ export default class Network extends EntityBase {
   async init() {
     this.bridgesManager = new BridgesManager()
     this.hostResolver = new HostResolver()
-    this.uriEvents = new UriEvents()
+    this.uriEvents = new UriEvents(this)
 
     this.bridgesManager.on(
       BRIDGE_MANAGER_EVENTS.incomeMessage,
@@ -60,7 +61,7 @@ export default class Network extends EntityBase {
     const hostId = this.hostResolver.resolveHostIdByName(hostName)
     const messageId = makeUniqId()
 
-    await this.sendMessage(NETWORK_CHANNELS.request, messageId, hostId, payload, uri)
+    await this.$sendMessage(NETWORK_CHANNELS.request, messageId, hostId, payload, uri)
 
     return this.waitForResponse(messageId)
   }
@@ -91,18 +92,46 @@ export default class Network extends EntityBase {
     uri: string,
     eventName: string | number,
     cb: (...params: any[]) => void
-  ): Promise<number> {
+  ): Promise<string> {
     return this.uriEvents.on(hostName, uri, eventName, cb)
   }
 
   offUriEvent(
     hostName: string,
     uri: string,
-    handlerIndex: number
+    handlerId: string
   ): Promise<void> {
-    return this.uriEvents.off(hostName, uri, handlerIndex)
+    return this.uriEvents.off(hostName, uri, handlerId)
   }
 
+
+  async $sendMessage(
+    channel: NETWORK_CHANNELS,
+    messageId: string,
+    toHostId: string,
+    payload?: Uint8Array,
+    uri?: string,
+    fromHostId?: string,
+    ttl?: number
+  ): Promise<void> {
+    const connectionId = this.hostResolver.resolveConnection(toHostId)
+    const completePayload = encodeNetworkMessage(
+      (fromHostId) ? fromHostId : this.config.hostId,
+      toHostId,
+      messageId,
+      (ttl) ? ttl : this.config.config.defaultTtl,
+      payload,
+      uri
+    )
+
+    await this.bridgesManager.send(
+      connectionId,
+      channel,
+      completePayload
+    )
+
+    // TODO: если не получилось отправить то надо либо повторять либо ждать пока появится сеть
+  }
 
   private handleIncomeMessage = (
     connectionId: string,
@@ -157,7 +186,7 @@ export default class Network extends EntityBase {
         return
       }
       // pass the message further
-      this.sendMessage(
+      this.$sendMessage(
         channel,
         messageId,
         toHostId,
@@ -223,36 +252,10 @@ export default class Network extends EntityBase {
   ) {
     const errorPayload = encodeErrorPayload(errorCode, message)
 
-    this.sendMessage(NETWORK_CHANNELS.errorResponse, messageId, toHostId, errorPayload)
+    this.$sendMessage(NETWORK_CHANNELS.errorResponse, messageId, toHostId, errorPayload)
       .catch((e: Error) => {
         this.log.error(`Error sending error back: "${e}"`)
       })
-  }
-
-  private async sendMessage(
-    channel: NETWORK_CHANNELS,
-    messageId: string,
-    toHostId: string,
-    payload?: Uint8Array,
-    uri?: string,
-    fromHostId?: string,
-    ttl?: number
-  ): Promise<void> {
-    const connectionId = this.hostResolver.resolveConnection(toHostId)
-    const completePayload = encodeNetworkMessage(
-      (fromHostId) ? fromHostId : this.config.hostId,
-      toHostId,
-      messageId,
-      (ttl) ? ttl : this.config.config.defaultTtl,
-      payload,
-      uri
-    )
-
-    await this.bridgesManager.send(
-      connectionId,
-      channel,
-      completePayload
-    )
   }
 
   private waitForResponse(requestMessageId: string): Promise<Uint8Array> {
