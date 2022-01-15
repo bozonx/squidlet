@@ -79,12 +79,11 @@ export default class Network extends EntityBase {
   }
 
   emitUriEvent(
-    hostName: string,
     uri: string,
     eventName: string | number,
     ...params: any[]
   ) {
-    this.uriEvents.emit(hostName, uri, eventName, ...params)
+    this.uriEvents.emit(uri, eventName, ...params)
   }
 
   onUriEvent(

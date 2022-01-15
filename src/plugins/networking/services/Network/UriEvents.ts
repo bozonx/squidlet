@@ -1,7 +1,12 @@
+import {makeUniqId} from 'squidlet-lib/src/uniqId'
+
 import Network from './Network'
 import {NETWORK_CHANNELS} from '../../constants'
-import {makeUniqId} from '../../../../../../squidlet-lib/src/uniqId'
-import {encodeEventEmitPayload, encodeEventOffPayload, encodeEventRegisterPayload} from './networkHelpers'
+import {
+  encodeEventEmitPayload,
+  encodeEventOffPayload,
+  encodeEventRegisterPayload
+} from './networkHelpers'
 import {BRIDGE_MANAGER_EVENTS} from './BridgesManager'
 
 
@@ -20,8 +25,9 @@ export class UriEvents {
   }
 
 
+  // TODO: мы поднимает просто событие,
+  //  а уже потом смотрится кто на нас подписан и туда рассылается
   emit(
-    hostName: string,
     uri: string,
     eventName: string | number,
     ...params: any[]
@@ -68,6 +74,7 @@ export class UriEvents {
 
   async off(
     hostName: string,
+    // TODO: лучше убрать uri
     uri: string,
     handlerId: string
   ) {
