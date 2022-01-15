@@ -27,7 +27,7 @@ export function lastItem(arr: any[]): any {
 export function withoutLastItem(arr: any[]): any[] {
   return arr.slice(0, arr.length - 1)
 }
-q
+
 /**
  * Make a new array which contains items which are different in samples.
  * Examples:
