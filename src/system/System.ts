@@ -1,5 +1,5 @@
-import {IndexedEventEmitter} from 'squidlet-lib/src/IndexedEventEmitter.js'
-import {LogPublisher} from 'squidlet-lib/src/LogPublisher.js'
+import {IndexedEventEmitter} from 'squidlet-lib'
+import {LogPublisher} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './managers/IoManager.js'
 import {SystemInfoManager} from './managers/SystemInfoManager.js'
