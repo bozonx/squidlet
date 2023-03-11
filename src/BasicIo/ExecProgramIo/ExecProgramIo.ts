@@ -1,7 +1,10 @@
 import {IoBase} from '../../system/Io/IoBase.js'
 
 
-export class HttpClientIo extends IoBase {
+/**
+ * Execute external program
+ */
+export class ExecProgramIo extends IoBase {
 
   async init(): Promise<void> {
     await super.init()

@@ -1,7 +1,7 @@
 import {System} from '../System.js'
 
 
-export class ServiceContext {
+export class IoContext {
   private readonly system: System
 
 
@@ -10,6 +10,7 @@ export class ServiceContext {
   }
 
   async init() {
+
   }
 
   async destroy() {

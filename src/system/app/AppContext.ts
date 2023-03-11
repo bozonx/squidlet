@@ -9,10 +9,6 @@ export class AppContext {
     this.system = system
   }
 
-  async init() {
-
-  }
-
   async destroy() {
   }
 }

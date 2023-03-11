@@ -1,15 +1,15 @@
-import {ServiceContext} from './ServiceContext.js'
 import {System} from '../System.js'
+import {IoContext} from './IoContext.js'
 
 
-export class ServiceBase {
+export class IoBase {
   private readonly system: System
-  private readonly context: ServiceContext
+  private readonly context: IoContext
 
 
   constructor(system: System) {
     this.system = system
-    this.context = new ServiceContext(this.system)
+    this.context = new IoContext(this.system)
   }
 
   async init() {
