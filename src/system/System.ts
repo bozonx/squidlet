@@ -24,14 +24,16 @@ export class System {
   )
   // managers
   readonly io: IoManager
+  // TODO: по сути это драйвер
   readonly exec: ExecManager
+  // TODO: по сути это драйвер
   readonly systemInfo: SystemInfoManager
-  readonly network: NetworkManager
   readonly files: FilesManager
-  readonly db: DbManager
   readonly cache: CacheManager
+  readonly db: DbManager
   readonly configs: ConfigsManager
   readonly permissions: PermissionsManager
+  readonly network: NetworkManager
   readonly services: ServicesManager
   readonly apiManager: ApiManager
   readonly cmd: CmdManager
@@ -45,12 +47,12 @@ export class System {
     this.io = new IoManager(this)
     this.exec = new ExecManager(this)
     this.systemInfo = new SystemInfoManager(this)
-    this.network = new NetworkManager(this)
     this.files = new FilesManager(this)
-    this.db = new DbManager(this)
     this.cache = new CacheManager(this)
+    this.db = new DbManager(this)
     this.configs = new ConfigsManager(this)
     this.permissions = new PermissionsManager(this)
+    this.network = new NetworkManager(this)
     this.services = new ServicesManager(this)
     this.apiManager = new ApiManager(this)
     this.cmd = new CmdManager(this)
@@ -63,12 +65,12 @@ export class System {
     await this.io.init()
     await this.exec.init()
     await this.systemInfo.init()
-    await this.network.init()
     await this.files.init()
-    await this.db.init()
     await this.cache.init()
+    await this.db.init()
     await this.configs.init()
     await this.permissions.init()
+    await this.network.init()
     await this.services.init()
     await this.apiManager.init()
     await this.cmd.init()
@@ -83,12 +85,12 @@ export class System {
     await this.cmd.destroy()
     await this.apiManager.destroy()
     await this.services.destroy()
+    await this.network.destroy()
     await this.permissions.destroy()
     await this.configs.destroy()
-    await this.cache.destroy()
     await this.db.destroy()
+    await this.cache.destroy()
     await this.files.destroy()
-    await this.network.destroy()
     await this.systemInfo.destroy()
     await this.exec.destroy()
     await this.io.destroy()
