@@ -37,6 +37,8 @@ export class System {
   readonly cmd: CmdManager
   readonly ui: UiManager
   readonly apps: AppsManager
+  // TODO: распределённая служба заданний
+  // TODO: realtime api
 
 
   constructor() {
