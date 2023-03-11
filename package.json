@@ -4,11 +4,15 @@
   "description": "Personal network and computer technology",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
+  "exports": "./src/index.js",
+  "type": "module",
   "engines": {
     "node": ">=18.14.0"
   },
   "license": "MIT",
+  "private": false,
   "scripts": {
+    "dev": "ts-node-esm ./src/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },
