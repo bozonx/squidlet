@@ -3,4 +3,4 @@
  * It has to be run from starter
  */
 
-export {System} from './system/System'
+export {System} from './system/System.js'

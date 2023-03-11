@@ -12,7 +12,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "ts-node-esm ./src/index.ts",
+    "dev": "ts-node-esm ./src/starters/dev/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },
