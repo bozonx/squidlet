@@ -1,7 +1,7 @@
 import {IndexedEventEmitter} from 'squidlet-lib/src/IndexedEventEmitter.js'
 import {LogPublisher} from 'squidlet-lib/src/LogPublisher.js'
 import {SystemEvents} from '../types/contstants.js'
-import {DriversManager} from './managers/DriversManager.js'
+import {IoManager} from './managers/IoManager.js'
 import {SystemInfoManager} from './managers/SystemInfoManager.js'
 import {ServicesManager} from './managers/ServicesManager.js'
 import {ApiManager} from './managers/ApiManager.js'
@@ -23,9 +23,9 @@ export class System {
     (...p) => this.events.emit(SystemEvents.logger, ...p)
   )
   // managers
+  readonly io: IoManager
   readonly exec: ExecManager
   readonly systemInfo: SystemInfoManager
-  readonly drivers: DriversManager
   readonly network: NetworkManager
   readonly files: FilesManager
   readonly db: DbManager
@@ -40,9 +40,9 @@ export class System {
 
 
   constructor() {
+    this.io = new IoManager(this)
     this.exec = new ExecManager(this)
     this.systemInfo = new SystemInfoManager(this)
-    this.drivers = new DriversManager(this)
     this.network = new NetworkManager(this)
     this.files = new FilesManager(this)
     this.db = new DbManager(this)
@@ -58,9 +58,9 @@ export class System {
 
 
   async init() {
+    await this.io.init()
     await this.exec.init()
     await this.systemInfo.init()
-    await this.drivers.init()
     await this.network.init()
     await this.files.init()
     await this.db.init()
@@ -87,9 +87,9 @@ export class System {
     await this.db.destroy()
     await this.files.destroy()
     await this.network.destroy()
-    await this.drivers.destroy()
     await this.systemInfo.destroy()
     await this.exec.destroy()
+    await this.io.destroy()
   }
 
 

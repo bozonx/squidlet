@@ -1,5 +1,5 @@
 import {System} from '../System.js'
-import {AppContext} from '../contexts/AppContext.js'
+import {AppContext} from '../App/AppContext.js'
 
 
 export class AppsManager {
