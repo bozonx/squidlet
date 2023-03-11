@@ -1,7 +1,7 @@
 import * as path from 'path';
 
-import {EntityTypePlural} from '../../../src/interfaces/EntityTypes';
-import EntityManifest from '../../../src/interfaces/EntityManifest';
+import {EntityTypePlural} from '../../../__idea2021/src/interfaces/EntityTypes';
+import EntityManifest from '../../../__idea2021/src/interfaces/EntityManifest';
 import StorageIo from '../../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import HostEnvSet from '../../hostEnvBuilder/interfaces/HostEnvSet';
 import {splitFirstElement, trimCharStart} from '../../../../squidlet-lib/src/strings';

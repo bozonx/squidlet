@@ -1,6 +1,6 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import EntityDefinition from '../../../src/interfaces/EntityDefinition';
+import EntityDefinition from '../../../__idea2021/src/interfaces/EntityDefinition';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import HostEntitySet from '../interfaces/HostEntitySet';
 import ConfigManager from '../hostConfig/ConfigManager';

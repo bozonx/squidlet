@@ -1,0 +1,13 @@
+#src: ../host/src
+src: ../build/hostTest/src
+dst: ../build/host
+#prjConfig: ../host/prjConfig.yaml
+prjConfig: ../build/hostTest/prjConfig.yaml
+# main ts file name without extension
+main: index
+strictMode: false
+
+# Port where mcu device is located
+port: /dev/ttyUSB0
+# ESP32 after flash has 115200 speed.
+portSpeed: 115200

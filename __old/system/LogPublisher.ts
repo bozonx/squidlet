@@ -1,5 +1,5 @@
 import LogLevel from './interfaces/LogLevel';
-import Context from '../../src/system/Context';
+import Context from '../../__idea2021/src/system/Context';
 import {SystemEvents} from './constants';
 
 

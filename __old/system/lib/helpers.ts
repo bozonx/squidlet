@@ -1,6 +1,6 @@
 import LogLevel, {LOG_LEVELS} from '../interfaces/LogLevel';
 import {compactUndefined} from '../../../../squidlet-lib/src/arrays';
-import {EntityType, EntityTypePlural} from '../../../src/interfaces/EntityTypes';
+import {EntityType, EntityTypePlural} from '../../../__idea2021/src/interfaces/EntityTypes';
 import {JsonTypes, Primitives} from '../../../../squidlet-lib/src/interfaces/Types';
 
 

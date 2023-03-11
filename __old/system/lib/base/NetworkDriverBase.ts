@@ -1,4 +1,4 @@
-import DriverBase from '../../../../src/base/DriverBase';
+import DriverBase from '../../../../__idea2021/src/base/DriverBase';
 import NetworkDriver, {
   IncomeRequestHandler, IncomeResponseHandler,
   NetworkRequest,

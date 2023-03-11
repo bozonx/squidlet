@@ -1,7 +1,7 @@
 
 // TODO: remove - use SemiDuplexFeedback driver
 
-import DriverBase from '../../../../src/base/DriverBase';
+import DriverBase from '../../../../__idea2021/src/base/DriverBase';
 import IndexedEvents from '../../../../../squidlet-lib/src/IndexedEvents';
 import Polling from '../../../../../squidlet-lib/src/Polling';
 import Sender from '../../../../../squidlet-lib/src/Sender';
@@ -10,8 +10,8 @@ import {
   isEqualUint8Array,
   stringToUint8Array
 } from '../../../../../squidlet-lib/src/binaryHelpers';
-import Context from '../../../../src/system/Context';
-import EntityDefinition from '../../../../src/interfaces/EntityDefinition';
+import Context from '../../../../__idea2021/src/system/Context';
+import EntityDefinition from '../../../../__idea2021/src/interfaces/EntityDefinition';
 
 
 export interface PollPreProps {

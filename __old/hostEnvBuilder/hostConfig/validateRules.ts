@@ -3,7 +3,7 @@ import {
   required,
   sequence
 } from './validationHelpers';
-import PropElement from '../../../src/interfaces/PropElement';
+import PropElement from '../../../__idea2021/src/interfaces/PropElement';
 import {parseType} from '../../system/lib/typesHelpers';
 import {isValueOfType, whiteList} from '../../system/lib/validate';
 

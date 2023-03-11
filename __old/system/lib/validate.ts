@@ -1,4 +1,4 @@
-import PropElement from '../../../src/interfaces/PropElement';
+import PropElement from '../../../__idea2021/src/interfaces/PropElement';
 import {ParsedType, parseType} from './typesHelpers';
 import {arraysDifference} from '../../../../squidlet-lib/src/arrays';
 

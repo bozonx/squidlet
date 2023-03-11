@@ -1,7 +1,7 @@
-import EntityDefinition from '../../../src/interfaces/EntityDefinition';
-import {EntityType} from '../../../src/interfaces/EntityTypes';
-import EntityBase from '../../../src/base/EntityBase';
-import Context from '../../../src/system/Context';
+import EntityDefinition from '../../../__idea2021/src/interfaces/EntityDefinition';
+import {EntityType} from '../../../__idea2021/src/interfaces/EntityTypes';
+import EntityBase from '../../../__idea2021/src/base/EntityBase';
+import Context from '../../../__idea2021/src/system/Context';
 
 
 export type EntityClassType = new (context: Context, definition: EntityDefinition) => EntityBase;

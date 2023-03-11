@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import systemConfig from '../configs/systemConfig';
-import {EntityType, EntityTypePlural} from '../../../src/interfaces/EntityTypes';
+import {EntityType, EntityTypePlural} from '../../../__idea2021/src/interfaces/EntityTypes';
 import Os from '../../shared/helpers/Os';
 import Logger from '../../../../squidlet-networking/src/interfaces/Logger';
 import buildEntity from './buildEntity';

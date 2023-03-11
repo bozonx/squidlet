@@ -1,4 +1,4 @@
-import {EntityType} from '../../../src/interfaces/EntityTypes';
+import {EntityType} from '../../../__idea2021/src/interfaces/EntityTypes';
 import {
   isBoolean,
   isLocalPath,

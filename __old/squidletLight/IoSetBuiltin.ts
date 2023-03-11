@@ -6,7 +6,7 @@ import HostEnvSet from '../hostEnvBuilder/interfaces/HostEnvSet';
 import StorageIo from '../../../squidlet-networking/src/interfaces/__old/io/StorageIo';
 import {PATH_SEP} from '../../../squidlet-lib/src/paths';
 import systemConfig from '../system/systemConfig';
-import {EntityTypePlural} from '../../src/interfaces/EntityTypes';
+import {EntityTypePlural} from '../../__idea2021/src/interfaces/EntityTypes';
 import {trimChar} from '../../../squidlet-lib/src/strings';
 
 

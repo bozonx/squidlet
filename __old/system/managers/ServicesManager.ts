@@ -1,8 +1,8 @@
-import EntityDefinition from '../../../src/interfaces/EntityDefinition';
+import EntityDefinition from '../../../__idea2021/src/interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import ServiceBase from '../../../src/base/ServiceBase';
+import ServiceBase from '../../../__idea2021/src/base/ServiceBase';
 import systemConfig from '../systemConfig';
-import {EntityType} from '../../../src/interfaces/EntityTypes';
+import {EntityType} from '../../../__idea2021/src/interfaces/EntityTypes';
 import ServicesObj from '../interfaces/ServicesObj';
 
 

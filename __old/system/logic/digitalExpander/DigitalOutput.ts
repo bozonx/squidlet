@@ -2,7 +2,7 @@ import {OutputResistorMode} from '../../interfaces/gpioTypes';
 import DigitalOutputIo from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalOutputIo';
 import {DigitalExpanderOutputDriver, DigitalExpanderPinSetup} from './interfaces/DigitalExpanderDriver';
 import DigitalExpanderOutputLogic from './DigitalExpanderOutputLogic';
-import Context from '../../../../src/system/Context';
+import Context from '../../../../__idea2021/src/system/Context';
 
 
 export interface DigitalExpanderOutputProps {

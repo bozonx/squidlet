@@ -1,13 +1,13 @@
 import _defaultsDeep = require('lodash/defaultsDeep');
 
-import {EntityType} from '../../../src/interfaces/EntityTypes';
+import {EntityType} from '../../../__idea2021/src/interfaces/EntityTypes';
 import PreEntityDefinition from '../interfaces/PreEntityDefinition';
 import ConfigManager from '../hostConfig/ConfigManager';
 import HostEntitySet, {HostEntitiesSet} from '../interfaces/HostEntitySet';
 import Register from './Register';
 import PreManifestBase from '../interfaces/PreManifestBase';
-import EntityManifest from '../../../src/interfaces/EntityManifest';
-import PropElement from '../../../src/interfaces/PropElement';
+import EntityManifest from '../../../__idea2021/src/interfaces/EntityManifest';
+import PropElement from '../../../__idea2021/src/interfaces/PropElement';
 import validateRules from '../hostConfig/validateRules';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 import {convertEntityTypePluralToSingle} from '../helpers';

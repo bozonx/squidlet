@@ -1,4 +1,4 @@
-import {EntityType, EntityTypePlural} from '../../src/interfaces/EntityTypes';
+import {EntityType, EntityTypePlural} from '../../__idea2021/src/interfaces/EntityTypes';
 import {arraysDifference} from '../../../squidlet-lib/src/arrays';
 
 

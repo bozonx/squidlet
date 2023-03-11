@@ -1,5 +1,5 @@
 import Promised from '../../../../../squidlet-lib/src/Promised';
-import Context from '../../../../src/system/Context';
+import Context from '../../../../__idea2021/src/system/Context';
 import Sender from '../../../../../squidlet-lib/src/Sender';
 import {CError} from '../../../../../squidlet-lib/src/CError';
 

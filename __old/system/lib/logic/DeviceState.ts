@@ -1,4 +1,4 @@
-import PropElement from '../../../../src/interfaces/PropElement';
+import PropElement from '../../../../__idea2021/src/interfaces/PropElement';
 import {isEmptyObject} from '../../../../../squidlet-lib/src/objects';
 import {validateParam} from '../validate';
 import ConsistentState, {Getter, Setter, Initialize} from '../../../../../squidlet-lib/src/ConsistentState';

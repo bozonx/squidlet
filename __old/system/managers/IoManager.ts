@@ -1,6 +1,6 @@
 import IoSet from '../interfaces/IoSet';
 import IoItem, {IoDefinitions} from '../interfaces/IoItem';
-import Context from '../../../src/system/Context';
+import Context from '../../../__idea2021/src/system/Context';
 import systemConfig from '../systemConfig';
 import Logger from '../../../../squidlet-networking/src/interfaces/Logger';
 

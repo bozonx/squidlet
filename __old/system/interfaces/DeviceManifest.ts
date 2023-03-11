@@ -1,5 +1,5 @@
 // parsed manifest of device
-import EntityManifest from '../../../src/interfaces/EntityManifest';
+import EntityManifest from '../../../__idea2021/src/interfaces/EntityManifest';
 
 
 export default interface DeviceManifest extends EntityManifest {

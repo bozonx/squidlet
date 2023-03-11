@@ -1,5 +1,5 @@
 import HostConfig from '../../system/interfaces/HostConfig';
-import EntityDefinition from '../../../src/interfaces/EntityDefinition';
+import EntityDefinition from '../../../__idea2021/src/interfaces/EntityDefinition';
 import {IoDefinitions} from '../../system/interfaces/IoItem';
 
 

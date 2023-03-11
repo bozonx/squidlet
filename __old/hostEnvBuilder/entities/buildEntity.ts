@@ -3,7 +3,7 @@ import * as path from 'path';
 import compileTs from '../../shared/buildToJs/compileTs';
 import compileJs from '../../shared/buildToJs/compileJs';
 import minimize from '../../shared/buildToJs/minimize';
-import {EntityType} from '../../../src/interfaces/EntityTypes';
+import {EntityType} from '../../../__idea2021/src/interfaces/EntityTypes';
 import {convertEntityTypeToPlural} from '../../system/lib/helpers';
 
 

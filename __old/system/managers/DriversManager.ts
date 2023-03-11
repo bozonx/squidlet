@@ -1,8 +1,8 @@
-import EntityDefinition from '../../../src/interfaces/EntityDefinition';
+import EntityDefinition from '../../../__idea2021/src/interfaces/EntityDefinition';
 import EntityManagerBase from './EntityManagerBase';
-import DriverBase from '../../../src/base/DriverBase';
+import DriverBase from '../../../__idea2021/src/base/DriverBase';
 import systemConfig from '../systemConfig';
-import {EntityType} from '../../../src/interfaces/EntityTypes';
+import {EntityType} from '../../../__idea2021/src/interfaces/EntityTypes';
 
 
 /**
