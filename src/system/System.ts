@@ -14,14 +14,18 @@ import {CacheManager} from './managers/CacheManager.js'
 import {ConfigsManager} from './managers/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './managers/UiManager.js'
+import {ExecManager} from './managers/ExecManager.js'
+import {NetworkManager} from './managers/NetworkManager.js'
 
 
 export class System {
   readonly log: LogPublisher
   readonly events = new IndexedEventEmitter()
   // managers
+  readonly exec: ExecManager
   readonly systemInfo: SystemInfoManager
   readonly drivers: DriversManager
+  readonly network: NetworkManager
   readonly files: FilesManager
   readonly db: DbManager
   readonly cache: CacheManager
@@ -38,8 +42,10 @@ export class System {
     this.log = new LogPublisher((logLevel: LogLevel, msg: string) => {
       this.events.emit(SystemEvents.logger, logLevel, msg)
     })
+    this.exec = new ExecManager()
     this.systemInfo = new SystemInfoManager()
     this.drivers = new DriversManager()
+    this.network = new NetworkManager()
     this.files = new FilesManager()
     this.db = new DbManager()
     this.cache = new CacheManager()
@@ -54,8 +60,10 @@ export class System {
 
 
   async init() {
+    await this.exec.init()
     await this.systemInfo.init()
     await this.drivers.init()
+    await this.network.init()
     await this.files.init()
     await this.db.init()
     await this.cache.init()
@@ -80,8 +88,10 @@ export class System {
     await this.cache.destroy()
     await this.db.destroy()
     await this.files.destroy()
+    await this.network.destroy()
     await this.drivers.destroy()
     await this.systemInfo.destroy()
+    await this.exec.destroy()
   }
 
 
