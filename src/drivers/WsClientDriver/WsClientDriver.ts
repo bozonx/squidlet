@@ -1,4 +1,4 @@
-import {DriverBase} from '../../system/Driver/DriverBase.js'
+import {DriverBase} from '../../system/driver/DriverBase.js'
 
 
 export class WsClientDriver extends DriverBase {
