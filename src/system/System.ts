@@ -15,6 +15,7 @@ import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './managers/UiManager.js'
 import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
+import {IoSetBase} from '../types/IoSet.js'
 
 
 export class System {
@@ -24,27 +25,34 @@ export class System {
   )
   // managers
   readonly io: IoManager
-  // TODO: по сути это драйвер
+  // DRIVERS
   readonly exec: ExecManager
-  // TODO: по сути это драйвер
   readonly systemInfo: SystemInfoManager
+  // TODO: add timer driver wrapper
+  // TODO: add system time driver wrapper
+  // SYSTEM
+  readonly permissions: PermissionsManager
+  // SERVICES
+  readonly services: ServicesManager
   readonly files: FilesManager
   readonly cache: CacheManager
   readonly db: DbManager
+  // It is wrapper for DB which is works with configs
   readonly configs: ConfigsManager
-  readonly permissions: PermissionsManager
   readonly network: NetworkManager
-  readonly services: ServicesManager
-  readonly apiManager: ApiManager
-  readonly cmd: CmdManager
+  // it is service
   readonly ui: UiManager
+  readonly apiManager: ApiManager
+  // it is wrapper for api
+  readonly cmd: CmdManager
+
   readonly apps: AppsManager
   // TODO: распределённая служба заданний
   // TODO: realtime api
 
 
-  constructor() {
-    this.io = new IoManager(this)
+  constructor(ioSet: IoSetBase) {
+    this.io = new IoManager(this, ioSet)
     this.exec = new ExecManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.files = new FilesManager(this)
@@ -52,8 +60,8 @@ export class System {
     this.db = new DbManager(this)
     this.configs = new ConfigsManager(this)
     this.permissions = new PermissionsManager(this)
-    this.network = new NetworkManager(this)
     this.services = new ServicesManager(this)
+    this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
     this.cmd = new CmdManager(this)
     this.ui = new UiManager(this)
@@ -70,12 +78,13 @@ export class System {
     await this.db.init()
     await this.configs.init()
     await this.permissions.init()
-    await this.network.init()
     await this.services.init()
+    await this.network.init()
     await this.apiManager.init()
     await this.cmd.init()
     await this.ui.init()
     await this.apps.init()
+
   }
 
   async destroy() {
@@ -84,8 +93,8 @@ export class System {
     await this.ui.destroy()
     await this.cmd.destroy()
     await this.apiManager.destroy()
-    await this.services.destroy()
     await this.network.destroy()
+    await this.services.destroy()
     await this.permissions.destroy()
     await this.configs.destroy()
     await this.db.destroy()
@@ -98,7 +107,9 @@ export class System {
 
 
   async start() {
-
+    // start system's and user's services
+    await this.services.start()
+    // TODO: выполнение пользовательских startup скриптов, где могут быть указанны apps
   }
 
 }

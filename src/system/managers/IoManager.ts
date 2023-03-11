@@ -1,12 +1,15 @@
 import {System} from '../System.js'
+import {IoSetBase} from '../../types/IoSet.js'
 
 
 export class IoManager {
   private readonly system: System
+  private readonly ioSet: IoSetBase
 
 
-  constructor(system: System) {
+  constructor(system: System, ioSet: IoSetBase) {
     this.system = system
+    this.ioSet = ioSet
   }
 
   async init() {

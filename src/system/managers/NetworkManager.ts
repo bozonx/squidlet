@@ -15,4 +15,5 @@ export class NetworkManager {
 
   async destroy() {
   }
+
 }
