@@ -1,4 +1,4 @@
-import {ServiceContext} from '../Service/ServiceContext.js'
+import {ServiceContext} from '../service/ServiceContext.js'
 
 export class ServiceBase {
   private readonly context: ServiceContext
