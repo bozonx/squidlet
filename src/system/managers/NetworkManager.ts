@@ -1,5 +1,12 @@
+import {System} from '../System.js'
+
+
 export class NetworkManager {
-  constructor() {
+  private readonly system: System
+
+
+  constructor(system: System) {
+    this.system = system
   }
 
   async init() {

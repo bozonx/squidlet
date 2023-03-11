@@ -1,5 +1,4 @@
 import {IndexedEventEmitter} from 'squidlet-lib/src/IndexedEventEmitter.js'
-import {LogLevel} from 'squidlet-lib/src/interfaces/Logger.js'
 import {LogPublisher} from 'squidlet-lib/src/LogPublisher.js'
 import {SystemEvents} from '../types/contstants.js'
 import {DriversManager} from './managers/DriversManager.js'
@@ -19,8 +18,10 @@ import {NetworkManager} from './managers/NetworkManager.js'
 
 
 export class System {
-  readonly log: LogPublisher
   readonly events = new IndexedEventEmitter()
+  readonly log = new LogPublisher(
+    (...p) => this.events.emit(SystemEvents.logger, ...p)
+  )
   // managers
   readonly exec: ExecManager
   readonly systemInfo: SystemInfoManager
@@ -39,23 +40,20 @@ export class System {
 
 
   constructor() {
-    this.log = new LogPublisher((logLevel: LogLevel, msg: string) => {
-      this.events.emit(SystemEvents.logger, logLevel, msg)
-    })
-    this.exec = new ExecManager()
-    this.systemInfo = new SystemInfoManager()
-    this.drivers = new DriversManager()
-    this.network = new NetworkManager()
-    this.files = new FilesManager()
-    this.db = new DbManager()
-    this.cache = new CacheManager()
-    this.configs = new ConfigsManager()
-    this.permissions = new PermissionsManager()
-    this.services = new ServicesManager()
-    this.apiManager = new ApiManager()
-    this.cmd = new CmdManager()
-    this.ui = new UiManager()
-    this.apps = new AppsManager()
+    this.exec = new ExecManager(this)
+    this.systemInfo = new SystemInfoManager(this)
+    this.drivers = new DriversManager(this)
+    this.network = new NetworkManager(this)
+    this.files = new FilesManager(this)
+    this.db = new DbManager(this)
+    this.cache = new CacheManager(this)
+    this.configs = new ConfigsManager(this)
+    this.permissions = new PermissionsManager(this)
+    this.services = new ServicesManager(this)
+    this.apiManager = new ApiManager(this)
+    this.cmd = new CmdManager(this)
+    this.ui = new UiManager(this)
+    this.apps = new AppsManager(this)
   }
 
 

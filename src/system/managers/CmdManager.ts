@@ -1,5 +1,12 @@
+import {System} from '../System.js'
+
+
 export class CmdManager {
-  constructor() {
+  private readonly system: System
+
+
+  constructor(system: System) {
+    this.system = system
   }
 
   async init() {
