@@ -1,7 +1,7 @@
 import {DriverContext} from './DriverContext.js'
 
 
-export class ServiceBase {
+export class DriverBase {
   private readonly context: DriverContext
 
 
