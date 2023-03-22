@@ -2,7 +2,10 @@ import {DriverContext} from './DriverContext.js'
 import {System} from '../System.js'
 
 
-export class DriverBase {
+export abstract class DriverBase {
+  // dirver name
+  readonly abstract name: string
+
   private readonly system: System
   private readonly context: DriverContext
 

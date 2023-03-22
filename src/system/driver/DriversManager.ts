@@ -1,15 +1,18 @@
 import {System} from '../System.js'
-import {Driver} from '../../types/types.js'
+import {DriverIndex} from '../../types/types.js'
 import {DriverBase} from './DriverBase.js'
+import {DriverContext} from './DriverContext.js'
 
 
 export class DriversManager {
   private readonly system: System
   private drivers: Record<string, DriverBase> = {}
+  private readonly ctx
 
 
   constructor(system: System) {
     this.system = system
+    this.ctx = new DriverContext(this.system)
   }
 
   async init() {
@@ -21,8 +24,10 @@ export class DriversManager {
   }
 
 
-  useDriver(driver: Driver) {
-    // TODO: add
+  useDriver(driverIndex: DriverIndex) {
+    const driver = driverIndex(this.ctx)
+
+    this.drivers[driver.name] = driver
   }
 
 }
