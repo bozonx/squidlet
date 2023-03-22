@@ -1,5 +1,6 @@
 import {IndexedEventEmitter, Logger} from 'squidlet-lib'
 import {System} from '../System.js'
+import {Driver} from '../../types/types.js'
 
 
 export class PackageContext {
@@ -20,31 +21,31 @@ export class PackageContext {
   }
 
 
-  registerIo() {
+  useIo() {
     // TODO: add
   }
 
-  registerDriver() {
+  useDriver(driver: Driver) {
+    this.system.drivers.useDriver(driver)
+  }
+
+  useService() {
     // TODO: add
   }
 
-  registerService() {
+  useCmd() {
     // TODO: add
   }
 
-  registerCmd() {
+  useApi() {
     // TODO: add
   }
 
-  registerApi() {
+  useUiApp() {
     // TODO: add
   }
 
-  registerUiApp() {
-    // TODO: add
-  }
-
-  registerDestroyFunc() {
+  useDestroyFunc() {
     // TODO: add
   }
 
