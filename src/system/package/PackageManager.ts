@@ -14,7 +14,7 @@ export class PackageManager {
 
   async init() {
     // TODO: load all the installed packages
-    // TODO: and init them
+    //const packagesDirs: string[] = this.system.files
   }
 
   async destroy() {

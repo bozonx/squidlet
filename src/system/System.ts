@@ -90,6 +90,7 @@ export class System {
       await this.apiManager.init()
       await this.cmd.init()
       await this.ui.init()
+      // load all the installed packages
       await this.packageManager.init()
       // notify that system is inited
       this.events.emit(SystemEvents.systemInited)
