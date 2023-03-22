@@ -135,6 +135,7 @@ export class System {
 
   use(pkg: Package) {
     this.packages.push(pkg)
+    // TODO: call install
   }
 
 }

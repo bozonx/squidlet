@@ -4,7 +4,7 @@ import {Package} from '../../types/Package.js'
 
 export function DevSystemPack (): Package {
   return {
-    async init(ctx: PackageContext) {
+    async install(ctx: PackageContext) {
 
     },
     async destroy(ctx: PackageContext) {
