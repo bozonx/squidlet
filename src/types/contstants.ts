@@ -5,4 +5,5 @@ export enum SystemEvents {
   // appInitialized,
   // beforeDestroy,
   logger,
+  systemInited,
 }

@@ -1,14 +1,20 @@
 import {System} from '../../index.js'
 import {SystemEvents} from '../../types/contstants.js'
-import {ConsoleLogger} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
+import {ConsoleLogger, LogLevel, handleLogEvent} from 'squidlet-lib'
+import {IoSetProd} from '../../system/Io/IoSetProd.js'
 
-// TODO: add IoSet
-const logLevel = process.env.LOG_LEVEL || undefined
-const system = new System()
-const logger = new ConsoleLogger(logLevel)
+
+const ioSetProd = new IoSetProd()
+const logLevel: LogLevel = process.env.LOG_LEVEL as LogLevel || 'info'
+const system = new System(ioSetProd)
+const consoleLogger = new ConsoleLogger(logLevel)
 // add console logger
-system.events.addListener(SystemEvents.logger, logger.handler)
+system.events.addListener(SystemEvents.logger, handleLogEvent(consoleLogger))
 // init the system
 system.init()
 
-// TODO: init
+system.events.once(SystemEvents.systemInited, () => system.start())
+
+// Enable graceful stop
+process.once('SIGINT', () => system.destroy())
+process.once('SIGTERM', () => system.destroy())

@@ -85,6 +85,8 @@ export class System {
       await this.cmd.init()
       await this.ui.init()
       await this.apps.init()
+
+      // TODO: emit system inited
     })()
       .catch((e) => {
         // TODO: what to do???
@@ -117,9 +119,14 @@ export class System {
 
 
   async start() {
-    // start system's and user's services
-    await this.services.start()
-    // TODO: выполнение пользовательских startup скриптов, где могут быть указанны apps
+    (async () => {
+      // start system's and user's services
+      await this.services.start()
+      // TODO: выполнение пользовательских startup скриптов, где могут быть указанны apps
+    })()
+      .catch((e) => {
+        // TODO: what to do???
+      })
   }
 
 }
