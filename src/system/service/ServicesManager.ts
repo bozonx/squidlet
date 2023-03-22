@@ -1,5 +1,5 @@
 import {System} from '../System.js'
-import {ServiceContext} from '../service/ServiceContext.js'
+import {ServiceContext} from './ServiceContext.js'
 
 
 export class ServicesManager {
