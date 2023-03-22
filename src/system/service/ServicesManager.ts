@@ -20,5 +20,6 @@ export class ServicesManager {
 
 
   async start() {
+    // TODO: если сервис не запустился то не понимать ошибку выше, писать в лог
   }
 }

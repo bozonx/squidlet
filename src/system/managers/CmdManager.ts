@@ -14,4 +14,10 @@ export class CmdManager {
 
   async destroy() {
   }
+
+
+  async startInitScripts() {
+    // TODO: не поднимать ошибку выше, писать в лог
+  }
+
 }

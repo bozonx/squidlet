@@ -95,7 +95,7 @@ export class System {
       this.events.emit(SystemEvents.systemInited)
     })()
       .catch((e) => {
-        // TODO: what to do???
+        this.log.error(String(e))
       })
   }
 
@@ -133,12 +133,12 @@ export class System {
     (async () => {
       // start system's and user's services
       await this.services.start()
-      // TODO: выполнение пользовательских startup скриптов, где могут быть указанны apps
+      await this.cmd.startInitScripts()
       // notify that system is started
       this.events.emit(SystemEvents.systemStarted)
     })()
       .catch((e) => {
-        // TODO: what to do???
+        this.log.error(String(e))
       })
   }
 
