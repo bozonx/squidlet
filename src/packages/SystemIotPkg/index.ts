@@ -1,8 +1,8 @@
 import {PackageContext} from '../../system/package/PackageContext.js'
-import {Package} from '../../types/types.js'
+import {PackageIndex} from '../../types/types.js'
 
 
-export function SystemIotPkg (): Package {
+export function SystemIotPkg (): PackageIndex {
   return (ctx: PackageContext) => {
   }
 }

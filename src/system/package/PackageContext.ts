@@ -1,6 +1,6 @@
 import {IndexedEventEmitter, Logger} from 'squidlet-lib'
 import {System} from '../System.js'
-import {DriverIndex} from '../../types/types.js'
+import {DriverIndex, IoIndex, ServiceIndex} from '../../types/types.js'
 
 
 export class PackageContext {
@@ -21,16 +21,16 @@ export class PackageContext {
   }
 
 
-  useIo() {
-    // TODO: add
+  useIo(io: IoIndex) {
+    this.system.io.useIo(io)
   }
 
   useDriver(driver: DriverIndex) {
     this.system.drivers.useDriver(driver)
   }
 
-  useService() {
-    // TODO: add
+  useService(service: ServiceIndex) {
+    this.system.services.useService(service)
   }
 
   useCmd() {

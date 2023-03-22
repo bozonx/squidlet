@@ -6,7 +6,9 @@ import {System} from '../System.js'
 // TODO: сервисы могут инициализироваться друг за другом в заданном порядке
 // TODO: тоже с дестроем
 
-export class ServiceBase {
+export abstract class ServiceBase {
+  readonly abstract name: string
+
   // startAfter?: string[]
   // startBefore?: string[]
   // destroyAfter?: string[]

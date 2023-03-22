@@ -1,9 +1,15 @@
 import {PackageContext} from '../system/package/PackageContext.js'
 import {DriverContext} from '../system/driver/DriverContext.js'
 import {DriverBase} from '../system/driver/DriverBase.js'
+import {IoBase} from '../system/Io/IoBase.js'
+import {ServiceBase} from '../system/service/ServiceBase.js'
+import {ServiceContext} from '../system/service/ServiceContext.js'
+import {IoContext} from '../system/Io/IoContext.js'
 
 
 // It is called right after it is set to system via use()
 // That means very early, before system.init()
 export type PackageIndex = (ctx: PackageContext) => void
+export type IoIndex = (ctx: IoContext) => IoBase
 export type DriverIndex = (ctx: DriverContext) => DriverBase
+export type ServiceIndex = (ctx: ServiceContext) => ServiceBase

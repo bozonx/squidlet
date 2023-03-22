@@ -2,7 +2,8 @@ import {System} from '../System.js'
 import {IoContext} from './IoContext.js'
 
 
-export class IoBase {
+export abstract class IoBase {
+  readonly abstract name: string
   private readonly system: System
   private readonly context: IoContext
 

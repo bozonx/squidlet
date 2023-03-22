@@ -14,7 +14,7 @@ import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './ui/UiManager.js'
 import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
-import {Package} from '../types/types.js'
+import {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
 import {DriversManager} from './driver/DriversManager.js'
 
@@ -142,7 +142,7 @@ export class System {
       })
   }
 
-  use(pkg: Package) {
+  use(pkg: PackageIndex) {
     pkg(this.packageManager.ctx)
   }
 

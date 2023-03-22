@@ -1,8 +1,8 @@
 import {PackageContext} from '../../system/package/PackageContext.js'
-import {Package} from '../../types/types.js'
+import {PackageIndex} from '../../types/types.js'
 
 
-export function SystemWithUiPkg (): Package {
+export function SystemWithUiPkg (): PackageIndex {
   return (ctx: PackageContext) => {
   }
 }
