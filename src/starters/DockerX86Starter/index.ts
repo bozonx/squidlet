@@ -4,6 +4,7 @@ import {SystemEvents} from '../../types/contstants.js'
 import {LinuxX86SystemPack} from '../../sysPackages/LinuxX86SystemPack/index.js'
 import {ConsoleLoggerPkg} from '../../packages/ConsoleLoggerPkg/index.js'
 
+// TODO: сбилдить и запускать JS !!!
 
 const logLevel: LogLevel = process.env.LOG_LEVEL as LogLevel || 'info'
 

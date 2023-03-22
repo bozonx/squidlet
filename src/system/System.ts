@@ -49,6 +49,8 @@ export class System {
   readonly apps: AppsManager
   // TODO: распределённая служба заданний
   // TODO: realtime api
+  // TODO: распределённый etc
+  // TODO: вычисление мастера
 
   private readonly packages: Package[] = []
 
