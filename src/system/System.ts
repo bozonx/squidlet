@@ -6,7 +6,6 @@ import {SystemInfoManager} from './managers/SystemInfoManager.js'
 import {ServicesManager} from './managers/ServicesManager.js'
 import {ApiManager} from './managers/ApiManager.js'
 import {CmdManager} from './managers/CmdManager.js'
-import {AppsManager} from './managers/AppsManager.js'
 import {FilesManager} from './managers/FilesManager.js'
 import {DbManager} from './managers/DbManager.js'
 import {CacheManager} from './managers/CacheManager.js'
@@ -17,6 +16,7 @@ import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
 import {Package} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
+import {DriversManager} from './managers/DriversManager.js'
 
 
 export class System {
@@ -26,6 +26,7 @@ export class System {
   )
   // managers
   readonly io: IoManager
+  readonly drivers: DriversManager
   // DRIVERS
   readonly exec: ExecManager
   readonly systemInfo: SystemInfoManager
@@ -48,7 +49,6 @@ export class System {
   readonly cmd: CmdManager
   readonly packageManager: PackageManager
 
-  readonly apps: AppsManager
   // TODO: распределённая служба заданний
   // TODO: realtime api
   // TODO: распределённый etc
@@ -59,6 +59,7 @@ export class System {
 
   constructor() {
     this.io = new IoManager(this)
+    this.drivers = new DriversManager(this)
     this.exec = new ExecManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.files = new FilesManager(this)
@@ -72,13 +73,13 @@ export class System {
     this.cmd = new CmdManager(this)
     this.ui = new UiManager(this)
     this.packageManager = new PackageManager(this)
-    this.apps = new AppsManager(this)
   }
 
 
   init() {
     (async () => {
       await this.io.init()
+      await this.drivers.init()
       await this.exec.init()
       await this.systemInfo.init()
       await this.files.init()
@@ -92,9 +93,7 @@ export class System {
       await this.cmd.init()
       await this.ui.init()
       await this.packageManager.init()
-      await this.apps.init()
 
-      // TODO: init packages
       // TODO: emit system inited
     })()
       .catch((e) => {
@@ -105,7 +104,6 @@ export class System {
   destroy() {
     (async () => {
       // TODO: продолжить дестроить даже если будет ошибка
-      await this.apps.destroy()
       await this.packageManager.destroy()
       await this.ui.destroy()
       await this.cmd.destroy()
@@ -119,6 +117,7 @@ export class System {
       await this.files.destroy()
       await this.systemInfo.destroy()
       await this.exec.destroy()
+      await this.drivers.destroy()
       await this.io.destroy()
       this.events.destroy()
     })()
