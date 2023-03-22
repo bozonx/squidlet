@@ -15,7 +15,6 @@ import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './managers/UiManager.js'
 import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
-import {IoSetBase} from '../types/IoSet.js'
 import {Package} from '../types/Package.js'
 
 
@@ -54,8 +53,8 @@ export class System {
   private readonly packages: Package[] = []
 
 
-  constructor(ioSet: IoSetBase) {
-    this.io = new IoManager(this, ioSet)
+  constructor() {
+    this.io = new IoManager(this)
     this.exec = new ExecManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.files = new FilesManager(this)
