@@ -69,40 +69,50 @@ export class System {
   }
 
 
-  async init() {
-    await this.io.init()
-    await this.exec.init()
-    await this.systemInfo.init()
-    await this.files.init()
-    await this.cache.init()
-    await this.db.init()
-    await this.configs.init()
-    await this.permissions.init()
-    await this.services.init()
-    await this.network.init()
-    await this.apiManager.init()
-    await this.cmd.init()
-    await this.ui.init()
-    await this.apps.init()
-
+  init() {
+    (async () => {
+      await this.io.init()
+      await this.exec.init()
+      await this.systemInfo.init()
+      await this.files.init()
+      await this.cache.init()
+      await this.db.init()
+      await this.configs.init()
+      await this.permissions.init()
+      await this.services.init()
+      await this.network.init()
+      await this.apiManager.init()
+      await this.cmd.init()
+      await this.ui.init()
+      await this.apps.init()
+    })()
+      .catch((e) => {
+        // TODO: what to do???
+      })
   }
 
-  async destroy() {
-    // TODO: продолжить дестроить даже если будет ошибка
-    await this.apps.destroy()
-    await this.ui.destroy()
-    await this.cmd.destroy()
-    await this.apiManager.destroy()
-    await this.network.destroy()
-    await this.services.destroy()
-    await this.permissions.destroy()
-    await this.configs.destroy()
-    await this.db.destroy()
-    await this.cache.destroy()
-    await this.files.destroy()
-    await this.systemInfo.destroy()
-    await this.exec.destroy()
-    await this.io.destroy()
+  destroy() {
+    (async () => {
+      // TODO: продолжить дестроить даже если будет ошибка
+      await this.apps.destroy()
+      await this.ui.destroy()
+      await this.cmd.destroy()
+      await this.apiManager.destroy()
+      await this.network.destroy()
+      await this.services.destroy()
+      await this.permissions.destroy()
+      await this.configs.destroy()
+      await this.db.destroy()
+      await this.cache.destroy()
+      await this.files.destroy()
+      await this.systemInfo.destroy()
+      await this.exec.destroy()
+      await this.io.destroy()
+      this.events.destroy()
+    })()
+      .catch((e) => {
+        // TODO: what to do???
+      })
   }
 
 
