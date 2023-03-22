@@ -1,4 +1,4 @@
-import {IndexedEventEmitter} from 'squidlet-lib'
+import {callSafely, IndexedEventEmitter} from 'squidlet-lib'
 import {LogPublisher} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './Io/IoManager.js'
@@ -19,6 +19,13 @@ import {PackageManager} from './package/PackageManager.js'
 import {DriversManager} from './driver/DriversManager.js'
 
 
+// TODO: add timer driver wrapper
+// TODO: add system time driver wrapper
+// TODO: распределённая служба заданний
+// TODO: realtime api
+// TODO: распределённый etc
+// TODO: вычисление мастера
+
 export class System {
   readonly events = new IndexedEventEmitter()
   readonly log = new LogPublisher(
@@ -30,8 +37,6 @@ export class System {
   // DRIVERS
   readonly exec: ExecManager
   readonly systemInfo: SystemInfoManager
-  // TODO: add timer driver wrapper
-  // TODO: add system time driver wrapper
   // SYSTEM
   readonly permissions: PermissionsManager
   // SERVICES
@@ -48,13 +53,6 @@ export class System {
   // it is wrapper for api
   readonly cmd: CmdManager
   readonly packageManager: PackageManager
-
-  // TODO: распределённая служба заданний
-  // TODO: realtime api
-  // TODO: распределённый etc
-  // TODO: вычисление мастера
-
-  //private readonly packages: Package[] = []
 
 
   constructor() {
@@ -93,8 +91,8 @@ export class System {
       await this.cmd.init()
       await this.ui.init()
       await this.packageManager.init()
-
-      // TODO: emit system inited
+      // notify that system is inited
+      this.events.emit(SystemEvents.systemInited)
     })()
       .catch((e) => {
         // TODO: what to do???
@@ -102,27 +100,31 @@ export class System {
   }
 
   destroy() {
-    (async () => {
-      // TODO: продолжить дестроить даже если будет ошибка
-      await this.packageManager.destroy()
-      await this.ui.destroy()
-      await this.cmd.destroy()
-      await this.apiManager.destroy()
-      await this.network.destroy()
-      await this.services.destroy()
-      await this.permissions.destroy()
-      await this.configs.destroy()
-      await this.db.destroy()
-      await this.cache.destroy()
-      await this.files.destroy()
-      await this.systemInfo.destroy()
-      await this.exec.destroy()
-      await this.drivers.destroy()
-      await this.io.destroy()
-      this.events.destroy()
-    })()
-      .catch((e) => {
-        // TODO: what to do???
+    this.events.emit(SystemEvents.systemDestroying)
+
+    const destroyWrapper = (fn: () => Promise<void>): Promise<void> => {
+      return callSafely(fn).catch((e) => this.log.error(String(e)))
+    }
+    // it will call destroy functions step by step
+    Promise.allSettled([
+      destroyWrapper(this.packageManager.destroy),
+      destroyWrapper(this.ui.destroy),
+      destroyWrapper(this.cmd.destroy),
+      destroyWrapper(this.apiManager.destroy),
+      destroyWrapper(this.network.destroy),
+      destroyWrapper(this.services.destroy),
+      destroyWrapper(this.permissions.destroy),
+      destroyWrapper(this.configs.destroy),
+      destroyWrapper(this.db.destroy),
+      destroyWrapper(this.cache.destroy),
+      destroyWrapper(this.files.destroy),
+      destroyWrapper(this.systemInfo.destroy),
+      destroyWrapper(this.exec.destroy),
+      destroyWrapper(this.drivers.destroy),
+      destroyWrapper(this.io.destroy),
+    ])
+      .then(() => {
+        this.events.destroy()
       })
   }
 
@@ -132,12 +134,12 @@ export class System {
       // start system's and user's services
       await this.services.start()
       // TODO: выполнение пользовательских startup скриптов, где могут быть указанны apps
+      // notify that system is started
+      this.events.emit(SystemEvents.systemStarted)
     })()
       .catch((e) => {
         // TODO: what to do???
       })
-
-    // TODO: emit systemStarted
   }
 
   use(pkg: Package) {

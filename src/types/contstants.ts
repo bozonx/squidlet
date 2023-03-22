@@ -7,4 +7,5 @@ export enum SystemEvents {
   logger,
   systemInited,
   systemStarted,
+  systemDestroying,
 }
