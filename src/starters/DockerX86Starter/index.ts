@@ -1,6 +1,6 @@
 import {System} from '../../index.js'
 import {SystemEvents} from '../../types/contstants.js'
-import {ConsoleLogger} from 'squidlet-lib/lib/index.js'
+import {ConsoleLogger} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
 
 // TODO: add IoSet
 const logLevel = process.env.LOG_LEVEL || undefined
