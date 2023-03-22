@@ -4,7 +4,6 @@ import {ConsoleLogger, LogLevel, handleLogEvent} from 'squidlet-lib'
 import {LinuxX86SystemPack} from '../../sysPackages/LinuxX86SystemPack/index.js'
 
 
-//const ioSetProd = new IoSetProd()
 const logLevel: LogLevel = process.env.LOG_LEVEL as LogLevel || 'info'
 const system = new System()
 const consoleLogger = new ConsoleLogger(logLevel)
