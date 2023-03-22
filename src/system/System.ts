@@ -16,6 +16,7 @@ import {UiManager} from './managers/UiManager.js'
 import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
 import {IoSetBase} from '../types/IoSet.js'
+import {Package} from '../types/Package.js'
 
 
 export class System {
@@ -49,6 +50,8 @@ export class System {
   readonly apps: AppsManager
   // TODO: распределённая служба заданний
   // TODO: realtime api
+
+  private readonly packages: Package[] = []
 
 
   constructor(ioSet: IoSetBase) {
@@ -86,6 +89,7 @@ export class System {
       await this.ui.init()
       await this.apps.init()
 
+      // TODO: init packages
       // TODO: emit system inited
     })()
       .catch((e) => {
@@ -95,6 +99,7 @@ export class System {
 
   destroy() {
     (async () => {
+      // TODO: destroy packages
       // TODO: продолжить дестроить даже если будет ошибка
       await this.apps.destroy()
       await this.ui.destroy()
@@ -127,6 +132,10 @@ export class System {
       .catch((e) => {
         // TODO: what to do???
       })
+  }
+
+  use(pkg: Package) {
+    this.packages.push(pkg)
   }
 
 }
