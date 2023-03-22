@@ -15,7 +15,8 @@ import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './managers/UiManager.js'
 import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
-import {Package} from '../types/Package.js'
+import {Package} from '../types/types.js'
+import {PackageManager} from './package/PackageManager.js'
 
 
 export class System {
@@ -45,6 +46,7 @@ export class System {
   readonly apiManager: ApiManager
   // it is wrapper for api
   readonly cmd: CmdManager
+  readonly packageManager: PackageManager
 
   readonly apps: AppsManager
   // TODO: распределённая служба заданний
@@ -52,7 +54,7 @@ export class System {
   // TODO: распределённый etc
   // TODO: вычисление мастера
 
-  private readonly packages: Package[] = []
+  //private readonly packages: Package[] = []
 
 
   constructor() {
@@ -69,6 +71,7 @@ export class System {
     this.apiManager = new ApiManager(this)
     this.cmd = new CmdManager(this)
     this.ui = new UiManager(this)
+    this.packageManager = new PackageManager(this)
     this.apps = new AppsManager(this)
   }
 
@@ -88,6 +91,7 @@ export class System {
       await this.apiManager.init()
       await this.cmd.init()
       await this.ui.init()
+      await this.packageManager.init()
       await this.apps.init()
 
       // TODO: init packages
@@ -100,9 +104,9 @@ export class System {
 
   destroy() {
     (async () => {
-      // TODO: destroy packages
       // TODO: продолжить дестроить даже если будет ошибка
       await this.apps.destroy()
+      await this.packageManager.destroy()
       await this.ui.destroy()
       await this.cmd.destroy()
       await this.apiManager.destroy()
@@ -138,8 +142,7 @@ export class System {
   }
 
   use(pkg: Package) {
-    this.packages.push(pkg)
-    // TODO: call install
+    pkg(this.packageManager.ctx)
   }
 
 }

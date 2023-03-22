@@ -14,10 +14,6 @@ export class PackageContext {
     return this.system.log
   }
 
-  // TODO: add system config
-  // TODO: add using permissions - exec, cmd, fs etc
-  // TODO: add платформо-зависимые переменные окружения
-
 
   constructor(system: System) {
     this.system = system
@@ -25,27 +21,31 @@ export class PackageContext {
 
 
   registerIo() {
-
+    // TODO: add
   }
 
   registerDriver() {
-
+    // TODO: add
   }
 
   registerService() {
-
-  }
-
-  registerUiApp() {
-
+    // TODO: add
   }
 
   registerCmd() {
-
+    // TODO: add
   }
 
   registerApi() {
+    // TODO: add
+  }
 
+  registerUiApp() {
+    // TODO: add
+  }
+
+  registerDestroyFunc() {
+    // TODO: add
   }
 
 }

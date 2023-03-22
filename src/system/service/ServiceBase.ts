@@ -2,6 +2,10 @@ import {ServiceContext} from './ServiceContext.js'
 import {System} from '../System.js'
 
 
+// TODO: у сервиса должно быть состояния и события его смены
+// TODO: сервисы могут инициализироваться друг за другом в заданном порядке
+// TODO: тоже с дестроем
+
 export class ServiceBase {
   // startAfter?: string[]
   // startBefore?: string[]

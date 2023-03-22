@@ -1,14 +1,9 @@
 import {PackageContext} from '../../system/package/PackageContext.js'
-import {Package} from '../../types/Package.js'
+import {Package} from '../../types/types.js'
 
 
 export function DevSystemPack (): Package {
-  return {
-    async install(ctx: PackageContext) {
+  return (ctx: PackageContext) => {
 
-    },
-    async destroy(ctx: PackageContext) {
-
-    },
   }
 }
