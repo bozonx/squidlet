@@ -17,7 +17,9 @@
     "lint": "tslint -p tsconfig.json"
   },
   "dependencies": {
-    "squidlet-lib": "file:../squidlet-lib"
+    "@types/ws": "^8.5.4",
+    "squidlet-lib": "file:../squidlet-lib",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.0",

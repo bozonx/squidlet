@@ -4,19 +4,16 @@ import {IoContext} from './IoContext.js'
 
 export abstract class IoBase {
   readonly abstract name: string
-  private readonly system: System
-  private readonly context: IoContext
+  private readonly ctx
 
 
-  constructor(system: System) {
-    this.system = system
-    this.context = new IoContext(this.system)
+  constructor(ctx: IoContext) {
+    this.ctx = ctx
   }
 
   async init() {
   }
 
   async destroy() {
-    await this.context.destroy()
   }
 }
