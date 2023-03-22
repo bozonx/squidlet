@@ -6,4 +6,5 @@ export enum SystemEvents {
   // beforeDestroy,
   logger,
   systemInited,
+  systemStarted,
 }

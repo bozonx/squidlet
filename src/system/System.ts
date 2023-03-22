@@ -131,6 +131,8 @@ export class System {
       .catch((e) => {
         // TODO: what to do???
       })
+
+    // TODO: emit systemStarted
   }
 
   use(pkg: Package) {

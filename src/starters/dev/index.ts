@@ -15,6 +15,8 @@ system.use(DevSystemPack())
 system.init()
 // start the system
 system.events.once(SystemEvents.systemInited, () => system.start())
-// Enable graceful stop
-process.once('SIGINT', () => system.destroy())
-process.once('SIGTERM', () => system.destroy())
+system.events.once(SystemEvents.systemStarted, () => {
+  // Enable graceful stop
+  process.once('SIGINT', () => system.destroy())
+  process.once('SIGTERM', () => system.destroy())
+})
