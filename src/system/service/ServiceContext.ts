@@ -1,5 +1,5 @@
 import {System} from '../System.js'
-import {Logger} from 'squidlet-lib'
+import {IndexedEventEmitter, Logger} from 'squidlet-lib'
 import {DriversManager} from '../driver/DriversManager.js'
 
 
@@ -12,6 +12,10 @@ export class ServiceContext {
 
   get drivers(): DriversManager {
     return this.system.drivers
+  }
+
+  get events(): IndexedEventEmitter {
+    return this.system.events
   }
 
 
