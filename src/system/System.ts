@@ -12,7 +12,6 @@ import {CacheManager} from './managers/CacheManager.js'
 import {ConfigsManager} from './config/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './ui/UiManager.js'
-import {ExecManager} from './managers/ExecManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
 import {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
@@ -35,22 +34,30 @@ export class System {
   readonly io: IoManager
   readonly drivers: DriversManager
   // DRIVERS
-  readonly exec: ExecManager
+  // TODO: add
   readonly systemInfo: SystemInfoManager
   // SYSTEM
+  // TODO: add
   readonly permissions: PermissionsManager
   // SERVICES
   readonly services: ServicesManager
   readonly files: FilesManager
+  // TODO: add
   readonly cache: CacheManager
+  // TODO: add !!!!!!
   readonly db: DbManager
   // It is wrapper for DB which is works with configs
+  // TODO: add
   readonly configs: ConfigsManager
+  // TODO: add !!!!!!
   readonly network: NetworkManager
   // it is service
+  // TODO: add
   readonly ui: UiManager
+  // TODO: add !!!!!!
   readonly apiManager: ApiManager
   // it is wrapper for api
+  // TODO: add
   readonly cmd: CmdManager
   readonly packageManager: PackageManager
 
@@ -58,7 +65,6 @@ export class System {
   constructor() {
     this.io = new IoManager(this)
     this.drivers = new DriversManager(this)
-    this.exec = new ExecManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.files = new FilesManager(this)
     this.cache = new CacheManager(this)
@@ -78,7 +84,6 @@ export class System {
     (async () => {
       await this.io.init()
       await this.drivers.init()
-      await this.exec.init()
       await this.systemInfo.init()
       await this.files.init()
       await this.cache.init()
@@ -121,7 +126,6 @@ export class System {
       destroyWrapper(this.cache.destroy),
       destroyWrapper(this.files.destroy),
       destroyWrapper(this.systemInfo.destroy),
-      destroyWrapper(this.exec.destroy),
       destroyWrapper(this.drivers.destroy),
       destroyWrapper(this.io.destroy),
     ])

@@ -22,6 +22,8 @@ export class FilesManager {
   readonly cache
   readonly log
   readonly tmp
+  // some extenal file system, can be any mounted fs
+  readonly external
 
   private readonly system: System
 
@@ -37,6 +39,7 @@ export class FilesManager {
     this.cache = new FilesCache(this.system, 'cache')
     this.log = new FilesLog(this.system, 'log')
     this.tmp = new FilesWrapper(this.system, 'tmp')
+    this.external = new FilesWrapper(this.system, 'external')
   }
 
   async init() {
