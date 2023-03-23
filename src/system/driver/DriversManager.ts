@@ -20,10 +20,22 @@ export class DriversManager {
 
   async init() {
     for (const driverName of Object.keys(this.drivers)) {
-
-      // TODO: если драйвер требует IO а его нет то драйвер не регистрируем
-
       const driver = this.drivers[driverName]
+
+      if (driver.requireIo) {
+        const found: string[] = this.ctx.io.getNames().filter((el) => {
+          if (driver.requireIo?.includes(el)) return true
+        })
+
+        if (found.length !== driver.requireIo.length) {
+          await driver.destroy?.()
+          // do not register the driver if ot doesn't meet his dependencies
+          delete this.drivers[driverName]
+
+          continue
+        }
+      }
+
       const cfgFilePath = pathJoin(CFG_DIRS.drivers, driverName + '.yml')
       let driverCfg: Record<string, any> | undefined
 

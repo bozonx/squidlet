@@ -2,6 +2,7 @@ import {DriverContext} from './DriverContext.js'
 
 
 export abstract class DriverBase {
+  readonly requireIo?: string[]
   // dirver name
   readonly abstract name: string
   private readonly ctx: DriverContext

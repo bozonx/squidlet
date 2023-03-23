@@ -1,5 +1,6 @@
 import {System} from '../System.js'
 import {Logger} from 'squidlet-lib'
+import {IoManager} from '../Io/IoManager.js'
 
 
 export class DriverContext {
@@ -8,6 +9,10 @@ export class DriverContext {
 
   get log(): Logger {
     return this.system.log
+  }
+
+  get io(): IoManager {
+    return this.system.io
   }
 
 
