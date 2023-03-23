@@ -17,6 +17,7 @@ export class DriversManager {
 
   async init() {
     // TODO: init all the driver
+    // TODO: если драйвер требует IO а его нет то драйвер не регистрируем
   }
 
   async destroy() {

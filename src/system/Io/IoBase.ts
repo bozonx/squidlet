@@ -11,13 +11,7 @@ export abstract class IoBase {
     this.ctx = ctx
   }
 
-  init?: () => Promise<void>
-
-  /**
-   * Setup props before init.
-   * It allowed to call it more than once.
-   */
-  configure?: (cfg: Record<string, any>) => Promise<void>
+  init?: (cfg?: Record<string, any>) => Promise<void>
 
   destroy?: () => Promise<void>
 

@@ -63,14 +63,9 @@ export class IoManager {
         ioCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
       }
 
-      if (ioItem.configure && ioCfg) {
-        this.ctx.log.debug(`IoManager: configure io "${ioName}" with ${JSON.stringify(ioCfg)}`)
-        await ioItem.configure(ioCfg)
-      }
-
       if (ioItem.init) {
         this.ctx.log.debug(`IoManager: initialize IO "${ioName}"`)
-        await ioItem.init()
+        await ioItem.init(ioCfg)
       }
     }
   }
