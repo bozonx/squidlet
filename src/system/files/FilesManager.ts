@@ -21,6 +21,7 @@ export class FilesManager {
   readonly userData
   readonly cache
   readonly log
+  readonly tmp
 
   private readonly system: System
 
@@ -35,6 +36,7 @@ export class FilesManager {
     this.userData = new FilesVersioned(this.system, 'userData')
     this.cache = new FilesCache(this.system, 'cache')
     this.log = new FilesLog(this.system, 'log')
+    this.tmp = new FilesWrapper(this.system, 'tmp')
   }
 
   async init() {
