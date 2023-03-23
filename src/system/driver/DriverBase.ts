@@ -1,24 +1,18 @@
 import {DriverContext} from './DriverContext.js'
-import {System} from '../System.js'
 
 
 export abstract class DriverBase {
   // dirver name
   readonly abstract name: string
-
-  private readonly system: System
-  private readonly context: DriverContext
+  private readonly ctx: DriverContext
 
 
-  constructor(system: System) {
-    this.system = system
-    this.context = new DriverContext(this.system)
+  constructor(ctx: DriverContext) {
+    this.ctx = ctx
   }
 
-  async init() {
-  }
+  init?: (cfg?: Record<string, any>) => Promise<void>
 
-  async destroy() {
-    await this.context.destroy()
-  }
+  destroy?: () => Promise<void>
+
 }

@@ -1,4 +1,3 @@
-import {System} from '../System.js'
 import {IoContext} from './IoContext.js'
 
 

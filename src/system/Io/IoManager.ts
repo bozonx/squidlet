@@ -19,7 +19,20 @@ export class IoManager {
   }
 
   async init() {
-    await this.configureAllIo()
+    for (const ioName of Object.keys(this.ios)) {
+      const ioItem = this.ios[ioName]
+      const cfgFilePath = pathJoin(CFG_DIRS.ios, ioName + '.yml')
+      let ioCfg: Record<string, any> | undefined
+
+      if (await this.system.files.cfg.exists(cfgFilePath)) {
+        ioCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
+      }
+
+      if (ioItem.init) {
+        this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
+        await ioItem.init(ioCfg)
+      }
+    }
   }
 
   async destroy() {
@@ -27,7 +40,7 @@ export class IoManager {
       const ioItem = this.ios[ioName]
 
       if (ioItem.destroy) {
-        this.ctx.log.debug(`IoManager: destroy IO "${ioName}"`)
+        this.ctx.log.debug(`IoManager: destroying IO "${ioName}"`)
         await ioItem.destroy()
       }
     }
@@ -50,24 +63,6 @@ export class IoManager {
     }
 
     this.ios[io.name] = io
-  }
-
-
-  private async configureAllIo() {
-    for (const ioName of Object.keys(this.ios)) {
-      const ioItem = this.ios[ioName]
-      const cfgFilePath = pathJoin(CFG_DIRS.ios, ioName + '.yml')
-      let ioCfg: Record<string, any> | undefined
-
-      if (await this.system.files.cfg.exists(cfgFilePath)) {
-        ioCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
-      }
-
-      if (ioItem.init) {
-        this.ctx.log.debug(`IoManager: initialize IO "${ioName}"`)
-        await ioItem.init(ioCfg)
-      }
-    }
   }
 
 }
