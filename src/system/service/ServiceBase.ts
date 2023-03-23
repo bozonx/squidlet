@@ -1,5 +1,4 @@
 import {ServiceContext} from './ServiceContext.js'
-import {System} from '../System.js'
 
 
 // TODO: у сервиса должно быть состояния и события его смены
@@ -14,19 +13,15 @@ export abstract class ServiceBase {
   // destroyAfter?: string[]
   // destroyBefore?: string[]
 
-  private readonly system: System
-  private readonly context: ServiceContext
+  private readonly ctx: ServiceContext
 
 
-  constructor(system: System) {
-    this.system = system
-    this.context = new ServiceContext(this.system)
+  constructor(ctx: ServiceContext) {
+    this.ctx = ctx
   }
 
-  async init() {
-  }
+  init?: (cfg?: Record<string, any>) => Promise<void>
 
-  async destroy() {
-    await this.context.destroy()
-  }
+  destroy?: () => Promise<void>
+
 }

@@ -51,11 +51,11 @@ export class DriversManager {
   }
 
   async destroy() {
-    for (const ioName of Object.keys(this.drivers)) {
-      const driver = this.drivers[ioName]
+    for (const driverName of Object.keys(this.drivers)) {
+      const driver = this.drivers[driverName]
 
       if (driver.destroy) {
-        this.ctx.log.debug(`DriversManager: destroying driver "${ioName}"`)
+        this.ctx.log.debug(`DriversManager: destroying driver "${driverName}"`)
         await driver.destroy()
       }
     }
