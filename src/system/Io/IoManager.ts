@@ -4,7 +4,7 @@ import {System} from '../System.js'
 import {IoIndex} from '../../types/types.js'
 import {IoBase} from './IoBase.js'
 import {IoContext} from './IoContext.js'
-import {CFG_DIRS, ROOT_DIRS} from '../../types/contstants.js'
+import {CFG_DIRS} from '../../types/contstants.js'
 
 
 export class IoManager {
@@ -23,6 +23,14 @@ export class IoManager {
   }
 
   async destroy() {
+    for (const ioName of Object.keys(this.ios)) {
+      const ioItem = this.ios[ioName]
+
+      if (ioItem.destroy) {
+        this.ctx.log.debug(`IoManager: destroy IO "${ioName}"`)
+        await ioItem.destroy()
+      }
+    }
   }
 
 
@@ -46,9 +54,6 @@ export class IoManager {
 
 
   private async configureAllIo() {
-    // TODO: для каждого IO должен быть уже некий конфиг
-    // TODO: конфиг нужно загрузить из папки конфигов
-
     for (const ioName of Object.keys(this.ios)) {
       const ioItem = this.ios[ioName]
       const cfgFilePath = pathJoin(CFG_DIRS.ios, ioName + '.yml')
@@ -65,7 +70,6 @@ export class IoManager {
 
       if (ioItem.init) {
         this.ctx.log.debug(`IoManager: initialize IO "${ioName}"`)
-
         await ioItem.init()
       }
     }

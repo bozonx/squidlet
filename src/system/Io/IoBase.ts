@@ -19,6 +19,6 @@ export abstract class IoBase {
    */
   configure?: (cfg: Record<string, any>) => Promise<void>
 
-  asdestroy?: () => Promise<void>
+  destroy?: () => Promise<void>
 
 }
