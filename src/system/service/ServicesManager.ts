@@ -25,6 +25,20 @@ export class ServicesManager {
     for (const serviceName of Object.keys(this.services)) {
       const service = this.services[serviceName]
 
+      if (service.requireDriver) {
+        const found: string[] = this.ctx.drivers.getNames().filter((el) => {
+          if (service.requireDriver?.includes(el)) return true
+        })
+
+        if (found.length !== service.requireDriver.length) {
+          await service.destroy?.()
+          // do not register the driver if ot doesn't meet his dependencies
+          delete this.services[serviceName]
+
+          continue
+        }
+      }
+
       const cfgFilePath = pathJoin(CFG_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
       let serviceCfg: Record<string, any> | undefined
 
@@ -57,6 +71,14 @@ export class ServicesManager {
     // TODO: выстраивать порядок запуска
   }
 
+
+  getService<T extends ServiceBase>(serviceName: string): T {
+    return this.services[serviceName] as T
+  }
+
+  getNames(): string[] {
+    return Object.keys(this.services)
+  }
 
   useService(serviceIndex: ServiceIndex) {
     const service = serviceIndex(this.ctx)

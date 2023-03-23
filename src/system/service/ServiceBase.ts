@@ -6,6 +6,7 @@ import {ServiceContext} from './ServiceContext.js'
 // TODO: тоже с дестроем
 
 export abstract class ServiceBase {
+  readonly requireDriver?: string[]
   readonly abstract name: string
 
   // startAfter?: string[]

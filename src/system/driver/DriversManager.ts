@@ -62,6 +62,14 @@ export class DriversManager {
   }
 
 
+  getDriver<T extends DriverBase>(driverName: string): T {
+    return this.drivers[driverName] as T
+  }
+
+  getNames(): string[] {
+    return Object.keys(this.drivers)
+  }
+
   useDriver(driverIndex: DriverIndex) {
     const driver = driverIndex(this.ctx)
 
