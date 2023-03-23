@@ -5,7 +5,7 @@ import {IoBase} from '../system/Io/IoBase.js'
 import {ServiceBase} from '../system/service/ServiceBase.js'
 import {ServiceContext} from '../system/service/ServiceContext.js'
 import {IoContext} from '../system/Io/IoContext.js'
-import {SERVICE_STATUS} from './contstants.js'
+import {SERVICE_DESTROY_REASON, SERVICE_STATUS} from './contstants.js'
 
 
 // It is called right after it is set to system via use()
@@ -15,3 +15,4 @@ export type IoIndex = (ctx: IoContext) => IoBase
 export type DriverIndex = (ctx: DriverContext) => DriverBase
 export type ServiceIndex = (ctx: ServiceContext) => ServiceBase
 export type ServiceStatus = keyof typeof SERVICE_STATUS
+export type ServiceDestroyReason = keyof typeof SERVICE_DESTROY_REASON

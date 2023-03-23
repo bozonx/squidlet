@@ -1,24 +1,33 @@
 import {ServiceContext} from './ServiceContext.js'
-import {ServiceStatus} from '../../types/types.js'
+import {ServiceDestroyReason, ServiceStatus} from '../../types/types.js'
 import {
   EVENT_DELIMITER,
-  RootEvents,
+  RootEvents, SERVICE_DESTROY_REASON,
   SERVICE_STATUS, ServiceEvents,
 } from '../../types/contstants.js'
 
 
 export abstract class ServiceBase {
+  // list of required drivers
   readonly requireDriver?: string[]
+  // list of required services
+  readonly required?: string[]
   readonly abstract name: string
-  private status = SERVICE_STATUS.registered as ServiceStatus
 
-  // TODO: сервисы могут инициализироваться друг за другом в заданном порядке. тоже с дестроем
+  // TODO: может управление статусом вынести в мэнеджер ???
+  private currentStatus = SERVICE_STATUS.registered as ServiceStatus
+
   // startAfter?: string[]
   // startBefore?: string[]
   // destroyAfter?: string[]
   // destroyBefore?: string[]
 
   private readonly ctx: ServiceContext
+
+
+  get status(): ServiceStatus {
+    return this.currentStatus
+  }
 
 
   constructor(ctx: ServiceContext) {
@@ -29,8 +38,15 @@ export abstract class ServiceBase {
     this.changeStatus(SERVICE_STATUS.initializing as ServiceStatus)
   }
 
-  async destroy() {
-    this.changeStatus(SERVICE_STATUS.destroying as ServiceStatus)
+  async destroy(reason?: ServiceDestroyReason) {
+    if (reason === SERVICE_DESTROY_REASON.noDependencies) {
+      // if right now status is registered and was called destroy it means
+      // that it doesn't meet some dependencies
+      this.changeStatus(SERVICE_STATUS.noDependencies as ServiceStatus)
+    }
+    else {
+      this.changeStatus(SERVICE_STATUS.destroying as ServiceStatus)
+    }
   }
 
 
@@ -44,7 +60,7 @@ export abstract class ServiceBase {
 
 
   protected changeStatus(newStatus: ServiceStatus) {
-    this.status = newStatus
+    this.currentStatus = newStatus
     this.ctx.events.emit(this.makeEventName(ServiceEvents.status), newStatus)
   }
 

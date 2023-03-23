@@ -58,3 +58,8 @@ export const SERVICE_STATUS = {
   destroying: 'destroying',
   destroyed: 'destroyed',
 }
+
+export const SERVICE_DESTROY_REASON = {
+  noDependencies: 'noDependencies',
+  systemDestroying: 'systemDestroying',
+}
