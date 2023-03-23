@@ -11,9 +11,14 @@ export abstract class IoBase {
     this.ctx = ctx
   }
 
-  async init() {
-  }
+  init?: () => Promise<void>
 
-  async destroy() {
-  }
+  /**
+   * Setup props before init.
+   * It allowed to call it more than once.
+   */
+  configure?: (cfg: Record<string, any>) => Promise<void>
+
+  asdestroy?: () => Promise<void>
+
 }

@@ -6,7 +6,7 @@ import {SystemInfoManager} from './managers/SystemInfoManager.js'
 import {ServicesManager} from './service/ServicesManager.js'
 import {ApiManager} from './api/ApiManager.js'
 import {CmdManager} from './managers/CmdManager.js'
-import {FilesManager} from './managers/FilesManager.js'
+import {FilesManager} from './files/FilesManager.js'
 import {DbManager} from './managers/DbManager.js'
 import {CacheManager} from './managers/CacheManager.js'
 import {ConfigsManager} from './managers/ConfigsManager.js'
@@ -90,6 +90,7 @@ export class System {
       await this.apiManager.init()
       await this.cmd.init()
       await this.ui.init()
+      // TODO: загрузку пакетов делать как можно раньше чтобы загрузились IO и драйвера
       // load all the installed packages
       await this.packageManager.init()
       // notify that system is inited

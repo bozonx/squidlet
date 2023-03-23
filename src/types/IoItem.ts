@@ -1,4 +1,6 @@
 
+// TODO: не нужно
+
 export interface IoDefinitions {
   [index: string]: {[index: string]: any};
 }
