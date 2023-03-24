@@ -14,6 +14,15 @@ export abstract class ServiceBase {
   // * if required service has just destroyed then this service will be destroyed
   readonly required: string[] = [SERVICE_TARGETS.systemInitialized]
   readonly abstract name: string
+  // timeout for starting process. It it exceeded then it goes to failed state
+  readonly startTimeoutSec?: number
+  // wait some time before start and start in restarting process
+  readonly waitBeforeStartSec?: number
+  // Tries count of restart service if it gone to failed state.
+  // * 0 means unlimited
+  // * -1 means do not restart
+  // * >1 count of restarts
+  readonly restartTries: number = 0
 
   private readonly ctx: ServiceContext
   // call it if running service went to failed state
