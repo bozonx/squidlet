@@ -93,19 +93,12 @@ export class ServicesManager {
     for (const serviceName of Object.keys(this.services)) {
       const service = this.services[serviceName]
 
-      if (driver.destroy) {
+      if (service.destroy) {
         this.ctx.log.debug(`ServicesManager: destroying service "${serviceName}"`)
-        await service.destroy()
+        this.changeStatus(serviceName, SERVICE_STATUS.destroying as ServiceStatus)
+        await service.destroy(SERVICE_DESTROY_REASON.systemDestroying as ServiceDestroyReason)
+        this.changeStatus(serviceName, SERVICE_STATUS.destroyed as ServiceStatus)
       }
-    }
-
-    if (reason === SERVICE_DESTROY_REASON.noDependencies) {
-      // if right now status is registered and was called destroy it means
-      // that it doesn't meet some dependencies
-      this.changeStatus(SERVICE_STATUS.noDependencies as ServiceStatus)
-    }
-    else {
-      this.changeStatus(SERVICE_STATUS.destroying as ServiceStatus)
     }
   }
 
@@ -146,14 +139,14 @@ export class ServicesManager {
   }
 
 
-  private changeStatus(newStatus: ServiceStatus) {
-    this.currentStatus = newStatus
-    this.ctx.events.emit(this.makeEventName(ServiceEvents.status), newStatus)
+  private changeStatus(serviceName: string, newStatus: ServiceStatus) {
+    this.statuses[serviceName] = newStatus
+    this.ctx.events.emit(this.makeEventName(serviceName, ServiceEvents.status), newStatus)
   }
 
-  private makeEventName(eventName: ServiceEvents): string {
+  private makeEventName(serviceName: string, eventName: ServiceEvents): string {
     return RootEvents.service + EVENT_DELIMITER +
-      this.name + EVENT_DELIMITER
+      serviceName + EVENT_DELIMITER
       + eventName
   }
 
@@ -162,6 +155,7 @@ export class ServicesManager {
       .destroy?.(SERVICE_DESTROY_REASON.noDependencies as ServiceDestroyReason)
     // do not register the driver if ot doesn't meet his dependencies
     delete this.services[serviceName]
+    //this.changeStatus(SERVICE_STATUS.noDependencies as ServiceStatus)
     this.ctx.log.error(`Failed initializing service "${serviceName}": ${reason}`)
   }
 
