@@ -1,5 +1,5 @@
 import yaml from 'yaml'
-import {pathJoin} from 'squidlet-lib'
+import {pathJoin, arraysDifference} from 'squidlet-lib'
 import {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
 import {ServiceDestroyReason, ServiceIndex, ServiceStatus} from '../../types/types.js'
@@ -47,9 +47,10 @@ export class ServicesManager {
         })
 
         if (found.length !== service.requireDriver.length) {
-          await service.destroy?.(SERVICE_DESTROY_REASON.noDependencies as ServiceDestroyReason)
-          // do not register the driver if ot doesn't meet his dependencies
-          delete this.services[serviceName]
+          await this.refuseInitService(
+            serviceName,
+            `No drivers: ${arraysDifference(found, service.requireDriver).join()}`
+          )
 
           continue
         }
@@ -60,9 +61,10 @@ export class ServicesManager {
         })
 
         if (found.length !== service.required.length) {
-          await service.destroy?.(SERVICE_DESTROY_REASON.noDependencies as ServiceDestroyReason)
-          // do not register the driver if ot doesn't meet his dependencies
-          delete this.services[serviceName]
+          await this.refuseInitService(
+            serviceName,
+            `No services: ${arraysDifference(found, service.required).join()}`
+          )
 
           continue
         }
@@ -79,12 +81,14 @@ export class ServicesManager {
 
       if (service.init) {
         this.ctx.log.debug(`ServicesManager: initializing service "${serviceName}"`)
+        // TODO: добавить таймаут инициализации
         await service.init(serviceCfg)
       }
     }
   }
 
   async destroy() {
+    // TODO: добавить таймаут дестроя
     for (const serviceName of Object.keys(this.services)) {
       const service = this.services[serviceName]
 
@@ -124,11 +128,11 @@ export class ServicesManager {
   }
 
   async startService() {
-
+    // TODO: добавить таймаут старта
   }
 
   async stopService() {
-
+    // TODO: добавить таймаут остановки
   }
 
   useService(serviceIndex: ServiceIndex) {
@@ -147,6 +151,14 @@ export class ServicesManager {
     return RootEvents.service + EVENT_DELIMITER +
       this.name + EVENT_DELIMITER
       + eventName
+  }
+
+  private async refuseInitService(serviceName: string, reason: string) {
+    await this.services[serviceName]
+      .destroy?.(SERVICE_DESTROY_REASON.noDependencies as ServiceDestroyReason)
+    // do not register the driver if ot doesn't meet his dependencies
+    delete this.services[serviceName]
+    this.ctx.log.error(`Failed initializing service "${serviceName}": ${reason}`)
   }
 
 }
