@@ -148,6 +148,8 @@ export class ServicesManager {
   async startService(serviceName: string) {
 
     // TODO: так же можно запускать после того как тот сервис запустился
+    // TODO: наверное все сервисы сразу ставить в режим ожидания
+    //       и сразу запустить initTarget и за ним должна запуститься вся цепочка
 
     // TODO: запускать только те сервисы которые помеченны для запуска - enabled
 
@@ -164,14 +166,18 @@ export class ServicesManager {
       else {
         this.changeStatus(serviceName, SERVICE_STATUS.wait as ServiceStatus)
 
-        // TODO: слушать статус всех сервисов
-        const handlerIndex = this.ctx.events.addListener(
-          this.makeEventName(serviceName, ServiceEvents.status),
-          (newStatus: ServiceStatus) => {
+        const evenName = this.makeEventName(ServiceEvents.status)
+        const handlerIndex = this.ctx.events.addListener(evenName, () => {
+          const runningRequired: string[] = service.props.required.filter((srvName: string) => {
+            if (this.statuses[srvName] === SERVICE_STATUS.running as ServiceStatus) return true
+          })
 
+          if (runningRequired.length === service.props.required.length) {
+            this.ctx.events.removeListener(handlerIndex, evenName)
+            this.startServiceRightNow(serviceName)
+              .catch((e) => this.ctx.log.error(e))
           }
-        )
-        // TODO: start later - listen event and check
+        })
       }
     }
   }
@@ -226,13 +232,11 @@ export class ServicesManager {
 
   private changeStatus(serviceName: string, newStatus: ServiceStatus) {
     this.statuses[serviceName] = newStatus
-    this.ctx.events.emit(this.makeEventName(serviceName, ServiceEvents.status), newStatus)
+    this.ctx.events.emit(this.makeEventName(ServiceEvents.status), serviceName, newStatus)
   }
 
-  private makeEventName(serviceName: string, eventName: ServiceEvents): string {
-    return RootEvents.service + EVENT_DELIMITER +
-      serviceName + EVENT_DELIMITER
-      + eventName
+  private makeEventName(eventName: ServiceEvents): string {
+    return RootEvents.service + EVENT_DELIMITER + eventName
   }
 
   private async refuseInitService(serviceName: string, reason: string) {
