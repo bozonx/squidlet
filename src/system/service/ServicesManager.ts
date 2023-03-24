@@ -23,6 +23,12 @@ export class ServicesManager {
   private services: Record<string, ServiceBase> = {}
   private statuses: Record<string, ServiceStatus> = {}
 
+  // TODO: наверное добавить логику что если сервис остановился то этот тоже должен останоиться
+  // TODO: так же можно запускать после того как тот сервис запустился
+  // TODO: так же можно останавливать только после того как этот сервис остановился
+
+  // TODO: что если сервис упал в процессе работы - например он запустил подпроцесс который упал
+
   // TODO: добавить Taragets
   // TODO: в required может быть зацикленная зависимость
 
@@ -80,12 +86,21 @@ export class ServicesManager {
 
   async destroy() {
     for (const serviceName of Object.keys(this.services)) {
-      const driver = this.services[serviceName]
+      const service = this.services[serviceName]
 
       if (driver.destroy) {
-        this.ctx.log.debug(`DriversManager: destroying driver "${serviceName}"`)
-        await driver.destroy()
+        this.ctx.log.debug(`ServicesManager: destroying service "${serviceName}"`)
+        await service.destroy()
       }
+    }
+
+    if (reason === SERVICE_DESTROY_REASON.noDependencies) {
+      // if right now status is registered and was called destroy it means
+      // that it doesn't meet some dependencies
+      this.changeStatus(SERVICE_STATUS.noDependencies as ServiceStatus)
+    }
+    else {
+      this.changeStatus(SERVICE_STATUS.destroying as ServiceStatus)
     }
   }
 
