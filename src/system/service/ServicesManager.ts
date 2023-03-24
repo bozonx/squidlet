@@ -81,10 +81,20 @@ export class ServicesManager {
         this.ctx.log.debug(`ServicesManager: initializing service "${serviceName}"`)
         // TODO: добавить таймаут инициализации
         this.changeStatus(service.name, SERVICE_STATUS.initializing as ServiceStatus)
-        await service.init(
-          (err: SubprogramError) => this.handleServiceFall(err, serviceName),
-          serviceCfg
-        )
+
+        try {
+          await service.init(
+            (err: SubprogramError) => this.handleServiceFall(err, serviceName),
+            serviceCfg
+          )
+        }
+        catch (e) {
+          this.ctx.log.error(`ServicesManager: service "${serviceName}" init error: ${e}`)
+          this.changeStatus(service.name, SERVICE_STATUS.initError as ServiceStatus)
+
+          return
+        }
+
         this.changeStatus(service.name, SERVICE_STATUS.initialized as ServiceStatus)
       }
     }
@@ -135,12 +145,41 @@ export class ServicesManager {
     // TODO: выстраивать порядок запуска
   }
 
-  async startService() {
+  async startService(serviceName: string) {
+    this.changeStatus(serviceName, SERVICE_STATUS.starting as ServiceStatus)
+
     // TODO: добавить таймаут старта
+    // TODO: use wait status
+
+    try {
+      await this.services[serviceName].start()
+    }
+    catch (e) {
+      this.ctx.log.error(`ServicesManager: service "${serviceName}" start error: ${e}`)
+      this.changeStatus(serviceName, SERVICE_STATUS.startError as ServiceStatus)
+
+      return
+    }
+
+    this.changeStatus(serviceName, SERVICE_STATUS.running as ServiceStatus)
   }
 
-  async stopService() {
+  async stopService(serviceName: string, force?: boolean) {
     // TODO: добавить таймаут остановки
+
+    this.changeStatus(serviceName, SERVICE_STATUS.stopping as ServiceStatus)
+
+    try {
+      await this.services[serviceName].stop(force)
+    }
+    catch (e) {
+      this.ctx.log.error(`ServicesManager: service "${serviceName}" stop error: ${e}`)
+      this.changeStatus(serviceName, SERVICE_STATUS.stopError as ServiceStatus)
+
+      return
+    }
+
+    this.changeStatus(serviceName, SERVICE_STATUS.stopped as ServiceStatus)
   }
 
   useService(serviceIndex: ServiceIndex) {
