@@ -2,9 +2,16 @@ import yaml from 'yaml'
 import {pathJoin} from 'squidlet-lib'
 import {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
-import {ServiceDestroyReason, ServiceIndex} from '../../types/types.js'
+import {ServiceDestroyReason, ServiceIndex, ServiceStatus} from '../../types/types.js'
 import {ServiceBase} from './ServiceBase.js'
-import {CFG_DIRS, SERVICE_DESTROY_REASON} from '../../types/contstants.js'
+import {
+  CFG_DIRS,
+  EVENT_DELIMITER,
+  RootEvents,
+  SERVICE_DESTROY_REASON,
+  SERVICE_STATUS,
+  ServiceEvents,
+} from '../../types/contstants.js'
 
 
 const SERVICE_CONFIG_FILE_NAME = 'index.yml'
@@ -12,9 +19,12 @@ const SERVICE_CONFIG_FILE_NAME = 'index.yml'
 
 export class ServicesManager {
   private readonly system: System
-  private services: Record<string, ServiceBase> = {}
   private readonly ctx
+  private services: Record<string, ServiceBase> = {}
+  private statuses: Record<string, ServiceStatus> = {}
 
+  // TODO: добавить Taragets
+  // TODO: в required может быть зацикленная зависимость
 
   constructor(system: System) {
     this.system = system
@@ -80,13 +90,6 @@ export class ServicesManager {
   }
 
 
-  async start() {
-    // TODO: если сервис не запустился то не поднимать ошибку выше, писать в лог
-    // TODO: запускать только те сервисы которые помеченны для запуска
-    // TODO: выстраивать порядок запуска
-  }
-
-
   getService<T extends ServiceBase>(serviceName: string): T {
     return this.services[serviceName] as T
   }
@@ -95,10 +98,40 @@ export class ServicesManager {
     return Object.keys(this.services)
   }
 
+  getServiceStatus(serviceName: string): ServiceStatus {
+
+  }
+
+  async startAll() {
+    // TODO: если сервис не запустился то не поднимать ошибку выше, писать в лог
+    // TODO: запускать только те сервисы которые помеченны для запуска
+    // TODO: выстраивать порядок запуска
+  }
+
+  async startService() {
+
+  }
+
+  async stopService() {
+
+  }
+
   useService(serviceIndex: ServiceIndex) {
     const service = serviceIndex(this.ctx)
 
     this.services[service.name] = service
+  }
+
+
+  private changeStatus(newStatus: ServiceStatus) {
+    this.currentStatus = newStatus
+    this.ctx.events.emit(this.makeEventName(ServiceEvents.status), newStatus)
+  }
+
+  private makeEventName(eventName: ServiceEvents): string {
+    return RootEvents.service + EVENT_DELIMITER +
+      this.name + EVENT_DELIMITER
+      + eventName
   }
 
 }

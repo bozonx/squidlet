@@ -3,31 +3,21 @@ import {ServiceDestroyReason, ServiceStatus} from '../../types/types.js'
 import {
   EVENT_DELIMITER,
   RootEvents, SERVICE_DESTROY_REASON,
-  SERVICE_STATUS, ServiceEvents,
+  SERVICE_STATUS, SERVICE_TARGETS, ServiceEvents,
 } from '../../types/contstants.js'
 
 
 export abstract class ServiceBase {
   // list of required drivers
   readonly requireDriver?: string[]
+  // TODO: наверное добавить логику что если сервис остановился то этот тоже должен останоиться
+  // TODO: так же можно запускать после того как тот сервис запустился
+  // TODO: так же можно останавливать только после того как этот сервис остановился
   // list of required services
-  readonly required?: string[]
+  readonly required: string[] = [SERVICE_TARGETS.systemInitialized]
   readonly abstract name: string
 
-  // TODO: может управление статусом вынести в мэнеджер ???
-  private currentStatus = SERVICE_STATUS.registered as ServiceStatus
-
-  // startAfter?: string[]
-  // startBefore?: string[]
-  // destroyAfter?: string[]
-  // destroyBefore?: string[]
-
   private readonly ctx: ServiceContext
-
-
-  get status(): ServiceStatus {
-    return this.currentStatus
-  }
 
 
   constructor(ctx: ServiceContext) {
@@ -49,25 +39,6 @@ export abstract class ServiceBase {
     }
   }
 
-
-  start() {
-    this.changeStatus(SERVICE_STATUS.starting as ServiceStatus)
-  }
-
-  stop() {
-    this.changeStatus(SERVICE_STATUS.stopping as ServiceStatus)
-  }
-
-
-  protected changeStatus(newStatus: ServiceStatus) {
-    this.currentStatus = newStatus
-    this.ctx.events.emit(this.makeEventName(ServiceEvents.status), newStatus)
-  }
-
-  protected makeEventName(eventName: ServiceEvents): string {
-    return RootEvents.service + EVENT_DELIMITER +
-      this.name + EVENT_DELIMITER
-      + eventName
-  }
-
+  abstract start: () => Promise<void>
+  abstract stop: () => Promise<void>
 }

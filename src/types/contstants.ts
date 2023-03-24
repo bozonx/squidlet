@@ -63,3 +63,17 @@ export const SERVICE_DESTROY_REASON = {
   noDependencies: 'noDependencies',
   systemDestroying: 'systemDestroying',
 }
+
+export const SERVICE_TYPES = {
+  service: 'service',
+  target: 'target',
+  oneshot: 'oneshot', // может быть таймаут запуска
+  interval: 'interval', // переодично запускается типа cron
+}
+
+export const SERVICE_TARGETS = {
+  // only for system low level services
+  root: 'root',
+  // for not system services
+  systemInitialized: 'systemInitialized',
+}
