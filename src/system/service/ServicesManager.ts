@@ -177,7 +177,7 @@ export class ServicesManager {
   }
 
   async stopService(serviceName: string, force?: boolean) {
-    // TODO: добавить таймаут остановки
+    // TODO: добавить таймаут остановки - stopTimeoutSec
 
     this.changeStatus(serviceName, SERVICE_STATUS.stopping as ServiceStatus)
 
@@ -205,9 +205,8 @@ export class ServicesManager {
 
   private async startServiceRightNow(serviceName: string) {
 
-    // TODO: добавить таймаут старта
-    // TODO: use startTimeoutSec
-    // TODO: use waitBeforeStartSec
+    // TODO: добавить таймаут старта - use startTimeoutSec
+    // TODO: use waitBeforeStartSec - и проверить ещё раз условия
 
 
     this.changeStatus(serviceName, SERVICE_STATUS.starting as ServiceStatus)

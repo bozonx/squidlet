@@ -10,6 +10,8 @@ export interface ServiceProps {
   readonly required: string[]
   // timeout for starting process. It it exceeded then it goes to failed state
   readonly startTimeoutSec?: number
+  // timeout for stopping process. It it exceeded then it goes to failed state
+  readonly stopTimeoutSec?: number
   // wait some time before start and start in restarting process
   readonly waitBeforeStartSec?: number
   // Tries count of restart service if it gone to failed state.
