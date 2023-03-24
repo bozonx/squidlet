@@ -145,7 +145,7 @@ export class System {
   async start() {
     (async () => {
       // start system's and user's services
-      await this.services.start()
+      await this.services.startAll()
       await this.cmd.startInitScripts()
       // notify that system is started
       this.events.emit(SystemEvents.systemStarted)

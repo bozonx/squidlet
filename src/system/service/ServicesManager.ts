@@ -32,6 +32,8 @@ export class ServicesManager {
   // TODO: добавить Taragets
   // TODO: в required может быть зацикленная зависимость
 
+  // TODO: use restartTries
+
   constructor(system: System) {
     this.system = system
     this.ctx = new ServiceContext(this.system)
@@ -109,6 +111,7 @@ export class ServicesManager {
         this.changeStatus(serviceName, SERVICE_STATUS.destroying as ServiceStatus)
 
         // TODO: добавить таймаут дестроя
+        // TODO: наверное сделать в порядке required
 
         try {
           await service.destroy(SERVICE_DESTROY_REASON.systemDestroying as ServiceDestroyReason)
@@ -137,31 +140,38 @@ export class ServicesManager {
   }
 
   async startAll() {
-
-    // TODO: сервисы могут инициализироваться друг за другом в заданном порядке. тоже с дестроем
-
-    // TODO: если сервис не запустился то не поднимать ошибку выше, писать в лог
-    // TODO: запускать только те сервисы которые помеченны для запуска
-    // TODO: выстраивать порядок запуска
+    for (const serviceName of Object.keys(this.services)) {
+      await this.startService(serviceName)
+    }
   }
 
   async startService(serviceName: string) {
-    this.changeStatus(serviceName, SERVICE_STATUS.starting as ServiceStatus)
 
-    // TODO: добавить таймаут старта
-    // TODO: use wait status
+    // TODO: запускать только те сервисы которые помеченны для запуска - enabled
 
-    try {
-      await this.services[serviceName].start()
+    const service = this.services[serviceName]
+
+    if (service.props.required) {
+      const runningRequired: string[] = service.props.required.filter((srvName: string) => {
+        if (this.statuses[srvName] === SERVICE_STATUS.running as ServiceStatus) return true
+      })
+
+      if (runningRequired.length === service.props.required.length) {
+        await this.startServiceRightNow(serviceName)
+      }
+      else {
+        this.changeStatus(serviceName, SERVICE_STATUS.wait as ServiceStatus)
+
+        // TODO: слушать статус всех сервисов
+        const handlerIndex = this.ctx.events.addListener(
+          this.makeEventName(serviceName, ServiceEvents.status),
+          (newStatus: ServiceStatus) => {
+
+          }
+        )
+        // TODO: start later - listen event and check
+      }
     }
-    catch (e) {
-      this.ctx.log.error(`ServicesManager: service "${serviceName}" start error: ${e}`)
-      this.changeStatus(serviceName, SERVICE_STATUS.startError as ServiceStatus)
-
-      return
-    }
-
-    this.changeStatus(serviceName, SERVICE_STATUS.running as ServiceStatus)
   }
 
   async stopService(serviceName: string, force?: boolean) {
@@ -190,6 +200,28 @@ export class ServicesManager {
     this.changeStatus(service.name, SERVICE_STATUS.loaded as ServiceStatus)
   }
 
+
+  private async startServiceRightNow(serviceName: string) {
+
+    // TODO: добавить таймаут старта
+    // TODO: use startTimeoutSec
+    // TODO: use waitBeforeStartSec
+
+
+    this.changeStatus(serviceName, SERVICE_STATUS.starting as ServiceStatus)
+
+    try {
+      await this.services[serviceName].start()
+    }
+    catch (e) {
+      this.ctx.log.error(`ServicesManager: service "${serviceName}" start error: ${e}`)
+      this.changeStatus(serviceName, SERVICE_STATUS.startError as ServiceStatus)
+
+      return
+    }
+
+    this.changeStatus(serviceName, SERVICE_STATUS.running as ServiceStatus)
+  }
 
   private changeStatus(serviceName: string, newStatus: ServiceStatus) {
     this.statuses[serviceName] = newStatus
