@@ -80,23 +80,34 @@ export class ServicesManager {
       if (service.init) {
         this.ctx.log.debug(`ServicesManager: initializing service "${serviceName}"`)
         // TODO: добавить таймаут инициализации
+        this.changeStatus(service.name, SERVICE_STATUS.initializing as ServiceStatus)
         await service.init(
           (err: SubprogramError) => this.handleServiceFall(err, serviceName),
           serviceCfg
         )
+        this.changeStatus(service.name, SERVICE_STATUS.initialized as ServiceStatus)
       }
     }
   }
 
   async destroy() {
-    // TODO: добавить таймаут дестроя
     for (const serviceName of Object.keys(this.services)) {
       const service = this.services[serviceName]
 
       if (service.destroy) {
         this.ctx.log.debug(`ServicesManager: destroying service "${serviceName}"`)
         this.changeStatus(serviceName, SERVICE_STATUS.destroying as ServiceStatus)
-        await service.destroy(SERVICE_DESTROY_REASON.systemDestroying as ServiceDestroyReason)
+
+        // TODO: добавить таймаут дестроя
+
+        try {
+          await service.destroy(SERVICE_DESTROY_REASON.systemDestroying as ServiceDestroyReason)
+        }
+        catch (e) {
+          this.ctx.log.error(`Service "${serviceName} destroying with error: ${e}"`)
+          // then ignore an error
+        }
+
         this.changeStatus(serviceName, SERVICE_STATUS.destroyed as ServiceStatus)
       }
     }
@@ -112,7 +123,7 @@ export class ServicesManager {
   }
 
   getServiceStatus(serviceName: string): ServiceStatus {
-
+    return this.statuses[serviceName]
   }
 
   async startAll() {
@@ -136,6 +147,8 @@ export class ServicesManager {
     const service = serviceIndex(this.ctx)
 
     this.services[service.name] = service
+
+    this.changeStatus(service.name, SERVICE_STATUS.loaded as ServiceStatus)
   }
 
 
@@ -155,12 +168,14 @@ export class ServicesManager {
       .destroy?.(SERVICE_DESTROY_REASON.noDependencies as ServiceDestroyReason)
     // do not register the driver if ot doesn't meet his dependencies
     delete this.services[serviceName]
-    //this.changeStatus(SERVICE_STATUS.noDependencies as ServiceStatus)
+    // service will be deleted but status was saved
+    this.changeStatus(serviceName, SERVICE_STATUS.noDependencies as ServiceStatus)
     this.ctx.log.error(`Failed initializing service "${serviceName}": ${reason}`)
   }
 
   private handleServiceFall(err: SubprogramError, serviceName: string) {
-    // TODO: add
+    this.ctx.log.error(`Service "${serviceName}" has gone to failed state: ${JSON.stringify(err)}`)
+    this.changeStatus(serviceName, SERVICE_STATUS.fallen as ServiceStatus)
   }
 
 }

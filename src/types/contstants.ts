@@ -40,20 +40,31 @@ export const CFG_DIRS = {
 
 export const SERVICE_STATUS = {
   // just instantiated
-  registered: 'registered',
-  // has not met some dependencies
+  loaded: 'loaded',
+  // has not met some dependencies. Service has been destroyed and removed in this case
   noDependencies: 'noDependencies',
+  // TODO: use
   // wait while service which is it depends on will be started
   wait: 'wait',
+  // was falled if it was in running state
+  fallen: 'fallen',
   // init is in progress
   initializing: 'initializing',
   initialized: 'initialized',
+  // TODO: use
   initError: 'initError',
+  // TODO: use
   starting: 'starting',
-  started: 'started',
+  // TODO: use
+  // after successfully run
+  running: 'running',
+  // TODO: use
   startError: 'startError',
+  // TODO: use
   stopping: 'stopping',
+  // TODO: use
   stopped: 'stopped',
+  // TODO: use
   stopError: 'stopError',
   destroying: 'destroying',
   destroyed: 'destroyed',
