@@ -2,7 +2,7 @@ import yaml from 'yaml'
 import {pathJoin, arraysDifference} from 'squidlet-lib'
 import {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
-import {ServiceDestroyReason, ServiceIndex, ServiceStatus} from '../../types/types.js'
+import {ServiceDestroyReason, ServiceIndex, ServiceStatus, SubprogramError} from '../../types/types.js'
 import {ServiceBase} from './ServiceBase.js'
 import {
   CFG_DIRS,
@@ -41,37 +41,35 @@ export class ServicesManager {
     for (const serviceName of Object.keys(this.services)) {
       const service = this.services[serviceName]
 
-      if (service.requireDriver) {
+      if (service.props.requireDriver) {
         const found: string[] = this.ctx.drivers.getNames().filter((el) => {
-          if (service.requireDriver?.includes(el)) return true
+          if (service.props.requireDriver?.includes(el)) return true
         })
 
-        if (found.length !== service.requireDriver.length) {
+        if (found.length !== service.props.requireDriver.length) {
           await this.refuseInitService(
             serviceName,
-            `No drivers: ${arraysDifference(found, service.requireDriver).join()}`
+            `No drivers: ${arraysDifference(found, service.props.requireDriver).join()}`
           )
 
           continue
         }
       }
-      else if (service.required) {
+      else if (service.props.required) {
         const found: string[] = this.getNames().filter((el) => {
-          if (service.required?.includes(el)) return true
+          if (service.props.required?.includes(el)) return true
         })
 
-        if (found.length !== service.required.length) {
+        if (found.length !== service.props.required.length) {
           await this.refuseInitService(
             serviceName,
-            `No services: ${arraysDifference(found, service.required).join()}`
+            `No services: ${arraysDifference(found, service.props.required).join()}`
           )
 
           continue
         }
       }
-
-      // TODO: сервисы могут инициализироваться друг за другом в заданном порядке. тоже с дестроем
-
+      // load service config
       const cfgFilePath = pathJoin(CFG_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
       let serviceCfg: Record<string, any> | undefined
 
@@ -82,7 +80,10 @@ export class ServicesManager {
       if (service.init) {
         this.ctx.log.debug(`ServicesManager: initializing service "${serviceName}"`)
         // TODO: добавить таймаут инициализации
-        await service.init(serviceCfg)
+        await service.init(
+          (err: SubprogramError) => this.handleServiceFall(err, serviceName),
+          serviceCfg
+        )
       }
     }
   }
@@ -122,6 +123,9 @@ export class ServicesManager {
   }
 
   async startAll() {
+
+    // TODO: сервисы могут инициализироваться друг за другом в заданном порядке. тоже с дестроем
+
     // TODO: если сервис не запустился то не поднимать ошибку выше, писать в лог
     // TODO: запускать только те сервисы которые помеченны для запуска
     // TODO: выстраивать порядок запуска
@@ -159,6 +163,10 @@ export class ServicesManager {
     // do not register the driver if ot doesn't meet his dependencies
     delete this.services[serviceName]
     this.ctx.log.error(`Failed initializing service "${serviceName}": ${reason}`)
+  }
+
+  private handleServiceFall(err: SubprogramError, serviceName: string) {
+    // TODO: add
   }
 
 }

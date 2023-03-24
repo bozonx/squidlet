@@ -7,7 +7,7 @@ import {ServiceProps} from '../../types/ServiceProps.js'
 export abstract class ServiceBase {
   readonly abstract name: string
 
-  private props: ServiceProps = {
+  props: ServiceProps = {
     required: [SERVICE_TARGETS.systemInitialized],
     restartTries: 0
   }

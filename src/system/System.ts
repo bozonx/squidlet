@@ -1,5 +1,5 @@
 import {callSafely, IndexedEventEmitter} from 'squidlet-lib'
-import {LogPublisher} from 'squidlet-lib'
+import {LogPublisher, MemStorage} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './Io/IoManager.js'
 import {SystemInfoManager} from './managers/SystemInfoManager.js'
@@ -32,6 +32,12 @@ export class System {
   )
   // managers
   readonly io: IoManager
+  // store some data only in memory while runtime
+  // TODO: ограничить правами только на свой dir
+  readonly memStorage: MemStorage
+  // TODO: ограничить правами только на свой dir
+  // TODO: слушать события и сохранять в файл всё что передаётся
+  //readonly localStorage: MemStorage
   readonly drivers: DriversManager
   // DRIVERS
   // TODO: add
@@ -64,6 +70,7 @@ export class System {
 
   constructor() {
     this.io = new IoManager(this)
+    this.memStorage = new MemStorage()
     this.drivers = new DriversManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.files = new FilesManager(this)
