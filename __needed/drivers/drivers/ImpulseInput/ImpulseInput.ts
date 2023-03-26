@@ -1,5 +1,5 @@
 type Timeout = NodeJS.Timeout;
-import DigitalInputIo, {ChangeHandler} from '../../../../../squidlet-networking/src/interfaces/__old/io/DigitalInputIo';
+import DigitalInputIo, {ChangeHandler} from '../../../../../../../../../mnt/disk2/workspace/squidlet-networking/src/interfaces/__old/io/DigitalInputIo.js';
 import DriverBase from 'src/base/DriverBase';
 import DriverFactoryBase from 'src/base/DriverFactoryBase';
 import {invertIfNeed, isDigitalPinInverted, resolveEdge} from '../squidlet-lib/src/digitalHelpers';
