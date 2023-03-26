@@ -1,15 +1,15 @@
 import * as path from 'path';
 import _template = require('lodash/template');
 
-import systemConfig from '../../../../../../squidlet/__old/system/systemConfig';
-import BuildSystem from '../../../../../../squidlet/__old/shared/envSetBuild/BuildSystem';
-import BuildIo from '../../../../../../squidlet/__old/shared/envSetBuild/BuildIo';
-import {SQUIDLET_PACKAGE_JSON_PATH} from '../../../../../../squidlet/__old/shared/helpers/helpers';
-import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
-import PackageJson from '../../../../../../squidlet/__old/shared/interfaces/PackageJson';
+import systemConfig from '../../../../../../__old/system/systemConfig';
+import BuildSystem from '../../../../../../__old/shared/envSetBuild/BuildSystem';
+import BuildIo from '../../../../../../__old/shared/envSetBuild/BuildIo';
+import {SQUIDLET_PACKAGE_JSON_PATH} from '../../../../../../__old/shared/helpers/helpers';
+import Os from '../../../../../../__old/shared/helpers/Os';
+import PackageJson from '../../../../../../__old/shared/interfaces/PackageJson';
 // TODO: don't use props
-import Props from '../../../../../../squidlet/__old/__veryold/nodejs/Props';
-import {ENV_BUILD_TMP_DIR} from '../../../../../../squidlet/__old/shared/constants';
+import Props from '../../../../../../__old/__veryold/nodejs/Props';
+import {ENV_BUILD_TMP_DIR} from '../../../../../../__old/shared/constants';
 
 
 export const PACKAGE_JSON_TEMPLATE_PATH = path.resolve(__dirname, './package.json.template');

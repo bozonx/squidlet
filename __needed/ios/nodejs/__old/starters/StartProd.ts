@@ -2,17 +2,17 @@
 
 import * as path from 'path';
 
-import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
-import GroupConfigParser from '../../../../../../squidlet/__old/shared/helpers/GroupConfigParser';
-import systemConfig from '../../../../../../squidlet/__old/system/systemConfig';
-import NodejsMachines from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/NodejsMachines.js';
-import {ENV_BUILD_TMP_DIR} from '../../../../../../squidlet/__old/shared/constants';
-import EnvBuilder from '../../../../../../squidlet/__old/hostEnvBuilder/EnvBuilder';
-import Props from '../../../../../../squidlet/__old/__veryold/nodejs/Props';
-import ProdBuild from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/starters/ProdBuild.js';
-import IoSetLocal from '../../../../../../squidlet/__old/system/IoSetLocal';
-import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
-import LogLevel from '../../../../../../squidlet/__old/system/interfaces/LogLevel';
+import Os from '../../../../../../__old/shared/helpers/Os';
+import GroupConfigParser from '../../../../../../__old/shared/helpers/GroupConfigParser';
+import systemConfig from '../../../../../../__old/system/systemConfig';
+import NodejsMachines from '../interfaces/NodejsMachines';
+import {ENV_BUILD_TMP_DIR} from '../../../../../../__old/shared/constants';
+import EnvBuilder from '../../../../../../__old/hostEnvBuilder/EnvBuilder';
+import Props from '../../../../../../__old/__veryold/nodejs/Props';
+import ProdBuild from './ProdBuild';
+import IoSetLocal from '../../../../../../__old/system/IoSetLocal';
+import IoSet from '../../../../../../__old/system/interfaces/IoSet';
+import LogLevel from '../../../../../../__old/system/interfaces/LogLevel';
 
 
 // TODO: extend StartBase

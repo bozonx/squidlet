@@ -1,22 +1,22 @@
 import * as path from 'path';
 
-import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
-import Platforms from '../../../../../../squidlet/__old/system/interfaces/Platforms';
-import systemConfig from '../../../../../../squidlet/__old/system/systemConfig';
-import Main from '../../../../../../squidlet/__old/system/Main';
-import EnvBuilder from '../../../../../../squidlet/__old/hostEnvBuilder/EnvBuilder';
-import PreHostConfig from '../../../../../../squidlet/__old/hostEnvBuilder/interfaces/PreHostConfig';
-import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
-import GroupConfigParser from '../../../../../../squidlet/__old/shared/helpers/GroupConfigParser';
-import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../../../../../squidlet/__old/shared/constants';
-import Starter from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/Starter.js';
-import StarterProps from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/StarterProps.js';
-import {LOG_LEVELS} from '../../../../../../squidlet/__old/system/interfaces/LogLevel';
-import NodejsMachines, {nodejsSupportedMachines} from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/NodejsMachines.js';
-import {REPO_ROOT} from '../../../../../../squidlet/__old/shared/helpers/helpers';
-import {getOsMachine} from '../../../../../../squidlet/__old/shared/helpers/resolveMachine';
-import {resolveUid, resolveGid} from '../../../../../../squidlet/__old/shared/helpers/resolveUserGroup';
-import ConsoleLoggerColorful from '../../../../../../squidlet/__old/shared/helpers/ConsoleLoggerColorful';
+import IoSet from '../../../../../../__old/system/interfaces/IoSet';
+import Platforms from '../../../../../../__old/system/interfaces/Platforms';
+import systemConfig from '../../../../../../__old/system/systemConfig';
+import Main from '../../../../../../__old/system/Main';
+import EnvBuilder from '../../../../../../__old/hostEnvBuilder/EnvBuilder';
+import PreHostConfig from '../../../../../../__old/hostEnvBuilder/interfaces/PreHostConfig';
+import Os from '../../../../../../__old/shared/helpers/Os';
+import GroupConfigParser from '../../../../../../__old/shared/helpers/GroupConfigParser';
+import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../../../../../__old/shared/constants';
+import Starter from '../interfaces/Starter';
+import StarterProps from '../interfaces/StarterProps';
+import {LOG_LEVELS} from '../../../../../../__old/system/interfaces/LogLevel';
+import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
+import {REPO_ROOT} from '../../../../../../__old/shared/helpers/helpers';
+import {getOsMachine} from '../../../../../../__old/shared/helpers/resolveMachine';
+import {resolveUid, resolveGid} from '../../../../../../__old/shared/helpers/resolveUserGroup';
+import ConsoleLoggerColorful from '../../../../../../__old/shared/helpers/ConsoleLoggerColorful';
 
 
 // TODO: maybe remove and use false instead of it

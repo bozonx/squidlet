@@ -1,15 +1,15 @@
-import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
-import LogLevel from '../../../../../../squidlet/__old/system/interfaces/LogLevel';
-import IoSetDevelopRemote from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ioSets/IoSetDevelopRemote.js';
-import StartBase from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/starters/StartBase.js';
-import {IOSET_STRING_DELIMITER} from '../../../../../../squidlet/__old/shared/constants';
-import Platforms from '../../../../../../squidlet/__old/system/interfaces/Platforms';
-import HostInfo from '../../../../../../squidlet/__old/system/interfaces/HostInfo';
-import HttpApiClient from '../../../../bridges/__old/HttpApiClient';
-import Main from '../../../../../../squidlet/__old/system/Main';
-import Sender from '../../../../../../squidlet-lib/src/Sender';
-import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../../../../../squidlet/__old/system/constants';
-import ConsoleLoggerColorful from '../../../../../../squidlet/__old/shared/helpers/ConsoleLoggerColorful';
+import IoSet from '../../../../../../__old/system/interfaces/IoSet';
+import LogLevel from '../../../../../../__old/system/interfaces/LogLevel';
+import IoSetDevelopRemote from '../ioSets/IoSetDevelopRemote';
+import StartBase from './StartBase';
+import {IOSET_STRING_DELIMITER} from '../../../../../../__old/shared/constants';
+import Platforms from '../../../../../../__old/system/interfaces/Platforms';
+import HostInfo from '../../../../../../__old/system/interfaces/HostInfo';
+import HttpApiClient from '../../../../plugins/networking/bridges/__old/HttpApiClient';
+import Main from '../../../../../../__old/system/Main';
+import Sender from '../../../../../../../squidlet-lib/src/Sender';
+import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../../../../../__old/system/constants';
+import ConsoleLoggerColorful from '../../../../../../__old/shared/helpers/ConsoleLoggerColorful';
 
 
 const SENDER_RESEND_INTERVAL_SEC = 1;

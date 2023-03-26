@@ -1,5 +1,5 @@
-import {callPromised} from '../../../../../../squidlet-lib/src/common';
-import {removeItemFromArray} from '../../../../../../squidlet-lib/src/arrays';
+import {callPromised} from '../../../../../../../squidlet-lib/src/common';
+import {removeItemFromArray} from '../../../../../../../squidlet-lib/src/arrays';
 
 
 export type PigpioHandler = (level: number, tick: number) => void;

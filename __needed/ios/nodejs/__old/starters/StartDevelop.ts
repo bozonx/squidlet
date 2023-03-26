@@ -1,7 +1,7 @@
-import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
-import StartBase from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/starters/StartBase.js';
-import IoSetDevelopSrc from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ioSets/IoSetDevelopSrc.js';
-import Main from '../../../../../../squidlet/__old/system/Main';
+import IoSet from '../../../../../../__old/system/interfaces/IoSet';
+import StartBase from './StartBase';
+import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
+import Main from '../../../../../../__old/system/Main';
 
 
 export default class StartDevelop extends StartBase {
