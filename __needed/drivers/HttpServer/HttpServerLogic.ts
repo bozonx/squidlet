@@ -1,8 +1,8 @@
 import {HttpRequestHandler, HttpServerIo, HttpServerProps} from '../../../../../squidlet/__old/system/interfaces/io/HttpServerIo';
 import Promised from '../squidlet-lib/src/Promised';
-import {SERVER_STARTING_TIMEOUT_SEC} from '../../../../../squidlet/__old/system/constants';
+import {SERVER_STARTING_TIMEOUT_SEC} from '../../../../../__old/system/constants';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
-import {JsonTypes} from '../../../../../squidlet/__old/system/interfaces/Types';
+import {JsonTypes} from '../../../../../../squidlet-lib/src/interfaces/Types';
 import {parseBody, prepareBody, resolveBodyType} from '../squidlet-lib/src/httpBody';
 import {omitUndefined} from '../squidlet-lib/src/objects';
 import {HttpContentType, HttpRequest, HttpRequestBase, HttpResponse, HttpResponseHeaders} from '../../../../../squidlet/__old/system/interfaces/Http';

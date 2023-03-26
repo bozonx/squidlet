@@ -1,9 +1,9 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import {hexNumToString, hexStringToHexNum} from '../squidlet-lib/src/binaryHelpers';
 import I2cMasterIo from '../../../../../squidlet/__old/system/interfaces/io/I2cMasterIo';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverBase from '../../../base/DriverBase';
 import Queue from '../squidlet-lib/src/Queue';
-import PeerConnectionLogic from '../../../../../squidlet/__old/system/logic/PeerConnectionLogic';
+import PeerConnectionLogic from '../../../../../__old/system/logic/PeerConnectionLogic';
 
 
 export interface I2cMasterDriverProps {

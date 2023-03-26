@@ -1,9 +1,9 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
+import DriverBase from '../../../base/DriverBase';
 import SerialIo from '../../../../../squidlet/__old/system/interfaces/io/SerialIo';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {SerialMessageHandler} from '../../../../../squidlet/__old/system/interfaces/io/SerialIo';
-import {uint8ArrayToAscii} from '../../../../../squidlet-lib/src/serialize';
+import {uint8ArrayToAscii} from '../../../../../../squidlet-lib/src/serialize';
 
 
 export interface SerialProps {

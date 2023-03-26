@@ -1,9 +1,9 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
+import DriverBase from '../../../base/DriverBase';
 import {HttpClientIo} from '../../../../../squidlet/__old/system/interfaces/io/HttpClientIo';
 import {HttpResponse} from '../../../../../squidlet/__old/system/interfaces/Http';
-import HttpClientLogic, {HttpClientProps} from './HttpClientLogic.js';
-import {HttpDriverRequest} from '../HttpServer/HttpServerLogic.js';
+import HttpClientLogic, {HttpClientProps} from './HttpClientLogic';
+import {HttpDriverRequest} from '../HttpServer/HttpServerLogic';
 
 
 export class HttpClient extends DriverBase<HttpClientProps> {

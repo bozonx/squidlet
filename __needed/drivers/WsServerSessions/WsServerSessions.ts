@@ -1,12 +1,12 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
+import DriverBase from '../../../base/DriverBase';
 import {ConnectionParams} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {WebSocketServerProps} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {parseCookie} from '../squidlet-lib/src/cookies';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {getKeyOfObject} from '../squidlet-lib/src/objects';
 import {omitObj} from '../squidlet-lib/src/objects';
-import {WsServer} from '../WsServer/WsServer.js';
+import {WsServerSessions} from '../../WsServerSessions/WsServerSessions';
 
 
 export enum WS_SESSIONS_EVENTS {
@@ -29,7 +29,7 @@ export class WsServerSessions extends DriverBase<WsServerSessionsProps> {
   }
 
   private readonly events = new IndexedEventEmitter();
-  private get server(): WsServer {
+  private get server(): WsServerSessions {
     return this.depsInstances.server;
   }
   // like {sessionId: connectionId}

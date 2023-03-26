@@ -5,8 +5,8 @@ import {
   numToWord,
   hexStringToHexNum
 } from '../squidlet-lib/src/binaryHelpers';
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
+import DriverBase from '../../../base/DriverBase';
 
 
 const MAX_BLOCK_LENGTH = 65535;

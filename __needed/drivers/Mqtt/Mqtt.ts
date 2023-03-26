@@ -1,12 +1,12 @@
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
+import DriverBase from '../../../base/DriverBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import MqttIo from '../../../../../squidlet/__old/system/interfaces/io/MqttIo';
 import {omitObj} from '../squidlet-lib/src/objects';
 import IndexedEvents from '../squidlet-lib/src/IndexedEvents';
 import {uint8ArrayToAscii} from '../squidlet-lib/src/serialize';
-import IoConnectionManager from '../../../../../squidlet/__old/system/lib/logic/IoConnectionManager';
-import Context from '../../../../../squidlet/__old/system/Context';
-import EntityDefinition from '../../../../../squidlet/__old/system/interfaces/EntityDefinition';
+import IoConnectionManager from '../../../../../__old/system/lib/logic/IoConnectionManager';
+import Context from '../../../system/Context';
+import EntityDefinition from '../../../interfaces/EntityDefinition';
 
 
 type MqttMessageHandler = (topic: string, data: string | Uint8Array) => void;

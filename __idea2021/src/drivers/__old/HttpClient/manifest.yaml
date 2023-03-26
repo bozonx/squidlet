@@ -1,7 +1,0 @@
-name: HttpClient
-main: HttpClient.ts
-
-ios:
-  - HttpClient
-
-props: {}

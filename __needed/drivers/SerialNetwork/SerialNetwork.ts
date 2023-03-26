@@ -1,7 +1,7 @@
-import NetworkDriverBase from '../../../../../squidlet/__old/system/lib/base/NetworkDriverBase';
+import NetworkDriverBase from '../../../../../__old/system/lib/base/NetworkDriverBase';
 import NetworkDriver, {NetworkDriverProps} from '../../../../../squidlet/__old/system/interfaces/NetworkDriver';
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import {Serial} from '../Serial/Serial.js';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
+import {Serial} from '../Serial/Serial';
 
 
 export interface SerialNetworkProps extends NetworkDriverProps {

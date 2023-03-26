@@ -1,13 +1,13 @@
-import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverFactoryBase';
-import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
+import DriverFactoryBase from '../../../base/DriverFactoryBase';
+import DriverBase from '../../../base/DriverBase';
 import {HttpServerProps} from '../../../../../squidlet/__old/system/interfaces/io/HttpServerIo';
-import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from '../../../../../squidlet/__old/system/lib/logic/HttpRouterLogic';
-import {JsonTypes} from '../../../../../squidlet/__old/system/interfaces/Types';
+import HttpRouterLogic, {RouterEnterHandler, RouterRequestHandler} from '../../../../../__old/system/lib/logic/HttpRouterLogic';
+import {JsonTypes} from '../../../../../../squidlet-lib/src/interfaces/Types';
 import {HttpMethods} from '../../../../../squidlet/__old/system/interfaces/Http';
 import {URL_DELIMITER} from '../squidlet-lib/src/url';
 
-import {HttpServer} from '../HttpServer/HttpServer.js';
-import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic.js';
+import {HttpServer} from '../HttpServer/HttpServer';
+import {HttpDriverRequest, HttpDriverResponse} from '../HttpServer/HttpServerLogic';
 
 
 export class HttpServerRouter extends DriverBase<HttpServerProps> {
