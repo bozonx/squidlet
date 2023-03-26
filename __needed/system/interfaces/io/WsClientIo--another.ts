@@ -1,4 +1,4 @@
-import {IoBase} from '../IoBase'
+import {IoBase} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/IoBase.js'
 import {WsCloseStatus} from './WsServerIo'
 
 
@@ -15,7 +15,7 @@ export interface WsClientProps {
 }
 
 
-export default interface WsClientIo extends IoBase {
+export default interface WsClientIoAnother extends IoBase {
   on(
     eventName: WsClientEvent.opened,
     cb: (connectionId: string) => void

@@ -1,4 +1,4 @@
-import {IoBase} from '../IoBase'
+import {IoBase} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/IoBase.js'
 
 
 export const CONNECTION_ID_DELIMITER = '|'
@@ -50,7 +50,7 @@ export interface WsServerConnectionParams {
 }
 
 
-export default interface WsServerIo extends IoBase {
+export default interface WsServerIoAnother extends IoBase {
   on(
     eventName: WsServerEvent.serverStarted,
     cb: (serverId: string) => void
