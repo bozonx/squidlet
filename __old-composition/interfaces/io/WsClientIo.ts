@@ -1,4 +1,4 @@
-import {ConnectionParams} from './WsServerIo.js';
+import {ConnectionParams} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/system/interfaces/io/WsServerIo';
 import IoItem from '../../../../squidlet/__old/system/interfaces/IoItem';
 
 

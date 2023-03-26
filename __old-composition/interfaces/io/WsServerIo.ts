@@ -1,4 +1,4 @@
-import {IoBase} from '../IoBase'
+import {IoBase} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/system/interfaces/IoBase'
 
 
 export enum WsServerEvent {

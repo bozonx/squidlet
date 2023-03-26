@@ -1,5 +1,5 @@
 import {IoBase} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/IoBase.js'
-import {WsCloseStatus} from './WsServerIo'
+import {WsCloseStatus} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/system/interfaces/io/WsServerIo'
 
 
 export enum WsClientEvent {
