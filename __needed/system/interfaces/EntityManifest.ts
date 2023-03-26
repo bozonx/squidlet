@@ -1,5 +1,5 @@
 // parsed manifest of device
-import PropElement from './PropElement';
+import PropElement from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/PropElement.js';
 
 
 export default interface EntityManifest<Props = Record<string, PropElement>> {

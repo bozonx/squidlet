@@ -1,4 +1,4 @@
-import {EntityType} from './EntityTypes'
+import {EntityType} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/EntityTypes.js'
 
 
 export default interface EntityDefinition {
