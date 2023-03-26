@@ -1,4 +1,4 @@
-import {NetworkStatus} from '../interfaces/BridgeDriver'
+import {NetworkStatus} from '../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/interfaces/BridgeDriver.js'
 
 
 export interface ConnectionMessage {

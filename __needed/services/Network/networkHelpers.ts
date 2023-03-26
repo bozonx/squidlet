@@ -1,4 +1,4 @@
-import {NETWORK_ERROR_CODE} from '../../constants'
+import {NETWORK_ERROR_CODE} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/constants.js'
 
 export function encodeNetworkMessage(
   fromHostId: string,

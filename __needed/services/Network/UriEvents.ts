@@ -1,13 +1,13 @@
 import {makeUniqId} from 'squidlet-lib/src/uniqId'
 
-import Network from './Network'
-import {NETWORK_CHANNELS} from '../../constants'
+import Network from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/Network.js'
+import {NETWORK_CHANNELS} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/constants.js'
 import {
   encodeEventEmitPayload,
   encodeEventOffPayload,
   encodeEventRegisterPayload
-} from './networkHelpers'
-import {BRIDGE_MANAGER_EVENTS} from './BridgesManager'
+} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/networkHelpers.js'
+import {BRIDGE_MANAGER_EVENTS} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/BridgesManager.js'
 
 
 export class UriEvents {

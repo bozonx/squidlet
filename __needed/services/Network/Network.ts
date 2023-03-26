@@ -3,17 +3,17 @@ import {makeUniqId} from 'squidlet-lib/src/uniqId'
 import IndexedEvents from 'squidlet-lib/src/IndexedEvents'
 import {JsonTypes} from 'squidlet-lib/src/interfaces/Types'
 
-import EntityBase from '../../../../base/EntityBase'
+import EntityBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/EntityBase.js'
 import {
   decodeErrorPayload,
   decodeNetworkMessage,
   encodeErrorPayload,
   encodeNetworkMessage,
-} from './networkHelpers'
-import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../constants'
-import {BRIDGE_MANAGER_EVENTS, BridgesManager} from './BridgesManager'
-import {HostResolver} from './HostResolver'
-import {UriEvents} from './UriEvents'
+} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/networkHelpers.js'
+import {NETWORK_CHANNELS, NETWORK_ERROR_CODE} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/constants.js'
+import {BRIDGE_MANAGER_EVENTS, BridgesManager} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/BridgesManager.js'
+import {HostResolver} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/HostResolver.js'
+import {UriEvents} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/UriEvents.js'
 
 
 export type UriHandler = (

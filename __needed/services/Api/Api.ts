@@ -2,9 +2,9 @@ import {splitFirstElement} from 'squidlet-lib/src/strings'
 import {RemoteCall} from 'squidlet-lib/src/RemoteCall'
 import {JsonTypes} from 'squidlet-lib/src/interfaces/Types'
 
-import EntityBase from '../../../../base/EntityBase'
-import Network from '../Network/Network'
-import {NETWORK_ACTION_SEPARATOR} from '../../constants'
+import EntityBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/EntityBase.js'
+import Network from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/services/Network/Network.js'
+import {NETWORK_ACTION_SEPARATOR} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/plugins/networking/constants.js'
 
 
 export default class Api extends EntityBase {
