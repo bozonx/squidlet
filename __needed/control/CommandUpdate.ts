@@ -1,17 +1,17 @@
 import * as path from 'path';
 
-import Os from '../shared/helpers/Os';
-import WsApiClient from '../../../squidlet-networking/src/bridges/__old/WsApiClient';
-import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
-import {consoleError} from '../system/lib/helpers';
-import HostInfo from '../system/interfaces/HostInfo';
-import Platforms from '../system/interfaces/Platforms';
-import AppBuilder, {DEFAULT_WORK_DIR} from '../squidletLight/AppBuilder';
+import Os from '../../../../../../../mnt/disk2/workspace/squidlet/__old/shared/helpers/Os.js';
+import WsApiClient from '../../../../../../../mnt/disk2/workspace/squidlet-networking/src/bridges/__old/WsApiClient.js';
+import hostDefaultConfig from '../../../../../../../mnt/disk2/workspace/squidlet/__old/hostEnvBuilder/configs/hostDefaultConfig.js';
+import {consoleError} from '../../../../../../../mnt/disk2/workspace/squidlet/__old/system/lib/helpers.js';
+import HostInfo from '../../../../../../../mnt/disk2/workspace/squidlet/__old/system/interfaces/HostInfo.js';
+import Platforms from '../../../../../../../mnt/disk2/workspace/squidlet/__old/system/interfaces/Platforms.js';
+import AppBuilder, {DEFAULT_WORK_DIR} from '../../../../../../../mnt/disk2/workspace/squidlet/__old/squidletLight/AppBuilder.js';
 import {
   BUNDLE_CHUNK_SIZE_BYTES,
   BUNDLE_FILE_NAME,
   BUNDLE_SUM_FILE_NAME
-} from '../entities/services/Updater/BundleUpdate';
+} from '../../../../../../../mnt/disk2/workspace/squidlet/__old/entities/services/Updater/BundleUpdate.js';
 
 
 export default class CommandUpdate {

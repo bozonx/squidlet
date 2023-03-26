@@ -1,8 +1,8 @@
-import WsApiClient from '../../../squidlet-networking/src/bridges/__old/WsApiClient';
-import hostDefaultConfig from '../hostEnvBuilder/configs/hostDefaultConfig';
+import WsApiClient from '../../../../../../../mnt/disk2/workspace/squidlet-networking/src/bridges/__old/WsApiClient.js';
+import hostDefaultConfig from '../../../../../../../mnt/disk2/workspace/squidlet/__old/hostEnvBuilder/configs/hostDefaultConfig.js';
 import {Dictionary} from '../../../squidlet-lib/src/interfaces/Types';
-import {listenScriptEnd} from '../shared/helpers/helpers';
-import {consoleError} from '../system/lib/helpers';
+import {listenScriptEnd} from '../../../../../../../mnt/disk2/workspace/squidlet/__old/shared/helpers/helpers.js';
+import {consoleError} from '../../../../../../../mnt/disk2/workspace/squidlet/__old/system/lib/helpers.js';
 
 
 export default class WsApiCall {

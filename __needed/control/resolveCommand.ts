@@ -1,9 +1,9 @@
 import * as yargs from 'yargs';
 
-import CommandUpdate from './CommandUpdate';
-import CommandStart from './CommandStart';
-import HttpApiCall from './HttpApiCall';
-import WsApiCall from './WsApiCall';
+import CommandUpdate from '../../../../../../../mnt/disk2/workspace/squidlet/__old/control/CommandUpdate.js';
+import CommandStart from '../../../../../../../mnt/disk2/workspace/squidlet/__old/control/CommandStart.js';
+import HttpApiCall from '../../../../../../../mnt/disk2/workspace/squidlet/__old/control/HttpApiCall.js';
+import WsApiCall from '../../../../../../../mnt/disk2/workspace/squidlet/__old/control/WsApiCall.js';
 import {omitObj} from '../../../squidlet-lib/src/objects';
 
 

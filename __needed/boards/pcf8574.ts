@@ -1,17 +1,14 @@
-import Board from '../system/interfaces/Board';
+import Board from '../../../../../../../mnt/disk2/workspace/squidlet/__old/system/interfaces/Board.js';
 
 
 const board: Board = {
   defaultPin: {
     hasPullUp: true,
-    hasPullDown: true,
+    hasPullDown: false,
     // TODO: check
     hasOpenDrain: true,
-    hasInterruption: true,
+    hasInterruption: false,
     directions: 'both',
-  },
-  pins: {
-    // TODO: add !!!!
   },
 };
 

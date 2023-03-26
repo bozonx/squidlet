@@ -3,7 +3,7 @@ import {resolveLevel} from '../squidlet-lib/src/digitalHelpers';
 import {Dictionary} from '../squidlet-lib/src/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 
-import {BinaryOutput, BinaryOutputProps} from '../../drivers/BinaryOutput/BinaryOutput';
+import {BinaryOutput, BinaryOutputProps} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old/entities/drivers/BinaryOutput/BinaryOutput.js';
 
 
 interface Props extends BinaryOutputProps {

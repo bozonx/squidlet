@@ -2,7 +2,7 @@ import DeviceBase from '__old/system/base/DeviceBase';
 import {Dictionary} from '../squidlet-lib/src/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 
-import {ImpulseInput, ImpulseInputProps} from '../../drivers/ImpulseInput/ImpulseInput';
+import {ImpulseInput, ImpulseInputProps} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old/entities/drivers/ImpulseInput/ImpulseInput.js';
 
 
 interface Props extends ImpulseInputProps {

@@ -1,5 +1,5 @@
-import HttpApiClient from '../../../squidlet-networking/src/bridges/__old/HttpApiClient';
-import {AppType} from '../system/interfaces/AppType';
+import HttpApiClient from '../../../../../../../mnt/disk2/workspace/squidlet-networking/src/bridges/__old/HttpApiClient.js';
+import {AppType} from '../../../../../../../mnt/disk2/workspace/squidlet/__old/system/interfaces/AppType.js';
 
 
 export default class HttpApiCall {

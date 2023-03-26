@@ -2,7 +2,7 @@ import DeviceBase from '__old/system/base/DeviceBase';
 import {Dictionary} from '../squidlet-lib/src/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 
-import {BinaryInput, BinaryInputProps} from '../../drivers/BinaryInput/BinaryInput';
+import {BinaryInput, BinaryInputProps} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old/entities/drivers/BinaryInput/BinaryInput.js';
 
 
 interface Props extends BinaryInputProps {

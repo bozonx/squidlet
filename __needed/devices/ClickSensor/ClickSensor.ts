@@ -3,7 +3,7 @@ import {omitObj} from '../squidlet-lib/src/objects';
 import {Dictionary} from '../squidlet-lib/src/interfaces/Types';
 import {DEFAULT_DEVICE_STATUS} from '__old/system/constants';
 
-import {BinaryClick, BinaryClickProps} from '../../drivers/BinaryClick/BinaryClick';
+import {BinaryClick, BinaryClickProps} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old/entities/drivers/BinaryClick/BinaryClick.js';
 
 
 

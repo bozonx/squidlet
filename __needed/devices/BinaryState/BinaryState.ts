@@ -1,4 +1,4 @@
-import DeviceBase from '../../../system/base/DeviceBase';
+import DeviceBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__old/system/base/DeviceBase.js';
 
 
 interface Props {
