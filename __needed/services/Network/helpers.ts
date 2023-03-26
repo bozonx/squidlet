@@ -1,5 +1,5 @@
 import {asciiToUint8Array, deserializeStringArray, serializeStringArray, uint8ArrayToAscii} from '../squidlet-lib/src/serialize';
-import NetworkMessage from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/interfaces/NetworkMessage.js';
+import NetworkMessage from './interfaces/NetworkMessage';
 
 
 /**

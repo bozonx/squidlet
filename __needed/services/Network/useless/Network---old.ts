@@ -2,7 +2,7 @@ import ServiceBase from '../../../../../../squidlet/__old/system/base/ServiceBas
 import Context from '../../../../../../squidlet/__old/system/Context';
 import EntityDefinition from '../../../../../../squidlet/__old/system/interfaces/EntityDefinition';
 import RemoteCallMessage from '../../../../../../squidlet/__old/system/interfaces/RemoteCallMessage';
-import Router from '../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/useless/Router.js';
+import Router from './Router';
 import NetworkMessage, {MessageType} from './interfaces/NetworkMessage';
 
 

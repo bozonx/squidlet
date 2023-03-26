@@ -16,7 +16,7 @@ import {
   ModbusMaster,
   ModbusMasterDriverProps
 } from '../../../../../squidlet-networking/src/drivers/ModbusMaster/ModbusMaster';
-import PollOnceModbus from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/ModbusMasterConnection/PollOnceModbus.js';
+import PollOnceModbus from './PollOnceModbus';
 import {makeCallFunctionMessage} from '../../../../../squidlet/__old/system/lib/remoteFunctionProtocol/writeLogic';
 
 

@@ -3,8 +3,8 @@ import {callSafely} from '../squidlet-lib/src/common';
 import Promised from '../squidlet-lib/src/Promised';
 import Connection from '../../../../../squidlet/__old/system/interfaces/Connection';
 
-import NetworkMessage from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/interfaces/NetworkMessage.js';
-import Router from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/Router.js';
+import NetworkMessage from './interfaces/NetworkMessage';
+import Router from './Router';
 
 
 type Timeout = NodeJS.Timeout;

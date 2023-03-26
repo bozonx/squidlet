@@ -1,7 +1,7 @@
 import ServiceBase from '../../../../../squidlet/__old/system/base/ServiceBase';
 import {omitObj} from '../squidlet-lib/src/objects';
 import {Mqtt, MqttProps} from '../../../../../squidlet-networking/src/drivers/Mqtt/Mqtt';
-import ApiTopicsLogic from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/MqttApiTopics/ApiTopicsLogic.js';
+import ApiTopicsLogic from './ApiTopicsLogic';
 
 
 interface Props extends MqttProps {

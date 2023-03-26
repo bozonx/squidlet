@@ -1,6 +1,6 @@
 import ServiceBase from '../../../../../squidlet/__old/system/base/ServiceBase';
 import {WsServerSessionsProps} from '../../../../../squidlet-networking/src/drivers/WsServerSessions/WsServerSessions';
-import IoServerConnectionLogic from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/IoServer/IoServerConnectionLogic.js';
+import IoServerConnectionLogic from './IoServerConnectionLogic';
 import {WsServer} from '../../../../../squidlet-networking/src/drivers/WsServer/WsServer';
 
 

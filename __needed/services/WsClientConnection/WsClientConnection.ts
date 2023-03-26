@@ -7,7 +7,7 @@ import Connection, {
 import {WebSocketClientProps} from '../../../../../squidlet/__old/system/interfaces/io/WsClientIo';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 
-import {WsClient} from '../../../../../squidlet-networking/src/drivers/WsClient/WsClient';
+import {WsClient} from '../../../../../squidlet-networking/src/drivers/WsClientSessions/WsClientSessions';
 
 
 export default class WsClientConnection extends ServiceBase<WebSocketClientProps> implements Connection {

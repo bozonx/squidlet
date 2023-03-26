@@ -1,6 +1,6 @@
 import ServiceBase from '../../../../../squidlet/__old/system/base/ServiceBase';
 
-import NetworkLogic, {UriHandler} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/NetworkLogic.js';
+import NetworkLogic, {UriHandler} from './NetworkLogic';
 
 
 export interface NetworkProps {

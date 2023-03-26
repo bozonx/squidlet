@@ -4,10 +4,10 @@ import {omitObj} from '../squidlet-lib/src/objects';
 import {lastItem} from '../squidlet-lib/src/arrays';
 import Connection from '../../../../../squidlet/__old/system/interfaces/Connection';
 
-import {decodeNetworkMessage, encodeNetworkMessage} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/helpers.js';
-import RouteResolver from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/RouteResolver.js';
-import NetworkMessage from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/interfaces/NetworkMessage.js';
-import {NETWORK_PORT} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/bridges/__old/Network/NetworkLogic.js';
+import {decodeNetworkMessage, encodeNetworkMessage} from './helpers';
+import RouteResolver from './RouteResolver';
+import NetworkMessage from './interfaces/NetworkMessage';
+import {NETWORK_PORT} from './NetworkLogic';
 
 
 type IncomeMessageHandler = (incomeMessage: NetworkMessage) => void;
