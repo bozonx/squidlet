@@ -8,7 +8,7 @@ import WsServerIo, {
   CONNECTION_ID_DELIMITER,
   WsCloseStatus,
   WsServerConnectionParams, WsServerEvent, WsServerProps
-} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo';
+} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo.js';
 
 
 // TODO: почему бы и не сделать объектом ??
