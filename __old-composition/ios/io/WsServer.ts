@@ -4,7 +4,7 @@ import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 
 import WsServerIo, {
   WsServerConnectionParams, WsServerProps
-} from '../../../interfaces/io/WsServerIo'
+} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo'
 
 
 type ServerItem = [

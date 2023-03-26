@@ -9,10 +9,10 @@ import PreHostConfig from '../../../../../../__old/hostEnvBuilder/interfaces/Pre
 import Os from '../../../../../../__old/shared/helpers/Os';
 import GroupConfigParser from '../../../../../../__old/shared/helpers/GroupConfigParser';
 import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../../../../../__old/shared/constants';
-import Starter from '../interfaces/Starter';
-import StarterProps from '../interfaces/StarterProps';
+import Starter from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/__old/interfaces/Starter';
+import StarterProps from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/__old/interfaces/StarterProps';
 import {LOG_LEVELS} from '../../../../../../__old/system/interfaces/LogLevel';
-import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
+import NodejsMachines, {nodejsSupportedMachines} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/__old/interfaces/NodejsMachines';
 import {REPO_ROOT} from '../../../../../../__old/shared/helpers/helpers';
 import {getOsMachine} from '../../../../../../__old/shared/helpers/resolveMachine';
 import {resolveUid, resolveGid} from '../../../../../../__old/shared/helpers/resolveUserGroup';

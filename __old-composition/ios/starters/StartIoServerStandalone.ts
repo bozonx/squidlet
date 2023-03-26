@@ -1,6 +1,6 @@
 import PreHostConfig from '../../../../../../__old/hostEnvBuilder/interfaces/PreHostConfig';
 import {pickObj} from '../../../../../../../squidlet-lib/src/objects';
-import StartDevelop from './StartDevelop';
+import StartDevelop from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/__old/starters/StartDevelop';
 
 
 export default class StartIoServerStandalone extends StartDevelop {

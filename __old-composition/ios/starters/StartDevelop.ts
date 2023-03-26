@@ -1,6 +1,6 @@
 import IoSet from '../../../../../../__old/system/interfaces/IoSet';
-import StartBase from './StartBase';
-import IoSetDevelopSrc from '../ioSets/IoSetDevelopSrc';
+import StartBase from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/__old/starters/StartBase';
+import IoSetDevelopSrc from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/__old/ioSets/IoSetDevelopSrc';
 import Main from '../../../../../../__old/system/Main';
 
 

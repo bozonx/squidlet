@@ -1,4 +1,4 @@
-import MachineConfig from '../../hostEnvBuilder/interfaces/MachineConfig';
+import MachineConfig from '../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/hostEnvBuilder/interfaces/MachineConfig';
 
 
 const machineConfig: MachineConfig = {
