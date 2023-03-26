@@ -5,12 +5,12 @@ import {callPromised} from 'squidlet-lib/src/common'
 import {omitObj} from 'squidlet-lib/src/objects'
 import {convertBufferToUint8Array} from 'squidlet-lib/src/buffer'
 
-import WsClientIo, {WsClientEvent, WsClientProps} from '../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsClientIo'
-import {WsCloseStatus} from '../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo'
+import WsClientIo, {WsClientEvent, WsClientProps} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsClientIo'
+import {WsCloseStatus} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo'
 import {makeConnectionParams} from '../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/ios/nodejs/WsServer'
 
 
-export default class WsClient implements WsClientIo {
+export default class WsClientAnother implements WsClientIo {
   private readonly events = new IndexedEventEmitter()
   private connections: (WebSocket | undefined)[] = []
 

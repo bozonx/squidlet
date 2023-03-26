@@ -8,7 +8,7 @@ import WsServerIo, {
   CONNECTION_ID_DELIMITER,
   WsCloseStatus,
   WsServerConnectionParams, WsServerEvent, WsServerProps
-} from '../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo';
+} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo';
 
 
 // TODO: почему бы и не сделать объектом ??
@@ -59,7 +59,7 @@ export function splitConnectionId(
 }
 
 
-export default class WsServer implements WsServerIo {
+export default class WsServerAnother implements WsServerIo {
   private readonly events = new IndexedEventEmitter()
   private readonly servers: Record<string, ServerItem> = {}
 
