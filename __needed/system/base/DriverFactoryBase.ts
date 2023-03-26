@@ -2,9 +2,9 @@ import {mergeDeepObjects} from 'squidlet-lib/src/objects'
 
 import {validateProps, validateRequiredProps} from '../../../__old/system/lib/validate'
 import Context from '../system/Context'
-import EntityBase from './EntityBase'
-import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase'
-import EntityManifest from '../interfaces/EntityManifest'
+import EntityBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/EntityBase.js'
+import DriverInstanceBase, {DriverInstanceParams} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverInstanceBase.js'
+import EntityManifest from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/EntityManifest.js'
 
 
 let defaultInstanceIdCounter = 0

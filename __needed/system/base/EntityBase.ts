@@ -1,32 +1,26 @@
-import Context from '../system/Context'
-import DriverFactoryBase from './DriverFactoryBase'
-import LogPublisher from '../../../__old/system/LogPublisher'
-import HostConfig from '../../../__old/system/interfaces/HostConfig'
+import EntityDefinition from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/EntityDefinition.js';
+import EntityManifest from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/EntityManifest.js';
+import Context from '../system/Context';
+import LogPublisher from '../../../__old/system/LogPublisher';
+import HostConfig from '../../../__old/system/interfaces/HostConfig';
+import {EntityType} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/EntityTypes.js';
 
 
-export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> {
-  instanceId: string
-  // instance props
-  props: Props
-  // base driver instance
-  driver: Driver
-  [index: string]: any
-}
+// TODO: может просто расширить контекст
 
-
-export default abstract class DriverInstanceBase<
-  Props = Record<string, any>,
-  Driver extends DriverFactoryBase<Props, any> = any
-> {
+export default abstract class EntityBase<Props = {}, ManifestType extends EntityManifest = EntityManifest> {
   //abstract readonly entityType: EntityType
   readonly context: Context
-  readonly params: DriverInstanceParams<Props, Driver>
+  readonly definition: EntityDefinition
 
-  get instanceId(): string {
-    return this.params.instanceId
+  get id(): string {
+    return this.definition.id
+  }
+  get className(): string {
+    return this.definition.className
   }
   get props(): Props {
-    return this.params.props
+    return this.definition.props as Props
   }
 
   protected get log(): LogPublisher {
@@ -40,9 +34,9 @@ export default abstract class DriverInstanceBase<
   protected validateProps?: (props: Props) => string | undefined;
 
 
-  constructor(context: Context, params: DriverInstanceParams<Props, Driver>) {
+  constructor(context: Context, definition: EntityDefinition) {
     this.context = context
-    this.params = params
+    this.definition = definition
 
     this.doPropsValidation()
 
@@ -50,21 +44,25 @@ export default abstract class DriverInstanceBase<
     if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit.bind(this))
     if (this.appDidInit) this.context.onAppInit(this.appDidInit.bind(this))
   }
-
-  abstract init?(): Promise<void>
-  // destroy logic of instance
-  abstract $doDestroy(): Promise<void>
+  // define this method and it will be called on system init
+  init?(): Promise<void>
   // define this method to destroy entity when system is destroying.
   // Don't call this method in other cases.
-  destroy = async () => {
-    await this.params.driver.destroyInstance(this.params.instanceId)
-  }
+  destroy?(): Promise<void>
 
   // it will be called after all the entities of entityType have been inited
   protected driversDidInit?(): Promise<void>
   protected servicesDidInit?(): Promise<void>
   // it will be risen after app init or immediately if app was inited
   protected appDidInit?(): Promise<void>
+
+  // TODO: review
+  /**
+   * Load manifest of this entity
+   */
+  protected async getManifest(): Promise<ManifestType> {
+    return this.context.system.envSet.loadManifest<ManifestType>(this.definition.entityType, this.className)
+  }
 
   /**
    * Print errors to console of async functions

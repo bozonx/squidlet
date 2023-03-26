@@ -1,4 +1,4 @@
-import EntityBase from './EntityBase';
+import EntityBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/EntityBase.js';
 import Sender from '../../../../squidlet-lib/src/Sender';
 
 
