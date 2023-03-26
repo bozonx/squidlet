@@ -6,9 +6,9 @@ import WsServerIo, {
   WsCloseStatus,
   WsServerEvent,
   WsServerProps,
-} from '../../interfaces/io/WsServerIo'
-import DriverFactoryBase from '../../base/DriverFactoryBase'
-import DriverInstanceBase from '../../base/DriverInstanceBase'
+} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/io/WsServerIo.js'
+import DriverFactoryBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverFactoryBase.js'
+import DriverInstanceBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverInstanceBase.js'
 
 
 export enum WS_SERVER_DRIVER_EVENTS {

@@ -1,10 +1,10 @@
 import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
 import {lastItem} from 'squidlet-lib/src/arrays'
 
-import DriverFactoryBase from '../../base/DriverFactoryBase'
-import DriverInstanceBase from '../../base/DriverInstanceBase'
-import WsClientIo, {WsClientEvent, WsClientProps} from '../../interfaces/io/WsClientIo'
-import {WsCloseStatus} from '../../interfaces/io/WsServerIo'
+import DriverFactoryBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverFactoryBase.js'
+import DriverInstanceBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverInstanceBase.js'
+import WsClientIo, {WsClientEvent, WsClientProps} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/io/WsClientIo.js'
+import {WsCloseStatus} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/io/WsServerIo.js'
 
 
 // TODO: use config
