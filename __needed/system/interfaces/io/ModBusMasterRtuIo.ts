@@ -1,5 +1,5 @@
-import IoItem from '../../../../../squidlet/__old/system/interfaces/IoItem';
-import {SerialParams} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/interfaces/__old/io/SerialIo.js';
+import IoItem from '../../../../../__old/system/interfaces/IoItem';
+import {SerialParams} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/__old/io/SerialIo.js';
 
 
 export const Methods = [

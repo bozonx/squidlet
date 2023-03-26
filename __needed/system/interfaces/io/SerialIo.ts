@@ -1,5 +1,5 @@
-import IoItem from '../../../../../squidlet/__old/system/interfaces/IoItem';
-import IoContext from '../../../../../squidlet/__old/system/interfaces/IoContext';
+import IoItem from '../../../../../__old/system/interfaces/IoItem';
+import IoContext from '../../../../../__old/system/interfaces/IoContext';
 
 
 export type BaudRate = 9600 | 14400 | 19200 | 38400 | 57600 | 115200 | 128000 | 256000;

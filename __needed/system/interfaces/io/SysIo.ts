@@ -1,6 +1,6 @@
-import IoItem from '../../../../../squidlet/__old/system/interfaces/IoItem';
-import SysInfo from '../../../../../squidlet/__old/system/interfaces/SysInfo';
-import {AppType} from '../../../../../squidlet/__old/system/interfaces/AppType';
+import IoItem from '../../../../../__old/system/interfaces/IoItem';
+import SysInfo from '../../../../../__old/system/interfaces/SysInfo';
+import {AppType} from '../../../../../__old/system/interfaces/AppType';
 
 
 export const Methods = [

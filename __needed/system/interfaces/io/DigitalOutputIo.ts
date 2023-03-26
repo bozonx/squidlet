@@ -1,5 +1,5 @@
-import IoItem from '../../../../../squidlet/__old/system/interfaces/IoItem';
-import {InputResistorMode, OutputResistorMode} from '../../../../../squidlet/__old/system/interfaces/gpioTypes';
+import IoItem from '../../../../../__old/system/interfaces/IoItem';
+import {InputResistorMode, OutputResistorMode} from '../../../../../__old/system/interfaces/gpioTypes';
 
 
 export type ChangeHandler = (level: boolean) => void;

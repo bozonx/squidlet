@@ -1,4 +1,4 @@
-import IoItem from '../../../../../squidlet/__old/system/interfaces/IoItem';
+import IoItem from '../../../../../__old/system/interfaces/IoItem';
 
 
 export interface StatsSimplified {

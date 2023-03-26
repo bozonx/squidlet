@@ -1,5 +1,5 @@
-import IoItem from '../../../../../squidlet/__old/system/interfaces/IoItem';
-import IoContext from '../../../../../squidlet/__old/system/interfaces/IoContext';
+import IoItem from '../../../../../__old/system/interfaces/IoItem';
+import IoContext from '../../../../../__old/system/interfaces/IoContext';
 
 
 export interface I2cBusParams {
