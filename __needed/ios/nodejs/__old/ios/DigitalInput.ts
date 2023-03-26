@@ -8,8 +8,8 @@ import ThrottleCall from '../../../../../../squidlet-lib/src/debounceCall/Thrott
 import DebounceCall from '../../../../../../squidlet-lib/src/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
-import PigpioPinWrapper from '../helpers/PigpioPinWrapper';
-import PigpioClient from './PigpioClient';
+import PigpioPinWrapper from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/helpers/PigpioPinWrapper.js';
+import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ios/PigpioClient.js';
 
 
 export default class DigitalInput implements DigitalInputIo {

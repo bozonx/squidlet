@@ -6,7 +6,7 @@ const pigpioClient = require('pigpio-client');
 import Promised from '../squidlet-lib/src/Promised';
 import {compactUndefined} from '../squidlet-lib/src/arrays';
 import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
-import PigpioPinWrapper, {PigpioInfo, PigpioOptions} from '../helpers/PigpioPinWrapper';
+import PigpioPinWrapper, {PigpioInfo, PigpioOptions} from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/helpers/PigpioPinWrapper.js';
 import PigpioClientIo from '../../../../../../squidlet/__old/system/interfaces/io/PigpioClientIo';
 
 

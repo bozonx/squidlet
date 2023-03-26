@@ -4,7 +4,7 @@ import {SERVER_STARTING_TIMEOUT_SEC} from '../../../../../../squidlet/__old/syst
 import SerialIoBase from '../../../../../../squidlet/__old/system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
-import PigpioClient from './PigpioClient';
+import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ios/PigpioClient.js';
 
 
 export default class Serial extends SerialIoBase {

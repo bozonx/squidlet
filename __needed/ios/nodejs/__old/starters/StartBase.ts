@@ -9,10 +9,10 @@ import PreHostConfig from '../../../../../../squidlet/__old/hostEnvBuilder/inter
 import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
 import GroupConfigParser from '../../../../../../squidlet/__old/shared/helpers/GroupConfigParser';
 import {APP_WORK_DIR, BUILD_WORK_DIR, ENV_BUILD_TMP_DIR, REPO_BUILD_DIR} from '../../../../../../squidlet/__old/shared/constants';
-import Starter from '../interfaces/Starter';
-import StarterProps from '../interfaces/StarterProps';
+import Starter from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/Starter.js';
+import StarterProps from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/StarterProps.js';
 import {LOG_LEVELS} from '../../../../../../squidlet/__old/system/interfaces/LogLevel';
-import NodejsMachines, {nodejsSupportedMachines} from '../interfaces/NodejsMachines';
+import NodejsMachines, {nodejsSupportedMachines} from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/interfaces/NodejsMachines.js';
 import {REPO_ROOT} from '../../../../../../squidlet/__old/shared/helpers/helpers';
 import {getOsMachine} from '../../../../../../squidlet/__old/shared/helpers/resolveMachine';
 import {resolveUid, resolveGid} from '../../../../../../squidlet/__old/shared/helpers/resolveUserGroup';

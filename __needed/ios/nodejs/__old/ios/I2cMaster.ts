@@ -2,7 +2,7 @@ import I2cMasterIo, {I2cDefinition} from '../../../../../../squidlet/__old/syste
 import {isKindOfNumber} from '../squidlet-lib/src/common';
 import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
 import Promised from '../squidlet-lib/src/Promised';
-import PigpioClient, {BAD_HANDLE_CODE} from './PigpioClient';
+import PigpioClient, {BAD_HANDLE_CODE} from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ios/PigpioClient.js';
 
 
 /**

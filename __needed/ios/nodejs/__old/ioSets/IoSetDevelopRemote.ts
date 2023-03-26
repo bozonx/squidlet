@@ -2,7 +2,7 @@ import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
 import IoItem from '../../../../../../squidlet/__old/system/interfaces/IoItem';
 import StorageIo from '../../../../../../squidlet/__old/system/interfaces/io/StorageIo';
 import StorageEnvMemoryWrapper from '../../../../../../squidlet/__old/shared/helpers/StorageEnvMemoryWrapper';
-import RemoteIoCollection from './RemoteIoCollection';
+import RemoteIoCollection from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ioSets/RemoteIoCollection.js';
 import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
 import EnvBuilder from '../../../../../../squidlet/__old/hostEnvBuilder/EnvBuilder';
 import {checkIoExistance} from '../../../../../../squidlet/__old/hostEnvBuilder/helpers';
