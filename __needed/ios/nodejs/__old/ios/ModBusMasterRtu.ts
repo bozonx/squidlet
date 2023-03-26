@@ -11,7 +11,7 @@ const SerialPort = require('serialport');
 import {OpenOptions} from 'serialport';
 
 import ModBusMasterRtuIo, {ModbusDefinition, ModbusParams} from '../../../../../../squidlet/__old/system/interfaces/io/ModBusMasterRtuIo';
-import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
+import IoContext from '../../../../../../__old/system/interfaces/IoContext';
 import {omitObj} from '../squidlet-lib/src/objects';
 
 

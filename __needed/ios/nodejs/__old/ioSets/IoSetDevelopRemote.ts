@@ -1,12 +1,12 @@
-import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
-import IoItem from '../../../../../../squidlet/__old/system/interfaces/IoItem';
+import IoSet from '../../../../../../__old/system/interfaces/IoSet';
+import IoItem from '../../../../../../__old/system/interfaces/IoItem';
 import StorageIo from '../../../../../../squidlet/__old/system/interfaces/io/StorageIo';
-import StorageEnvMemoryWrapper from '../../../../../../squidlet/__old/shared/helpers/StorageEnvMemoryWrapper';
-import RemoteIoCollection from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ioSets/RemoteIoCollection.js';
-import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
-import EnvBuilder from '../../../../../../squidlet/__old/hostEnvBuilder/EnvBuilder';
-import {checkIoExistance} from '../../../../../../squidlet/__old/hostEnvBuilder/helpers';
-import HostEnvSet from '../../../../../../squidlet/__old/hostEnvBuilder/interfaces/HostEnvSet';
+import StorageEnvMemoryWrapper from '../../../../../../__old/shared/helpers/StorageEnvMemoryWrapper';
+import RemoteIoCollection from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/io/nodejs/__old/ioSets/RemoteIoCollection.js';
+import Os from '../../../../../../__old/shared/helpers/Os';
+import EnvBuilder from '../../../../../../__old/hostEnvBuilder/EnvBuilder';
+import {checkIoExistance} from '../../../../../../__old/hostEnvBuilder/helpers';
+import HostEnvSet from '../../../../../../__old/hostEnvBuilder/interfaces/HostEnvSet';
 
 
 /**

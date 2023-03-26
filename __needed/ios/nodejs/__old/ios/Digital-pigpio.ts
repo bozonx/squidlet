@@ -2,10 +2,10 @@
 import {Gpio} from 'pigpio';
 
 import DigitalInputIo, {ChangeHandler} from '../../../../../../squidlet/__old/system/interfaces/io/DigitalInputIo';
-import DebounceCall from '../../../../../../squidlet-lib/src/debounceCall/DebounceCall';
+import DebounceCall from '../../../../../../../squidlet-lib/src/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
-import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../../../../squidlet/__old/system/interfaces/gpioTypes';
-import ThrottleCall from '../../../../../../squidlet-lib/src/debounceCall/ThrottleCall';
+import {Edge, InputResistorMode, OutputResistorMode, PinDirection} from '../../../../../../__old/system/interfaces/gpioTypes';
+import ThrottleCall from '../../../../../../../squidlet-lib/src/debounceCall/ThrottleCall';
 
 
 type GpioHandler = (level: number) => void;

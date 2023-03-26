@@ -2,9 +2,9 @@ import * as childProcess from 'child_process';
 import {ExecException} from 'child_process';
 
 import SysIo from '../../../../../../squidlet/__old/system/interfaces/io/SysIo';
-import SysInfo from '../../../../../../squidlet/__old/system/interfaces/SysInfo';
+import SysInfo from '../../../../../../__old/system/interfaces/SysInfo';
 import {SysConfig} from '../../../../../../squidlet/__old/system/interfaces/io/SysIo';
-import {AppType} from '../../../../../../squidlet/__old/system/interfaces/AppType';
+import {AppType} from '../../../../../../__old/system/interfaces/AppType';
 
 
 let config: SysConfig | undefined;

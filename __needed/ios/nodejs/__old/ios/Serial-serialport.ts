@@ -3,7 +3,7 @@ import {OpenOptions} from 'serialport';
 
 import SerialIo, {SerialParams, SerialPortItemEvent, SerialPortLike} from '../../../../../../squidlet/__old/system/interfaces/io/SerialIo';
 import {omitObj} from '../squidlet-lib/src/objects';
-import SerialIoBase from '../../../../../../squidlet/__old/system/lib/base/SerialIoBase';
+import SerialIoBase from '../../../../../../__old/system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import {callPromised} from '../squidlet-lib/src/common';
 

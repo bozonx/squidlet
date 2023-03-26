@@ -2,12 +2,12 @@
  * It uses a pigpiod daemon via websocket.
  */
 
-import {OutputResistorMode} from '../../../../../../squidlet/__old/system/interfaces/gpioTypes';
-import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
+import {OutputResistorMode} from '../../../../../../__old/system/interfaces/gpioTypes';
+import IoContext from '../../../../../../__old/system/interfaces/IoContext';
 import DigitalOutputIo from '../../../../../../squidlet/__old/system/interfaces/io/DigitalOutputIo';
 
-import PigpioPinWrapper from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/helpers/PigpioPinWrapper.js';
-import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ios/PigpioClient.js';
+import PigpioPinWrapper from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/io/nodejs/__old/helpers/PigpioPinWrapper.js';
+import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/io/nodejs/__old/ios/PigpioClient.js';
 
 
 export default class DigitalOutput implements DigitalOutputIo {

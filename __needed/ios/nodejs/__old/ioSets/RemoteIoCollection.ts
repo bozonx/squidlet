@@ -1,9 +1,9 @@
 import * as path from 'path';
 
-import IoItem from '../../../../../../squidlet/__old/system/interfaces/IoItem';
-import {SYSTEM_DIR} from '../../../../../../squidlet/__old/shared/helpers/helpers';
-import IoClient from '../../../../../../squidlet/__old/shared/helpers/IoClient';
-import {consoleError} from '../../../../../../squidlet/__old/system/lib/helpers';
+import IoItem from '../../../../../../__old/system/interfaces/IoItem';
+import {SYSTEM_DIR} from '../../../../../../__old/shared/helpers/helpers';
+import IoClient from '../../../../../../__old/shared/helpers/IoClient';
+import {consoleError} from '../../../../../../__old/system/lib/helpers';
 
 
 export default class RemoteIoCollection {

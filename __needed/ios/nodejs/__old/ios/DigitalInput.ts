@@ -3,13 +3,13 @@
  */
 
 import DigitalInputIo, {ChangeHandler} from '../../../../../../squidlet/__old/system/interfaces/io/DigitalInputIo';
-import {Edge, InputResistorMode} from '../../../../../../squidlet/__old/system/interfaces/gpioTypes';
-import ThrottleCall from '../../../../../../squidlet-lib/src/debounceCall/ThrottleCall';
-import DebounceCall from '../../../../../../squidlet-lib/src/debounceCall/DebounceCall';
+import {Edge, InputResistorMode} from '../../../../../../__old/system/interfaces/gpioTypes';
+import ThrottleCall from '../../../../../../../squidlet-lib/src/debounceCall/ThrottleCall';
+import DebounceCall from '../../../../../../../squidlet-lib/src/debounceCall/DebounceCall';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
-import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
-import PigpioPinWrapper from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/helpers/PigpioPinWrapper.js';
-import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ios/PigpioClient.js';
+import IoContext from '../../../../../../__old/system/interfaces/IoContext';
+import PigpioPinWrapper from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/io/nodejs/__old/helpers/PigpioPinWrapper.js';
+import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/io/nodejs/__old/ios/PigpioClient.js';
 
 
 export default class DigitalInput implements DigitalInputIo {

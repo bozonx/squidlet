@@ -1,10 +1,10 @@
 import {SerialParams, SerialPortLike} from '../../../../../../squidlet/__old/system/interfaces/io/SerialIo';
 import {omitObj} from '../squidlet-lib/src/objects';
-import {SERVER_STARTING_TIMEOUT_SEC} from '../../../../../../squidlet/__old/system/constants';
-import SerialIoBase from '../../../../../../squidlet/__old/system/lib/base/SerialIoBase';
+import {SERVER_STARTING_TIMEOUT_SEC} from '../../../../../../__old/system/constants';
+import SerialIoBase from '../../../../../../__old/system/lib/base/SerialIoBase';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
-import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
-import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/io/nodejs/__old/ios/PigpioClient.js';
+import IoContext from '../../../../../../__old/system/interfaces/IoContext';
+import PigpioClient from '../../../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/io/nodejs/__old/ios/PigpioClient.js';
 
 
 export default class Serial extends SerialIoBase {

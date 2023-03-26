@@ -1,14 +1,14 @@
 import * as path from 'path';
 
-import IoSet from '../../../../../../squidlet/__old/system/interfaces/IoSet';
-import EnvBuilder from '../../../../../../squidlet/__old/hostEnvBuilder/EnvBuilder';
-import IoItem from '../../../../../../squidlet/__old/system/interfaces/IoItem';
-import Os from '../../../../../../squidlet/__old/shared/helpers/Os';
-import StorageEnvMemoryWrapper from '../../../../../../squidlet/__old/shared/helpers/StorageEnvMemoryWrapper';
+import IoSet from '../../../../../../__old/system/interfaces/IoSet';
+import EnvBuilder from '../../../../../../__old/hostEnvBuilder/EnvBuilder';
+import IoItem from '../../../../../../__old/system/interfaces/IoItem';
+import Os from '../../../../../../__old/shared/helpers/Os';
+import StorageEnvMemoryWrapper from '../../../../../../__old/shared/helpers/StorageEnvMemoryWrapper';
 import StorageIo from '../../../../../../squidlet/__old/system/interfaces/io/StorageIo';
-import {resolvePlatformDir} from '../../../../../../squidlet/__old/shared/helpers/helpers';
-import MachineConfig from '../../../../../../squidlet/__old/hostEnvBuilder/interfaces/MachineConfig';
-import HostEnvSet from '../../../../../../squidlet/__old/hostEnvBuilder/interfaces/HostEnvSet';
+import {resolvePlatformDir} from '../../../../../../__old/shared/helpers/helpers';
+import MachineConfig from '../../../../../../__old/hostEnvBuilder/interfaces/MachineConfig';
+import HostEnvSet from '../../../../../../__old/hostEnvBuilder/interfaces/HostEnvSet';
 
 
 /**

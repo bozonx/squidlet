@@ -6,7 +6,7 @@ import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {callPromised} from '../squidlet-lib/src/common';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
 import {CError} from '../squidlet-lib/src/CError';
-import IoContext from '../../../../../../squidlet/__old/system/interfaces/IoContext';
+import IoContext from '../../../../../../__old/system/interfaces/IoContext';
 
 require('mqtt-packet').writeToStream.cacheNumbers = false;
 
