@@ -2,14 +2,14 @@ import fs from 'node:fs/promises'
 import {Stats, existsSync} from 'node:fs'
 import {isUtf8} from 'buffer'
 import {pathJoin, PATH_SEP, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
-import FilesIo, {StatsSimplified} from '../../../types/io/FilesIo.js'
+import FilesIoType, {StatsSimplified} from '../../../types/io/FilesIoType.js'
 
 
 //let config: ConfigParams | undefined;
 
 
-export default class Files implements FilesIo {
-  name = 'Files'
+export default class FilesIo implements FilesIoType {
+  name = 'FilesIo'
   //private readonly os = new Os();
 
   async configure(configParams: ConfigParams): Promise<void> {
@@ -178,7 +178,7 @@ export default class Files implements FilesIo {
   }
 
   private makePath(pathTo: string): string {
-    //if (!config || !config.workDir) throw new Error(`Files IO: workDir han't been set`);
+    //if (!config || !config.workDir) throw new Error(`FilesIo IO: workDir han't been set`);
 
     return pathJoin(config.workDir, pathTo)
   }
