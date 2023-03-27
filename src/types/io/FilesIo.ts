@@ -14,7 +14,7 @@ export interface StatsSimplified {
 export interface ConfigParams {
   uid?: number;
   gid?: number;
-  // if set then it will be used as root of all the files which are read and written using Storage.
+  // if set then it will be used as root of all the files which are read and written using Files.
   workDir?: string;
 }
 
@@ -38,10 +38,10 @@ export const Methods = [
 
 
 /**
- * Storage works with absolute paths like /envSet/..., /varData/... and /tmp/...
+ * Files works with absolute paths like /envSet/..., /varData/... and /tmp/...
  * But actually it joins these paths with workDir and result will be like /workdir/envSet/...
  */
-export default interface StorageIo extends IoBase {
+export default interface FilesIo extends IoBase {
   configure(configParams: ConfigParams): Promise<void>;
 
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void>;

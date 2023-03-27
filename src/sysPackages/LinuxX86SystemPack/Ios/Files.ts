@@ -1,16 +1,16 @@
 import fs from 'node:fs/promises'
 import {Stats} from 'node:fs'
 import {pathJoin, PATH_SEP, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
-import StorageIo from '../../../types/io/StorageIo.js'
+import FilesIo from '../../../types/io/FilesIo.js'
 
-import {StatsSimplified, ConfigParams} from '../../../../../../squidlet/__old/system/interfaces/io/StorageIo';
+import {StatsSimplified, ConfigParams} from '../../../../../../squidlet/__old/system/interfaces/io/FilesIo';
 import {trimCharEnd} from '../squidlet-lib/src/strings';
 
 
 let config: ConfigParams | undefined;
 
 
-export default class Storage implements StorageIo {
+export default class Files implements FilesIo {
   //private readonly os = new Os();
 
   async configure(configParams: ConfigParams): Promise<void> {
