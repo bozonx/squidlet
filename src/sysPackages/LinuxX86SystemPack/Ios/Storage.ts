@@ -1,13 +1,10 @@
-import * as fs from 'fs';
-import {Stats} from 'fs';
-import * as path from 'path';
+import fs from 'node:fs/promises'
+import {Stats} from 'node:fs'
+import {pathJoin, PATH_SEP, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
+import StorageIo from '../../../types/io/StorageIo.js'
 
-import StorageIo, {StatsSimplified, ConfigParams} from '../../../../../../squidlet/__old/system/interfaces/io/StorageIo';
-import {callPromised} from '../squidlet-lib/src/common';
-import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
-import {ENCODE} from '../squidlet-lib/src/constants';
+import {StatsSimplified, ConfigParams} from '../../../../../../squidlet/__old/system/interfaces/io/StorageIo';
 import {trimCharEnd} from '../squidlet-lib/src/strings';
-import {PATH_SEP} from '../squidlet-lib/src/paths';
 
 
 let config: ConfigParams | undefined;
@@ -17,6 +14,7 @@ export default class Storage implements StorageIo {
   //private readonly os = new Os();
 
   async configure(configParams: ConfigParams): Promise<void> {
+    // TODO: review
     // remove trailing slash if set
     const resolvedWorkDir: string | undefined = (configParams.workDir)
       ? trimCharEnd(configParams.workDir, PATH_SEP)
@@ -31,80 +29,85 @@ export default class Storage implements StorageIo {
   }
 
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
-    const resolvedPath = this.resolvePath(pathTo);
+    // TODO: review
+    const fullPath = this.makePath(pathTo)
     const wasExist: boolean = await this.exists(pathTo);
 
     if (typeof data === 'string') {
-      await callPromised(fs.appendFile, resolvedPath, data, ENCODE);
+      await callPromised(fs.appendFile, fullPath, data, ENCODE);
     }
     else {
-      await callPromised(fs.appendFile, resolvedPath, data);
+      await callPromised(fs.appendFile, fullPath, data);
     }
 
-    if (!wasExist) await this.chown(resolvedPath);
+    if (!wasExist) await this.chown(fullPath);
   }
 
   async mkdir(pathTo: string): Promise<void> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
-    await callPromised(fs.mkdir, resolvedPath);
-    await this.chown(resolvedPath);
+    await fs.mkdir(fullPath)
+
+    return this.chown(fullPath)
   }
 
   readdir(pathTo: string): Promise<string[]> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
-    return callPromised(fs.readdir, resolvedPath, ENCODE) as Promise<string[]>;
+    return fs.readdir(fullPath, DEFAULT_ENCODE)
   }
 
-  readFile(pathTo: string): Promise<string> {
-    const resolvedPath = this.resolvePath(pathTo);
+  async readTextFile(pathTo: string): Promise<string> {
+    const fullPath = this.makePath(pathTo);
 
-    return callPromised(fs.readFile, resolvedPath, ENCODE) as Promise<string>;
+    const buff = await fs.readFile(fullPath, DEFAULT_ENCODE)
+
+    return buff.toString(DEFAULT_ENCODE)
   }
 
   readlink(pathTo: string): Promise<string> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
-    return callPromised(fs.readlink, resolvedPath);
+    return fs.readlink(fullPath)
   }
 
   async readBinFile(pathTo: string): Promise<Uint8Array> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo);
 
-    const buffer: Buffer = await callPromised(fs.readFile, resolvedPath);
+    const buffer: Buffer = await fs.readFile(fullPath)
 
-    return convertBufferToUint8Array(buffer);
+    return convertBufferToUint8Array(buffer)
   }
 
   rmdir(pathTo: string): Promise<void> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
-    return callPromised(fs.rmdir, resolvedPath);
+    return fs.rmdir(fullPath)
   }
 
   unlink(pathTo: string): Promise<void> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
-    return callPromised(fs.unlink, resolvedPath);
+    return fs.unlink(fullPath)
   }
 
   async writeFile(pathTo: string, data: string | Uint8Array): Promise<void> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
     if (typeof data === 'string') {
-      await callPromised(fs.writeFile, resolvedPath, data, ENCODE);
+      await fs.writeFile(fullPath, data, DEFAULT_ENCODE)
     }
     else {
-      await callPromised(fs.writeFile, resolvedPath, data);
+      await fs.writeFile(fullPath, data)
     }
 
-    await this.chown(resolvedPath);
+    await this.chown(fullPath)
   }
 
   async stat(pathTo: string): Promise<StatsSimplified> {
-    const resolvedPath = this.resolvePath(pathTo);
-    const stat = await callPromised(fs.lstat, resolvedPath);
+    // TODO: review
+    const fullPath = this.makePath(pathTo);
+    const stat = await callPromised(fs.lstat, fullPath);
 
     return {
       size: stat.size,
@@ -115,36 +118,39 @@ export default class Storage implements StorageIo {
   }
 
   async exists(pathTo: string): Promise<boolean> {
-    const resolvedPath = this.resolvePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
-    return new Promise<boolean>((resolve) => {
-      fs.access(resolvedPath, fs.constants.F_OK, (err) => {
-        if (err) return resolve(false);
+    try {
+      await fs.access(fullPath)
 
-        resolve(true);
-      });
-    });
+      return true
+    }
+    catch (e) {
+      return false
+    }
   }
 
-
-  ////// additional
-
   async copyFile(src: string, dest: string): Promise<void> {
-    const resolvedDest = this.resolvePath(dest);
+    const resolvedDest = this.makePath(dest);
 
-    await callPromised(fs.copyFile, this.resolvePath(src), resolvedDest);
-    await this.chown(resolvedDest);
+    await fs.copyFile(this.makePath(src), resolvedDest)
+
+    return  this.chown(resolvedDest)
   }
 
   async rename(oldPath: string, newPath: string): Promise<void> {
-    const resolvedNewPath = this.resolvePath(newPath);
+    const resolvedNewPath = this.makePath(newPath)
 
-    await callPromised(fs.rename, this.resolvePath(oldPath), resolvedNewPath);
-    await this.chown(resolvedNewPath);
+    await fs.rename(this.makePath(oldPath), resolvedNewPath)
+
+    return this.chown(resolvedNewPath)
   }
 
 
   private async chown(pathTo: string) {
+
+    // TODO: а оно надо???
+
     if (!config) return;
 
     if (typeof config.uid === 'undefined' && typeof config.gid === 'undefined') {
@@ -168,10 +174,10 @@ export default class Storage implements StorageIo {
     );
   }
 
-  private resolvePath(pathTo: string): string {
+  private makePath(pathTo: string): string {
     if (!config || !config.workDir) throw new Error(`Storage IO: workDir han't been set`);
 
-    return path.join(config.workDir, pathTo);
+    return pathJoin(config.workDir, pathTo)
   }
 
 }
