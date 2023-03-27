@@ -1,13 +1,10 @@
 import fs from 'node:fs/promises'
 import {Stats} from 'node:fs'
 import {pathJoin, PATH_SEP, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
-import FilesIo from '../../../types/io/FilesIo.js'
-
-import {StatsSimplified, ConfigParams} from '../../../../../../squidlet/__old/system/interfaces/io/FilesIo';
-import {trimCharEnd} from '../squidlet-lib/src/strings';
+import FilesIo, {StatsSimplified} from '../../../types/io/FilesIo.js'
 
 
-let config: ConfigParams | undefined;
+//let config: ConfigParams | undefined;
 
 
 export default class Files implements FilesIo {
@@ -60,9 +57,7 @@ export default class Files implements FilesIo {
   async readTextFile(pathTo: string): Promise<string> {
     const fullPath = this.makePath(pathTo);
 
-    const buff = await fs.readFile(fullPath, DEFAULT_ENCODE)
-
-    return buff.toString(DEFAULT_ENCODE)
+    return await fs.readFile(fullPath, DEFAULT_ENCODE)
   }
 
   readlink(pathTo: string): Promise<string> {
@@ -105,9 +100,8 @@ export default class Files implements FilesIo {
   }
 
   async stat(pathTo: string): Promise<StatsSimplified> {
-    // TODO: review
-    const fullPath = this.makePath(pathTo);
-    const stat = await callPromised(fs.lstat, fullPath);
+    const fullPath = this.makePath(pathTo)
+    const stat = await fs.lstat(fullPath)
 
     return {
       size: stat.size,
@@ -175,7 +169,7 @@ export default class Files implements FilesIo {
   }
 
   private makePath(pathTo: string): string {
-    if (!config || !config.workDir) throw new Error(`Storage IO: workDir han't been set`);
+    //if (!config || !config.workDir) throw new Error(`Files IO: workDir han't been set`);
 
     return pathJoin(config.workDir, pathTo)
   }

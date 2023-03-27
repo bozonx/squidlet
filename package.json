@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@types/ws": "^8.5.4",
+    "isutf8": "^4.0.0",
     "squidlet-lib": "file:../squidlet-lib",
     "ws": "^8.13.0",
     "yaml": "^2.2.1"

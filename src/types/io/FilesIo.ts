@@ -9,6 +9,9 @@ export interface StatsSimplified {
   symbolicLink: boolean;
   // modified time - number of milliseconds elapsed since 1 January 1970 00:00:00 UTC
   mtime: number;
+  // atime
+  // ctime
+  // birthtime
 }
 
 export interface ConfigParams {
