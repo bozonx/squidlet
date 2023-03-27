@@ -68,8 +68,10 @@ export default interface FilesIo extends IoBase {
   exists(pathTo: string): Promise<boolean>
   ////// additional
   copyFile(src: string, dest: string): Promise<void>;
-  rename(oldPath: string, newPath: string): Promise<void>;
+  rename(oldPath: string, newPath: string): Promise<void>
+  isFileUtf8(pathTo: string): Promise<boolean>
 
-  // TODO: check is it bin file
   // TODO: что по части удаления дириктории рекурсивно?
+  // TODO: что по части удаления нескольких файлов
+  // TODO: чтение файла блоками
 }

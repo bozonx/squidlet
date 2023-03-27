@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
-import {Stats} from 'node:fs'
+import {Stats, existsSync} from 'node:fs'
+import {isUtf8} from 'buffer'
 import {pathJoin, PATH_SEP, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
 import FilesIo, {StatsSimplified} from '../../../types/io/FilesIo.js'
 
@@ -8,6 +9,7 @@ import FilesIo, {StatsSimplified} from '../../../types/io/FilesIo.js'
 
 
 export default class Files implements FilesIo {
+  name = 'Files'
   //private readonly os = new Os();
 
   async configure(configParams: ConfigParams): Promise<void> {
@@ -26,18 +28,17 @@ export default class Files implements FilesIo {
   }
 
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
-    // TODO: review
     const fullPath = this.makePath(pathTo)
-    const wasExist: boolean = await this.exists(pathTo);
+    const wasExist: boolean = existsSync(pathTo)
 
     if (typeof data === 'string') {
-      await callPromised(fs.appendFile, fullPath, data, ENCODE);
+      await fs.appendFile(fullPath, data, DEFAULT_ENCODE)
     }
     else {
-      await callPromised(fs.appendFile, fullPath, data);
+      await fs.appendFile(fullPath, data)
     }
 
-    if (!wasExist) await this.chown(fullPath);
+    if (!wasExist) await this.chown(fullPath)
   }
 
   async mkdir(pathTo: string): Promise<void> {
@@ -60,18 +61,18 @@ export default class Files implements FilesIo {
     return await fs.readFile(fullPath, DEFAULT_ENCODE)
   }
 
-  readlink(pathTo: string): Promise<string> {
-    const fullPath = this.makePath(pathTo)
-
-    return fs.readlink(fullPath)
-  }
-
   async readBinFile(pathTo: string): Promise<Uint8Array> {
     const fullPath = this.makePath(pathTo);
 
     const buffer: Buffer = await fs.readFile(fullPath)
 
     return convertBufferToUint8Array(buffer)
+  }
+
+  readlink(pathTo: string): Promise<string> {
+    const fullPath = this.makePath(pathTo)
+
+    return fs.readlink(fullPath)
   }
 
   rmdir(pathTo: string): Promise<void> {
@@ -138,6 +139,14 @@ export default class Files implements FilesIo {
     await fs.rename(this.makePath(oldPath), resolvedNewPath)
 
     return this.chown(resolvedNewPath)
+  }
+
+  async isFileUtf8(pathTo: string): Promise<boolean> {
+    const fullPath = this.makePath(pathTo)
+    // TODO: лучше считывать не весь файл, 1000 байт но кратно utf8 стандарту бит
+    const buffer: Buffer = await fs.readFile(fullPath)
+    // ещё есть пакет - isutf8
+    return isUtf8(buffer)
   }
 
 
