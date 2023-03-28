@@ -2,7 +2,7 @@ import {isUtf8} from 'buffer'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex} from '../../types/types.js'
-import FilesIoType from '../../types/io/FilesIoType.js'
+import FilesIoType, {StatsSimplified} from '../../types/io/FilesIoType.js'
 
 
 export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
@@ -77,17 +77,15 @@ export class FilesDriver extends DriverBase {
   ///////
 
   async isDir(pathToDir: string): Promise<boolean> {
-    const absPath: string = pathJoin(this.rootDir, pathToDir);
-    const stats: StatsSimplified = await this.storageIo.stat(absPath);
+    const stats: StatsSimplified = await this.io.stat(pathToDir)
 
-    return stats.dir;
+    return stats.dir
   }
 
   async isFile(pathToFile: string) {
-    const absPath: string = pathJoin(this.rootDir, pathToFile);
-    const stats: StatsSimplified = await this.storageIo.stat(absPath);
+    const stats: StatsSimplified = await this.io.stat(pathToFile)
 
-    return !stats.dir;
+    return !stats.dir
   }
 
   // TODO: может вместо этого использовать stat?
@@ -116,11 +114,10 @@ export class FilesDriver extends DriverBase {
 
 
   async isFileUtf8(pathTo: string): Promise<boolean> {
-    const fullPath = this.makePath(pathTo)
-    // TODO: лучше считывать не весь файл, 1000 байт но кратно utf8 стандарту бит
-    const buffer: Buffer = await fs.readFile(fullPath)
     // ещё есть пакет - isutf8
-    return isUtf8(buffer)
+    // TODO: лучше считывать не весь файл, 1000 байт но кратно utf8 стандарту бит
+    const data: Uint8Array = await this.io.readBinFile(pathTo)
+    return isUtf8(data)
   }
 
 }
