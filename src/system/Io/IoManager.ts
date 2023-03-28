@@ -47,7 +47,7 @@ export class IoManager {
   }
 
 
-  getIo<T extends IoBase>(ioName: string): T {
+  getIo<T>(ioName: string): T {
     return this.ios[ioName] as T
   }
 

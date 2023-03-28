@@ -1,15 +1,22 @@
 import {DriverBase} from '../../system/driver/DriverBase.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex} from '../../types/types.js'
+import FilesIoType from '../../types/io/FilesIoType.js'
 
 
 export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
   return new FilesDriver(ctx)
 }
 
+const filesIoName = 'FilesIo'
+
 
 export class FilesDriver extends DriverBase {
-  readonly name = 'FilesDriver'
+  requireIo = [filesIoName]
+
+  private get io(): FilesIoType {
+    return this.ctx.io.getIo<FilesIoType>(filesIoName)
+  }
 
 
   async isDir(pathToDir: string): Promise<boolean> {
