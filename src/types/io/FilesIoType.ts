@@ -20,24 +20,6 @@ export interface FilesIoConfig {
 }
 
 
-// export const Methods = [
-//   'configure',
-//   'appendFile',
-//   'mkdir',
-//   'readdir',
-//   'readFile',
-//   'readlink',
-//   'readBinFile',
-//   'rmdir',
-//   'unlink',
-//   'writeFile',
-//   'stat',
-//   'exists',
-//   'copyFile',
-//   'rename',
-// ];
-
-
 /**
  * FilesIo works with absolute paths like /envSet/..., /varData/... and /tmp/...
  * But actually it joins these paths with workDir and result will be like /workdir/envSet/...
@@ -47,27 +29,30 @@ export default interface FilesIoType {
   mkdir(pathTo: string): Promise<void>
   readdir(pathTo: string): Promise<string[]>
   readTextFile(pathTo: string): Promise<string>
-
+  readBinFile(pathTo: string): Promise<Uint8Array>
   /**
    * You should pass only symlink. Resolve it by using stat().
    * It returns relative or absolute path to target file
    */
   readlink(pathTo: string): Promise<string>
-
-  readBinFile(pathTo: string): Promise<Uint8Array>
   rmdir(pathTo: string): Promise<void>
   unlink(pathTo: string): Promise<void>
   writeFile(pathTo: string, data: string | Uint8Array): Promise<void>
   stat(pathTo: string): Promise<StatsSimplified>
+  // TODO: может вместо этого использовать stat?
   // Do it only for simple checks not before read or write
   // because the file can be removed between promises
-  exists(pathTo: string): Promise<boolean>
+  //exists(pathTo: string): Promise<boolean>
   ////// additional
   copyFile(src: string, dest: string): Promise<void>
+  // rename or remove
   rename(oldPath: string, newPath: string): Promise<void>
-  isFileUtf8(pathTo: string): Promise<boolean>
+  //isFileUtf8(pathTo: string): Promise<boolean>
 
+  // TODO: может для батч операций просто передавать некую очередь
   // TODO: что по части удаления дириктории рекурсивно?
   // TODO: что по части удаления нескольких файлов
   // TODO: чтение файла блоками
+  // TODO: копирование нескольких файлов
+  // TODO: перемещение нескольких файлов
 }

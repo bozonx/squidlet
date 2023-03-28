@@ -16,5 +16,4 @@ export class DriverBase {
   init?: (cfg?: Record<string, any>) => Promise<void>
 
   destroy?: () => Promise<void>
-
 }

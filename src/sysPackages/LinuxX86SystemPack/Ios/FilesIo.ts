@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises'
 import {Stats, existsSync, lstatSync} from 'node:fs'
-import {isUtf8} from 'buffer'
 import {pathJoin, PATH_SEP, trimCharEnd, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
 import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/FilesIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
@@ -115,18 +114,18 @@ export class FilesIo extends IoBase implements FilesIoType {
     };
   }
 
-  async exists(pathTo: string): Promise<boolean> {
-    const fullPath = this.makePath(pathTo)
-
-    try {
-      await fs.access(fullPath)
-
-      return true
-    }
-    catch (e) {
-      return false
-    }
-  }
+  // async exists(pathTo: string): Promise<boolean> {
+  //   const fullPath = this.makePath(pathTo)
+  //
+  //   try {
+  //     await fs.access(fullPath)
+  //
+  //     return true
+  //   }
+  //   catch (e) {
+  //     return false
+  //   }
+  // }
 
   async copyFile(src: string, dest: string): Promise<void> {
     const resolvedDest = this.makePath(dest);
@@ -142,14 +141,6 @@ export class FilesIo extends IoBase implements FilesIoType {
     await fs.rename(this.makePath(oldPath), resolvedNewPath)
 
     return this.chown(resolvedNewPath)
-  }
-
-  async isFileUtf8(pathTo: string): Promise<boolean> {
-    const fullPath = this.makePath(pathTo)
-    // TODO: лучше считывать не весь файл, 1000 байт но кратно utf8 стандарту бит
-    const buffer: Buffer = await fs.readFile(fullPath)
-    // ещё есть пакет - isutf8
-    return isUtf8(buffer)
   }
 
 
