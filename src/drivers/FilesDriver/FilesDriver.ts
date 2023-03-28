@@ -15,6 +15,10 @@ const filesIoName = 'FilesIo'
 // TODO: должна быть проверка прав, либо делать обертку с проверкой
 
 
+/**
+ * Files driver
+ * Use relative paths
+ */
 export class FilesDriver extends DriverBase {
   requireIo = [filesIoName]
 
@@ -22,61 +26,17 @@ export class FilesDriver extends DriverBase {
     return this.ctx.io.getIo<FilesIoType>(filesIoName)
   }
 
-
-  appendFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
-    const absPath: string = pathJoin(this.rootDir, pathToFile);
-
-    return this.storageIo.appendFile(absPath, data);
-  }
-
-  mkdir(pathTo: string): Promise<void> {
-
-  }
-
-  readDir(pathToDir: string): Promise<string[]> {
-    const absPath: string = pathJoin(this.rootDir, pathToDir);
-
-    return this.storageIo.readdir(absPath);
-  }
-
-
-  readTextFile(pathToFile: string): Promise<string> {
-    const absPath: string = pathJoin(this.rootDir, pathToFile);
-
-    return this.storageIo.readFile(absPath);
-  }
-
-  readBinFile(pathToFile: string): Promise<Uint8Array> {
-    const absPath: string = pathJoin(this.rootDir, pathToFile);
-
-    return this.storageIo.readBinFile(absPath);
-  }
-
-  readlink(pathTo: string): Promise<string> {
-
-  }
-
-  rmdir(pathTo: string): Promise<void> {
-
-  }
-
-  unlink(pathTo: string): Promise<void> {
-
-  }
-
-  writeFile(pathToFile: string, data: string | Uint8Array): Promise<void> {
-    const absPath: string = pathJoin(this.rootDir, pathToFile);
-
-    return this.storageIo.writeFile(absPath, data);
-  }
-
-
-  stat(pathToFileOrDir: string): Promise<StatsSimplified> {
-    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
-
-    return this.storageIo.stat(absPath);
-  }
-
+  //////// AS IN FILES IO
+  appendFile = this.io.appendFile.bind(this)
+  mkdir = this.io.mkdir.bind(this)
+  readDir = this.io.readdir.bind(this)
+  readTextFile = this.io.readTextFile.bind(this)
+  readBinFile = this.io.readBinFile.bind(this)
+  readlink = this.io.readlink.bind(this)
+  rmdir = this.io.rmdir.bind(this)
+  unlink = this.io.unlink.bind(this)
+  writeFile = this.io.writeFile.bind(this)
+  stat = this.io.stat.bind(this)
 
   ////////// ADDITIONAL
 
