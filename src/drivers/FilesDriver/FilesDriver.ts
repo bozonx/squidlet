@@ -1,4 +1,11 @@
 import {DriverBase} from '../../system/driver/DriverBase.js'
+import {DriverContext} from '../../system/driver/DriverContext.js'
+import {DriverIndex} from '../../types/types.js'
+
+
+export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
+  return new FilesDriver(ctx)
+}
 
 
 export class FilesDriver extends DriverBase {
