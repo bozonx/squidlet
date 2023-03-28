@@ -37,6 +37,8 @@ export class ConfigsManager {
       ...this.systemCfg,
       ...loadedCfg
     }
+
+    // TODO: валидировать - пути в versionsCount должны начинаться со слеша
   }
 
 

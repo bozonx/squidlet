@@ -1,3 +1,4 @@
+import {pathDirname} from 'squidlet-lib'
 import {System} from '../System.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
@@ -12,9 +13,6 @@ export class VersionsManager {
 
   constructor(system: System) {
     this.system = system
-
-    // TODO: в конфиге можно указать какие директории имеюют сколько версий
-    //       тогда нужно каждый раз сравнивать с конфигом чтобы понять сколько версий использовать
   }
 
 
@@ -24,20 +22,34 @@ export class VersionsManager {
 
 
   async incrementFileVersion(pathToFile: string) {
+    const dirName = pathDirname(pathToFile)
+    const versionsCount = this.resolveVersionsCount(dirName)
 
-    //const fileVersionsDir =
+    // TODO: add
   }
 
   async removeFileVersions(pathToFile: string) {
-
+    // TODO: add
   }
 
   async removeVersionsDirRecursively(pathToDir: string) {
-
+    // TODO: add
   }
 
   async renameVersions(files: [string, string][]) {
+    // TODO: add
+  }
 
+  async actualise(rootPath: string) {
+    // TODO: remove unused version and dirs
+    // TODO: run it in cron???
+  }
+
+
+  private resolveVersionsCount(dirName: string): number {
+
+    // TODO: в конфиге можно указать какие директории имеюют сколько версий
+    //       тогда нужно каждый раз сравнивать с конфигом чтобы понять сколько версий использовать
   }
 
 }
