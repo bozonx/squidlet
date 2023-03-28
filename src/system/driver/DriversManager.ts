@@ -1,10 +1,7 @@
-import yaml from 'yaml'
-import {pathJoin} from 'squidlet-lib'
 import {System} from '../System.js'
 import {DriverIndex} from '../../types/types.js'
 import {DriverBase} from './DriverBase.js'
 import {DriverContext} from './DriverContext.js'
-import {CFG_DIRS} from '../../types/contstants.js'
 
 
 export class DriversManager {
@@ -36,12 +33,8 @@ export class DriversManager {
         }
       }
 
-      const cfgFilePath = pathJoin(CFG_DIRS.drivers, driverName + '.yml')
-      let driverCfg: Record<string, any> | undefined
-
-      if (await this.system.files.cfg.exists(cfgFilePath)) {
-        driverCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
-      }
+      const driverCfg: Record<string, any> | undefined = await this.system.configs
+        .loadDriverConfig(driverName)
 
       if (driver.init) {
         this.ctx.log.debug(`DriversManager: initializing driver "${driverName}"`)

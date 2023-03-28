@@ -1,10 +1,7 @@
-import yaml from 'yaml'
-import {pathJoin} from 'squidlet-lib'
 import {System} from '../System.js'
 import {IoIndex} from '../../types/types.js'
 import {IoBase} from './IoBase.js'
 import {IoContext} from './IoContext.js'
-import {CFG_DIRS} from '../../types/contstants.js'
 
 
 export class IoManager {
@@ -21,12 +18,8 @@ export class IoManager {
   async init() {
     for (const ioName of Object.keys(this.ios)) {
       const ioItem = this.ios[ioName]
-      const cfgFilePath = pathJoin(CFG_DIRS.ios, ioName + '.yml')
-      let ioCfg: Record<string, any> | undefined
-
-      if (await this.system.files.cfg.exists(cfgFilePath)) {
-        ioCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
-      }
+      const ioCfg: Record<string, any> | undefined = await this.system.configs
+        .loadIoConfig(ioName)
 
       if (ioItem.init) {
         this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
