@@ -38,15 +38,12 @@ export class System {
   // TODO: слушать события и сохранять в файл всё что передаётся
   //readonly localStorage: MemStorage
   readonly drivers: DriversManager
-  // DRIVERS
   // TODO: add
   readonly systemInfo: SystemInfoManager
-  // SYSTEM
+  readonly filesManager: FilesManager
   // TODO: add
   readonly permissions: PermissionsManager
-  // SERVICES
   readonly services: ServicesManager
-  readonly filesManager: FilesManager
   // It is wrapper for DB which is works with configs
   // TODO: add
   readonly configs: ConfigsManager
@@ -84,19 +81,19 @@ export class System {
 
   init() {
     (async () => {
-      await this.packageManager.init()
       await this.io.init()
       await this.drivers.init()
       await this.systemInfo.init()
       await this.filesManager.init()
+
       await this.configs.init()
       await this.permissions.init()
+
       await this.services.init()
       await this.network.init()
       await this.apiManager.init()
       await this.cmd.init()
       await this.ui.init()
-      // TODO: загрузку пакетов делать как можно раньше чтобы загрузились IO и драйвера
       // load all the installed packages
       await this.packageManager.loadInstalled()
       // notify that system is inited
@@ -122,7 +119,6 @@ export class System {
       destroyWrapper(this.services.destroy),
       destroyWrapper(this.permissions.destroy),
       destroyWrapper(this.configs.destroy),
-      destroyWrapper(this.filesManager.destroy),
       destroyWrapper(this.systemInfo.destroy),
       destroyWrapper(this.drivers.destroy),
       destroyWrapper(this.packageManager.destroy),

@@ -12,9 +12,6 @@ export class PackageManager {
     this.ctx = new PackageContext(this.system)
   }
 
-  async init() {
-    //const packagesDirs: string[] = this.system.files
-  }
 
   async destroy() {
     // TODO: дестроить то на что пакеты навешались дестроить

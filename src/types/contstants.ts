@@ -33,11 +33,12 @@ export const ROOT_DIRS = {
   external: 'external',
 }
 
+export const SYSTEM_CFG_DIR = `${ROOT_DIRS.cfg}/system`
+export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.yml`
+
 export const CFG_DIRS = {
   ios: 'ios',
   drivers: 'drivers',
-  services: 'services',
-  uiApps: 'uiApps',
 }
 
 export const SERVICE_STATUS = {
