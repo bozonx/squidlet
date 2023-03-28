@@ -202,10 +202,15 @@ export class ServicesManager {
 
   useService(serviceIndex: ServiceIndex) {
     const service = serviceIndex(this.ctx)
+    const serviceName: string = service.myName || service.constructor.name
 
-    this.services[service.name] = service
+    if (this.services[serviceName]) {
+      throw new Error(`The same service "${serviceName} is already in use"`)
+    }
 
-    this.changeStatus(service.name, SERVICE_STATUS.loaded as ServiceStatus)
+    this.services[serviceName] = service
+
+    this.changeStatus(serviceName, SERVICE_STATUS.loaded as ServiceStatus)
   }
 
 

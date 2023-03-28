@@ -2,8 +2,8 @@ import {IoContext} from './IoContext.js'
 
 
 export class IoBase {
-  // put name of IO here it it not the same as class name
-  readonly name?: string
+  // put name of the IO here it it not the same as class name
+  readonly myName?: string
 
   protected readonly ctx
 

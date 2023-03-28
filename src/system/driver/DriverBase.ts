@@ -2,9 +2,9 @@ import {DriverContext} from './DriverContext.js'
 
 
 export class DriverBase {
+  // put name of the driver here it it not the same as class name
+  readonly myName?: string
   readonly requireIo?: string[]
-  // dirver name
-  readonly name?: string
 
   protected readonly ctx: DriverContext
 

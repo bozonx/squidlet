@@ -72,8 +72,13 @@ export class DriversManager {
 
   useDriver(driverIndex: DriverIndex) {
     const driver = driverIndex(this.ctx)
+    const driverName: string = driver.myName || driver.constructor.name
 
-    this.drivers[driver.name] = driver
+    if (this.drivers[driverName]) {
+      throw new Error(`The same driver "${driverName} is already in use"`)
+    }
+
+    this.drivers[driverName] = driver
   }
 
 }

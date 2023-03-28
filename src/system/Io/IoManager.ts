@@ -57,12 +57,13 @@ export class IoManager {
 
   useIo(ioIndex: IoIndex) {
     const io = ioIndex(this.ctx)
+    const ioName: string = io.myName || io.constructor.name
 
-    if (this.ios[io.name]) {
-      throw new Error(`The same IO "${io.name} is already in use"`)
+    if (this.ios[ioName]) {
+      throw new Error(`The same IO "${ioName} is already in use"`)
     }
 
-    this.ios[io.name] = io
+    this.ios[ioName] = io
   }
 
 }
