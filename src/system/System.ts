@@ -29,6 +29,7 @@ export class System {
     (...p) => this.events.emit(SystemEvents.logger, ...p)
   )
   // managers
+  readonly packageManager: PackageManager
   readonly io: IoManager
   // store some data only in memory while runtime
   // TODO: ограничить правами только на свой dir
@@ -59,29 +60,31 @@ export class System {
   // it is wrapper for api
   // TODO: add
   readonly cmd: CmdManager
-  readonly packageManager: PackageManager
 
 
   constructor() {
+    this.packageManager = new PackageManager(this)
     this.io = new IoManager(this)
     this.memStorage = new MemStorage()
     this.drivers = new DriversManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.filesManager = new FilesManager(this)
 
+    // TODO: наверное это просто системный конфиг
     this.configs = new ConfigsManager(this)
     this.permissions = new PermissionsManager(this)
     this.services = new ServicesManager(this)
+
     this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
     this.cmd = new CmdManager(this)
     this.ui = new UiManager(this)
-    this.packageManager = new PackageManager(this)
   }
 
 
   init() {
     (async () => {
+      await this.packageManager.init()
       await this.io.init()
       await this.drivers.init()
       await this.systemInfo.init()
@@ -95,7 +98,7 @@ export class System {
       await this.ui.init()
       // TODO: загрузку пакетов делать как можно раньше чтобы загрузились IO и драйвера
       // load all the installed packages
-      await this.packageManager.init()
+      await this.packageManager.loadInstalled()
       // notify that system is inited
       this.events.emit(SystemEvents.systemInited)
     })()
@@ -112,7 +115,6 @@ export class System {
     }
     // it will call destroy functions step by step
     Promise.allSettled([
-      destroyWrapper(this.packageManager.destroy),
       destroyWrapper(this.ui.destroy),
       destroyWrapper(this.cmd.destroy),
       destroyWrapper(this.apiManager.destroy),
@@ -123,6 +125,7 @@ export class System {
       destroyWrapper(this.filesManager.destroy),
       destroyWrapper(this.systemInfo.destroy),
       destroyWrapper(this.drivers.destroy),
+      destroyWrapper(this.packageManager.destroy),
       destroyWrapper(this.io.destroy),
     ])
       .then(() => {

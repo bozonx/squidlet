@@ -13,12 +13,17 @@ export class PackageManager {
   }
 
   async init() {
-    // TODO: load all the installed packages
     //const packagesDirs: string[] = this.system.files
   }
 
   async destroy() {
     // TODO: дестроить то на что пакеты навешались дестроить
+  }
+
+
+  async loadInstalled() {
+    // TODO: load all the installed packages
+
   }
 
 }
