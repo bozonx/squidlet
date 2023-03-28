@@ -5,7 +5,6 @@ import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/Fil
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {IoIndex} from '../../../types/types.js'
 import {IoContext} from '../../../system/Io/IoContext.js'
-import {it} from 'node:test'
 
 
 export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
@@ -114,19 +113,6 @@ export class FilesIo extends IoBase implements FilesIoType {
       mtime: stat.mtime.getTime(),
     };
   }
-
-  // async exists(pathTo: string): Promise<boolean> {
-  //   const fullPath = this.makePath(pathTo)
-  //
-  //   try {
-  //     await fs.access(fullPath)
-  //
-  //     return true
-  //   }
-  //   catch (e) {
-  //     return false
-  //   }
-  // }
 
   async copyFiles(files: [string, string][]): Promise<void> {
     for (const item of files) {

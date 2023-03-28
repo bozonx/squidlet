@@ -35,12 +35,11 @@ export default interface FilesIoType {
    * It returns relative or absolute path to target file
    */
   readlink(pathTo: string): Promise<string>
+  // remove an empty dir
   rmdir(pathTo: string): Promise<void>
   unlink(pathTo: string): Promise<void>
   writeFile(pathTo: string, data: string | Uint8Array): Promise<void>
   stat(pathTo: string): Promise<StatsSimplified>
-
-  ////////// ADDITIONAL
   // Copy specified files. Use full path
   // files is [SRC, DEST][]
   copyFiles(files: [string, string][]): Promise<void>

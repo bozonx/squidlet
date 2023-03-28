@@ -1,4 +1,5 @@
 import {isUtf8} from 'buffer'
+import {pathDirname, pathJoin} from 'squidlet-lib'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex} from '../../types/types.js'
@@ -37,44 +38,64 @@ export class FilesDriver extends DriverBase {
   unlink = this.io.unlink.bind(this)
   writeFile = this.io.writeFile.bind(this)
   stat = this.io.stat.bind(this)
+  copyFiles = this.io.copyFiles.bind(this)
+  renameFiles = this.io.renameFiles.bind(this)
 
   ////////// ADDITIONAL
 
+  /**
+   * Remove one file or an empty dir
+   */
   async rm(pathToFileOrDir: string) {
-    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
-    const stats: StatsSimplified = await this.storageIo.stat(pathToFileOrDir);
+    const stats: StatsSimplified = await this.io.stat(pathToFileOrDir)
 
     if (stats.dir) {
-      return this.storageIo.rmdir(absPath);
+      return this.io.rmdir(pathToFileOrDir)
     }
     else {
-      return this.storageIo.unlink(absPath);
+      return this.io.unlink(pathToFileOrDir)
     }
   }
 
-  async copyFile(fromPath: string, toPath: string): Promise<void> {
+  /**
+   * Remove one file of dir recursively
+   */
+  async rmRf(pathToFileOrDir: string): Promise<void> {
+    // TODO: !!!!
+  }
+
+  /**
+   * Copy some file, several files or dir recursively to specified dest dir
+   */
+  async cp(src: string | string[], destDir: string): Promise<void> {
     // TODO: !!!!
     // TODO: !!!! support copying dir recursively
   }
 
-  async mv(fromPath: string, toPath: string): Promise<void> {
+  /**
+   * Move some file, several files or dir recursively to specified dest dir
+   */
+  async mv(src: string | string[], destDir: string): Promise<void> {
     // TODO: !!!! support moving dir recursively
 
-    const oldAbsPath: string = pathJoin(this.rootDir, fromPath);
-    const newAbsPath: string = pathJoin(this.rootDir, toPath);
-
-    return this.storageIo.rename(oldAbsPath, newAbsPath);
+    // const oldAbsPath: string = pathJoin(this.rootDir, fromPath);
+    // const newAbsPath: string = pathJoin(this.rootDir, toPath);
+    //
+    // return this.storageIo.rename(oldAbsPath, newAbsPath);
   }
 
+  /**
+   * Change name of file or dir
+   */
   async rename(pathToFileOrDir: string, newName: string): Promise<void> {
-    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
-    const fileDir: string = pathDirname(absPath);
-    const newPath: string = pathJoin(fileDir, newName);
 
-    return this.storageIo.rename(absPath, newPath);
+    // TODO: проверить сработает ли с полной папкой
+
+    const fileDir: string = pathDirname(pathToFileOrDir)
+    const newPath: string = pathJoin(fileDir, newName)
+
+    return this.io.renameFiles([[pathToFileOrDir, newPath]])
   }
-
-  ///////
 
   async isDir(pathToDir: string): Promise<boolean> {
     const stats: StatsSimplified = await this.io.stat(pathToDir)
@@ -88,14 +109,26 @@ export class FilesDriver extends DriverBase {
     return !stats.dir
   }
 
-  // TODO: может вместо этого использовать stat?
-  // Do it only for simple checks not before read or write
-  // because the file can be removed between promises
-  //exists(pathTo: string): Promise<boolean>
-  isExists(pathToFileOrDir: string): Promise<boolean> {
-    const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
+  /**
+   * Is file exists.
+   * Do it only for simple checks not before read or write.
+   *   because the file can be removed between promises
+   * @param pathToFileOrDir
+   */
+  async isExists(pathToFileOrDir: string): Promise<boolean> {
 
-    return this.storageIo.exists(absPath);
+    // TODO: проверить что stat вернет ошибку если файла нет
+    // TODO: и какую именно ошибку
+    //await fs.access(fullPath)
+
+    try {
+      await this.io.stat(pathToFileOrDir)
+
+      return true
+    }
+    catch (e) {
+      return false
+    }
   }
 
   /**
@@ -103,13 +136,6 @@ export class FilesDriver extends DriverBase {
    */
   async mkDirP(pathToDir: string): Promise<void> {
     // TODO: !!!! use helpers/mkdirPLogic.ts
-  }
-
-  /**
-   * Remove dir recursively or file.
-   */
-  async rmRf(pathToFileOrDir: string): Promise<void> {
-    // TODO: !!!!
   }
 
 
