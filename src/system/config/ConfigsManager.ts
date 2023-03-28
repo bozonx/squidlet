@@ -55,22 +55,28 @@ export class ConfigsManager {
 
   async saveIoConfig(ioName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.ios, ioName + '.yml')
-    // TODO: add
+    const dataStr = yaml.stringify(newConfig)
+
+    await this.filesDriver.writeFile(cfgFilePath, dataStr)
   }
 
   async saveDriverConfig(driverName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.drivers, driverName + '.yml')
-    // TODO: add
+    const dataStr = yaml.stringify(newConfig)
+
+    await this.filesDriver.writeFile(cfgFilePath, dataStr)
   }
 
   async removeIoConfig(ioName: string) {
     const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.ios, ioName + '.yml')
-    // TODO: add
+
+    await this.filesDriver.unlink(cfgFilePath)
   }
 
   async removeDriverConfig(driverName: string) {
     const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.drivers, driverName + '.yml')
-    // TODO: add
+
+    await this.filesDriver.unlink(cfgFilePath)
   }
 
 }
