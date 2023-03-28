@@ -8,19 +8,28 @@ import {IoIndex} from '../../../types/types.js'
 import {IoContext} from '../../../system/Io/IoContext.js'
 
 
-const cfg: FilesIoConfig = {
-  rootDir: trimCharEnd(process.env.FILES_ROOT_DIR || '', PATH_SEP),
-  uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
-  gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
+export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
+  const cfg: FilesIoConfig = {
+    rootDir: trimCharEnd(process.env.FILES_ROOT_DIR || '', PATH_SEP),
+    uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
+    gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
+  }
+
+  if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
+
+  return new FilesIo(ctx, cfg)
 }
-
-if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
-
-
-export const FilesIoIndex: IoIndex = (ctx: IoContext) => new FilesIo(ctx)
 
 
 export class FilesIo extends IoBase implements FilesIoType {
+  private readonly cfg: FilesIoConfig
+
+  constructor(ctx: IoContext, cfg: FilesIoConfig) {
+    super(ctx)
+
+    this.cfg = cfg
+  }
+
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     const fullPath = this.makePath(pathTo)
     const wasExist: boolean = existsSync(pathTo)
@@ -145,26 +154,26 @@ export class FilesIo extends IoBase implements FilesIoType {
 
 
   private async chown(pathTo: string) {
-    if (!cfg.uid && !cfg.gid) {
+    if (!this.cfg.uid && !this.cfg.gid) {
       // if noting to change - just return
       return
     }
-    else if (cfg.uid && cfg.gid) {
+    else if (this.cfg.uid && this.cfg.gid) {
       // uid and gid are specified - set both
-      return await fs.chown(pathTo, cfg.uid, cfg.gid)
+      return await fs.chown(pathTo, this.cfg.uid, this.cfg.gid)
     }
     // else load stats to resolve lack of params
     const stat: Stats = lstatSync(pathTo)
 
     await fs.chown(
       pathTo,
-      (!cfg.uid) ? stat.uid : cfg.uid,
-      (!cfg.gid) ? stat.gid : cfg.gid,
+      (!this.cfg.uid) ? stat.uid : this.cfg.uid,
+      (!this.cfg.gid) ? stat.gid : this.cfg.gid,
     )
   }
 
   private makePath(pathTo: string): string {
-    return pathJoin(cfg.rootDir, pathTo)
+    return pathJoin(this.cfg.rootDir, pathTo)
   }
 
 }
