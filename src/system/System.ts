@@ -38,15 +38,14 @@ export class System {
   // TODO: слушать события и сохранять в файл всё что передаётся
   //readonly localStorage: MemStorage
   readonly drivers: DriversManager
+  // It is wrapper for DB which is works with configs
+  readonly configs: ConfigsManager
   // TODO: add
   readonly systemInfo: SystemInfoManager
   readonly filesManager: FilesManager
   // TODO: add
   readonly permissions: PermissionsManager
   readonly services: ServicesManager
-  // It is wrapper for DB which is works with configs
-  // TODO: add
-  readonly configs: ConfigsManager
   // TODO: add !!!!!!
   readonly network: NetworkManager
   // it is service
@@ -64,10 +63,9 @@ export class System {
     this.io = new IoManager(this)
     this.memStorage = new MemStorage()
     this.drivers = new DriversManager(this)
+    this.configs = new ConfigsManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.filesManager = new FilesManager(this)
-    // TODO: наверное это просто системный конфиг
-    this.configs = new ConfigsManager(this)
     this.permissions = new PermissionsManager(this)
     this.services = new ServicesManager(this)
 
@@ -82,9 +80,9 @@ export class System {
     (async () => {
       await this.io.init()
       await this.drivers.init()
+      await this.configs.init()
       await this.systemInfo.init()
       await this.filesManager.init()
-      await this.configs.init()
       await this.permissions.init()
       await this.services.init()
 
@@ -116,7 +114,6 @@ export class System {
       destroyWrapper(this.network.destroy),
       destroyWrapper(this.services.destroy),
       destroyWrapper(this.permissions.destroy),
-      destroyWrapper(this.configs.destroy),
       destroyWrapper(this.systemInfo.destroy),
       destroyWrapper(this.drivers.destroy),
       destroyWrapper(this.packageManager.destroy),
