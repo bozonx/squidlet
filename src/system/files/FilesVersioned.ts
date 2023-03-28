@@ -95,16 +95,28 @@ export class FilesVersioned {
     return this.driver.copyFiles(fullFilesPaths)
   }
 
+  // Remove one file or an empty dir
   async rm(pathToFileOrDir: string) {
-    // TODO: remove versions too
+    const fullPath = pathJoin(this.rootDir, pathToFileOrDir)
+
+    if (await this.driver.isFile(fullPath)) {
+      await this.system.versions.removeFileVersions(fullPath)
+    }
 
     return this.driver.rm(pathJoin(this.rootDir, pathToFileOrDir))
   }
 
   async rmRf(pathToFileOrDir: string): Promise<void> {
-    // TODO: remove versions too
+    const fullPath = pathJoin(this.rootDir, pathToFileOrDir)
 
-    return this.driver.rmRf(pathJoin(this.rootDir, pathToFileOrDir))
+    if (await this.driver.isDir(fullPath)) {
+      await this.system.versions.removeVersionsDirRecursively(fullPath)
+    }
+    else {
+      await this.system.versions.removeFileVersions(fullPath)
+    }
+
+    return this.driver.rmRf(fullPath)
   }
 
   async cp(src: string | string[], destDir: string): Promise<void> {

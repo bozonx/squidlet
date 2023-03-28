@@ -12,6 +12,9 @@ export class VersionsManager {
 
   constructor(system: System) {
     this.system = system
+
+    // TODO: в конфиге можно указать какие директории имеюют сколько версий
+    //       тогда нужно каждый раз сравнивать с конфигом чтобы понять сколько версий использовать
   }
 
 
@@ -25,7 +28,11 @@ export class VersionsManager {
     //const fileVersionsDir =
   }
 
-  async removeFileVersions(pathToFiles: string) {
+  async removeFileVersions(pathToFile: string) {
+
+  }
+
+  async removeVersionsDirRecursively(pathToDir: string) {
 
   }
 
