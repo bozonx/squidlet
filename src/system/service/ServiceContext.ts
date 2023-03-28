@@ -6,7 +6,6 @@ import {FilesDb} from '../files/FilesDb.js'
 import {FilesCache} from '../files/FilesCache.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesVersioned} from '../files/FilesVersioned.js'
-import {FilesConfig} from '../files/FilesConfig.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
 import {ROOT_DIRS} from '../../types/contstants.js'
 
@@ -23,7 +22,7 @@ export class ServiceContext {
   readonly logFiles
   // file cache of this app
   readonly fileCache
-  // configs for this app
+  // config files for this app. It manages them by it self
   readonly cfg
   // files of this app
   readonly appFiles
@@ -55,8 +54,7 @@ export class ServiceContext {
     this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
     this.logFiles = new FilesLog(this.system, pathJoin(ROOT_DIRS.log, appName))
     this.fileCache = new FilesCache(this.system, pathJoin(ROOT_DIRS.cache, appName))
-    // TODO: это должна быть папка для конфиг файлов приложения, которые оно само создает
-    this.cfg = new FilesConfig(this.system, pathJoin(ROOT_DIRS.cfg, appName))
+    this.cfg = new FilesWrapper(this.system, pathJoin(ROOT_DIRS.cfg, appName))
     this.tmp = new FilesWrapper(this.system, pathJoin(ROOT_DIRS.tmp, appName))
     this.appFiles = new FilesReadOnly(this.system, pathJoin(ROOT_DIRS.appFiles, appName))
     this.appData = new FilesWrapper(this.system, pathJoin(ROOT_DIRS.appData, appName))
