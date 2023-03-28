@@ -1,14 +1,16 @@
 import {System} from '../System.js'
 
 
-// TODO: поддержка ротации
-export class FilesLog {
+export class FilesConfig {
   readonly rootDir: string
 
   private readonly system: System
+
 
   constructor(system: System, rootDir: string) {
     this.system = system
     this.rootDir = rootDir
   }
+
+
 }
