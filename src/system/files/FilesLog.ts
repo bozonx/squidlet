@@ -1,5 +1,5 @@
 import {System} from '../System.js'
-import {LogLevel, pathDirname, pathJoin} from 'squidlet-lib'
+import {clearRelPathLeft, LogLevel, pathDirname, pathJoin} from 'squidlet-lib'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {StatsSimplified} from '../../types/io/FilesIoType.js'
 
@@ -16,7 +16,7 @@ export class FilesLog {
 
   constructor(system: System, rootDir: string) {
     this.system = system
-    this.rootDir = rootDir
+    this.rootDir = clearRelPathLeft(rootDir)
   }
 
 
@@ -121,6 +121,10 @@ export class FilesLog {
 
   async rename(pathToFileOrDir: string, newName: string): Promise<void> {
     return this.driver.rename(pathJoin(this.rootDir, pathToFileOrDir), newName)
+  }
+
+  async isDir(pathToDir: string): Promise<boolean> {
+    return this.driver.isDir(pathJoin(this.rootDir, pathToDir))
   }
 
   async isFile(pathToFile: string) {

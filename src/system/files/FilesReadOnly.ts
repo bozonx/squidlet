@@ -40,6 +40,10 @@ export class FilesReadOnly {
     return this.driver.stat(pathJoin(this.rootDir, pathTo))
   }
 
+  async isDir(pathToDir: string): Promise<boolean> {
+    return this.driver.isDir(pathJoin(this.rootDir, pathToDir))
+  }
+
   async isFile(pathToFile: string) {
     return this.driver.isFile(pathJoin(this.rootDir, pathToFile))
   }

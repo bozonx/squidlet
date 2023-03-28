@@ -55,6 +55,7 @@ export class ServiceContext {
     this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
     this.logFiles = new FilesLog(this.system, pathJoin(ROOT_DIRS.log, appName))
     this.fileCache = new FilesCache(this.system, pathJoin(ROOT_DIRS.cache, appName))
+    // TODO: это должна быть папка для конфиг файлов приложения, которые оно само создает
     this.cfg = new FilesConfig(this.system, pathJoin(ROOT_DIRS.cfg, appName))
     this.tmp = new FilesWrapper(this.system, pathJoin(ROOT_DIRS.tmp, appName))
     this.appFiles = new FilesReadOnly(this.system, pathJoin(ROOT_DIRS.appFiles, appName))

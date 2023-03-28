@@ -197,7 +197,7 @@ export class FilesDriver extends DriverBase {
     return stats.dir
   }
 
-  async isFile(pathToFile: string) {
+  async isFile(pathToFile: string): Promise<boolean> {
     this.checkPermissions(pathToFile, 'r')
 
     const stats: StatsSimplified = await this.io.stat(pathToFile)

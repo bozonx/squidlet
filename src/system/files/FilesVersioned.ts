@@ -108,6 +108,10 @@ export class FilesVersioned {
     return this.driver.rename(pathJoin(this.rootDir, pathToFileOrDir), newName)
   }
 
+  async isDir(pathToDir: string): Promise<boolean> {
+    return this.driver.isDir(pathJoin(this.rootDir, pathToDir))
+  }
+
   async isFile(pathToFile: string) {
     return this.driver.isFile(pathJoin(this.rootDir, pathToFile))
   }

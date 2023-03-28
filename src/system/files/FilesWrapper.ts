@@ -107,7 +107,11 @@ export class FilesWrapper {
     return this.driver.rename(pathJoin(this.rootDir, pathToFileOrDir), newName)
   }
 
-  async isFile(pathToFile: string) {
+  async isDir(pathToDir: string): Promise<boolean> {
+    return this.driver.isDir(pathJoin(this.rootDir, pathToDir))
+  }
+
+  async isFile(pathToFile: string): Promise<boolean> {
     return this.driver.isFile(pathJoin(this.rootDir, pathToFile))
   }
 
