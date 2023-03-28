@@ -7,6 +7,7 @@ export class FilesWrapper {
 
   private readonly system: System
 
+
   constructor(system: System, accessToken: string, rootDir: string) {
     this.system = system
     this.accessToken = accessToken
