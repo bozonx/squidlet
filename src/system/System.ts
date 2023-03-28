@@ -14,6 +14,7 @@ import {NetworkManager} from './managers/NetworkManager.js'
 import {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
 import {DriversManager} from './driver/DriversManager.js'
+import {VersionsManager} from './files/VersionsManager.js'
 
 
 // TODO: add timer driver wrapper
@@ -40,6 +41,7 @@ export class System {
   readonly drivers: DriversManager
   // It is wrapper for DB which is works with configs
   readonly configs: ConfigsManager
+  readonly versions: VersionsManager
   // TODO: add
   readonly systemInfo: SystemInfoManager
   readonly filesManager: FilesManager
@@ -64,6 +66,7 @@ export class System {
     this.memStorage = new MemStorage()
     this.drivers = new DriversManager(this)
     this.configs = new ConfigsManager(this)
+    this.versions = new VersionsManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.filesManager = new FilesManager(this)
     this.permissions = new PermissionsManager(this)
@@ -81,6 +84,7 @@ export class System {
       await this.io.init()
       await this.drivers.init()
       await this.configs.init()
+      await this.versions.init()
       await this.systemInfo.init()
       await this.filesManager.init()
       await this.permissions.init()

@@ -1,4 +1,5 @@
 export const EVENT_DELIMITER = '|'
+export const VERSIONS_DIR_NAME = '.versions'
 
 export enum SystemEvents {
   // driversInitialized,

@@ -1,10 +1,8 @@
-import {clearRelPathLeft, pathJoin} from 'squidlet-lib'
+import {clearRelPathLeft, pathJoin, pathBasename, pathDirname} from 'squidlet-lib'
 import {System} from '../System.js'
 import {StatsSimplified} from '../../types/io/FilesIoType.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
-
-// TODO: add versions
 
 export class FilesVersioned {
   readonly rootDir: string
@@ -23,7 +21,11 @@ export class FilesVersioned {
 
 
   async appendFile(pathTo: string, data: string | Uint8Array) {
-    return this.driver.appendFile(pathJoin(this.rootDir, pathTo), data)
+    const fullPath = pathJoin(this.rootDir, pathTo)
+
+    await this.system.versions.incrementFileVersion(fullPath)
+
+    return this.driver.appendFile(fullPath, data)
   }
 
   async mkdir(pathTo: string) {
@@ -46,16 +48,25 @@ export class FilesVersioned {
     return this.driver.readlink(pathJoin(this.rootDir, pathTo))
   }
 
+  // remove an empty dir. Doesn't need to remove versions
   async rmdir(pathTo: string) {
     return this.driver.rmdir(pathJoin(this.rootDir, pathTo))
   }
 
   async unlink(pathTo: string) {
-    return this.driver.unlink(pathJoin(this.rootDir, pathTo))
+    const fullPath = pathJoin(this.rootDir, pathTo)
+
+    await this.system.versions.removeFileVersions(fullPath)
+
+    return this.driver.unlink(fullPath)
   }
 
   async writeFile(pathTo: string, data: string | Uint8Array) {
-    return this.driver.writeFile(pathJoin(this.rootDir, pathTo), data)
+    const fullPath = pathJoin(this.rootDir, pathTo)
+
+    await this.system.versions.incrementFileVersion(fullPath)
+
+    return this.driver.writeFile(fullPath, data)
   }
 
   async stat(pathTo: string): Promise<StatsSimplified> {
@@ -72,19 +83,27 @@ export class FilesVersioned {
   }
 
   async renameFiles(files: [string, string][]) {
-    return this.driver.copyFiles(files.map(([src, dest]) => {
+    const fullFilesPaths: [string, string][] = files.map(([src, dest]) => {
       return [
         pathJoin(this.rootDir, src),
         pathJoin(this.rootDir, dest)
       ]
-    }))
+    })
+
+    await this.system.versions.renameVersions(fullFilesPaths)
+
+    return this.driver.copyFiles(fullFilesPaths)
   }
 
   async rm(pathToFileOrDir: string) {
+    // TODO: remove versions too
+
     return this.driver.rm(pathJoin(this.rootDir, pathToFileOrDir))
   }
 
   async rmRf(pathToFileOrDir: string): Promise<void> {
+    // TODO: remove versions too
+
     return this.driver.rmRf(pathJoin(this.rootDir, pathToFileOrDir))
   }
 
@@ -97,15 +116,29 @@ export class FilesVersioned {
   }
 
   async mv(src: string | string[], destDir: string): Promise<void> {
-    const fixedSrc = (typeof src === 'string')
-      ? pathJoin(this.rootDir, src)
-      : src.map((el) => pathJoin(this.rootDir, el))
+    const srcArr = (typeof src === 'string') ? [src] : src
+    const fixedSrc = srcArr.map((el) => pathJoin(this.rootDir, el))
+    const fullFilesPaths: [string, string][] = srcArr.map((el) => {
+      return [
+        pathJoin(this.rootDir, el),
+        pathJoin(this.rootDir, destDir, pathBasename(el))
+      ]
+    })
+
+    await this.system.versions.renameVersions(fullFilesPaths)
 
     return this.driver.mv(fixedSrc, pathJoin(this.rootDir, destDir))
   }
 
   async rename(pathToFileOrDir: string, newName: string): Promise<void> {
-    return this.driver.rename(pathJoin(this.rootDir, pathToFileOrDir), newName)
+    const fullPath = pathJoin(this.rootDir, pathToFileOrDir)
+
+    await this.system.versions.renameVersions([[
+      fullPath,
+      pathJoin(pathDirname(fullPath), newName)
+    ]])
+
+    return this.driver.rename(fullPath, newName)
   }
 
   async isDir(pathToDir: string): Promise<boolean> {
