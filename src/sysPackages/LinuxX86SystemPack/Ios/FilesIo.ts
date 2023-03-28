@@ -1,9 +1,11 @@
 import fs from 'node:fs/promises'
-import {Stats, existsSync} from 'node:fs'
+import {Stats, existsSync, lstatSync} from 'node:fs'
 import {isUtf8} from 'buffer'
 import {pathJoin, PATH_SEP, trimCharEnd, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
 import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/FilesIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
+import {IoIndex} from '../../../types/types.js'
+import {IoContext} from '../../../system/Io/IoContext.js'
 
 
 const cfg: FilesIoConfig = {
@@ -15,7 +17,10 @@ const cfg: FilesIoConfig = {
 if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
 
 
-export default class FilesIo extends IoBase implements FilesIoType {
+export const FilesIoIndex: IoIndex = (ctx: IoContext) => new FilesIo(ctx)
+
+
+export class FilesIo extends IoBase implements FilesIoType {
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     const fullPath = this.makePath(pathTo)
     const wasExist: boolean = existsSync(pathTo)
@@ -146,19 +151,16 @@ export default class FilesIo extends IoBase implements FilesIoType {
     }
     else if (cfg.uid && cfg.gid) {
       // uid and gid are specified - set both
-      return await callPromised(fs.chown, pathTo, cfg.uid, cfg.gid);
+      return await fs.chown(pathTo, cfg.uid, cfg.gid)
     }
-
     // else load stats to resolve lack of params
+    const stat: Stats = lstatSync(pathTo)
 
-    const stat: Stats = await callPromised(fs.lstat, pathTo);
-
-    await callPromised(
-      fs.chown,
+    await fs.chown(
       pathTo,
-      (typeof cfg.uid === 'undefined') ? stat.uid : cfg.uid,
-      (typeof cfg.gid === 'undefined') ? stat.gid : cfg.gid,
-    );
+      (!cfg.uid) ? stat.uid : cfg.uid,
+      (!cfg.gid) ? stat.gid : cfg.gid,
+    )
   }
 
   private makePath(pathTo: string): string {
