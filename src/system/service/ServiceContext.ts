@@ -8,6 +8,7 @@ import {FilesLog} from '../files/FilesLog.js'
 import {FilesVersioned} from '../files/FilesVersioned.js'
 import {FilesConfig} from '../files/FilesConfig.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
+import {ROOT_DIRS} from '../../types/contstants.js'
 
 
 // TODO: add system-wide access to memStorage, rootFiles
@@ -51,14 +52,14 @@ export class ServiceContext {
 
     const appName = ''
 
-    this.db = new FilesDb(this.system, pathJoin('db', appName))
-    this.logFiles = new FilesLog(this.system, pathJoin('log', appName))
-    this.fileCache = new FilesCache(this.system, pathJoin('cache', appName))
-    this.cfg = new FilesConfig(this.system, pathJoin('cfg', appName))
-    this.tmp = new FilesWrapper(this.system, pathJoin('tmp', appName))
-    this.appFiles = new FilesReadOnly(this.system, pathJoin('apps', appName))
-    this.appData = new FilesWrapper(this.system, pathJoin('appData', appName))
-    this.appShared = new FilesVersioned(this.system, pathJoin('appShared', appName))
+    this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
+    this.logFiles = new FilesLog(this.system, pathJoin(ROOT_DIRS.log, appName))
+    this.fileCache = new FilesCache(this.system, pathJoin(ROOT_DIRS.cache, appName))
+    this.cfg = new FilesConfig(this.system, pathJoin(ROOT_DIRS.cfg, appName))
+    this.tmp = new FilesWrapper(this.system, pathJoin(ROOT_DIRS.tmp, appName))
+    this.appFiles = new FilesReadOnly(this.system, pathJoin(ROOT_DIRS.appFiles, appName))
+    this.appData = new FilesWrapper(this.system, pathJoin(ROOT_DIRS.appData, appName))
+    this.appShared = new FilesVersioned(this.system, pathJoin(ROOT_DIRS.appShared, appName))
   }
 
   async init() {

@@ -1,26 +1,27 @@
 import {System} from '../System.js'
+import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import {pathJoin} from '../../../../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
 
-
-// TODO: запретить в начале пути ..
 
 export class FilesWrapper {
+  // it is relative path of system root dir
   readonly rootDir: string
 
   private readonly system: System
 
+  private get driver(): FilesDriver {
+    return this.system.drivers.getDriver('FilesDriver')
+  }
+
 
   constructor(system: System, rootDir: string) {
     this.system = system
-    this.rootDir = rootDir
+    this.rootDir = rootDir.replace(/^[.\\~\/]+/, '')
   }
 
 
-  async readTextFile(filePath: string): Promise<string> {
-    return ''
-  }
-
-  async exists(pathTo: string): Promise<boolean> {
-    return true
+  async appendFile(pathTo: string, data: string | Uint8Array) {
+    return this.driver.appendFile(pathJoin(this.rootDir, pathTo), data)
   }
 
 }
