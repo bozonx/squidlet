@@ -3,7 +3,7 @@ import {System} from '../System.js'
 import {FilesVersioned} from './FilesVersioned.js'
 
 
-export class FileAccess {
+export class SharedFiles {
   readonly accessToken: string
 
   // user data versioned and shared between all the hosts
