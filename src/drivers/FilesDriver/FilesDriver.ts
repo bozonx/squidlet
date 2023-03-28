@@ -13,7 +13,7 @@ export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
 const filesIoName = 'FilesIo'
 
 
-// TODO: должна быть проверка прав, либо делать обертку с проверкой
+// TODO: должна быть проверка прав через токен, либо делать обертку с проверкой
 
 
 /**
