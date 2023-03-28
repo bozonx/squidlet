@@ -8,8 +8,7 @@ export class SharedFiles {
 
   // user data versioned and shared between all the hosts
   readonly userData
-  // for temporary files
-  readonly tmp
+
   // some external file system, mount your external fs here
   readonly external
 
@@ -21,7 +20,6 @@ export class SharedFiles {
     this.accessToken = accessToken
 
     this.userData = new FilesVersioned(this.system, accessToken, 'userData')
-    this.tmp = new FilesWrapper(this.system, accessToken, 'tmp')
     this.external = new FilesWrapper(this.system, accessToken, 'external')
   }
 
