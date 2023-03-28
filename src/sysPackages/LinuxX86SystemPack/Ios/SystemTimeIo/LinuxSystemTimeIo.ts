@@ -1,10 +1,7 @@
-import {IoBase} from '../../system/Io/IoBase.js'
+import {IoBase} from '../../../../system/Io/IoBase.js'
 
 
-/**
- * Execute external program
- */
-export class ExecProgramIo extends IoBase {
+export class SystemTimeIo extends IoBase {
 
   async init(): Promise<void> {
     await super.init()

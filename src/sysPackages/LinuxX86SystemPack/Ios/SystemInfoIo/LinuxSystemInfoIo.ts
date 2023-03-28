@@ -1,7 +1,7 @@
-import {IoBase} from '../../system/Io/IoBase.js'
+import {IoBase} from '../../../../system/Io/IoBase.js'
 
 
-export class SandBoxIo extends IoBase {
+export class SystemInfoIo extends IoBase {
 
   async init(): Promise<void> {
     await super.init()
