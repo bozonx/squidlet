@@ -7,6 +7,10 @@ import {FilesCache} from '../files/FilesCache.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesVersioned} from '../files/FilesVersioned.js'
 import {FilesConfig} from '../files/FilesConfig.js'
+import {FilesReadOnly} from '../files/FilesReadOnly.js'
+
+
+// TODO: add system-wide access to memStorage, rootFiles
 
 
 export class ServiceContext {
@@ -51,10 +55,10 @@ export class ServiceContext {
     this.logFiles = new FilesLog(this.system, pathJoin('log', appName))
     this.fileCache = new FilesCache(this.system, pathJoin('cache', appName))
     this.cfg = new FilesConfig(this.system, pathJoin('cfg', appName))
-    this.appFiles = new FilesWrapper(this.system, pathJoin('apps', appName))
+    this.tmp = new FilesWrapper(this.system, pathJoin('tmp', appName))
+    this.appFiles = new FilesReadOnly(this.system, pathJoin('apps', appName))
     this.appData = new FilesWrapper(this.system, pathJoin('appData', appName))
     this.appShared = new FilesVersioned(this.system, pathJoin('appShared', appName))
-    this.tmp = new FilesWrapper(this.system, pathJoin('tmp', appName))
   }
 
   async init() {
