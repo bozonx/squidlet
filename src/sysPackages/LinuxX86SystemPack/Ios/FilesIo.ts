@@ -1,32 +1,21 @@
 import fs from 'node:fs/promises'
 import {Stats, existsSync} from 'node:fs'
 import {isUtf8} from 'buffer'
-import {pathJoin, PATH_SEP, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
-import FilesIoType, {StatsSimplified} from '../../../types/io/FilesIoType.js'
+import {pathJoin, PATH_SEP, trimCharEnd, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
+import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/FilesIoType.js'
+import {IoBase} from '../../../system/Io/IoBase.js'
 
 
-//let config: ConfigParams | undefined;
+const cfg: FilesIoConfig = {
+  rootDir: trimCharEnd(process.env.FILES_ROOT_DIR || '', PATH_SEP),
+  uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
+  gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
+}
+
+if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
 
 
-export default class FilesIo implements FilesIoType {
-  name = 'FilesIo'
-  //private readonly os = new Os();
-
-  async configure(configParams: ConfigParams): Promise<void> {
-    // TODO: review
-    // remove trailing slash if set
-    const resolvedWorkDir: string | undefined = (configParams.workDir)
-      ? trimCharEnd(configParams.workDir, PATH_SEP)
-      : undefined;
-
-    config = {
-      ...config,
-      ...configParams,
-    };
-
-    if (resolvedWorkDir) config.workDir = resolvedWorkDir;
-  }
-
+export default class FilesIo extends IoBase implements FilesIoType {
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     const fullPath = this.makePath(pathTo)
     const wasExist: boolean = existsSync(pathTo)
@@ -151,18 +140,13 @@ export default class FilesIo implements FilesIoType {
 
 
   private async chown(pathTo: string) {
-
-    // TODO: а оно надо???
-
-    if (!config) return;
-
-    if (typeof config.uid === 'undefined' && typeof config.gid === 'undefined') {
-      // noting to change - just return
-      return;
+    if (!cfg.uid && !cfg.gid) {
+      // if noting to change - just return
+      return
     }
-    else if (typeof config.uid !== 'undefined' && typeof config.gid !== 'undefined') {
+    else if (cfg.uid && cfg.gid) {
       // uid and gid are specified - set both
-      return await callPromised(fs.chown, pathTo, config.uid, config.gid);
+      return await callPromised(fs.chown, pathTo, cfg.uid, cfg.gid);
     }
 
     // else load stats to resolve lack of params
@@ -172,15 +156,13 @@ export default class FilesIo implements FilesIoType {
     await callPromised(
       fs.chown,
       pathTo,
-      (typeof config.uid === 'undefined') ? stat.uid : config.uid,
-      (typeof config.gid === 'undefined') ? stat.gid : config.gid,
+      (typeof cfg.uid === 'undefined') ? stat.uid : cfg.uid,
+      (typeof cfg.gid === 'undefined') ? stat.gid : cfg.gid,
     );
   }
 
   private makePath(pathTo: string): string {
-    //if (!config || !config.workDir) throw new Error(`FilesIo IO: workDir han't been set`);
-
-    return pathJoin(config.workDir, pathTo)
+    return pathJoin(cfg.rootDir, pathTo)
   }
 
 }

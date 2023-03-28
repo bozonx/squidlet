@@ -1,17 +1,18 @@
 import {IoContext} from './IoContext.js'
 
 
-export abstract class IoBase {
-  readonly abstract name: string
-  private readonly ctx
+export class IoBase {
+  // put name of IO here it it not the same as class name
+  readonly name?: string
+
+  protected readonly ctx
 
 
   constructor(ctx: IoContext) {
     this.ctx = ctx
   }
 
-  init?: (cfg?: Record<string, any>) => Promise<void>
+  init?: (cfg?: any) => Promise<void>
 
   destroy?: () => Promise<void>
-
 }
