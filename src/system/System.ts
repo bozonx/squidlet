@@ -66,7 +66,6 @@ export class System {
     this.drivers = new DriversManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.filesManager = new FilesManager(this)
-
     // TODO: наверное это просто системный конфиг
     this.configs = new ConfigsManager(this)
     this.permissions = new PermissionsManager(this)
@@ -85,11 +84,10 @@ export class System {
       await this.drivers.init()
       await this.systemInfo.init()
       await this.filesManager.init()
-
       await this.configs.init()
       await this.permissions.init()
-
       await this.services.init()
+
       await this.network.init()
       await this.apiManager.init()
       await this.cmd.init()
