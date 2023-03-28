@@ -30,6 +30,9 @@ export class FilesManager {
 
   constructor(system: System) {
     this.system = system
+
+    // TODO: поидее это надо перенести в контекст сервиса и UI
+
     this.cfg = new FilesWrapper(this.system, 'cfg')
     this.db = new FilesDb(this.system, 'db')
     this.apps = new FilesWrapper(this.system, 'apps')
@@ -43,6 +46,7 @@ export class FilesManager {
   }
 
   async init() {
+    // TODO: создать папки
   }
 
   async destroy() {
