@@ -2,12 +2,12 @@ import yaml from 'yaml'
 import {pathJoin} from 'squidlet-lib'
 import {System} from '../System.js'
 import {SystemCfg, systemCfgDefaults} from '../../types/SystemCfg.js'
-import {CFG_DIRS, SYSTEM_CFG_DIR} from '../../types/contstants.js'
+import {CFG_DIRS, SYSTEM_CFG_DIR, SYSTEM_CONFIG_FILE} from '../../types/contstants.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 
 export class ConfigsManager {
-  readonly systemCfg: SystemCfg = systemCfgDefaults
+  systemCfg: SystemCfg = systemCfgDefaults
 
   private readonly system: System
 
@@ -21,7 +21,22 @@ export class ConfigsManager {
   }
 
   async init() {
-    // TODO: load system config and overwrite defaults
+    const cfgFilePath = pathJoin(SYSTEM_CONFIG_FILE)
+    let fileContent: string
+
+    try {
+      fileContent = await this.filesDriver.readTextFile(cfgFilePath)
+    }
+    catch (e) {
+      return
+    }
+
+    const loadedCfg = yaml.parse(fileContent)
+
+    this.systemCfg = {
+      ...this.systemCfg,
+      ...loadedCfg
+    }
   }
 
 

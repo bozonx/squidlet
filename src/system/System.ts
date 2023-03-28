@@ -46,12 +46,12 @@ export class System {
   // TODO: add
   readonly permissions: PermissionsManager
   readonly services: ServicesManager
-  // TODO: add !!!!!!
+  // TODO: add
   readonly network: NetworkManager
   // it is service
   // TODO: add
   readonly ui: UiManager
-  // TODO: add !!!!!!
+  // TODO: add
   readonly apiManager: ApiManager
   // it is wrapper for api
   // TODO: add
