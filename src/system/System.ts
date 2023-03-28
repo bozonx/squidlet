@@ -7,8 +7,6 @@ import {ServicesManager} from './service/ServicesManager.js'
 import {ApiManager} from './api/ApiManager.js'
 import {CmdManager} from './managers/CmdManager.js'
 import {FilesManager} from './files/FilesManager.js'
-import {DbManager} from './managers/DbManager.js'
-import {CacheManager} from './managers/CacheManager.js'
 import {ConfigsManager} from './config/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
 import {UiManager} from './ui/UiManager.js'
@@ -47,11 +45,7 @@ export class System {
   readonly permissions: PermissionsManager
   // SERVICES
   readonly services: ServicesManager
-  readonly files: FilesManager
-  // TODO: add
-  readonly cache: CacheManager
-  // TODO: add !!!!!!
-  readonly db: DbManager
+  readonly filesManager: FilesManager
   // It is wrapper for DB which is works with configs
   // TODO: add
   readonly configs: ConfigsManager
@@ -73,9 +67,8 @@ export class System {
     this.memStorage = new MemStorage()
     this.drivers = new DriversManager(this)
     this.systemInfo = new SystemInfoManager(this)
-    this.files = new FilesManager(this)
-    this.cache = new CacheManager(this)
-    this.db = new DbManager(this)
+    this.filesManager = new FilesManager(this)
+
     this.configs = new ConfigsManager(this)
     this.permissions = new PermissionsManager(this)
     this.services = new ServicesManager(this)
@@ -92,9 +85,7 @@ export class System {
       await this.io.init()
       await this.drivers.init()
       await this.systemInfo.init()
-      await this.files.init()
-      await this.cache.init()
-      await this.db.init()
+      await this.filesManager.init()
       await this.configs.init()
       await this.permissions.init()
       await this.services.init()
@@ -129,9 +120,7 @@ export class System {
       destroyWrapper(this.services.destroy),
       destroyWrapper(this.permissions.destroy),
       destroyWrapper(this.configs.destroy),
-      destroyWrapper(this.db.destroy),
-      destroyWrapper(this.cache.destroy),
-      destroyWrapper(this.files.destroy),
+      destroyWrapper(this.filesManager.destroy),
       destroyWrapper(this.systemInfo.destroy),
       destroyWrapper(this.drivers.destroy),
       destroyWrapper(this.io.destroy),
