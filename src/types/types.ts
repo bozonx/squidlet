@@ -16,6 +16,7 @@ export type DriverIndex = (ctx: DriverContext) => DriverBase
 export type ServiceIndex = (ctx: ServiceContext) => ServiceBase
 export type ServiceStatus = keyof typeof SERVICE_STATUS
 export type ServiceDestroyReason = keyof typeof SERVICE_DESTROY_REASON
+export type PermissionFileType = 'r' | 'w'
 
 export interface SubprogramError {
   code: number,
