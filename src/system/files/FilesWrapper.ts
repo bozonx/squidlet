@@ -1,4 +1,4 @@
-import {pathJoin} from 'squidlet-lib'
+import {pathJoin, clearRelPathLeft} from 'squidlet-lib'
 import {System} from '../System.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {StatsSimplified} from '../../types/io/FilesIoType.js'
@@ -17,7 +17,7 @@ export class FilesWrapper {
 
   constructor(system: System, rootDir: string) {
     this.system = system
-    this.rootDir = rootDir.replace(/^[.\\~\/]+/, '')
+    this.rootDir = clearRelPathLeft(rootDir)
   }
 
 
