@@ -5,6 +5,7 @@ import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/Fil
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {IoIndex} from '../../../types/types.js'
 import {IoContext} from '../../../system/Io/IoContext.js'
+import {it} from 'node:test'
 
 
 export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
@@ -127,20 +128,24 @@ export class FilesIo extends IoBase implements FilesIoType {
   //   }
   // }
 
-  async copyFile(src: string, dest: string): Promise<void> {
-    const resolvedDest = this.makePath(dest);
+  async copyFiles(files: [string, string][]): Promise<void> {
+    for (const item of files) {
+      const dest = this.makePath(item[1])
+      const src = this.makePath(item[0])
 
-    await fs.copyFile(this.makePath(src), resolvedDest)
-
-    return  this.chown(resolvedDest)
+      await fs.copyFile(src, dest)
+      await  this.chown(dest)
+    }
   }
 
-  async rename(oldPath: string, newPath: string): Promise<void> {
-    const resolvedNewPath = this.makePath(newPath)
+  async renameFiles(files: [string, string][]): Promise<void> {
+    for (const item of files) {
+      const oldPath = this.makePath(item[0])
+      const newPath = this.makePath(item[1])
 
-    await fs.rename(this.makePath(oldPath), resolvedNewPath)
-
-    return this.chown(resolvedNewPath)
+      await fs.rename(oldPath, newPath)
+      await this.chown(newPath)
+    }
   }
 
 

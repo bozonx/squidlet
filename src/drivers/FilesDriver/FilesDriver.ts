@@ -83,8 +83,6 @@ export class FilesDriver extends DriverBase {
     return stats.dir;
   }
 
-  // TODO: add - isBinFile
-
   async isFile(pathToFile: string) {
     const absPath: string = pathJoin(this.rootDir, pathToFile);
     const stats: StatsSimplified = await this.storageIo.stat(absPath);
@@ -92,6 +90,10 @@ export class FilesDriver extends DriverBase {
     return !stats.dir;
   }
 
+  // TODO: может вместо этого использовать stat?
+  // Do it only for simple checks not before read or write
+  // because the file can be removed between promises
+  //exists(pathTo: string): Promise<boolean>
   isExists(pathToFileOrDir: string): Promise<boolean> {
     const absPath: string = pathJoin(this.rootDir, pathToFileOrDir);
 

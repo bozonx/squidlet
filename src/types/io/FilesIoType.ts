@@ -39,20 +39,17 @@ export default interface FilesIoType {
   unlink(pathTo: string): Promise<void>
   writeFile(pathTo: string, data: string | Uint8Array): Promise<void>
   stat(pathTo: string): Promise<StatsSimplified>
-  // TODO: может вместо этого использовать stat?
-  // Do it only for simple checks not before read or write
-  // because the file can be removed between promises
-  //exists(pathTo: string): Promise<boolean>
-  ////// additional
-  copyFile(src: string, dest: string): Promise<void>
-  // rename or remove
-  rename(oldPath: string, newPath: string): Promise<void>
-  //isFileUtf8(pathTo: string): Promise<boolean>
+
+  ////////// ADDITIONAL
+  // Copy specified files. Use full path
+  // files is [SRC, DEST][]
+  copyFiles(files: [string, string][]): Promise<void>
+  // rename or remove. Use full path
+  // files is [OLD_PATH, NEW_PATH][]
+  renameFiles(files: [string, string][]): Promise<void>
 
   // TODO: может для батч операций просто передавать некую очередь
   // TODO: что по части удаления дириктории рекурсивно?
   // TODO: что по части удаления нескольких файлов
   // TODO: чтение файла блоками
-  // TODO: копирование нескольких файлов
-  // TODO: перемещение нескольких файлов
 }
