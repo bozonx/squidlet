@@ -33,11 +33,7 @@ export class System {
   readonly packageManager: PackageManager
   readonly io: IoManager
   // store some data only in memory while runtime
-  // TODO: ограничить правами только на свой dir
   readonly memStorage: MemStorage
-  // TODO: ограничить правами только на свой dir
-  // TODO: слушать события и сохранять в файл всё что передаётся
-  //readonly localStorage: MemStorage
   readonly drivers: DriversManager
   // It is wrapper for DB which is works with configs
   readonly configs: ConfigsManager
