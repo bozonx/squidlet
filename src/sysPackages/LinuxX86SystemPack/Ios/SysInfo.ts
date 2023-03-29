@@ -1,9 +1,9 @@
 import {exec, ExecException} from 'node:child_process';
-import SysInfoIo from '../../../types/io/SysInfoIo.js'
+import SysInfoIoType from '../../../types/io/SysInfoIoType.js'
 import {OS_ARCH, OS_TYPE, OsArch, OsType, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
 
 
-export default class SysInfo implements SysInfoIo {
+export default class SysInfo implements SysInfoIoType {
   async getInfo(): Promise<SysPermanentInfo> {
     const {cpuNum, arch} = await this.getCpuInfo()
     const ramTotalMb = await this.getRamTotal()

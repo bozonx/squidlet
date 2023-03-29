@@ -7,7 +7,7 @@ export interface SysConfig {
 }
 
 
-export default interface SysIo extends IoItem {
+export default interface SysIoType extends IoItem {
   /**
    * Setup props before init
    */

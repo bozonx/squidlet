@@ -1,7 +1,7 @@
 import {SysPermanentInfo} from '../SysInfo.js'
 
 
-export default interface SysInfoIo {
+export default interface SysInfoIoType {
   getInfo(): Promise<SysPermanentInfo>
   // get amount of used memory in megabytes
   getUsedMem(): Promise<number>

@@ -1,9 +1,9 @@
 import * as childProcess from 'child_process';
 import {ExecException} from 'child_process';
 
-import SysIo from '../../../../../../squidlet/__old/system/interfaces/io/SysIo';
+import SysIo from '../../../../../../squidlet/__old/system/interfaces/io/SysIoType';
 import SysInfo from '../../../../../../__old/system/interfaces/SysInfo';
-import {SysConfig} from '../../../../../../squidlet/__old/system/interfaces/io/SysIo';
+import {SysConfig} from '../../../../../../squidlet/__old/system/interfaces/io/SysIoType';
 import {AppType} from '../../../../../../__old/system/interfaces/AppType';
 
 
