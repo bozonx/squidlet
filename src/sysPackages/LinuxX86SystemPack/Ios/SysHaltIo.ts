@@ -1,16 +1,16 @@
 import * as childProcess from 'child_process';
 import {ExecException} from 'child_process';
 
-import SysIo from '../../../../../../squidlet/__old/system/interfaces/io/SysIoType';
+import SysIo from '../../../../../../squidlet/__old/system/interfaces/io/SysHaltIoType';
 import SysInfo from '../../../../../../__old/system/interfaces/SysInfoIo';
-import {SysConfig} from '../../../../../../squidlet/__old/system/interfaces/io/SysIoType';
+import {SysConfig} from '../../../../../../squidlet/__old/system/interfaces/io/SysHaltIoType';
 import {AppType} from '../../../../../../__old/system/interfaces/AppType';
 
 
 let config: SysConfig | undefined;
 
 
-export default class SysIo implements SysIo {
+export default class SysHaltIo implements SysHaltIo {
   async configure(configParams: SysConfig): Promise<void> {
     config = {
       ...config,
