@@ -1,5 +1,6 @@
 export const EVENT_DELIMITER = '|'
 export const VERSIONS_DIR_NAME = '.versions'
+export const WAIT_BEFORE_HALT_MS = 1000
 
 export enum SystemEvents {
   // driversInitialized,

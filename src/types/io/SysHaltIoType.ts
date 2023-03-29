@@ -1,7 +1,7 @@
-
 export default interface SysHaltIoType {
   /**
-   * It exists script
+   * It exists script with code.
+   * It will wait 1 second to be able to return an answer
    */
   exit(code?: number): Promise<void>
 
