@@ -1,15 +1,6 @@
-import IoItem from '../../../../../__old/system/interfaces/IoItem';
 import SysInfo from '../../../../../__old/system/interfaces/SysInfo';
 import {AppType} from '../../../../../__old/system/interfaces/AppType';
 
-
-export const Methods = [
-  'configure',
-  'exit',
-  'reboot',
-  'shutdown',
-  'info',
-];
 
 export interface SysConfig {
   exit?: (code: number, switchToApp?: AppType) => void;
@@ -37,5 +28,7 @@ export default interface SysIo extends IoItem {
    */
   shutdown(): Promise<void>;
 
+
+  // TODO: get free memoery
   info(): Promise<SysInfo>;
 }
