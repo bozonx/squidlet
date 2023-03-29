@@ -19,14 +19,18 @@ export const DEVICE_TYPE = {
   laptop: 'laptop',
   microLaptop: 'microLaptop',
   tablet: 'tablet',
+  // book reader with e-ink screen
+  reader: 'reader',
   mobilePhone: 'mobilePhone',
-  // smart watches or band
-  watches: 'watches',
+  // smartwatch or band
+  smartwatch: 'smartwatch',
   // VR helmet
   vrHelmet: 'vrHelmet',
   // AR glasses
   glasses: 'glasses',
 }
+
+export type DeviceType = keyof typeof DEVICE_TYPE
 
 export const OS_TYPE = {
   linux: 'linux',
@@ -38,6 +42,8 @@ export const OS_TYPE = {
   // microcontroller
   noOs: 'noOs',
 }
+
+export type OsType = keyof typeof OS_TYPE
 
 export const OS_ARCH = {
   x86_64: 'x86_64',
@@ -76,7 +82,7 @@ export interface SysPermanentInfo {
 
 export interface SysVariableInfo {
   /////// WAS SET ON INSTALL STEP
-  mobileLevel: MobileLevels
+  deviceType: DeviceType
   hasScreen: boolean
   // has some user input devices for expample keyboard or touch screen
   hasUserInput: boolean

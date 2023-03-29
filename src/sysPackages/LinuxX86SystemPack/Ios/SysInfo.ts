@@ -1,24 +1,21 @@
-import childProcess from 'node:child_process';
+import {exec, ExecException} from 'node:child_process';
 import SysInfoIo from '../../../types/io/SysInfoIo.js'
-import {MobileLevels, OS_ARCH, OsArch, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
-import {ExecException} from 'child_process'
+import {OS_ARCH, OS_TYPE, OsArch, OsType, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
 
 
 export default class SysInfo implements SysInfoIo {
   async getInfo(): Promise<SysPermanentInfo> {
     const {cpuNum, arch} = await this.getCpuInfo()
     const ramTotalMb = await this.getRamTotal()
+    const {osName, osVersion} = await this.getOsInfo()
 
     // TODO: cache result
 
     return {
       os: {
-        // TODO: get type
-        type: 'linux',
-        // TODO: get naem
-        name: '',
-        // TODO: get version
-        version: '',
+        type: OS_TYPE.linux as OsType,
+        name: osName,
+        version: osVersion,
       },
       system: {
         arch,
@@ -31,7 +28,7 @@ export default class SysInfo implements SysInfoIo {
 
   async getUsedMem(): Promise<number> {
     return new Promise((resolve, reject) => {
-      childProcess.exec('free', (error: ExecException | null, stdout: string, stderr: string) => {
+      exec('free', (error: ExecException | null, stdout: string, stderr: string) => {
         if (error) return reject(error)
 
         const ramTotalMatchRes = stdout
@@ -49,7 +46,7 @@ export default class SysInfo implements SysInfoIo {
 
   private async getCpuInfo(): Promise<{ cpuNum: number, arch: OsArch }> {
     return new Promise((resolve, reject) => {
-      childProcess.exec('lscpu -J', (error: ExecException | null, stdout: string, stderr: string) => {
+      exec('lscpu -J', (error: ExecException | null, stdout: string, stderr: string) => {
         if (error) return reject(error)
 
         const data: any = JSON.parse(stdout)
@@ -69,7 +66,7 @@ export default class SysInfo implements SysInfoIo {
 
   private async getRamTotal(): Promise<number> {
     return new Promise((resolve, reject) => {
-      childProcess.exec('free', (error: ExecException | null, stdout: string, stderr: string) => {
+      exec('free', (error: ExecException | null, stdout: string, stderr: string) => {
         if (error) return reject(error)
 
         const ramTotalMatchRes = stdout.match(/Mem:\s+(\d+)/)
@@ -77,6 +74,18 @@ export default class SysInfo implements SysInfoIo {
         resolve((ramTotalMatchRes) ? Number(ramTotalMatchRes[1]) : -1);
       })
     })
+  }
+
+  private async getOsInfo(): Promise<{osName: string, osVersion: string}> {
+    // return new Promise((resolve, reject) => {
+    //   exec('uname -a', (error: ExecException | null, stdout: string, stderr: string) => {
+    //     if (error) return reject(error)
+    //
+    //     const ramTotalMatchRes = stdout.match(/Mem:\s+(\d+)/)
+    //
+    //     resolve((ramTotalMatchRes) ? Number(ramTotalMatchRes[1]) : -1);
+    //   })
+    // })
   }
 
 }
