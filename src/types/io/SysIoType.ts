@@ -1,4 +1,4 @@
-import SysInfo from '../../../../../__old/system/interfaces/SysInfo';
+import SysInfo from '../../../../../__old/system/interfaces/SysInfoIo';
 import {AppType} from '../../../../../__old/system/interfaces/AppType';
 
 

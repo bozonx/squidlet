@@ -3,7 +3,7 @@ import SysInfoIoType from '../../../types/io/SysInfoIoType.js'
 import {OS_ARCH, OS_TYPE, OsArch, OsType, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
 
 
-export default class SysInfo implements SysInfoIoType {
+export default class SysInfoIo implements SysInfoIoType {
   async getInfo(): Promise<SysPermanentInfo> {
     const {cpuNum, arch} = await this.getCpuInfo()
     const ramTotalMb = await this.getRamTotal()
