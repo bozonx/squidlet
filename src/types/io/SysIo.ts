@@ -29,6 +29,5 @@ export default interface SysIo extends IoItem {
   shutdown(): Promise<void>;
 
 
-  // TODO: get free memoery
   info(): Promise<SysInfo>;
 }

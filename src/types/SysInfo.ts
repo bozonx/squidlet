@@ -1,21 +1,31 @@
-export enum MobileLevels {
-  desktop,
+export const DEVICE_TYPE = {
+  // full desktop
+  desktop: 'desktop',
   // and other mini desktop
-  netTop,
-  // TV sets, TV dongle, or smart TV app
-  tvSet,
-  // microcontroller or smart home station and other devices with permanent power
-  mcPermanent,
-  laptop,
-  microLaptop,
-  tablet,
-  mobilePhone,
-  // smart watches
-  wearable,
-  // VR helmet and AR glasses
-  vr,
+  netTop: 'netTop',
+  // some kiosk with permanent power and UPS
+  kiosk: 'kiosk',
+  // TV sets, TV dongle
+  tvSet: 'tvSet',
+  // an application on smart TV
+  smartTvApp: 'smartTvApp',
+  // raspberry Pi, smart home station or router Linux powered and so on
+  board: 'board',
+  // microcontroller or smart home station and other devices
+  // with permanent power and without OS
+  mcPermanent: 'mcPermanent',
   // microcontroller battery powered
-  mcOnBattery,
+  mcOnBattery: 'mcOnBattery',
+  laptop: 'laptop',
+  microLaptop: 'microLaptop',
+  tablet: 'tablet',
+  mobilePhone: 'mobilePhone',
+  // smart watches or band
+  watches: 'watches',
+  // VR helmet
+  vrHelmet: 'vrHelmet',
+  // AR glasses
+  glasses: 'glasses',
 }
 
 export const OS_TYPE = {
@@ -39,7 +49,10 @@ export type OsArch = keyof typeof OS_ARCH
 
 export const RUNTIME_ENV = {
   nodejs: 'nodejs',
+  pwa: 'pwa',
 }
+
+export type RuntimeEnv = keyof typeof RUNTIME_ENV
 
 
 export interface SysPermanentInfo {
@@ -48,7 +61,6 @@ export interface SysPermanentInfo {
     // name of OS as it gets from OS
     name: string
     version: string
-    uptimeSec: number
   }
   system: {
     arch: OsArch
@@ -58,7 +70,7 @@ export interface SysPermanentInfo {
     ramTotalMb: number
   }
 
-  runtimeEnv: keyof typeof RUNTIME_ENV
+  runtimeEnv: RuntimeEnv
 }
 
 

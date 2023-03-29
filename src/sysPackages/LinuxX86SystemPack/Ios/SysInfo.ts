@@ -1,6 +1,6 @@
 import childProcess from 'node:child_process';
 import SysInfoIo from '../../../types/io/SysInfoIo.js'
-import {MobileLevels, OS_ARCH, OsArch, SysPermanentInfo} from '../../../types/SysInfo.js'
+import {MobileLevels, OS_ARCH, OsArch, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
 import {ExecException} from 'child_process'
 
 
@@ -9,20 +9,41 @@ export default class SysInfo implements SysInfoIo {
     const {cpuNum, arch} = await this.getCpuInfo()
     const ramTotalMb = await this.getRamTotal()
 
+    // TODO: cache result
+
     return {
       os: {
-        type,
-        name,
-        version,
-        uptimeSec,
+        // TODO: get type
+        type: 'linux',
+        // TODO: get naem
+        name: '',
+        // TODO: get version
+        version: '',
       },
       system: {
         arch,
         cpuNum,
         ramTotalMb,
       },
-      runtimeEnv: 'nodejs',
+      runtimeEnv: RUNTIME_ENV.nodejs as RuntimeEnv,
     }
+  }
+
+  async getUsedMem(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      childProcess.exec('free', (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) return reject(error)
+
+        const ramTotalMatchRes = stdout
+          .match(/Mem:\s+\d+\s+(\d+)/)
+
+        resolve((ramTotalMatchRes) ? Number(ramTotalMatchRes[1]) : -1);
+      })
+    })
+  }
+
+  async getCpuLoad(): Promise<number[]> {
+    // TODO: add
   }
 
 
@@ -39,7 +60,7 @@ export default class SysInfo implements SysInfoIo {
           .find((el: Record<string, string>) => el.field === 'CPU(s):')
 
         resolve({
-          cpuNum: (cpuDoc) ? Number(cpuDoc.data) : 0,
+          cpuNum: (cpuDoc) ? Number(cpuDoc.data) : -1,
           arch: (archDoc) ? archDoc.data as OsArch : 'unknown',
         });
       })
@@ -47,7 +68,15 @@ export default class SysInfo implements SysInfoIo {
   }
 
   private async getRamTotal(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      childProcess.exec('free', (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) return reject(error)
 
+        const ramTotalMatchRes = stdout.match(/Mem:\s+(\d+)/)
+
+        resolve((ramTotalMatchRes) ? Number(ramTotalMatchRes[1]) : -1);
+      })
+    })
   }
 
 }
