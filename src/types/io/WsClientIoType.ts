@@ -56,7 +56,7 @@ export interface WebSocketClientProps {
   headers?: {[index: string]: string};
 }
 
-export default interface WsClientIo extends IoItem {
+export default interface WsClientIoType extends IoItem {
   destroy: () => Promise<void>;
 
   newConnection       (props: WebSocketClientProps): Promise<string>;

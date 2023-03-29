@@ -1,4 +1,4 @@
-import {exec, ExecException} from 'node:child_process';
+import {exec, ExecException} from 'node:child_process'
 import SysInfoIoType from '../../../types/io/SysInfoIoType.js'
 import {OS_ARCH, OS_TYPE, OsArch, OsType, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
 import {IoIndex} from '../../../types/types.js'

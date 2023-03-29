@@ -1,11 +1,7 @@
 import WebSocket from 'ws';
-import {ClientRequest, IncomingMessage} from 'http';
+import {ClientRequest, IncomingMessage} from 'http'
 
 
-
-/**
- * The same for lowjs and nodejs
- */
 export default class WsClient implements WebSocketClientIo {
   private readonly events = new IndexedEventEmitter();
   private readonly connections: WebSocket[] = [];
