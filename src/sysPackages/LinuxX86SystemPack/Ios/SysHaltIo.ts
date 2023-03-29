@@ -1,61 +1,38 @@
-import * as childProcess from 'child_process';
-import {ExecException} from 'child_process';
-
-import SysIo from '../../../../../../squidlet/__old/system/interfaces/io/SysHaltIoType';
-import SysInfo from '../../../../../../__old/system/interfaces/SysInfoIo';
-import {SysConfig} from '../../../../../../squidlet/__old/system/interfaces/io/SysHaltIoType';
-import {AppType} from '../../../../../../__old/system/interfaces/AppType';
+import {exec, ExecException} from 'node:child_process';
+import SysHaltIoType from '../../../types/io/SysHaltIoType.js'
 
 
-let config: SysConfig | undefined;
-
-
-export default class SysHaltIo implements SysHaltIo {
-  async configure(configParams: SysConfig): Promise<void> {
-    config = {
-      ...config,
-      ...configParams,
-    };
-  }
-
+export default class SysHaltIo implements SysHaltIoType {
   /**
-   * It just exits script. And starter has to restart it.
+   * It just exits script.
+   * It will wait 1 second to be able to return an answer
    */
   async exit(code: number = 0) {
-    if (config && config.exit) {
-      // call starter's exit
-      return config.exit(code);
-    }
-    // or just exit if doesn't set
-    process.exit(code);
+    setTimeout(() => {
+      process.exit(code)
+    }, 1000)
   }
 
-  reboot(): Promise<void> {
+  async reboot() {
+    // TODO: сделать это через пару сек чтобы успел прийти ответ
     return new Promise<void>((resolve, reject) => {
-      childProcess.exec('reboot', (error: ExecException | null, stdout: string, stderr: string) => {
-        if (error) {
-          return reject(error);
-        }
+      exec('reboot', (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) return reject(error)
 
         resolve();
       });
     });
   }
 
-  shutdown(): Promise<void> {
+  async shutdown() {
+    // TODO: сделать это через пару сек чтобы успел прийти ответ
     return new Promise<void>((resolve, reject) => {
-      childProcess.exec('shutdown', (error: ExecException | null, stdout: string, stderr: string) => {
-        if (error) {
-          return reject(error);
-        }
+      exec('shutdown', (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) return reject(error)
 
-        resolve();
+        resolve()
       });
     });
-  }
-
-  async info(): Promise<SysInfo> {
-    return {};
   }
 
 }

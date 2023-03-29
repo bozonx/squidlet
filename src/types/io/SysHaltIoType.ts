@@ -11,7 +11,7 @@ export default interface SysHaltIoType {
   reboot(): Promise<void>
 
   /**
-   * It turns off the system.
+   * It turns off the system
    */
   shutdown(): Promise<void>
 }
