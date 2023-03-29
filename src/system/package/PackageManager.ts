@@ -24,6 +24,8 @@ export class PackageManager {
     // TODO: дестроить то на что пакеты навешались дестроить
   }
 
+  // TODO: наверное сделать отдельный дестрой для системных пакетов и пользовательских
+
 
   async loadInstalled() {
     const appsDirContent = await this.filesDriver.readDir(pathJoin(ROOT_DIRS.appFiles))

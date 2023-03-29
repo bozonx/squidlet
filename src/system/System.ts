@@ -1,5 +1,4 @@
-import {callSafely, IndexedEventEmitter} from 'squidlet-lib'
-import {LogPublisher, MemStorage} from 'squidlet-lib'
+import {callSafely, IndexedEventEmitter, LogPublisher, MemStorage} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './Io/IoManager.js'
 import {SystemInfoManager} from './managers/SystemInfoManager.js'
@@ -17,57 +16,48 @@ import {DriversManager} from './driver/DriversManager.js'
 import {VersionsManager} from './files/VersionsManager.js'
 
 
-// TODO: add timer driver wrapper
-// TODO: add system time driver wrapper
-// TODO: распределённая служба заданний
-// TODO: realtime api
-// TODO: распределённый etc
-// TODO: вычисление мастера
-
 export class System {
   readonly events = new IndexedEventEmitter()
   readonly log = new LogPublisher(
     (...p) => this.events.emit(SystemEvents.logger, ...p)
   )
+  // store some data only in memory while runtime
+  readonly memStorage = new MemStorage()
+
   // managers
   readonly packageManager: PackageManager
   readonly io: IoManager
-  // store some data only in memory while runtime
-  readonly memStorage: MemStorage
   readonly drivers: DriversManager
+  readonly filesManager: FilesManager
   // It is wrapper for DB which is works with configs
   readonly configs: ConfigsManager
   readonly versions: VersionsManager
   // TODO: add
   readonly systemInfo: SystemInfoManager
-  readonly filesManager: FilesManager
   // TODO: add
   readonly permissions: PermissionsManager
   readonly services: ServicesManager
   // TODO: add
   readonly network: NetworkManager
-  // it is service
-  // TODO: add
-  readonly ui: UiManager
   // TODO: add
   readonly apiManager: ApiManager
   // it is wrapper for api
   // TODO: add
   readonly cmd: CmdManager
-
+  // it is service
+  // TODO: add
+  readonly ui: UiManager
 
   constructor() {
     this.packageManager = new PackageManager(this)
     this.io = new IoManager(this)
-    this.memStorage = new MemStorage()
     this.drivers = new DriversManager(this)
+    this.filesManager = new FilesManager(this)
     this.configs = new ConfigsManager(this)
     this.versions = new VersionsManager(this)
     this.systemInfo = new SystemInfoManager(this)
-    this.filesManager = new FilesManager(this)
     this.permissions = new PermissionsManager(this)
     this.services = new ServicesManager(this)
-
     this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
     this.cmd = new CmdManager(this)
@@ -79,13 +69,12 @@ export class System {
     (async () => {
       await this.io.init()
       await this.drivers.init()
+      await this.filesManager.init()
       await this.configs.init()
       await this.versions.init()
       await this.systemInfo.init()
-      await this.filesManager.init()
       await this.permissions.init()
       await this.services.init()
-
       await this.network.init()
       await this.apiManager.init()
       await this.cmd.init()
@@ -116,8 +105,8 @@ export class System {
       destroyWrapper(this.permissions.destroy),
       destroyWrapper(this.systemInfo.destroy),
       destroyWrapper(this.drivers.destroy),
-      destroyWrapper(this.packageManager.destroy),
       destroyWrapper(this.io.destroy),
+      destroyWrapper(this.packageManager.destroy),
     ])
       .then(() => {
         this.events.destroy()

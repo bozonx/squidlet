@@ -1,5 +1,6 @@
 import {System} from '../System.js'
 
+
 export class RestrictedMemStorage {
   private readonly system: System
   private readonly appName: string
