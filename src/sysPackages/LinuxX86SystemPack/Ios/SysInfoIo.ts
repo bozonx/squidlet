@@ -1,9 +1,16 @@
 import {exec, ExecException} from 'node:child_process';
 import SysInfoIoType from '../../../types/io/SysInfoIoType.js'
 import {OS_ARCH, OS_TYPE, OsArch, OsType, RUNTIME_ENV, RuntimeEnv, SysPermanentInfo} from '../../../types/SysInfo.js'
+import {IoIndex} from '../../../types/types.js'
+import {IoContext} from '../../../system/Io/IoContext.js'
+import {IoBase} from '../../../system/Io/IoBase.js'
 
 
-export default class SysInfoIo implements SysInfoIoType {
+export const SysInfoIoIndex: IoIndex = (ctx: IoContext) => {
+  return new SysInfoIo(ctx)
+}
+
+export default class SysInfoIo extends IoBase implements SysInfoIoType {
   async getInfo(): Promise<SysPermanentInfo> {
     const {cpuNum, arch} = await this.getCpuInfo()
     const ramTotalMb = await this.getRamTotal()

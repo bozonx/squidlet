@@ -1,9 +1,17 @@
 import {exec, ExecException} from 'node:child_process';
 import SysHaltIoType from '../../../types/io/SysHaltIoType.js'
 import {WAIT_BEFORE_HALT_MS} from '../../../types/contstants.js'
+import {IoIndex} from '../../../types/types.js'
+import {IoContext} from '../../../system/Io/IoContext.js'
+import {IoBase} from '../../../system/Io/IoBase.js'
 
 
-export default class SysHaltIo implements SysHaltIoType {
+export const SysHaltIoIndex: IoIndex = (ctx: IoContext) => {
+  return new SysHaltIo(ctx)
+}
+
+
+export default class SysHaltIo extends IoBase implements SysHaltIoType {
   async exit(code: number = 0) {
     setTimeout(() => {
       process.exit(code)
