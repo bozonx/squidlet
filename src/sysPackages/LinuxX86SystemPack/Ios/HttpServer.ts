@@ -38,15 +38,11 @@ export default class HttpServer extends IoBase implements HttpServerIoType {
 
   destroy = async () => {
     for (let serverId in this.servers) {
-      // destroy events of server
-      // TODO: review
-      if (this.servers[Number(serverId)] && this.servers[Number(serverId)][ITEM_POSITION.events]) {
-        this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
-      }
-
       // TODO: not emit events
       await this.closeServer(serverId);
     }
+
+    this.events.destroy()
   }
 
 

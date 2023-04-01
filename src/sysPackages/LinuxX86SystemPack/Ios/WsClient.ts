@@ -12,11 +12,11 @@ export class WsClient extends IoBase implements WsClientIoType {
 
 
   destroy = async () => {
-    this.events.destroy()
-
     for (let connectionId in this.connections) {
       await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy');
     }
+
+    this.events.destroy()
   }
 
 

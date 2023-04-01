@@ -49,6 +49,8 @@ export class WsServer extends IoBase implements WsServerIoType {
     for (const serverId of Object.keys(this.servers)) {
       await this.destroyServer(serverId)
     }
+
+    this.events.destroy()
   }
 
 
