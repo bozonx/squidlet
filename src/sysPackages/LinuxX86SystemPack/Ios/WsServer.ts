@@ -1,17 +1,16 @@
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import {callPromised, IndexedEventEmitter} from 'squidlet-lib'
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {WsServerConnectionParams, WsServerEvent, WsServerIo, WsServerProps} from '../../../types/io/WsServerIo.js'
 import IndexedEvents from '../../../../../../../../../mnt/disk2/workspace/squidlet-lib/lib/IndexedEvents.js'
 import {WsCloseStatus} from '../../../types/io/WsClientIoType.js'
+import {ErrorEvent} from 'ws'
 
 
 type ServerItem = [
   // server instance
   WebSocket.WebSocketServer,
-  // server's events
-  //IndexedEventEmitter,
   // connection instances
   WebSocket[],
   // is server listening.
@@ -20,7 +19,6 @@ type ServerItem = [
 
 enum ITEM_POSITION {
   wsServer,
-  //events,
   // saved Socket instances
   connections,
   listeningState,
@@ -181,13 +179,17 @@ export class WsServer extends IoBase implements WsServerIo {
     const serverItem = this.getServerItem(serverId)
     const connections = serverItem[ITEM_POSITION.connections]
     const connectionId: string = String(connections.length)
-    const requestParams: ConnectionParams = makeConnectionParams(request)
+    const requestParams: WsServerConnectionParams = makeConnectionParams(request)
 
-    connections.push(socket);
+    connections.push(socket)
 
-    socket.on('error', (err: Error) => {
-      serverItem[ITEM_POSITION.events].emit(WsServerEvent.clientError, connectionId, err);
-    });
+    // if (
+    //   !socket.onerror || !socket.onopen || !socket.onclose || !socket.onmessage
+    // ) throw new Error(`Connection ${connectionId} of server ${serverId} doesn't have some event methods`)
+
+    socket.addEventListener('error', (event: WebSocket.ErrorEvent) => {
+      this.events.emit(WsServerEvent.clientError, connectionId, event.message);
+    })
 
     // TODO: что если соединение само закроется???
     socket.on('close', (code: number, reason: string) => {

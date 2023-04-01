@@ -16,10 +16,10 @@ export enum WsServerEvent {
   // TODO: review
   //clientUnexpectedResponse,
 
-  // clientClose
-  // clientMessage
-  // clientError
-  // clientUnexpectedResponse
+  clientClose,
+  clientMessage,
+  clientError,
+  clientUnexpectedResponse,
 }
 
 
