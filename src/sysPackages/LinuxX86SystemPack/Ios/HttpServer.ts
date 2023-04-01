@@ -11,31 +11,32 @@ import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../../../../../__old/system/constant
 import {makeUniqNumber} from '../squidlet-lib/src/uniqId';
 import {callPromised} from '../squidlet-lib/src/common';
 import {HttpRequest, HttpResponse} from '../../../../../../squidlet/__old/system/interfaces/Http';
+import {HttpServerIoType} from '../../../types/io/HttpServerIoType.js'
+import {IoBase} from '../../../system/Io/IoBase.js'
+import {IndexedEvents} from '../../../../../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
 
 
 type ServerItem = [
   // Http server instance
   Server,
-  // server's events
-  IndexedEventEmitter<DefaultHandler>,
   // is server listening.
   boolean
 ];
 
 enum ITEM_POSITION {
   server,
-  events,
   listeningState
 }
 
 const RESPONSE_EVENT = 'res';
 
 
-export default class HttpServer implements HttpServerIo {
-  private readonly servers: ServerItem[] = [];
+export default class HttpServer extends IoBase implements HttpServerIoType {
+  private readonly events = new IndexedEvents()
+  private readonly servers: ServerItem[] = []
 
 
-  async destroy() {
+  destroy = async () => {
     for (let serverId in this.servers) {
       // destroy events of server
       // TODO: review
@@ -48,6 +49,14 @@ export default class HttpServer implements HttpServerIo {
     }
   }
 
+
+  async on(cb: (...p: any[]) => void): Promise<number> {
+    return this.events.addListener(cb)
+  }
+
+  async off(handlerIndex: number) {
+    this.events.removeListener(handlerIndex)
+  }
 
   async newServer(props: HttpServerProps): Promise<string>{
     const serverId: string = String(this.servers.length);

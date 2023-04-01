@@ -1,6 +1,3 @@
-//import {HttpRequest, HttpResponse} from '../__old/Http';
-
-
 export enum HttpServerEvent {
   request,
   listening,
@@ -16,22 +13,7 @@ export interface HttpServerProps {
 }
 
 
-export interface HttpServerIoType extends IoItem {
-  /**
-   * Destroy server and don't rise a close event.
-   */
-  destroy: () => Promise<void>;
-
-  /**
-   * make new server and return serverId
-   */
-  newServer(props: HttpServerProps): Promise<string>;
-
-  /**
-   * Shut down a server which has been previously created
-   */
-  closeServer(serverId: string): Promise<void>;
-
+export interface HttpServerIoType {
   /**
    * on server close. Depend on http server close
    */
@@ -54,13 +36,23 @@ export interface HttpServerIoType extends IoItem {
   onRequest(serverId: string, cb: HttpRequestHandler): Promise<number>;
 
   /**
+   * Remove one of server listeners
+   */
+  removeListener(serverId: string, eventName: HttpServerEvent, handlerIndex: number): Promise<void>;
+
+  /**
+   * make new server and return serverId
+   */
+  newServer(props: HttpServerProps): Promise<string>;
+
+  /**
+   * Shut down a server which has been previously created
+   */
+  closeServer(serverId: string): Promise<void>;
+
+  /**
    * Send a response to client.
    * Call it only when you are handled a request.
    */
   sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void>;
-
-  /**
-   * Remove one of server listeners
-   */
-  removeListener(serverId: string, eventName: HttpServerEvent, handlerIndex: number): Promise<void>;
 }
