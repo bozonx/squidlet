@@ -46,6 +46,6 @@ export interface WsClientIoType {
   removeListener (connectionId: string, handlerIndex: number): Promise<void>;
 
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;
-  close               (connectionId: string, code: number, reason?: string): Promise<void>;
+  close               (connectionId: string, code?: number, reason?: string): Promise<void>;
   destroyConnection   (connectionId: string): Promise<void>;
 }
