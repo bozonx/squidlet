@@ -41,7 +41,7 @@ export interface MqttOptions {
   connectTimeout?: number;
 }
 
-export default interface MqttIoType extends IoItem {
+export default interface MqttClientIoType extends IoItem {
   destroy: () => Promise<void>;
 
   /**

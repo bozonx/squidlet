@@ -1,7 +1,7 @@
 // need to decrease of memory usage
 import * as mqtt from 'mqtt';
 
-import MqttIo, {MqttIoEvents, MqttOptions} from '../../../../../../squidlet/__old/system/interfaces/io/MqttIoType';
+import MqttIo, {MqttIoEvents, MqttOptions} from '../../../../../../squidlet/__old/system/interfaces/io/MqttClientIoType';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {callPromised} from '../squidlet-lib/src/common';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';
@@ -34,7 +34,7 @@ let connectionCounter: number = 0;
 /**
  * The same for rpi and x86
  */
-export default class MqttIo implements MqttIo {
+export default class MqttClientIo implements MqttClientIo {
   private ioContext?: IoContext;
   private readonly connections: Record<string, ConnectionItem> = {};
 

@@ -91,7 +91,6 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
   // }
 
   private makeServer(serverId: string, props: HttpServerProps): ServerItem {
-    const events = new IndexedEventEmitter();
     const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {
         this.handleIncomeRequest(serverId, req, res)
           .catch((e: Error) => events.emit(HttpServerEvent.serverError, e));
@@ -118,6 +117,7 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
     serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
   }
 
+  // TODO: почему промис возвращается ???
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
     if (!this.servers[Number(serverId)]) return Promise.resolve();
 
@@ -190,7 +190,6 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
       // TODO: support of Buffer - convert from Uint8Arr to Buffer
     }
   }
-
 
   private getServerItem(serverId: string): ServerItem {
     if (!this.servers[Number(serverId)]) {
