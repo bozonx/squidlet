@@ -1,3 +1,16 @@
+// TODO: лучше брать из конфига. И это не соединение а старт сервера
+export const WS_SERVER_CONNECTION_TIMEOUT_SEC = 20
+
+// see https://github.com/Luka967/websocket-close-codes
+export enum WsCloseStatus {
+  // Successful operation / regular socket shutdown
+  closeNormal = 1000,
+  // Client is leaving (browser tab closing)
+  closeGoingAway,
+  // Internal server error while operating
+  serverError = 1011,
+}
+
 export enum WsServerEvent {
   serverStarted,
   serverClosed,
@@ -36,7 +49,7 @@ export interface WsServerConnectionParams {
 }
 
 
-export default interface WsServerIo {
+export interface WsServerIo {
   // TODO: почему не поднимается событие ??
   /**
    * Destroy server and don't rise a close event.

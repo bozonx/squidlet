@@ -1,22 +1,20 @@
 import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
-import IndexedEventEmitter from 'squidlet-lib/src/IndexedEventEmitter'
-
-import WsServerIo, {
-  WsServerConnectionParams, WsServerProps
-} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/interfaces/io/WsServerIo.js'
+import {IndexedEventEmitter} from 'squidlet-lib'
+import {IoBase} from '../../../system/Io/IoBase.js'
+import {WsServerConnectionParams, WsServerIo} from '../../../types/io/WsServerIo.js'
 
 
 type ServerItem = [
   // server instance
-  WebSocket.Server,
+  WebSocket.WebSocketServer,
   // server's events
   IndexedEventEmitter,
   // connection instances
   WebSocket[],
   // is server listening.
   boolean
-];
+]
 
 enum ITEM_POSITION {
   wsServer,
@@ -43,13 +41,13 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
 }
 
 
-export default class WsServer implements WsServerIo {
+export class WsServer extends IoBase implements WsServerIo {
   private readonly servers: Record<string, ServerItem> = {};
 
 
-  async destroy() {
+  destroy = async () => {
     for (const serverId of Object.keys(this.servers)) {
-      await this.destroyServer(serverId);
+      await this.destroyServer(serverId)
     }
   }
 
