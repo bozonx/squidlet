@@ -69,6 +69,13 @@ export interface WsServerIo {
    */
   closeServer(serverId: string): Promise<void>
 
+  /**
+   * When new client is connected
+   */
+  onConnection(
+    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
+  ): Promise<number>
+
   on(
     eventName: WsServerEvent.serverClosed,
     cb: (connectionId: string) => void
@@ -80,14 +87,6 @@ export interface WsServerIo {
   on(
     eventName: WsServerEvent.connectionError,
     cb: (connectionId: string, err: Error) => void
-  ): Promise<number>
-
-  /**
-   * When new client is connected
-   */
-  on(
-    eventName: WsServerEvent.newConnection,
-    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
   ): Promise<number>
 
   /**

@@ -2,14 +2,14 @@ import * as WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
 import {IndexedEventEmitter} from 'squidlet-lib'
 import {IoBase} from '../../../system/Io/IoBase.js'
-import {WsServerConnectionParams, WsServerIo} from '../../../types/io/WsServerIo.js'
+import {WsServerConnectionParams, WsServerEvent, WsServerIo, WsServerProps} from '../../../types/io/WsServerIo.js'
 
 
 type ServerItem = [
   // server instance
   WebSocket.WebSocketServer,
   // server's events
-  IndexedEventEmitter,
+  //IndexedEventEmitter,
   // connection instances
   WebSocket[],
   // is server listening.
@@ -18,7 +18,7 @@ type ServerItem = [
 
 enum ITEM_POSITION {
   wsServer,
-  events,
+  //events,
   // saved Socket instances
   connections,
   listeningState,
@@ -42,7 +42,9 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
 
 
 export class WsServer extends IoBase implements WsServerIo {
-  private readonly servers: Record<string, ServerItem> = {};
+  private readonly events = new IndexedEventEmitter()
+  // like {'host:port': [server, events, connections[], isListening]}
+  private readonly servers: Record<string, ServerItem> = {}
 
 
   destroy = async () => {
@@ -55,29 +57,25 @@ export class WsServer extends IoBase implements WsServerIo {
   async newServer(props: WsServerProps): Promise<string> {
     const serverId: string = this.makeServerId(props)
 
-    if (!this.servers[serverId]) {
-      this.servers[serverId] = this.makeServer(props)
+    if (this.servers[serverId]) {
+      throw new Error(`Server ${serverId} already exists`)
     }
 
-    return serverId;
+    this.servers[serverId] = this.makeServer(serverId, props)
+
+    return serverId
   }
 
   async closeServer(serverId: string): Promise<void> {
-    // TODO: review
-    const events = this.servers[Number(serverId)][ITEM_POSITION.events];
+    await this.destroyServer(serverId)
 
-    await this.destroyServer(serverId);
-
-    events.destroy();
+    // TODO: надо наверное удалить сервер из this.servers
   }
 
   async onConnection(
-    serverId: string,
-    cb: (connectionId: string, request: ConnectionParams) => void
+    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
   ): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(WsServerEvent.newConnection, cb);
+    return this.events.addListener(WsServerEvent.newConnection, cb)
   }
 
   async onServerListening(serverId: string, cb: () => void): Promise<number> {
@@ -175,11 +173,10 @@ export class WsServer extends IoBase implements WsServerIo {
   }
 
 
-  private makeServer(props: WebSocketServerProps): ServerItem {
+  private makeServer(serverId: string, props: WsServerProps): ServerItem {
     // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
     //       обычные http роуты
-    const events = new IndexedEventEmitter();
-    const server = new WebSocket.Server(props);
+    const server = new WebSocket.WebSocketServer(props);
 
     server.on('close', () => events.emit(WsServerEvent.serverClose));
     server.on('listening', () => this.handleServerStartListening(serverId));
@@ -207,6 +204,8 @@ export class WsServer extends IoBase implements WsServerIo {
   }
 
   private async destroyServer(serverId: string) {
+    // TODO: он не закрывает соединения
+
     if (!this.servers[Number(serverId)]) return;
     // destroy events of server
     this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
