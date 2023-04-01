@@ -47,7 +47,7 @@ export interface WsServerConnectionParams {
 }
 
 
-export interface WsServerIo {
+export interface WsServerIoType {
   /**
    * When new client is connected
    */

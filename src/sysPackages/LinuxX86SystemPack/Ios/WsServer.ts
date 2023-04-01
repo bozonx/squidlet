@@ -1,9 +1,8 @@
 import WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http';
-import {callPromised, IndexedEventEmitter} from 'squidlet-lib'
+import {callPromised, IndexedEvents} from 'squidlet-lib'
 import {IoBase} from '../../../system/Io/IoBase.js'
-import {WsServerConnectionParams, WsServerEvent, WsServerIo, WsServerProps} from '../../../types/io/WsServerIo.js'
-import IndexedEvents from '../../../../../../../../../mnt/disk2/workspace/squidlet-lib/lib/IndexedEvents.js'
+import {WsServerConnectionParams, WsServerEvent, WsServerIoType, WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {WsCloseStatus} from '../../../types/io/WsClientIoType.js'
 import {ErrorEvent} from 'ws'
 
@@ -49,7 +48,7 @@ export function splitConnectionId(
 }
 
 
-export class WsServer extends IoBase implements WsServerIo {
+export class WsServer extends IoBase implements WsServerIoType {
   private readonly events = new IndexedEvents()
   // like {'host:port': [server, events, connections[], isListening]}
   private readonly servers: Record<string, ServerItem> = {}
