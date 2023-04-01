@@ -1,3 +1,5 @@
+import {WsServerConnectionParams} from './WsServerIoType.js'
+
 export enum WsClientEvent {
   open,
   close,
@@ -25,10 +27,10 @@ export interface WebSocketClientProps {
 
 export interface WsClientIoType {
   on(cb: (eventName: WsClientEvent.open, connectionId: string) => void): Promise<number>
-  on(cb: (eventName: WsClientEvent.close, connectionId: string) => void): Promise<number>;
-  on(cb: (eventName: WsClientEvent.message, connectionId: string, data: string | Uint8Array) => void): Promise<number>;
-  on(cb: (eventName: WsClientEvent.error, connectionId: string, err: Error) => void): Promise<number>;
-  on(cb: (eventName: WsClientEvent.unexpectedResponse, connectionId: string, response: ConnectionParams) => void): Promise<number>;
+  on(cb: (eventName: WsClientEvent.close, connectionId: string) => void): Promise<number>
+  on(cb: (eventName: WsClientEvent.error, connectionId: string, err: Error) => void): Promise<number>
+  on(cb: (eventName: WsClientEvent.unexpectedResponse, connectionId: string, res: WsServerConnectionParams) => void): Promise<number>
+  on(cb: (eventName: WsClientEvent.message, connectionId: string, data: string | Uint8Array) => void): Promise<number>
   off(handlerIndex: number): Promise<void>
 
   newConnection       (props: WebSocketClientProps): Promise<string>;

@@ -92,27 +92,25 @@ export class WsClient extends IoBase implements WsClientIoType {
   private connectToServer(connectionId: string, props: WebSocketClientProps): WebSocket {
     const client = new WebSocket(props.url, omitObj(props, 'url'))
 
-    client.on('open', () => this.events.emit(WsClientEvent.open, connectionId))
+    client.on('open', () =>
+      this.events.emit(WsClientEvent.open, connectionId))
     // TODO: если соединение само закрылось не по желанию пользователя - то удалить его
-    client.on('close', () => this.events.emit(WsClientEvent.close, connectionId))
+    client.on('close', () =>
+      this.events.emit(WsClientEvent.close, connectionId))
+    client.on('error', (err: Error) =>
+      this.events.emit(WsClientEvent.error, connectionId, err))
+    client.on('unexpected-response', (req: ClientRequest, res: IncomingMessage) =>
+      // TODO: а точно будет makeConnectionParams ???
+      this.events.emit(WsClientEvent.unexpectedResponse, connectionId, makeConnectionParams(res)))
     client.on('message', (data: string | Uint8Array) => {
-      let resolvedData: string | Uint8Array
+      let resolvedData: string | Uint8Array = data
 
       if (Buffer.isBuffer(data)) {
         resolvedData = convertBufferToUint8Array(data)
       }
-      else {
-        resolvedData = data
-      }
 
       this.events.emit(WsClientEvent.message, connectionId, resolvedData)
-    });
-    client.on('error', (err: Error) => {
-      this.events.emit(WsClientEvent.error, connectionId, err)
-    });
-    client.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      this.events.emit(WsClientEvent.unexpectedResponse, connectionId, makeConnectionParams(response));
-    });
+    })
 
     return client
   }

@@ -153,8 +153,6 @@ export class WsServer extends IoBase implements WsServerIoType {
     // TODO: он не закрывает соединения
 
     if (!this.servers[Number(serverId)]) return;
-    // destroy events of server
-    this.servers[Number(serverId)][ITEM_POSITION.events].destroy();
 
     const server = this.servers[Number(serverId)][ITEM_POSITION.wsServer];
 
