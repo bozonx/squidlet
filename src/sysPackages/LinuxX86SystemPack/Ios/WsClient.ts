@@ -1,13 +1,13 @@
 import WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http'
-import {callPromised, convertBufferToUint8Array, IndexedEventEmitter, omitObj} from 'squidlet-lib'
+import {callPromised, convertBufferToUint8Array, IndexedEvents, omitObj} from 'squidlet-lib'
 import {WsClientIoType, WebSocketClientProps, WsCloseStatus, WsClientEvent} from '../../../types/io/WsClientIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {makeConnectionParams} from './WsServer.js'
 
 
 export class WsClient extends IoBase implements WsClientIoType {
-  private readonly events = new IndexedEventEmitter()
+  private readonly events = new IndexedEvents()
   private readonly connections: (WebSocket | undefined)[] = []
 
 
@@ -19,6 +19,14 @@ export class WsClient extends IoBase implements WsClientIoType {
     }
   }
 
+
+  async on(cb: (...p: any[]) => void): Promise<number> {
+    return this.events.addListener(cb)
+  }
+
+  async off(handlerIndex: number) {
+    this.events.removeListener(handlerIndex)
+  }
 
   /**
    * Make new connection to server.
@@ -43,37 +51,6 @@ export class WsClient extends IoBase implements WsClientIoType {
     await this.close(connectionId, WsCloseStatus.closeNormal)
 
     this.connections[Number(connectionId)] = this.connectToServer(connectionId, props)
-  }
-
-  async onOpen(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.open, cb)
-  }
-
-  async onClose(cb: (connectionId: string) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.close, cb)
-  }
-
-  async onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.message, cb)
-  }
-
-  async onError(cb: (connectionId: string, err: Error) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.error, cb)
-  }
-
-  async onUnexpectedResponse(cb: (connectionId: string, response: ConnectionParams) => void): Promise<number> {
-    return this.events.addListener(WsClientEvent.unexpectedResponse, cb)
-  }
-
-  async removeListener(connectionId: string, handlerIndex: number) {
-
-    // TODO: зачем тут connectionId ???
-
-    const connectionItem = this.connections[Number(connectionId)]
-
-    if (!connectionItem) return
-
-    this.events.removeListener(handlerIndex)
   }
 
   async send(connectionId: string, data: string | Uint8Array) {

@@ -1,13 +1,3 @@
-// export const wsEventNames: {[index: string]: WsEvents} = {
-//   open: 'open',
-//   close: 'close',
-//   message: 'message',
-//   error: 'error',
-//   unexpectedResponse: 'unexpectedResponse',
-// };
-
-//export type WsEvents = 'open' | 'close' | 'message' | 'error' | 'unexpectedResponse';
-
 export enum WsClientEvent {
   open,
   close,
@@ -34,17 +24,15 @@ export interface WebSocketClientProps {
 }
 
 export interface WsClientIoType {
+  on(cb: (eventName: WsClientEvent.open, connectionId: string) => void): Promise<number>
+  on(cb: (eventName: WsClientEvent.close, connectionId: string) => void): Promise<number>;
+  on(cb: (eventName: WsClientEvent.message, connectionId: string, data: string | Uint8Array) => void): Promise<number>;
+  on(cb: (eventName: WsClientEvent.error, connectionId: string, err: Error) => void): Promise<number>;
+  on(cb: (eventName: WsClientEvent.unexpectedResponse, connectionId: string, response: ConnectionParams) => void): Promise<number>;
+  off(handlerIndex: number): Promise<void>
+
   newConnection       (props: WebSocketClientProps): Promise<string>;
   reConnect           (connectionId: string, props: WebSocketClientProps): Promise<void>;
-
-  onOpen              (cb: (connectionId: string) => void): Promise<number>;
-  onClose             (cb: (connectionId: string) => void): Promise<number>;
-  onMessage           (cb: (connectionId: string, data: string | Uint8Array) => void): Promise<number>;
-  onError             (cb: (connectionId: string, err: Error) => void): Promise<number>;
-  onUnexpectedResponse(cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>;
-
-  removeListener (connectionId: string, handlerIndex: number): Promise<void>;
-
   send                (connectionId: string, data: string | Uint8Array): Promise<void>;
   close               (connectionId: string, code?: number, reason?: string): Promise<void>;
   destroyConnection   (connectionId: string): Promise<void>;
