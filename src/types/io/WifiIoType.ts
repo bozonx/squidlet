@@ -12,6 +12,6 @@ export const Methods = [
 ];
 
 
-export default interface WifiIo extends IoItem {
+export default interface WifiIoType extends IoItem {
   configure(params: WifiParams): Promise<void>;
 }

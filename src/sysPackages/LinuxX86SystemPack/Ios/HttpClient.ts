@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from 'axios';
 
-import {HttpClientIo} from '../../../../../../squidlet/__old/system/interfaces/io/HttpClientIo';
+import {HttpClientIo} from '../../../../../../squidlet/__old/system/interfaces/io/HttpClientIoType';
 import {HttpRequest, HttpResponse} from '../../../../../../squidlet/__old/system/interfaces/Http';
 
 

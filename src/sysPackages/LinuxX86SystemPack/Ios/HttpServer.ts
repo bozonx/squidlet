@@ -5,7 +5,7 @@ import {
   HttpServerEvent,
   HttpServerIo,
   HttpServerProps
-} from '../../../../../../squidlet/__old/system/interfaces/io/HttpServerIo';
+} from '../../../../../../squidlet/__old/system/interfaces/io/HttpServerIoType';
 import IndexedEventEmitter, {DefaultHandler} from '../squidlet-lib/src/IndexedEventEmitter';
 import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../../../../../__old/system/constants';
 import {makeUniqNumber} from '../squidlet-lib/src/uniqId';

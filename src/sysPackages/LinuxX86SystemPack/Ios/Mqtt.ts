@@ -1,7 +1,7 @@
 // need to decrease of memory usage
 import * as mqtt from 'mqtt';
 
-import MqttIo, {MqttIoEvents, MqttOptions} from '../../../../../../squidlet/__old/system/interfaces/io/MqttIo';
+import MqttIo, {MqttIoEvents, MqttOptions} from '../../../../../../squidlet/__old/system/interfaces/io/MqttIoType';
 import IndexedEventEmitter from '../squidlet-lib/src/IndexedEventEmitter';
 import {callPromised} from '../squidlet-lib/src/common';
 import {convertBufferToUint8Array} from '../squidlet-lib/src/buffer';

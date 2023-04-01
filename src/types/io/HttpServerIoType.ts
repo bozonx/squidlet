@@ -16,7 +16,7 @@ export interface HttpServerProps {
 }
 
 
-export interface HttpServerIo extends IoItem {
+export interface HttpServerIoType extends IoItem {
   /**
    * Destroy server and don't rise a close event.
    */

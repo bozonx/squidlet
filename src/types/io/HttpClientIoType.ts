@@ -7,6 +7,6 @@ export const Methods = [
 ];
 
 
-export interface HttpClientIo extends IoItem {
+export interface HttpClientIoType extends IoItem {
   fetch(request: HttpRequest): Promise<HttpResponse>;
 }
