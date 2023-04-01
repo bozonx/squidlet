@@ -39,7 +39,7 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
 }
 
 
-export class WsServer extends IoBase implements WsServerIoType {
+export class WsServerIo extends IoBase implements WsServerIoType {
   private readonly events = new IndexedEvents()
   // like {'host:port': [server, events, connections[], isListening]}
   private readonly servers: Record<string, ServerItem> = {}

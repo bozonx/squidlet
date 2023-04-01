@@ -4,7 +4,7 @@ import {HttpRequest, HttpResponse} from '../../../types/Http.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
 
 
-export default class HttpClient extends IoBase implements HttpClientIoType {
+export default class HttpClientIo extends IoBase implements HttpClientIoType {
   async fetch(request: HttpRequest): Promise<HttpResponse> {
     const result: AxiosResponse = await axios({
       method: request.method,

@@ -3,10 +3,10 @@ import {ClientRequest, IncomingMessage} from 'http'
 import {callPromised, convertBufferToUint8Array, IndexedEvents, omitObj} from 'squidlet-lib'
 import {WsClientIoType, WebSocketClientProps, WsCloseStatus, WsClientEvent} from '../../../types/io/WsClientIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
-import {makeConnectionParams} from './WsServer.js'
+import {makeConnectionParams} from './WsServerIo.js'
 
 
-export class WsClient extends IoBase implements WsClientIoType {
+export class WsClientIo extends IoBase implements WsClientIoType {
   private readonly events = new IndexedEvents()
   private readonly connections: (WebSocket | undefined)[] = []
 

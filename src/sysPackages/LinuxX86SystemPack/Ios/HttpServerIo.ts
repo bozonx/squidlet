@@ -21,7 +21,7 @@ enum ITEM_POSITION {
 //const RESPONSE_EVENT = 'res';
 
 
-export default class HttpServer extends IoBase implements HttpServerIoType {
+export default class HttpServerIo extends IoBase implements HttpServerIoType {
   private readonly events = new IndexedEvents()
   // like {'host:port': [server, events, connections[], isListening]}
   private readonly servers: Record<string, ServerItem> = {}

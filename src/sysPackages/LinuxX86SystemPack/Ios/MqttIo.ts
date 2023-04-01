@@ -34,7 +34,7 @@ let connectionCounter: number = 0;
 /**
  * The same for rpi and x86
  */
-export default class Mqtt implements MqttIo {
+export default class MqttIo implements MqttIo {
   private ioContext?: IoContext;
   private readonly connections: Record<string, ConnectionItem> = {};
 
