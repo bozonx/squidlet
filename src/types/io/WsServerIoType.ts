@@ -2,7 +2,6 @@
 export const WS_SERVER_CONNECTION_TIMEOUT_SEC = 20
 
 
-
 export enum WsServerEvent {
   // when server starts listening
   serverStarted,
@@ -52,7 +51,12 @@ export interface WsServerIoType {
    * When new client is connected
    */
   on(
-    cb: (eventName: WsServerEvent.newConnection, serverId: string, connectionId: string, params: ConnectionParams) => void
+    cb: (
+      eventName: WsServerEvent.newConnection,
+      serverId: string,
+      connectionId: string,
+      params: ConnectionParams
+    ) => void
   ): Promise<number>
   on(
     cb: (eventName: WsServerEvent.serverClosed, connectionId: string) => void
@@ -72,6 +76,20 @@ export interface WsServerIoType {
    */
   on(
     cb: (eventName: WsServerEvent.serverClosed, serverId: string) => void
+  ): Promise<number>
+
+  ///////// CLIENT
+  on(
+    cb: (eventName: WsServerEvent.clientError, serverId: string, connectionId: string, err: Error) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.clientClose, serverId: string, connectionId: string, code?: number, reason?: string) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.clientMessage, serverId: string, connectionId: string, data: string | Uint8Array) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.clientUnexpectedResponse, serverId: string, connectionId: string, params: WsServerConnectionParams) => void
   ): Promise<number>
 
   off(handlerIndex: number): Promise<void>
@@ -121,6 +139,5 @@ export interface WsServerIoType {
    * Destroy the connection and not rise an close event
    */
   destroyConnection(serverId: string, connectionId: string): Promise<void>
-
 
 }

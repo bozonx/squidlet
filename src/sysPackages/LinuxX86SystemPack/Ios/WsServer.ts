@@ -1,10 +1,9 @@
-import WebSocket from 'ws';
-import {ClientRequest, IncomingMessage} from 'http';
-import {callPromised, IndexedEvents} from 'squidlet-lib'
+import WebSocket from 'ws'
+import {ClientRequest, IncomingMessage} from 'http'
+import {callPromised, convertBufferToUint8Array, IndexedEvents} from 'squidlet-lib'
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {WsServerConnectionParams, WsServerEvent, WsServerIoType, WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {WsCloseStatus} from '../../../types/io/WsClientIoType.js'
-import {ErrorEvent} from 'ws'
 
 
 type ServerItem = [
@@ -37,14 +36,6 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
       'User-Agent': request.headers['User-Agent'],
     },
   };
-}
-
-export function splitConnectionId(
-  connectionId: string
-): { serverId: string, socketId: number } {
-  const splat = connectionId.split(CONNECTION_ID_DELIMITER)
-
-  return { serverId: splat[0], socketId: parseInt(splat[1]) }
 }
 
 
@@ -182,42 +173,36 @@ export class WsServer extends IoBase implements WsServerIoType {
 
     connections.push(socket)
 
-    // if (
-    //   !socket.onerror || !socket.onopen || !socket.onclose || !socket.onmessage
-    // ) throw new Error(`Connection ${connectionId} of server ${serverId} doesn't have some event methods`)
-
-    socket.addEventListener('error', (event: WebSocket.ErrorEvent) => {
-      this.events.emit(WsServerEvent.clientError, connectionId, event.message);
+    socket.on('error', (err: Error) => {
+      this.events.emit(WsServerEvent.clientError, serverId, connectionId, err)
     })
 
     // TODO: что если соединение само закроется???
     socket.on('close', (code: number, reason: string) => {
-      serverItem[ITEM_POSITION.events].emit(WsServerEvent.clientClose, connectionId, code, reason);
+      this.events.emit(WsServerEvent.clientClose, serverId, connectionId, code, reason)
     });
 
     socket.on('message', (data: string | Buffer) => {
-      let resolvedData: string | Uint8Array;
+      let resolvedData: string | Uint8Array = data
 
       if (Buffer.isBuffer(data)) {
-        resolvedData = convertBufferToUint8Array(data);
-      }
-      else {
-        resolvedData = data;
+        resolvedData = convertBufferToUint8Array(data)
       }
 
-      serverItem[ITEM_POSITION.events].emit(WsServerEvent.clientMessage, connectionId, resolvedData);
-    });
+      this.events.emit(WsServerEvent.clientMessage, serverId, connectionId, resolvedData)
+    })
 
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
-      serverItem[ITEM_POSITION.events].emit(
+      this.events.emit(
         WsServerEvent.clientUnexpectedResponse,
+        serverId,
         connectionId,
         makeConnectionParams(response)
       );
     });
 
     // emit new connection
-    serverItem[ITEM_POSITION.events].emit(WsServerEvent.newConnection, connectionId, requestParams);
+    this.events.emit(WsServerEvent.newConnection, connectionId, requestParams)
   }
 
   private getServerItem(serverId: string): ServerItem {
