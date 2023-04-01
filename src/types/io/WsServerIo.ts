@@ -1,27 +1,25 @@
 // TODO: лучше брать из конфига. И это не соединение а старт сервера
 export const WS_SERVER_CONNECTION_TIMEOUT_SEC = 20
 
-// see https://github.com/Luka967/websocket-close-codes
-export enum WsCloseStatus {
-  // Successful operation / regular socket shutdown
-  closeNormal = 1000,
-  // Client is leaving (browser tab closing)
-  closeGoingAway,
-  // Internal server error while operating
-  serverError = 1011,
-}
+
 
 export enum WsServerEvent {
+  // when server starts listening
   serverStarted,
   serverClosed,
   // TODO: в какой момент возникает, может лучше с промисом отдать или с событием
-  //serverError,
+  serverError,
   newConnection,
   connectionClose,
   incomeMessage,
   connectionError,
   // TODO: review
   //clientUnexpectedResponse,
+
+  // clientClose
+  // clientMessage
+  // clientError
+  // clientUnexpectedResponse
 }
 
 
@@ -50,6 +48,38 @@ export interface WsServerConnectionParams {
 
 
 export interface WsServerIo {
+  /**
+   * When new client is connected
+   */
+  on(
+    cb: (eventName: WsServerEvent.newConnection, serverId: string, connectionId: string, params: ConnectionParams) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.serverClosed, connectionId: string) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.incomeMessage, connectionId: string, data: string | Uint8Array) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.connectionError, connectionId: string, err: Error) => void
+  ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.serverStarted, serverId: string) => void
+  ): Promise<number>
+
+  /**
+   * on server close. Depend on http server close
+   */
+  on(
+    cb: (eventName: WsServerEvent.serverClosed, serverId: string) => void
+  ): Promise<number>
+
+  off(handlerIndex: number): Promise<void>
+
+  //onServerError(serverId: string, cb: (err: Error) => void): Promise<number>
+  //onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>
+
+
   // TODO: почему не поднимается событие ??
   /**
    * Destroy server and don't rise a close event.
@@ -70,52 +100,10 @@ export interface WsServerIo {
   closeServer(serverId: string): Promise<void>
 
   /**
-   * When new client is connected
-   */
-  onConnection(
-    cb: (serverId: string, connectionId: string, params: ConnectionParams) => void
-  ): Promise<number>
-
-  on(
-    eventName: WsServerEvent.serverClosed,
-    cb: (connectionId: string) => void
-  ): Promise<number>
-  on(
-    eventName: WsServerEvent.incomeMessage,
-    cb: (connectionId: string, data: string | Uint8Array) => void
-  ): Promise<number>
-  on(
-    eventName: WsServerEvent.connectionError,
-    cb: (connectionId: string, err: Error) => void
-  ): Promise<number>
-
-  /**
-   * when server starts listening
-   */
-  on(
-    eventName: WsServerEvent.serverStarted,
-    cb: (serverId: string) => void
-  ): Promise<number>
-
-  /**
-   * on server close. Depend on http server close
-   */
-  on(
-    eventName: WsServerEvent.serverClosed,
-    cb: (serverId: string) => void
-  ): Promise<number>
-
-  //onServerError(serverId: string, cb: (err: Error) => void): Promise<number>
-  //onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>
-
-  off(handlerIndex: number): Promise<void>
-
-
-  /**
    * Send message from server to the client.
    * It waits while message has been sent but it doesn't wait for response.
    */
-  sendMessage(
+  send(
     serverId: string,
     connectionId: string,
     data: string | Uint8Array
@@ -133,4 +121,6 @@ export interface WsServerIo {
    * Destroy the connection and not rise an close event
    */
   destroyConnection(serverId: string, connectionId: string): Promise<void>
+
+
 }
