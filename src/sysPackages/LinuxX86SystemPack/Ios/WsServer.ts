@@ -207,10 +207,10 @@ export class WsServer extends IoBase implements WsServerIoType {
 
   private getServerItem(serverId: string): ServerItem {
     if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`);
+      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`)
     }
 
-    return this.servers[Number(serverId)];
+    return this.servers[Number(serverId)]
   }
 
   private makeServerId(props: WsServerProps): string {

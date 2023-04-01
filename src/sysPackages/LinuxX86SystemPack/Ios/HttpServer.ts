@@ -1,19 +1,9 @@
-import {createServer, IncomingMessage, Server, ServerResponse} from 'http';
-
-import {
-  HttpRequestHandler,
-  HttpServerEvent,
-  HttpServerIo,
-  HttpServerProps
-} from '../../../../../../squidlet/__old/system/interfaces/io/HttpServerIoType';
-import IndexedEventEmitter, {DefaultHandler} from '../squidlet-lib/src/IndexedEventEmitter';
-import {WAIT_RESPONSE_TIMEOUT_SEC} from '../../../../../../__old/system/constants';
-import {makeUniqNumber} from '../squidlet-lib/src/uniqId';
-import {callPromised} from '../squidlet-lib/src/common';
-import {HttpRequest, HttpResponse} from '../../../../../../squidlet/__old/system/interfaces/Http';
-import {HttpServerIoType} from '../../../types/io/HttpServerIoType.js'
+import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
+import {IndexedEvents} from 'squidlet-lib'
 import {IoBase} from '../../../system/Io/IoBase.js'
-import {IndexedEvents} from '../../../../../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
+import {HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
+import {WsServerProps} from '../../../types/io/WsServerIoType.js'
+import {HttpResponse} from '../../../types/Http.js'
 
 
 type ServerItem = [
@@ -28,12 +18,13 @@ enum ITEM_POSITION {
   listeningState
 }
 
-const RESPONSE_EVENT = 'res';
+//const RESPONSE_EVENT = 'res';
 
 
 export default class HttpServer extends IoBase implements HttpServerIoType {
   private readonly events = new IndexedEvents()
-  private readonly servers: ServerItem[] = []
+  // like {'host:port': [server, events, connections[], isListening]}
+  private readonly servers: Record<string, ServerItem> = {}
 
 
   destroy = async () => {
@@ -55,11 +46,15 @@ export default class HttpServer extends IoBase implements HttpServerIoType {
   }
 
   async newServer(props: HttpServerProps): Promise<string>{
-    const serverId: string = String(this.servers.length);
+    const serverId: string = this.makeServerId(props)
 
-    this.servers.push( this.makeServer(serverId, props) );
+    if (this.servers[serverId]) {
+      throw new Error(`Server ${serverId} already exists`)
+    }
 
-    return serverId;
+    this.servers[serverId] = this.makeServer(serverId, props)
+
+    return serverId
   }
 
   async closeServer(serverId: string): Promise<void> {
@@ -68,7 +63,6 @@ export default class HttpServer extends IoBase implements HttpServerIoType {
 
     const serverItem = this.servers[serverIdNum];
 
-    serverItem[ITEM_POSITION.events].destroy();
     // TODO: если раскоментировать то будет ошибка при дестрое
     //await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
 
@@ -78,48 +72,23 @@ export default class HttpServer extends IoBase implements HttpServerIoType {
     // TODO: отписаться от всех событий навешанный на этот сервер
   }
 
-  async onServerClose(serverId: string, cb: () => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(HttpServerEvent.serverClose, cb);
-  }
-
-  async onServerError(serverId: string, cb: (err: string) => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(HttpServerEvent.serverError, cb);
-  }
-
-  async onServerListening(serverId: string, cb: () => void): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    if (serverItem[ITEM_POSITION.listeningState]) {
-      cb();
-
-      return -1;
-    }
-
-    return serverItem[ITEM_POSITION.events].once(HttpServerEvent.listening, cb);
-  }
-
-  async onRequest(serverId: string, cb: HttpRequestHandler): Promise<number> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].addListener(HttpServerEvent.request, cb);
-  }
-
   async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
-    const serverItem = this.getServerItem(serverId);
-
-    return serverItem[ITEM_POSITION.events].emit(RESPONSE_EVENT, requestId, response);
+    // TODO: это вообще что ???
+    return this.events.emit(RESPONSE_EVENT, requestId, response)
   }
 
-  async removeListener(serverId: string, handlerIndex: number): Promise<void> {
-    if (!this.servers[Number(serverId)]) return;
 
-    return this.servers[Number(serverId)][ITEM_POSITION.events].removeListener(handlerIndex);
-  }
-
+  // async onServerListening(serverId: string, cb: () => void): Promise<number> {
+  //   const serverItem = this.getServerItem(serverId);
+  //
+  //   if (serverItem[ITEM_POSITION.listeningState]) {
+  //     cb();
+  //
+  //     return -1;
+  //   }
+  //
+  //   return serverItem[ITEM_POSITION.events].once(HttpServerEvent.listening, cb);
+  // }
 
   private makeServer(serverId: string, props: HttpServerProps): ServerItem {
     const events = new IndexedEventEmitter();
@@ -222,12 +191,17 @@ export default class HttpServer extends IoBase implements HttpServerIoType {
     }
   }
 
+
   private getServerItem(serverId: string): ServerItem {
     if (!this.servers[Number(serverId)]) {
-      throw new Error(`РеезServer: Server "${serverId}" hasn't been found`);
+      throw new Error(`HttpServer: Server "${serverId}" hasn't been found`)
     }
 
-    return this.servers[Number(serverId)];
+    return this.servers[Number(serverId)]
+  }
+
+  private makeServerId(props: WsServerProps): string {
+    return `${props.host}:${props.port}`
   }
 
 }
