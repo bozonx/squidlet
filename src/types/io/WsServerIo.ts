@@ -1,6 +1,3 @@
-import {IoBase} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/system/interfaces/IoBase'
-
-
 export enum WsServerEvent {
   serverStarted,
   serverClosed,
@@ -39,7 +36,7 @@ export interface WsServerConnectionParams {
 }
 
 
-export default interface WsServerIo extends IoBase {
+export default interface WsServerIo {
   // TODO: почему не поднимается событие ??
   /**
    * Destroy server and don't rise a close event.

@@ -1,14 +1,17 @@
 import WebSocket from 'ws';
 import {ClientRequest, IncomingMessage} from 'http'
+import {IndexedEventEmitter} from 'squidlet-lib'
+import {WsClientIoType, WebSocketClientProps, WsCloseStatus} from '../../../types/io/WsClientIoType.js'
+import {IoBase} from '../../../system/Io/IoBase.js'
 
 
-export default class WsClient implements WebSocketClientIo {
-  private readonly events = new IndexedEventEmitter();
-  private readonly connections: WebSocket[] = [];
+export class WsClient extends IoBase implements WsClientIoType {
+  private readonly events = new IndexedEventEmitter()
+  private readonly connections: WebSocket[] = []
 
 
-  async destroy() {
-    this.events.destroy();
+  destroy = async () => {
+    this.events.destroy()
 
     for (let connectionId in this.connections) {
       await this.close(connectionId, WsCloseStatus.closeGoingAway, 'destroy');

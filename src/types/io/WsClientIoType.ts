@@ -1,26 +1,3 @@
-import {ConnectionParams} from '../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/system/interfaces/io/WsServerIo';
-import IoItem from '../../../../squidlet/__old/system/interfaces/IoItem';
-
-
-export const Methods = [
-  'destroy',
-
-  'newConnection',
-  'reConnect',
-
-  'onOpen',
-  'onClose',
-  'onMessage',
-  'onError',
-  'onUnexpectedResponse',
-
-  'removeListener',
-
-  'send',
-  'close',
-  'destroyConnection',
-];
-
 // export const wsEventNames: {[index: string]: WsEvents} = {
 //   open: 'open',
 //   close: 'close',
@@ -56,9 +33,7 @@ export interface WebSocketClientProps {
   headers?: {[index: string]: string};
 }
 
-export default interface WsClientIoType extends IoItem {
-  destroy: () => Promise<void>;
-
+export interface WsClientIoType {
   newConnection       (props: WebSocketClientProps): Promise<string>;
   reConnect           (connectionId: string, props: WebSocketClientProps): Promise<void>;
 
