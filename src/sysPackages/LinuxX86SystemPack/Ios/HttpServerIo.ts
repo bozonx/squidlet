@@ -49,7 +49,7 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
     const serverId: string = this.makeServerId(props)
 
     if (this.servers[serverId]) {
-      throw new Error(`Server ${serverId} already exists`)
+      throw new Error(`HTTP server ${serverId} already exists`)
     }
 
     this.servers[serverId] = this.makeServer(serverId, props)
@@ -58,18 +58,7 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
   }
 
   async closeServer(serverId: string): Promise<void> {
-    const serverIdNum: number = Number(serverId);
-    if (!this.servers[serverIdNum]) return;
-
-    const serverItem = this.servers[serverIdNum];
-
-    // TODO: если раскоментировать то будет ошибка при дестрое
-    //await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
-
-    delete this.servers[serverIdNum];
-
-    // TODO: НЕ должно при этом подняться событие close или должно???
-    // TODO: отписаться от всех событий навешанный на этот сервер
+    return this.destroyServer(serverId)
   }
 
   async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
@@ -115,6 +104,19 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
     serverItem[ITEM_POSITION.listeningState] = true;
 
     serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
+  }
+
+  private async destroyServer(serverId: string) {
+    const serverIdNum: number = Number(serverId);
+    if (!this.servers[serverIdNum]) return;
+
+    // TODO: если раскоментировать то будет ошибка при дестрое
+    //await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
+
+    delete this.servers[serverIdNum];
+
+    // TODO: НЕ должно при этом подняться событие close или должно???
+    // TODO: отписаться от всех событий навешанный на этот сервер
   }
 
   // TODO: почему промис возвращается ???

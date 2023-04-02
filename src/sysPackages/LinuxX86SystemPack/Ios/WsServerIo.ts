@@ -1,9 +1,9 @@
 import WebSocket from 'ws'
 import {ClientRequest, IncomingMessage} from 'http'
-import {callPromised, convertBufferToUint8Array, IndexedEvents} from 'squidlet-lib'
-import {IoBase} from '../../../system/Io/IoBase.js'
+import {callPromised, convertBufferToUint8Array} from 'squidlet-lib'
 import {WsServerConnectionParams, WsServerEvent, WsServerIoType, WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {WsCloseStatus} from '../../../types/io/WsClientIoType.js'
+import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
 
 
 type ServerItem = [
@@ -39,50 +39,7 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
 }
 
 
-export class WsServerIo extends IoBase implements WsServerIoType {
-  private readonly events = new IndexedEvents()
-  // like {'host:port': [server, events, connections[], isListening]}
-  private readonly servers: Record<string, ServerItem> = {}
-
-
-  destroy = async () => {
-    for (const serverId of Object.keys(this.servers)) {
-      await this.destroyServer(serverId)
-    }
-
-    this.events.destroy()
-  }
-
-
-  /**
-   * Listen all the events of all the servers and connections
-   */
-  async on(cb: (...p: any[]) => void): Promise<number> {
-    return this.events.addListener(cb)
-  }
-
-  async off(handlerIndex: number) {
-    this.events.removeListener(handlerIndex)
-  }
-
-  async newServer(props: WsServerProps): Promise<string> {
-    const serverId: string = this.makeServerId(props)
-
-    if (this.servers[serverId]) {
-      throw new Error(`Server ${serverId} already exists`)
-    }
-
-    this.servers[serverId] = this.makeServer(serverId, props)
-
-    return serverId
-  }
-
-  async closeServer(serverId: string): Promise<void> {
-    await this.destroyServer(serverId)
-
-    // TODO: надо наверное удалить сервер из this.servers
-  }
-
+export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implements WsServerIoType {
   async send(serverId: string, connectionId: string, data: string | Uint8Array): Promise<void> {
 
     // TODO: is it need support of null or undefined, number, boolean ???
@@ -119,7 +76,7 @@ export class WsServerIo extends IoBase implements WsServerIoType {
   }
 
 
-  private makeServer(serverId: string, props: WsServerProps): ServerItem {
+  protected makeServer(serverId: string, props: WsServerProps): ServerItem {
     // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
     //       обычные http роуты
     const server = new WebSocket.WebSocketServer(props);
@@ -143,15 +100,7 @@ export class WsServerIo extends IoBase implements WsServerIoType {
     ]
   }
 
-  private handleServerStartListening = (serverId: string) => {
-    const serverItem = this.getServerItem(serverId)
-
-    serverItem[ITEM_POSITION.listeningState] = true
-
-    this.events.emit(WsServerEvent.serverStarted, serverId)
-  }
-
-  private async destroyServer(serverId: string) {
+  protected async destroyServer(serverId: string) {
     // TODO: он не закрывает соединения
 
     if (!this.servers[Number(serverId)]) return;
@@ -163,6 +112,19 @@ export class WsServerIo extends IoBase implements WsServerIoType {
     //await callPromised(server.close.bind(server));
 
     delete this.servers[Number(serverId)];
+  }
+
+  protected makeServerId(props: WsServerProps): string {
+    return `${props.host}:${props.port}`
+  }
+
+
+  private handleServerStartListening = (serverId: string) => {
+    const serverItem = this.getServerItem(serverId)
+
+    serverItem[ITEM_POSITION.listeningState] = true
+
+    this.events.emit(WsServerEvent.serverStarted, serverId)
   }
 
   private handleIncomeConnection(serverId: string, socket: WebSocket, request: IncomingMessage) {
@@ -203,18 +165,6 @@ export class WsServerIo extends IoBase implements WsServerIoType {
 
     // emit new connection
     this.events.emit(WsServerEvent.newConnection, connectionId, requestParams)
-  }
-
-  private getServerItem(serverId: string): ServerItem {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`WebSocketServer: Server "${serverId}" hasn't been found`)
-    }
-
-    return this.servers[Number(serverId)]
-  }
-
-  private makeServerId(props: WsServerProps): string {
-    return `${props.host}:${props.port}`
   }
 
 }
