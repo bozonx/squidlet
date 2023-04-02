@@ -33,7 +33,7 @@ export function makeConnectionParams(request: IncomingMessage): WsServerConnecti
     headers: {
       Authorization: request.headers.authorization,
       Cookie: request.headers.cookie,
-      'User-Agent': request.headers['User-Agent'],
+      'User-Agent': request.headers['user-agent'],
     },
   };
 }

@@ -11,16 +11,34 @@ type ServerItem = [
   Server,
   // is server listening.
   boolean
-];
+]
 
 enum ITEM_POSITION {
   server,
   listeningState
 }
 
+export interface HttpServerIoConfig {
+  requestTimeoutSec: number
+}
+
+const HTTP_SERVER_IO_CONFIG_DEFAULTS = {
+  requestTimeoutSec: 60
+}
+
 
 export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
   private responseEvent = new IndexedEvents<(requestId: number, response: HttpResponse) => void>()
+  private cfg: HttpServerIoConfig = HTTP_SERVER_IO_CONFIG_DEFAULTS
+
+
+  init = async (cfg?: HttpServerIoConfig)=> {
+    this.cfg = {
+      ...HTTP_SERVER_IO_CONFIG_DEFAULTS,
+      ...cfg,
+    }
+  }
+
 
   /**
    * Receive response to request and after that
@@ -31,23 +49,10 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
   }
 
 
-  // async onServerListening(serverId: string, cb: () => void): Promise<number> {
-  //   const serverItem = this.getServerItem(serverId);
-  //
-  //   if (serverItem[ITEM_POSITION.listeningState]) {
-  //     cb();
-  //
-  //     return -1;
-  //   }
-  //
-  //   return serverItem[ITEM_POSITION.events].once(HttpServerEvent.listening, cb);
-  // }
-
   protected makeServer(serverId: string, props: HttpServerProps): ServerItem {
     const server: Server = createServer({
-      // TODO: get from IO config
-      // // timeout of entire request in ms
-      // requestTimeout: 60000,
+      // timeout of entire request in ms
+      requestTimeout: this.cfg.requestTimeoutSec * 1000,
     })
 
     server.on('error', (err: Error) =>
@@ -118,7 +123,7 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
         `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
         `Server ${serverId}. ${req.method} ${req.url}`
       );
-    }, WAIT_RESPONSE_TIMEOUT_SEC * 1000);
+    }, this.cfg.requestTimeoutSec * 1000);
 
     this.events.emit(HttpServerEvent.request, serverId, requestId, httpRequest)
   }
