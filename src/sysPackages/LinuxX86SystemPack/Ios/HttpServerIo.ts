@@ -1,5 +1,5 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
-import {HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
+import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
 import {WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {HttpResponse} from '../../../types/Http.js'
 import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
@@ -21,6 +21,9 @@ enum ITEM_POSITION {
 
 
 export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
+  /**
+   * Send response back to client of it request and close request.
+   */
   async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
     // TODO: это вообще что ???
     return this.events.emit(RESPONSE_EVENT, requestId, response)
@@ -40,32 +43,37 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
   // }
 
   protected makeServer(serverId: string, props: HttpServerProps): ServerItem {
-    const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {
-        this.handleIncomeRequest(serverId, req, res)
-          .catch((e: Error) => events.emit(HttpServerEvent.serverError, e));
-    });
+    const server: Server = createServer({
+      // TODO: get from IO config
+      // // timeout of entire request in ms
+      // requestTimeout: 60000,
+    })
 
-    server.on('error', (err: Error) => events.emit(HttpServerEvent.serverError, String(err)));
-    server.on('close', () => events.emit(HttpServerEvent.serverClose));
+    server.on('error', (err: Error) =>
+      this.events.emit(HttpServerEvent.serverError, String(err)))
+    server.on('close', () =>
+      this.events.emit(HttpServerEvent.serverClose))
+    server.on('listening', () =>
+      this.handleServerStartListening(serverId))
+    server.on('request', (req: IncomingMessage, res: ServerResponse) =>
+      this.handleIncomeRequest(serverId, req, res))
 
-    server.listen(props.port, props.host, () => this.handleServerStartListening(serverId));
+    server.listen(props.port, props.host)
 
     return [
       server,
-      events,
       // not listening at the moment
       false
-    ];
+    ]
   }
 
   protected async destroyServer(serverId: string) {
-    const serverIdNum: number = Number(serverId);
-    if (!this.servers[serverIdNum]) return;
+    if (!this.servers[serverId]) return
 
     // TODO: если раскоментировать то будет ошибка при дестрое
     //await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
 
-    delete this.servers[serverIdNum];
+    delete this.servers[serverId]
 
     // TODO: НЕ должно при этом подняться событие close или должно???
     // TODO: отписаться от всех событий навешанный на этот сервер
@@ -81,11 +89,10 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
 
     serverItem[ITEM_POSITION.listeningState] = true;
 
-    serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
+    this.events.emit(HttpServerEvent.listening, serverId)
   }
 
-  // TODO: почему промис возвращается ???
-  private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse): Promise<void> {
+  private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse) {
     if (!this.servers[Number(serverId)]) return Promise.resolve();
 
     const events = this.servers[Number(serverId)][ITEM_POSITION.events];

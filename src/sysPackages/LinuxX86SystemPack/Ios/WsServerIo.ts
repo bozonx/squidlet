@@ -79,13 +79,13 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
   protected makeServer(serverId: string, props: WsServerProps): ServerItem {
     // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
     //       обычные http роуты
-    const server = new WebSocket.WebSocketServer(props);
+    const server = new WebSocket.WebSocketServer(props)
 
     server.on('close', () =>
       // TODO: а разве код и reason не должны прийти???
       this.events.emit(WsServerEvent.serverClosed, serverId))
     server.on('error', (err) =>
-      this.events.emit(WsServerEvent.serverError, serverId, err))
+      this.events.emit(WsServerEvent.serverError, serverId, String(err)))
     server.on('listening', () =>
       this.handleServerStartListening(serverId))
     server.on('connection', (socket: WebSocket, request: IncomingMessage) =>
@@ -103,15 +103,13 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
   protected async destroyServer(serverId: string) {
     // TODO: он не закрывает соединения
 
-    if (!this.servers[Number(serverId)]) return;
-
-    const server = this.servers[Number(serverId)][ITEM_POSITION.wsServer];
+    if (!this.servers[serverId]) return
 
     // call server close
     // TODO: если раскоментировать то будет ошибка при дестрое
     //await callPromised(server.close.bind(server));
 
-    delete this.servers[Number(serverId)];
+    delete this.servers[serverId]
   }
 
   protected makeServerId(props: WsServerProps): string {
