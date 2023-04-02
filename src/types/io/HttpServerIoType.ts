@@ -1,4 +1,4 @@
-import {HttpRequest} from '../Http.js'
+import {HttpRequest, HttpResponse} from '../Http.js'
 
 
 export enum HttpServerEvent {

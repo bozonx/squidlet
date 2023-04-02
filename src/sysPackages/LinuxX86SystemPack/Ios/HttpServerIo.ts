@@ -1,7 +1,8 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
+import {makeUniqNumber} from 'squidlet-lib'
 import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
 import {WsServerProps} from '../../../types/io/WsServerIoType.js'
-import {HttpResponse} from '../../../types/Http.js'
+import {HttpRequest, HttpResponse} from '../../../types/Http.js'
 import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
 
 
@@ -95,36 +96,35 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse) {
     if (!this.servers[serverId]) return
 
-    new Promise<void>((resolve, reject) => {
-      let handlerIndex: number;
-      let waitTimeout: any;
-      const requestId: number = makeUniqNumber();
-      const httpRequest: HttpRequest = this.makeRequestObject(req);
+    let handlerIndex: number
+    let waitTimeout: any
+    const requestId: number = makeUniqNumber()
+    const httpRequest: HttpRequest = this.makeRequestObject(req);
 
-      const respHandler = (receivedRequestId: number, response: HttpResponse) => {
-        // listen only expected requestId
-        if (receivedRequestId !== requestId) return;
+    const respHandler = (receivedRequestId: number, response: HttpResponse) => {
+      // listen only expected requestId
+      if (receivedRequestId !== requestId) return;
 
-        clearTimeout(waitTimeout);
-        events.removeListener(handlerIndex, RESPONSE_EVENT);
+      clearTimeout(waitTimeout);
+      events.removeListener(handlerIndex, RESPONSE_EVENT);
 
-        this.setupResponse(response, res);
+      this.setupResponse(response, res);
 
-        resolve();
-      };
+      resolve();
+    };
 
-      handlerIndex = events.addListener(RESPONSE_EVENT, respHandler);
+    handlerIndex = events.addListener(RESPONSE_EVENT, respHandler);
 
-      waitTimeout = setTimeout(() => {
-        events.removeListener(handlerIndex, RESPONSE_EVENT);
-        reject(
-          `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
-          `Server ${serverId}. ${req.method} ${req.url}`
-        );
-      }, WAIT_RESPONSE_TIMEOUT_SEC * 1000);
+    waitTimeout = setTimeout(() => {
+      events.removeListener(handlerIndex, RESPONSE_EVENT);
+      reject(
+        `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
+        `Server ${serverId}. ${req.method} ${req.url}`
+      );
+    }, WAIT_RESPONSE_TIMEOUT_SEC * 1000);
 
-      events.emit(HttpServerEvent.request, requestId, httpRequest);
-    });
+    events.emit(HttpServerEvent.request, requestId, httpRequest);
+
   }
 
   private makeRequestObject(req: IncomingMessage): HttpRequest {
