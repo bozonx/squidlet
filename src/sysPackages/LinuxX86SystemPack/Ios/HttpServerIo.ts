@@ -1,5 +1,5 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
-import {makeUniqNumber} from 'squidlet-lib'
+import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber} from 'squidlet-lib'
 import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
 import {WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {HttpRequest, HttpResponse} from '../../../types/Http.js'
@@ -18,16 +18,16 @@ enum ITEM_POSITION {
   listeningState
 }
 
-//const RESPONSE_EVENT = 'res';
-
 
 export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
+  private responseEvent = new IndexedEvents<(requestId: number, response: HttpResponse) => void>()
+
   /**
-   * Send response back to client of it request and close request.
+   * Receive response to request and after that
+   * send response back to client of it request and close request.
    */
   async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
-    // TODO: это вообще что ???
-    return this.events.emit(RESPONSE_EVENT, requestId, response)
+    return this.responseEvent.emit(requestId, response)
   }
 
 
@@ -96,52 +96,38 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse) {
     if (!this.servers[serverId]) return
 
-    let handlerIndex: number
     let waitTimeout: any
     const requestId: number = makeUniqNumber()
-    const httpRequest: HttpRequest = this.makeRequestObject(req);
+    const httpRequest: HttpRequest = this.makeRequestObject(req)
 
-    const respHandler = (receivedRequestId: number, response: HttpResponse) => {
+    const handlerIndex = this.responseEvent.addListener((receivedRequestId: number, response: HttpResponse) => {
       // listen only expected requestId
-      if (receivedRequestId !== requestId) return;
+      if (receivedRequestId !== requestId) return
 
-      clearTimeout(waitTimeout);
-      events.removeListener(handlerIndex, RESPONSE_EVENT);
+      clearTimeout(waitTimeout)
+      this.responseEvent.removeListener(handlerIndex)
 
-      this.setupResponse(response, res);
-
-      resolve();
-    };
-
-    handlerIndex = events.addListener(RESPONSE_EVENT, respHandler);
+      this.setupResponse(response, res)
+    })
 
     waitTimeout = setTimeout(() => {
-      events.removeListener(handlerIndex, RESPONSE_EVENT);
-      reject(
+      this.responseEvent.removeListener(handlerIndex)
+      this.events.emit(
+        HttpServerEvent.serverError,
+        serverId,
         `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
         `Server ${serverId}. ${req.method} ${req.url}`
       );
     }, WAIT_RESPONSE_TIMEOUT_SEC * 1000);
 
-    events.emit(HttpServerEvent.request, requestId, httpRequest);
-
+    this.events.emit(HttpServerEvent.request, serverId, requestId, httpRequest)
   }
 
   private makeRequestObject(req: IncomingMessage): HttpRequest {
-    // TODO: review
-    let body: string | Buffer | undefined;
+    const bodyBuff: Buffer | null = req.read()
+    const body: string | undefined = bodyBuff?.toString(DEFAULT_ENCODE)
 
-    //req.
-
-    // if (typeof req.body === 'string') {
-    //   body = req.body;
-    // }
-    // else {
-    //   // TODO: convert Uint8Array to Buffer
-    //   body = req.body;
-    // }
-
-    //console.log(111111, req.method, req.url, req.headers);
+    // TODO: если content type бинарный то преобразовать body в Uint8
 
     return  {
       // method of http request is in upper case format
@@ -153,6 +139,9 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
   }
 
   private setupResponse(response: HttpResponse, httpRes: ServerResponse) {
+
+    // TODO: review
+
     httpRes.writeHead(response.status, response.headers as {[index: string]: string});
 
     if (typeof response.body === 'string') {
