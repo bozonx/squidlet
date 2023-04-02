@@ -93,11 +93,9 @@ export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerPro
   }
 
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse) {
-    if (!this.servers[Number(serverId)]) return Promise.resolve();
+    if (!this.servers[serverId]) return
 
-    const events = this.servers[Number(serverId)][ITEM_POSITION.events];
-
-    return new Promise<void>((resolve, reject) => {
+    new Promise<void>((resolve, reject) => {
       let handlerIndex: number;
       let waitTimeout: any;
       const requestId: number = makeUniqNumber();
