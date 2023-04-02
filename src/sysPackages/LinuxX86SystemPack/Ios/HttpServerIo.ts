@@ -1,9 +1,8 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
-import {IndexedEvents} from 'squidlet-lib'
-import {IoBase} from '../../../system/Io/IoBase.js'
 import {HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
 import {WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {HttpResponse} from '../../../types/Http.js'
+import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
 
 
 type ServerItem = [
@@ -21,46 +20,7 @@ enum ITEM_POSITION {
 //const RESPONSE_EVENT = 'res';
 
 
-export default class HttpServerIo extends IoBase implements HttpServerIoType {
-  private readonly events = new IndexedEvents()
-  // like {'host:port': [server, events, connections[], isListening]}
-  private readonly servers: Record<string, ServerItem> = {}
-
-
-  destroy = async () => {
-    for (let serverId in this.servers) {
-      // TODO: not emit events
-      await this.closeServer(serverId);
-    }
-
-    this.events.destroy()
-  }
-
-
-  async on(cb: (...p: any[]) => void): Promise<number> {
-    return this.events.addListener(cb)
-  }
-
-  async off(handlerIndex: number) {
-    this.events.removeListener(handlerIndex)
-  }
-
-  async newServer(props: HttpServerProps): Promise<string>{
-    const serverId: string = this.makeServerId(props)
-
-    if (this.servers[serverId]) {
-      throw new Error(`HTTP server ${serverId} already exists`)
-    }
-
-    this.servers[serverId] = this.makeServer(serverId, props)
-
-    return serverId
-  }
-
-  async closeServer(serverId: string): Promise<void> {
-    return this.destroyServer(serverId)
-  }
-
+export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
   async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
     // TODO: это вообще что ???
     return this.events.emit(RESPONSE_EVENT, requestId, response)
@@ -79,7 +39,7 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
   //   return serverItem[ITEM_POSITION.events].once(HttpServerEvent.listening, cb);
   // }
 
-  private makeServer(serverId: string, props: HttpServerProps): ServerItem {
+  protected makeServer(serverId: string, props: HttpServerProps): ServerItem {
     const server: Server = createServer((req: IncomingMessage, res: ServerResponse) => {
         this.handleIncomeRequest(serverId, req, res)
           .catch((e: Error) => events.emit(HttpServerEvent.serverError, e));
@@ -98,15 +58,7 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
     ];
   }
 
-  private handleServerStartListening = (serverId: string) => {
-    const serverItem = this.getServerItem(serverId);
-
-    serverItem[ITEM_POSITION.listeningState] = true;
-
-    serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
-  }
-
-  private async destroyServer(serverId: string) {
+  protected async destroyServer(serverId: string) {
     const serverIdNum: number = Number(serverId);
     if (!this.servers[serverIdNum]) return;
 
@@ -117,6 +69,19 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
 
     // TODO: НЕ должно при этом подняться событие close или должно???
     // TODO: отписаться от всех событий навешанный на этот сервер
+  }
+
+  protected makeServerId(props: WsServerProps): string {
+    return `${props.host}:${props.port}`
+  }
+
+
+  private handleServerStartListening = (serverId: string) => {
+    const serverItem = this.getServerItem(serverId);
+
+    serverItem[ITEM_POSITION.listeningState] = true;
+
+    serverItem[ITEM_POSITION.events].emit(HttpServerEvent.listening);
   }
 
   // TODO: почему промис возвращается ???
@@ -191,18 +156,6 @@ export default class HttpServerIo extends IoBase implements HttpServerIoType {
     else {
       // TODO: support of Buffer - convert from Uint8Arr to Buffer
     }
-  }
-
-  private getServerItem(serverId: string): ServerItem {
-    if (!this.servers[Number(serverId)]) {
-      throw new Error(`HttpServer: Server "${serverId}" hasn't been found`)
-    }
-
-    return this.servers[Number(serverId)]
-  }
-
-  private makeServerId(props: WsServerProps): string {
-    return `${props.host}:${props.port}`
   }
 
 }
