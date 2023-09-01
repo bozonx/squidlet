@@ -34,3 +34,14 @@ And select src/starts/FirefoxStarter/addon/manifest.json
 
 ### Dev
 
+* Install Android Studio
+* Install SDK api 30
+* Install SDK build tools - switch to tab "SDK tools", check show details and select build tools 30
+* Run virtual phone
+
+    
+    # run to check an environment
+    ns doctor android
+
+    # run
+    ns run android
