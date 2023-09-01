@@ -19,8 +19,7 @@
 
   "browser_action": {
     "default_icon": "icons/squidlet-icon-32.png",
-    "default_title": "Squidlet",
-    "default_popup": "popup/popup.html"
+    "default_title": "Squidlet"
   },
 
   "web_accessible_resources": [
@@ -31,20 +30,14 @@
     "scripts": ["background/background.js"]
   },
 
-  "content_scripts": [
-    {
-      "matches": ["*://*.mozilla.org/*"],
-      "js": ["squidlet.js"]
-    }
-  ],
-
   "sidebar_action": {
     "default_icon": "icons/squidlet-icon-32.png",
     "default_title" : "Sidebar",
-    "default_panel": "sidebar/sidebar.html"
+    "default_panel": "sidebar/sidebar.html",
+    "open_at_install": true
   },
 
-  "permissions": ["storage", "tabs", "activeTab"],
+  "permissions": ["storage", "tabs", "activeTab", "notifications"],
 
   "commands": {
     "_execute_sidebar_action": {
