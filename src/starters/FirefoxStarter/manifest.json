@@ -9,6 +9,8 @@
     "96": "icons/squidlet-icon-96.png"
   },
 
+  "permissions": ["storage", "tabs", "activeTab", "notifications"],
+
   "applications": {
     "gecko": {
       "id": "squidlet@mozilla.org",
@@ -16,15 +18,10 @@
     }
   },
 
-
   "browser_action": {
     "default_icon": "icons/squidlet-icon-32.png",
     "default_title": "Squidlet"
   },
-
-  "web_accessible_resources": [
-    "icons/*.png"
-  ],
 
   "background": {
     "scripts": ["background/background.js"]
@@ -37,12 +34,10 @@
     "open_at_install": true
   },
 
-  "permissions": ["storage", "tabs", "activeTab", "notifications"],
-
   "commands": {
     "_execute_sidebar_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y"
+        "default": "Ctrl+Shift+Q"
       }
     }
   }
