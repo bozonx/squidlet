@@ -1,4 +1,9 @@
-import {callSafely, IndexedEventEmitter, LogPublisher, MemStorage} from 'squidlet-lib'
+import {
+  callSafely,
+  IndexedEventEmitter,
+  LogPublisher,
+  MemStorage
+} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './Io/IoManager.js'
 import {SystemInfoManager} from './managers/SystemInfoManager.js'
@@ -114,7 +119,7 @@ export class System {
   }
 
 
-  async start() {
+  start() {
     (async () => {
       // start system's and user's services
       await this.services.startAll()

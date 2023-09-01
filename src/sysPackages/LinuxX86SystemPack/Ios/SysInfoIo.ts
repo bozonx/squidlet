@@ -48,6 +48,7 @@ export default class SysInfoIo extends IoBase implements SysInfoIoType {
 
   async getCpuLoad(): Promise<number[]> {
     // TODO: add
+    return [0]
   }
 
 
@@ -93,6 +94,10 @@ export default class SysInfoIo extends IoBase implements SysInfoIoType {
     //     resolve((ramTotalMatchRes) ? Number(ramTotalMatchRes[1]) : -1);
     //   })
     // })
+    return {
+      osName: 'Linux',
+      osVersion: '5',
+    }
   }
 
 }
