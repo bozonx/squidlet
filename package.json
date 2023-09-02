@@ -12,7 +12,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "FILES_ROOT_DIR=./testData ts-node-esm ./src/starters/dev/index.ts",
+    "dev": "ROOT_DIR=./_testData ts-node-esm ./src/starters/dev/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },

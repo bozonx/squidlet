@@ -24,15 +24,15 @@ export enum ServiceEvents {
 
 export const ROOT_DIRS = {
   cfg: 'cfg',
-  db: 'db',
   appFiles: 'appFiles',
-  appData: 'appData',
-  appShared: 'appShared',
-  userData: 'userData',
+  appDataLocal: 'appDataLocal',
+  appDataSynced: 'appDataSynced',
+  db: 'db',
   cache: 'cache',
   log: 'log',
   tmp: 'tmp',
-  external: 'external',
+  userData: 'userData',
+  //external: 'external',
 }
 
 export const SYSTEM_CFG_DIR = `${ROOT_DIRS.cfg}/system`

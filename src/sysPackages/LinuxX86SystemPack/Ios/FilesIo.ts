@@ -1,20 +1,54 @@
+import path from 'node:path'
 import fs from 'node:fs/promises'
+import {exec} from 'node:child_process'
+import {promisify} from 'node:util'
 import {Stats, existsSync, lstatSync} from 'node:fs'
 import {pathJoin, PATH_SEP, trimCharEnd, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
 import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/FilesIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {IoIndex} from '../../../types/types.js'
 import {IoContext} from '../../../system/Io/IoContext.js'
+import {ROOT_DIRS} from '../../../types/contstants.js'
+
+export const execPromise = promisify(exec)
 
 
-export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
-  const cfg: FilesIoConfig = {
-    rootDir: trimCharEnd(process.env.FILES_ROOT_DIR || '', PATH_SEP),
-    uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
-    gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
+function prepareSubPath(subDirOfRoot: string, rootDir?: string, envPath?: string) {
+  if (rootDir) {
+    return path.join(rootDir, subDirOfRoot)
   }
 
-  if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
+  if (!envPath) {
+    throw new Error(`Dir "${subDirOfRoot}" haven't set by env`)
+  }
+
+  // TODO: а разве path.resolve не уберёт последний слэш???
+  return trimCharEnd(path.resolve(envPath), PATH_SEP)
+}
+
+export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
+  const rootDir = process.env.ROOT_DIR
+    // TODO: а разве path.resolve не уберёт последний слэш???
+    && trimCharEnd(path.resolve(process.env.ROOT_DIR), PATH_SEP)
+    || ''
+  const cfg: FilesIoConfig = {
+
+    //rootDir: trimCharEnd(path.resolve(process.env.FILES_ROOT_DIR|| '') , PATH_SEP),
+    uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
+    gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
+
+    configsDir: prepareSubPath(ROOT_DIRS.cfg, rootDir, process.env.CONFIGS_DIR),
+    appFilesDir: prepareSubPath(ROOT_DIRS.appFiles, rootDir, process.env.APP_FILES_DIR),
+    appDataLocalDir: prepareSubPath(ROOT_DIRS.appDataLocal, rootDir, process.env.APP_DATA_LOCAL_DIR),
+    appDataSyncedDir: prepareSubPath(ROOT_DIRS.appDataSynced, rootDir, process.env.APP_DATA_SYNCED_DIR),
+    dbDir: prepareSubPath(ROOT_DIRS.db, rootDir, process.env.DB_DIR),
+    cacheDir: prepareSubPath(ROOT_DIRS.cache, rootDir, process.env.CACHE_DIR),
+    logDir: prepareSubPath(ROOT_DIRS.log, rootDir, process.env.LOG_DIR),
+    tmpDir: prepareSubPath(ROOT_DIRS.tmp, rootDir, process.env.TMP_DIR),
+    userDataDir: prepareSubPath(ROOT_DIRS.userData, rootDir, process.env.USER_DATA_DIR),
+  }
+
+  //if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
 
   return new FilesIo(ctx, cfg)
 }

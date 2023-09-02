@@ -2,7 +2,6 @@ import {pathJoin} from 'squidlet-lib'
 import {System} from '../System.js'
 import {PackageContext} from './PackageContext.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {ROOT_DIRS} from '../../types/contstants.js'
 
 
 export class PackageManager {
@@ -28,9 +27,11 @@ export class PackageManager {
 
 
   async loadInstalled() {
+    // TODO: не правильно
     const appsDirContent = await this.filesDriver.readDir(pathJoin(ROOT_DIRS.appFiles))
 
     for (const appDir of appsDirContent) {
+      // TODO: не правильно
       const indexFilePath = pathJoin(ROOT_DIRS.appFiles, appDir, 'index.js')
       const indexFileContent = await this.filesDriver.readTextFile(indexFilePath)
 

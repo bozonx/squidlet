@@ -7,7 +7,6 @@ import {FilesCache} from '../files/FilesCache.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesVersioned} from '../files/FilesVersioned.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
-import {ROOT_DIRS} from '../../types/contstants.js'
 import {RestrictedMemStorage} from './RestrictedMemStorage.js'
 
 
@@ -55,6 +54,7 @@ export class ServiceContext {
 
     const appName = ''
 
+    // TODO: не правильно
     this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
     this.logFiles = new FilesLog(this.system, pathJoin(ROOT_DIRS.log, appName))
     this.fileCache = new FilesCache(this.system, pathJoin(ROOT_DIRS.cache, appName))

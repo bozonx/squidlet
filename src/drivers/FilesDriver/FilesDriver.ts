@@ -1,9 +1,10 @@
 import {isUtf8} from 'buffer'
-import {pathDirname, pathJoin} from 'squidlet-lib'
+import {pathDirname, pathJoin, mkdirPLogic} from 'squidlet-lib'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex, PermissionFileType} from '../../types/types.js'
 import FilesIoType, {StatsSimplified} from '../../types/io/FilesIoType.js'
+
 
 
 export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
@@ -235,7 +236,12 @@ export class FilesDriver extends DriverBase {
    */
   async mkDirP(pathToDir: string): Promise<void> {
     this.checkPermissions(pathToDir, 'w')
-    // TODO: !!!! use helpers/mkdirPLogic.ts
+
+    await mkdirPLogic(
+      pathToDir,
+      (dirName: string) => this.isExists(dirName),
+      (dirName: string) => this.io.mkdir(dirName),
+    )
   }
 
 

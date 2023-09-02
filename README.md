@@ -2,6 +2,20 @@
 
 Easy make IoT devices and local net of devices which can be managed by master
 
+## Environment variables
+
+* ROOT_DIR - if set then it will be default root dir for all the other dirs
+* CONFIGS_DIR - set specific configs dir
+* APP_FILES_DIR - set specific dir for app files. They will be readonly
+* APP_DATA_LOCAL_DIR - set specific dir for apps local data
+* APP_DATA_SYNCED_DIR - set specific dir for apps data which are synced between
+  user's devices
+* DB_DIR - set specific db dir
+* CACHE_DIR - set specific cache dir
+* LOG_DIR - set specific dir for logs
+* TMP_DIR - set specific dir for tmp files
+* USER_DATA_DIR - set specific dir where user store his files. They are synced
+
 ## Start dev
 
     yarn dev

@@ -16,7 +16,16 @@ export interface FilesIoConfig {
   uid?: number;
   gid?: number;
   // It will be used as root of all the files which are read and written using FilesIo.
-  rootDir: string;
+  //rootDir: string;
+  configsDir: string
+  appFilesDir: string
+  appDataLocalDir: string
+  appDataSyncedDir: string
+  dbDir: string
+  cacheDir: string
+  logDir: string
+  tmpDir: string
+  userDataDir: string
 }
 
 
