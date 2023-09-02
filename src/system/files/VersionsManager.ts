@@ -3,6 +3,11 @@ import {System} from '../System.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 
+// TODO: может это лучше драйвером сделать ????
+
+/**
+ * It is file versioning manager
+ */
 export class VersionsManager {
   private readonly system: System
 
@@ -48,6 +53,7 @@ export class VersionsManager {
 
   private resolveVersionsCount(dirName: string): number {
 
+    return -1
     // TODO: в конфиге можно указать какие директории имеюют сколько версий
     //       тогда нужно каждый раз сравнивать с конфигом чтобы понять сколько версий использовать
   }

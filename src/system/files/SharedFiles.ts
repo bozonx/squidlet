@@ -19,8 +19,8 @@ export class SharedFiles {
     this.system = system
     this.accessToken = accessToken
 
-    this.userData = new FilesVersioned(this.system, accessToken, 'userData')
-    this.external = new FilesWrapper(this.system, accessToken, 'external')
+    this.userData = new FilesVersioned(this.system, 'userData')
+    this.external = new FilesWrapper(this.system, 'external')
   }
 
 }

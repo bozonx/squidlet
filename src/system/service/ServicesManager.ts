@@ -72,17 +72,19 @@ export class ServicesManager {
         }
       }
       // load service config
-      const cfgFilePath = pathJoin(CFG_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
-      let serviceCfg: Record<string, any> | undefined
-
-      if (await this.system.files.cfg.exists(cfgFilePath)) {
-        serviceCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
-      }
+      const serviceCfg: Record<string, any> | undefined = await this.system.configs
+          .loadDriverConfig(serviceName)
+      // const cfgFilePath = pathJoin(CFG_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
+      // let serviceCfg: Record<string, any> | undefined
+      //
+      // if (await this.system.files.cfg.exists(cfgFilePath)) {
+      //   serviceCfg = yaml.parse(await this.system.files.cfg.readTextFile(cfgFilePath))
+      // }
 
       if (service.init) {
         this.ctx.log.debug(`ServicesManager: initializing service "${serviceName}"`)
         // TODO: добавить таймаут инициализации
-        this.changeStatus(service.name, SERVICE_STATUS.initializing as ServiceStatus)
+        this.changeStatus(serviceName, SERVICE_STATUS.initializing as ServiceStatus)
 
         try {
           await service.init(
@@ -92,12 +94,12 @@ export class ServicesManager {
         }
         catch (e) {
           this.ctx.log.error(`ServicesManager: service "${serviceName}" init error: ${e}`)
-          this.changeStatus(service.name, SERVICE_STATUS.initError as ServiceStatus)
+          this.changeStatus(serviceName, SERVICE_STATUS.initError as ServiceStatus)
 
           return
         }
 
-        this.changeStatus(service.name, SERVICE_STATUS.initialized as ServiceStatus)
+        this.changeStatus(serviceName, SERVICE_STATUS.initialized as ServiceStatus)
       }
     }
   }

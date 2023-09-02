@@ -41,6 +41,7 @@ export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.yml`
 export const CFG_DIRS = {
   ios: 'ios',
   drivers: 'drivers',
+  services: 'services',
 }
 
 export const SERVICE_STATUS = {
