@@ -55,9 +55,11 @@ export default interface FilesIoType {
   // rename or remove. Use full path
   // files is [OLD_PATH, NEW_PATH][]
   renameFiles(files: [string, string][]): Promise<void>
+  // remove directory recursively
+  rmdirR(pathTo: string): Promise<void>
+  mkDirP(pathTo: string): Promise<void>
 
   // TODO: может для батч операций просто передавать некую очередь
-  // TODO: что по части удаления дириктории рекурсивно?
   // TODO: что по части удаления нескольких файлов
   // TODO: чтение файла блоками
 }

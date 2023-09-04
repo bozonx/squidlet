@@ -25,6 +25,7 @@ export class DriversManager {
         })
 
         if (found.length !== driver.requireIo.length) {
+          this.ctx.log.warn(`Driver "${driverName}" hasn't meet a dependency IO "${driver.requireIo.join(', ')}"`)
           await driver.destroy?.()
           // do not register the driver if ot doesn't meet his dependencies
           delete this.drivers[driverName]

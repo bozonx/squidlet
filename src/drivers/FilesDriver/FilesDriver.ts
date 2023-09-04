@@ -14,10 +14,6 @@ export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
 const filesIoName = 'FilesIo'
 
 
-// TODO: должна быть проверка прав через токен, либо делать обертку с проверкой
-// TODO: create symlink
-
-
 /**
  * Files driver
  * Use relative paths
@@ -26,7 +22,7 @@ export class FilesDriver extends DriverBase {
   requireIo = [filesIoName]
 
   private get io(): FilesIoType {
-    return this.ctx.io.getIo<FilesIoType>(filesIoName)
+    return this.ctx.io.getIo(filesIoName)
   }
 
   //////// AS IN FILES IO
@@ -108,6 +104,23 @@ export class FilesDriver extends DriverBase {
     return this.io.renameFiles(files)
   }
 
+  /**
+   * Remove dir recursively
+   */
+  async rmdirR(pathToDir: string): Promise<void> {
+    this.checkPermissions(pathToDir, 'w')
+
+    return this.io.rmdirR(pathToDir)
+  }
+
+  /**
+   * Make dir even parent dir doesn't exist
+   */
+  async mkDirP(pathToDir: string): Promise<void> {
+    this.checkPermissions(pathToDir, 'w')
+
+    await this.io.mkDirP(pathToDir)
+  }
 
   ////////// ADDITIONAL
 
@@ -127,14 +140,6 @@ export class FilesDriver extends DriverBase {
     else {
       return this.io.unlink(pathToFileOrDir)
     }
-  }
-
-  /**
-   * Remove one file of dir recursively
-   */
-  async rmRf(pathToFileOrDir: string): Promise<void> {
-    this.checkPermissions(pathToFileOrDir, 'w')
-    // TODO: !!!!
   }
 
   /**
@@ -229,19 +234,6 @@ export class FilesDriver extends DriverBase {
     catch (e) {
       return false
     }
-  }
-
-  /**
-   * Make dir even parent dir doesn't exist
-   */
-  async mkDirP(pathToDir: string): Promise<void> {
-    this.checkPermissions(pathToDir, 'w')
-
-    await mkdirPLogic(
-      pathToDir,
-      (dirName: string) => this.isExists(dirName),
-      (dirName: string) => this.io.mkdir(dirName),
-    )
   }
 
 

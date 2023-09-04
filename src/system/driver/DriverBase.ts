@@ -2,7 +2,7 @@ import {DriverContext} from './DriverContext.js'
 
 
 export class DriverBase {
-  // put name of the driver here it it not the same as class name
+  // put name of the driver here if it not the same as class name
   readonly myName?: string
   readonly requireIo?: string[]
 
@@ -13,7 +13,6 @@ export class DriverBase {
     this.ctx = ctx
   }
 
-  init?: (cfg?: Record<string, any>) => Promise<void>
-
-  destroy?: () => Promise<void>
+  init?(cfg?: Record<string, any>): Promise<void>
+  destroy?(): Promise<void>
 }

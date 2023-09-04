@@ -3,7 +3,14 @@ import fs from 'node:fs/promises'
 import {exec} from 'node:child_process'
 import {promisify} from 'node:util'
 import {Stats, existsSync, lstatSync} from 'node:fs'
-import {pathJoin, PATH_SEP, trimCharEnd, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
+import {
+  pathJoin,
+  PATH_SEP,
+  trimCharEnd,
+  DEFAULT_ENCODE,
+  convertBufferToUint8Array,
+  trimCharStart
+} from 'squidlet-lib'
 import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../../types/io/FilesIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {IoIndex} from '../../../types/types.js'
@@ -168,6 +175,30 @@ export class FilesIo extends IoBase implements FilesIoType {
     }
   }
 
+  async rmdirR(pathTo: string): Promise<void> {
+    const fullPath = this.makePath(pathTo)
+
+    const res = await execPromise(`rm -R "${fullPath}"`)
+
+    if (res.stderr) {
+      throw new Error(`Can't remove a directory recursively: ${res.stderr}`)
+    }
+
+    return
+  }
+
+  async mkDirP(pathTo: string): Promise<void> {
+    const fullPath = this.makePath(pathTo)
+
+    const res = await execPromise(`mkdir -p "${fullPath}"`)
+
+    if (res.stderr) {
+      throw new Error(`Can't mkDirP: ${res.stderr}`)
+    }
+
+    return
+  }
+
 
   private async chown(pathTo: string) {
     if (!this.cfg.uid && !this.cfg.gid) {
@@ -189,7 +220,15 @@ export class FilesIo extends IoBase implements FilesIoType {
   }
 
   private makePath(pathTo: string): string {
-    return pathJoin(this.cfg.rootDir, pathTo)
+    const pathSplat: string[] = trimCharStart(pathTo, PATH_SEP).split(PATH_SEP)
+
+    if (!Object.keys(ROOT_DIRS).includes(pathSplat[0])) {
+      throw new Error(`Wrong root dir`)
+    }
+
+    pathSplat[0] = this.cfg[pathSplat[0] as keyof FilesIoConfig] as string
+
+    return pathJoin(pathSplat.join(PATH_SEP))
   }
 
 }

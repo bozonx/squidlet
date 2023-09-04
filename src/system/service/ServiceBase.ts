@@ -27,7 +27,7 @@ export abstract class ServiceBase {
     this.onFall = onFall
   }
 
-  destroy?: (reason: ServiceDestroyReason) => Promise<void>
+  destroy?(reason: ServiceDestroyReason): Promise<void>
 
   abstract start: () => Promise<void>
   abstract stop: (force?: boolean) => Promise<void>

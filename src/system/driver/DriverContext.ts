@@ -20,12 +20,4 @@ export class DriverContext {
     this.system = system
   }
 
-
-  async init() {
-
-  }
-
-  async destroy() {
-  }
-
 }

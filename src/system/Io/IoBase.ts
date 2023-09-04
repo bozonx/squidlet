@@ -12,7 +12,6 @@ export class IoBase {
     this.ctx = ctx
   }
 
-  init?: (cfg?: any) => Promise<void>
-
-  destroy?: () => Promise<void>
+  init?(cfg?: any): Promise<void>
+  destroy?(): Promise<void>
 }
