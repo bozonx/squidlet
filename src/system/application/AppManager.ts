@@ -1,14 +1,20 @@
 import {System} from '../System.js'
 import {AppContext} from './AppContext.js'
+import {AppBase} from './AppBase.js'
+
+
+// TODO: системное приложение может иметь свои файлы, бд и тд
 
 
 export class AppManager {
   private readonly system: System
-  private apps: Record<string, AppContext> = {}
+  private readonly ctx: AppContext
+  private apps: Record<string, AppBase> = {}
 
 
   constructor(system: System) {
     this.system = system
+    this.ctx = new AppContext(this.system)
   }
 
 
@@ -23,18 +29,20 @@ export class AppManager {
   }
 
 
-  getApp(appName: string): AppContext | undefined {
-    return this.apps[appName]
+  getApp<T extends AppBase>(appName: string): T | undefined {
+    return this.apps[appName] as T
   }
 
-  registerApp(appName: string): AppContext {
+  getAppNames(): string[] {
+    return Object.keys(this.apps)
+  }
+
+  registerApp(appName: string, app: AppBase) {
     if (this.apps[appName]) {
       throw new Error(`Can't register app "${appName}" because it has already registered`)
     }
 
-    const app = new AppContext()
-
-    return app
+    this.apps[appName] = app
   }
 
 }
