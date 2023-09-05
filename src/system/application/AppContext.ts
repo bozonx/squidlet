@@ -11,7 +11,7 @@ import {DriversManager} from '../driver/DriversManager.js'
 import {System} from '../System.js'
 
 
-export class AppController {
+export class AppContext {
   appName: string
 
   api: Record<string, any> = {}
@@ -56,14 +56,14 @@ export class AppController {
     this.system = system
 
     //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
-    this.logFiles = new FilesLog(this.ctx.drivers, pathJoin(ROOT_DIRS.log, appName))
-    this.fileCache = new FilesCache(this.ctx.drivers, pathJoin(ROOT_DIRS.cache, appName))
-    this.cfg = new FilesWrapper(this.ctx.drivers, pathJoin(ROOT_DIRS.cfg, appName))
-    this.tmp = new FilesWrapper(this.ctx.drivers, pathJoin(ROOT_DIRS.tmp, appName))
-    this.appFiles = new FilesReadOnly(this.ctx.drivers, pathJoin(ROOT_DIRS.appFiles, appName))
-    this.appDataLocal = new FilesWrapper(this.ctx.drivers, pathJoin(ROOT_DIRS.appDataLocal, appName))
+    this.logFiles = new FilesLog(this.system.drivers, pathJoin(ROOT_DIRS.log, appName))
+    this.fileCache = new FilesCache(this.system.drivers, pathJoin(ROOT_DIRS.cache, appName))
+    this.cfg = new FilesWrapper(this.system.drivers, pathJoin(ROOT_DIRS.cfg, appName))
+    this.tmp = new FilesWrapper(this.system.drivers, pathJoin(ROOT_DIRS.tmp, appName))
+    this.appFiles = new FilesReadOnly(this.system.drivers, pathJoin(ROOT_DIRS.appFiles, appName))
+    this.appDataLocal = new FilesWrapper(this.system.drivers, pathJoin(ROOT_DIRS.appDataLocal, appName))
     this.appDataSynced = new FilesVersioned(
-      this.ctx.drivers,
+      this.system.drivers,
       pathJoin(ROOT_DIRS.appDataSynced, appName)
     )
 

@@ -6,7 +6,7 @@ import {ServiceBase} from '../system/service/ServiceBase.js'
 import {ServiceContext} from '../system/service/ServiceContext.js'
 import {IoContext} from '../system/Io/IoContext.js'
 import {SERVICE_DESTROY_REASON, SERVICE_STATUS} from './contstants.js'
-import {AppController} from '../system/application/AppController.js'
+import {AppContext} from '../system/application/AppContext.js'
 import {AppBase} from '../system/application/AppBase.js'
 
 

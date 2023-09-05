@@ -1,5 +1,5 @@
 import {System} from '../System.js'
-import {AppController} from './AppController.js'
+import {AppContext} from './AppContext.js'
 import {AppBase} from './AppBase.js'
 import {AppIndex} from '../../types/types.js'
 
@@ -37,7 +37,7 @@ export class AppManager {
         this.system.log.debug(`AppManager: initializing app "${appName}"`)
 
         try {
-          await app.ctl.init()
+          await app.ctx.init()
           await app.init()
         }
         catch (e) {
@@ -60,7 +60,7 @@ export class AppManager {
 
         try {
           await app.destroy()
-          await app.ctl.destroy()
+          await app.ctx.destroy()
         }
         catch (e) {
           this.system.log.error(`App "${appName} destroying with error: ${e}"`)
@@ -87,9 +87,9 @@ export class AppManager {
       throw new Error(`Can't register app "${appName}" because it has already registered`)
     }
 
-    const appController = new AppController(this.system, appName)
+    const appController = new AppContext(this.system, appName)
 
-    appInstance.$setCtl(appController)
+    appInstance.$setCtx(appController)
 
     this.apps[appName] = appInstance
   }
