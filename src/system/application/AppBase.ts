@@ -7,8 +7,8 @@ import {AppController} from './AppController.js'
 
 export abstract class AppBase {
   abstract myName: string
-
-  private ctl: AppController
+  readonly requireDriver?: string[]
+  protected ctl: AppController
 
 
   constructor(ctl: AppController) {
@@ -17,8 +17,11 @@ export abstract class AppBase {
   }
 
 
-  async init() {
-    // TODO: будет выполненно на init
-  }
+  // async init() {
+  //   // TODO: будет выполненно на init
+  // }
+
+  init?(cfg?: Record<string, any>): Promise<void>
+  destroy?(): Promise<void>
 
 }

@@ -1,4 +1,3 @@
-import yaml from 'yaml'
 import {pathJoin, arraysDifference} from 'squidlet-lib'
 import {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
@@ -14,7 +13,7 @@ import {
 } from '../../types/contstants.js'
 
 
-const SERVICE_CONFIG_FILE_NAME = 'index.yml'
+//const SERVICE_CONFIG_FILE_NAME = 'index.yml'
 
 
 export class ServicesManager {
@@ -73,7 +72,7 @@ export class ServicesManager {
       }
       // load service config
       const serviceCfg: Record<string, any> | undefined = await this.system.configs
-          .loadDriverConfig(serviceName)
+          .loadServiceConfig(serviceName)
       // const cfgFilePath = pathJoin(CFG_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
       // let serviceCfg: Record<string, any> | undefined
       //

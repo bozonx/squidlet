@@ -2,7 +2,12 @@ import yaml from 'yaml'
 import {pathJoin, mergeDeepObjects} from 'squidlet-lib'
 import {System} from '../System.js'
 import {SystemCfg, systemCfgDefaults} from '../../types/SystemCfg.js'
-import {CFG_DIRS, CFG_FILE_EXT, SYSTEM_CFG_DIR, SYSTEM_CONFIG_FILE} from '../../types/contstants.js'
+import {
+  CFG_DIRS,
+  CFG_FILE_EXT,
+  SYSTEM_CFG_DIR,
+  SYSTEM_CONFIG_FILE,
+} from '../../types/contstants.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 
@@ -65,6 +70,26 @@ export class ConfigsManager {
     return this.loadConfig(cfgFilePath)
   }
 
+  async loadServiceConfig(serviceName: string): Promise<Record<string, any> | undefined> {
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.services,
+      `${serviceName}.${CFG_FILE_EXT}`
+    )
+
+    return this.loadConfig(cfgFilePath)
+  }
+
+  // async loadAppConfig(appName: string): Promise<Record<string, any> | undefined> {
+  //   const cfgFilePath = pathJoin(
+  //     ROOT_DIRS.cfg,
+  //     appName,
+  //     APP_CONFIG_FILE
+  //   )
+  //
+  //   return this.loadConfig(cfgFilePath)
+  // }
+
   async saveIoConfig(ioName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
@@ -85,6 +110,16 @@ export class ConfigsManager {
     await this.filesDriver.writeFile(cfgFilePath, makeYamlString(newConfig))
   }
 
+  async saveServiceConfig(serviceName: string, newConfig: Record<string, any>) {
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.services,
+      `${serviceName}.${CFG_FILE_EXT}`
+    )
+
+    await this.filesDriver.writeFile(cfgFilePath, makeYamlString(newConfig))
+  }
+
   async removeIoConfig(ioName: string) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
@@ -100,6 +135,16 @@ export class ConfigsManager {
       SYSTEM_CFG_DIR,
       CFG_DIRS.drivers,
       `${driverName}.${CFG_FILE_EXT}`
+    )
+
+    await this.filesDriver.unlink(cfgFilePath)
+  }
+
+  async removeServiceConfig(serviceName: string) {
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.services,
+      `${serviceName}.${CFG_FILE_EXT}`
     )
 
     await this.filesDriver.unlink(cfgFilePath)
