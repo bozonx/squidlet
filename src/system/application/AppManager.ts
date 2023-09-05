@@ -1,12 +1,12 @@
 import {System} from '../System.js'
-import {Application} from './Application.js'
+import {AppContext} from './AppContext.js'
 
 
 // TODO: как зарегать приложение??? какой-то install script???
 
 export class AppManager {
   private readonly system: System
-  private apps: Record<string, Application> = {}
+  private apps: Record<string, AppContext> = {}
 
 
   constructor(system: System) {
@@ -25,16 +25,16 @@ export class AppManager {
   }
 
 
-  getApp(appName: string): Application | undefined {
+  getApp(appName: string): AppContext | undefined {
     return this.apps[appName]
   }
 
-  registerApp(appName: string): Application {
+  registerApp(appName: string): AppContext {
     if (this.apps[appName]) {
       throw new Error(`Can't register app "${appName}" because it has already registered`)
     }
 
-    const app = new Application()
+    const app = new AppContext()
 
     return app
   }

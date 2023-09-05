@@ -1,6 +1,6 @@
 
 
-export class Application {
+export class AppContext {
   api: Record<string, any> = {}
 
 
