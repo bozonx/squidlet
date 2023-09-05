@@ -223,9 +223,10 @@ export class FilesIo extends IoBase implements FilesIoType {
     const pathSplat: string[] = trimCharStart(pathTo, PATH_SEP).split(PATH_SEP)
 
     if (!Object.keys(ROOT_DIRS).includes(pathSplat[0])) {
-      throw new Error(`Wrong root dir`)
+      // means external dir
+      return pathTo
     }
-
+    // put some system dir
     pathSplat[0] = this.cfg[pathSplat[0] as keyof FilesIoConfig] as string
 
     return pathJoin(pathSplat.join(PATH_SEP))

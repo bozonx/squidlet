@@ -1,13 +1,13 @@
 import {System} from '../System.js'
 import {AppContext} from './AppContext.js'
+import {AppController} from './AppController.js'
 import {AppBase} from './AppBase.js'
-
-
-// TODO: системное приложение может иметь свои файлы, бд и тд
+import {AppIndex} from '../../types/types.js'
 
 
 export class AppManager {
   private readonly system: System
+  // restricted system access for apps
   private readonly ctx: AppContext
   private apps: Record<string, AppBase> = {}
 
@@ -37,12 +37,16 @@ export class AppManager {
     return Object.keys(this.apps)
   }
 
-  registerApp(appName: string, app: AppBase) {
+  useApp(appIndex: AppIndex) {
+    const appController = new AppController(this.ctx)
+    const appInstance = appIndex(appController)
+    const appName: string = appInstance.myName
+
     if (this.apps[appName]) {
       throw new Error(`Can't register app "${appName}" because it has already registered`)
     }
 
-    this.apps[appName] = app
+    this.apps[appName] = appInstance
   }
 
 }

@@ -46,10 +46,10 @@ export class System {
   readonly network: NetworkManager
   // TODO: add
   readonly apiManager: ApiManager
-  readonly apps: AppManager
   // it is service
   // TODO: add
   readonly ui: UiManager
+  readonly apps: AppManager
 
   constructor() {
     this.packageManager = new PackageManager(this)
@@ -63,8 +63,8 @@ export class System {
     this.services = new ServicesManager(this)
     this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
-    this.apps = new AppManager(this)
     this.ui = new UiManager(this)
+    this.apps = new AppManager(this)
   }
 
 
@@ -79,10 +79,10 @@ export class System {
       await this.permissions.init()
       await this.services.init()
       await this.network.init()
-      await this.apps.init()
       await this.ui.init()
       // load all the installed packages
       await this.packageManager.loadInstalled()
+      await this.apps.init()
       // notify that system is inited
       this.events.emit(SystemEvents.systemInited)
     })()
@@ -99,8 +99,8 @@ export class System {
     }
     // it will call destroy functions step by step
     Promise.allSettled([
-      destroyWrapper(this.ui.destroy),
       destroyWrapper(this.apps.destroy),
+      destroyWrapper(this.ui.destroy),
       destroyWrapper(this.network.destroy),
       destroyWrapper(this.services.destroy),
       destroyWrapper(this.permissions.destroy),
