@@ -101,7 +101,7 @@ export class FilesIo extends IoBase implements FilesIoType {
   async readTextFile(pathTo: string): Promise<string> {
     const fullPath = this.makePath(pathTo);
 
-    return await fs.readFile(fullPath, DEFAULT_ENCODE)
+    return fs.readFile(fullPath, DEFAULT_ENCODE)
   }
 
   async readBinFile(pathTo: string): Promise<Uint8Array> {

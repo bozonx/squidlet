@@ -1,6 +1,7 @@
 export const EVENT_DELIMITER = '|'
 export const VERSIONS_DIR_NAME = '.versions'
 export const WAIT_BEFORE_HALT_MS = 1000
+export const CFG_FILE_EXT = 'yml'
 
 export enum SystemEvents {
   // driversInitialized,
@@ -36,7 +37,7 @@ export const ROOT_DIRS = {
 }
 
 export const SYSTEM_CFG_DIR = `${ROOT_DIRS.cfg}/system`
-export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.yml`
+export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.${CFG_FILE_EXT}`
 
 export const CFG_DIRS = {
   ios: 'ios',

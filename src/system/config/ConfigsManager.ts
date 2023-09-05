@@ -1,9 +1,14 @@
 import yaml from 'yaml'
-import {pathJoin} from 'squidlet-lib'
+import {pathJoin, mergeDeepObjects} from 'squidlet-lib'
 import {System} from '../System.js'
 import {SystemCfg, systemCfgDefaults} from '../../types/SystemCfg.js'
-import {CFG_DIRS, SYSTEM_CFG_DIR, SYSTEM_CONFIG_FILE} from '../../types/contstants.js'
+import {CFG_DIRS, CFG_FILE_EXT, SYSTEM_CFG_DIR, SYSTEM_CONFIG_FILE} from '../../types/contstants.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+
+
+export function makeYamlString(obj: any): string {
+  return yaml.stringify(obj)
+}
 
 
 export class ConfigsManager {
@@ -21,79 +26,102 @@ export class ConfigsManager {
   }
 
   async init() {
-    const cfgFilePath = pathJoin(SYSTEM_CONFIG_FILE)
-    let fileContent: string
+    let loadedCfg: SystemCfg = systemCfgDefaults
 
-    try {
-      fileContent = await this.filesDriver.readTextFile(cfgFilePath)
-    }
-    catch (e) {
-      return
-    }
+    if (await this.filesDriver.isExists(SYSTEM_CONFIG_FILE)) {
+      const fileContent = await this.filesDriver.readTextFile(SYSTEM_CONFIG_FILE)
 
-    const loadedCfg = yaml.parse(fileContent)
+      loadedCfg = yaml.parse(fileContent)
+    }
+    else {
+      // if not exist then make a new file with default config
+      await this.filesDriver.writeFile(SYSTEM_CONFIG_FILE, makeYamlString(systemCfgDefaults))
+    }
 
     this.systemCfg = {
       ...this.systemCfg,
       ...loadedCfg
     }
-
-    // TODO: валидировать - пути в versionsCount должны начинаться со слеша
   }
 
 
   async loadIoConfig(ioName: string): Promise<Record<string, any> | undefined> {
-    const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.ios, ioName + '.yml')
-    let fileContent: string
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.ios,
+      `${ioName}.${CFG_FILE_EXT}`
+    )
 
-    try {
-      fileContent = await this.filesDriver.readTextFile(cfgFilePath)
-    }
-    catch (e) {
-      return
-    }
-
-    return yaml.parse(fileContent)
+    return this.loadConfig(cfgFilePath)
   }
 
   async loadDriverConfig(driverName: string): Promise<Record<string, any> | undefined> {
-    const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.drivers, driverName + '.yml')
-    let fileContent: string
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.drivers,
+      `${driverName}.${CFG_FILE_EXT}`
+    )
 
-    try {
-      fileContent = await this.filesDriver.readTextFile(cfgFilePath)
-    }
-    catch (e) {
-      return
-    }
-
-    return yaml.parse(fileContent)
+    return this.loadConfig(cfgFilePath)
   }
 
   async saveIoConfig(ioName: string, newConfig: Record<string, any>) {
-    const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.ios, ioName + '.yml')
-    const dataStr = yaml.stringify(newConfig)
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.ios,
+      `${ioName}.${CFG_FILE_EXT}`
+    )
 
-    await this.filesDriver.writeFile(cfgFilePath, dataStr)
+    await this.filesDriver.writeFile(cfgFilePath, makeYamlString(newConfig))
   }
 
   async saveDriverConfig(driverName: string, newConfig: Record<string, any>) {
-    const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.drivers, driverName + '.yml')
-    const dataStr = yaml.stringify(newConfig)
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.drivers,
+      `${driverName}.${CFG_FILE_EXT}`
+    )
 
-    await this.filesDriver.writeFile(cfgFilePath, dataStr)
+    await this.filesDriver.writeFile(cfgFilePath, makeYamlString(newConfig))
   }
 
   async removeIoConfig(ioName: string) {
-    const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.ios, ioName + '.yml')
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.ios,
+      `${ioName}.${CFG_FILE_EXT}`
+    )
 
     await this.filesDriver.unlink(cfgFilePath)
   }
 
   async removeDriverConfig(driverName: string) {
-    const cfgFilePath = pathJoin(SYSTEM_CFG_DIR, CFG_DIRS.drivers, driverName + '.yml')
+    const cfgFilePath = pathJoin(
+      SYSTEM_CFG_DIR,
+      CFG_DIRS.drivers,
+      `${driverName}.${CFG_FILE_EXT}`
+    )
 
     await this.filesDriver.unlink(cfgFilePath)
+  }
+
+  async setSystemCfg(partial: Partial<SystemCfg>) {
+
+    // TODO: валидировать
+    // TODO: валидировать - пути в versionsCount должны начинаться со слеша
+
+    this.systemCfg = mergeDeepObjects(partial, this.systemCfg)
+
+    await this.filesDriver.writeFile(SYSTEM_CONFIG_FILE, makeYamlString(this.systemCfg))
+  }
+
+
+  private async loadConfig(cfgFilePath: string) {
+    if (await this.filesDriver.isExists(cfgFilePath)) {
+      const fileContent = await this.filesDriver.readTextFile(cfgFilePath)
+
+      return yaml.parse(fileContent)
+    }
   }
 
 }

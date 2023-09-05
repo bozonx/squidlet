@@ -1,5 +1,5 @@
 import {isUtf8} from 'buffer'
-import {pathDirname, pathJoin, mkdirPLogic} from 'squidlet-lib'
+import {pathDirname, pathJoin} from 'squidlet-lib'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex, PermissionFileType} from '../../types/types.js'

@@ -36,7 +36,7 @@ export class System {
   readonly filesManager: FilesManager
   // It is wrapper for DB which is works with configs
   readonly configs: ConfigsManager
-  readonly versions: VersionsManager
+  //readonly versions: VersionsManager
   // TODO: add
   readonly systemInfo: SystemInfoManager
   // TODO: add
@@ -59,7 +59,7 @@ export class System {
     this.drivers = new DriversManager(this)
     this.filesManager = new FilesManager(this)
     this.configs = new ConfigsManager(this)
-    this.versions = new VersionsManager(this)
+    //this.versions = new VersionsManager(this)
     this.systemInfo = new SystemInfoManager(this)
     this.permissions = new PermissionsManager(this)
     this.services = new ServicesManager(this)
@@ -76,7 +76,7 @@ export class System {
       await this.drivers.init()
       await this.filesManager.init()
       await this.configs.init()
-      await this.versions.init()
+      //await this.versions.init()
       await this.systemInfo.init()
       await this.permissions.init()
       await this.services.init()
