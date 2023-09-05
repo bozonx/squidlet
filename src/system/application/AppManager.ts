@@ -2,8 +2,6 @@ import {System} from '../System.js'
 import {AppContext} from './AppContext.js'
 
 
-// TODO: как зарегать приложение??? какой-то install script???
-
 export class AppManager {
   private readonly system: System
   private apps: Record<string, AppContext> = {}
