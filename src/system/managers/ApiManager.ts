@@ -26,11 +26,11 @@ export class ApiManager {
   }
 
   getAppApi<T = any>(appName: string): T | undefined {
-    // const service = this.system.services.getService(serviceName)
-    //
-    // if (!service) return
-    //
-    // return service.api
+    const app = this.system.apps.getApp(appName)
+
+    if (!app) return
+
+    return app.api as T
   }
 
   registerApi(apiName: string, newApiObj: Record<string, ApiFunction>) {
