@@ -1,5 +1,4 @@
 import {IndexedEventEmitter, Logger, pathJoin} from 'squidlet-lib'
-import {FilesDb} from '../files/FilesDb.js'
 import {ROOT_DIRS} from '../../types/contstants.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesCache} from '../files/FilesCache.js'
@@ -56,15 +55,33 @@ export class AppContext {
     this.system = system
 
     //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
-    this.logFiles = new FilesLog(this.system.drivers, pathJoin(ROOT_DIRS.log, appName))
-    this.fileCache = new FilesCache(this.system.drivers, pathJoin(ROOT_DIRS.cache, appName))
-    this.cfg = new FilesWrapper(this.system.drivers, pathJoin(ROOT_DIRS.cfg, appName))
-    this.tmp = new FilesWrapper(this.system.drivers, pathJoin(ROOT_DIRS.tmp, appName))
-    this.appFiles = new FilesReadOnly(this.system.drivers, pathJoin(ROOT_DIRS.appFiles, appName))
-    this.appDataLocal = new FilesWrapper(this.system.drivers, pathJoin(ROOT_DIRS.appDataLocal, appName))
+    this.logFiles = new FilesLog(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.log, appName)
+    )
+    this.fileCache = new FilesCache(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.cache, appName)
+    )
+    this.cfg = new FilesWrapper(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.cfg, appName)
+    )
+    this.tmp = new FilesWrapper(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.tmp, appName)
+    )
+    this.appFiles = new FilesReadOnly(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.appFiles, appName)
+    )
+    this.appDataLocal = new FilesWrapper(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.appDataLocal, appName)
+    )
     this.appDataSynced = new FilesVersioned(
       this.system.drivers,
-      pathJoin(ROOT_DIRS.appDataSynced, appName)
+      pathJoin('/', ROOT_DIRS.appDataSynced, appName)
     )
 
     //this.memStorage = new RestrictedMemStorage(this.system, appName)
