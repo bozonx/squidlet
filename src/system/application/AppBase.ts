@@ -8,12 +8,14 @@ import {AppController} from './AppController.js'
 export abstract class AppBase {
   abstract myName: string
   readonly requireDriver?: string[]
-  protected ctl: AppController
+  ctl!: AppController
 
 
-  constructor(ctl: AppController) {
+  constructor() {
+  }
+
+  $setCtl(ctl: AppController) {
     this.ctl = ctl
-
   }
 
 

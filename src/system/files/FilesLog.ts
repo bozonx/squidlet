@@ -1,21 +1,21 @@
-import {System} from '../System.js'
 import {clearRelPathLeft, LogLevel, pathDirname, pathJoin} from 'squidlet-lib'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {StatsSimplified} from '../../types/io/FilesIoType.js'
+import {DriversManager} from '../driver/DriversManager.js'
 
 
 export class FilesLog {
   readonly rootDir: string
 
-  private readonly system: System
+  private readonly drivers: DriversManager
 
   private get driver(): FilesDriver {
-    return this.system.drivers.getDriver('FilesDriver')
+    return this.drivers.getDriver('FilesDriver')
   }
 
 
-  constructor(system: System, rootDir: string) {
-    this.system = system
+  constructor(drivers: DriversManager, rootDir: string) {
+    this.drivers = drivers
     this.rootDir = clearRelPathLeft(rootDir)
   }
 

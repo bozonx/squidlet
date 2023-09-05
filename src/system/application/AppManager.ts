@@ -30,7 +30,7 @@ export class AppManager {
         if (found.length !== app.requireDriver.length) {
           this.ctx.log.warn(`Application "${appName}" hasn't meet a dependency drivers "${app.requireDriver.join(', ')}"`)
           await app.destroy?.()
-          // do not register the driver if ot doesn't meet his dependencies
+          // do not register the app if ot doesn't meet his dependencies
           delete this.apps[appName]
 
           continue
@@ -41,6 +41,7 @@ export class AppManager {
         this.ctx.log.debug(`AppManager: initializing app "${appName}"`)
 
         try {
+          await app.ctl.init()
           await app.init()
         }
         catch (e) {
@@ -63,6 +64,7 @@ export class AppManager {
 
         try {
           await app.destroy()
+          await app.ctl.destroy()
         }
         catch (e) {
           this.ctx.log.error(`App "${appName} destroying with error: ${e}"`)
@@ -82,13 +84,16 @@ export class AppManager {
   }
 
   useApp(appIndex: AppIndex) {
-    const appController = new AppController(this.ctx)
-    const appInstance = appIndex(appController)
+    const appInstance = appIndex()
     const appName: string = appInstance.myName
 
     if (this.apps[appName]) {
       throw new Error(`Can't register app "${appName}" because it has already registered`)
     }
+
+    const appController = new AppController(this.ctx, appName)
+
+    appInstance.$setCtl(appController)
 
     this.apps[appName] = appInstance
   }

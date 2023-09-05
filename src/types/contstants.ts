@@ -24,7 +24,9 @@ export enum ServiceEvents {
 }
 
 export const ROOT_DIRS = {
+  // configs of system and apps
   cfg: 'cfg',
+  // ro app files
   appFiles: 'appFiles',
   appDataLocal: 'appDataLocal',
   appDataSynced: 'appDataSynced',

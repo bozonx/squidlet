@@ -16,7 +16,7 @@ export type PackageIndex = (ctx: PackageContext) => void
 export type IoIndex = (ctx: IoContext) => IoBase
 export type DriverIndex = (ctx: DriverContext) => DriverBase
 export type ServiceIndex = (ctx: ServiceContext) => ServiceBase
-export type AppIndex = (controller: AppController) => AppBase
+export type AppIndex = () => AppBase
 export type ServiceStatus = keyof typeof SERVICE_STATUS
 export type ServiceDestroyReason = keyof typeof SERVICE_DESTROY_REASON
 export type PermissionFileType = 'r' | 'w'
