@@ -12,7 +12,6 @@ import {ApiManager} from './managers/ApiManager.js'
 import {FilesManager} from './files/FilesManager.js'
 import {ConfigsManager} from './config/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
-import {UiManager} from './ui/UiManager.js'
 import {NetworkManager} from './managers/NetworkManager.js'
 import {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
@@ -46,9 +45,6 @@ export class System {
   readonly network: NetworkManager
   // TODO: add
   readonly apiManager: ApiManager
-  // it is service
-  // TODO: add
-  readonly ui: UiManager
   readonly apps: AppManager
 
   constructor() {
@@ -63,7 +59,6 @@ export class System {
     this.services = new ServicesManager(this)
     this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
-    this.ui = new UiManager(this)
     this.apps = new AppManager(this)
   }
 
@@ -79,7 +74,6 @@ export class System {
       await this.permissions.init()
       await this.services.init()
       await this.network.init()
-      await this.ui.init()
       // load all the installed packages
       await this.packageManager.loadInstalled()
       await this.apps.init()

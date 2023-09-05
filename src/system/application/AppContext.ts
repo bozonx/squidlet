@@ -8,12 +8,15 @@ import {FilesVersioned} from '../files/FilesVersioned.js'
 import {RestrictedMemStorage} from '../service/RestrictedMemStorage.js'
 import {DriversManager} from '../driver/DriversManager.js'
 import {System} from '../System.js'
+import {AppUiManager} from './AppUiManager.js'
 
 
 export class AppContext {
   appName: string
 
   api: Record<string, any> = {}
+
+  readonly ui
 
   // data bases for this app
   //readonly db
@@ -54,6 +57,7 @@ export class AppContext {
     this.appName = appName
     this.system = system
 
+    this.ui = new AppUiManager(system, appName)
     //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
     this.logFiles = new FilesLog(
       this.system.drivers,
