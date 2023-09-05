@@ -94,7 +94,6 @@ export class System {
     // it will call destroy functions step by step
     Promise.allSettled([
       destroyWrapper(this.apps.destroy),
-      destroyWrapper(this.ui.destroy),
       destroyWrapper(this.network.destroy),
       destroyWrapper(this.services.destroy),
       destroyWrapper(this.permissions.destroy),

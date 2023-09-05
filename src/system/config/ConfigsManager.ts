@@ -80,16 +80,6 @@ export class ConfigsManager {
     return this.loadConfig(cfgFilePath)
   }
 
-  // async loadAppConfig(appName: string): Promise<Record<string, any> | undefined> {
-  //   const cfgFilePath = pathJoin(
-  //     ROOT_DIRS.cfg,
-  //     appName,
-  //     APP_CONFIG_FILE
-  //   )
-  //
-  //   return this.loadConfig(cfgFilePath)
-  // }
-
   async saveIoConfig(ioName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,

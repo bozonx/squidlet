@@ -138,7 +138,6 @@ export class FilesWrapper {
     return this.driver.isExists(pathJoin(this.rootDir, clearRelPathLeft(pathToFileOrDir)))
   }
 
-
   async isFileUtf8(pathTo: string): Promise<boolean> {
     return this.driver.isFileUtf8(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }

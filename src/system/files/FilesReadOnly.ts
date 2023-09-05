@@ -22,39 +22,39 @@ export class FilesReadOnly {
 
 
   async readDir(pathTo: string): Promise<string[]> {
-    return this.driver.readDir(pathJoin(this.rootDir, pathTo))
+    return this.driver.readDir(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 
   async readTextFile(pathTo: string): Promise<string> {
-    return this.driver.readTextFile(pathJoin(this.rootDir, pathTo))
+    return this.driver.readTextFile(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 
   async readBinFile(pathTo: string): Promise<Uint8Array> {
-    return this.driver.readBinFile(pathJoin(this.rootDir, pathTo))
+    return this.driver.readBinFile(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 
   async readlink(pathTo: string): Promise<string> {
-    return this.driver.readlink(pathJoin(this.rootDir, pathTo))
+    return this.driver.readlink(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 
   async stat(pathTo: string): Promise<StatsSimplified> {
-    return this.driver.stat(pathJoin(this.rootDir, pathTo))
+    return this.driver.stat(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 
   async isDir(pathToDir: string): Promise<boolean> {
-    return this.driver.isDir(pathJoin(this.rootDir, pathToDir))
+    return this.driver.isDir(pathJoin(this.rootDir, clearRelPathLeft(pathToDir)))
   }
 
-  async isFile(pathToFile: string) {
-    return this.driver.isFile(pathJoin(this.rootDir, pathToFile))
+  async isFile(pathToFile: string): Promise<boolean> {
+    return this.driver.isFile(pathJoin(this.rootDir, clearRelPathLeft(pathToFile)))
   }
 
   async isExists(pathToFileOrDir: string): Promise<boolean> {
-    return this.driver.isExists(pathJoin(this.rootDir, pathToFileOrDir))
+    return this.driver.isExists(pathJoin(this.rootDir, clearRelPathLeft(pathToFileOrDir)))
   }
 
   async isFileUtf8(pathTo: string): Promise<boolean> {
-    return this.driver.isFileUtf8(pathJoin(this.rootDir, pathTo))
+    return this.driver.isFileUtf8(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 
 }

@@ -1,11 +1,8 @@
 import {IndexedEventEmitter, Logger, pathJoin} from 'squidlet-lib'
 import {ROOT_DIRS} from '../../types/contstants.js'
 import {FilesLog} from '../files/FilesLog.js'
-import {FilesCache} from '../files/FilesCache.js'
 import {FilesWrapper} from '../files/FilesWrapper.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
-import {FilesVersioned} from '../files/FilesVersioned.js'
-import {RestrictedMemStorage} from '../service/RestrictedMemStorage.js'
 import {DriversManager} from '../driver/DriversManager.js'
 import {System} from '../System.js'
 import {AppUiManager} from './AppUiManager.js'
@@ -23,15 +20,15 @@ export class AppContext {
   // log files of this app
   readonly logFiles
   // file cache of this app
-  readonly fileCache
+  //readonly fileCache
   // config files for this app. It manages them by it self
   readonly cfg
   // files of this app
   readonly appFiles
   // local data of this app. Only for this machine
   readonly appDataLocal
-  // some shared data of this app between all the hosts. Versioned
-  readonly appDataSynced
+  // app's syncronized data of this app between all the hosts. Versioned
+  //readonly appDataSynced
   // for temporary files of this app
   readonly tmp
 
@@ -63,10 +60,10 @@ export class AppContext {
       this.system.drivers,
       pathJoin('/', ROOT_DIRS.log, appName)
     )
-    this.fileCache = new FilesCache(
-      this.system.drivers,
-      pathJoin('/', ROOT_DIRS.cache, appName)
-    )
+    // this.fileCache = new FilesCache(
+    //   this.system.drivers,
+    //   pathJoin('/', ROOT_DIRS.cache, appName)
+    // )
     this.cfg = new FilesWrapper(
       this.system.drivers,
       pathJoin('/', ROOT_DIRS.cfg, appName)
@@ -83,10 +80,10 @@ export class AppContext {
       this.system.drivers,
       pathJoin('/', ROOT_DIRS.appDataLocal, appName)
     )
-    this.appDataSynced = new FilesVersioned(
-      this.system.drivers,
-      pathJoin('/', ROOT_DIRS.appDataSynced, appName)
-    )
+    // this.appDataSynced = new FilesVersioned(
+    //   this.system.drivers,
+    //   pathJoin('/', ROOT_DIRS.appDataSynced, appName)
+    // )
 
     //this.memStorage = new RestrictedMemStorage(this.system, appName)
   }
