@@ -9,7 +9,6 @@ import {IoManager} from './Io/IoManager.js'
 import {SystemInfoManager} from './managers/SystemInfoManager.js'
 import {ServicesManager} from './service/ServicesManager.js'
 import {ApiManager} from './api/ApiManager.js'
-import {CmdManager} from './managers/CmdManager.js'
 import {FilesManager} from './files/FilesManager.js'
 import {ConfigsManager} from './config/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
@@ -18,7 +17,7 @@ import {NetworkManager} from './managers/NetworkManager.js'
 import {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
 import {DriversManager} from './driver/DriversManager.js'
-import {VersionsManager} from './files/VersionsManager.js'
+//import {VersionsManager} from './files/VersionsManager.js'
 
 
 export class System {
@@ -46,9 +45,6 @@ export class System {
   readonly network: NetworkManager
   // TODO: add
   readonly apiManager: ApiManager
-  // it is wrapper for api
-  // TODO: add
-  readonly cmd: CmdManager
   // it is service
   // TODO: add
   readonly ui: UiManager
@@ -65,7 +61,6 @@ export class System {
     this.services = new ServicesManager(this)
     this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
-    this.cmd = new CmdManager(this)
     this.ui = new UiManager(this)
   }
 
@@ -81,8 +76,6 @@ export class System {
       await this.permissions.init()
       await this.services.init()
       await this.network.init()
-      await this.apiManager.init()
-      await this.cmd.init()
       await this.ui.init()
       // load all the installed packages
       await this.packageManager.loadInstalled()
@@ -103,8 +96,6 @@ export class System {
     // it will call destroy functions step by step
     Promise.allSettled([
       destroyWrapper(this.ui.destroy),
-      destroyWrapper(this.cmd.destroy),
-      destroyWrapper(this.apiManager.destroy),
       destroyWrapper(this.network.destroy),
       destroyWrapper(this.services.destroy),
       destroyWrapper(this.permissions.destroy),
@@ -123,7 +114,6 @@ export class System {
     (async () => {
       // start system's and user's services
       await this.services.startAll()
-      await this.cmd.startInitScripts()
       // notify that system is started
       this.events.emit(SystemEvents.systemStarted)
     })()
