@@ -1,5 +1,4 @@
 import {System} from '../System.js'
-import {AppContext} from './AppContext.js'
 import {AppController} from './AppController.js'
 import {AppBase} from './AppBase.js'
 import {AppIndex} from '../../types/types.js'
@@ -7,14 +6,11 @@ import {AppIndex} from '../../types/types.js'
 
 export class AppManager {
   private readonly system: System
-  // restricted system access for apps
-  private readonly ctx: AppContext
   private apps: Record<string, AppBase> = {}
 
 
   constructor(system: System) {
     this.system = system
-    this.ctx = new AppContext(this.system)
   }
 
 
@@ -23,12 +19,12 @@ export class AppManager {
       const app = this.apps[appName]
 
       if (app.requireDriver) {
-        const found: string[] = this.ctx.drivers.getNames().filter((el) => {
+        const found: string[] = this.system.drivers.getNames().filter((el) => {
           if (app.requireDriver?.includes(el)) return true
         })
 
         if (found.length !== app.requireDriver.length) {
-          this.ctx.log.warn(`Application "${appName}" hasn't meet a dependency drivers "${app.requireDriver.join(', ')}"`)
+          this.system.log.warn(`Application "${appName}" hasn't meet a dependency drivers "${app.requireDriver.join(', ')}"`)
           await app.destroy?.()
           // do not register the app if ot doesn't meet his dependencies
           delete this.apps[appName]
@@ -38,14 +34,14 @@ export class AppManager {
       }
 
       if (app.init) {
-        this.ctx.log.debug(`AppManager: initializing app "${appName}"`)
+        this.system.log.debug(`AppManager: initializing app "${appName}"`)
 
         try {
           await app.ctl.init()
           await app.init()
         }
         catch (e) {
-          this.ctx.log.error(`AppManager: app's "${appName}" init error: ${e}`)
+          this.system.log.error(`AppManager: app's "${appName}" init error: ${e}`)
 
           return
         }
@@ -58,7 +54,7 @@ export class AppManager {
       const app = this.apps[appName]
 
       if (app.destroy) {
-        this.ctx.log.debug(`AppManager: destroying app "${appName}"`)
+        this.system.log.debug(`AppManager: destroying app "${appName}"`)
 
         // TODO: добавить таймаут дестроя
 
@@ -67,7 +63,7 @@ export class AppManager {
           await app.ctl.destroy()
         }
         catch (e) {
-          this.ctx.log.error(`App "${appName} destroying with error: ${e}"`)
+          this.system.log.error(`App "${appName} destroying with error: ${e}"`)
           // then ignore an error
         }
       }
@@ -91,7 +87,7 @@ export class AppManager {
       throw new Error(`Can't register app "${appName}" because it has already registered`)
     }
 
-    const appController = new AppController(this.ctx, appName)
+    const appController = new AppController(this.system, appName)
 
     appInstance.$setCtl(appController)
 

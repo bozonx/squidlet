@@ -7,7 +7,8 @@ import {FilesWrapper} from '../files/FilesWrapper.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
 import {FilesVersioned} from '../files/FilesVersioned.js'
 import {RestrictedMemStorage} from '../service/RestrictedMemStorage.js'
-import {AppContext} from './AppContext.js'
+import {DriversManager} from '../driver/DriversManager.js'
+import {System} from '../System.js'
 
 
 export class AppController {
@@ -35,11 +36,24 @@ export class AppController {
   // memStorage only for this app
   //readonly memStorage
 
-  private ctx: AppContext
+  private system: System
 
-  constructor(ctx: AppContext, appName: string) {
+  get log(): Logger {
+    return this.system.log
+  }
+
+  get drivers(): DriversManager {
+    return this.system.drivers
+  }
+
+  get events(): IndexedEventEmitter {
+    return this.system.events
+  }
+
+
+  constructor(system: System, appName: string) {
     this.appName = appName
-    this.ctx = ctx
+    this.system = system
 
     //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
     this.logFiles = new FilesLog(this.ctx.drivers, pathJoin(ROOT_DIRS.log, appName))
