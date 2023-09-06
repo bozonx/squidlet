@@ -4,6 +4,8 @@ import {callPromised, convertBufferToUint8Array} from 'squidlet-lib'
 import {WsServerConnectionParams, WsServerEvent, WsServerIoType, WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {WsCloseStatus} from '../../../types/io/WsClientIoType.js'
 import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
+import {IoIndex} from '../../../types/types.js'
+import {IoContext} from '../../../system/Io/IoContext.js'
 
 
 type ServerItem = [
@@ -20,6 +22,11 @@ enum ITEM_POSITION {
   // saved Socket instances
   connections,
   listeningState,
+}
+
+
+export const WsServerIoIndex: IoIndex = (ctx: IoContext) => {
+  return new WsServerIo(ctx)
 }
 
 

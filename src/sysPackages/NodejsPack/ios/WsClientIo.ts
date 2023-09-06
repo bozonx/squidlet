@@ -4,6 +4,14 @@ import {callPromised, convertBufferToUint8Array, IndexedEvents, omitObj} from 's
 import {WsClientIoType, WebSocketClientProps, WsCloseStatus, WsClientEvent} from '../../../types/io/WsClientIoType.js'
 import {IoBase} from '../../../system/Io/IoBase.js'
 import {makeConnectionParams} from './WsServerIo.js'
+import {IoIndex} from '../../../types/types.js'
+import {IoContext} from '../../../system/Io/IoContext.js'
+
+
+
+export const WsClientIoIndex: IoIndex = (ctx: IoContext) => {
+  return new WsClientIo(ctx)
+}
 
 
 export class WsClientIo extends IoBase implements WsClientIoType {

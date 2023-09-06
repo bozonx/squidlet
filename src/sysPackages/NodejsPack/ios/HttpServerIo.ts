@@ -4,6 +4,8 @@ import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../../types
 import {WsServerProps} from '../../../types/io/WsServerIoType.js'
 import {HttpRequest, HttpResponse} from '../../../types/Http.js'
 import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
+import {IoIndex} from '../../../types/types.js'
+import {IoContext} from '../../../system/Io/IoContext.js'
 
 
 type ServerItem = [
@@ -24,6 +26,11 @@ export interface HttpServerIoConfig {
 
 const HTTP_SERVER_IO_CONFIG_DEFAULTS = {
   requestTimeoutSec: 60
+}
+
+
+export const HttpServerIoIndex: IoIndex = (ctx: IoContext) => {
+  return new HttpServerIo(ctx)
 }
 
 
