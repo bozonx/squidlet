@@ -1,7 +1,8 @@
 import {IoContext} from './IoContext.js'
+import {IoItem} from '../../IoSets/IoItem.js'
 
 
-export class IoBase {
+export class IoBase implements IoItem {
   // put name of the IO here it it not the same as class name
   readonly myName?: string
 

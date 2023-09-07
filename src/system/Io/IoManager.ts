@@ -2,7 +2,6 @@ import {System} from '../System.js'
 import {IoIndex} from '../../types/types.js'
 import {IoBase} from './IoBase.js'
 import {IoContext} from './IoContext.js'
-import {IoSetType} from '../../IoSets/IoSetType.js'
 
 
 export class IoManager {
@@ -50,6 +49,7 @@ export class IoManager {
   }
 
   useIoSet(ioSet: IoSetType) {
+    // TODO: первым зарезолвить fileIO
 
   }
 

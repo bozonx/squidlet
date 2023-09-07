@@ -1,12 +1,15 @@
-import {IoItem} from './IoItem.js'
-import {PackageIndex} from '../types/types.js'
+import {IoIndex, PackageIndex} from '../types/types.js'
 import {PackageContext} from '../system/package/PackageContext.js'
-import {IoSetType} from './IoSetType.js'
+import {IoBase} from '../system/Io/IoBase.js'
 
 
-export function ioSetLocalPkg (ios: IoItem[]): PackageIndex {
+export function ioSetLocalPkg (ios: IoIndex[]): PackageIndex {
   return (ctx: PackageContext) => {
-    const ioSetLocal = new IoSetLocal()
+    const ioSetLocal = new IoSetLocal(ctx)
+
+    for (const io of ios) {
+      ioSetLocal.registerIo(io)
+    }
 
     ctx.useIoSet(ioSetLocal)
   }
@@ -16,15 +19,13 @@ export function ioSetLocalPkg (ios: IoItem[]): PackageIndex {
 /**
  * It loads IO set index file where all the used IOs are defined.
  */
-export class IoSetLocal implements IoSetType {
-  private ioCollection: {[index: string]: IoItem} = {};
-
-
+export class IoSetLocal {
   /**
    * Load ioSet index.js file where included all the used platforms on platform.
    * It will be called on system start
    */
   async init(): Promise<void> {
+    super.init()
     // TODO: use workDir
     const pathToIoSetIndex = pathJoin(
       '/',
@@ -55,6 +56,10 @@ export class IoSetLocal implements IoSetType {
   }
 
 
+  registerIo(ioItem: IoIndex): Promise<void> {
+
+  }
+
   getIo<T extends IoItem>(ioName: string): T {
     if (!this.ioCollection[ioName]) {
       throw new Error(`Can't find io instance "${ioName}"`);
@@ -67,14 +72,10 @@ export class IoSetLocal implements IoSetType {
     return Object.keys(this.ioCollection);
   }
 
-  async requireLocalFile(fileName: string): Promise<any> {
-    return require(fileName);
-  }
-
 
   // it is need for test purpose
-  private requireIoSetIndex(pathToIoSetIndex: string): {[index: string]: new () => IoItem} {
-    return require(pathToIoSetIndex);
-  }
+  // private requireIoSetIndex(pathToIoSetIndex: string): {[index: string]: new () => IoItem} {
+  //   return require(pathToIoSetIndex);
+  // }
 
 }

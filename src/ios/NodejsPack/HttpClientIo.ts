@@ -10,7 +10,7 @@ export const HttpClientIoIndex: IoIndex = (ctx: IoContext) => {
   return new HttpClientIo(ctx)
 }
 
-export default class HttpClientIo extends IoBase implements HttpClientIoType {
+export class HttpClientIo extends IoBase implements HttpClientIoType {
   async fetch(request: HttpRequest): Promise<HttpResponse> {
     const result: AxiosResponse = await axios({
       method: request.method,

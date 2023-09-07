@@ -34,7 +34,7 @@ export const HttpServerIoIndex: IoIndex = (ctx: IoContext) => {
 }
 
 
-export default class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
+export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
   private responseEvent = new IndexedEvents<(requestId: number, response: HttpResponse) => void>()
   private cfg: HttpServerIoConfig = HTTP_SERVER_IO_CONFIG_DEFAULTS
 

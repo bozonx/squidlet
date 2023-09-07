@@ -10,7 +10,7 @@ export const SysInfoIoIndex: IoIndex = (ctx: IoContext) => {
   return new SysInfoIo(ctx)
 }
 
-export default class SysInfoIo extends IoBase implements SysInfoIoType {
+export class SysInfoIo extends IoBase implements SysInfoIoType {
   async getInfo(): Promise<SysPermanentInfo> {
     const {cpuNum, arch} = await this.getCpuInfo()
     const ramTotalMb = await this.getRamTotal()

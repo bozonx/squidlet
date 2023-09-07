@@ -6,11 +6,11 @@ import {SystemCommonPkg} from '../../packages/SystemCommonPkg/index.js'
 import {SystemWithUiPkg} from '../../packages/SystemWithUiPkg/index.js'
 import {ioSetLocalPkg} from '../../IoSets/IoSetLocal.js'
 import {FilesIoIndex} from '../../ios/NodejsLinuxPack/FilesIo.js'
-import SysInfoIo from '../../ios/NodejsLinuxPack/SysInfoIo.js'
-import HttpClientIo from '../../ios/NodejsPack/HttpClientIo.js'
-import HttpServerIo from '../../ios/NodejsPack/HttpServerIo.js'
-import {WsClientIo} from '../../ios/NodejsPack/WsClientIo.js'
-import {WsServerIo} from '../../ios/NodejsPack/WsServerIo.js'
+import {SysInfoIoIndex} from '../../ios/NodejsLinuxPack/SysInfoIo.js'
+import {HttpClientIoIndex} from '../../ios/NodejsPack/HttpClientIo.js'
+import {HttpServerIoIndex} from '../../ios/NodejsPack/HttpServerIo.js'
+import {WsClientIoIndex} from '../../ios/NodejsPack/WsClientIo.js'
+import {WsServerIoIndex} from '../../ios/NodejsPack/WsServerIo.js'
 
 
 const system = new System()
@@ -18,11 +18,11 @@ const system = new System()
 // use packages
 system.use(ioSetLocalPkg([
   FilesIoIndex,
-  SysInfoIo,
-  HttpClientIo,
-  HttpServerIo,
-  WsClientIo,
-  WsServerIo,
+  SysInfoIoIndex,
+  HttpClientIoIndex,
+  HttpServerIoIndex,
+  WsClientIoIndex,
+  WsServerIoIndex,
 ]))
 system.use(ConsoleLoggerPkg({logLevel: LOG_LEVELS.debug as LogLevel}))
 system.use(SystemCommonPkg())
