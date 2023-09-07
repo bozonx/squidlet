@@ -90,3 +90,9 @@ export const SERVICE_TARGETS = {
   // for not system services
   systemInitialized: 'systemInitialized',
 }
+
+export const STANDARD_IO_NAMES = {
+  FileIo: 'FileIo',
+
+  // TODO: add others
+}

@@ -1,11 +1,14 @@
 import {System} from '../System.js'
-import {IoIndex} from '../../types/types.js'
 import {IoBase} from './IoBase.js'
 import {IoContext} from './IoContext.js'
+import {IoSetBase} from './IoSetBase.js'
+import {STANDARD_IO_NAMES} from '../../types/contstants.js'
 
 
 export class IoManager {
   private readonly system: System
+  private readonly ioSets: IoSetBase[] = []
+  // object like {ioName: IoBase}
   private ios: Record<string, IoBase> = {}
   private readonly ctx
 
@@ -16,31 +19,29 @@ export class IoManager {
   }
 
   async init() {
-    for (const ioName of Object.keys(this.ios)) {
-      const ioItem = this.ios[ioName]
-      const ioCfg: Record<string, any> | undefined = await this.system.configs
-        .loadIoConfig(ioName)
+    if (!this.ios[STANDARD_IO_NAMES.FileIo]) {
+      throw new Error(`Can't find FileIo`)
+    }
 
-      if (ioItem.init) {
-        this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
-        await ioItem.init(ioCfg)
-      }
+    for (const ioSet of this.ioSets) {
+      await ioSet.init()
     }
   }
 
   async destroy() {
     for (const ioName of Object.keys(this.ios)) {
-      const ioItem = this.ios[ioName]
+      delete this.ios[ioName]
+    }
 
-      if (ioItem.destroy) {
-        this.ctx.log.debug(`IoManager: destroying IO "${ioName}"`)
-        await ioItem.destroy()
-      }
+    for (const index in this.ioSets) {
+      await this.ioSets[index].destroy()
+
+      delete this.ioSets[index]
     }
   }
 
 
-  getIo<T>(ioName: string): T {
+  getIo<T extends IoBase>(ioName: string): T {
     return this.ios[ioName] as T
   }
 
@@ -48,20 +49,18 @@ export class IoManager {
     return Object.keys(this.ios)
   }
 
-  useIoSet(ioSet: IoSetType) {
-    // TODO: первым зарезолвить fileIO
+  useIoSet(ioSet: IoSetBase) {
+    this.ioSets.push(ioSet)
 
+    const ioNames = ioSet.getNames()
+
+    for (const name of ioNames) {
+      if (this.ios[name]) {
+        throw new Error(`The IO "${name}" has already registered`)
+      }
+
+      this.ios[name] = ioSet.getIo(name)
+    }
   }
-
-  // useIo(ioIndex: IoIndex) {
-  //   const io = ioIndex(this.ctx)
-  //   const ioName: string = io.myName || io.constructor.name
-  //
-  //   if (this.ios[ioName]) {
-  //     throw new Error(`The same IO "${ioName} is already in use"`)
-  //   }
-  //
-  //   this.ios[ioName] = io
-  // }
 
 }

@@ -4,8 +4,8 @@ import {IoIndex} from '../../types/types.js'
 
 
 export abstract class IoSetBase {
-  private ioCollection: {[index: string]: IoBase} = {}
-  private ctx: PackageContext
+  private readonly ioCollection: {[index: string]: IoBase} = {}
+  private readonly ctx: PackageContext
   private wasInited: boolean = false
 
 
@@ -21,7 +21,34 @@ export abstract class IoSetBase {
   async init() {
     this.wasInited = true
 
+    // TODO: сначала выбрать файловый io
+
+    this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
+
+
+    for (const ioName of Object.keys(this.ioSets)) {
+      const ioItem = this.ios[ioName]
+      const ioCfg: Record<string, any> | undefined = await this.system.configs
+        .loadIoConfig(ioName)
+
+      if (ioItem.init) {
+        this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
+        await ioItem.init(ioCfg)
+      }
+    }
   }
+
+  // useIo(ioIndex: IoIndex) {
+  //   const io = ioIndex(this.ctx)
+  //   const ioName: string = io.myName || io.constructor.name
+  //
+  //   if (this.ios[ioName]) {
+  //     throw new Error(`The same IO "${ioName} is already in use"`)
+  //   }
+  //
+  //   this.ios[ioName] = io
+  // }
+
 
   /**
    * It is called only once on system destroy
@@ -34,7 +61,9 @@ export abstract class IoSetBase {
       const ioItem = this.ioCollection[ioName]
 
       // TODO: таймаут ожидания
-      
+
+      this.ctx.log.debug(`IoSetBase: destroying IO "${ioName}"`)
+
       if (ioItem.destroy) await ioItem.destroy()
 
       delete this.ioCollection[ioName]

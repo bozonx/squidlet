@@ -1,6 +1,7 @@
 import {IndexedEventEmitter, Logger} from 'squidlet-lib'
 import {System} from '../System.js'
-import {AppIndex, DriverIndex, IoIndex, ServiceIndex} from '../../types/types.js'
+import {AppIndex, DriverIndex, ServiceIndex} from '../../types/types.js'
+import {IoSetBase} from '../Io/IoSetBase.js'
 
 
 export class PackageContext {
@@ -21,7 +22,7 @@ export class PackageContext {
   }
 
 
-  useIoSet(ioSet: IoIndex) {
+  useIoSet(ioSet: IoSetBase) {
     this.system.io.useIoSet(ioSet)
   }
 
