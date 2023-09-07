@@ -1,4 +1,4 @@
-import IoItem from '../../../../../../../../mnt/disk2/workspace/squidlet/__old/system/interfaces/IoItem.js';
+import {IoItem} from './IoItem.js'
 
 
 export interface IoSetType {

@@ -1,9 +1,9 @@
 import axios, {AxiosResponse} from 'axios'
-import {HttpClientIoType} from '../../../types/io/HttpClientIoType.js'
-import {HttpRequest, HttpResponse} from '../../../types/Http.js'
-import {IoBase} from '../../../system/Io/IoBase.js'
-import {IoIndex} from '../../../types/types.js'
-import {IoContext} from '../../../system/Io/IoContext.js'
+import {HttpClientIoType} from '../../types/io/HttpClientIoType.js'
+import {HttpRequest, HttpResponse} from '../../types/Http.js'
+import {IoBase} from '../../system/Io/IoBase.js'
+import {IoIndex} from '../../types/types.js'
+import {IoContext} from '../../system/Io/IoContext.js'
 
 
 export const HttpClientIoIndex: IoIndex = (ctx: IoContext) => {

@@ -1,10 +1,9 @@
-import {IoBase} from '../../../system/Io/IoBase.js'
+import {IoBase} from '../../system/Io/IoBase.js'
 
 
-/**
- * Execute external program
- */
-export class ExecProgramIo extends IoBase {
+// TODO: like cron
+
+export class TimerIo extends IoBase {
 
   // async init(): Promise<void> {
   //   await super.init()

@@ -1,11 +1,11 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
 import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber} from 'squidlet-lib'
-import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../../types/io/HttpServerIoType.js'
-import {WsServerProps} from '../../../types/io/WsServerIoType.js'
-import {HttpRequest, HttpResponse} from '../../../types/Http.js'
-import {ServerIoBase} from '../../../system/Io/ServerIoBase.js'
-import {IoIndex} from '../../../types/types.js'
-import {IoContext} from '../../../system/Io/IoContext.js'
+import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
+import {WsServerProps} from '../../types/io/WsServerIoType.js'
+import {HttpRequest, HttpResponse} from '../../types/Http.js'
+import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
+import {IoIndex} from '../../types/types.js'
+import {IoContext} from '../../system/Io/IoContext.js'
 
 
 type ServerItem = [

@@ -1,9 +1,22 @@
+import {IoItem} from './IoItem.js'
+import {PackageIndex} from '../types/types.js'
+import {PackageContext} from '../system/package/PackageContext.js'
+import {IoSetType} from './IoSetType.js'
+
+
+export function ioSetLocalPkg (ios: IoItem[]): PackageIndex {
+  return (ctx: PackageContext) => {
+    const ioSetLocal = new IoSetLocal()
+
+    ctx.useIoSet(ioSetLocal)
+  }
+}
 
 
 /**
  * It loads IO set index file where all the used IOs are defined.
  */
-export class IoSetLocal {
+export class IoSetLocal implements IoSetType {
   private ioCollection: {[index: string]: IoItem} = {};
 
 
