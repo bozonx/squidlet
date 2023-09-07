@@ -1,17 +1,17 @@
-import {PackageIndex} from '../types/types.js'
+import {IoIndex, PackageIndex} from '../types/types.js'
 import {PackageContext} from '../system/package/PackageContext.js'
 import {IoSetBase} from '../system/Io/IoSetBase.js'
 
 
 export function ioSetLocalPkg (ios: IoIndex[]): PackageIndex {
-  return (ctx: PackageContext) => {
-    const ioSetLocal = new IoSetLocal(ctx)
+  return (pkgCtx: PackageContext) => {
+    const ioSetLocal = new IoSetLocal(pkgCtx)
 
     for (const io of ios) {
       ioSetLocal.registerIo(io)
     }
 
-    ctx.useIoSet(ioSetLocal)
+    pkgCtx.useIoSet(ioSetLocal)
   }
 }
 
@@ -44,7 +44,7 @@ export class IoSetLocal extends IoSetBase {
 
 
   registerIo(ioItem: IoIndex): Promise<void> {
-
+    // TODO: нужен io context
   }
 
 

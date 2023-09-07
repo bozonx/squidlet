@@ -13,7 +13,7 @@ import {AppBase} from '../system/application/AppBase.js'
 // It is called right after it is set to system via use()
 // That means very early, before system.init()
 export type PackageIndex = (ctx: PackageContext) => void
-//export type IoIndex = (ctx: IoContext) => IoBase
+export type IoIndex = (ctx: IoContext) => IoBase
 export type DriverIndex = (ctx: DriverContext) => DriverBase
 export type ServiceIndex = (ctx: ServiceContext) => ServiceBase
 export type AppIndex = () => AppBase

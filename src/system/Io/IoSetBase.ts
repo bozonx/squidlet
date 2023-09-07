@@ -1,16 +1,15 @@
 import {IoBase} from './IoBase.js'
 import {PackageContext} from '../package/PackageContext.js'
-import {IoIndex} from '../../types/types.js'
 
 
 export abstract class IoSetBase {
   private readonly ioCollection: {[index: string]: IoBase} = {}
-  private readonly ctx: PackageContext
+  private readonly pkgCtx: PackageContext
   private wasInited: boolean = false
 
 
-  constructor(ctx: PackageContext) {
-    this.ctx = ctx
+  constructor(pkgCtx: PackageContext) {
+    this.pkgCtx = pkgCtx
   }
 
 
