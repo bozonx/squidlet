@@ -52,6 +52,9 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
    * send response back to client of it request and close request.
    */
   async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
+
+    // TODO: use serverId
+
     return this.responseEvent.emit(requestId, response)
   }
 
