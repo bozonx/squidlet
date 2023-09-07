@@ -1,6 +1,6 @@
 import {IoIndex, PackageIndex} from '../types/types.js'
 import {PackageContext} from '../system/package/PackageContext.js'
-import {IoBase} from '../system/Io/IoBase.js'
+import {IoSetBase} from '../system/Io/IoSetBase.js'
 
 
 export function ioSetLocalPkg (ios: IoIndex[]): PackageIndex {
@@ -19,7 +19,7 @@ export function ioSetLocalPkg (ios: IoIndex[]): PackageIndex {
 /**
  * It loads IO set index file where all the used IOs are defined.
  */
-export class IoSetLocal {
+export class IoSetLocal extends IoSetBase {
   /**
    * Load ioSet index.js file where included all the used platforms on platform.
    * It will be called on system start
@@ -40,19 +40,6 @@ export class IoSetLocal {
     for (let ioName of Object.keys(ioClasses)) {
       this.ioCollection[ioName] = new ioClasses[ioName]();
     }
-  }
-
-  async destroy() {
-    // destroy of ios
-    const ioNames: string[] = this.getNames();
-
-    for (let ioName of ioNames) {
-      const ioItem: IoItem = this.getIo(ioName);
-
-      if (ioItem.destroy) await ioItem.destroy();
-    }
-
-    delete this.ioCollection;
   }
 
 

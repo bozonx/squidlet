@@ -27,7 +27,18 @@ export abstract class IoSetBase {
    * It is called only once on system destroy
    */
   async destroy() {
+    // destroy of ios
+    const ioNames: string[] = this.getNames()
 
+    for (let ioName of ioNames) {
+      const ioItem = this.ioCollection[ioName]
+
+      // TODO: таймаут ожидания
+      
+      if (ioItem.destroy) await ioItem.destroy()
+
+      delete this.ioCollection[ioName]
+    }
   }
 
 
