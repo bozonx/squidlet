@@ -1,8 +1,7 @@
 import {IoContext} from './IoContext.js'
-import {IoItem} from '../../IoSets/IoItem.js'
 
 
-export class IoBase implements IoItem {
+export class IoBase {
   // put name of the IO here it it not the same as class name
   readonly myName?: string
 
@@ -15,4 +14,11 @@ export class IoBase implements IoItem {
 
   init?(cfg?: any): Promise<void>
   destroy?(): Promise<void>
+
+  /**
+   * Setup props before init.
+   * It allowed to call it more than once.
+   */
+  configure?(definition?: any): Promise<void>
+
 }

@@ -1,6 +1,6 @@
-import {IoBase} from '../system/Io/IoBase.js'
-import {PackageContext} from '../system/package/PackageContext.js'
-import {IoIndex} from '../types/types.js'
+import {IoBase} from './IoBase.js'
+import {PackageContext} from '../package/PackageContext.js'
+import {IoIndex} from '../../types/types.js'
 
 
 export abstract class IoSetBase {

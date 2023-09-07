@@ -21,7 +21,7 @@ export class PackageContext {
   }
 
 
-  useIoSet(ioSet: IoSetType) {
+  useIoSet(ioSet: IoIndex) {
     this.system.io.useIoSet(ioSet)
   }
 
