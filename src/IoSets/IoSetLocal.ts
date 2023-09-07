@@ -60,18 +60,6 @@ export class IoSetLocal {
 
   }
 
-  getIo<T extends IoItem>(ioName: string): T {
-    if (!this.ioCollection[ioName]) {
-      throw new Error(`Can't find io instance "${ioName}"`);
-    }
-
-    return this.ioCollection[ioName] as T;
-  }
-
-  getNames(): string[] {
-    return Object.keys(this.ioCollection);
-  }
-
 
   // it is need for test purpose
   // private requireIoSetIndex(pathToIoSetIndex: string): {[index: string]: new () => IoItem} {

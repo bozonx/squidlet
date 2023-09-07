@@ -1,10 +1,9 @@
 import {IoBase} from '../system/Io/IoBase.js'
 import {PackageContext} from '../system/package/PackageContext.js'
 import {IoIndex} from '../types/types.js'
-import {IoItem} from './IoItem.js'
 
 
-export abstract class IoSetBase implements IoSetType {
+export abstract class IoSetBase {
   private ioCollection: {[index: string]: IoBase} = {}
   private ctx: PackageContext
   private wasInited: boolean = false
@@ -47,11 +46,19 @@ export abstract class IoSetBase implements IoSetType {
    * It returns the instance of IO which was created on initialization
    * @param ioName
    */
-  abstract getIo<T extends IoItem>(ioName: string): T;
+  getIo<T extends IoBase>(ioName: string): T {
+    if (!this.ioCollection[ioName]) {
+      throw new Error(`Can't find io instance "${ioName}"`);
+    }
+
+    return this.ioCollection[ioName] as T;
+  }
 
   /**
    * Get all the names of platforms items
    */
-  abstract getNames(): string[];
+  getNames(): string[] {
+    return Object.keys(this.ioCollection);
+  }
 
 }
