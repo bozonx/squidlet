@@ -1,4 +1,3 @@
-import {HttpServerDriver} from '../drivers/HttpServerDriver/HttpServerDriver.js'
 
 export const EVENT_DELIMITER = '|'
 export const VERSIONS_DIR_NAME = '.versions'
@@ -105,5 +104,10 @@ export const IO_NAMES = {
 }
 
 export const DRIVER_NAMES = {
+  FilesDriver: 'FilesDriver',
+  HttpClientDriver: 'HttpClientDriver',
   HttpServerDriver: 'HttpServerDriver',
+  MqttClientDriver: 'MqttClientDriver',
+  WsClientDriver: 'WsClientDriver',
+  WsServerDriver: 'WsServerDriver',
 }

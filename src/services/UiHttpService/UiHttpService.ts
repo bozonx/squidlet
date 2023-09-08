@@ -2,7 +2,7 @@ import {ServiceIndex, SubprogramError} from '../../types/types.js'
 import {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import {HttpServerDriver, HttpServerInstance} from '../../drivers/HttpServerDriver/HttpServerDriver.js'
-import {DEFAULT_UI_HTTP_PORT, DRIVER_NAMES, SERVICE_TARGETS} from '../../types/contstants.js'
+import {DEFAULT_UI_HTTP_PORT, DRIVER_NAMES} from '../../types/contstants.js'
 import {HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServiceProps} from '../../types/ServiceProps.js'
 
@@ -26,9 +26,8 @@ export class UiHttpService extends ServiceBase {
 
 
   props: ServiceProps = {
-    // TODO: require driver
-    required: [SERVICE_TARGETS.systemInitialized],
-    restartTries: 0
+    requireDriver: [DRIVER_NAMES.HttpServerDriver],
+    ...super.props,
   }
 
 

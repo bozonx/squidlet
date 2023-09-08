@@ -1,4 +1,5 @@
 import {DriverContext} from './DriverContext.js'
+import DriverFactoryBase from './DriverFactoryBase.js'
 
 
 export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> {
@@ -22,23 +23,24 @@ export default abstract class DriverInstanceBase<
   get instanceId(): string {
     return this.params.instanceId
   }
-  get props(): Props {
-    return this.params.props
-  }
 
-  protected get log(): LogPublisher {
-    return this.context.log
-  }
-  protected get config(): HostConfig {
-    return this.context.config
-  }
+  // get props(): Props {
+  //   return this.params.props
+  // }
+
+  // protected get log(): LogPublisher {
+  //   return this.context.log
+  // }
+  // protected get config(): HostConfig {
+  //   return this.context.config
+  // }
 
   // If you have props you can validate it in this method
   protected validateProps?: (props: Props) => string | undefined;
 
 
-  constructor(context: Context, params: DriverInstanceParams<Props, Driver>) {
-    this.context = context
+  constructor(ctx: DriverContext, params: DriverInstanceParams<Props, Driver>) {
+    this.ctx = ctx
     this.params = params
 
     this.doPropsValidation()
