@@ -1,7 +1,4 @@
-import Context from '../system/Context'
-import DriverFactoryBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverFactoryBase.js'
-import LogPublisher from '../../../__old/system/LogPublisher'
-import HostConfig from '../../../__old/system/interfaces/HostConfig'
+import {DriverContext} from './DriverContext.js'
 
 
 export interface DriverInstanceParams<Props, Driver = DriverFactoryBase<Props>> {
@@ -19,7 +16,7 @@ export default abstract class DriverInstanceBase<
   Driver extends DriverFactoryBase<Props, any> = any
 > {
   //abstract readonly entityType: EntityType
-  readonly context: Context
+  readonly ctx: DriverContext
   readonly params: DriverInstanceParams<Props, Driver>
 
   get instanceId(): string {

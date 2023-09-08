@@ -1,13 +1,11 @@
-import {mergeDeepObjects} from 'squidlet-lib/src/objects'
-
-import {validateProps, validateRequiredProps} from '../../../__old/system/lib/validate'
-import Context from '../system/Context'
-import EntityBase from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/EntityBase.js'
-import DriverInstanceBase, {DriverInstanceParams} from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/base/DriverInstanceBase.js'
-import EntityManifest from '../../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/src/interfaces/EntityManifest.js'
+import {DriverBase} from './DriverBase.js'
+import DriverInstanceBase from './DriverInstanceBase.js'
 
 
-let defaultInstanceIdCounter = 0
+//let defaultInstanceIdCounter = 0
+
+// TODO: инстанс должен быть пролойкой. Если его задестроить то сам инстанс не дестроится
+//   если его кто-то исползует
 
 
 /**
@@ -18,9 +16,8 @@ let defaultInstanceIdCounter = 0
  * and never be saved.
  */
 export default abstract class DriverFactoryBase<
-  Props = Record<string, any>,
-  Instance extends DriverInstanceBase = any
-> extends EntityBase {
+  Instance extends DriverInstanceBase
+> extends DriverBase {
   // there instances are kept
   protected instances: Record<string, Instance> = {}
   // Specify your sub driver class. It's required.
@@ -98,24 +95,24 @@ export default abstract class DriverFactoryBase<
   }
 
 
-  private async validateInstanceProps(
-    instanceProps: {[index: string]: any},
-    mergedProps: {[index: string]: any}
-  ) {
-    // TODO: а нужно ли повторно загружать манифест, он же должен быть заружен в drivers manager
-    const manifest: EntityManifest = await this.context.system.envSet.loadManifest(
-      'driver',
-      this.definition.id
-    );
-
-    if (!manifest.props) return;
-
-    const validationErr: string | undefined = validateProps(instanceProps, manifest.props)
-      || validateRequiredProps(mergedProps, manifest.props);
-
-    if (validationErr) {
-      throw new Error(`Props of sub driver "${this.definition.id}" are invalid: ${validationErr}`);
-    }
-  }
+  // private async validateInstanceProps(
+  //   instanceProps: {[index: string]: any},
+  //   mergedProps: {[index: string]: any}
+  // ) {
+  //   // TODO: а нужно ли повторно загружать манифест, он же должен быть заружен в drivers manager
+  //   const manifest: EntityManifest = await this.context.system.envSet.loadManifest(
+  //     'driver',
+  //     this.definition.id
+  //   );
+  //
+  //   if (!manifest.props) return;
+  //
+  //   const validationErr: string | undefined = validateProps(instanceProps, manifest.props)
+  //     || validateRequiredProps(mergedProps, manifest.props);
+  //
+  //   if (validationErr) {
+  //     throw new Error(`Props of sub driver "${this.definition.id}" are invalid: ${validationErr}`);
+  //   }
+  // }
 
 }

@@ -1,7 +1,7 @@
 import DriverFactoryBase from '../../../base/DriverFactoryBase';
 import DriverBase from '../../../base/DriverBase';
 import {HttpServerIo, HttpServerProps} from '../../../../../squidlet/__old/system/interfaces/io/HttpServerIo';
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerLogic';
+import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from '../HttpServerLogic.js';
 
 
 export class HttpServer extends DriverBase<HttpServerProps> {

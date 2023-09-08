@@ -4,6 +4,8 @@ export const EVENT_DELIMITER = '|'
 export const VERSIONS_DIR_NAME = '.versions'
 export const WAIT_BEFORE_HALT_MS = 1000
 export const CFG_FILE_EXT = 'yml'
+export const DEFAULT_UI_HTTP_PORT = 41810
+export const DEFAULT_UI_WS_PORT = 41811
 
 export enum SystemEvents {
   // driversInitialized,
@@ -95,8 +97,11 @@ export const SERVICE_TARGETS = {
 
 export const IO_NAMES = {
   FileIo: 'FileIo',
-
-  // TODO: add others
+  HttpClientIo: 'HttpClientIo',
+  HttpServerIo: 'HttpServerIo',
+  MqttClientIo: 'MqttClientIo',
+  WsClientIo: 'WsClientIo',
+  WsServerIo: 'WsServerIo',
 }
 
 export const DRIVER_NAMES = {
