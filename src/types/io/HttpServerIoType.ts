@@ -62,5 +62,5 @@ export interface HttpServerIoType {
    * Send a response to client.
    * Call it only when you are handled a request.
    */
-  sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void>;
+  sendResponse(requestId: number, response: HttpResponse): Promise<void>;
 }

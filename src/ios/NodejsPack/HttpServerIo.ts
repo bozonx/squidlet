@@ -1,5 +1,5 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
-import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber} from 'squidlet-lib'
+import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber, callPromised} from 'squidlet-lib'
 import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {WsServerProps} from '../../types/io/WsServerIoType.js'
 import {HttpRequest, HttpResponse} from '../../types/Http.js'
@@ -35,7 +35,10 @@ export const HttpServerIoIndex: IoIndex = (ctx: IoContext) => {
 
 
 export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> implements HttpServerIoType {
-  private responseEvent = new IndexedEvents<(requestId: number, response: HttpResponse) => void>()
+  private responseEvent = new IndexedEvents<(
+    requestId: number,
+    response: HttpResponse
+  ) => void>()
   private cfg: HttpServerIoConfig = HTTP_SERVER_IO_CONFIG_DEFAULTS
 
 
@@ -51,10 +54,7 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
    * Receive response to request and after that
    * send response back to client of it request and close request.
    */
-  async sendResponse(serverId: string, requestId: number, response: HttpResponse): Promise<void> {
-
-    // TODO: use serverId
-
+  async sendResponse(requestId: number, response: HttpResponse): Promise<void> {
     return this.responseEvent.emit(requestId, response)
   }
 
@@ -86,13 +86,14 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
   protected async destroyServer(serverId: string) {
     if (!this.servers[serverId]) return
 
-    // TODO: если раскоментировать то будет ошибка при дестрое
-    //await callPromised(serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server]));
-
-    delete this.servers[serverId]
+    const serverItem = this.getServerItem(serverId)
 
     // TODO: НЕ должно при этом подняться событие close или должно???
-    // TODO: отписаться от всех событий навешанный на этот сервер
+    await callPromised(
+      serverItem[ITEM_POSITION.server].close.bind(serverItem[ITEM_POSITION.server])
+    )
+
+    delete this.servers[serverId]
   }
 
   protected makeServerId(props: WsServerProps): string {
@@ -108,6 +109,14 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
     this.events.emit(HttpServerEvent.listening, serverId)
   }
 
+  /**
+   * When income request is came then it wait for a response from driver
+   * while it call sendResponse(). And after that it return the response.
+   * @param serverId
+   * @param req
+   * @param res
+   * @private
+   */
   private handleIncomeRequest(serverId: string, req: IncomingMessage, res: ServerResponse) {
     if (!this.servers[serverId]) return
 
@@ -115,15 +124,17 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
     const requestId: number = makeUniqNumber()
     const httpRequest: HttpRequest = this.makeRequestObject(req)
 
-    const handlerIndex = this.responseEvent.addListener((receivedRequestId: number, response: HttpResponse) => {
-      // listen only expected requestId
-      if (receivedRequestId !== requestId) return
+    const handlerIndex = this.responseEvent.addListener(
+      (receivedRequestId: number, response: HttpResponse) => {
+        // listen only expected requestId
+        if (receivedRequestId !== requestId) return
 
-      clearTimeout(waitTimeout)
-      this.responseEvent.removeListener(handlerIndex)
+        clearTimeout(waitTimeout)
+        this.responseEvent.removeListener(handlerIndex)
 
-      this.setupResponse(response, res)
-    })
+        this.setupResponse(response, res)
+      }
+    )
 
     waitTimeout = setTimeout(() => {
       this.responseEvent.removeListener(handlerIndex)
@@ -133,6 +144,9 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
         `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
         `Server ${serverId}. ${req.method} ${req.url}`
       );
+
+      // TODO: send 500th response
+
     }, this.cfg.requestTimeoutSec * 1000);
 
     this.events.emit(HttpServerEvent.request, serverId, requestId, httpRequest)
