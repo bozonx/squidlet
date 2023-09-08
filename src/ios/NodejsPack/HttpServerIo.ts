@@ -143,10 +143,10 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
         serverId,
         `HttpServerIo: Wait for response: Timeout has been exceeded. ` +
         `Server ${serverId}. ${req.method} ${req.url}`
-      );
-
-      // TODO: send 500th response
-
+      )
+      // send request timeout code
+      res.writeHead(408)
+      res.end()
     }, this.cfg.requestTimeoutSec * 1000);
 
     this.events.emit(HttpServerEvent.request, serverId, requestId, httpRequest)
@@ -168,13 +168,10 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
   }
 
   private setupResponse(response: HttpResponse, httpRes: ServerResponse) {
-
-    // TODO: review
-
-    httpRes.writeHead(response.status, response.headers as {[index: string]: string});
+    httpRes.writeHead(response.status, response.headers as Record<string, any>)
 
     if (typeof response.body === 'string') {
-      httpRes.end(response.body);
+      httpRes.end(response.body)
     }
     else {
       // TODO: support of Buffer - convert from Uint8Arr to Buffer
