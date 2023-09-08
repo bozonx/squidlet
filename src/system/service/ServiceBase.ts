@@ -13,7 +13,7 @@ export abstract class ServiceBase {
     restartTries: 0
   }
 
-  private readonly ctx: ServiceContext
+  protected readonly ctx: ServiceContext
   // call it if running service went to failed state
   private onFall?: (err: SubprogramError) => void
 
@@ -29,7 +29,7 @@ export abstract class ServiceBase {
 
   destroy?(reason: ServiceDestroyReason): Promise<void>
 
-  abstract start: () => Promise<void>
-  abstract stop: (force?: boolean) => Promise<void>
+  abstract start(): Promise<void>
+  abstract stop(force?: boolean): Promise<void>
 
 }

@@ -1,3 +1,5 @@
+import {HttpServerDriver} from '../drivers/HttpServerDriver/HttpServerDriver.js'
+
 export const EVENT_DELIMITER = '|'
 export const VERSIONS_DIR_NAME = '.versions'
 export const WAIT_BEFORE_HALT_MS = 1000
@@ -95,4 +97,8 @@ export const IO_NAMES = {
   FileIo: 'FileIo',
 
   // TODO: add others
+}
+
+export const DRIVER_NAMES = {
+  HttpServerDriver: 'HttpServerDriver',
 }
