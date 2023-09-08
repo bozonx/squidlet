@@ -83,7 +83,7 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
   }
 
 
-  protected makeServer(serverId: string, props: WsServerProps): ServerItem {
+  protected startServer(serverId: string, props: WsServerProps): ServerItem {
     // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
     //       обычные http роуты
     const server = new WebSocket.WebSocketServer(props)

@@ -35,7 +35,7 @@ export abstract class ServerIoBase<ServerItem, Props> extends IoBase {
       throw new Error(`WS server ${serverId} already exists`)
     }
 
-    this.servers[serverId] = this.makeServer(serverId, props)
+    this.servers[serverId] = this.startServer(serverId, props)
 
     return serverId
   }
@@ -55,5 +55,5 @@ export abstract class ServerIoBase<ServerItem, Props> extends IoBase {
 
   protected abstract destroyServer(serverId: string): Promise<void>
   protected abstract makeServerId(props: Props): string
-  protected abstract makeServer(serverId: string, props: Props): ServerItem
+  protected abstract startServer(serverId: string, props: Props): ServerItem
 }

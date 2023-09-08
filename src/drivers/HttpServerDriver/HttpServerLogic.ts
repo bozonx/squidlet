@@ -169,7 +169,7 @@ export default class HttpServerLogic {
       preparedResponse = this.makeSuccessResponse(response);
     }
     catch(err) {
-      preparedResponse = this.makeServerErrorResponse(String(err));
+      preparedResponse = this.startServerErrorResponse(String(err));
     }
 
     await this.httpServerIo.sendResponse(this.serverId, requestId, preparedResponse);
@@ -192,7 +192,7 @@ export default class HttpServerLogic {
     return omitUndefined(preparedResponse) as HttpResponse;
   }
 
-  private makeServerErrorResponse(err: string): HttpResponse {
+  private startServerErrorResponse(err: string): HttpResponse {
     return {
       headers: {
         'content-type': 'text/plain',

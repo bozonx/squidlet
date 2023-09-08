@@ -59,16 +59,16 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
   }
 
 
-  protected makeServer(serverId: string, props: HttpServerProps): ServerItem {
+  protected startServer(serverId: string, props: HttpServerProps): ServerItem {
     const server: Server = createServer({
       // timeout of entire request in ms
       requestTimeout: this.cfg.requestTimeoutSec * 1000,
     })
 
     server.on('error', (err: Error) =>
-      this.events.emit(HttpServerEvent.serverError, String(err)))
+      this.events.emit(HttpServerEvent.serverError, serverId, String(err)))
     server.on('close', () =>
-      this.events.emit(HttpServerEvent.serverClose))
+      this.events.emit(HttpServerEvent.serverClose, serverId))
     server.on('listening', () =>
       this.handleServerStartListening(serverId))
     server.on('request', (req: IncomingMessage, res: ServerResponse) =>
@@ -78,7 +78,7 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
 
     return [
       server,
-      // not listening at the moment
+      // not listening at the moment. Wait listen event
       false
     ]
   }
@@ -101,9 +101,9 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
 
 
   private handleServerStartListening = (serverId: string) => {
-    const serverItem = this.getServerItem(serverId);
+    const serverItem = this.getServerItem(serverId)
 
-    serverItem[ITEM_POSITION.listeningState] = true;
+    serverItem[ITEM_POSITION.listeningState] = true
 
     this.events.emit(HttpServerEvent.listening, serverId)
   }
