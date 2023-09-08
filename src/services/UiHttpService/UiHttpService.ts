@@ -2,8 +2,9 @@ import {ServiceIndex, SubprogramError} from '../../types/types.js'
 import {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import {HttpServerDriver, HttpServerInstance} from '../../drivers/HttpServerDriver/HttpServerDriver.js'
-import {DEFAULT_UI_HTTP_PORT, DRIVER_NAMES} from '../../types/contstants.js'
+import {DEFAULT_UI_HTTP_PORT, DRIVER_NAMES, SERVICE_TARGETS} from '../../types/contstants.js'
 import {HttpServerProps} from '../../types/io/HttpServerIoType.js'
+import {ServiceProps} from '../../types/ServiceProps.js'
 
 
 export const UiHttpServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
@@ -24,6 +25,13 @@ export class UiHttpService extends ServiceBase {
   private cfg!: UiHttpServiceCfg
 
 
+  props: ServiceProps = {
+    // TODO: require driver
+    required: [SERVICE_TARGETS.systemInitialized],
+    restartTries: 0
+  }
+
+
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: UiHttpServiceCfg) {
     super.init(onFall)
 
@@ -40,12 +48,6 @@ export class UiHttpService extends ServiceBase {
   }
 
   async destroy() {
-    // TODO: на самом деле надо просто указать что больше инстанс не нужен
-    //       и если нет других слушателей то задестроить его
-    //       а значит надо отписаться от него
-    await this.ctx.drivers
-      .getDriver<HttpServerDriver>(DRIVER_NAMES.HttpServerDriver)
-      .destroyInstance(this.httpServer.instanceId)
   }
 
   async start() {
