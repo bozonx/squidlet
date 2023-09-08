@@ -9,6 +9,10 @@ export class IoContext {
     return this.system.log
   }
 
+  get loadIoConfig(): (ioName: string) => Promise<Record<string, any> | undefined> {
+    return this.system.configs.loadIoConfig
+  }
+
 
   constructor(system: System) {
     this.system = system
@@ -20,4 +24,5 @@ export class IoContext {
 
   async destroy() {
   }
+
 }

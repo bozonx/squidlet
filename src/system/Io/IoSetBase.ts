@@ -1,15 +1,22 @@
 import {IoBase} from './IoBase.js'
 import {PackageContext} from '../package/PackageContext.js'
+import {IoIndex} from '../../types/types.js'
+import {IoContext} from './IoContext.js'
 
 
-export abstract class IoSetBase {
+export class IoSetBase {
   private readonly ioCollection: {[index: string]: IoBase} = {}
   private readonly pkgCtx: PackageContext
+  private ioCtx!: IoContext
   private wasInited: boolean = false
 
 
   constructor(pkgCtx: PackageContext) {
     this.pkgCtx = pkgCtx
+  }
+
+  $giveIoContext(ioCtx: IoContext) {
+    this.ioCtx = ioCtx
   }
 
 
@@ -18,35 +25,16 @@ export abstract class IoSetBase {
    * It is called only once.
    */
   async init() {
+    if (this.wasInited) {
+      throw new Error(`It isn't allowed to init IoSet more than once`)
+    }
+
     this.wasInited = true
 
-    // TODO: сначала выбрать файловый io
-
-    this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
-
-
-    for (const ioName of Object.keys(this.ioSets)) {
-      const ioItem = this.ios[ioName]
-      const ioCfg: Record<string, any> | undefined = await this.system.configs
-        .loadIoConfig(ioName)
-
-      if (ioItem.init) {
-        this.ctx.log.debug(`IoManager: initializing IO "${ioName}"`)
-        await ioItem.init(ioCfg)
-      }
+    for (const ioName of Object.keys(this.ioCollection)) {
+      await this.initIo(ioName)
     }
   }
-
-  // useIo(ioIndex: IoIndex) {
-  //   const io = ioIndex(this.ctx)
-  //   const ioName: string = io.myName || io.constructor.name
-  //
-  //   if (this.ios[ioName]) {
-  //     throw new Error(`The same IO "${ioName} is already in use"`)
-  //   }
-  //
-  //   this.ios[ioName] = io
-  // }
 
 
   /**
@@ -61,7 +49,7 @@ export abstract class IoSetBase {
 
       // TODO: таймаут ожидания
 
-      this.ctx.log.debug(`IoSetBase: destroying IO "${ioName}"`)
+      this.pkgCtx.log.info(`IoSetBase: destroying IO "${ioName}"`)
 
       if (ioItem.destroy) await ioItem.destroy()
 
@@ -70,16 +58,47 @@ export abstract class IoSetBase {
   }
 
 
-  /**
-   * It is called before instantiating System if set.
-   */
-  prepare?(): Promise<void>
+  // /**
+  //  * It is called before instantiating System if set.
+  //  */
+  // prepare?(): Promise<void>
 
   /**
    * Register a new IO item.
-   * If it will be called after Io set init then this item will be inited imediatelly
+   * It only registers it and not init.
+   * To init use initIo()
    */
-  abstract registerIo(ioItem: IoIndex): Promise<void>
+  registerIo(ioItemIndex: IoIndex) {
+    const io = ioItemIndex(this.ioCtx)
+    const ioName: string = io.myName || io.constructor.name
+
+    this.pkgCtx.log.info(`IoSetBase: registering IO "${ioName}"`)
+
+    if (this.ioCollection[ioName]) {
+      throw new Error(`The same IO "${ioName}" is already in use`)
+    }
+
+    this.ioCollection[ioName] = io
+  }
+
+  /**
+   * Init Io
+   * Call it if you register an Io after system initialization
+   * @param ioName
+   */
+  async initIo(ioName: string) {
+    const ioItem = this.ioCollection[ioName]
+
+    if (!ioItem.init) return
+
+    this.pkgCtx.log.info(`IoSetBase: initializing IO "${ioName}"`)
+
+    const ioCfg: Record<string, any> | undefined = await this.ioCtx.loadIoConfig(ioName)
+
+    // TODO: таймаут ожидания
+
+    await ioItem.init(ioCfg)
+  }
 
   /**
    * It returns the instance of IO which was created on initialization
