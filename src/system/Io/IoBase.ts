@@ -15,10 +15,10 @@ export class IoBase {
   init?(cfg?: any): Promise<void>
   destroy?(): Promise<void>
 
-  /**
-   * Setup props before init.
-   * It allowed to call it more than once.
-   */
-  configure?(definition?: any): Promise<void>
+  // /**
+  //  * Setup props before init.
+  //  * It allowed to call it more than once.
+  //  */
+  // configure?(definition?: any): Promise<void>
 
 }

@@ -2,7 +2,7 @@ import {System} from '../System.js'
 import {IoBase} from './IoBase.js'
 import {IoContext} from './IoContext.js'
 import {IoSetBase} from './IoSetBase.js'
-import {STANDARD_IO_NAMES} from '../../types/contstants.js'
+import {IO_NAMES} from '../../types/contstants.js'
 
 
 export class IoManager {
@@ -19,7 +19,7 @@ export class IoManager {
   }
 
   async init() {
-    if (!this.ios[STANDARD_IO_NAMES.FileIo]) {
+    if (!this.ios[IO_NAMES.FileIo]) {
       throw new Error(`Can't find FileIo`)
     }
 

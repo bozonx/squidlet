@@ -91,7 +91,7 @@ export const SERVICE_TARGETS = {
   systemInitialized: 'systemInitialized',
 }
 
-export const STANDARD_IO_NAMES = {
+export const IO_NAMES = {
   FileIo: 'FileIo',
 
   // TODO: add others

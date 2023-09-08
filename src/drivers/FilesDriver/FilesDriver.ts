@@ -4,6 +4,8 @@ import {DriverBase} from '../../system/driver/DriverBase.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex, PermissionFileType} from '../../types/types.js'
 import FilesIoType, {StatsSimplified} from '../../types/io/FilesIoType.js'
+import {IO_NAMES} from '../../types/contstants.js'
+import {IoBase} from '../../system/Io/IoBase.js'
 
 
 
@@ -11,18 +13,16 @@ export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
   return new FilesDriver(ctx)
 }
 
-const filesIoName = 'FilesIo'
-
 
 /**
  * Files driver
  * Use relative paths
  */
 export class FilesDriver extends DriverBase {
-  requireIo = [filesIoName]
+  requireIo = [IO_NAMES.FileIo]
 
-  private get io(): FilesIoType {
-    return this.ctx.io.getIo(filesIoName)
+  private get io(): IoBase & FilesIoType {
+    return this.ctx.io.getIo(IO_NAMES.FileIo)
   }
 
   //////// AS IN FILES IO

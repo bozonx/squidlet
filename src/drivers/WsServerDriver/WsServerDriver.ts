@@ -3,10 +3,10 @@ import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 
 
-export const HttpClientDriverIndex: DriverIndex = (ctx: DriverContext) => {
-  return new HttpClientDriver(ctx)
+export const WsServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
+  return new WsServerDriver(ctx)
 }
 
-export class HttpClientDriver extends DriverBase {
+export class WsServerDriver extends DriverBase {
 
 }
