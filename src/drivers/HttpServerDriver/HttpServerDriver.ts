@@ -1,22 +1,22 @@
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex} from '../../types/types.js'
 import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
-import {HttpServerIo} from '../../ios/NodejsPack/HttpServerIo.js'
 import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
-import {HttpServerProps} from '../../types/io/HttpServerIoType.js'
+import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerLogic.js'
+import {IoBase} from '../../system/Io/IoBase.js'
 
 
 export const HttpServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
   return new HttpServerDriver(ctx)
 }
 
-export class HttpServerInstance extends DriverInstanceBase {
+export class HttpServerInstance extends DriverInstanceBase<HttpServerProps extends Record<string, any>> {
   private server!: HttpServerLogic
 
-  private get httpServerIo(): HttpServerIo {
-    return this.ctx.io.getIo(IO_NAMES.HttpServerIo)
+  private get httpServerIo(): HttpServerIoType & IoBase {
+    return this.ctx.io.getIo<HttpServerIoType & IoBase>(IO_NAMES.HttpServerIo)
   }
 
   private get closedMsg() {
@@ -76,10 +76,49 @@ export class HttpServerInstance extends DriverInstanceBase {
     this.server.removeRequestListener(handlerIndex)
   }
 
+  handleServerListening = this.server.handleServerListening
+  handleServerClose = this.server.handleServerClose
+  handleServerError = this.server.handleServerError
+  handleServerRequest = this.server.handleServerRequest
+
 }
 
 export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, HttpServerProps> {
   protected SubDriverClass = HttpServerInstance
+
+  async init(cfg?: Record<string, any>) {
+    super.init(cfg)
+
+    const httpServerIo = this.ctx.io
+      .getIo<HttpServerIoType & IoBase>(IO_NAMES.HttpServerIo)
+
+    // TODO: лучше чтобы драйвер слушал один раз и раздовал по серверам
+
+    await httpServerIo.on((eventName: HttpServerEvent, serverId: string, ...p: any[]) => {
+      const instance = this.instances[serverId]
+      
+      if (!instance) {
+        this.ctx.log.warn(`Can't find instance of HTTP server "${serverId}"`)
+
+        return
+      }
+
+      if (eventName === HttpServerEvent.serverClose) {
+        //clearTimeout(listeningTimeout)
+        instance.handleServerClose()
+      }
+      else if (eventName === HttpServerEvent.listening) {
+        //clearTimeout(listeningTimeout)
+        instance.handleServerListening()
+      }
+      else if (eventName === HttpServerEvent.serverError) {
+        instance.handleServerError(p[0])
+      }
+      else if (eventName === HttpServerEvent.request) {
+        instance.handleServerRequest(p[0], p[1])
+      }
+    })
+  }
 
   protected instanceId = (props: HttpServerProps, cfg?: Record<string, any>): string => {
     return `${props.host}:${props.port}`;
