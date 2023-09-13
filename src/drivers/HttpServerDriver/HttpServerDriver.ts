@@ -78,10 +78,10 @@ export class HttpServerInstance extends DriverInstanceBase {
 
 }
 
-export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance> {
+export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, HttpServerProps> {
   protected SubDriverClass = HttpServerInstance
 
-  protected instanceId = (props: HttpServerProps): string => {
+  protected instanceId = (props: HttpServerProps, cfg?: Record<string, any>): string => {
     return `${props.host}:${props.port}`;
   }
 }
