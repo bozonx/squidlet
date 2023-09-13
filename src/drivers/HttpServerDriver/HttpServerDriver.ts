@@ -96,7 +96,7 @@ export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, Http
 
     await httpServerIo.on((eventName: HttpServerEvent, serverId: string, ...p: any[]) => {
       const instance = this.instances[serverId]
-      
+
       if (!instance) {
         this.ctx.log.warn(`Can't find instance of HTTP server "${serverId}"`)
 
