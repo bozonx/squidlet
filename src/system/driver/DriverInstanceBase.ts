@@ -3,7 +3,7 @@ import DriverFactoryBase from './DriverFactoryBase.js'
 
 
 export interface DriverInstanceParams<
-  Props,
+  Props extends Record<string, any> = Record<string, any>,
   Driver = DriverFactoryBase<DriverInstanceBase, Props>
 > {
   ctx: DriverContext
@@ -17,8 +17,8 @@ export interface DriverInstanceParams<
 
 
 export default class DriverInstanceBase<
-  Props extends Record<string, any>,
-  Driver extends DriverFactoryBase<Props, any>
+  Props extends Record<string, any> = Record<string, any>,
+  Driver extends DriverFactoryBase<any, Props> = DriverFactoryBase<any, Props>
 > {
   readonly params: DriverInstanceParams<Props, Driver>
 
@@ -45,9 +45,9 @@ export default class DriverInstanceBase<
   constructor(params: DriverInstanceParams<Props, Driver>) {
     this.params = params
 
-    if (this.driversDidInit) this.context.onDriversInit(this.driversDidInit.bind(this))
-    if (this.servicesDidInit) this.context.onServicesInit(this.servicesDidInit.bind(this))
-    if (this.appDidInit) this.context.onAppInit(this.appDidInit.bind(this))
+    // if (this.driversDidInit) this.ctx.onDriversInit(this.driversDidInit.bind(this))
+    // if (this.servicesDidInit) this.ctx.onServicesInit(this.servicesDidInit.bind(this))
+    // if (this.appDidInit) this.ctx.onAppInit(this.appDidInit.bind(this))
   }
 
   init?(): Promise<void>
@@ -61,11 +61,11 @@ export default class DriverInstanceBase<
     await this.params.driver.destroyInstance(this.params.instanceId)
   }
 
-  // it will be called after all the entities of entityType have been inited
-  protected driversDidInit?(): Promise<void>
-  protected servicesDidInit?(): Promise<void>
-  // it will be risen after app init or immediately if app was inited
-  protected appDidInit?(): Promise<void>
+  // // it will be called after all the entities of entityType have been inited
+  // protected driversDidInit?(): Promise<void>
+  // protected servicesDidInit?(): Promise<void>
+  // // it will be risen after app init or immediately if app was inited
+  // protected appDidInit?(): Promise<void>
 
 }
 

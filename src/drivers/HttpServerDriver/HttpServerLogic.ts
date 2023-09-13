@@ -98,7 +98,7 @@ export default class HttpServerLogic {
     this.requestEvents.removeListener(handlerIndex);
   }
 
-  async closeServer() {
+  async closeServer(force?: boolean) {
     if (!this.serverId) return;
 
     // TODO: должно при этом подняться событие close

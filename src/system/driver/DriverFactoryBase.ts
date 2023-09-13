@@ -1,6 +1,5 @@
 import {DriverBase} from './DriverBase.js'
 import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase.js'
-import {DriverContext} from './DriverContext.js'
 
 
 // this is used to make instance id
@@ -19,7 +18,7 @@ let defaultInstanceIdCounter = 0
  */
 export default abstract class DriverFactoryBase<
   Instance extends DriverInstanceBase,
-  Props extends Record<string, any> | undefined
+  Props extends Record<string, any> = Record<string, any>
 > extends DriverBase {
   // there instances are kept
   protected instances: Record<string, Instance> = {}

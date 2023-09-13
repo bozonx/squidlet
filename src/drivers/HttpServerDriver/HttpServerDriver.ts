@@ -19,17 +19,18 @@ export class HttpServerInstance extends DriverInstanceBase {
     return this.ctx.io.getIo(IO_NAMES.HttpServerIo)
   }
 
-  // private get closedMsg() {
-  //   return `Server "${this.props.host}:${this.props.port}" has been already closed`;
-  // }
-  // // it fulfils when server is start listening
-  // get listeningPromise(): Promise<void> {
-  //   if (!this.server) {
-  //     throw new Error(`HttpServer.listeningPromise: ${this.closedMsg}`);
-  //   }
-  //
-  //   return this.server.listeningPromise;
-  // }
+  private get closedMsg() {
+    return `Server "${this.props.host}:${this.props.port}" has been already closed`;
+  }
+
+  // it fulfils when server is start listening
+  get listeningPromise(): Promise<void> {
+    if (!this.server) {
+      throw new Error(`HttpServer.listeningPromise: ${this.closedMsg}`);
+    }
+
+    return this.server.listeningPromise;
+  }
 
 
   async init() {
@@ -53,27 +54,26 @@ export class HttpServerInstance extends DriverInstanceBase {
 
 
   async start() {
-
+    // TODO: WTF ???
   }
 
   async stop(force?: boolean) {
-    // await this.server?.closeServer();
-    if (!this.server) throw new Error(`WebSocketServer.removeRequestListener: ${this.onRequest}`);
+    if (!this.server) throw new Error(`HttpServer.removeRequestListener: ${this.onRequest}`);
 
-    return this.server.closeServer();
+    return this.server.closeServer(force);
   }
 
 
   onRequest(cb: (request: HttpDriverRequest) => Promise<HttpDriverResponse>): number {
-    if (!this.server) throw new Error(`WebSocketServer.onMessage: ${this.onRequest}`);
+    if (!this.server) throw new Error(`HttpServer.onMessage: ${this.onRequest}`);
 
-    return this.server.onRequest(cb);
+    return this.server.onRequest(cb)
   }
 
   removeRequestListener(handlerIndex: number) {
-    if (!this.server) throw new Error(`WebSocketServer.removeRequestListener: ${this.onRequest}`);
+    if (!this.server) throw new Error(`HttpServer.removeRequestListener: ${this.onRequest}`);
 
-    this.server.removeRequestListener(handlerIndex);
+    this.server.removeRequestListener(handlerIndex)
   }
 
 }
