@@ -44,15 +44,17 @@ export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
     uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
     gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
 
-    configsDir: prepareSubPath(ROOT_DIRS.cfg, rootDir, process.env.CONFIGS_DIR),
-    appFilesDir: prepareSubPath(ROOT_DIRS.appFiles, rootDir, process.env.APP_FILES_DIR),
-    appDataLocalDir: prepareSubPath(ROOT_DIRS.appDataLocal, rootDir, process.env.APP_DATA_LOCAL_DIR),
-    appDataSyncedDir: prepareSubPath(ROOT_DIRS.appDataSynced, rootDir, process.env.APP_DATA_SYNCED_DIR),
-    dbDir: prepareSubPath(ROOT_DIRS.db, rootDir, process.env.DB_DIR),
-    cacheDir: prepareSubPath(ROOT_DIRS.cache, rootDir, process.env.CACHE_DIR),
-    logDir: prepareSubPath(ROOT_DIRS.log, rootDir, process.env.LOG_DIR),
-    tmpDir: prepareSubPath(ROOT_DIRS.tmp, rootDir, process.env.TMP_DIR),
-    userDataDir: prepareSubPath(ROOT_DIRS.userData, rootDir, process.env.USER_DATA_DIR),
+    dirs: {
+      cfg: prepareSubPath(ROOT_DIRS.cfg, rootDir, process.env.CONFIGS_DIR),
+      appFiles: prepareSubPath(ROOT_DIRS.appFiles, rootDir, process.env.APP_FILES_DIR),
+      appDataLocal: prepareSubPath(ROOT_DIRS.appDataLocal, rootDir, process.env.APP_DATA_LOCAL_DIR),
+      appDataSynced: prepareSubPath(ROOT_DIRS.appDataSynced, rootDir, process.env.APP_DATA_SYNCED_DIR),
+      db: prepareSubPath(ROOT_DIRS.db, rootDir, process.env.DB_DIR),
+      cache: prepareSubPath(ROOT_DIRS.cache, rootDir, process.env.CACHE_DIR),
+      log: prepareSubPath(ROOT_DIRS.log, rootDir, process.env.LOG_DIR),
+      tmp: prepareSubPath(ROOT_DIRS.tmp, rootDir, process.env.TMP_DIR),
+      userData: prepareSubPath(ROOT_DIRS.userData, rootDir, process.env.USER_DATA_DIR),
+    },
   }
 
   //if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
@@ -189,7 +191,6 @@ export class FilesIo extends IoBase implements FilesIoType {
 
   async mkDirP(pathTo: string): Promise<void> {
     const fullPath = this.makePath(pathTo)
-
     const res = await execPromise(`mkdir -p "${fullPath}"`)
 
     if (res.stderr) {
@@ -227,9 +228,15 @@ export class FilesIo extends IoBase implements FilesIoType {
       return pathTo
     }
     // put some system dir
-    pathSplat[0] = this.cfg[pathSplat[0] as keyof FilesIoConfig] as string
+    const resolvedAbsDir: string | undefined = this.cfg.dirs[pathSplat[0] as keyof FilesIoConfig['dirs']]
 
-    return pathJoin(pathSplat.join(PATH_SEP))
+    if (resolvedAbsDir) {
+      pathSplat[0] = resolvedAbsDir
+
+      return resolvedAbsDir
+    }
+
+    return pathTo
   }
 
 }

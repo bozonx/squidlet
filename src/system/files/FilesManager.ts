@@ -18,7 +18,7 @@ export class FilesManager {
 
   async init() {
     for (const dir of Object.keys(ROOT_DIRS)) {
-      await this.driver.mkDirP(dir)
+      await this.driver.mkDirP('/' + dir)
     }
 
     for (const cfgDir of Object.keys(CFG_DIRS)) {

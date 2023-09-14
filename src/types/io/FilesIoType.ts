@@ -17,15 +17,17 @@ export interface FilesIoConfig {
   gid?: number;
   // It will be used as root of all the files which are read and written using FilesIo.
   //rootDir: string;
-  configsDir: string
-  appFilesDir: string
-  appDataLocalDir: string
-  appDataSyncedDir: string
-  dbDir: string
-  cacheDir: string
-  logDir: string
-  tmpDir: string
-  userDataDir: string
+  dirs: {
+    cfg: string
+    appFiles: string
+    appDataLocal: string
+    appDataSynced: string
+    db: string
+    cache: string
+    log: string
+    tmp: string
+    userData: string
+  }
 }
 
 
