@@ -96,7 +96,7 @@ export const SERVICE_TARGETS = {
 }
 
 export const IO_NAMES = {
-  FileIo: 'FileIo',
+  FilesIo: 'FilesIo',
   HttpClientIo: 'HttpClientIo',
   HttpServerIo: 'HttpServerIo',
   MqttClientIo: 'MqttClientIo',

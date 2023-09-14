@@ -28,18 +28,18 @@ export class PackageManager {
 
   async loadInstalled() {
     // TODO: не правильно
-    const appsDirContent = await this.filesDriver.readDir(pathJoin(ROOT_DIRS.appFiles))
-
-    for (const appDir of appsDirContent) {
-      // TODO: не правильно
-      const indexFilePath = pathJoin(ROOT_DIRS.appFiles, appDir, 'index.js')
-      const indexFileContent = await this.filesDriver.readTextFile(indexFilePath)
-
-      // TODO: Что делать с зависимостями этого фала ???? сбилдить в 1 файл в require???
-      // TODO: засунуть в sandbox
-
-      // TODO: должен ещё быть запущен init io, driver, service который предоставляет пакет
-    }
+    // const appsDirContent = await this.filesDriver.readDir(pathJoin(ROOT_DIRS.appFiles))
+    //
+    // for (const appDir of appsDirContent) {
+    //   // TODO: не правильно
+    //   const indexFilePath = pathJoin(ROOT_DIRS.appFiles, appDir, 'index.js')
+    //   const indexFileContent = await this.filesDriver.readTextFile(indexFilePath)
+    //
+    //   // TODO: Что делать с зависимостями этого фала ???? сбилдить в 1 файл в require???
+    //   // TODO: засунуть в sandbox
+    //
+    //   // TODO: должен ещё быть запущен init io, driver, service который предоставляет пакет
+    // }
   }
 
   async install() {

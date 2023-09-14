@@ -19,10 +19,10 @@ export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
  * Use relative paths
  */
 export class FilesDriver extends DriverBase {
-  requireIo = [IO_NAMES.FileIo]
+  requireIo = [IO_NAMES.FilesIo]
 
   private get io(): IoBase & FilesIoType {
-    return this.ctx.io.getIo(IO_NAMES.FileIo)
+    return this.ctx.io.getIo(IO_NAMES.FilesIo)
   }
 
   //////// AS IN FILES IO

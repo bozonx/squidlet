@@ -19,8 +19,8 @@ export class IoManager {
   }
 
   async init() {
-    if (!this.ios[IO_NAMES.FileIo]) {
-      throw new Error(`Can't find FileIo`)
+    if (!this.ios[IO_NAMES.FilesIo]) {
+      throw new Error(`Can't find FilesIo`)
     }
 
     for (const ioSet of this.ioSets) {
@@ -50,6 +50,8 @@ export class IoManager {
   }
 
   useIoSet(ioSet: IoSetBase) {
+    ioSet.$giveIoContext(this.ctx)
+
     this.ioSets.push(ioSet)
 
     const ioNames = ioSet.getNames()
