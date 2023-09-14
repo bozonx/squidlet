@@ -221,6 +221,10 @@ export class FilesIo extends IoBase implements FilesIoType {
   }
 
   private makePath(pathTo: string): string {
+    if (pathTo.indexOf('/') !== 0) {
+      throw new Error(`Path has to be started from "/": ${pathTo}`)
+    }
+
     const pathSplat: string[] = trimCharStart(pathTo, PATH_SEP).split(PATH_SEP)
 
     if (!Object.keys(ROOT_DIRS).includes(pathSplat[0])) {
@@ -233,9 +237,9 @@ export class FilesIo extends IoBase implements FilesIoType {
     if (resolvedAbsDir) {
       pathSplat[0] = resolvedAbsDir
 
-      return resolvedAbsDir
+      return pathSplat.join('/')
     }
-
+    // means full absolute path
     return pathTo
   }
 

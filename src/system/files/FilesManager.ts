@@ -22,7 +22,7 @@ export class FilesManager {
     }
 
     for (const cfgDir of Object.keys(CFG_DIRS)) {
-      await this.driver.mkDirP(pathJoin(SYSTEM_CFG_DIR, cfgDir))
+      await this.driver.mkDirP('/' + pathJoin(SYSTEM_CFG_DIR, cfgDir))
     }
   }
 

@@ -2,6 +2,7 @@
 .idea
 build
 __example
+_testData
 
 *.csv
 *.dat
