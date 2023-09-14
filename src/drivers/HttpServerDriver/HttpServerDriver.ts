@@ -1,3 +1,6 @@
+import {
+  HttpRequest,
+} from 'squidlet-lib'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverIndex} from '../../types/types.js'
 import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
@@ -78,10 +81,21 @@ export class HttpServerInstance extends DriverInstanceBase<
     this.server.removeRequestListener(handlerIndex)
   }
 
-  handleServerListening = this.server.handleServerListening
-  handleServerClose = this.server.handleServerClose
-  handleServerError = this.server.handleServerError
-  handleServerRequest = this.server.handleServerRequest
+  handleServerListening() {
+    this.server.handleServerListening()
+  }
+
+  handleServerClose() {
+    this.server.handleServerClose()
+  }
+
+  handleServerError(err: string) {
+    this.server.handleServerError(err)
+  }
+
+  handleServerRequest(requestId: number, request: HttpRequest) {
+    this.server.handleServerRequest(requestId, request)
+  }
 
 }
 
