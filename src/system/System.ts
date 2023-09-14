@@ -88,19 +88,21 @@ export class System {
   destroy() {
     this.events.emit(SystemEvents.systemDestroying)
 
+    // TODO: add timeout for each
+
     const destroyWrapper = (fn: () => Promise<void>): Promise<void> => {
       return callSafely(fn).catch((e) => this.log.error(String(e)))
     }
     // it will call destroy functions step by step
     Promise.allSettled([
-      destroyWrapper(this.apps.destroy),
-      destroyWrapper(this.network.destroy),
-      destroyWrapper(this.services.destroy),
-      destroyWrapper(this.permissions.destroy),
-      destroyWrapper(this.systemInfo.destroy),
-      destroyWrapper(this.drivers.destroy),
-      destroyWrapper(this.io.destroy),
-      destroyWrapper(this.packageManager.destroy),
+      destroyWrapper(this.apps.destroy.bind(this.apps)),
+      destroyWrapper(this.network.destroy.bind(this.network)),
+      destroyWrapper(this.services.destroy.bind(this.services)),
+      destroyWrapper(this.permissions.destroy.bind(this.permissions)),
+      destroyWrapper(this.systemInfo.destroy.bind(this.systemInfo)),
+      destroyWrapper(this.drivers.destroy.bind(this.drivers)),
+      destroyWrapper(this.io.destroy.bind(this.io)),
+      destroyWrapper(this.packageManager.destroy.bind(this.packageManager)),
     ])
       .then(() => {
         this.events.destroy()
