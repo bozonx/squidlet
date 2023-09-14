@@ -55,7 +55,7 @@ export interface WsServerIoType {
       eventName: WsServerEvent.newConnection,
       serverId: string,
       connectionId: string,
-      params: ConnectionParams
+      params: WsServerConnectionParams
     ) => void
   ): Promise<number>
   on(

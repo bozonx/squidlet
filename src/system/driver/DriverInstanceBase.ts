@@ -17,7 +17,7 @@ export interface DriverInstanceParams<
 
 
 export default class DriverInstanceBase<
-  Props extends Record<string, any> = Record<string, any>,
+  Props extends {[index: string]: any} = any,
   Driver extends DriverFactoryBase<any, Props> = DriverFactoryBase<any, Props>
 > {
   readonly params: DriverInstanceParams<Props, Driver>

@@ -1,7 +1,7 @@
 {
   "name": "squidlet",
-  "version": "6.0.0",
-  "description": "Personal network and computer technology",
+  "version": "7.0.0",
+  "description": "Personal and distributed social network",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
   "exports": "./src/index.js",
@@ -12,7 +12,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "ROOT_DIR=./_testData ts-node-esm ./src/starters/dev/index.ts",
+    "dev": "ROOT_DIR=./_testData ts-node-esm ./src/starters/devLocal/index.ts",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
   },

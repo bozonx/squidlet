@@ -12,7 +12,9 @@ export const HttpServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
   return new HttpServerDriver(ctx)
 }
 
-export class HttpServerInstance extends DriverInstanceBase<HttpServerProps extends Record<string, any>> {
+export class HttpServerInstance extends DriverInstanceBase<
+  HttpServerProps
+> {
   private server!: HttpServerLogic
 
   private get httpServerIo(): HttpServerIoType & IoBase {
