@@ -46,11 +46,11 @@ export abstract class ServerIoBase<ServerItem, Props> extends IoBase {
 
 
   protected getServerItem(serverId: string): ServerItem {
-    if (!this.servers[Number(serverId)]) {
+    if (!this.servers[serverId]) {
       throw new Error(`Server "${serverId}" hasn't been found`)
     }
 
-    return this.servers[Number(serverId)]
+    return this.servers[serverId]
   }
 
   protected abstract destroyServer(serverId: string): Promise<void>

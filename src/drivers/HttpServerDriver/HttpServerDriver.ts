@@ -136,7 +136,7 @@ export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, Http
     })
   }
 
-  protected instanceId = (props: HttpServerProps, cfg?: Record<string, any>): string => {
+  protected makeInstanceId(props: HttpServerProps, cfg?: Record<string, any>): string {
     return `${props.host}:${props.port}`;
   }
 }
