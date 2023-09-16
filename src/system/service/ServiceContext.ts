@@ -29,4 +29,8 @@ export class ServiceContext {
   // async destroy() {
   // }
 
+  getAppUiStaticFiles(appName: string): string[] | undefined {
+    return this.system.appsUi.getUi(appName)
+  }
+
 }

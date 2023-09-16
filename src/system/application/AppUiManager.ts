@@ -2,17 +2,25 @@ import {System} from '../System.js'
 
 
 export class AppUiManager {
-  appName: string
   private system: System
+  // {appName: staticFilesPaths[]}
+  private uis: Record<string, string[]> = {}
 
-  constructor(system: System, appName: string) {
-    this.appName = appName
+  constructor(system: System) {
     this.system = system
   }
 
 
-  registerRoot(uiFn: () => void) {
+  getUi(appName: string): string[] | undefined {
+    return this.uis[appName]
+  }
 
+  registerUi(appName: string, staticFilesPaths: string[]) {
+    if (this.uis[appName]) {
+      throw new Error(`This UI of app "${appName}" is already registered`)
+    }
+
+    this.uis[appName] = staticFilesPaths
   }
 
 }

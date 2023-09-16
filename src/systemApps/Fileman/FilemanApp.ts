@@ -1,5 +1,4 @@
 import {AppBase} from '../../system/application/AppBase.js'
-import {fileManUi} from './ui/fileManUi.js'
 
 
 export class FilemanApp extends AppBase {
@@ -12,7 +11,10 @@ export class FilemanApp extends AppBase {
 
 
   async init() {
-    this.ctx.ui.registerRoot(fileManUi)
+    this.ctx.registerAppUi(this.myName, [
+      'main.js',
+      'main.css',
+    ])
   }
 
 }

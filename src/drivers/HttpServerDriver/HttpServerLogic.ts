@@ -8,9 +8,7 @@ import {
   JsonTypes,
   HttpRequest,
   HttpResponse,
-  HttpContentType,
   HttpRequestBase,
-  HttpResponseHeaders
 } from 'squidlet-lib'
 import {
   HttpRequestHandler,
@@ -30,7 +28,7 @@ export interface HttpDriverResponse {
   // if you don't set a status then 200 or 500 will be used
   status?: number;
   // headers are optional. But content-type will be set.
-  headers?: HttpResponseHeaders;
+  headers?: Record<string, string>;
   body?: JsonTypes | Uint8Array;
 }
 
@@ -188,7 +186,8 @@ export default class HttpServerLogic {
   }
 
   private makeSuccessResponse(response: HttpDriverResponse): HttpResponse {
-    const contentType: HttpContentType | undefined = (response.headers && response.headers['content-type'])
+    // TODO: если с заглавными букавми ???
+    const contentType: string | undefined = (response.headers && response.headers['content-type'])
       || resolveBodyType(response.body);
 
     const preparedResponse: HttpResponse = {

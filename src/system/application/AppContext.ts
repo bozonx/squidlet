@@ -13,7 +13,7 @@ export class AppContext {
 
   api: Record<string, any> = {}
 
-  readonly ui
+  //readonly ui
 
   // data bases for this app
   //readonly db
@@ -54,7 +54,7 @@ export class AppContext {
     this.appName = appName
     this.system = system
 
-    this.ui = new AppUiManager(system, appName)
+    //this.ui = new AppUiManager(system, appName)
     //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
     this.logFiles = new FilesLog(
       this.system.drivers,
@@ -94,6 +94,11 @@ export class AppContext {
 
   async destroy() {
     // TODO: wait while writing proccess in progress
+  }
+
+
+  registerAppUi(appName: string, staticFilesPaths: string[]) {
+    this.system.appsUi.registerUi(appName, staticFilesPaths)
   }
 
 }

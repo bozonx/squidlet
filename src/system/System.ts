@@ -17,6 +17,7 @@ import {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
 import {DriversManager} from './driver/DriversManager.js'
 import {AppManager} from './application/AppManager.js'
+import {AppUiManager} from './application/AppUiManager.js'
 //import {VersionsManager} from './files/VersionsManager.js'
 
 
@@ -46,6 +47,7 @@ export class System {
   // TODO: add
   readonly apiManager: ApiManager
   readonly apps: AppManager
+  readonly appsUi: AppUiManager
 
   constructor() {
     this.packageManager = new PackageManager(this)
@@ -60,6 +62,7 @@ export class System {
     this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
     this.apps = new AppManager(this)
+    this.appsUi = new AppUiManager(this)
   }
 
 

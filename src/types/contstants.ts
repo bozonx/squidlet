@@ -45,6 +45,7 @@ export const ROOT_DIRS = {
 export const SYSTEM_CFG_DIR = `/${ROOT_DIRS.cfg}/system`
 export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.${CFG_FILE_EXT}`
 //export const APP_CONFIG_FILE = `app-config.${CFG_FILE_EXT}`
+export const APP_FILES_PUBLIC_DIR = 'public'
 
 export const CFG_DIRS = {
   ios: 'ios',
