@@ -1,4 +1,4 @@
-import WebSocket from 'ws'
+import WebSocket, { WebSocketServer } from 'ws'
 import {ClientRequest, IncomingMessage} from 'http'
 import {callPromised, convertBufferToUint8Array} from 'squidlet-lib'
 import {WsServerConnectionParams, WsServerEvent, WsServerIoType, WsServerProps} from '../../types/io/WsServerIoType.js'
@@ -10,7 +10,7 @@ import {IoContext} from '../../system/Io/IoContext.js'
 
 type ServerItem = [
   // server instance
-  WebSocket.WebSocketServer,
+  WebSocketServer,
   // connection instances
   WebSocket[],
   // is server listening.
@@ -86,7 +86,7 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
   protected startServer(serverId: string, props: WsServerProps): ServerItem {
     // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
     //       обычные http роуты
-    const server = new WebSocket.WebSocketServer(props)
+    const server = new WebSocketServer(props)
 
     server.on('close', () =>
       // TODO: а разве код и reason не должны прийти???
