@@ -7,7 +7,7 @@ import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
 import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
 import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
-import HttpServerLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerLogic.js'
+import HttpServerDriverLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerDriverLogic.js'
 import {IoBase} from '../../system/Io/IoBase.js'
 
 
@@ -18,7 +18,7 @@ export const HttpServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
 export class HttpServerInstance extends DriverInstanceBase<
   HttpServerProps
 > {
-  logic!: HttpServerLogic
+  logic!: HttpServerDriverLogic
 
   private get httpServerIo(): HttpServerIoType & IoBase {
     return this.ctx.io.getIo<HttpServerIoType & IoBase>(IO_NAMES.HttpServerIo)
@@ -39,7 +39,7 @@ export class HttpServerInstance extends DriverInstanceBase<
 
 
   async init() {
-    this.logic = new HttpServerLogic(
+    this.logic = new HttpServerDriverLogic(
       this.httpServerIo,
       this.props,
       () => {

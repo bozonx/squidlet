@@ -35,7 +35,7 @@ export interface HttpDriverResponse {
 type HttpDriverHandler = (request: HttpDriverRequest) => Promise<HttpDriverResponse>;
 
 
-export default class HttpServerLogic {
+export default class HttpServerDriverLogic {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
     return this._startedPromised.promise;

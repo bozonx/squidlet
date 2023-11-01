@@ -13,7 +13,7 @@ import {HttpServerDriver, HttpServerInstance} from '../../drivers/HttpServerDriv
 import {APP_FILES_PUBLIC_DIR, DEFAULT_UI_HTTP_PORT, DRIVER_NAMES, ROOT_DIRS} from '../../types/contstants.js'
 import {HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServiceProps} from '../../types/ServiceProps.js'
-import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerLogic.js'
+import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerDriverLogic.js'
 import {uiHtml} from './uiHtmlTmpl.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 

@@ -38,7 +38,7 @@ import {
 } from '../../types/contstants.js'
 import {HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServiceProps} from '../../types/ServiceProps.js'
-import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerLogic.js'
+import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerDriverLogic.js'
 import {uiHtml} from './uiHtmlTmpl.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {WsServerProps} from '../../types/io/WsServerIoType.js'
