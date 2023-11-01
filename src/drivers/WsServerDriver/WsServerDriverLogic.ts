@@ -1,19 +1,21 @@
-import {Logger, Promised} from 'squidlet-lib'
-import WsServerIo, {WsServerProps} from '../../../../interfaces/io/WsServerIo'
+import {Promised, IndexedEvents} from 'squidlet-lib'
+import {WsServerEvent, WsServerIoFullType, WsServerProps} from '../../types/io/WsServerIoType.js'
 
 
-export enum WS_SERVER_EVENTS {
-  incomeMessage,
-  closeConnection,
-  newConnection,
-}
+// export enum WS_SERVER_EVENTS {
+//   incomeMessage,
+//   closeConnection,
+//   newConnection,
+// }
 
+// TODO: а оно надо??? может лучше сессию использовать?
 export const SETCOOKIE_LABEL = '__SET_COOKIE__';
 // TODO: review
 const HANDLER_INDEX_POSITION = 1;
 
 
 // TODO: наверное прикрутить сессию чтобы считать что клиент ещё подключен
+// TODO: отслежитьвать статус соединения
 
 
 export default class WsServerDriverLogic {
@@ -22,20 +24,24 @@ export default class WsServerDriverLogic {
     return this._startedPromised.promise;
   }
 
-  private readonly events = new IndexedEventEmitter<(...args: any[]) => void>();
-  private readonly wsServerIo: WsServerIo;
+  private readonly events = new IndexedEvents<(event: number, ...args: any[]) => void>()
+  private readonly wsServerIo: WsServerIoFullType
   private readonly props: WsServerProps;
   private readonly onClose: () => void;
-  private readonly logDebug: (message: string) => void;
-  private readonly logInfo: (message: string) => void;
-  private readonly logError: (message: string) => void;
-  private serverId: string = '';
-  private _startedPromised: Promised<void>;
-  private handlerIndexes: [WsServerEvent, number][] = [];
+  private readonly logDebug: (message: string) => void
+  private readonly logInfo: (message: string) => void
+  private readonly logError: (message: string) => void
+
+  // TODO: why not undefined?
+  private serverId: string = ''
+  private _startedPromised: Promised<void>
+
+  // TODO: review
+  private handlerIndexes: [WsServerEvent, number][] = []
 
 
   constructor(
-    wsServerIo: WsServerIo,
+    wsServerIo: WsServerIoFullType,
     props: WsServerProps,
     // TODO: должен сам перезапускать сервер
     // It rises a handler only if server is closed.
@@ -45,13 +51,13 @@ export default class WsServerDriverLogic {
     logInfo: (message: string) => void,
     logError: (message: string) => void,
   ) {
-    this.wsServerIo = wsServerIo;
-    this.props = props;
-    this.onClose = onClose;
+    this.wsServerIo = wsServerIo
+    this.props = props
+    this.onClose = onClose
     this.logDebug = logDebug
     this.logInfo = logInfo
     this.logError = logError
-    this._startedPromised = new Promised<void>();
+    this._startedPromised = new Promised<void>()
   }
 
 
@@ -60,37 +66,41 @@ export default class WsServerDriverLogic {
    */
   async init() {
     // TODO: review
-    this.log.info(`... Starting websocket server: ${this.props.host}:${this.props.port}`);
-    this.serverId = await this.wsServerIo.newServer(this.props);
+    this.logInfo(`... Starting ws server: ${this.props.host}:${this.props.port}`)
 
-    await this.listenServerEvents();
-    await this.listenConnectionEvents();
+    this.serverId = await this.wsServerIo.newServer(this.props)
+
+    await this.listenServerEvents()
+    await this.listenConnectionEvents()
   }
 
   async destroy() {
     // TODO: review
     if (!this.isInitialized()) {
-      return this.logError(`WsServerLogic.destroy: Server hasn't been initialized yet.`);
+      return this.logError(`WsServerLogic.destroy: Server hasn't been initialized yet.`)
     }
 
-    this.logDebug(`... destroying websocket server: ${this.props.host}:${this.props.port}`);
-    this.events.destroy();
-    await this.removeListeners();
+    this.logDebug(`... destroying websocket server: ${this.props.host}:${this.props.port}`)
+    this.events.destroy()
+
+    // TODO: review
+    await this.removeListeners()
     // TODO: use destroyServer - it removes all the events before destroy
     // TODO: не должно поднять события
-    await this.wsServerIo.closeServer(this.serverId);
+    await this.wsServerIo.closeServer(this.serverId)
 
-    delete this.serverId;
+    this.serverId = ''
   }
 
 
   isInitialized(): boolean {
-    return typeof this.serverId !== 'undefined';
+    return Boolean(this.serverId)
   }
 
   async closeServer(force?: boolean) {
     if (!this.serverId) return
 
+    // TODO: use force
     // TODO: должно при этом подняться событие close
     await this.wsServerIo.closeServer(this.serverId)
 
@@ -101,18 +111,19 @@ export default class WsServerDriverLogic {
    * Send message to client
    */
   send = (connectionId: string, data: string | Uint8Array): Promise<void> => {
-    this.logDebug(`WsServerLogic.send from ${this.props.host}:${this.props.port} to connection ${connectionId}, data length ${data.length}`);
+    this.logDebug(`WsServerLogic.send from ${this.props.host}:${this.props.port} to connection ${connectionId}, data length ${data.length}`)
 
-    return this.wsServerIo.send(this.serverId, connectionId, data);
+    return this.wsServerIo.send(this.serverId, connectionId, data)
   }
 
-  async setCookie(connectionId: string, cookie: string) {
-    const data = `${SETCOOKIE_LABEL}${cookie}`;
-
-    this.logDebug(`WsServerLogic.setCookie from ${this.props.host}:${this.props.port} to connection ${connectionId}, ${data}`);
-
-    return this.wsServerIo.send(this.serverId, connectionId, data);
-  }
+  // TODO: оно нужно ???
+  // async setCookie(connectionId: string, cookie: string) {
+  //   const data = `${SETCOOKIE_LABEL}${cookie}`;
+  //
+  //   this.logDebug(`WsServerLogic.setCookie from ${this.props.host}:${this.props.port} to connection ${connectionId}, ${data}`);
+  //
+  //   return this.wsServerIo.send(this.serverId, connectionId, data);
+  // }
 
   /**
    * Force closing a connection.
@@ -195,6 +206,9 @@ export default class WsServerDriverLogic {
   }
 
   private async listenConnectionEvents() {
+
+    // TODO: review
+
     const closeIndex: number = await this.wsServerIo.onClose(
       this.serverId,
       (connectionId: string) => {
@@ -238,6 +252,9 @@ export default class WsServerDriverLogic {
   }
 
   private async removeListeners() {
+
+    // TODO: review
+
     for (let handlerIndex of this.handlerIndexes) {
       await this.wsServerIo.removeListener(this.serverId, handlerIndex[HANDLER_INDEX_POSITION]);
     }

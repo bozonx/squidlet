@@ -25,9 +25,9 @@ export class WsServerInstance extends DriverInstanceBase<
   }
 
   // it fulfils when server is start listening
-  get listeningPromise(): Promise<void> {
+  get startedPromise(): Promise<void> {
     if (!this.logic) {
-      throw new Error(`WsServer.listeningPromise: ${this.closedMsg}`);
+      throw new Error(`WsServer.startedPromise: ${this.closedMsg}`);
     }
 
     return this.logic.startedPromise

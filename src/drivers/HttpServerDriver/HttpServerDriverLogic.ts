@@ -12,7 +12,7 @@ import {
 } from 'squidlet-lib'
 import {
   HttpRequestHandler,
-  HttpServerEvent,
+  HttpServerEvent, HttpServerIoFullType,
   HttpServerIoType,
   HttpServerProps,
 } from '../../types/io/HttpServerIoType.js'
@@ -24,6 +24,7 @@ export interface HttpDriverRequest extends HttpRequestBase {
   body?: JsonTypes | Uint8Array;
 }
 
+// TODO: брать из squidlet-lib types/Http.ts
 export interface HttpDriverResponse {
   // if you don't set a status then 200 or 500 will be used
   status?: number;
@@ -37,25 +38,25 @@ type HttpDriverHandler = (request: HttpDriverRequest) => Promise<HttpDriverRespo
 
 export default class HttpServerDriverLogic {
   // it fulfils when server is start listening
-  get listeningPromise(): Promise<void> {
-    return this._startedPromised.promise;
+  get startedPromise(): Promise<void> {
+    return this._startedPromised.promise
   }
 
   private requestEvents = new IndexedEvents<HttpRequestHandler>();
-  private readonly httpServerIo: HttpServerIoType & IoBase
-  private readonly props: HttpServerProps;
-  private readonly onClose: () => void;
-  private readonly logDebug: (message: string) => void;
-  private readonly logInfo: (message: string) => void;
-  private readonly logError: (message: string) => void;
+  private readonly httpServerIo: HttpServerIoFullType
+  private readonly props: HttpServerProps
+  private readonly onClose: () => void
+  private readonly logDebug: (message: string) => void
+  private readonly logInfo: (message: string) => void
+  private readonly logError: (message: string) => void
 
   // TODO: why not undefined?
-  private serverId: string = '';
-  private _startedPromised: Promised<void>;
+  private serverId: string = ''
+  private _startedPromised: Promised<void>
 
 
   constructor(
-    httpServerIo: HttpServerIoType & IoBase,
+    httpServerIo: HttpServerIoFullType,
     props: HttpServerProps,
     // It rises a handler only if server is closed.
     // It's better to destroy this instance and make new one if need.
@@ -86,6 +87,7 @@ export default class HttpServerDriverLogic {
       return this.logError(`HttpServerLogic.destroy: Server hasn't been initialized yet.`)
     }
 
+    this.logDebug(`... destroying http server: ${this.props.host}:${this.props.port}`)
     this.requestEvents.destroy()
     // TODO: не должно поднять события
     await this.httpServerIo.closeServer(this.serverId)
@@ -95,9 +97,19 @@ export default class HttpServerDriverLogic {
 
 
   isInitialized(): boolean {
-    return typeof this.serverId !== 'undefined'
+    return Boolean(this.serverId)
   }
 
+
+  async closeServer(force?: boolean) {
+    if (!this.serverId) return
+
+    // TODO: use force
+    // TODO: должно при этом подняться событие close
+    await this.httpServerIo.closeServer(this.serverId)
+
+    this.serverId = ''
+  }
 
   onRequest(cb: HttpDriverHandler): number {
     const cbWrapper = (requestId: number, request: HttpRequest) => {
@@ -110,15 +122,6 @@ export default class HttpServerDriverLogic {
 
   removeRequestListener(handlerIndex: number) {
     this.requestEvents.removeListener(handlerIndex)
-  }
-
-  async closeServer(force?: boolean) {
-    if (!this.serverId) return
-
-    // TODO: должно при этом подняться событие close
-    await this.httpServerIo.closeServer(this.serverId)
-
-    this.serverId = ''
   }
 
   handleServerListening = () => {

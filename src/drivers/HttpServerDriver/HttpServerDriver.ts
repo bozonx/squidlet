@@ -20,8 +20,8 @@ export class HttpServerInstance extends DriverInstanceBase<
 > {
   logic!: HttpServerDriverLogic
 
-  private get httpServerIo(): HttpServerIoType & IoBase {
-    return this.ctx.io.getIo<HttpServerIoType & IoBase>(IO_NAMES.HttpServerIo)
+  private get httpServerIo(): HttpServerIoFullType {
+    return this.ctx.io.getIo<HttpServerIoFullType>(IO_NAMES.HttpServerIo)
   }
 
   private get closedMsg() {
@@ -29,12 +29,12 @@ export class HttpServerInstance extends DriverInstanceBase<
   }
 
   // it fulfils when server is start listening
-  get listeningPromise(): Promise<void> {
+  get startedPromise(): Promise<void> {
     if (!this.logic) {
-      throw new Error(`HttpServer.listeningPromise: ${this.closedMsg}`);
+      throw new Error(`HttpServer.startedPromise: ${this.closedMsg}`);
     }
 
-    return this.logic.listeningPromise;
+    return this.logic.startedPromise;
   }
 
 
@@ -106,7 +106,7 @@ export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, Http
     super.init(cfg)
 
     const httpServerIo = this.ctx.io
-      .getIo<HttpServerIoType & IoBase>(IO_NAMES.HttpServerIo)
+      .getIo<HttpServerIoFullType>(IO_NAMES.HttpServerIo)
 
     // TODO: лучше чтобы драйвер слушал один раз и раздовал по серверам
 

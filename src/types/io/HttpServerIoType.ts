@@ -1,4 +1,5 @@
 import {HttpRequest, HttpResponse} from 'squidlet-lib'
+import {IoBase} from '../../system/Io/IoBase.js'
 
 
 export enum HttpServerEvent {
@@ -64,3 +65,5 @@ export interface HttpServerIoType {
    */
   sendResponse(requestId: number, response: HttpResponse): Promise<void>;
 }
+
+export type HttpServerIoFullType = HttpServerIoType & IoBase
