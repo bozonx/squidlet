@@ -1,6 +1,5 @@
-import WsServerIo, {WsServerProps} from '../../../../../../../mnt/disk2/workspace/squidlet/__idea2021/networking/interfaces/io/WsServerIo.js'
-import Logger from 'squidlet-lib/src/interfaces/Logger'
-import Promised from 'squidlet-lib/src/Promised'
+import {Logger, Promised} from 'squidlet-lib'
+import WsServerIo, {WsServerProps} from '../../../../interfaces/io/WsServerIo'
 
 
 export enum WS_SERVER_EVENTS {
@@ -17,7 +16,7 @@ const HANDLER_INDEX_POSITION = 1;
 // TODO: наверное прикрутить сессию чтобы считать что клиент ещё подключен
 
 
-export default class WsServerDriver {
+export default class WsServerDriverLogic {
   // it fulfils when server is start listening
   get startedPromise(): Promise<void> {
     return this._startedPromised.promise;
@@ -27,7 +26,9 @@ export default class WsServerDriver {
   private readonly wsServerIo: WsServerIo;
   private readonly props: WsServerProps;
   private readonly onClose: () => void;
-  private readonly log: Logger;
+  private readonly logDebug: (message: string) => void;
+  private readonly logInfo: (message: string) => void;
+  private readonly logError: (message: string) => void;
   private serverId: string = '';
   private _startedPromised: Promised<void>;
   private handlerIndexes: [WsServerEvent, number][] = [];
@@ -40,12 +41,16 @@ export default class WsServerDriver {
     // It rises a handler only if server is closed.
     // It's better to destroy this instance and make new one if need.
     onClose: () => void,
-    log: Logger
+    logDebug: (message: string) => void,
+    logInfo: (message: string) => void,
+    logError: (message: string) => void,
   ) {
     this.wsServerIo = wsServerIo;
     this.props = props;
     this.onClose = onClose;
-    this.log = log;
+    this.logDebug = logDebug
+    this.logInfo = logInfo
+    this.logError = logError
     this._startedPromised = new Promised<void>();
   }
 
@@ -81,6 +86,15 @@ export default class WsServerDriver {
 
   isInitialized(): boolean {
     return typeof this.serverId !== 'undefined';
+  }
+
+  async closeServer(force?: boolean) {
+    if (!this.serverId) return
+
+    // TODO: должно при этом подняться событие close
+    await this.wsServerIo.closeServer(this.serverId)
+
+    this.serverId = ''
   }
 
   /**

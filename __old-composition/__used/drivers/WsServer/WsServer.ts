@@ -2,7 +2,7 @@ import DriverFactoryBase from '../../../../../squidlet/__old/system/base/DriverF
 import DriverBase from '../../../../../squidlet/__old/system/base/DriverBase';
 import WebSocketServerIo, {ConnectionParams} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
 import {WebSocketServerProps} from '../../../../../squidlet/__old/system/interfaces/io/WsServerIo';
-import WsServerDriver, {WS_SERVER_EVENTS} from '../WsServerDriver.js';
+import WsServerDriver, {WS_SERVER_EVENTS} from '../../../../../../../../../mnt/disk2/workspace/squidlet/__old-composition/drivers/WsServerDriver';
 
 
 export class WsServer extends DriverBase<WebSocketServerProps> {

@@ -1,7 +1,6 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
 import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber, callPromised} from 'squidlet-lib'
 import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
-import {WsServerProps} from '../../types/io/WsServerIoType.js'
 import {HttpRequest, HttpResponse} from '../../../../squidlet-lib/lib/interfaces/Http.js'
 import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
 import {IoIndex} from '../../types/types.js'
@@ -96,7 +95,7 @@ export class HttpServerIo extends ServerIoBase<ServerItem, HttpServerProps> impl
     delete this.servers[serverId]
   }
 
-  protected makeServerId(props: WsServerProps): string {
+  protected makeServerId(props: HttpServerProps): string {
     return `${props.host}:${props.port}`
   }
 

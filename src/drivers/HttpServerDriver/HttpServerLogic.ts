@@ -38,7 +38,7 @@ type HttpDriverHandler = (request: HttpDriverRequest) => Promise<HttpDriverRespo
 export default class HttpServerLogic {
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
-    return this._listeningPromised.promise;
+    return this._startedPromised.promise;
   }
 
   private requestEvents = new IndexedEvents<HttpRequestHandler>();
@@ -51,7 +51,7 @@ export default class HttpServerLogic {
 
   // TODO: why not undefined?
   private serverId: string = '';
-  private _listeningPromised: Promised<void>;
+  private _startedPromised: Promised<void>;
 
 
   constructor(
@@ -70,7 +70,7 @@ export default class HttpServerLogic {
     this.logDebug = logDebug
     this.logInfo = logInfo
     this.logError = logError
-    this._listeningPromised = new Promised<void>()
+    this._startedPromised = new Promised<void>()
   }
 
   async init() {
@@ -123,7 +123,7 @@ export default class HttpServerLogic {
 
   handleServerListening = () => {
     this.logDebug(`HttpServerLogic: server ${this.props.host}:${this.props.port} started listening`);
-    this._listeningPromised.resolve();
+    this._startedPromised.resolve();
   }
 
   handleServerClose = () => {
@@ -160,7 +160,7 @@ export default class HttpServerLogic {
   }
 
   private async handleTimeout() {
-    this._listeningPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
+    this._startedPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
     await this.httpServerIo.closeServer(this.serverId);
   }
 

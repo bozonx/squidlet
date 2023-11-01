@@ -18,28 +18,28 @@ export const HttpServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
 export class HttpServerInstance extends DriverInstanceBase<
   HttpServerProps
 > {
-  private server!: HttpServerLogic
+  logic!: HttpServerLogic
 
   private get httpServerIo(): HttpServerIoType & IoBase {
     return this.ctx.io.getIo<HttpServerIoType & IoBase>(IO_NAMES.HttpServerIo)
   }
 
   private get closedMsg() {
-    return `Server "${this.props.host}:${this.props.port}" has been already closed`;
+    return `Http server "${this.props.host}:${this.props.port}" has been already closed`;
   }
 
   // it fulfils when server is start listening
   get listeningPromise(): Promise<void> {
-    if (!this.server) {
+    if (!this.logic) {
       throw new Error(`HttpServer.listeningPromise: ${this.closedMsg}`);
     }
 
-    return this.server.listeningPromise;
+    return this.logic.listeningPromise;
   }
 
 
   async init() {
-    this.server = new HttpServerLogic(
+    this.logic = new HttpServerLogic(
       this.httpServerIo,
       this.props,
       () => {
@@ -48,13 +48,13 @@ export class HttpServerInstance extends DriverInstanceBase<
       this.ctx.log.debug,
       this.ctx.log.info,
       this.ctx.log.error
-    );
+    )
 
-    await this.server.init();
+    await this.logic.init()
   }
 
   async destroy() {
-    await this.server.destroy();
+    await this.logic.destroy()
   }
 
 
@@ -63,39 +63,39 @@ export class HttpServerInstance extends DriverInstanceBase<
   }
 
   async stop(force?: boolean) {
-    if (!this.server) throw new Error(`HttpServer.removeRequestListener: ${this.onRequest}`);
+    if (!this.logic) throw new Error(`HttpServer.stop: ${this.onRequest}`)
 
-    return this.server.closeServer(force);
+    return this.logic.closeServer(force)
   }
 
 
   onRequest(cb: (request: HttpDriverRequest) => Promise<HttpDriverResponse>): number {
-    if (!this.server) throw new Error(`HttpServer.onMessage: ${this.onRequest}`);
+    if (!this.logic) throw new Error(`HttpServer.onMessage: ${this.onRequest}`);
 
-    return this.server.onRequest(cb)
+    return this.logic.onRequest(cb)
   }
 
   removeRequestListener(handlerIndex: number) {
-    if (!this.server) throw new Error(`HttpServer.removeRequestListener: ${this.onRequest}`);
+    if (!this.logic) throw new Error(`HttpServer.removeRequestListener: ${this.onRequest}`);
 
-    this.server.removeRequestListener(handlerIndex)
+    this.logic.removeRequestListener(handlerIndex)
   }
 
-  handleServerListening() {
-    this.server.handleServerListening()
-  }
-
-  handleServerClose() {
-    this.server.handleServerClose()
-  }
-
-  handleServerError(err: string) {
-    this.server.handleServerError(err)
-  }
-
-  handleServerRequest(requestId: number, request: HttpRequest) {
-    this.server.handleServerRequest(requestId, request)
-  }
+  // handleServerListening() {
+  //   this.logic.handleServerListening()
+  // }
+  //
+  // handleServerClose() {
+  //   this.logic.handleServerClose()
+  // }
+  //
+  // handleServerError(err: string) {
+  //   this.logic.handleServerError(err)
+  // }
+  //
+  // handleServerRequest(requestId: number, request: HttpRequest) {
+  //   this.logic.handleServerRequest(requestId, request)
+  // }
 
 }
 
@@ -121,17 +121,17 @@ export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, Http
 
       if (eventName === HttpServerEvent.serverClose) {
         //clearTimeout(listeningTimeout)
-        instance.handleServerClose()
+        instance.logic.handleServerClose()
       }
       else if (eventName === HttpServerEvent.listening) {
         //clearTimeout(listeningTimeout)
-        instance.handleServerListening()
+        instance.logic.handleServerListening()
       }
       else if (eventName === HttpServerEvent.serverError) {
-        instance.handleServerError(p[0])
+        instance.logic.handleServerError(p[0])
       }
       else if (eventName === HttpServerEvent.request) {
-        instance.handleServerRequest(p[0], p[1])
+        instance.logic.handleServerRequest(p[0], p[1])
       }
     })
   }
