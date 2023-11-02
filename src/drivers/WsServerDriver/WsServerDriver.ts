@@ -105,6 +105,8 @@ export class WsServerDriver extends DriverFactoryBase<WsServerInstance, WsServer
       .getIo<WsServerIoFullType>(IO_NAMES.WsServerIo)
 
     // TODO: лучше чтобы драйвер слушал один раз и раздовал по серверам
+    // TODO: отслеживать статус соединения с io
+    // TODO: отслеживать таймаут для поднятия сервера - если не получилось то повторить
 
     await wsServerIo.on((eventName: WsServerEvent, serverId: string, ...p: any[]) => {
       const instance = this.instances[serverId]
@@ -126,16 +128,20 @@ export class WsServerDriver extends DriverFactoryBase<WsServerInstance, WsServer
       else if (eventName === WsServerEvent.serverError) {
         instance.logic.handleServerError(p[0])
       }
-
-      // TODO: add newConnection
-      // TODO: add connectionClose
-      // TODO: add incomeMessage
-      // TODO: add incomeMessage
-      // TODO: add connectionError
-
       else if (eventName === WsServerEvent.newConnection) {
-        //instance.handleServerRequest(p[0], p[1])
+        instance.logic.handleNewConnection(p[0], p[1])
       }
+      // else if (eventName === WsServerEvent.connectionClose) {
+      //   instance.logic.handleConnectionClose(p[0], p[1])
+      // }
+      else if (eventName === WsServerEvent.incomeMessage) {
+        instance.logic.handleIncomeMessage(p[0], p[1])
+      }
+      else if (eventName === WsServerEvent.connectionError) {
+        instance.logic.handleConnectionError(p[0], p[1])
+      }
+
+      // TODO: ??? clientClose, ...
     })
   }
 

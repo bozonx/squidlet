@@ -1,23 +1,18 @@
 import {Promised, IndexedEventEmitter} from 'squidlet-lib'
-import {WsServerEvent, WsServerIoFullType, WsServerProps} from '../../types/io/WsServerIoType.js'
-import {WsCloseStatus} from '../../types/io/WsClientIoType.js'
-import {SERVER_STARTING_TIMEOUT_SEC} from '../../types/contstants.js'
+import {
+  WsServerConnectionParams,
+  WsServerEvent,
+  WsServerIoFullType,
+  WsServerProps,
+} from '../../types/io/WsServerIoType.js'
 
-
-// export enum WS_SERVER_EVENTS {
-//   incomeMessage,
-//   closeConnection,
-//   newConnection,
-// }
 
 // TODO: а оно надо??? может лучше сессию использовать?
 export const SETCOOKIE_LABEL = '__SET_COOKIE__';
-// TODO: review
-const HANDLER_INDEX_POSITION = 1;
 
 
 // TODO: наверное прикрутить сессию чтобы считать что клиент ещё подключен
-// TODO: отслежитьвать статус соединения
+// TODO: отслежитьвать статус соединения - connected, wait, reconnect ...
 
 
 export default class WsServerDriverLogic {
@@ -67,13 +62,9 @@ export default class WsServerDriverLogic {
    * Start server
    */
   async init() {
-    // TODO: review
     this.logInfo(`... Starting ws server: ${this.props.host}:${this.props.port}`)
 
     this.serverId = await this.wsServerIo.newServer(this.props)
-
-    await this.listenServerEvents()
-    await this.listenConnectionEvents()
   }
 
   async destroy() {
@@ -86,7 +77,7 @@ export default class WsServerDriverLogic {
     this.events.destroy()
 
     // TODO: review
-    await this.removeListeners()
+    //await this.removeListeners()
     // TODO: use destroyServer - it removes all the events before destroy
     // TODO: не должно поднять события
     await this.wsServerIo.closeServer(this.serverId)
@@ -159,7 +150,7 @@ export default class WsServerDriverLogic {
   /**
    * It rises when new connection is come.
    */
-  onConnection(cb: (connectionId: string, request: ConnectionParams) => void): number {
+  onConnection(cb: (connectionId: string, request: WsServerConnectionParams) => void): number {
     return this.events.addListener(WsServerEvent.newConnection, cb);
   }
 
@@ -170,12 +161,18 @@ export default class WsServerDriverLogic {
     return this.events.addListener(WsServerEvent.connectionClose, cb);
   }
 
+  onConnectionError(cb: (connectionId: string, err: string) => void): number {
+    return this.events.addListener(WsServerEvent.connectionError, cb)
+  }
+
+  onServerError(cb: (err: string) => void): number {
+    return this.events.addListener(WsServerEvent.serverError, cb)
+  }
+
   // TODO: add events
   /*
   serverStarted,
   serverClosed,
-  serverError,
-  connectionError,
   */
 
   removeListener(handlerIndex: number) {
@@ -183,80 +180,129 @@ export default class WsServerDriverLogic {
   }
 
 
-  private async listenServerEvents() {
-
-    // TODO: вместо этого использовать класс где подключение идёт повторно
-    const listeningTimeout = setTimeout(() => {
-      this.handleTimeout()
-        .catch(this.logError);
-    }, SERVER_STARTING_TIMEOUT_SEC * 1000);
-
-    // const listeningIndex: number = await this.wsServerIo.onServerListening(
-    //   this.serverId,
-    //   () => {
-    //     clearTimeout(listeningTimeout);
-    //     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
-    //     this._startedPromised.resolve();
-    //   }
-    // );
-    // const connectionIndex: number = await this.wsServerIo.onConnection(
-    //   this.serverId,
-    //   (connectionId: string, request: ConnectionParams) => {
-    //     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
-    //     this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
-    //   }
-    // );
-    // const closeIndex: number = await this.wsServerIo.onServerClose(
-    //   this.serverId,
-    //   () => {
-    //     clearTimeout(listeningTimeout);
-    //     this.handleCloseServer()
-    //       .catch(this.logError);
-    //   }
-    // );
-    //const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
-
-    // this.handlerIndexes.push([WsServerEvent.serverStarted, listeningIndex])
-    // this.handlerIndexes.push([WsServerEvent.newConnection, connectionIndex])
-    // this.handlerIndexes.push([WsServerEvent.serverClosed, closeIndex])
-    // this.handlerIndexes.push([WsServerEvent.serverError, errorIndex])
-
-    // TODO: нужно сохранить handler index?
-
-    const serverHandlerIndex = this.wsServerIo.on(
-      (event: WsServerEvent, ...p: any[]) => {
-        if (p[0] !== this.serverId) return
-
-        switch (event) {
-          case WsServerEvent.serverStarted:
-            clearTimeout(listeningTimeout)
-            this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
-            this._startedPromised.resolve()
-            this.events.emit(WsServerEvent.serverStarted)
-
-            break
-          case WsServerEvent.newConnection:
-            this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${p[1]}, ${JSON.stringify(p[2])}`);
-            this.events.emit(WsServerEvent.newConnection, p[1], p[2]);
-
-            break
-          case WsServerEvent.serverClosed:
-            clearTimeout(listeningTimeout)
-            this.handleCloseServer()
-              .catch(this.logError)
-
-            break
-          case WsServerEvent.serverError:
-            this.events.emit(WsServerEvent.serverError, String(p[1]))
-            this.logError(`Error on ws server ${this.props.host}:${this.props.port}. ${String(p[1])}`)
-
-            break
-        }
-      }
-    )
+  handleServerListening() {
+    this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+    this._startedPromised.resolve()
+    this.events.emit(WsServerEvent.serverStarted)
   }
 
-  private async listenConnectionEvents() {
+  handleServerClose() {
+    this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
+    //await this.removeListeners();
+
+    this.serverId = ''
+
+    this.onClose();
+    this.events.destroy();
+  }
+
+  handleServerError(err: string) {
+    this.logError(`Error on ws server ${this.props.host}:${this.props.port}. ${err}`)
+    this.events.emit(WsServerEvent.serverError, err)
+  }
+
+  handleNewConnection(connectionId: string, params: WsServerConnectionParams) {
+    this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${p[1]}, ${JSON.stringify(p[2])}`)
+    this.events.emit(WsServerEvent.newConnection, connectionId, params)
+  }
+
+  // TODO: add !!!
+  // handleConnectionClose() {
+  //   this.logDebug(`WsServerLogic connection ${connectionId} has been closed on server ${this.props.host}:${this.props.port} has been closed`);
+  //   this.events.emit(WsServerEvent.closeConnection, connectionId);
+  // }
+
+  handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
+    this.logDebug(`WsServerLogic income message on server ${this.props.host}:${this.props.port}, connection id ${connectionId}, data length ${data.length}`);
+    this.events.emit(WsServerEvent.incomeMessage, connectionId, data);
+  }
+
+  handleConnectionError(connectionId: string, err: string) {
+    this.logError(`Error on ws server ${this.props.host}:${this.props.port} connection ${connectionId}. ${err}`)
+    this.events.emit(WsServerEvent.connectionError, connectionId, err)
+  }
+
+
+
+//   this.logError(
+// `Unexpected response has been received on server "${this.serverId}", ` +
+// `connection "${connectionId}": ${JSON.stringify(response)}`
+// );
+
+  // private async listenServerEvents() {
+  //
+  //   // TODO: вместо этого использовать класс где подключение идёт повторно
+  //   const listeningTimeout = setTimeout(() => {
+  //     this.handleTimeout()
+  //       .catch(this.logError);
+  //   }, SERVER_STARTING_TIMEOUT_SEC * 1000);
+  //
+  //   // const listeningIndex: number = await this.wsServerIo.onServerListening(
+  //   //   this.serverId,
+  //   //   () => {
+  //   //     clearTimeout(listeningTimeout);
+  //   //     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+  //   //     this._startedPromised.resolve();
+  //   //   }
+  //   // );
+  //   // const connectionIndex: number = await this.wsServerIo.onConnection(
+  //   //   this.serverId,
+  //   //   (connectionId: string, request: ConnectionParams) => {
+  //   //     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
+  //   //     this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
+  //   //   }
+  //   // );
+  //   // const closeIndex: number = await this.wsServerIo.onServerClose(
+  //   //   this.serverId,
+  //   //   () => {
+  //   //     clearTimeout(listeningTimeout);
+  //   //     this.handleCloseServer()
+  //   //       .catch(this.logError);
+  //   //   }
+  //   // );
+  //   //const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
+  //
+  //   // this.handlerIndexes.push([WsServerEvent.serverStarted, listeningIndex])
+  //   // this.handlerIndexes.push([WsServerEvent.newConnection, connectionIndex])
+  //   // this.handlerIndexes.push([WsServerEvent.serverClosed, closeIndex])
+  //   // this.handlerIndexes.push([WsServerEvent.serverError, errorIndex])
+  //
+  //   // TODO: нужно сохранить handler index?
+  //
+  //   const serverHandlerIndex = this.wsServerIo.on(
+  //     (event: WsServerEvent, ...p: any[]) => {
+  //       if (p[0] !== this.serverId) return
+  //
+  //       switch (event) {
+  //         case WsServerEvent.serverStarted:
+  //           clearTimeout(listeningTimeout)
+  //           this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+  //           this._startedPromised.resolve()
+  //           this.events.emit(WsServerEvent.serverStarted)
+  //
+  //           break
+  //         case WsServerEvent.newConnection:
+  //           this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${p[1]}, ${JSON.stringify(p[2])}`);
+  //           this.events.emit(WsServerEvent.newConnection, p[1], p[2]);
+  //
+  //           break
+  //         case WsServerEvent.serverClosed:
+  //           clearTimeout(listeningTimeout)
+  //           this.handleCloseServer()
+  //             .catch(this.logError)
+  //
+  //           break
+  //         case WsServerEvent.serverError:
+  //           this.events.emit(WsServerEvent.serverError, String(p[1]))
+  //           this.logError(`Error on ws server ${this.props.host}:${this.props.port}. ${String(p[1])}`)
+  //
+  //           break
+  //       }
+  //     }
+  //   )
+  // }
+
+/*  private async listenConnectionEvents() {
 
     // TODO: review
 
@@ -292,33 +338,33 @@ export default class WsServerDriverLogic {
     this.handlerIndexes.push([WsServerEvent.clientMessage, messageIndex]);
     this.handlerIndexes.push([WsServerEvent.clientError, errorIndex]);
     this.handlerIndexes.push([WsServerEvent.clientUnexpectedResponse, unexpectedIndex]);
-  }
+  }*/
 
-  private async handleCloseServer() {
-    this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
-    await this.removeListeners();
+  // private async handleCloseServer() {
+  //   this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
+  //   await this.removeListeners();
+  //
+  //   this.serverId = ''
+  //
+  //   this.onClose();
+  //   this.events.destroy();
+  // }
 
-    this.serverId = ''
-
-    this.onClose();
-    this.events.destroy();
-  }
-
-  private async removeListeners() {
-
-    // TODO: review
-
-    for (let handlerIndex of this.handlerIndexes) {
-      await this.wsServerIo.removeListener(this.serverId, handlerIndex[HANDLER_INDEX_POSITION]);
-    }
-  }
-
-  private async handleTimeout() {
-    this._startedPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
-    await this.removeListeners()
-    await this.wsServerIo.closeServer(this.serverId)
-
-    // TODO: а повторно надо же делать
-  }
+  // private async removeListeners() {
+  //
+  //   // TODO: review
+  //
+  //   for (let handlerIndex of this.handlerIndexes) {
+  //     await this.wsServerIo.removeListener(this.serverId, handlerIndex[HANDLER_INDEX_POSITION]);
+  //   }
+  // }
+  //
+  // private async handleTimeout() {
+  //   this._startedPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
+  //   await this.removeListeners()
+  //   await this.wsServerIo.closeServer(this.serverId)
+  //
+  //   // TODO: а повторно надо же делать
+  // }
 
 }
