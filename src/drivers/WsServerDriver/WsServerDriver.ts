@@ -22,6 +22,7 @@ export const WsServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
 
 // TODO: наверное прикрутить сессию чтобы считать что клиент ещё подключен
 // TODO: отслежитьвать статус соединения - connected, wait, reconnect ...
+// TODO: что если сервер сам неожиданно отвалился
 
 
 export class WsServerInstance extends DriverInstanceBase<

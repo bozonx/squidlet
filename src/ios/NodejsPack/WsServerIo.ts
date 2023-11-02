@@ -98,6 +98,9 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
     server.on('connection', (socket: WebSocket, request: IncomingMessage) =>
       this.handleIncomeConnection(serverId, socket, request))
 
+    // TODO: !!!! incomeMessage
+    // TODO: !!!! connectionError
+
     return [
       server,
       // an empty connections
@@ -169,7 +172,7 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
     });
 
     // emit new connection
-    this.events.emit(WsServerEvent.newConnection, connectionId, requestParams)
+    this.events.emit(WsServerEvent.newConnection, serverId, connectionId, requestParams)
   }
 
 }

@@ -1,50 +1,19 @@
-// TODO: должен запустить ws сервер на localhost чтобы обмениваться данными
-//       c специальным фронтенд клиентом - это не универсальный api сервис
-
-
-
-// TODO: remove
-// async init() {
-//   this.events.addListener((...d: any[]) => {
-//     console.log(1111, d)
-//   })
-//
-//   const srverId = await this.newServer({
-//     host: 'localhost',
-//     port: 42181
-//   })
-//
-// }
-
-
-import {
-  parseUrl,
-  pathJoin,
-  getExt,
-  trimCharStart,
-  HTTP_CONTENT_TYPES,
-  HTTP_FILE_EXT_CONTENT_TYPE
-} from 'squidlet-lib'
 import {ServiceIndex, SubprogramError} from '../../types/types.js'
 import {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
-import {HttpServerDriver, HttpServerInstance} from '../../drivers/HttpServerDriver/HttpServerDriver.js'
 import {
-  APP_FILES_PUBLIC_DIR,
-  DEFAULT_UI_HTTP_PORT,
   DEFAULT_UI_WS_PORT,
   DRIVER_NAMES,
-  ROOT_DIRS,
 } from '../../types/contstants.js'
-import {HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServiceProps} from '../../types/ServiceProps.js'
-import {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerDriverLogic.js'
-import {uiHtml} from './uiHtmlTmpl.js'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {WsServerProps} from '../../types/io/WsServerIoType.js'
+import {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
+import {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
 
 
 // TODO: можно добавить специальный кукис сессии чтобы проверять откуда сделан запрос
+// TODO: должен запустить ws сервер на localhost чтобы обмениваться данными
+//       c специальным фронтенд клиентом - это не универсальный api сервис
+
 
 
 export const UiWsApiServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
@@ -87,11 +56,9 @@ export class UiWsApiService extends ServiceBase {
       .subDriver({
         host: this.cfg.host,
         port: this.cfg.port,
-      } as HttpServerProps)
+      } as WsServerProps)
 
-    this.wsServer.onRequest(
-      (request: HttpDriverRequest) => this.handleRequest(request)
-    )
+    this.wsServer.onConnection(this.handleConnection)
   }
 
   async destroy() {
@@ -101,15 +68,18 @@ export class UiWsApiService extends ServiceBase {
 
     // TODO: WTF ???!!!
 
-    await this.wsServer.start()
+    //await this.wsServer.start()
   }
 
   async stop(force?: boolean) {
-    await this.wsServer.stop(force)
+    await this.wsServer.closeServer(force)
   }
 
 
-  private async handleRequest(request: WsDriverRequest): Promise<WsDriverResponse> {
+  private handleConnection = (connectionId: string, request: WsServerConnectionParams) => {
+
+    console.log(222, connectionId, request)
+
     // if (request.method !== 'get') {
     //   return {
     //     status: 405

@@ -6,7 +6,12 @@ import {DriverIndex} from '../../types/types.js'
 import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
 import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
-import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
+import {
+  HttpServerEvent,
+  HttpServerIoFullType,
+  HttpServerIoType,
+  HttpServerProps,
+} from '../../types/io/HttpServerIoType.js'
 import HttpServerDriverLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerDriverLogic.js'
 import {IoBase} from '../../system/Io/IoBase.js'
 
@@ -111,6 +116,7 @@ export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, Http
     // TODO: лучше чтобы драйвер слушал один раз и раздовал по серверам
 
     await httpServerIo.on((eventName: HttpServerEvent, serverId: string, ...p: any[]) => {
+      // serverId is host:port
       const instance = this.instances[serverId]
 
       if (!instance) {

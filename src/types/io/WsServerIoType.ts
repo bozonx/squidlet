@@ -61,13 +61,13 @@ export interface WsServerIoType {
     ) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.serverClosed, connectionId: string) => void
+    cb: (eventName: WsServerEvent.serverClosed, serverId: string) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.incomeMessage, connectionId: string, data: string | Uint8Array) => void
+    cb: (eventName: WsServerEvent.incomeMessage, serverId: string, connectionId: string, data: string | Uint8Array) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.connectionError, connectionId: string, err: Error) => void
+    cb: (eventName: WsServerEvent.connectionError, serverId: string, connectionId: string, err: Error) => void
   ): Promise<number>
   on(
     cb: (eventName: WsServerEvent.serverStarted, serverId: string) => void
