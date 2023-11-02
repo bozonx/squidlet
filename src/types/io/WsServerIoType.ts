@@ -78,7 +78,7 @@ export interface WsServerIoType {
     cb: (eventName: WsServerEvent.connectionClose, serverId: string, connectionId: string, code?: number, reason?: string) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.connectionMessage, serverId: string, connectionId: string, data: string | Uint8Array) => void
+    cb: (eventName: WsServerEvent.connectionMessage, serverId: string, connectionId: string, data: Uint8Array) => void
   ): Promise<number>
   on(
     cb: (eventName: WsServerEvent.connectionUnexpectedResponse, serverId: string, connectionId: string, params: WsServerConnectionParams) => void

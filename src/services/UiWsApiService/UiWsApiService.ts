@@ -1,3 +1,4 @@
+import {deserializeJson} from 'squidlet-lib'
 import {ServiceIndex, SubprogramError} from '../../types/types.js'
 import {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
@@ -81,13 +82,15 @@ export class UiWsApiService extends ServiceBase {
 
     // TODO: подключиться к сессии вкладки и приложения
 
-    console.log(222, connectionId, request)
+    //console.log(222, connectionId, request)
 
 
   }
 
-  private handleMessage = (connectionId: string, data: string | Uint8Array) => {
-    console.log(333, connectionId, data)
+  private handleMessage = (connectionId: string, data: Uint8Array) => {
+    const msgObj = deserializeJson(data)
+
+    console.log(333, connectionId, msgObj)
   }
 
 }

@@ -140,7 +140,7 @@ export class WsServerInstance extends DriverInstanceBase<
   /**
    * Listen income messages
    */
-  onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {
+  onMessage(cb: (connectionId: string, data: Uint8Array) => void): number {
     return this.events.addListener(WsServerEvent.connectionMessage, cb)
   }
 
@@ -208,7 +208,7 @@ export class WsServerInstance extends DriverInstanceBase<
     this.events.emit(WsServerEvent.connectionClose, connectionId)
   }
 
-  handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
+  handleIncomeMessage(connectionId: string, data: Uint8Array) {
     this.ctx.log.debug(`WsServerLogic income message on server ${this.props.host}:${this.props.port}, connection id ${connectionId}, data length ${data.length}`);
     this.events.emit(WsServerEvent.connectionMessage, connectionId, data)
   }

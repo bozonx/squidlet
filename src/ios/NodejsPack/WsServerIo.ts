@@ -148,11 +148,13 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
     });
 
     socket.on('message', (data: string | Buffer) => {
-      let resolvedData: string | Uint8Array = data
+      if (!Buffer.isBuffer(data)) {
+        this.events.emit(WsServerEvent.connectionError, serverId, connectionId, `Income data isn't a buffer`)
 
-      if (Buffer.isBuffer(data)) {
-        resolvedData = convertBufferToUint8Array(data)
+        return
       }
+
+      let resolvedData: Uint8Array = convertBufferToUint8Array(data)
 
       this.events.emit(WsServerEvent.connectionMessage, serverId, connectionId, resolvedData)
     })
