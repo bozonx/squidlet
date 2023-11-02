@@ -1,5 +1,7 @@
-import {Promised, IndexedEvents} from 'squidlet-lib'
+import {Promised, IndexedEventEmitter} from 'squidlet-lib'
 import {WsServerEvent, WsServerIoFullType, WsServerProps} from '../../types/io/WsServerIoType.js'
+import {WsCloseStatus} from '../../types/io/WsClientIoType.js'
+import {SERVER_STARTING_TIMEOUT_SEC} from '../../types/contstants.js'
 
 
 // export enum WS_SERVER_EVENTS {
@@ -24,7 +26,7 @@ export default class WsServerDriverLogic {
     return this._startedPromised.promise;
   }
 
-  private readonly events = new IndexedEvents<(event: number, ...args: any[]) => void>()
+  private readonly events = new IndexedEventEmitter<(...args: any[]) => void>()
   private readonly wsServerIo: WsServerIoFullType
   private readonly props: WsServerProps;
   private readonly onClose: () => void;
@@ -130,79 +132,128 @@ export default class WsServerDriverLogic {
    * Close event will be risen
    */
   closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
-    this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} manually closes connection ${connectionId}`);
+    this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} manually closes connection ${connectionId}`)
     // TODO: проверить будет ли поднято событие close ???
-    return this.wsServerIo.close(this.serverId, connectionId, code, reason);
+    return this.wsServerIo.closeConnection(this.serverId, connectionId, code, reason)
   }
 
   async destroyConnection(connectionId: string) {
     this.logDebug(`WsServerLogic server ${this.props.host}:${this.props.port} destroys connection ${connectionId}`);
     // TODO: может проще тут отписаться от события и выполнить просто close
-    return this.wsServerIo.close(this.serverId, connectionId, WsCloseStatus.closeGoingAway, 'Destroy connection');
-    //await this.wsServerIo.destroyConnection(this.serverId, connectionId);
+    // return this.wsServerIo.closeConnection(
+    //   this.serverId,
+    //   connectionId,
+    //   WsCloseStatus.closeGoingAway,
+    //   'Destroy connection'
+    // )
+    await this.wsServerIo.destroyConnection(this.serverId, connectionId)
   }
 
   /**
    * Listen income messages
    */
   onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {
-    return this.events.addListener(WS_SERVER_EVENTS.incomeMessage, cb);
+    return this.events.addListener(WsServerEvent.incomeMessage, cb)
   }
 
   /**
    * It rises when new connection is come.
    */
   onConnection(cb: (connectionId: string, request: ConnectionParams) => void): number {
-    return this.events.addListener(WS_SERVER_EVENTS.newConnection, cb);
+    return this.events.addListener(WsServerEvent.newConnection, cb);
   }
 
   /**
    * Listen any connection close
    */
   onConnectionClose(cb: (connectionId: string) => void): number {
-    return this.events.addListener(WS_SERVER_EVENTS.closeConnection, cb);
+    return this.events.addListener(WsServerEvent.connectionClose, cb);
   }
 
+  // TODO: add events
+  /*
+  serverStarted,
+  serverClosed,
+  serverError,
+  connectionError,
+  */
+
   removeListener(handlerIndex: number) {
-    this.events.removeListener(handlerIndex);
+    this.events.removeListener(handlerIndex)
   }
 
 
   private async listenServerEvents() {
+
+    // TODO: вместо этого использовать класс где подключение идёт повторно
     const listeningTimeout = setTimeout(() => {
       this.handleTimeout()
         .catch(this.logError);
     }, SERVER_STARTING_TIMEOUT_SEC * 1000);
 
-    const listeningIndex: number = await this.wsServerIo.onServerListening(
-      this.serverId,
-      () => {
-        clearTimeout(listeningTimeout);
-        this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
-        this._startedPromised.resolve();
-      }
-    );
-    const connectionIndex: number = await this.wsServerIo.onConnection(
-      this.serverId,
-      (connectionId: string, request: ConnectionParams) => {
-        this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
-        this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
-      }
-    );
-    const closeIndex: number = await this.wsServerIo.onServerClose(
-      this.serverId,
-      () => {
-        clearTimeout(listeningTimeout);
-        this.handleCloseServer()
-          .catch(this.logError);
-      }
-    );
-    const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
+    // const listeningIndex: number = await this.wsServerIo.onServerListening(
+    //   this.serverId,
+    //   () => {
+    //     clearTimeout(listeningTimeout);
+    //     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+    //     this._startedPromised.resolve();
+    //   }
+    // );
+    // const connectionIndex: number = await this.wsServerIo.onConnection(
+    //   this.serverId,
+    //   (connectionId: string, request: ConnectionParams) => {
+    //     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(request)}`);
+    //     this.events.emit(WS_SERVER_EVENTS.newConnection, connectionId, request);
+    //   }
+    // );
+    // const closeIndex: number = await this.wsServerIo.onServerClose(
+    //   this.serverId,
+    //   () => {
+    //     clearTimeout(listeningTimeout);
+    //     this.handleCloseServer()
+    //       .catch(this.logError);
+    //   }
+    // );
+    //const errorIndex: number = await this.wsServerIo.onServerError(this.serverId, (err: Error) => this.logError(String(err)));
 
-    this.handlerIndexes.push([WsServerEvent.listening, listeningIndex]);
-    this.handlerIndexes.push([WsServerEvent.newConnection, connectionIndex]);
-    this.handlerIndexes.push([WsServerEvent.serverClose, closeIndex]);
-    this.handlerIndexes.push([WsServerEvent.serverError, errorIndex]);
+    // this.handlerIndexes.push([WsServerEvent.serverStarted, listeningIndex])
+    // this.handlerIndexes.push([WsServerEvent.newConnection, connectionIndex])
+    // this.handlerIndexes.push([WsServerEvent.serverClosed, closeIndex])
+    // this.handlerIndexes.push([WsServerEvent.serverError, errorIndex])
+
+    // TODO: нужно сохранить handler index?
+
+    const serverHandlerIndex = this.wsServerIo.on(
+      (event: WsServerEvent, ...p: any[]) => {
+        if (p[0] !== this.serverId) return
+
+        switch (event) {
+          case WsServerEvent.serverStarted:
+            clearTimeout(listeningTimeout)
+            this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+            this._startedPromised.resolve()
+            this.events.emit(WsServerEvent.serverStarted)
+
+            break
+          case WsServerEvent.newConnection:
+            this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${p[1]}, ${JSON.stringify(p[2])}`);
+            this.events.emit(WsServerEvent.newConnection, p[1], p[2]);
+
+            break
+          case WsServerEvent.serverClosed:
+            clearTimeout(listeningTimeout)
+            this.handleCloseServer()
+              .catch(this.logError)
+
+            break
+          case WsServerEvent.serverError:
+            this.events.emit(WsServerEvent.serverError, String(p[1]))
+            this.logError(`Error on ws server ${this.props.host}:${this.props.port}. ${String(p[1])}`)
+
+            break
+        }
+      }
+    )
   }
 
   private async listenConnectionEvents() {
@@ -246,7 +297,9 @@ export default class WsServerDriverLogic {
   private async handleCloseServer() {
     this.logDebug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
     await this.removeListeners();
-    delete this.serverId;
+
+    this.serverId = ''
+
     this.onClose();
     this.events.destroy();
   }
@@ -262,8 +315,10 @@ export default class WsServerDriverLogic {
 
   private async handleTimeout() {
     this._startedPromised.reject(new Error(`Server hasn't been started. Timeout has been exceeded`));
-    await this.removeListeners();
-    await this.wsServerIo.closeServer(this.serverId);
+    await this.removeListeners()
+    await this.wsServerIo.closeServer(this.serverId)
+
+    // TODO: а повторно надо же делать
   }
 
 }

@@ -72,6 +72,9 @@ export interface WsServerIoType {
   on(
     cb: (eventName: WsServerEvent.serverStarted, serverId: string) => void
   ): Promise<number>
+  on(
+    cb: (eventName: WsServerEvent.serverError, serverId: string, error: string) => void
+  ): Promise<number>
 
   /**
    * on server close. Depend on http server close
