@@ -15,6 +15,23 @@ import {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsS
 // TODO: должен запустить ws сервер на localhost чтобы обмениваться данными
 //       c специальным фронтенд клиентом - это не универсальный api сервис
 
+export interface UiApiIncomeMessage {
+  // session of a app tab
+  sessionId: string
+  // generate it on client to have a certain request
+  requestId: string
+  // api method to call can be with "." separator
+  method: string
+  // arguments for the method
+  arguments: any[]
+}
+
+export interface UiApiResponse {
+  requestId: string
+  data?: any
+  errorStatus?: number
+  errorMessage?: string
+}
 
 
 export const UiWsApiServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
@@ -86,12 +103,24 @@ export class UiWsApiService extends ServiceBase {
   }
 
   private handleMessage = (connectionId: string, data: Uint8Array) => {
-    const msgObj = deserializeJson(data)
-
-    console.log(333, connectionId, msgObj)
-
-    this.wsServer.send(connectionId, serializeJson({tt: 'resp'}))
+    (async () => {
+      const msgObj = deserializeJson(data)
+      const resp = await this.processMessage(msgObj)
+      // send response
+      await this.wsServer.send(connectionId, serializeJson(resp))
+    })()
       .catch((er: string) => this.ctx.log.error(er))
   }
 
+  private async processMessage(msgObj: UiApiIncomeMessage): Promise<UiApiResponse> {
+    // TODO: resolve sessionId
+    // TODO: если проихошла ошибка то вернуть статус и сообщение
+
+    console.log(333, msgObj)
+
+    return {
+      requestId: msgObj.requestId,
+      data: {aa: 'result111'}
+    }
+  }
 }
