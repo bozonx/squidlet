@@ -31,7 +31,7 @@ export class WsServerInstance extends DriverInstanceBase<
   private readonly events = new IndexedEventEmitter<(...args: any[]) => void>()
   // TODO: why not undefined?
   private serverId: string = ''
-  private _startedPromised: Promised<void> = new Promised<void>()
+  private _startedPromised = new Promised<void>()
 
   // it fulfils when server is start listening
   get startedPromise(): Promise<void> {
@@ -89,7 +89,7 @@ export class WsServerInstance extends DriverInstanceBase<
   /**
    * Send message to client
    */
-  send = (connectionId: string, data: string | Uint8Array): Promise<void> => {
+  send = (connectionId: string, data: Uint8Array): Promise<void> => {
     this.ctx.log.debug(`WsServerLogic.send from ${this.props.host}:${this.props.port} to connection ${connectionId}, data length ${data.length}`)
 
     return this.wsServerIo.send(this.serverId, connectionId, data)

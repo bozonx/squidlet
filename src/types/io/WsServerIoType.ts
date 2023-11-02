@@ -110,11 +110,7 @@ export interface WsServerIoType {
    * Send message from server to the client.
    * It waits while message has been sent but it doesn't wait for response.
    */
-  send(
-    serverId: string,
-    connectionId: string,
-    data: string | Uint8Array
-  ): Promise<void>
+  send(serverId: string, connectionId: string, data: Uint8Array): Promise<void>
 
   closeConnection(
     serverId: string,
