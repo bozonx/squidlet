@@ -84,8 +84,6 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
 
 
   protected startServer(serverId: string, props: WsServerProps): ServerItem {
-    // TODO: использовать http сервер так чтобы там можно было ещё и поднимать
-    //       обычные http роуты
     const server = new WebSocketServer(props)
 
     server.on('close', () =>
@@ -97,9 +95,6 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
       this.handleServerStartListening(serverId))
     server.on('connection', (socket: WebSocket, request: IncomingMessage) =>
       this.handleIncomeConnection(serverId, socket, request))
-
-    // TODO: !!!! incomeMessage
-    // TODO: !!!! connectionError
 
     return [
       server,
@@ -144,12 +139,12 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
     connections.push(socket)
 
     socket.on('error', (err: Error) => {
-      this.events.emit(WsServerEvent.clientError, serverId, connectionId, err)
+      this.events.emit(WsServerEvent.connectionError, serverId, connectionId, err)
     })
 
     // TODO: что если соединение само закроется???
     socket.on('close', (code: number, reason: string) => {
-      this.events.emit(WsServerEvent.clientClose, serverId, connectionId, code, reason)
+      this.events.emit(WsServerEvent.connectionClose, serverId, connectionId, code, reason)
     });
 
     socket.on('message', (data: string | Buffer) => {
@@ -159,12 +154,12 @@ export class WsServerIo extends ServerIoBase<ServerItem, WsServerProps> implemen
         resolvedData = convertBufferToUint8Array(data)
       }
 
-      this.events.emit(WsServerEvent.clientMessage, serverId, connectionId, resolvedData)
+      this.events.emit(WsServerEvent.connectionMessage, serverId, connectionId, resolvedData)
     })
 
     socket.on('unexpected-response', (request: ClientRequest, response: IncomingMessage) => {
       this.events.emit(
-        WsServerEvent.clientUnexpectedResponse,
+        WsServerEvent.connectionUnexpectedResponse,
         serverId,
         connectionId,
         makeConnectionParams(response)

@@ -11,16 +11,16 @@ export enum WsServerEvent {
   // TODO: в какой момент возникает, может лучше с промисом отдать или с событием
   serverError,
   newConnection,
-  connectionClose,
-  incomeMessage,
-  connectionError,
+  // connectionClose,
+  // incomeMessage,
+  // connectionError,
   // TODO: review
   //clientUnexpectedResponse,
 
-  clientClose,
-  clientMessage,
-  clientError,
-  clientUnexpectedResponse,
+  connectionClose,
+  connectionMessage,
+  connectionError,
+  connectionUnexpectedResponse,
 }
 
 
@@ -64,43 +64,27 @@ export interface WsServerIoType {
     cb: (eventName: WsServerEvent.serverClosed, serverId: string) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.incomeMessage, serverId: string, connectionId: string, data: string | Uint8Array) => void
-  ): Promise<number>
-  on(
-    cb: (eventName: WsServerEvent.connectionError, serverId: string, connectionId: string, err: Error) => void
-  ): Promise<number>
-  on(
     cb: (eventName: WsServerEvent.serverStarted, serverId: string) => void
   ): Promise<number>
   on(
     cb: (eventName: WsServerEvent.serverError, serverId: string, error: string) => void
   ): Promise<number>
 
-  /**
-   * on server close. Depend on http server close
-   */
+  ///////// Connection
   on(
-    cb: (eventName: WsServerEvent.serverClosed, serverId: string) => void
-  ): Promise<number>
-
-  ///////// CLIENT
-  on(
-    cb: (eventName: WsServerEvent.clientError, serverId: string, connectionId: string, err: Error) => void
+    cb: (eventName: WsServerEvent.connectionError, serverId: string, connectionId: string, err: Error) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.clientClose, serverId: string, connectionId: string, code?: number, reason?: string) => void
+    cb: (eventName: WsServerEvent.connectionClose, serverId: string, connectionId: string, code?: number, reason?: string) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.clientMessage, serverId: string, connectionId: string, data: string | Uint8Array) => void
+    cb: (eventName: WsServerEvent.connectionMessage, serverId: string, connectionId: string, data: string | Uint8Array) => void
   ): Promise<number>
   on(
-    cb: (eventName: WsServerEvent.clientUnexpectedResponse, serverId: string, connectionId: string, params: WsServerConnectionParams) => void
+    cb: (eventName: WsServerEvent.connectionUnexpectedResponse, serverId: string, connectionId: string, params: WsServerConnectionParams) => void
   ): Promise<number>
 
   off(handlerIndex: number): Promise<void>
-
-  //onServerError(serverId: string, cb: (err: Error) => void): Promise<number>
-  //onUnexpectedResponse(serverId: string, cb: (connectionId: string, response: ConnectionParams) => void): Promise<number>
 
 
   // TODO: почему не поднимается событие ??

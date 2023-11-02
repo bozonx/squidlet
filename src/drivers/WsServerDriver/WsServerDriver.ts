@@ -141,7 +141,7 @@ export class WsServerInstance extends DriverInstanceBase<
    * Listen income messages
    */
   onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {
-    return this.events.addListener(WsServerEvent.incomeMessage, cb)
+    return this.events.addListener(WsServerEvent.connectionMessage, cb)
   }
 
   /**
@@ -166,7 +166,7 @@ export class WsServerInstance extends DriverInstanceBase<
     return this.events.addListener(WsServerEvent.serverError, cb)
   }
 
-  // TODO: add events
+  // TODO: add other events
   /*
   serverStarted,
   serverClosed,
@@ -203,15 +203,19 @@ export class WsServerInstance extends DriverInstanceBase<
     this.events.emit(WsServerEvent.newConnection, connectionId, params)
   }
 
-  // TODO: add !!!
-  // handleConnectionClose() {
-  //   this.ctx.log.debug(`WsServerLogic connection ${connectionId} has been closed on server ${this.props.host}:${this.props.port} has been closed`);
-  //   this.events.emit(WsServerEvent.closeConnection, connectionId);
-  // }
+  handleConnectionClose(serverId: string, connectionId: string, code?: number, reason?: string) {
+    this.ctx.log.debug(`WsServerLogic connection ${connectionId} has been closed on server ${this.props.host}:${this.props.port} has been closed. Code ${code}. Reason: ${reason || ''}`);
+    this.events.emit(WsServerEvent.connectionClose, connectionId)
+  }
 
   handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
     this.ctx.log.debug(`WsServerLogic income message on server ${this.props.host}:${this.props.port}, connection id ${connectionId}, data length ${data.length}`);
-    this.events.emit(WsServerEvent.incomeMessage, connectionId, data);
+    this.events.emit(WsServerEvent.connectionMessage, connectionId, data)
+  }
+
+  handleConnectionUnexpectedResponse(connectionId: string, params: WsServerConnectionParams) {
+    this.ctx.log.error(`Unexpected response on ws server ${this.props.host}:${this.props.port} connection ${connectionId}. ${JSON.stringify(params)}`)
+    this.events.emit(WsServerEvent.connectionUnexpectedResponse, connectionId, params)
   }
 
   handleConnectionError(connectionId: string, err: string) {
@@ -257,17 +261,19 @@ export class WsServerDriver extends DriverFactoryBase<WsServerInstance, WsServer
       else if (eventName === WsServerEvent.newConnection) {
         instance.handleNewConnection(p[0], p[1])
       }
-      // else if (eventName === WsServerEvent.connectionClose) {
-      //   instance.handleConnectionClose(p[0], p[1])
-      // }
-      else if (eventName === WsServerEvent.incomeMessage) {
+      // Connection
+      else if (eventName === WsServerEvent.connectionClose) {
+        instance.handleConnectionClose(p[0], p[1], p[2])
+      }
+      else if (eventName === WsServerEvent.connectionMessage) {
         instance.handleIncomeMessage(p[0], p[1])
       }
       else if (eventName === WsServerEvent.connectionError) {
         instance.handleConnectionError(p[0], p[1])
       }
-
-      // TODO: ??? clientClose, ...
+      else if (eventName === WsServerEvent.connectionUnexpectedResponse) {
+        instance.handleConnectionUnexpectedResponse(p[0], p[1])
+      }
     })
   }
 

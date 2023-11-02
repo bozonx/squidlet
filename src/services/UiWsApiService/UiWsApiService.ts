@@ -59,6 +59,7 @@ export class UiWsApiService extends ServiceBase {
       } as WsServerProps)
 
     this.wsServer.onConnection(this.handleConnection)
+    this.wsServer.onMessage(this.handleMessage)
   }
 
   async destroy() {
@@ -78,39 +79,15 @@ export class UiWsApiService extends ServiceBase {
 
   private handleConnection = (connectionId: string, request: WsServerConnectionParams) => {
 
+    // TODO: подключиться к сессии вкладки и приложения
+
     console.log(222, connectionId, request)
 
-    // if (request.method !== 'get') {
-    //   return {
-    //     status: 405
-    //   }
-    // }
-    // else if (request.url === '/assets/squidletUi.js') {
-    //   return {
-    //     status: 200,
-    //     headers: {
-    //       'content-type': 'text/javascript',
-    //     } as any,
-    //     body: '',
-    //   }
-    // }
-    //
-    // const parsedUrl = parseUrl(request.url)
-    // const appName = parsedUrl.search?.app as string | undefined
-    //
-    // if (!appName) {
-    //   return {
-    //     status: 404,
-    //     body: `Application hasn't set`
-    //   }
-    // }
-    //
-    // // TODO: add images
-    // if ((parsedUrl.path || '').match(/\.(js|css)$/i)) {
-    //   return this.makeStaticFileResponse(appName, parsedUrl.path!)
-    // }
-    //
-    // return this.makeMainHtmlResp(appName)
+
+  }
+
+  private handleMessage = (connectionId: string, data: string | Uint8Array) => {
+    console.log(333, connectionId, data)
   }
 
 }
