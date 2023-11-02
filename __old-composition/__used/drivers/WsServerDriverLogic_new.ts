@@ -4,7 +4,7 @@ import {
   WsServerEvent,
   WsServerIoFullType,
   WsServerProps,
-} from '../../types/io/WsServerIoType.js'
+} from '../../../src/types/io/WsServerIoType'
 
 
 // TODO: а оно надо??? может лучше сессию использовать?
@@ -15,7 +15,7 @@ export const SETCOOKIE_LABEL = '__SET_COOKIE__';
 // TODO: отслежитьвать статус соединения - connected, wait, reconnect ...
 
 
-export default class WsServerDriverLogic {
+export default class WsServerDriverLogic_new {
   // it fulfils when server is start listening
   get startedPromise(): Promise<void> {
     return this._startedPromised.promise;

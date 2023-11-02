@@ -1,97 +1,222 @@
+import {Promised, IndexedEventEmitter} from 'squidlet-lib'
 import {DriverIndex} from '../../types/types.js'
 import {DriverContext} from '../../system/driver/DriverContext.js'
 import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
-import {WsServerEvent, WsServerIoFullType, WsServerProps} from '../../types/io/WsServerIoType.js'
+import {
+  WsServerConnectionParams,
+  WsServerEvent,
+  WsServerIoFullType,
+  WsServerProps,
+} from '../../types/io/WsServerIoType.js'
 import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
-import WsServerDriverLogic from './WsServerDriverLogic.js'
+
+
+// TODO: а оно надо??? может лучше сессию использовать?
+export const SETCOOKIE_LABEL = '__SET_COOKIE__';
 
 
 export const WsServerDriverIndex: DriverIndex = (ctx: DriverContext) => {
   return new WsServerDriver(ctx)
 }
 
+// TODO: наверное прикрутить сессию чтобы считать что клиент ещё подключен
+// TODO: отслежитьвать статус соединения - connected, wait, reconnect ...
+
+
 export class WsServerInstance extends DriverInstanceBase<
   WsServerProps
 > {
-  logic!: WsServerDriverLogic
+  private readonly events = new IndexedEventEmitter<(...args: any[]) => void>()
+  // TODO: why not undefined?
+  private serverId: string = ''
+  private _startedPromised: Promised<void> = new Promised<void>()
+
+  // it fulfils when server is start listening
+  get startedPromise(): Promise<void> {
+    return this._startedPromised.promise;
+  }
 
   private get wsServerIo(): WsServerIoFullType {
     return this.ctx.io.getIo<WsServerIoFullType>(IO_NAMES.WsServerIo)
   }
 
-  private get closedMsg() {
-    return `Ws srver "${this.props.host}:${this.props.port}" has been already closed`;
-  }
-
-  // it fulfils when server is start listening
-  get startedPromise(): Promise<void> {
-    if (!this.logic) {
-      throw new Error(`WsServer.startedPromise: ${this.closedMsg}`);
-    }
-
-    return this.logic.startedPromise
-  }
+  // private get closedMsg() {
+  //   return `Ws server "${this.props.host}:${this.props.port}" has been already closed, you can't manipulate it any more!`;
+  // }
 
 
   async init() {
-    this.logic = new WsServerDriverLogic(
-      this.wsServerIo,
-      this.props,
-      () => {
-        this.ctx.log.error(`WsServer: ${this.closedMsg}, you can't manipulate it any more!`);
-      },
-      this.ctx.log.debug,
-      this.ctx.log.info,
-      this.ctx.log.error
-    )
+    this.ctx.log.info(`... Starting ws server: ${this.props.host}:${this.props.port}`)
 
-    await this.logic.init()
+    this.serverId = await this.wsServerIo.newServer(this.props)
   }
 
   async destroy() {
-    await this.logic.destroy()
+    // TODO: review
+    if (!this.isInitialized()) {
+      return this.ctx.log.error(`WsServerLogic.destroy: Server hasn't been initialized yet.`)
+    }
+
+    this.ctx.log.debug(`... destroying websocket server: ${this.props.host}:${this.props.port}`)
+    this.events.destroy()
+
+    // TODO: review
+    //await this.removeListeners()
+    // TODO: use destroyServer - it removes all the events before destroy
+    // TODO: не должно поднять события
+    await this.wsServerIo.closeServer(this.serverId)
+
+    this.serverId = ''
   }
 
 
-  async start() {
-    // TODO: WTF ???
+  isInitialized(): boolean {
+    return Boolean(this.serverId)
   }
 
-  async stop(force?: boolean) {
-    if (!this.logic) throw new Error(`WsServer.stop: ${this.onRequest}`)
+  async closeServer(force?: boolean) {
+    if (!this.serverId) return
 
-    return this.logic.closeServer(force)
+    // TODO: use force
+    // TODO: должно при этом подняться событие close
+    await this.wsServerIo.closeServer(this.serverId)
+
+    this.serverId = ''
   }
 
+  /**
+   * Send message to client
+   */
+  send = (connectionId: string, data: string | Uint8Array): Promise<void> => {
+    this.ctx.log.debug(`WsServerLogic.send from ${this.props.host}:${this.props.port} to connection ${connectionId}, data length ${data.length}`)
 
-  onRequest(cb: (request: WsDriverRequest) => Promise<WsDriverResponse>): number {
-    if (!this.logic) throw new Error(`WsServer.onMessage: ${this.onRequest}`);
-
-    return this.logic.onRequest(cb)
+    return this.wsServerIo.send(this.serverId, connectionId, data)
   }
 
-  removeRequestListener(handlerIndex: number) {
-    if (!this.logic) throw new Error(`WsServer.removeRequestListener: ${this.onRequest}`);
+  // TODO: оно нужно ???
+  // async setCookie(connectionId: string, cookie: string) {
+  //   const data = `${SETCOOKIE_LABEL}${cookie}`;
+  //
+  //   this.ctx.log.debug(`WsServerLogic.setCookie from ${this.props.host}:${this.props.port} to connection ${connectionId}, ${data}`);
+  //
+  //   return this.wsServerIo.send(this.serverId, connectionId, data);
+  // }
 
-    this.logic.removeRequestListener(handlerIndex)
+  /**
+   * Force closing a connection.
+   * Close event will be risen
+   */
+  closeConnection(connectionId: string, code: number, reason: string): Promise<void> {
+    this.ctx.log.debug(`WsServerLogic server ${this.props.host}:${this.props.port} manually closes connection ${connectionId}`)
+    // TODO: проверить будет ли поднято событие close ???
+    return this.wsServerIo.closeConnection(this.serverId, connectionId, code, reason)
   }
 
-  // handleServerListening() {
-  //   this.logic.handleServerListening()
+  async destroyConnection(connectionId: string) {
+    this.ctx.log.debug(`WsServerLogic server ${this.props.host}:${this.props.port} destroys connection ${connectionId}`);
+    // TODO: может проще тут отписаться от события и выполнить просто close
+    // return this.wsServerIo.closeConnection(
+    //   this.serverId,
+    //   connectionId,
+    //   WsCloseStatus.closeGoingAway,
+    //   'Destroy connection'
+    // )
+    await this.wsServerIo.destroyConnection(this.serverId, connectionId)
+  }
+
+  // async start() {
+  //   // TODO: WTF ???
   // }
   //
-  // handleServerClose() {
-  //   this.logic.handleServerClose()
-  // }
+  // async stop(force?: boolean) {
+  //   if (!this.logic) throw new Error(`WsServer.stop: ${this.onRequest}`)
   //
-  // handleServerError(err: string) {
-  //   this.logic.handleServerError(err)
+  //   return this.logic.closeServer(force)
   // }
 
-  // handleServerRequest(requestId: number, request: WsRequest) {
-  //   this.logic.handleServerRequest(requestId, request)
+
+  /**
+   * Listen income messages
+   */
+  onMessage(cb: (connectionId: string, data: string | Uint8Array) => void): number {
+    return this.events.addListener(WsServerEvent.incomeMessage, cb)
+  }
+
+  /**
+   * It rises when new connection is come.
+   */
+  onConnection(cb: (connectionId: string, request: WsServerConnectionParams) => void): number {
+    return this.events.addListener(WsServerEvent.newConnection, cb);
+  }
+
+  /**
+   * Listen any connection close
+   */
+  onConnectionClose(cb: (connectionId: string) => void): number {
+    return this.events.addListener(WsServerEvent.connectionClose, cb);
+  }
+
+  onConnectionError(cb: (connectionId: string, err: string) => void): number {
+    return this.events.addListener(WsServerEvent.connectionError, cb)
+  }
+
+  onServerError(cb: (err: string) => void): number {
+    return this.events.addListener(WsServerEvent.serverError, cb)
+  }
+
+  // TODO: add events
+  /*
+  serverStarted,
+  serverClosed,
+  */
+
+  removeListener(handlerIndex: number) {
+    this.events.removeListener(handlerIndex)
+  }
+
+
+  handleServerListening() {
+    this.ctx.log.debug(`WsServerLogic: server ${this.props.host}:${this.props.port} started listening`);
+    this._startedPromised.resolve()
+    this.events.emit(WsServerEvent.serverStarted)
+  }
+
+  handleServerClose() {
+    //this.ctx.log.debug(`WsServerLogic: server ${this.props.host}:${this.props.port} has been closed`);
+    this.ctx.log.log(`Ws server "${this.props.host}:${this.props.port}" has been already closed, you can't manipulate it any more!`);
+    //await this.removeListeners();
+
+    this.serverId = ''
+
+    this.events.destroy();
+  }
+
+  handleServerError(err: string) {
+    this.ctx.log.error(`Error on ws server ${this.props.host}:${this.props.port}. ${err}`)
+    this.events.emit(WsServerEvent.serverError, err)
+  }
+
+  handleNewConnection(connectionId: string, params: WsServerConnectionParams) {
+    this.ctx.log.debug(`WsServerLogic: server ${this.props.host}:${this.props.port} received a new connection ${connectionId}, ${JSON.stringify(params)}`)
+    this.events.emit(WsServerEvent.newConnection, connectionId, params)
+  }
+
+  // TODO: add !!!
+  // handleConnectionClose() {
+  //   this.ctx.log.debug(`WsServerLogic connection ${connectionId} has been closed on server ${this.props.host}:${this.props.port} has been closed`);
+  //   this.events.emit(WsServerEvent.closeConnection, connectionId);
   // }
+
+  handleIncomeMessage(connectionId: string, data: string | Uint8Array) {
+    this.ctx.log.debug(`WsServerLogic income message on server ${this.props.host}:${this.props.port}, connection id ${connectionId}, data length ${data.length}`);
+    this.events.emit(WsServerEvent.incomeMessage, connectionId, data);
+  }
+
+  handleConnectionError(connectionId: string, err: string) {
+    this.ctx.log.error(`Error on ws server ${this.props.host}:${this.props.port} connection ${connectionId}. ${err}`)
+    this.events.emit(WsServerEvent.connectionError, connectionId, err)
+  }
 
 }
 
@@ -119,26 +244,26 @@ export class WsServerDriver extends DriverFactoryBase<WsServerInstance, WsServer
 
       if (eventName === WsServerEvent.serverClosed) {
         //clearTimeout(listeningTimeout)
-        instance.logic.handleServerClose()
+        instance.handleServerClose()
       }
       else if (eventName === WsServerEvent.serverStarted) {
         //clearTimeout(listeningTimeout)
-        instance.logic.handleServerListening()
+        instance.handleServerListening()
       }
       else if (eventName === WsServerEvent.serverError) {
-        instance.logic.handleServerError(p[0])
+        instance.handleServerError(p[0])
       }
       else if (eventName === WsServerEvent.newConnection) {
-        instance.logic.handleNewConnection(p[0], p[1])
+        instance.handleNewConnection(p[0], p[1])
       }
       // else if (eventName === WsServerEvent.connectionClose) {
-      //   instance.logic.handleConnectionClose(p[0], p[1])
+      //   instance.handleConnectionClose(p[0], p[1])
       // }
       else if (eventName === WsServerEvent.incomeMessage) {
-        instance.logic.handleIncomeMessage(p[0], p[1])
+        instance.handleIncomeMessage(p[0], p[1])
       }
       else if (eventName === WsServerEvent.connectionError) {
-        instance.logic.handleConnectionError(p[0], p[1])
+        instance.handleConnectionError(p[0], p[1])
       }
 
       // TODO: ??? clientClose, ...
