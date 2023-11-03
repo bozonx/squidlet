@@ -3,6 +3,7 @@
 build
 __example
 _testData
+distr
 
 *.csv
 *.dat

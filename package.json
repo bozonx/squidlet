@@ -4,7 +4,7 @@
   "description": "Personal and distributed social network",
   "author": "Ivan Kozyrin <ipkozyrin@gmail.com>",
   "repository": "git@github.com:bozonx/squidlet.git",
-  "exports": "./src/index.js",
+  "exports": "./distr/index.js",
   "type": "module",
   "engines": {
     "node": ">=18.14.0"
@@ -13,8 +13,12 @@
   "private": false,
   "scripts": {
     "dev": "ROOT_DIR=./_testData ts-node-esm ./src/starters/devLocal/index.ts",
+    "build": "tsc",
     "test": "mocha",
     "lint": "tslint -p tsconfig.json"
+  },
+  "directories": {
+    "src": "./src"
   },
   "dependencies": {
     "@types/ws": "^8.5.4",
