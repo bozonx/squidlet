@@ -1,4 +1,4 @@
-import {serializeJson, deserializeJson} from 'squidlet-lib'
+import {serializeJson, deserializeJson, deepGet} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
@@ -9,6 +9,8 @@ import {
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
 import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
+import {requestError} from '../../system/helpers/helpers.js'
+import type {RequestError} from '../../system/helpers/helpers.js'
 
 
 // TODO: можно добавить специальный кукис сессии чтобы проверять откуда сделан запрос
@@ -105,22 +107,50 @@ export class UiWsApiService extends ServiceBase {
   private handleMessage = (connectionId: string, data: Uint8Array) => {
     (async () => {
       const msgObj = deserializeJson(data)
-      const resp = await this.processMessage(msgObj)
+      let resultData
+
+      try {
+        resultData = await this.processMessage(msgObj)
+      }
+      catch (e) {
+        const err = e as RequestError
+        const errResp: UiApiResponse = {
+          requestId: msgObj.requestId,
+          errorStatus: err.code,
+          errorMessage: err.message,
+        }
+
+        await this.wsServer.send(connectionId, serializeJson(errResp))
+
+        return
+      }
+
+      const resp: UiApiResponse = {
+        requestId: msgObj.requestId,
+        data: resultData,
+      }
       // send response
       await this.wsServer.send(connectionId, serializeJson(resp))
     })()
       .catch((er: string) => this.ctx.log.error(er))
   }
 
-  private async processMessage(msgObj: UiApiIncomeMessage): Promise<UiApiResponse> {
+  private async processMessage(msgObj: UiApiIncomeMessage): Promise<any> {
     // TODO: resolve sessionId
-    // TODO: если проихошла ошибка то вернуть статус и сообщение
+    // TODO: взять имя приложение из сессии
+    const appName = 'Publisher'
+    const app = this.ctx.apps.getApp(appName)
 
-    console.log(333, msgObj)
+    if (!app) throw requestError(500, `Can't find an app "${appName}"`)
 
-    return {
-      requestId: msgObj.requestId,
-      data: {aa: 'result111'}
-    }
+    const method = deepGet(app, msgObj.method)
+
+    console.log(333, app, msgObj, method)
+
+    if (!method) throw requestError(500, `Can't find a method "${msgObj.method}" of an app "${appName}"`)
+
+    //this.ctx.apps.getApp('')
+
+    return {aa: 'result111'}
   }
 }
