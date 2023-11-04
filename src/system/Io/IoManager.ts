@@ -1,7 +1,7 @@
-import {System} from '../System.js'
-import {IoBase} from './IoBase.js'
+import type {System} from '../System.js'
+import type {IoBase} from './IoBase.js'
 import {IoContext} from './IoContext.js'
-import {IoSetBase} from './IoSetBase.js'
+import type {IoSetBase} from './IoSetBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
 
 

@@ -1,9 +1,9 @@
 import axios, {AxiosResponse} from 'axios'
-import {HttpClientIoType} from '../../types/io/HttpClientIoType.js'
-import {HttpRequest, HttpResponse} from 'squidlet-lib'
+import type {HttpClientIoType} from '../../types/io/HttpClientIoType.js'
+import type {HttpRequest, HttpResponse} from 'squidlet-lib'
 import {IoBase} from '../../system/Io/IoBase.js'
-import {IoIndex} from '../../types/types.js'
-import {IoContext} from '../../system/Io/IoContext.js'
+import type {IoIndex} from '../../types/types.js'
+import type {IoContext} from '../../system/Io/IoContext.js'
 
 
 export const HttpClientIoIndex: IoIndex = (ctx: IoContext) => {

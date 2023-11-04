@@ -1,7 +1,7 @@
-import {System} from '../System.js'
+import type {System} from '../System.js'
 import {AppContext} from './AppContext.js'
-import {AppBase} from './AppBase.js'
-import {AppIndex} from '../../types/types.js'
+import type {AppBase} from './AppBase.js'
+import type {AppIndex} from '../../types/types.js'
 
 
 export class AppManager {

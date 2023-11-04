@@ -4,3 +4,4 @@
  */
 
 export {System} from './system/System.js'
+export {devStarter} from './starters/devLocal/index.js'

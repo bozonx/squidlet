@@ -1,8 +1,8 @@
 import {
   HttpRequest,
 } from 'squidlet-lib'
-import {DriverContext} from '../../system/driver/DriverContext.js'
-import {DriverIndex} from '../../types/types.js'
+import type {DriverContext} from '../../system/driver/DriverContext.js'
+import type {DriverIndex} from '../../types/types.js'
 import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
 import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
 import {IO_NAMES} from '../../types/contstants.js'

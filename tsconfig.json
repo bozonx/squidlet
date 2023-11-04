@@ -68,7 +68,7 @@
     // "noEmitHelpers": true,                            /* Disable generating custom helper functions like '__extends' in compiled output. */
     // "noEmitOnError": true,                            /* Disable emitting files if any type checking errors are reported. */
     // "preserveConstEnums": true,                       /* Disable erasing 'const enum' declarations in generated code. */
-    // "declarationDir": "./",                           /* Specify the output directory for generated declaration files. */
+    // "declarationDir": "./distr-types",                           /* Specify the output directory for generated declaration files. */
     // "preserveValueImports": true,                     /* Preserve unused imported values in the JavaScript output that would otherwise be removed. */
 
     /* Interop Constraints */
@@ -101,14 +101,23 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "skipLibCheck": true,                                /* Skip type checking all .d.ts files. */
+
+    "importsNotUsedAsValues": "error",
+    // "verbatimModuleSyntax": true,
     "declaration": true,
+    "composite": true,
     "rootDir": "src",
-    "outDir": "./distr"
+    "declarationDir": "./distr/types",
+    "outDir": "./distr/src"
   },
   "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", "next.config.js"],
   "exclude": [
-    "src/starters",
+    "src/starters/AndroidStarter",
+    "src/starters/DockerArmStarter",
+    "src/starters/DockerX86Starter",
+    "src/starters/FirefoxStarter",
+    "src/starters/RpiStarter",
     "distr",
     "__old-composition",
     "build",

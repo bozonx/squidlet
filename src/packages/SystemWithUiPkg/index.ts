@@ -1,5 +1,5 @@
-import {PackageContext} from '../../system/package/PackageContext.js'
-import {PackageIndex} from '../../types/types.js'
+import type {PackageContext} from '../../system/package/PackageContext.js'
+import type {PackageIndex} from '../../types/types.js'
 import {UiHttpServiceIndex} from '../../services/UiHttpService/UiHttpService.js'
 import {UiWsApiServiceIndex} from '../../services/UiWsApiService/UiWsApiService.js'
 

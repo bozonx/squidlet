@@ -1,14 +1,14 @@
 import {serializeJson, deserializeJson} from 'squidlet-lib'
-import {ServiceIndex, SubprogramError} from '../../types/types.js'
-import {ServiceContext} from '../../system/service/ServiceContext.js'
+import type {ServiceIndex, SubprogramError} from '../../types/types.js'
+import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import {
   DEFAULT_UI_WS_PORT,
   DRIVER_NAMES,
 } from '../../types/contstants.js'
-import {ServiceProps} from '../../types/ServiceProps.js'
-import {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
-import {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
+import type {ServiceProps} from '../../types/ServiceProps.js'
+import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
+import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
 
 
 // TODO: можно добавить специальный кукис сессии чтобы проверять откуда сделан запрос

@@ -1,7 +1,7 @@
 import {clearRelPathLeft, LogLevel, pathDirname, pathJoin} from 'squidlet-lib'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {StatsSimplified} from '../../types/io/FilesIoType.js'
-import {DriversManager} from '../driver/DriversManager.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {StatsSimplified} from '../../types/io/FilesIoType.js'
+import type {DriversManager} from '../driver/DriversManager.js'
 
 
 export class FilesLog {

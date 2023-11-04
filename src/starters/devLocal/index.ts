@@ -13,27 +13,33 @@ import {WsClientIoIndex} from '../../ios/NodejsPack/WsClientIo.js'
 import {WsServerIoIndex} from '../../ios/NodejsPack/WsServerIo.js'
 
 
-const system = new System()
+export function devStarter(middleware?: (system: System) => void) {
+  const system = new System()
 
-// use packages
-system.use(ioSetLocalPkg([
-  FilesIoIndex,
-  SysInfoIoIndex,
-  HttpClientIoIndex,
-  HttpServerIoIndex,
-  WsClientIoIndex,
-  WsServerIoIndex,
-]))
-system.use(ConsoleLoggerPkg({logLevel: LOG_LEVELS.debug as LogLevel}))
-system.use(SystemCommonPkg())
-system.use(SystemWithUiPkg())
+  // use packages
+  system.use(ioSetLocalPkg([
+    FilesIoIndex,
+    SysInfoIoIndex,
+    HttpClientIoIndex,
+    HttpServerIoIndex,
+    WsClientIoIndex,
+    WsServerIoIndex,
+  ]))
+  system.use(ConsoleLoggerPkg({logLevel: LOG_LEVELS.debug as LogLevel}))
+  system.use(SystemCommonPkg())
+  system.use(SystemWithUiPkg())
 
-// init the system
-system.init()
-// start the system
-system.events.once(SystemEvents.systemInited, () => system.start())
-system.events.once(SystemEvents.systemStarted, () => {
-  // Enable graceful stop
-  process.once('SIGINT', () => system.destroy())
-  process.once('SIGTERM', () => system.destroy())
-})
+  middleware?.(system)
+
+  // init the system
+  system.init()
+  // start the system
+  system.events.once(SystemEvents.systemInited, () => system.start())
+  system.events.once(SystemEvents.systemStarted, () => {
+    // Enable graceful stop
+    process.once('SIGINT', () => system.destroy())
+    process.once('SIGTERM', () => system.destroy())
+  })
+}
+
+devStarter()

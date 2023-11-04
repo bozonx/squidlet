@@ -10,7 +10,7 @@ import {
   HttpResponse,
   HttpRequestBase,
 } from 'squidlet-lib'
-import {
+import type {
   HttpRequestHandler,
   HttpServerEvent, HttpServerIoFullType,
   HttpServerIoType,

@@ -1,8 +1,8 @@
 import {pathJoin, arraysDifference} from 'squidlet-lib'
-import {System} from '../System.js'
+import type {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
-import {ServiceDestroyReason, ServiceIndex, ServiceStatus, SubprogramError} from '../../types/types.js'
-import {ServiceBase} from './ServiceBase.js'
+import type {ServiceDestroyReason, ServiceIndex, ServiceStatus, SubprogramError} from '../../types/types.js'
+import type {ServiceBase} from './ServiceBase.js'
 import {
   CFG_DIRS,
   EVENT_DELIMITER,

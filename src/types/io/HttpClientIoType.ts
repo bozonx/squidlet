@@ -1,4 +1,4 @@
-import {HttpRequest, HttpResponse} from 'squidlet-lib'
+import type {HttpRequest, HttpResponse} from 'squidlet-lib'
 
 
 export interface HttpClientIoType {

@@ -1,5 +1,6 @@
 import {DriverBase} from './DriverBase.js'
-import DriverInstanceBase, {DriverInstanceParams} from './DriverInstanceBase.js'
+import type DriverInstanceBase from './DriverInstanceBase.js'
+import type {DriverInstanceParams} from './DriverInstanceBase.js'
 
 
 // this is used to make instance id

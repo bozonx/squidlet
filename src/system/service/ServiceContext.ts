@@ -1,6 +1,6 @@
-import {IndexedEventEmitter, Logger} from 'squidlet-lib'
-import {System} from '../System.js'
-import {DriversManager} from '../driver/DriversManager.js'
+import type {IndexedEventEmitter, Logger} from 'squidlet-lib'
+import type {System} from '../System.js'
+import type {DriversManager} from '../driver/DriversManager.js'
 
 
 export class ServiceContext {

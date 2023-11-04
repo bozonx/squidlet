@@ -1,4 +1,4 @@
-import {WsServerConnectionParams} from './WsServerIoType.js'
+import type {WsServerConnectionParams} from './WsServerIoType.js'
 
 export enum WsClientEvent {
   open,

@@ -1,6 +1,6 @@
 import yaml from 'yaml'
 import {pathJoin, mergeDeepObjects} from 'squidlet-lib'
-import {System} from '../System.js'
+import type {System} from '../System.js'
 import {SystemCfg, systemCfgDefaults} from '../../types/SystemCfg.js'
 import {
   CFG_DIRS,
@@ -8,7 +8,7 @@ import {
   SYSTEM_CFG_DIR,
   SYSTEM_CONFIG_FILE,
 } from '../../types/contstants.js'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 
 

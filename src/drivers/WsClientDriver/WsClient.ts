@@ -1,5 +1,5 @@
 import {DriverBase} from '../../system/driver/DriverBase.js'
-import {DriverContext} from '../../system/driver/DriverContext.js'
+import type {DriverContext} from '../../system/driver/DriverContext.js'
 
 
 export class WsClient extends DriverBase {

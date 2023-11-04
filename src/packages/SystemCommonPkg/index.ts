@@ -1,5 +1,5 @@
-import {PackageContext} from '../../system/package/PackageContext.js'
-import {PackageIndex} from '../../types/types.js'
+import type {PackageContext} from '../../system/package/PackageContext.js'
+import type {PackageIndex} from '../../types/types.js'
 import {FilesDriverIndex} from '../../drivers/FilesDriver/FilesDriver.js'
 import {HttpServerDriverIndex} from '../../drivers/HttpServerDriver/HttpServerDriver.js'
 import {HttpClientDriverIndex} from '../../drivers/HttpClientDriver/HttpClientDriver.js'

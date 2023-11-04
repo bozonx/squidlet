@@ -3,8 +3,8 @@ import {ROOT_DIRS} from '../../types/contstants.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesWrapper} from '../files/FilesWrapper.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
-import {DriversManager} from '../driver/DriversManager.js'
-import {System} from '../System.js'
+import type {DriversManager} from '../driver/DriversManager.js'
+import type {System} from '../System.js'
 import {AppUiManager} from './AppUiManager.js'
 
 

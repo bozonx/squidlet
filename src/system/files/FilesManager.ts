@@ -1,6 +1,6 @@
 import {pathJoin} from 'squidlet-lib'
-import {System} from '../System.js'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {System} from '../System.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {CFG_DIRS, ROOT_DIRS, SYSTEM_CFG_DIR} from '../../types/contstants.js'
 
 

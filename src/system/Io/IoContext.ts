@@ -1,5 +1,5 @@
-import {System} from '../System.js'
-import {Logger} from 'squidlet-lib'
+import type {Logger} from 'squidlet-lib'
+import type {System} from '../System.js'
 
 
 export class IoContext {

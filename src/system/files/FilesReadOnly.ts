@@ -1,8 +1,8 @@
 import {pathJoin, clearRelPathLeft} from 'squidlet-lib'
 import {System} from '../System.js'
-import {StatsSimplified} from '../../types/io/FilesIoType.js'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {DriversManager} from '../driver/DriversManager.js'
+import type {StatsSimplified} from '../../types/io/FilesIoType.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {DriversManager} from '../driver/DriversManager.js'
 
 
 export class FilesReadOnly {

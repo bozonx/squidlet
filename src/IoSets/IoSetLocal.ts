@@ -1,5 +1,5 @@
-import {IoIndex, PackageIndex} from '../types/types.js'
-import {PackageContext} from '../system/package/PackageContext.js'
+import type {IoIndex, PackageIndex} from '../types/types.js'
+import type {PackageContext} from '../system/package/PackageContext.js'
 import {IoSetBase} from '../system/Io/IoSetBase.js'
 
 

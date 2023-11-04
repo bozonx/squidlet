@@ -1,4 +1,4 @@
-import {SysPermanentInfo} from '../SysInfo.js'
+import type {SysPermanentInfo} from '../SysInfo.js'
 
 
 export default interface SysInfoIoType {

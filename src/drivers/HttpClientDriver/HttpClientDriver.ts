@@ -1,5 +1,5 @@
-import {DriverIndex} from '../../types/types.js'
-import {DriverContext} from '../../system/driver/DriverContext.js'
+import type {DriverIndex} from '../../types/types.js'
+import type {DriverContext} from '../../system/driver/DriverContext.js'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 
 

@@ -9,8 +9,8 @@ import {
 } from 'squidlet-lib'
 import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
-import {IoIndex} from '../../types/types.js'
-import {IoContext} from '../../system/Io/IoContext.js'
+import type {IoIndex} from '../../types/types.js'
+import type {IoContext} from '../../system/Io/IoContext.js'
 
 
 type ServerItem = [

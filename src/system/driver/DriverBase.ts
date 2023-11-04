@@ -1,4 +1,4 @@
-import {DriverContext} from './DriverContext.js'
+import type {DriverContext} from './DriverContext.js'
 
 
 export class DriverBase {

@@ -1,7 +1,7 @@
-import {ServiceContext} from './ServiceContext.js'
-import {ServiceDestroyReason, SubprogramError} from '../../types/types.js'
+import type {ServiceContext} from './ServiceContext.js'
+import type {ServiceDestroyReason, SubprogramError} from '../../types/types.js'
 import {SERVICE_TARGETS} from '../../types/contstants.js'
-import {ServiceProps} from '../../types/ServiceProps.js'
+import type {ServiceProps} from '../../types/ServiceProps.js'
 
 
 export abstract class ServiceBase {

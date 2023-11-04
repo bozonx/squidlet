@@ -11,10 +11,11 @@ import {
   convertBufferToUint8Array,
   trimCharStart
 } from 'squidlet-lib'
-import FilesIoType, {FilesIoConfig, StatsSimplified} from '../../types/io/FilesIoType.js'
+import type FilesIoType from '../../types/io/FilesIoType.js'
+import type {FilesIoConfig, StatsSimplified} from '../../types/io/FilesIoType.js'
 import {IoBase} from '../../system/Io/IoBase.js'
-import {IoIndex} from '../../types/types.js'
-import {IoContext} from '../../system/Io/IoContext.js'
+import type {IoIndex} from '../../types/types.js'
+import type {IoContext} from '../../system/Io/IoContext.js'
 import {ROOT_DIRS} from '../../types/contstants.js'
 
 export const execPromise = promisify(exec)

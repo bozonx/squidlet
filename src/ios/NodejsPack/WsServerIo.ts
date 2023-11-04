@@ -1,11 +1,11 @@
 import WebSocket, { WebSocketServer } from 'ws'
-import {ClientRequest, IncomingMessage} from 'http'
+import type {ClientRequest, IncomingMessage} from 'http'
 import {callPromised, convertBufferToUint8Array} from 'squidlet-lib'
 import {WsServerConnectionParams, WsServerEvent, WsServerIoType, WsServerProps} from '../../types/io/WsServerIoType.js'
-import {WsCloseStatus} from '../../types/io/WsClientIoType.js'
+import type {WsCloseStatus} from '../../types/io/WsClientIoType.js'
 import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
-import {IoIndex} from '../../types/types.js'
-import {IoContext} from '../../system/Io/IoContext.js'
+import type {IoIndex} from '../../types/types.js'
+import type {IoContext} from '../../system/Io/IoContext.js'
 
 
 type ServerItem = [

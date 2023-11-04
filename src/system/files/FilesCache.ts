@@ -1,6 +1,6 @@
 import {clearRelPathLeft} from 'squidlet-lib'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {DriversManager} from '../driver/DriversManager.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {DriversManager} from '../driver/DriversManager.js'
 
 
 // TODO: файлы сразу сохранять и одновременно держать в памяти несколько секунд

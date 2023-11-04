@@ -1,6 +1,6 @@
 import {clearRelPathLeft} from 'squidlet-lib'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {DriversManager} from '../driver/DriversManager.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {DriversManager} from '../driver/DriversManager.js'
 
 
 export class FilesDb {

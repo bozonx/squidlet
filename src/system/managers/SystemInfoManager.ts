@@ -1,4 +1,4 @@
-import {System} from '../System.js'
+import type {System} from '../System.js'
 
 
 export class SystemInfoManager {

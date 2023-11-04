@@ -1,5 +1,5 @@
-import {DriverContext} from './DriverContext.js'
-import DriverFactoryBase from './DriverFactoryBase.js'
+import type {DriverContext} from './DriverContext.js'
+import type DriverFactoryBase from './DriverFactoryBase.js'
 
 
 export interface DriverInstanceParams<
