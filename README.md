@@ -69,3 +69,9 @@ Prerequisite:
     nvm use
     yarn global add pigpio
     yarn
+
+## Publish
+
+    yarn test
+    yarn build
+    yarn publish

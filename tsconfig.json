@@ -106,7 +106,7 @@
     "importsNotUsedAsValues": "error",
     // "verbatimModuleSyntax": true,
     "declaration": true,
-    "composite": true,
+    //"composite": true,
     "rootDir": "src",
     "declarationDir": "./distr/types",
     "outDir": "./distr/src"
