@@ -4,6 +4,8 @@ import {
   IndexedEvents,
   Promised
 } from 'squidlet-lib'
+import type {UiApiIncomeMessage, UiApiResponse} from '../services/UiWsApiService/UiWsApiService.js'
+import {makeRequestId} from '../system/helpers/helpers.js'
 
 
 //const PROTOCOL = 'squidlet-app-api'
@@ -73,8 +75,13 @@ export class SquidletAppApiConnection {
   // }
 
   // TODO: указать тип возврата
-  async send(msgObj: any): Promise<any> {
+  async send(msgObj: Omit<UiApiIncomeMessage, 'requestId'>): Promise<UiApiResponse> {
     await this.startedPromise
+
+    const request: UiApiIncomeMessage = {
+      requestId: makeRequestId(),
+      ...msgObj,
+    }
     this.socket.send(serializeJson(msgObj))
 
     const promised = new Promised()
@@ -82,7 +89,7 @@ export class SquidletAppApiConnection {
     // TODO: добавить таймаут ожидания
     // TODO: проверить ошибку
     const handlerIndex = this.incomeMessages.addListener((data: any) => {
-      if (data.requestId !== msgObj.requestId) return
+      if (data.requestId !== request.requestId) return
 
       this.incomeMessages.removeListener(handlerIndex)
       promised.resolve(data)

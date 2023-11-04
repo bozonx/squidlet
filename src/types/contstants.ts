@@ -6,6 +6,7 @@ export const CFG_FILE_EXT = 'yml'
 export const DEFAULT_UI_HTTP_PORT = 41810
 export const DEFAULT_UI_WS_PORT = 41811
 export const SERVER_STARTING_TIMEOUT_SEC = 60
+export const REQUEST_ID_LENGTH = 8
 
 export enum SystemEvents {
   // driversInitialized,
