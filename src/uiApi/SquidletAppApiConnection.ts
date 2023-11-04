@@ -4,8 +4,14 @@ import {
   IndexedEvents,
   Promised
 } from 'squidlet-lib'
-import type {UiApiIncomeMessage, UiApiResponse} from '../services/UiWsApiService/UiWsApiService.js'
+import type {
+  UiApiIncomeMessage,
+  UiApiResponse
+} from '../services/UiWsApiService/UiWsApiService.js'
 import {makeRequestId} from '../system/helpers/helpers.js'
+import {DEFAULT_UI_WS_PORT} from '../types/contstants.js'
+
+export const APP_API_WS_PORT = DEFAULT_UI_WS_PORT
 
 
 //const PROTOCOL = 'squidlet-app-api'
@@ -14,13 +20,11 @@ import {makeRequestId} from '../system/helpers/helpers.js'
 //  * this is api which is used in frontend to connect to backend api
 //  */
 //
-// const DEFAULT_HOST = 'localhost'
-// const DEFAULT_PORT = 42181
 // const WsClass: new (url: string, protocol: string) => WebSocket = WebSocket
 // // @ts-ignore
-// const wsHost = window.SQUIDLET_API_HOST || DEFAULT_HOST
+// const wsHost = window.SQUIDLET_API_HOST || DEFAULT_UI_HTTP_PORT
 // // @ts-ignore
-// const wsPort = window.SQUIDLET_API_PORT || DEFAULT_PORT
+// const wsPort = window.SQUIDLET_API_PORT || DEFAULT_UI_WS_PORT
 //
 // // @ts-ignore
 // window.squidletUiApi =
@@ -74,7 +78,6 @@ export class SquidletAppApiConnection {
   //   })
   // }
 
-  // TODO: указать тип возврата
   async send(msgObj: Omit<UiApiIncomeMessage, 'requestId'>): Promise<UiApiResponse> {
     await this.startedPromise
 
@@ -82,7 +85,8 @@ export class SquidletAppApiConnection {
       requestId: makeRequestId(),
       ...msgObj,
     }
-    this.socket.send(serializeJson(msgObj))
+
+    this.socket.send(serializeJson(request))
 
     const promised = new Promised()
 
