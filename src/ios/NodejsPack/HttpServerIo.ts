@@ -1,13 +1,8 @@
 import {createServer, IncomingMessage, Server, ServerResponse} from 'http'
-import {
-  DEFAULT_ENCODE,
-  IndexedEvents,
-  makeUniqNumber,
-  callPromised,
-  HttpRequest,
-  HttpResponse
-} from 'squidlet-lib'
-import {HttpServerEvent, HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
+import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber, callPromised} from 'squidlet-lib'
+import type {HttpRequest, HttpResponse} from 'squidlet-lib'
+import {HttpServerEvent} from '../../types/io/HttpServerIoType.js'
+import type {HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'

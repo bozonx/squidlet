@@ -5,6 +5,8 @@ import {
   parseBody,
   prepareBody,
   resolveBodyType,
+} from 'squidlet-lib'
+import type {
   JsonTypes,
   HttpRequest,
   HttpResponse,

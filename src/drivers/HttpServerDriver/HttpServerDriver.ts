@@ -1,4 +1,4 @@
-import {
+import type {
   HttpRequest,
 } from 'squidlet-lib'
 import type {DriverContext} from '../../system/driver/DriverContext.js'
@@ -8,11 +8,14 @@ import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
 import {
   HttpServerEvent,
+} from '../../types/io/HttpServerIoType.js'
+import type {
   HttpServerIoFullType,
   HttpServerIoType,
   HttpServerProps,
 } from '../../types/io/HttpServerIoType.js'
-import HttpServerDriverLogic, {HttpDriverRequest, HttpDriverResponse} from './HttpServerDriverLogic.js'
+import HttpServerDriverLogic from './HttpServerDriverLogic.js'
+import type {HttpDriverRequest, HttpDriverResponse} from './HttpServerDriverLogic.js'
 import {IoBase} from '../../system/Io/IoBase.js'
 
 

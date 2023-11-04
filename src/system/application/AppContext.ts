@@ -1,4 +1,5 @@
-import {IndexedEventEmitter, Logger, pathJoin} from 'squidlet-lib'
+import {IndexedEventEmitter, pathJoin} from 'squidlet-lib'
+import type {Logger} from 'squidlet-lib'
 import {ROOT_DIRS} from '../../types/contstants.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesWrapper} from '../files/FilesWrapper.js'

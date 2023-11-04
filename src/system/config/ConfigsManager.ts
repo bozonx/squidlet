@@ -1,7 +1,8 @@
 import yaml from 'yaml'
 import {pathJoin, mergeDeepObjects} from 'squidlet-lib'
 import type {System} from '../System.js'
-import {SystemCfg, systemCfgDefaults} from '../../types/SystemCfg.js'
+import {systemCfgDefaults} from '../../types/SystemCfg.js'
+import type {SystemCfg} from '../../types/SystemCfg.js'
 import {
   CFG_DIRS,
   CFG_FILE_EXT,

@@ -3,9 +3,9 @@ import type {DriverIndex} from '../../types/types.js'
 import type {DriverContext} from '../../system/driver/DriverContext.js'
 import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
-import {
+import {WsServerEvent} from '../../types/io/WsServerIoType.js'
+import type {
   WsServerConnectionParams,
-  WsServerEvent,
   WsServerIoFullType,
   WsServerProps,
 } from '../../types/io/WsServerIoType.js'

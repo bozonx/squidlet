@@ -1,4 +1,5 @@
-import {LOG_LEVELS, LogLevel} from 'squidlet-lib'
+import {LOG_LEVELS} from 'squidlet-lib'
+import type {LogLevel} from 'squidlet-lib'
 import {System} from '../../index.js'
 import {SystemEvents} from '../../types/contstants.js'
 import {ConsoleLoggerPkg} from '../../packages/ConsoleLoggerPkg/index.js'
