@@ -7,6 +7,7 @@ import {FilesReadOnly} from '../files/FilesReadOnly.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 import type {System} from '../System.js'
 import {AppUiManager} from './AppUiManager.js'
+import {UserData} from '../files/UserData.js'
 
 
 export class AppContext {
@@ -32,6 +33,7 @@ export class AppContext {
   //readonly appDataSynced
   // for temporary files of this app
   readonly tmp
+  readonly userData
 
   // memStorage only for this app
   //readonly memStorage
@@ -85,6 +87,12 @@ export class AppContext {
     //   this.system.drivers,
     //   pathJoin('/', ROOT_DIRS.appDataSynced, appName)
     // )
+
+    // TODO: это должен быть отдельный класс
+    this.userData = new UserData(
+      this.system.drivers,
+      pathJoin('/', ROOT_DIRS.userData)
+    )
 
     //this.memStorage = new RestrictedMemStorage(this.system, appName)
   }

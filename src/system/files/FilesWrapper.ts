@@ -21,7 +21,9 @@ export class FilesWrapper {
 
   constructor(drivers: DriversManager, rootDir: string) {
     this.drivers = drivers
-    this.rootDir = clearRelPathLeft(rootDir)
+    // TODO: а зачем оно убиралось???
+    //this.rootDir = clearRelPathLeft(rootDir)
+    this.rootDir = rootDir
   }
 
 
@@ -33,6 +35,9 @@ export class FilesWrapper {
   }
 
   async mkdir(pathTo: string) {
+
+    console.log(777, this.rootDir, clearRelPathLeft(pathTo), pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+
     return this.driver.mkdir(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 

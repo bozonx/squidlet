@@ -1,4 +1,4 @@
-import {serializeJson, deserializeJson, deepGet} from 'squidlet-lib'
+import {serializeJson, deserializeJson, getDeepMethod} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
@@ -12,10 +12,6 @@ import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDrive
 import {requestError} from '../../system/helpers/helpers.js'
 import type {RequestError} from '../../system/helpers/helpers.js'
 
-
-// TODO: можно добавить специальный кукис сессии чтобы проверять откуда сделан запрос
-// TODO: должен запустить ws сервер на localhost чтобы обмениваться данными
-//       c специальным фронтенд клиентом - это не универсальный api сервис
 
 export interface UiApiIncomeMessage {
   // session of a app tab
@@ -58,10 +54,6 @@ export class UiWsApiService extends ServiceBase {
     requireDriver: [DRIVER_NAMES.WsServerDriver],
     ...super.props,
   }
-
-  // get fileDriver(): FilesDriver {
-  //   return this.ctx.drivers.getDriver(DRIVER_NAMES.FilesDriver)
-  // }
 
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: UiWsApiServiceCfg) {
@@ -120,6 +112,8 @@ export class UiWsApiService extends ServiceBase {
           errorMessage: err.message,
         }
 
+        this.ctx.log.debug(`UiWsApiService ERROR response ${JSON.stringify(errResp)}`)
+
         await this.wsServer.send(connectionId, serializeJson(errResp))
 
         return
@@ -129,6 +123,9 @@ export class UiWsApiService extends ServiceBase {
         requestId: msgObj.requestId,
         data: resultData,
       }
+
+      this.ctx.log.debug(`UiWsApiService response ${JSON.stringify(resp)}`)
+
       // send response
       await this.wsServer.send(connectionId, serializeJson(resp))
     })()
@@ -143,14 +140,19 @@ export class UiWsApiService extends ServiceBase {
 
     if (!app) throw requestError(500, `Can't find an app "${appName}"`)
 
-    const method = deepGet(app, msgObj.method)
-
-    console.log(333, app, msgObj, method)
+    const method = getDeepMethod(app, msgObj.method)
 
     if (!method) throw requestError(500, `Can't find a method "${msgObj.method}" of an app "${appName}"`)
 
-    //this.ctx.apps.getApp('')
+    let result: any
 
-    return {aa: 'result111'}
+    try {
+      result = await method(...msgObj.arguments)
+    }
+    catch (e) {
+      throw requestError(500, `Error calling method "${msgObj.method}" of an app "${appName}": ${e}`)
+    }
+
+    return result
   }
 }
