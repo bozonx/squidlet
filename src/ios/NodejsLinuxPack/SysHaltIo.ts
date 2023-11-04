@@ -1,4 +1,5 @@
-import {exec, ExecException} from 'node:child_process';
+import {exec} from 'node:child_process'
+import type {ExecException} from 'node:child_process'
 import type SysHaltIoType from '../../types/io/SysHaltIoType.js'
 import {WAIT_BEFORE_HALT_MS} from '../../types/contstants.js'
 import type {IoIndex} from '../../types/types.js'
