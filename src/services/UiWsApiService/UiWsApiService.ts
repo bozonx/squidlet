@@ -4,7 +4,7 @@ import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import {
   DEFAULT_UI_WS_PORT,
-  DRIVER_NAMES,
+  DRIVER_NAMES, LOCAL_HOST,
 } from '../../types/contstants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
@@ -29,7 +29,7 @@ export interface UiWsApiServiceCfg extends WsServerProps {
 }
 
 export const DEFAULT_UI_WS_SERVICE_CFG = {
-  host: 'localhost',
+  host: LOCAL_HOST,
   port: DEFAULT_UI_WS_PORT,
 }
 

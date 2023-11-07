@@ -4,15 +4,19 @@ import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import {
   DEFAULT_WS_CTRL_PORT,
-  DRIVER_NAMES,
+  DRIVER_NAMES, LOCAL_HOST,
 } from '../../types/contstants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
 import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
 import {requestError} from '../../system/helpers/helpers.js'
 import type {RequestError} from '../../system/helpers/helpers.js'
-import type {ResponseMessage} from '../../types/Message.js'
+import type {RequestMessage, ResponseMessage} from '../../types/Message.js'
 
+
+export interface CtrlServiceRequestData {
+
+}
 
 export const CtrlServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
   return new CtrlService(ctx)
@@ -22,7 +26,7 @@ export interface CtrlServiceCfg extends WsServerProps {
 }
 
 export const DEFAULT_CTRL_SERVICE_CFG = {
-  host: 'localhost',
+  host: LOCAL_HOST,
   port: DEFAULT_WS_CTRL_PORT,
 }
 
@@ -105,7 +109,7 @@ export class CtrlService extends ServiceBase {
         data: resultData,
       }
 
-      this.ctx.log.debug(`UiWsApiService response ${JSON.stringify(resp)}`)
+      this.ctx.log.debug(`CtrlService response ${JSON.stringify(resp)}`)
 
       // send response
       await this.wsServer.send(connectionId, serializeJson(resp))
@@ -113,27 +117,27 @@ export class CtrlService extends ServiceBase {
       .catch((er: string) => this.ctx.log.error(er))
   }
 
-  private async processMessage(msgObj: UiApiIncomeMessage): Promise<any> {
+  private async processMessage(msgObj: RequestMessage<CtrlServiceRequestData>): Promise<any> {
     // TODO: resolve sessionId
-    // TODO: взять имя приложение из сессии
-    const appName = 'Publisher'
-    const app = this.ctx.apps.getApp(appName)
 
-    if (!app) throw requestError(500, `Can't find an app "${appName}"`)
-
-    const method = getDeepMethod(app, msgObj.method)
-
-    if (!method) throw requestError(500, `Can't find a method "${msgObj.method}" of an app "${appName}"`)
-
-    let result: any
-
-    try {
-      result = await method(...msgObj.arguments)
-    }
-    catch (e) {
-      throw requestError(500, `Error calling method "${msgObj.method}" of an app "${appName}": ${e}`)
-    }
-
-    return result
+    // const appName = 'Publisher'
+    // const app = this.ctx.apps.getApp(appName)
+    //
+    // if (!app) throw requestError(500, `Can't find an app "${appName}"`)
+    //
+    // const method = getDeepMethod(app, msgObj.method)
+    //
+    // if (!method) throw requestError(500, `Can't find a method "${msgObj.method}" of an app "${appName}"`)
+    //
+    // let result: any
+    //
+    // try {
+    //   result = await method(...msgObj.arguments)
+    // }
+    // catch (e) {
+    //   throw requestError(500, `Error calling method "${msgObj.method}" of an app "${appName}": ${e}`)
+    // }
+    //
+    //return result
   }
 }

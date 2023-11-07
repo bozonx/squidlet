@@ -10,7 +10,13 @@ import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import type {HttpServerDriver, HttpServerInstance} from '../../drivers/HttpServerDriver/HttpServerDriver.js'
-import {APP_FILES_PUBLIC_DIR, DEFAULT_UI_HTTP_PORT, DRIVER_NAMES, ROOT_DIRS} from '../../types/contstants.js'
+import {
+  APP_FILES_PUBLIC_DIR,
+  DEFAULT_UI_HTTP_PORT,
+  DRIVER_NAMES,
+  LOCAL_HOST,
+  ROOT_DIRS,
+} from '../../types/contstants.js'
 import type {HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerDriverLogic.js'
@@ -29,7 +35,7 @@ export interface UiHttpServiceCfg extends HttpServerProps {
 }
 
 export const DEFAULT_UI_HTTP_SERVICE_CFG = {
-  host: 'localhost',
+  host: LOCAL_HOST,
   port: DEFAULT_UI_HTTP_PORT,
 }
 

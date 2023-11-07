@@ -9,6 +9,7 @@ import {makeRequestId} from '../system/helpers/helpers.js'
 import {DEFAULT_UI_WS_PORT} from '../types/contstants.js'
 import type {ResponseMessage, RequestMessage} from '../types/Message.js'
 
+// it needs to export the port
 export const APP_API_WS_PORT = DEFAULT_UI_WS_PORT
 
 
