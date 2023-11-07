@@ -3,6 +3,10 @@ export const EVENT_DELIMITER = '|'
 export const VERSIONS_DIR_NAME = '.versions'
 export const WAIT_BEFORE_HALT_MS = 1000
 export const CFG_FILE_EXT = 'yml'
+// port for connections with other squidlets
+export const DEFAULT_WS_CONNECT_PORT = 41808
+// port for squidletctrl
+export const DEFAULT_WS_CTRL_PORT = 41809
 export const DEFAULT_UI_HTTP_PORT = 41810
 export const DEFAULT_UI_WS_PORT = 41811
 export const SERVER_STARTING_TIMEOUT_SEC = 60

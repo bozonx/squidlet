@@ -4,12 +4,10 @@ import {
   IndexedEvents,
   Promised
 } from 'squidlet-lib'
-import type {
-  UiApiIncomeMessage,
-  UiApiResponse
-} from '../services/UiWsApiService/UiWsApiService.js'
+import type {UiApiRequestData} from '../services/UiWsApiService/UiWsApiService.js'
 import {makeRequestId} from '../system/helpers/helpers.js'
 import {DEFAULT_UI_WS_PORT} from '../types/contstants.js'
+import type {ResponseMessage, RequestMessage} from '../types/Message.js'
 
 export const APP_API_WS_PORT = DEFAULT_UI_WS_PORT
 
@@ -78,10 +76,10 @@ export class SquidletAppApiConnection {
   //   })
   // }
 
-  async send(msgObj: Omit<UiApiIncomeMessage, 'requestId'>): Promise<UiApiResponse> {
+  async send(msgObj: Omit<RequestMessage<UiApiRequestData>, 'requestId'>): Promise<ResponseMessage> {
     await this.startedPromise
 
-    const request: UiApiIncomeMessage = {
+    const request: RequestMessage<UiApiRequestData> = {
       requestId: makeRequestId(),
       ...msgObj,
     }

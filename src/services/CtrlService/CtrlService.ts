@@ -3,7 +3,7 @@ import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/service/ServiceContext.js'
 import {ServiceBase} from '../../system/service/ServiceBase.js'
 import {
-  DEFAULT_UI_WS_PORT,
+  DEFAULT_WS_CTRL_PORT,
   DRIVER_NAMES,
 } from '../../types/contstants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
@@ -11,32 +11,25 @@ import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsSer
 import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
 import {requestError} from '../../system/helpers/helpers.js'
 import type {RequestError} from '../../system/helpers/helpers.js'
-import type {RequestMessage, ResponseMessage} from '../../types/Message.js'
+import type {ResponseMessage} from '../../types/Message.js'
 
 
-export interface UiApiRequestData {
-  // api method to call can be with "." separator
-  method: string
-  // arguments for the method
-  arguments: any[]
+export const CtrlServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
+  return new CtrlService(ctx)
 }
 
-export const UiWsApiServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
-  return new UiWsApiService(ctx)
+export interface CtrlServiceCfg extends WsServerProps {
 }
 
-export interface UiWsApiServiceCfg extends WsServerProps {
-}
-
-export const DEFAULT_UI_WS_SERVICE_CFG = {
+export const DEFAULT_CTRL_SERVICE_CFG = {
   host: 'localhost',
-  port: DEFAULT_UI_WS_PORT,
+  port: DEFAULT_WS_CTRL_PORT,
 }
 
 
-export class UiWsApiService extends ServiceBase {
+export class CtrlService extends ServiceBase {
   private wsServer!: WsServerInstance
-  private cfg!: UiWsApiServiceCfg
+  private cfg!: CtrlServiceCfg
 
 
   props: ServiceProps = {
@@ -45,12 +38,10 @@ export class UiWsApiService extends ServiceBase {
   }
 
 
-  async init(onFall: (err: SubprogramError) => void, loadedCfg?: UiWsApiServiceCfg) {
+  async init(onFall: (err: SubprogramError) => void, loadedCfg?: CtrlServiceCfg) {
     super.init(onFall)
 
-    this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_UI_WS_SERVICE_CFG
-
-    // TODO: если конфина нет то по умолчанию
+    this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_CTRL_SERVICE_CFG
 
     this.wsServer = await this.ctx.drivers
       .getDriver<WsServerDriver>(DRIVER_NAMES.WsServerDriver)
@@ -80,7 +71,8 @@ export class UiWsApiService extends ServiceBase {
 
   private handleConnection = (connectionId: string, request: WsServerConnectionParams) => {
 
-    // TODO: подключиться к сессии вкладки и приложения
+    // TODO: нужно ли создавать сессию???
+    // TODO: нужно ли авторизовывать???
 
     //console.log(222, connectionId, request)
   }
@@ -121,8 +113,7 @@ export class UiWsApiService extends ServiceBase {
       .catch((er: string) => this.ctx.log.error(er))
   }
 
-  private async processMessage(msgObj: RequestMessage<UiApiRequestData>): Promise<any> {
-    // TODO: обработать url
+  private async processMessage(msgObj: UiApiIncomeMessage): Promise<any> {
     // TODO: resolve sessionId
     // TODO: взять имя приложение из сессии
     const appName = 'Publisher'
@@ -130,17 +121,17 @@ export class UiWsApiService extends ServiceBase {
 
     if (!app) throw requestError(500, `Can't find an app "${appName}"`)
 
-    const method = getDeepMethod(app, msgObj.data!.method)
+    const method = getDeepMethod(app, msgObj.method)
 
-    if (!method) throw requestError(500, `Can't find a method "${msgObj.data!.method}" of an app "${appName}"`)
+    if (!method) throw requestError(500, `Can't find a method "${msgObj.method}" of an app "${appName}"`)
 
     let result: any
 
     try {
-      result = await method(...msgObj.data!.arguments)
+      result = await method(...msgObj.arguments)
     }
     catch (e) {
-      throw requestError(500, `Error calling method "${msgObj.data!.method}" of an app "${appName}": ${e}`)
+      throw requestError(500, `Error calling method "${msgObj.method}" of an app "${appName}": ${e}`)
     }
 
     return result
