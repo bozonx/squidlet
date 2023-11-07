@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
-import {exec, ExecException} from 'node:child_process'
+import {exec} from 'node:child_process'
+import type {ExecException} from 'child_process'
 import {DEFAULT_WS_CTRL_PORT, LOCAL_HOST} from '../types/contstants.js'
 
 
@@ -98,12 +99,16 @@ export class SquidletCtl {
 
 
   private async execCmd(cmd: string) {
-    exec(cmd, (error: ExecException | null, stdout: string, stderr: string) => {
-      if (error) return console.error(error)
-      else if (stderr) return console.error(stderr)
+    return new Promise<void>((resolve, reject) => {
+      exec(cmd, (error: ExecException | null, stdout: string, stderr: string) => {
+        if (error) console.error(error)
+        else if (stderr) console.error(stderr)
 
-      console.log(stdout)
-    });
+        if (stdout) console.log(stdout)
+
+        resolve()
+      })
+    })
   }
 
 }
