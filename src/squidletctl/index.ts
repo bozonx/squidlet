@@ -9,13 +9,17 @@ Squidlet control script.
 commands:
 
 - install <package.tar.gz> - Install or update the package which is in tar.gz format
+
+Control system service
 - update - update the squidlet host itself
+- install-service - Install the squidlet service
+- uninstall-service - remove service from system. It removes only services and nothing else
+- status - show status of the service
+- restart - restart the service. It will create service if need.
 - start - start the service. It will create service if need.
 - stop - stop the service
 - enable - enable auto start service on system start
 - disable - disable auto start service on system start
-- install-service - Install the squidlet service
-- uninstall-service - remove service from system. It removes only services and nothing else
 
 arguments:
 
@@ -41,6 +45,19 @@ arguments:
     case 'update':
       await ctrl.updateHost()
       break
+
+    case 'install-service':
+      await ctrl.installService()
+      break
+    case 'uninstall-service':
+      await ctrl.uninstallService()
+      break
+    case 'status':
+      await ctrl.status()
+      break
+    case 'restart':
+      await ctrl.restart()
+      break
     case 'start':
       await ctrl.start()
       break
@@ -48,16 +65,10 @@ arguments:
       await ctrl.stop()
       break
     case 'enable':
-      await ctrl.start()
+      await ctrl.enable()
       break
     case 'disable':
-      await ctrl.stop()
-      break
-    case 'install-service':
-      await ctrl.installService()
-      break
-    case 'uninstall-service':
-      await ctrl.uninstallService()
+      await ctrl.disable()
       break
     default:
       console.info(`ERROR: Wrong command "${cmd}"\n\n-----------------------\n`)
