@@ -3,48 +3,42 @@ import fs from 'node:fs/promises'
 import {exec} from 'node:child_process'
 import {promisify} from 'node:util'
 import type {Stats} from 'node:fs'
-import {
-  pathJoin,
-  PATH_SEP,
-  trimCharEnd,
-  DEFAULT_ENCODE,
-  convertBufferToUint8Array,
-  trimCharStart
-} from 'squidlet-lib'
+import {pathJoin, DEFAULT_ENCODE, convertBufferToUint8Array} from 'squidlet-lib'
 import type FilesIoType from '../../types/io/FilesIoType.js'
 import type {FilesIoConfig, StatsSimplified} from '../../types/io/FilesIoType.js'
 import {IoBase} from '../../system/Io/IoBase.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'
-import {ROOT_DIRS} from '../../types/contstants.js'
+import {EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/contstants.js'
 
 export const execPromise = promisify(exec)
 
 
-function prepareSubPath(subDirOfRoot: string, rootDir?: string, envPath?: string) {
-  if (rootDir) {
+function prepareSubPath(subDirOfRoot: string, rootDir?: string, envPath?: string): string {
+  // specified env var is preferred
+  if (envPath) {
+    // it env variable set then use it as absolute or relative to PWD
+    return path.resolve(envPath)
+  }
+  else if (rootDir) {
+    // if ROOT_DIR env set then just join sub path with it
     return pathJoin(rootDir, subDirOfRoot)
   }
 
-  if (!envPath) {
-    throw new Error(`Dir "${subDirOfRoot}" haven't set by env`)
-  }
-
-  // TODO: а разве path.resolve не уберёт последний слэш???
-  return trimCharEnd(path.resolve(envPath), PATH_SEP)
+  throw new Error(`FilesIo: can't resolve path for "${subDirOfRoot}". There are no ROOT_DIR and specified env variable`)
 }
 
 export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
-  const rootDir = process.env.ROOT_DIR
-    // TODO: а разве path.resolve не уберёт последний слэш???
-    && trimCharEnd(path.resolve(process.env.ROOT_DIR), PATH_SEP)
-    || ''
-  const cfg: FilesIoConfig = {
+  // if root dir is relative then make it absolute relate to PWD
+  const rootDir = (process.env.ROOT_DIR) ? path.resolve(process.env.ROOT_DIR) : ''
+  const external = {}
+  
+  // TODO: fill external
 
-    //rootDir: trimCharEnd(path.resolve(process.env.FILES_ROOT_DIR|| '') , PATH_SEP),
+  const cfg: FilesIoConfig = {
     uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,
     gid: (process.env.FILES_GID) ? Number(process.env.FILES_GID) : undefined,
-
+    external,
     dirs: {
       cfg: prepareSubPath(ROOT_DIRS.cfg, rootDir, process.env.CONFIGS_DIR),
       appFiles: prepareSubPath(ROOT_DIRS.appFiles, rootDir, process.env.APP_FILES_DIR),
@@ -53,12 +47,10 @@ export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
       db: prepareSubPath(ROOT_DIRS.db, rootDir, process.env.DB_DIR),
       cache: prepareSubPath(ROOT_DIRS.cache, rootDir, process.env.CACHE_DIR),
       log: prepareSubPath(ROOT_DIRS.log, rootDir, process.env.LOG_DIR),
-      tmp: prepareSubPath(ROOT_DIRS.tmp, rootDir, process.env.TMP_DIR),
-      userData: prepareSubPath(ROOT_DIRS.userData, rootDir, process.env.USER_DATA_DIR),
+      tmpLocal: prepareSubPath(ROOT_DIRS.tmpLocal, rootDir, process.env.TMP_LOCAL_DIR),
+      home: prepareSubPath(ROOT_DIRS.home, rootDir, process.env.USER_HOME_DIR),
     },
   }
-
-  //if (!cfg.rootDir) throw new Error(`FilesIo: no rootDir in config`)
 
   return new FilesIo(ctx, cfg)
 }
@@ -109,7 +101,7 @@ export class FilesIo extends IoBase implements FilesIoType {
   }
 
   async readTextFile(pathTo: string): Promise<string> {
-    const fullPath = this.makePath(pathTo);
+    const fullPath = this.makePath(pathTo)
 
     return fs.readFile(fullPath, DEFAULT_ENCODE)
   }
@@ -171,7 +163,7 @@ export class FilesIo extends IoBase implements FilesIoType {
       const src = this.makePath(item[0])
 
       await fs.copyFile(src, dest)
-      await  this.chown(dest)
+      await this.chown(dest)
     }
   }
 
@@ -190,6 +182,7 @@ export class FilesIo extends IoBase implements FilesIoType {
 
     const res = await execPromise(`rm -R "${fullPath}"`)
 
+    // TODO: а резве ошибка не произойдёт?
     if (res.stderr) {
       throw new Error(`Can't remove a directory recursively: ${res.stderr}`)
     }
@@ -201,6 +194,7 @@ export class FilesIo extends IoBase implements FilesIoType {
     const fullPath = this.makePath(pathTo)
     const res = await execPromise(`mkdir -p "${fullPath}"`)
 
+    // TODO: а резве ошибка не произойдёт?
     if (res.stderr) {
       throw new Error(`Can't mkDirP: ${res.stderr}`)
     }
@@ -228,27 +222,44 @@ export class FilesIo extends IoBase implements FilesIoType {
     )
   }
 
+  /**
+   * Make real path on external file system
+   * @param pathTo - it has to be /appFiles/..., /cfg/... etc.
+   *   /external/extMountedDir/... is a virtual path to virtual dir where some
+   *   external virtual dirs are mounted
+   * @private
+   */
   private makePath(pathTo: string): string {
     if (pathTo.indexOf('/') !== 0) {
-      throw new Error(`Path has to be started from "/": ${pathTo}`)
+      throw new Error(`Path has to start with "/": ${pathTo}`)
     }
 
-    const pathSplat: string[] = trimCharStart(pathTo, PATH_SEP).split(PATH_SEP)
+    const pathMatch = pathTo.match(/^\/([^\/]+)(\/.+)$/)
 
-    if (!Object.keys(ROOT_DIRS).includes(pathSplat[0])) {
-      // means external dir
-      return pathTo
+    if (!pathMatch) throw new Error(`Wrong path "${pathTo}"`)
+
+    const subDir = pathMatch[1] as keyof typeof ROOT_DIRS
+    const restPath = pathMatch[2]
+
+    if (subDir as string === EXTERNAL_ROOT_DIR) {
+      const extMatch = pathTo.match(/^\/([^\/]+)(\/.+)$/)
+
+      if (!extMatch) throw new Error(`Wrong external path "${pathTo}"`)
+
+      const extDir = extMatch[1]
+      const extRestPath = extMatch[2]
+      const resolvedExtAbsDir: string | undefined = this.cfg.external[extDir]
+
+      if (resolvedExtAbsDir) return resolvedExtAbsDir + extRestPath
+
+      throw new Error(`Can't resolve external path "${pathTo}"`)
     }
-    // put some system dir
-    const resolvedAbsDir: string | undefined = this.cfg.dirs[pathSplat[0] as keyof FilesIoConfig['dirs']]
+    // resolve root dir
+    const resolvedAbsDir: string | undefined = this.cfg.dirs[subDir]
+    // replace sub dir to system path
+    if (resolvedAbsDir) return resolvedAbsDir + restPath
 
-    if (resolvedAbsDir) {
-      pathSplat[0] = resolvedAbsDir
-
-      return pathSplat.join('/')
-    }
-    // means full absolute path
-    return pathTo
+    throw new Error(`Can't resolve path "${pathTo}"`)
   }
 
 }

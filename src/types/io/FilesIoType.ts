@@ -1,3 +1,5 @@
+import {ROOT_DIRS} from '../contstants.js'
+
 export interface StatsSimplified {
   // in bytes
   size: number;
@@ -15,19 +17,19 @@ export interface StatsSimplified {
 export interface FilesIoConfig {
   uid?: number;
   gid?: number;
-  // It will be used as root of all the files which are read and written using FilesIo.
-  //rootDir: string;
-  dirs: {
-    cfg: string
-    appFiles: string
-    appDataLocal: string
-    appDataSynced: string
-    db: string
-    cache: string
-    log: string
-    tmp: string
-    userData: string
-  }
+  external: Record<string, string>
+  dirs: Record<keyof typeof ROOT_DIRS, string>
+  // dirs: {
+  //   cfg: string
+  //   appFiles: string
+  //   appDataLocal: string
+  //   appDataSynced: string
+  //   db: string
+  //   cache: string
+  //   log: string
+  //   tmpLocal: string
+  //   home: string
+  // }
 }
 
 

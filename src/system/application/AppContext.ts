@@ -91,7 +91,7 @@ export class AppContext {
     // TODO: это должен быть отдельный класс
     this.userData = new UserData(
       this.system.drivers,
-      pathJoin('/', ROOT_DIRS.userData)
+      pathJoin('/', ROOT_DIRS.home)
     )
 
     //this.memStorage = new RestrictedMemStorage(this.system, appName)

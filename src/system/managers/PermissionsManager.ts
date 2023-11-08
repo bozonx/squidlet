@@ -5,7 +5,7 @@ import type {System} from '../System.js'
  files:
    * root - на полный доступ ко всем файлам
    * app - для приложения только своя папка в apps, appData, appShared, cache, log
-   * userData
+   * home
    * external
  DB:
    * сервис работает только со своим дб

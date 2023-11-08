@@ -33,6 +33,7 @@ export enum ServiceEvents {
   status,
 }
 
+// real root dirs
 export const ROOT_DIRS = {
   // configs of system and apps
   cfg: 'cfg',
@@ -43,10 +44,11 @@ export const ROOT_DIRS = {
   db: 'db',
   cache: 'cache',
   log: 'log',
-  tmp: 'tmp',
-  userData: 'userData',
-  //external: 'external',
+  tmpLocal: 'tmpLocal',
+  home: 'home',
 }
+// virtual external root dir
+export const EXTERNAL_ROOT_DIR = 'external'
 
 export const SYSTEM_CFG_DIR = `/${ROOT_DIRS.cfg}/system`
 export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.${CFG_FILE_EXT}`

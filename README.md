@@ -2,19 +2,73 @@
 
 Easy make IoT devices and local net of devices which can be managed by master
 
+
 ## Environment variables
 
-* ROOT_DIR - if set then it will be default root dir for all the other dirs
-* CONFIGS_DIR - set specific configs dir
-* APP_FILES_DIR - set specific dir for app files. They will be readonly
-* APP_DATA_LOCAL_DIR - set specific dir for apps local data
-* APP_DATA_SYNCED_DIR - set specific dir for apps data which are synced between
-  user's devices
-* DB_DIR - set specific db dir
-* CACHE_DIR - set specific cache dir
-* LOG_DIR - set specific dir for logs
-* TMP_DIR - set specific dir for tmp files
-* USER_DATA_DIR - set specific dir where user store his files. They are synced
+* ROOT_DIR - if set then it will be a default root dir for all the other dirs.
+  It can be absolute or relative to PWD
+* FILES_UID - uid for all the files on unix-like systems
+* FILES_GID - gid for all the files on unix-like systems
+
+You can overwrite some dir paths. Set absolute or PWD relative path.
+For production please prefer absolute paths.
+By default, these paths will be under ROOT_DIR.
+
+* APP_FILES_DIR - path to dir `/appFiles`
+* APP_DATA_LOCAL_DIR - path to dir `/appDataLocal`
+* APP_DATA_SYNCED_DIR - path to dir `/appDataSynced`
+* CACHE_DIR - path to dir `/cache`
+* CONFIGS_DIR - path to dir `/cfg`
+* DB_DIR - path to dir `/db`
+* LOG_DIR - path to dir `/log`
+* TMP_LOCAL_DIR - path to dir `/tmp`
+* USER_HOME_DIR - path to dir `/home`
+
+## File structure
+
+* `/appFiles` - app files after install are put here. They will be readonly
+  * `/[appName]`
+* `/appDataLocal` - apps data which is only for current machine
+  * `/[appName]`
+  * `/system` - for system services and drivers
+* `/appDataSynced` - apps data which is synced between app user's devices
+  * `/[appName]`
+  * `/system` - for system services and drivers
+* `/cache` - cache for all the apps and system
+  * `/[appName]`
+  * `/system` - for system services and drivers
+  * `/common` - for anyone
+* `/cfg` - configs for all the apps and system
+  * `/[appName]`
+  * `/system` - for system services and drivers
+  * `/common` - for anyone
+* `/db` - all databases of all the apps and system here. They are synced by db engine
+  * `/[appName]`
+  * `/system` - for system services and drivers
+  * `/common` - for anyone
+* `/log` - logs for all the apps and system. They are handled by log engine
+  * `/[appName]`
+  * `/system` - for system services and drivers
+  * `/common` - for anyone
+* `/tmpLocal` - tmp for all the apps and system. It is local
+  * `/[appName]`
+  * `/system` - for system services and drivers
+  * `/common` - for anyone
+* `/home` - common dir where user store his files. They are synced.
+  User can select witch files sync between his machines.
+  This is the only dir which is accessible outside squidlet.
+  * `/.trash` - synced trash bin
+  * `/.versions` - synced versions of changed files
+  * `/_Apps/[appName]` - synced user data by app e.g. games save files
+  * `/_Downloads` - synced dir for downloads
+  * `/_Tmp` - synced user's tmp dir
+  * `/_Media` - synced images, videos, audio files and documents
+  * `/_Mnt` - mount here external dirs or put symlinks (if allowed in config).
+    It is machine specific, not synced
+  * `...` any other synced user's files
+
+And there is a virtual dir `/external` which is used to have access to local
+machine file.
 
 ## Start dev
 
