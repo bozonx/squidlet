@@ -35,14 +35,15 @@ export enum ServiceEvents {
 
 // real root dirs
 export const ROOT_DIRS = {
-  // configs of system and apps
-  cfg: 'cfg',
   // ro app files
   appFiles: 'appFiles',
   appDataLocal: 'appDataLocal',
   appDataSynced: 'appDataSynced',
+  cacheLocal: 'cacheLocal',
+  // configs of system and apps
+  cfgLocal: 'cfgLocal',
+  cfgSynced: 'cfgSynced',
   db: 'db',
-  cache: 'cache',
   log: 'log',
   tmpLocal: 'tmpLocal',
   home: 'home',

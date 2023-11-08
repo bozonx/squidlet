@@ -1,4 +1,4 @@
-import {StatsSimplified} from './io/FilesIoType.js'
+import type {StatsSimplified} from './io/FilesIoType.js'
 
 export interface FilesDriverType {
   appendFile(pathTo: string, data: string | Uint8Array): Promise<void>
@@ -24,5 +24,4 @@ export interface FilesDriverType {
   isFile(pathToFile: string): Promise<boolean>
   isExists(pathToFileOrDir: string): Promise<boolean>
   isFileUtf8(pathTo: string): Promise<boolean>
-
 }

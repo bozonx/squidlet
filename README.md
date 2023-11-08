@@ -17,8 +17,9 @@ By default, these paths will be under ROOT_DIR.
 * APP_FILES_DIR - path to dir `/appFiles`
 * APP_DATA_LOCAL_DIR - path to dir `/appDataLocal`
 * APP_DATA_SYNCED_DIR - path to dir `/appDataSynced`
-* CACHE_DIR - path to dir `/cache`
-* CONFIGS_DIR - path to dir `/cfg`
+* CACHE_LOCAL_DIR - path to dir `/cacheLocal`
+* CFG_LOCAL_DIR - path to dir `/cfgLocal`
+* CFG_SYNCED_DIR - path to dir `/cfgSynced`
 * DB_DIR - path to dir `/db`
 * LOG_DIR - path to dir `/log`
 * TMP_LOCAL_DIR - path to dir `/tmp`
@@ -37,11 +38,15 @@ By default, these paths will be under ROOT_DIR.
 * `/appDataSynced` - apps data which is synced between app user's devices
   * `/[appName]`
   * `/system` - for system services and drivers
-* `/cache` - cache for all the apps and system
+* `/cacheLocal` - local cache for all the apps and system
   * `/[appName]`
   * `/system` - for system services and drivers
   * `/common` - for anyone
-* `/cfg` - configs for all the apps and system
+* `/cfgLocal` - local configs for all the apps and system
+  * `/[appName]`
+  * `/system` - for system services and drivers
+  * `/common` - for anyone
+* `/cfgSynced` - synced configs for all the apps and system
   * `/[appName]`
   * `/system` - for system services and drivers
   * `/common` - for anyone

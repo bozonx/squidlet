@@ -1,13 +1,13 @@
 import {IndexedEventEmitter, pathJoin} from 'squidlet-lib'
 import type {Logger} from 'squidlet-lib'
-import {ROOT_DIRS} from '../../types/contstants.js'
+import {DRIVER_NAMES, ROOT_DIRS} from '../../types/contstants.js'
 import {FilesLog} from '../files/FilesLog.js'
 import {FilesWrapper} from '../files/FilesWrapper.js'
 import {FilesReadOnly} from '../files/FilesReadOnly.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 import type {System} from '../System.js'
-import {AppUiManager} from './AppUiManager.js'
-import {VersionedWrapper} from '../../helpers/VersionedWrapper.js'
+import {FilesHome} from '../files/FilesHome.js'
+import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 
 export class AppContext {
@@ -15,24 +15,23 @@ export class AppContext {
 
   api: Record<string, any> = {}
 
-  //readonly ui
-
+  // readonly files of this app
+  readonly appFiles
+  // local data of this app. Only for local machine
+  readonly appDataLocal
+  // app's syncronized data of this app between all the hosts
+  readonly appDataSynced
+  // file cache of this app
+  readonly cacheLocal
+  // config files for this app. It manages them by it self
+  readonly cfgLocal
+  readonly cfgSynced
   // data bases for this app
   //readonly db
   // log files of this app
-  readonly logFiles
-  // file cache of this app
-  //readonly fileCache
-  // config files for this app. It manages them by it self
-  readonly cfg
-  // files of this app
-  readonly appFiles
-  // local data of this app. Only for this machine
-  readonly appDataLocal
-  // app's syncronized data of this app between all the hosts. Versioned
-  //readonly appDataSynced
+  readonly logEngine
   // for temporary files of this app
-  readonly tmp
+  readonly tmpLocal
   readonly home
 
   // memStorage only for this app
@@ -58,40 +57,46 @@ export class AppContext {
     this.system = system
 
     //this.ui = new AppUiManager(system, appName)
-    //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
-    this.logFiles = new FilesLog(
-      this.system.drivers,
-      pathJoin('/', ROOT_DIRS.log, appName)
-    )
-    // this.fileCache = new FilesCache(
-    //   this.system.drivers,
-    //   pathJoin('/', ROOT_DIRS.cache, appName)
-    // )
-    this.cfg = new FilesWrapper(
-      this.system.drivers,
-      pathJoin('/', ROOT_DIRS.cfg, appName)
-    )
-    this.tmp = new FilesWrapper(
-      this.system.drivers,
-      pathJoin('/', ROOT_DIRS.tmpLocal, appName)
-    )
+
+    const filesDriver = this.system.drivers.getDriver<FilesDriver>(DRIVER_NAMES.FilesDriver)
+
     this.appFiles = new FilesReadOnly(
-      this.system.drivers,
+      filesDriver,
       pathJoin('/', ROOT_DIRS.appFiles, appName)
     )
     this.appDataLocal = new FilesWrapper(
-      this.system.drivers,
+      filesDriver,
       pathJoin('/', ROOT_DIRS.appDataLocal, appName)
     )
-    // this.appDataSynced = new FilesVersioned(
-    //   this.system.drivers,
-    //   pathJoin('/', ROOT_DIRS.appDataSynced, appName)
-    // )
-
-    this.home = new VersionedWrapper(new FilesWrapper(
-      this.system.drivers,
+    this.appDataSynced = new FilesWrapper(
+      filesDriver,
+      pathJoin('/', ROOT_DIRS.appDataSynced, appName)
+    )
+    this.cacheLocal = new FilesCache(
+      filesDriver,
+      pathJoin('/', ROOT_DIRS.cacheLocal, appName)
+    )
+    this.cfgLocal = new FilesWrapper(
+      filesDriver,
+      pathJoin('/', ROOT_DIRS.cfgLocal, appName)
+    )
+    this.cfgSynced = new FilesWrapper(
+      filesDriver,
+      pathJoin('/', ROOT_DIRS.cfgSynced, appName)
+    )
+    //this.db = new FilesDb(this.system, pathJoin(ROOT_DIRS.db, appName))
+    this.logEngine = new FilesLog(
+      filesDriver,
+      pathJoin('/', ROOT_DIRS.log, appName)
+    )
+    this.tmpLocal = new FilesWrapper(
+      filesDriver,
+      pathJoin('/', ROOT_DIRS.tmpLocal, appName)
+    )
+    this.home = new FilesHome(
+      filesDriver,
       pathJoin('/', ROOT_DIRS.home)
-    ))
+    )
 
     //this.memStorage = new RestrictedMemStorage(this.system, appName)
   }
