@@ -7,6 +7,7 @@ import type FilesIoType from '../../types/io/FilesIoType.js'
 import type {StatsSimplified} from '../../types/io/FilesIoType.js'
 import {IO_NAMES} from '../../types/contstants.js'
 import type {IoBase} from '../../system/Io/IoBase.js'
+import type {FilesDriverType} from '../../types/FilesDriverType.js'
 
 
 
@@ -19,7 +20,7 @@ export const FilesDriverIndex: DriverIndex = (ctx: DriverContext) => {
  * Files driver
  * Use relative paths
  */
-export class FilesDriver extends DriverBase {
+export class FilesDriver extends DriverBase implements FilesDriverType {
   requireIo = [IO_NAMES.FilesIo]
 
   private get io(): IoBase & FilesIoType {
@@ -189,7 +190,7 @@ export class FilesDriver extends DriverBase {
 
     const stats: StatsSimplified = await this.io.stat(pathToFile)
 
-    return !stats.dir
+    return !stats.dir && !stats.symbolicLink
   }
 
   /**
@@ -203,7 +204,6 @@ export class FilesDriver extends DriverBase {
 
     // TODO: проверить что stat вернет ошибку если файла нет
     // TODO: и какую именно ошибку
-    //await fs.access(fullPath)
 
     try {
       await this.io.stat(pathToFileOrDir)

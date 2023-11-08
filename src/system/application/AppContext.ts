@@ -7,7 +7,7 @@ import {FilesReadOnly} from '../files/FilesReadOnly.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 import type {System} from '../System.js'
 import {AppUiManager} from './AppUiManager.js'
-import {UserData} from '../files/UserData.js'
+import {VersionedWrapper} from '../../helpers/VersionedWrapper.js'
 
 
 export class AppContext {
@@ -33,7 +33,7 @@ export class AppContext {
   //readonly appDataSynced
   // for temporary files of this app
   readonly tmp
-  readonly userData
+  readonly home
 
   // memStorage only for this app
   //readonly memStorage
@@ -73,7 +73,7 @@ export class AppContext {
     )
     this.tmp = new FilesWrapper(
       this.system.drivers,
-      pathJoin('/', ROOT_DIRS.tmp, appName)
+      pathJoin('/', ROOT_DIRS.tmpLocal, appName)
     )
     this.appFiles = new FilesReadOnly(
       this.system.drivers,
@@ -88,11 +88,10 @@ export class AppContext {
     //   pathJoin('/', ROOT_DIRS.appDataSynced, appName)
     // )
 
-    // TODO: это должен быть отдельный класс
-    this.userData = new UserData(
+    this.home = new VersionedWrapper(new FilesWrapper(
       this.system.drivers,
       pathJoin('/', ROOT_DIRS.home)
-    )
+    ))
 
     //this.memStorage = new RestrictedMemStorage(this.system, appName)
   }

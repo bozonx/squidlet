@@ -2,13 +2,14 @@ import {pathJoin, clearRelPathLeft} from 'squidlet-lib'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import type {StatsSimplified} from '../../types/io/FilesIoType.js'
 import type {DriversManager} from '../driver/DriversManager.js'
+import type {FilesDriverType} from '../../types/FilesDriverType.js'
 
 
 /**
  * It is simple wrapper on driver but with root dir
  */
 
-export class FilesWrapper {
+export class FilesWrapper implements FilesDriverType {
   // it is relative path of system root dir
   readonly rootDir: string
 
@@ -35,9 +36,6 @@ export class FilesWrapper {
   }
 
   async mkdir(pathTo: string) {
-
-    console.log(777, this.rootDir, clearRelPathLeft(pathTo), pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
-
     return this.driver.mkdir(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
   }
 

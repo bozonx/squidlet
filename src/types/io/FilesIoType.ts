@@ -19,17 +19,6 @@ export interface FilesIoConfig {
   gid?: number;
   external: Record<string, string>
   dirs: Record<keyof typeof ROOT_DIRS, string>
-  // dirs: {
-  //   cfg: string
-  //   appFiles: string
-  //   appDataLocal: string
-  //   appDataSynced: string
-  //   db: string
-  //   cache: string
-  //   log: string
-  //   tmpLocal: string
-  //   home: string
-  // }
 }
 
 
