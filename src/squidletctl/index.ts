@@ -11,9 +11,6 @@ commands:
 - install <package.tar.gz> - Install or update the package which is in tar.gz format
 
 Control system service
-- update - update the squidlet host itself
-- install-service - Install the squidlet service
-- uninstall-service - remove service from system. It removes only services and nothing else
 - status - show status of the service
 - restart - restart the service. It will create service if need.
 - start - start the service. It will create service if need.
@@ -41,16 +38,6 @@ arguments:
   switch (cmd) {
     case 'install':
       await ctrl.installPackage(args[1])
-      break
-    case 'update':
-      await ctrl.updateHost()
-      break
-
-    case 'install-service':
-      await ctrl.installService()
-      break
-    case 'uninstall-service':
-      await ctrl.uninstallService()
       break
     case 'status':
       await ctrl.status()

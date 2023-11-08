@@ -46,21 +46,6 @@ export class SquidletCtl {
 
 
   ///// systemd
-  async updateHost() {
-    const cmd = `docker pull ${dockerContainerName}`
-
-    await this.execCmd(cmd)
-    await this.restart()
-  }
-
-  async installService() {
-    //await this.execCmd(cmd)
-  }
-
-  async uninstallService() {
-    //await this.execCmd(cmd)
-  }
-
   async status() {
     const cmd = `systemctl status ${serviceName}`
 
@@ -68,31 +53,31 @@ export class SquidletCtl {
   }
 
   async restart() {
-    const cmd = `systemctl restart ${serviceName}`
+    const cmd = `sudo systemctl restart ${serviceName}`
 
     await this.execCmd(cmd)
   }
 
   async start() {
-    const cmd = `systemctl start ${serviceName}`
+    const cmd = `sudo systemctl start ${serviceName}`
 
     await this.execCmd(cmd)
   }
 
   async stop() {
-    const cmd = `systemctl stop ${serviceName}`
+    const cmd = `sudo systemctl stop ${serviceName}`
 
     await this.execCmd(cmd)
   }
 
   async enable() {
-    const cmd = `systemctl enable ${serviceName}`
+    const cmd = `sudo systemctl enable ${serviceName}`
 
     await this.execCmd(cmd)
   }
 
   async disable() {
-    const cmd = `systemctl disable ${serviceName}`
+    const cmd = `sudo systemctl disable ${serviceName}`
 
     await this.execCmd(cmd)
   }
