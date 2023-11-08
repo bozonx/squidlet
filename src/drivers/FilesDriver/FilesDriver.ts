@@ -131,8 +131,6 @@ export class FilesDriver extends DriverBase {
   async rm(pathToFileOrDir: string) {
     this.checkPermissions(pathToFileOrDir, 'w')
 
-    // TODO: лучше сделать последовательно - сначала попытаться удалить файл потом директорию
-
     const stats: StatsSimplified = await this.io.stat(pathToFileOrDir)
 
     if (stats.dir) {
