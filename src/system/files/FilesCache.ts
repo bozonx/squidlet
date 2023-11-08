@@ -1,4 +1,3 @@
-import {} from 'squidlet-lib'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 
@@ -30,7 +29,7 @@ export class FilesCache {
 
   constructor(drivers: DriversManager, rootDir: string) {
     this.drivers = drivers
-    this.rootDir = clearRelPathLeft(rootDir)
+    this.rootDir = rootDir
   }
 
 

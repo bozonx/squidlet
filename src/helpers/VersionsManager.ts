@@ -1,6 +1,6 @@
 import {pathDirname} from 'squidlet-lib'
-import type {System} from '../System.js'
-import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {System} from '../system/System.js'
+import type {FilesDriver} from '../drivers/FilesDriver/FilesDriver.js'
 
 
 // TODO: может это лучше драйвером сделать ????
