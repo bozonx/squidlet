@@ -4,7 +4,7 @@ import type {System} from '../System.js'
 import {systemCfgDefaults} from '../../types/SystemCfg.js'
 import type {SystemCfg} from '../../types/SystemCfg.js'
 import {
-  CFG_DIRS,
+  SYSTEM_SUB_DIRS,
   CFG_FILE_EXT,
   SYSTEM_CFG_DIR,
   SYSTEM_CONFIG_FILE,
@@ -55,7 +55,7 @@ export class ConfigsManager {
   async loadIoConfig(ioName: string): Promise<Record<string, any> | undefined> {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.ios,
+      SYSTEM_SUB_DIRS.ios,
       `${ioName}.${CFG_FILE_EXT}`
     )
 
@@ -65,7 +65,7 @@ export class ConfigsManager {
   async loadDriverConfig(driverName: string): Promise<Record<string, any> | undefined> {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.drivers,
+      SYSTEM_SUB_DIRS.drivers,
       `${driverName}.${CFG_FILE_EXT}`
     )
 
@@ -75,7 +75,7 @@ export class ConfigsManager {
   async loadServiceConfig(serviceName: string): Promise<Record<string, any> | undefined> {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.services,
+      SYSTEM_SUB_DIRS.services,
       `${serviceName}.${CFG_FILE_EXT}`
     )
 
@@ -85,7 +85,7 @@ export class ConfigsManager {
   async saveIoConfig(ioName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.ios,
+      SYSTEM_SUB_DIRS.ios,
       `${ioName}.${CFG_FILE_EXT}`
     )
 
@@ -95,7 +95,7 @@ export class ConfigsManager {
   async saveDriverConfig(driverName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.drivers,
+      SYSTEM_SUB_DIRS.drivers,
       `${driverName}.${CFG_FILE_EXT}`
     )
 
@@ -105,7 +105,7 @@ export class ConfigsManager {
   async saveServiceConfig(serviceName: string, newConfig: Record<string, any>) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.services,
+      SYSTEM_SUB_DIRS.services,
       `${serviceName}.${CFG_FILE_EXT}`
     )
 
@@ -115,7 +115,7 @@ export class ConfigsManager {
   async removeIoConfig(ioName: string) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.ios,
+      SYSTEM_SUB_DIRS.ios,
       `${ioName}.${CFG_FILE_EXT}`
     )
 
@@ -125,7 +125,7 @@ export class ConfigsManager {
   async removeDriverConfig(driverName: string) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.drivers,
+      SYSTEM_SUB_DIRS.drivers,
       `${driverName}.${CFG_FILE_EXT}`
     )
 
@@ -135,7 +135,7 @@ export class ConfigsManager {
   async removeServiceConfig(serviceName: string) {
     const cfgFilePath = pathJoin(
       SYSTEM_CFG_DIR,
-      CFG_DIRS.services,
+      SYSTEM_SUB_DIRS.services,
       `${serviceName}.${CFG_FILE_EXT}`
     )
 

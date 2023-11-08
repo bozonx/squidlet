@@ -1,10 +1,9 @@
-import {pathJoin, arraysDifference} from 'squidlet-lib'
+import {arraysDifference} from 'squidlet-lib'
 import type {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
 import type {ServiceDestroyReason, ServiceIndex, ServiceStatus, SubprogramError} from '../../types/types.js'
 import type {ServiceBase} from './ServiceBase.js'
 import {
-  CFG_DIRS,
   EVENT_DELIMITER,
   RootEvents,
   SERVICE_DESTROY_REASON,
@@ -73,7 +72,7 @@ export class ServicesManager {
       // load service config
       const serviceCfg: Record<string, any> | undefined = await this.system.configs
           .loadServiceConfig(serviceName)
-      // const cfgFilePath = pathJoin(CFG_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
+      // const cfgFilePath = pathJoin(SYSTEM_SUB_DIRS.services, serviceName, SERVICE_CONFIG_FILE_NAME)
       // let serviceCfg: Record<string, any> | undefined
       //
       // if (await this.system.files.cfg.exists(cfgFilePath)) {

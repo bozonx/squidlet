@@ -69,9 +69,9 @@ By default, these paths will be under ROOT_DIR.
   * `/.versions` - synced versions of changed files
   * `/_Apps/[appName]` - synced user data by app e.g. games save files
   * `/_Downloads` - synced dir for downloads
-  * `/_Tmp` - synced user's tmp dir
   * `/_Media` - synced images, videos, audio files and documents
   * `/_Mnt` - mount here external dirs or put symlinks (if allowed in config).
+  * `/_Tmp` - synced user's tmp dir
     It is machine specific, not synced
   * `...` any other synced user's files
 

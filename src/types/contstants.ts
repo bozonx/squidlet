@@ -51,15 +51,26 @@ export const ROOT_DIRS = {
 // virtual external root dir
 export const EXTERNAL_ROOT_DIR = 'external'
 
-export const SYSTEM_CFG_DIR = `/${ROOT_DIRS.cfgLocal}/system`
-export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/system.${CFG_FILE_EXT}`
+export const SYSTEM_DIR = 'system'
+export const COMMON_DIR = 'common'
+export const SYSTEM_CFG_DIR = `/${ROOT_DIRS.cfgLocal}/${SYSTEM_DIR}`
+export const SYSTEM_CONFIG_FILE = `${SYSTEM_CFG_DIR}/${SYSTEM_DIR}.${CFG_FILE_EXT}`
 //export const APP_CONFIG_FILE = `app-config.${CFG_FILE_EXT}`
 export const APP_FILES_PUBLIC_DIR = 'public'
 
-export const CFG_DIRS = {
+export const SYSTEM_SUB_DIRS = {
   ios: 'ios',
   drivers: 'drivers',
   services: 'services',
+}
+export const HOME_SUB_DIRS = {
+  '.trash': '.trash',
+  '.versions': '.versions',
+  _Apps: '_Apps',
+  _Downloads: '_Downloads',
+  _Media: '_Media',
+  _Mnt: '_Mnt',
+  _Tmp: '_Tmp',
 }
 
 export const SERVICE_STATUS = {

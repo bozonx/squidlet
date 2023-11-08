@@ -240,20 +240,20 @@ export class FilesIo extends IoBase implements FilesIoType {
       throw new Error(`Path has to start with "/": ${pathTo}`)
     }
 
-    const pathMatch = pathTo.match(/^\/([^\/]+)(\/.+)$/)
+    const pathMatch = pathTo.match(/^\/([^\/]+)(\/.+)?$/)
 
     if (!pathMatch) throw new Error(`Wrong path "${pathTo}"`)
 
     const subDir = pathMatch[1] as keyof typeof ROOT_DIRS
-    const restPath = pathMatch[2]
+    const restPath = pathMatch[2] || ''
 
     if (subDir as string === EXTERNAL_ROOT_DIR) {
-      const extMatch = pathTo.match(/^\/([^\/]+)(\/.+)$/)
+      const extMatch = pathTo.match(/^\/([^\/]+)(\/.+)?$/)
 
       if (!extMatch) throw new Error(`Wrong external path "${pathTo}"`)
 
       const extDir = extMatch[1]
-      const extRestPath = extMatch[2]
+      const extRestPath = extMatch[2] || ''
       const resolvedExtAbsDir: string | undefined = this.cfg.external[extDir]
 
       if (resolvedExtAbsDir) return resolvedExtAbsDir + extRestPath
