@@ -1,5 +1,5 @@
 import {isUtf8} from 'buffer'
-import {pathDirname, pathJoin} from 'squidlet-lib'
+import {pathBasename, pathDirname, pathJoin} from 'squidlet-lib'
 import {DriverBase} from '../../system/driver/DriverBase.js'
 import type {DriverContext} from '../../system/driver/DriverContext.js'
 import type {DriverIndex, PermissionFileType} from '../../types/types.js'
@@ -145,38 +145,18 @@ export class FilesDriver extends DriverBase {
    * Copy some file, several files or dir recursively to specified dest dir
    */
   async cp(src: string | string[], destDir: string): Promise<void> {
-    if (typeof src === 'string') {
-      this.checkPermissions(src, 'r')
-    }
-    else {
-      for (const item of src) this.checkPermissions(item, 'r')
-    }
+    const prepared = await this.prepareBatchFileNames(src, destDir)
 
-    this.checkPermissions(destDir, 'w')
-
-    // TODO: !!!!
-    // TODO: !!!! support copying dir recursively
+    return this.io.copyFiles(prepared)
   }
 
   /**
    * Move some file, several files or dir recursively to specified dest dir
    */
   async mv(src: string | string[], destDir: string): Promise<void> {
-    if (typeof src === 'string') {
-      this.checkPermissions(src, 'r')
-    }
-    else {
-      for (const item of src) this.checkPermissions(item, 'r')
-    }
+    const prepared = await this.prepareBatchFileNames(src, destDir)
 
-    this.checkPermissions(destDir, 'w')
-
-    // TODO: !!!! support moving dir recursively
-
-    // const oldAbsPath: string = pathJoin(this.rootDir, fromPath);
-    // const newAbsPath: string = pathJoin(this.rootDir, toPath);
-    //
-    // return this.storageIo.rename(oldAbsPath, newAbsPath);
+    return this.io.renameFiles(prepared)
   }
 
   /**
@@ -250,6 +230,35 @@ export class FilesDriver extends DriverBase {
 
   private checkPermissions(pathTo: string, perm: PermissionFileType) {
     // TODO: throw an error if path is not allowed
+  }
+
+  private async prepareBatchFileNames(src: string | string[], destDir: string): Promise<[string, string][]> {
+    let resolvedSrc: string[]
+    const prepared: [string, string][] = []
+
+    if (typeof src === 'string') {
+      this.checkPermissions(src, 'r')
+      resolvedSrc = [src]
+    }
+    else {
+      for (const item of src) this.checkPermissions(item, 'r')
+      resolvedSrc = src
+    }
+
+    this.checkPermissions(destDir, 'w')
+
+    for (const item of resolvedSrc) {
+      const fileStats: StatsSimplified = await this.io.stat(item)
+
+      if (fileStats.dir) {
+        // TODO: !!!! support copying dir recursively
+      }
+      else {
+        prepared.push([item, pathJoin(destDir, pathBasename(item))])
+      }
+    }
+
+    return prepared
   }
 
 }
