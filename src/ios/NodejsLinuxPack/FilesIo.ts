@@ -2,7 +2,7 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import {exec} from 'node:child_process'
 import {promisify} from 'node:util'
-import {Stats, existsSync, lstatSync} from 'node:fs'
+import type {Stats} from 'node:fs'
 import {
   pathJoin,
   PATH_SEP,
@@ -23,7 +23,7 @@ export const execPromise = promisify(exec)
 
 function prepareSubPath(subDirOfRoot: string, rootDir?: string, envPath?: string) {
   if (rootDir) {
-    return path.join(rootDir, subDirOfRoot)
+    return pathJoin(rootDir, subDirOfRoot)
   }
 
   if (!envPath) {
@@ -75,7 +75,14 @@ export class FilesIo extends IoBase implements FilesIoType {
 
   async appendFile(pathTo: string, data: string | Uint8Array): Promise<void> {
     const fullPath = this.makePath(pathTo)
-    const wasExist: boolean = existsSync(pathTo)
+    let wasExist = true
+
+    try {
+      await fs.lstat(pathTo)
+    }
+    catch (e) {
+      wasExist = false
+    }
 
     if (typeof data === 'string') {
       await fs.appendFile(fullPath, data, DEFAULT_ENCODE)
@@ -148,7 +155,7 @@ export class FilesIo extends IoBase implements FilesIoType {
 
   async stat(pathTo: string): Promise<StatsSimplified> {
     const fullPath = this.makePath(pathTo)
-    const stat = await fs.lstat(fullPath)
+    const stat: Stats = await fs.lstat(fullPath)
 
     return {
       size: stat.size,
@@ -212,7 +219,7 @@ export class FilesIo extends IoBase implements FilesIoType {
       return await fs.chown(pathTo, this.cfg.uid, this.cfg.gid)
     }
     // else load stats to resolve lack of params
-    const stat: Stats = lstatSync(pathTo)
+    const stat: Stats = await fs.lstat(pathTo)
 
     await fs.chown(
       pathTo,

@@ -1,7 +1,11 @@
 import fs from 'node:fs/promises'
 import {exec} from 'node:child_process'
 import type {ExecException} from 'child_process'
+import {promisify} from 'node:util'
 import {DEFAULT_WS_CTRL_PORT, LOCAL_HOST} from '../types/contstants.js'
+
+
+export const execPromise = promisify(exec)
 
 
 export interface SquidletCtlParams {
@@ -84,16 +88,16 @@ export class SquidletCtl {
 
 
   private async execCmd(cmd: string) {
-    return new Promise<void>((resolve, reject) => {
-      exec(cmd, (error: ExecException | null, stdout: string, stderr: string) => {
-        if (error) console.error(error)
-        else if (stderr) console.error(stderr)
+    try {
+      const {stdout, stderr} = await execPromise(cmd)
 
-        if (stdout) console.log(stdout)
+      if (stderr) console.error(stderr)
 
-        resolve()
-      })
-    })
+      if (stdout) console.log(stdout)
+    }
+    catch (e) {
+      console.error(e)
+    }
   }
 
 }

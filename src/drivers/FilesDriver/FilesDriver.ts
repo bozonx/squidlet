@@ -237,13 +237,15 @@ export class FilesDriver extends DriverBase {
     }
   }
 
-
   async isFileUtf8(pathTo: string): Promise<boolean> {
     this.checkPermissions(pathTo, 'r')
 
     // ещё есть пакет - isutf8
     // TODO: лучше считывать не весь файл, 1000 байт но кратно utf8 стандарту бит
     const data: Uint8Array = await this.io.readBinFile(pathTo)
+
+    // TODO: поидее буфера может не быть - наверное лучше использвать в io
+    //       или написать свой хэлпер
     return isUtf8(data)
   }
 
