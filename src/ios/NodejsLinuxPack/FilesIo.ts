@@ -11,6 +11,7 @@ import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'
 import {EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/contstants.js'
 
+
 export const execPromise = promisify(exec)
 
 
@@ -31,9 +32,13 @@ function prepareSubPath(subDirOfRoot: string, rootDir?: string, envPath?: string
 export const FilesIoIndex: IoIndex = (ctx: IoContext) => {
   // if root dir is relative then make it absolute relate to PWD
   const rootDir = (process.env.ROOT_DIR) ? path.resolve(process.env.ROOT_DIR) : ''
-  const external = {}
-  
-  // TODO: fill external
+  const external = JSON.parse(process.env.EXT_DIRS || '{}')
+  // check if external paths are absolute
+  for (const name of Object.keys(external)) {
+    if (external[name].indexOf('/') !== 0) {
+      throw new Error(`External path ${name}: ${external[name]} has to be absolute`)
+    }
+  }
 
   const cfg: FilesIoConfig = {
     uid: (process.env.FILES_UID) ? Number(process.env.FILES_UID) : undefined,

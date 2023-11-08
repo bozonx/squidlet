@@ -23,6 +23,9 @@ By default, these paths will be under ROOT_DIR.
 * LOG_DIR - path to dir `/log`
 * TMP_LOCAL_DIR - path to dir `/tmp`
 * USER_HOME_DIR - path to dir `/home`
+* EXT_DIRS - JSON object which specifies external dirs which are pointed to any
+  external dir of local system. Like EXT_DIRS='{"myExtDir": "/home/userName/Downloads"}'.
+  They have to be absolute. To call it use `/external/myExtDir/someFile.jpg`
 
 ## File structure
 
