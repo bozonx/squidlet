@@ -6,7 +6,7 @@
 
 
 import {DriversManager} from '../driver/DriversManager.js'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 export class FilesHome {
   // it is relative path of system root dir

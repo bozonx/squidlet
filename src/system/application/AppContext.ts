@@ -7,7 +7,7 @@ import {FilesReadOnly} from '../files/FilesReadOnly.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 import type {System} from '../System.js'
 import {FilesHome} from '../files/FilesHome.js'
-import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {FilesCache} from '../files/FilesCache.js'
 import {FilesDb} from '../files/FilesDb.js'
 
