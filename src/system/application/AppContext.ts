@@ -8,6 +8,7 @@ import type {DriversManager} from '../driver/DriversManager.js'
 import type {System} from '../System.js'
 import {FilesHome} from '../files/FilesHome.js'
 import {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import {FilesCache} from '../files/FilesCache.js'
 
 
 export class AppContext {

@@ -1,60 +1,59 @@
-import {pathJoin, clearRelPathLeft} from 'squidlet-lib'
-import {System} from '../System.js'
+import {clearRelPath, pathJoin, trimCharStart} from 'squidlet-lib'
 import type {StatsSimplified} from '../../types/io/FilesIoType.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import type {DriversManager} from '../driver/DriversManager.js'
+import type {ReadOnlyFilesDriverType} from '../../types/FilesDriverType.js'
 
 
-export class FilesReadOnly {
+export class FilesReadOnly implements ReadOnlyFilesDriverType {
+  // it is dir where this wrapper is allowed to work
   readonly rootDir: string
-
-  private readonly drivers: DriversManager
-
-  private get driver(): FilesDriver {
-    return this.drivers.getDriver('FilesDriver')
-  }
+  protected readonly filesDriver: FilesDriver
 
 
-  constructor(drivers: DriversManager, rootDir: string) {
-    this.drivers = drivers
-    this.rootDir = clearRelPathLeft(rootDir)
+  constructor(filesDriver: FilesDriver, rootDir: string) {
+    this.filesDriver = filesDriver
+    this.rootDir = rootDir
   }
 
 
   async readDir(pathTo: string): Promise<string[]> {
-    return this.driver.readDir(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+    return this.filesDriver.readDir(this.preparePath(pathTo))
   }
 
   async readTextFile(pathTo: string): Promise<string> {
-    return this.driver.readTextFile(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+    return this.filesDriver.readTextFile(this.preparePath(pathTo))
   }
 
   async readBinFile(pathTo: string): Promise<Uint8Array> {
-    return this.driver.readBinFile(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+    return this.filesDriver.readBinFile(this.preparePath(pathTo))
   }
 
   async readlink(pathTo: string): Promise<string> {
-    return this.driver.readlink(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+    return this.filesDriver.readlink(this.preparePath(pathTo))
   }
 
   async stat(pathTo: string): Promise<StatsSimplified> {
-    return this.driver.stat(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+    return this.filesDriver.stat(this.preparePath(pathTo))
   }
 
   async isDir(pathToDir: string): Promise<boolean> {
-    return this.driver.isDir(pathJoin(this.rootDir, clearRelPathLeft(pathToDir)))
+    return this.filesDriver.isDir(this.preparePath(pathToDir))
   }
 
   async isFile(pathToFile: string): Promise<boolean> {
-    return this.driver.isFile(pathJoin(this.rootDir, clearRelPathLeft(pathToFile)))
+    return this.filesDriver.isFile(this.preparePath(pathToFile))
   }
 
   async isExists(pathToFileOrDir: string): Promise<boolean> {
-    return this.driver.isExists(pathJoin(this.rootDir, clearRelPathLeft(pathToFileOrDir)))
+    return this.filesDriver.isExists(this.preparePath(pathToFileOrDir))
   }
 
   async isFileUtf8(pathTo: string): Promise<boolean> {
-    return this.driver.isFileUtf8(pathJoin(this.rootDir, clearRelPathLeft(pathTo)))
+    return this.filesDriver.isFileUtf8(this.preparePath(pathTo))
   }
 
+
+  protected preparePath(pathTo: string): string {
+    return pathJoin(this.rootDir, trimCharStart(clearRelPath(pathTo), '/'))
+  }
 }

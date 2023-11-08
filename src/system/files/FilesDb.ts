@@ -1,4 +1,4 @@
-import {clearRelPathLeft} from 'squidlet-lib'
+import {} from 'squidlet-lib'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 

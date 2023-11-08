@@ -1,4 +1,4 @@
-import {clearRelPathLeft, pathJoin, pathBasename, pathDirname} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
+import { pathJoin, pathBasename, pathDirname} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
 import type {StatsSimplified} from '../types/io/FilesIoType.js'
 import {FilesDriver} from '../drivers/FilesDriver/FilesDriver.js'
 import {DriversManager} from '../system/driver/DriversManager.js'
