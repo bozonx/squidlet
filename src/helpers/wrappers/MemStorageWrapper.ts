@@ -1,7 +1,10 @@
-import type {System} from '../System.js'
+import type {System} from '../../system/System.js'
 
+/**
+ * Your private space in mem storage
+ */
 
-export class RestrictedMemStorage {
+export class MemStorageWrapper {
   private readonly system: System
   private readonly appName: string
 

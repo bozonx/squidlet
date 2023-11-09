@@ -1,24 +1,16 @@
-import {
-  callSafely,
-  IndexedEventEmitter,
-  LogPublisher,
-  MemStorage
-} from 'squidlet-lib'
+import {callSafely, IndexedEventEmitter, LogPublisher} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './Io/IoManager.js'
-import {SystemInfoManager} from './managers/SystemInfoManager.js'
 import {ServicesManager} from './service/ServicesManager.js'
 import {ApiManager} from './managers/ApiManager.js'
-import {FilesManager} from './files/FilesManager.js'
+import {FilesManager} from './managers/FilesManager.js'
 import {ConfigsManager} from './config/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
-import {NetworkManager} from './managers/NetworkManager.js'
 import type {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
 import {DriversManager} from './driver/DriversManager.js'
 import {AppManager} from './application/AppManager.js'
 import {AppUiManager} from './application/AppUiManager.js'
-//import {VersionsManager} from './files/VersionsManager.js'
 
 
 export class System {
@@ -26,9 +18,6 @@ export class System {
   readonly log = new LogPublisher(
     (...p) => this.events.emit(SystemEvents.logger, ...p)
   )
-  // store some data only in memory while runtime
-  readonly memStorage = new MemStorage()
-
   // managers
   readonly packageManager: PackageManager
   readonly io: IoManager
@@ -36,14 +25,9 @@ export class System {
   readonly filesManager: FilesManager
   // It is wrapper for DB which is works with configs
   readonly configs: ConfigsManager
-  //readonly versions: VersionsManager
-  // TODO: add
-  readonly systemInfo: SystemInfoManager
   // TODO: add
   readonly permissions: PermissionsManager
   readonly services: ServicesManager
-  // TODO: add
-  readonly network: NetworkManager
   // TODO: add
   readonly apiManager: ApiManager
   readonly apps: AppManager
@@ -55,11 +39,8 @@ export class System {
     this.drivers = new DriversManager(this)
     this.filesManager = new FilesManager(this)
     this.configs = new ConfigsManager(this)
-    //this.versions = new VersionsManager(this)
-    this.systemInfo = new SystemInfoManager(this)
     this.permissions = new PermissionsManager(this)
     this.services = new ServicesManager(this)
-    this.network = new NetworkManager(this)
     this.apiManager = new ApiManager(this)
     this.apps = new AppManager(this)
     this.appsUi = new AppUiManager(this)
