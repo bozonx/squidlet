@@ -1,5 +1,5 @@
-import {pathDirname, pathJoin} from 'squidlet-lib'
-import type {LogLevel} from 'squidlet-lib'
+import {pathDirname, pathJoin} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
+import type {LogLevel} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
 import {FilesWrapper} from './FilesWrapper.js'
 
 

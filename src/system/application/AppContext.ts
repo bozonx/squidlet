@@ -1,15 +1,15 @@
 import {IndexedEventEmitter, pathJoin} from 'squidlet-lib'
 import type {Logger} from 'squidlet-lib'
 import {DRIVER_NAMES, EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/contstants.js'
-import {FilesLog} from '../files/FilesLog.js'
-import {FilesWrapper} from '../files/FilesWrapper.js'
-import {FilesReadOnly} from '../files/FilesReadOnly.js'
+import {FilesLog} from '../../helpers/wrappers/FilesLog.js'
+import {FilesWrapper} from '../../helpers/wrappers/FilesWrapper.js'
+import {FilesReadOnly} from '../../helpers/wrappers/FilesReadOnly.js'
 import type {DriversManager} from '../driver/DriversManager.js'
 import type {System} from '../System.js'
-import {FilesHome} from '../files/FilesHome.js'
+import {FilesHome} from '../../helpers/wrappers/FilesHome.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import {FilesCache} from '../files/FilesCache.js'
-import {FilesDb} from '../files/FilesDb.js'
+import {FilesCache} from '../../helpers/wrappers/FilesCache.js'
+import {FilesDb} from '../../helpers/wrappers/FilesDb.js'
 
 
 export class AppContext {

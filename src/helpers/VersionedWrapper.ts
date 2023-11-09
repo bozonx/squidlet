@@ -2,7 +2,7 @@ import { pathJoin, pathBasename, pathDirname} from 'squidlet-lib'
 import type {StatsSimplified} from '../types/io/FilesIoType.js'
 import {FilesDriver} from '../drivers/FilesDriver/FilesDriver.js'
 import {DriversManager} from '../system/driver/DriversManager.js'
-import {FilesWrapper} from '../system/files/FilesWrapper.js'
+import {FilesWrapper} from './wrappers/FilesWrapper.js'
 import type {FilesDriverType} from '../types/FilesDriverType.js'
 
 

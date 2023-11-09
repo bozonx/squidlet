@@ -1,5 +1,5 @@
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import type {DriversManager} from '../driver/DriversManager.js'
+import type {DriversManager} from '../../system/driver/DriversManager.js'
 
 
 export class FilesDb {
