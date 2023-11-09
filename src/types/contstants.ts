@@ -133,3 +133,10 @@ export const DRIVER_NAMES = {
   WsClientDriver: 'WsClientDriver',
   WsServerDriver: 'WsServerDriver',
 }
+
+// system services which have api
+export const SYSTEM_SERVICE_NAMES = {
+  Network: 'Network',
+  PublicApiService: 'PublicApiService',
+  Sessions: 'Sessions',
+}

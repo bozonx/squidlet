@@ -2,10 +2,14 @@ import {deepGet, deepSet} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
-import {
-  DRIVER_NAMES
-} from '../../types/contstants.js'
+import {DRIVER_NAMES, LOCAL_HOST, SYSTEM_SERVICE_NAMES} from '../../types/contstants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
+
+
+export interface PublicApiServiceApi {
+  callMethod(host: string | undefined, pathToMethod: string, ...args: any[]): Promise<any>
+  registerNode(nodePath: string, item: Record<string, any> | Function, accessToken?: string): void
+}
 
 
 export const PublicApiServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
@@ -24,12 +28,13 @@ export class PublicApiService extends ServiceBase {
 
 
   props: ServiceProps = {
-    requireDriver: [DRIVER_NAMES.WsServerDriver],
+    // TODO: require service network
+    //requireDriver: [DRIVER_NAMES.WsServerDriver],
     ...super.props,
   }
 
 
-  getApi(): Record<string, any> {
+  getApi(): PublicApiServiceApi {
     return {
       callMethod: this.callMethod.bind(this),
       registerNode: this.registerNode.bind(this),
@@ -52,19 +57,31 @@ export class PublicApiService extends ServiceBase {
   }
 
 
-  async callMethod(pathToMethod: string, ...args: any[]): Promise<any> {
+  async callMethod(hostId: string | undefined, pathToMethod: string, ...args: any[]): Promise<any> {
     // TODO: валидировать - не должно быть ф-и, классов, символов в аргументах в глубине
 
-    const node = deepGet(this.nodes, pathToMethod)
+    if (!hostId) {
+      // TODO: либо хост тот же что и мой
+      //  - спросить systemInfoService через контекст
 
-    if (node) throw new Error(`Node ${node} doesn't exist.`)
-    else if (typeof node !== 'function') throw new Error(`Node ${node} is not function.`)
+      const node = deepGet(this.nodes, pathToMethod)
 
-    const result = await node(...args)
+      if (node) throw new Error(`Node ${node} doesn't exist.`)
+      else if (typeof node !== 'function') throw new Error(`Node ${node} is not function.`)
 
-    // TODO: валидировать что в результате не должно быть не нужных типов в глубине
+      const result = await node(...args)
 
-    return result
+      // TODO: валидировать что в результате не должно быть не нужных типов в глубине
+
+      return result
+    }
+    else {
+      // remote call
+      const network = this.ctx.getServiceApi(SYSTEM_SERVICE_NAMES.Network)
+
+
+      // TODO: call network
+    }
   }
 
   /**
