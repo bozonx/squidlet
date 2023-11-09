@@ -10,7 +10,8 @@ import type {
   NetworkSendRequest,
   NetworkSendResponse,
 } from '../../types/Network.js'
-import {Connections, ConnectionsIncomeMsgHandler} from './Connections.js'
+import {Connections} from './Connections.js'
+import type {ConnectionsIncomeMsgHandler} from './Connections.js'
 import {NETWORK_CODES, REQUEST_ID_LENGTH} from '../../types/constants.js'
 
 
@@ -99,24 +100,20 @@ export class NetworkService extends ServiceBase {
       // TODO: timeout of waiting
 
       const handlerIndex = this.incomeMessages
-        .addListener((incomeMsg: NetworkIncomeRequest) => {
-          this.incomeMessages.removeListener(handlerIndex)
-
+        .addListener((incomeMsg: NetworkIncomeRequest | NetworkIncomeResponse) => {
           if (incomeMsg.requestId !== requestId) return
 
+          this.incomeMessages.removeListener(handlerIndex)
 
-          // TODO: если ошибка то не поднимаем??
+          resolve(incomeMsg as NetworkIncomeResponse)
 
-          return {
-            ...request,
-            fromHostId: '',
-            requestId,
-            routeHosts: [],
-            code: 0,
-            payload: '' as any
-          }
+          // TODO: надо ли отправить что всё дошло??? или это уже выше делается?
+
+          // this.sendResponseStatus({
+          //   code: NETWORK_CODES.success
+          // })
+          //   .catch((e) => this.ctx.log.error(String(e)))
         })
-
     })
   }
 
