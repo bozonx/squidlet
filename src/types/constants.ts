@@ -33,6 +33,16 @@ export enum ServiceEvents {
   status,
 }
 
+export enum NETWORK_CODES {
+  success,
+  badRequest,
+  // error of remote method
+  payloadHandlerError,
+  // error while request or response process
+  fatalError,
+  noCategory,
+}
+
 // real root dirs
 export const ROOT_DIRS = {
   // ro app files

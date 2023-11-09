@@ -6,10 +6,15 @@
 
 import {serializeJson} from 'squidlet-lib'
 import {NetworkService} from './NetworkService.js'
-import type {NetworkIncomeRequest, NetworkSendRequest} from '../../types/Network.js'
+import type {
+  NetworkIncomeRequest,
+  NetworkMessageBase,
+  NetworkSendRequest
+} from '../../types/Network.js'
+import type {NetworkIncomeResponse} from '../../types/Network.js'
 
 
-export type ConnectionsIncomeMsgHandler = () => void
+export type ConnectionsIncomeMsgHandler = (incomeMsg: NetworkIncomeRequest | NetworkIncomeResponse) => void
 
 
 export class Connections {
@@ -29,9 +34,11 @@ export class Connections {
 
     // TODO: слушать все интерфейсы
     // TODO: call incomeMsgHandler
+    // TODO: проверить что это мое сообщение для network а не для чего-то ещё
   }
 
   async stop(force?: boolean) {
+    delete this.incomeMsgHandler
   }
 
 
@@ -41,7 +48,7 @@ export class Connections {
    * Promise will be fulfilled when IO send data
    * @param request
    */
-  async send(request: NetworkSendRequest): Promise<void> {
+  async send(request: NetworkSendRequest & Pick<NetworkMessageBase, 'requestId'>): Promise<void> {
     const msg: NetworkIncomeRequest = {
       // TODO: get my id
       fromHostId: '',
@@ -49,17 +56,18 @@ export class Connections {
       routeHosts: [],
       category: request.category,
       requestId: request.requestId,
+
+      // TODO: может быть undefined
       payload: serializeJson(request.payload),
     }
-    const serialized = serializeJson(msg)
 
-    await this.pushToConnection(request.toHostId, serialized)
+    await this.pushToConnection(request.toHostId, serializeJson(msg))
   }
 
 
   private async pushToConnection(toHostId: string, msgBin: Uint8Array): Promise<void> {
     // TODO: resolve nearest host and connection
-
+    // TODO: send message to selected connection
   }
 
 }

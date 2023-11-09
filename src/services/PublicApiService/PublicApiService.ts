@@ -2,7 +2,7 @@ import {deepGet, deepSet} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
-import {SYSTEM_SERVICE_NAMES} from '../../types/constants.js'
+import {NETWORK_CODES, SYSTEM_SERVICE_NAMES} from '../../types/constants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {NetworkServiceApi} from '../Network/NetworkService.js'
 import type {NetworkIncomeRequest} from '../../types/Network.js'
@@ -29,7 +29,6 @@ export interface PublicApiServiceCfg {
 export const DEFAULT_PUBLIC_API_SERVICE_CFG = {
 }
 export const PUBLIC_API_CATEGORY = 'PUBLIC_API'
-export const PUBLIC_API_METHOD_ERROR_CODE = 2
 
 export class PublicApiService extends ServiceBase {
   private cfg!: PublicApiServiceCfg
@@ -75,12 +74,12 @@ export class PublicApiService extends ServiceBase {
 
           try {
             payload = await this.callLocalMethod(
-              request.payload.method,
-              request.payload.args
+              request.payload?.method,
+              request.payload?.args
             )
           }
           catch (e) {
-            code = PUBLIC_API_METHOD_ERROR_CODE
+            code = NETWORK_CODES.payloadHandlerError
             error = String(e)
           }
 
@@ -164,7 +163,9 @@ export class PublicApiService extends ServiceBase {
   //
   // }
 
-  private async callLocalMethod(pathToMethod: string, ...args: any[]): Promise<any> {
+  private async callLocalMethod(pathToMethod: string | undefined, ...args: any[]): Promise<any> {
+    if (!pathToMethod) throw new Error(`Path to method "${pathToMethod}" is empty.`)
+
     const method = deepGet(this.nodes, pathToMethod)
 
     if (method) throw new Error(`Node ${method} doesn't exist.`)

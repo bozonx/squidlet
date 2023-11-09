@@ -8,23 +8,23 @@ export interface NetworkMessageBase {
 }
 
 export interface NetworkIncomeRequest<T = any> extends NetworkMessageBase {
-  payload: T
+  payload?: T
 }
 
-export interface NetworkIncomeResponse<T> extends NetworkMessageBase, NetworkResponseStatus {
-  payload: T
+export interface NetworkIncomeResponse<T = any> extends NetworkMessageBase, NetworkResponseStatus {
+  payload?: T
 }
 
 export interface NetworkSendRequest
   extends Pick<NetworkMessageBase, 'toHostId' | 'category'>
 {
-  payload: Record<string, any>
+  payload?: Record<string, any>
 }
 
 export interface NetworkSendResponse
   extends Pick<NetworkMessageBase, 'toHostId' | 'category' | 'requestId'>, NetworkResponseStatus
 {
-  payload: Record<string, any>
+  payload?: Record<string, any>
 }
 
 export interface NetworkResponseStatus {

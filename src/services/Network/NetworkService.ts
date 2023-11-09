@@ -1,4 +1,4 @@
-import {makeUniqId} from 'squidlet-lib'
+import {IndexedEvents, makeUniqId} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
@@ -10,8 +10,8 @@ import type {
   NetworkSendRequest,
   NetworkSendResponse,
 } from '../../types/Network.js'
-import {Connections} from './Connections.js'
-import {REQUEST_ID_LENGTH} from '../../types/constants.js'
+import {Connections, ConnectionsIncomeMsgHandler} from './Connections.js'
+import {NETWORK_CODES, REQUEST_ID_LENGTH} from '../../types/constants.js'
 
 
 export interface NetworkServiceApi {
@@ -37,7 +37,8 @@ export class NetworkService extends ServiceBase {
   private cfg!: NetworkServiceCfg
   private categoriesHandlers: Record<string, CategoryHandler> = {}
   private readonly connections = new Connections(this)
-
+  private readonly incomeMessages =
+    new IndexedEvents<ConnectionsIncomeMsgHandler>()
 
   props: ServiceProps = {
     //requireDriver: [DRIVER_NAMES.WsServerDriver],
@@ -87,24 +88,36 @@ export class NetworkService extends ServiceBase {
     const requestId = makeUniqId(REQUEST_ID_LENGTH)
 
     // TODO: validate message - only supported types
-    // TODO: make request id
-    // TODO: check if handlerId exists
-    // TODO: make network message
-    // TODO: serialize
-    // TODO: resolve nearest host and connection
-    // TODO: send message to selected connection
-    // TODO: wait for response
-    // TODO: timeout of waiting
 
-
-    return {
+    await this.connections.send({
       ...request,
-      fromHostId: '',
-      requestId: '',
-      routeHosts: [],
-      code: 0,
-      payload: '' as any
-    }
+      requestId,
+    })
+
+    return new Promise((resolve, reject) => {
+
+      // TODO: timeout of waiting
+
+      const handlerIndex = this.incomeMessages
+        .addListener((incomeMsg: NetworkIncomeRequest) => {
+          this.incomeMessages.removeListener(handlerIndex)
+
+          if (incomeMsg.requestId !== requestId) return
+
+
+          // TODO: если ошибка то не поднимаем??
+
+          return {
+            ...request,
+            fromHostId: '',
+            requestId,
+            routeHosts: [],
+            code: 0,
+            payload: '' as any
+          }
+        })
+
+    })
   }
 
   async sendResponse(response: NetworkSendResponse): Promise<NetworkResponseStatus> {
@@ -114,7 +127,8 @@ export class NetworkService extends ServiceBase {
     // TODO: ожидать с таймаутом response
 
     return {
-      code: 0,
+      code: response.code,
+      error: response.error,
     }
   }
 
@@ -143,8 +157,19 @@ export class NetworkService extends ServiceBase {
   }
 
 
-  private incomeConnectionMsgHandler = () => {
+  private incomeConnectionMsgHandler = (incomeMsg: NetworkIncomeRequest | NetworkIncomeResponse) => {
+    if (this.categoriesHandlers[incomeMsg.category]) {
+      return this.incomeMessages.emit(incomeMsg)
+    }
 
+    this.sendResponse({
+      toHostId: incomeMsg.fromHostId,
+      category: incomeMsg.category,
+      requestId: incomeMsg.requestId,
+      code: NETWORK_CODES.noCategory,
+      error: `Host "${incomeMsg.toHostId}" doesn't have a category "${incomeMsg.category}" handler`,
+    })
+      .catch((e) => this.ctx.log.error(String(e)))
   }
 
 }
