@@ -1,4 +1,4 @@
-import {AppBase} from '../../system/application/AppBase.js'
+import {AppBase} from '../../base/AppBase.js'
 
 
 export class FilemanApp extends AppBase {

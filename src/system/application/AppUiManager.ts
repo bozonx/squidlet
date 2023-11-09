@@ -1,6 +1,9 @@
 import type {System} from '../System.js'
 
 
+// TODO: может вынести в серсис???
+
+
 export class AppUiManager {
   private system: System
   // {appName: staticFilesPaths[]}

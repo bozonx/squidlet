@@ -18,7 +18,7 @@ import type {
   HttpServerIoType,
   HttpServerProps,
 } from '../../types/io/HttpServerIoType.js'
-import {IoBase} from '../../system/Io/IoBase.js'
+import {IoBase} from '../../base/IoBase.js'
 import {SERVER_STARTING_TIMEOUT_SEC} from '../../types/contstants.js'
 
 

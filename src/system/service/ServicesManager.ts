@@ -2,7 +2,7 @@ import {arraysDifference} from 'squidlet-lib'
 import type {System} from '../System.js'
 import {ServiceContext} from './ServiceContext.js'
 import type {ServiceDestroyReason, ServiceIndex, ServiceStatus, SubprogramError} from '../../types/types.js'
-import type {ServiceBase} from './ServiceBase.js'
+import type {ServiceBase} from '../../base/ServiceBase.js'
 import {
   EVENT_DELIMITER,
   RootEvents,

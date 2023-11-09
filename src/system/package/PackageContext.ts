@@ -1,7 +1,7 @@
 import type {IndexedEventEmitter, Logger} from 'squidlet-lib'
 import type {System} from '../System.js'
 import type {AppIndex, DriverIndex, ServiceIndex} from '../../types/types.js'
-import type {IoSetBase} from '../Io/IoSetBase.js'
+import type {IoSetBase} from '../../base/IoSetBase.js'
 
 
 export class PackageContext {

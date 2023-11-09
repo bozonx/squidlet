@@ -4,7 +4,7 @@ import type SysHaltIoType from '../../types/io/SysHaltIoType.js'
 import {WAIT_BEFORE_HALT_MS} from '../../types/contstants.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'
-import {IoBase} from '../../system/Io/IoBase.js'
+import {IoBase} from '../../base/IoBase.js'
 
 
 export const SysHaltIoIndex: IoIndex = (ctx: IoContext) => {

@@ -4,7 +4,7 @@ import {IoManager} from './Io/IoManager.js'
 import {ServicesManager} from './service/ServicesManager.js'
 import {ApiManager} from './managers/ApiManager.js'
 import {FilesManager} from './managers/FilesManager.js'
-import {ConfigsManager} from './config/ConfigsManager.js'
+import {ConfigsManager} from './managers/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
 import type {PackageIndex} from '../types/types.js'
 import {PackageManager} from './package/PackageManager.js'
@@ -19,31 +19,21 @@ export class System {
     (...p) => this.events.emit(SystemEvents.logger, ...p)
   )
   // managers
-  readonly packageManager: PackageManager
-  readonly io: IoManager
-  readonly drivers: DriversManager
-  readonly filesManager: FilesManager
+  readonly packageManager = new PackageManager(this)
+  readonly io = new IoManager(this)
+  readonly drivers = new DriversManager(this)
+  readonly filesManager = new FilesManager(this)
   // It is wrapper for DB which is works with configs
-  readonly configs: ConfigsManager
+  readonly configs = new ConfigsManager(this)
   // TODO: add
-  readonly permissions: PermissionsManager
-  readonly services: ServicesManager
+  readonly permissions = new PermissionsManager(this)
+  readonly services = new ServicesManager(this)
   // TODO: add
-  readonly apiManager: ApiManager
-  readonly apps: AppManager
-  readonly appsUi: AppUiManager
+  readonly apiManager = new ApiManager(this)
+  readonly apps = new AppManager(this)
+  readonly appsUi = new AppUiManager(this)
 
   constructor() {
-    this.packageManager = new PackageManager(this)
-    this.io = new IoManager(this)
-    this.drivers = new DriversManager(this)
-    this.filesManager = new FilesManager(this)
-    this.configs = new ConfigsManager(this)
-    this.permissions = new PermissionsManager(this)
-    this.services = new ServicesManager(this)
-    this.apiManager = new ApiManager(this)
-    this.apps = new AppManager(this)
-    this.appsUi = new AppUiManager(this)
   }
 
 
@@ -53,11 +43,8 @@ export class System {
       await this.drivers.init()
       await this.filesManager.init()
       await this.configs.init()
-      //await this.versions.init()
-      await this.systemInfo.init()
       await this.permissions.init()
       await this.services.init()
-      await this.network.init()
       // load all the installed packages
       await this.packageManager.loadInstalled()
       await this.apps.init()
@@ -72,7 +59,7 @@ export class System {
   destroy() {
     this.events.emit(SystemEvents.systemDestroying)
 
-    // TODO: add timeout for each
+    // TODO: add timeout for each item
 
     const destroyWrapper = (fn: () => Promise<void>): Promise<void> => {
       return callSafely(fn).catch((e) => this.log.error(String(e)))
@@ -80,10 +67,8 @@ export class System {
     // it will call destroy functions step by step
     Promise.allSettled([
       destroyWrapper(this.apps.destroy.bind(this.apps)),
-      destroyWrapper(this.network.destroy.bind(this.network)),
       destroyWrapper(this.services.destroy.bind(this.services)),
       destroyWrapper(this.permissions.destroy.bind(this.permissions)),
-      destroyWrapper(this.systemInfo.destroy.bind(this.systemInfo)),
       destroyWrapper(this.drivers.destroy.bind(this.drivers)),
       destroyWrapper(this.io.destroy.bind(this.io)),
       destroyWrapper(this.packageManager.destroy.bind(this.packageManager)),

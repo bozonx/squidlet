@@ -1,6 +1,6 @@
 import type {System} from '../System.js'
 import type {DriverIndex} from '../../types/types.js'
-import type {DriverBase} from './DriverBase.js'
+import type {DriverBase} from '../../base/DriverBase.js'
 import {DriverContext} from './DriverContext.js'
 
 

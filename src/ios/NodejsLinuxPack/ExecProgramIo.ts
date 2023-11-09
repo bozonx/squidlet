@@ -1,4 +1,4 @@
-import {IoBase} from '../../system/Io/IoBase.js'
+import {IoBase} from '../../base/IoBase.js'
 
 
 /**

@@ -3,7 +3,7 @@ import {DEFAULT_ENCODE, IndexedEvents, makeUniqNumber, callPromised} from 'squid
 import type {HttpRequest, HttpResponse} from 'squidlet-lib'
 import {HttpServerEvent} from '../../types/io/HttpServerIoType.js'
 import type {HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
-import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
+import {ServerIoBase} from '../../base/ServerIoBase.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'
 

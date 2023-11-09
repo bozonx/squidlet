@@ -1,13 +1,13 @@
 import type {PackageContext} from '../system/package/PackageContext.js'
 import type {DriverContext} from '../system/driver/DriverContext.js'
-import type {DriverBase} from '../system/driver/DriverBase.js'
-import type {IoBase} from '../system/Io/IoBase.js'
-import type {ServiceBase} from '../system/service/ServiceBase.js'
+import type {DriverBase} from '../base/DriverBase.js'
+import type {IoBase} from '../base/IoBase.js'
+import type {ServiceBase} from '../base/ServiceBase.js'
 import type {ServiceContext} from '../system/service/ServiceContext.js'
 import type {IoContext} from '../system/Io/IoContext.js'
 import type {SERVICE_DESTROY_REASON, SERVICE_STATUS} from './contstants.js'
 import {AppContext} from '../system/application/AppContext.js'
-import type {AppBase} from '../system/application/AppBase.js'
+import type {AppBase} from '../base/AppBase.js'
 
 
 // It is called right after it is set to system via use()

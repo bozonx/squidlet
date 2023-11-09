@@ -1,6 +1,6 @@
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/service/ServiceContext.js'
-import {ServiceBase} from '../../system/service/ServiceBase.js'
+import {ServiceBase} from '../../base/ServiceBase.js'
 import {
   DRIVER_NAMES
 } from '../../types/contstants.js'

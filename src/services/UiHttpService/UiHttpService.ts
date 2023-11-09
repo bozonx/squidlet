@@ -8,7 +8,7 @@ import {
 } from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/service/ServiceContext.js'
-import {ServiceBase} from '../../system/service/ServiceBase.js'
+import {ServiceBase} from '../../base/ServiceBase.js'
 import type {HttpServerDriver, HttpServerInstance} from '../../drivers/HttpServerDriver/HttpServerDriver.js'
 import {
   APP_FILES_PUBLIC_DIR,

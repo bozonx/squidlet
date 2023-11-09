@@ -1,6 +1,6 @@
 import type {System} from '../System.js'
 import {AppContext} from './AppContext.js'
-import type {AppBase} from './AppBase.js'
+import type {AppBase} from '../../base/AppBase.js'
 import type {AppIndex} from '../../types/types.js'
 
 

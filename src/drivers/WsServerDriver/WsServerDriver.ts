@@ -1,7 +1,7 @@
 import {Promised, IndexedEventEmitter} from 'squidlet-lib'
 import type {DriverIndex} from '../../types/types.js'
 import type {DriverContext} from '../../system/driver/DriverContext.js'
-import DriverFactoryBase from '../../system/driver/DriverFactoryBase.js'
+import DriverFactoryBase from '../../base/DriverFactoryBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
 import {WsServerEvent} from '../../types/io/WsServerIoType.js'
 import type {
@@ -9,7 +9,7 @@ import type {
   WsServerIoFullType,
   WsServerProps,
 } from '../../types/io/WsServerIoType.js'
-import DriverInstanceBase from '../../system/driver/DriverInstanceBase.js'
+import DriverInstanceBase from '../../base/DriverInstanceBase.js'
 
 
 // TODO: а оно надо??? может лучше сессию использовать?

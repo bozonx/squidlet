@@ -4,7 +4,7 @@ import {callPromised, convertBufferToUint8Array} from 'squidlet-lib'
 import {WsServerEvent} from '../../types/io/WsServerIoType.js'
 import type {WsServerConnectionParams, WsServerIoType, WsServerProps} from '../../types/io/WsServerIoType.js'
 import type {WsCloseStatus} from '../../types/io/WsClientIoType.js'
-import {ServerIoBase} from '../../system/Io/ServerIoBase.js'
+import {ServerIoBase} from '../../base/ServerIoBase.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'
 

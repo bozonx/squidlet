@@ -1,6 +1,6 @@
 import type {DriverContext} from '../../system/driver/DriverContext.js'
 import type {DriverIndex} from '../../types/types.js'
-import {DriverBase} from '../../system/driver/DriverBase.js'
+import {DriverBase} from '../../base/DriverBase.js'
 
 
 export const WsClientDriverIndex: DriverIndex = (ctx: DriverContext) => {

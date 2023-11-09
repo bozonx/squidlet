@@ -1,5 +1,5 @@
 import type {HttpRequest, HttpResponse} from 'squidlet-lib'
-import type {IoBase} from '../../system/Io/IoBase.js'
+import type {IoBase} from '../../base/IoBase.js'
 
 
 export enum HttpServerEvent {

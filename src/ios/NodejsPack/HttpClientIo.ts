@@ -2,7 +2,7 @@ import axios from 'axios'
 import type {AxiosResponse} from 'axios'
 import type {HttpClientIoType} from '../../types/io/HttpClientIoType.js'
 import type {HttpRequest, HttpResponse} from 'squidlet-lib'
-import {IoBase} from '../../system/Io/IoBase.js'
+import {IoBase} from '../../base/IoBase.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/Io/IoContext.js'
 

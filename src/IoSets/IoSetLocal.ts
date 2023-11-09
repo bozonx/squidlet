@@ -1,6 +1,6 @@
 import type {IoIndex, PackageIndex} from '../types/types.js'
 import type {PackageContext} from '../system/package/PackageContext.js'
-import {IoSetBase} from '../system/Io/IoSetBase.js'
+import {IoSetBase} from '../base/IoSetBase.js'
 
 
 export function ioSetLocalPkg (ios: IoIndex[]): PackageIndex {
