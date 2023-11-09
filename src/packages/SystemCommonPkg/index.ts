@@ -17,8 +17,8 @@ export function SystemCommonPkg (): PackageIndex {
     ctx.useDriver(HttpServerDriverIndex)
     ctx.useDriver(WsClientDriverIndex)
     ctx.useDriver(WsServerDriverIndex)
+    ctx.useService(SessionsServiceIndex)
     ctx.useService(NetworkServiceIndex)
     ctx.useService(PublicApiServiceIndex)
-    ctx.useService(SessionsServiceIndex)
   }
 }

@@ -56,6 +56,14 @@ export class AppContext {
     return this.system.events
   }
 
+  getServiceApi(serviceName: string): Record<string, any> | undefined {
+    return this.system.services.getServiceApi(serviceName)
+  }
+
+  getAppApi(appName: string): Record<string, any> | undefined {
+    return this.system.apps.getAppApi(appName)
+  }
+
 
   constructor(system: System, appName: string) {
     this.appName = appName

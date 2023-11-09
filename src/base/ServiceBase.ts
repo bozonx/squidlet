@@ -29,6 +29,13 @@ export abstract class ServiceBase {
 
   destroy?(reason: ServiceDestroyReason): Promise<void>
 
+  /**
+   * Public local api of service.
+   * Put here only api which is accessible on local machine.
+   * For api which is accessible on network use PublicApiService
+   */
+  getApi?(): Record<string, any>
+
   abstract start(): Promise<void>
   abstract stop(force?: boolean): Promise<void>
 

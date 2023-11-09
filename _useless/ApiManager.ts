@@ -1,4 +1,4 @@
-import type {System} from '../System.js'
+import type {System} from '../src/system/System.js'
 
 
 export type ApiFunction = (...p: any[]) => Promise<void>

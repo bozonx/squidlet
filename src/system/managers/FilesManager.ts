@@ -1,4 +1,3 @@
-import {pathJoin} from 'squidlet-lib'
 import type {System} from '../System.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 import {

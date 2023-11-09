@@ -2,9 +2,8 @@ import {callSafely, IndexedEventEmitter, LogPublisher} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
 import {IoManager} from './managers/IoManager.js'
 import {ServicesManager} from './managers/ServicesManager.js'
-import {ApiManager} from './managers/ApiManager.js'
 import {FilesManager} from './managers/FilesManager.js'
-import {ConfigsManager} from './managers/ConfigsManager.js'
+import {SystemConfigsManager} from './managers/SystemConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
 import type {PackageIndex} from '../types/types.js'
 import {PackageManager} from './managers/PackageManager.js'
@@ -24,14 +23,12 @@ export class System {
   readonly drivers = new DriversManager(this)
   readonly filesManager = new FilesManager(this)
   // It is wrapper for DB which is works with configs
-  readonly configs = new ConfigsManager(this)
-  // TODO: add
+  readonly configs = new SystemConfigsManager(this)
   readonly permissions = new PermissionsManager(this)
   readonly services = new ServicesManager(this)
-  // TODO: add
-  readonly apiManager = new ApiManager(this)
   readonly apps = new AppManager(this)
   readonly appsUi = new AppUiManager(this)
+
 
   constructor() {
   }

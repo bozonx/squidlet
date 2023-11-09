@@ -1,3 +1,5 @@
+
+// TODO: не импортировать??? есть ли там nodejs зависимости???
 import yaml from 'yaml'
 import {pathJoin, mergeDeepObjects} from 'squidlet-lib'
 import type {System} from '../System.js'
@@ -12,13 +14,12 @@ import {
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 
-
 export function makeYamlString(obj: any): string {
   return yaml.stringify(obj)
 }
 
 
-export class ConfigsManager {
+export class SystemConfigsManager {
   systemCfg: SystemCfg = systemCfgDefaults
 
   private readonly system: System

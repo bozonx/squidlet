@@ -26,4 +26,10 @@ export abstract class AppBase {
   init?(cfg?: Record<string, any>): Promise<void>
   destroy?(): Promise<void>
 
+  /**
+   * Public local api of app.
+   * Put here only api which is accessible on local machine.
+   * For api which is accessible on network use PublicApiService
+   */
+  getApi?(): Record<string, any>
 }
