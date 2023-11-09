@@ -12,6 +12,7 @@ import {HttpClientIoIndex} from '../../ios/NodejsPack/HttpClientIo.js'
 import {HttpServerIoIndex} from '../../ios/NodejsPack/HttpServerIo.js'
 import {WsClientIoIndex} from '../../ios/NodejsPack/WsClientIo.js'
 import {WsServerIoIndex} from '../../ios/NodejsPack/WsServerIo.js'
+import {SystemExtraPkg} from '../../packages/SystemExtraPkg/index.js'
 
 
 export function startSystem(middleware?: (system: System) => void) {
@@ -28,6 +29,7 @@ export function startSystem(middleware?: (system: System) => void) {
   ]))
   system.use(ConsoleLoggerPkg({logLevel: LOG_LEVELS.debug as LogLevel}))
   system.use(SystemCommonPkg())
+  system.use(SystemExtraPkg())
   system.use(SystemWithUiPkg())
 
   middleware?.(system)

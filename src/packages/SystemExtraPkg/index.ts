@@ -1,0 +1,10 @@
+import type {PackageContext} from '../../system/package/PackageContext.js'
+import type {PackageIndex} from '../../types/types.js'
+import {CtrlServiceIndex} from '../../services/CtrlService/CtrlService.js'
+
+
+export function SystemExtraPkg (): PackageIndex {
+  return (ctx: PackageContext) => {
+    ctx.useService(CtrlServiceIndex)
+  }
+}

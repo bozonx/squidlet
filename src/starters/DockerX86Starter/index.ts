@@ -4,6 +4,7 @@ import {SystemEvents} from '../../types/contstants.js'
 import {LinuxX86SystemPack} from '../../sysPackages/LinuxX86SystemPack/index.js'
 import {ConsoleLoggerPkg} from '../../packages/ConsoleLoggerPkg/index.js'
 import {SystemCommonPkg} from '../../packages/SystemCommonPkg/index.js'
+import {SystemExtraPkg} from '../../packages/SystemExtraPkg/index.js'
 import {SystemWithUiPkg} from '../../packages/SystemWithUiPkg/index.js'
 
 const logLevel: LogLevel = process.env.LOG_LEVEL as LogLevel || 'info'
@@ -14,6 +15,7 @@ const system = new System()
 system.use(ConsoleLoggerPkg({ logLevel }))
 system.use(LinuxX86SystemPack())
 system.use(SystemCommonPkg())
+system.use(SystemExtraPkg())
 system.use(SystemWithUiPkg())
 
 // init the system

@@ -5,6 +5,9 @@ import {HttpServerDriverIndex} from '../../drivers/HttpServerDriver/HttpServerDr
 import {HttpClientDriverIndex} from '../../drivers/HttpClientDriver/HttpClientDriver.js'
 import {WsClientDriverIndex} from '../../drivers/WsClientDriver/WsClientDriver.js'
 import {WsServerDriverIndex} from '../../drivers/WsServerDriver/WsServerDriver.js'
+import {NetworkServiceIndex} from '../../services/Network/NetworkService.js'
+import {PublicApiServiceIndex} from '../../services/PublicApiService/PublicApiService.js'
+import {SessionsServiceIndex} from '../../services/Sessions/SessionsService.js'
 
 
 export function SystemCommonPkg (): PackageIndex {
@@ -14,5 +17,8 @@ export function SystemCommonPkg (): PackageIndex {
     ctx.useDriver(HttpServerDriverIndex)
     ctx.useDriver(WsClientDriverIndex)
     ctx.useDriver(WsServerDriverIndex)
+    ctx.useService(NetworkServiceIndex)
+    ctx.useService(PublicApiServiceIndex)
+    ctx.useService(SessionsServiceIndex)
   }
 }
