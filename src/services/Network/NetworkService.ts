@@ -1,13 +1,17 @@
+import {makeUniqId} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {
-  NetworkIncomeRequest, NetworkIncomeResponse,
+  NetworkIncomeRequest,
+  NetworkIncomeResponse,
   NetworkResponseStatus,
-  NetworkSendRequest, NetworkSendResponse,
+  NetworkSendRequest,
+  NetworkSendResponse,
 } from '../../types/Network.js'
 import {Connections} from './Connections.js'
+import {REQUEST_ID_LENGTH} from '../../types/constants.js'
 
 
 export interface NetworkServiceApi {
@@ -51,7 +55,7 @@ export class NetworkService extends ServiceBase {
 
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: NetworkServiceCfg) {
-    super.init(onFall)
+    await super.init(onFall)
 
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_NETWORK_SERVICE_CFG
   }
@@ -63,7 +67,7 @@ export class NetworkService extends ServiceBase {
   }
 
   async start() {
-    await this.connections.start()
+    await this.connections.start(this.incomeConnectionMsgHandler)
   }
 
   async stop(force?: boolean) {
@@ -80,6 +84,8 @@ export class NetworkService extends ServiceBase {
    * @param request
    */
   async sendRequest<T = any>(request: NetworkSendRequest): Promise<NetworkIncomeResponse<T>> {
+    const requestId = makeUniqId(REQUEST_ID_LENGTH)
+
     // TODO: validate message - only supported types
     // TODO: make request id
     // TODO: check if handlerId exists
@@ -134,6 +140,11 @@ export class NetworkService extends ServiceBase {
     // TODO: check token
 
     delete this.categoriesHandlers[category]
+  }
+
+
+  private incomeConnectionMsgHandler = () => {
+
   }
 
 }

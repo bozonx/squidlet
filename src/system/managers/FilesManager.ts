@@ -7,7 +7,7 @@ import {
   SYSTEM_DIR,
   HOME_SUB_DIRS,
   COMMON_DIR,
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 
 
 export class FilesManager {

@@ -6,7 +6,7 @@ import {
 } from 'squidlet-lib'
 import type {UiApiRequestData} from '../services/UiWsApiService/UiWsApiService.js'
 import {makeRequestId} from '../helpers/helpers.js'
-import {DEFAULT_UI_WS_PORT} from '../types/contstants.js'
+import {DEFAULT_UI_WS_PORT} from '../types/constants.js'
 import type {ResponseMessage, RequestMessage} from '../types/Message.js'
 
 // it needs to export the port

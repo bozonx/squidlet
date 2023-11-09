@@ -3,7 +3,7 @@ import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
 import {
   DRIVER_NAMES
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
 
@@ -32,7 +32,7 @@ export class SessionsService extends ServiceBase {
 
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: SessionsServiceCfg) {
-    super.init(onFall)
+    await super.init(onFall)
 
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_SESSIONS_SERVICE_CFG
   }

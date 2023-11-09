@@ -5,7 +5,7 @@ import type {IoBase} from '../base/IoBase.js'
 import type {ServiceBase} from '../base/ServiceBase.js'
 import type {ServiceContext} from '../system/context/ServiceContext.js'
 import type {IoContext} from '../system/context/IoContext.js'
-import type {SERVICE_DESTROY_REASON, SERVICE_STATUS} from './contstants.js'
+import type {SERVICE_DESTROY_REASON, SERVICE_STATUS} from './constants.js'
 import {AppContext} from '../system/context/AppContext.js'
 import type {AppBase} from '../base/AppBase.js'
 

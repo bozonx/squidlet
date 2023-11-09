@@ -10,7 +10,7 @@ import {
   CFG_FILE_EXT,
   SYSTEM_CFG_DIR,
   SYSTEM_CONFIG_FILE,
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 

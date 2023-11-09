@@ -1,7 +1,7 @@
 import {LOG_LEVELS} from 'squidlet-lib'
 import type {LogLevel} from 'squidlet-lib'
 import {System} from '../../index.js'
-import {SystemEvents} from '../../types/contstants.js'
+import {SystemEvents} from '../../types/constants.js'
 import {ConsoleLoggerPkg} from '../../packages/ConsoleLoggerPkg/index.js'
 import {SystemCommonPkg} from '../../packages/SystemCommonPkg/index.js'
 import {SystemWithUiPkg} from '../../packages/SystemWithUiPkg/index.js'

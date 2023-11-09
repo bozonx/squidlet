@@ -2,7 +2,7 @@ import type {System} from '../System.js'
 import type {IoBase} from '../../base/IoBase.js'
 import {IoContext} from '../context/IoContext.js'
 import type {IoSetBase} from '../../base/IoSetBase.js'
-import {IO_NAMES} from '../../types/contstants.js'
+import {IO_NAMES} from '../../types/constants.js'
 
 
 export class IoManager {

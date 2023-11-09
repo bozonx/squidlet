@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import {exec} from 'node:child_process'
 import type {ExecException} from 'child_process'
 import {promisify} from 'node:util'
-import {DEFAULT_WS_CTRL_PORT, LOCAL_HOST} from '../types/contstants.js'
+import {DEFAULT_WS_CTRL_PORT, LOCAL_HOST} from '../types/constants.js'
 
 
 export const execPromise = promisify(exec)

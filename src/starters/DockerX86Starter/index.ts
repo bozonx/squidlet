@@ -1,6 +1,6 @@
 import {LogLevel} from 'squidlet-lib'
 import {System} from '../../index.js'
-import {SystemEvents} from '../../types/contstants.js'
+import {SystemEvents} from '../../types/constants'
 import {LinuxX86SystemPack} from '../../sysPackages/LinuxX86SystemPack/index.js'
 import {ConsoleLoggerPkg} from '../../packages/ConsoleLoggerPkg/index.js'
 import {SystemCommonPkg} from '../../packages/SystemCommonPkg/index.js'

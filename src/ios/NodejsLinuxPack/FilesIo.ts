@@ -9,7 +9,7 @@ import type {FilesIoConfig, StatsSimplified} from '../../types/io/FilesIoType.js
 import {IoBase} from '../../base/IoBase.js'
 import type {IoIndex} from '../../types/types.js'
 import type {IoContext} from '../../system/context/IoContext.js'
-import {EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/contstants.js'
+import {EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/constants.js'
 
 
 export const execPromise = promisify(exec)

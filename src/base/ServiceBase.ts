@@ -1,6 +1,6 @@
 import type {ServiceContext} from '../system/context/ServiceContext.js'
 import type {ServiceDestroyReason, SubprogramError} from '../types/types.js'
-import {SERVICE_TARGETS} from '../types/contstants.js'
+import {SERVICE_TARGETS} from '../types/constants.js'
 import type {ServiceProps} from '../types/ServiceProps.js'
 
 

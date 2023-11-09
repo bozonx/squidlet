@@ -5,7 +5,7 @@ import type {DriverContext} from '../../system/context/DriverContext.js'
 import type {DriverIndex} from '../../types/types.js'
 import DriverFactoryBase from '../../base/DriverFactoryBase.js'
 import DriverInstanceBase from '../../base/DriverInstanceBase.js'
-import {IO_NAMES} from '../../types/contstants.js'
+import {IO_NAMES} from '../../types/constants.js'
 import {
   HttpServerEvent,
 } from '../../types/io/HttpServerIoType.js'
@@ -111,7 +111,7 @@ export class HttpServerDriver extends DriverFactoryBase<HttpServerInstance, Http
   protected SubDriverClass = HttpServerInstance
 
   async init(cfg?: Record<string, any>) {
-    super.init(cfg)
+    await super.init(cfg)
 
     const httpServerIo = this.ctx.io
       .getIo<HttpServerIoFullType>(IO_NAMES.HttpServerIo)

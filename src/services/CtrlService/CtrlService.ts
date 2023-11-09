@@ -5,7 +5,7 @@ import {ServiceBase} from '../../base/ServiceBase.js'
 import {
   DEFAULT_WS_CTRL_PORT,
   DRIVER_NAMES, LOCAL_HOST,
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
 import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
@@ -43,7 +43,7 @@ export class CtrlService extends ServiceBase {
 
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: CtrlServiceCfg) {
-    super.init(onFall)
+    await super.init(onFall)
 
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_CTRL_SERVICE_CFG
 

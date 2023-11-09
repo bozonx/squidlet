@@ -16,7 +16,7 @@ import {
   DRIVER_NAMES,
   LOCAL_HOST,
   ROOT_DIRS,
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 import type {HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {HttpDriverRequest, HttpDriverResponse} from '../../drivers/HttpServerDriver/HttpServerDriverLogic.js'
@@ -56,7 +56,7 @@ export class UiHttpService extends ServiceBase {
 
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: UiHttpServiceCfg) {
-    super.init(onFall)
+    await super.init(onFall)
 
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_UI_HTTP_SERVICE_CFG
 

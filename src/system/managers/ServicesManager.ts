@@ -9,7 +9,7 @@ import {
   SERVICE_DESTROY_REASON,
   SERVICE_STATUS,
   ServiceEvents,
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 
 
 //const SERVICE_CONFIG_FILE_NAME = 'index.yml'

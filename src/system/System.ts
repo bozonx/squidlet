@@ -1,5 +1,5 @@
 import {callSafely, IndexedEventEmitter, LogPublisher} from 'squidlet-lib'
-import {SystemEvents} from '../types/contstants.js'
+import {SystemEvents} from '../types/constants.js'
 import {IoManager} from './managers/IoManager.js'
 import {ServicesManager} from './managers/ServicesManager.js'
 import {FilesManager} from './managers/FilesManager.js'

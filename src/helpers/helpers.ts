@@ -1,5 +1,5 @@
 import {makeUniqId} from 'squidlet-lib'
-import {REQUEST_ID_LENGTH} from '../types/contstants.js'
+import {REQUEST_ID_LENGTH} from '../types/constants.js'
 
 
 export interface RequestError {

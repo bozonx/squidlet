@@ -5,7 +5,7 @@ import {ServiceBase} from '../../base/ServiceBase.js'
 import {
   DEFAULT_UI_WS_PORT,
   DRIVER_NAMES, LOCAL_HOST,
-} from '../../types/contstants.js'
+} from '../../types/constants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {WsServerConnectionParams, WsServerProps} from '../../types/io/WsServerIoType.js'
 import type {WsServerDriver, WsServerInstance} from '../../drivers/WsServerDriver/WsServerDriver.js'
@@ -46,7 +46,7 @@ export class UiWsApiService extends ServiceBase {
 
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: UiWsApiServiceCfg) {
-    super.init(onFall)
+    await super.init(onFall)
 
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_UI_WS_SERVICE_CFG
 

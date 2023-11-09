@@ -2,7 +2,7 @@ import {Promised, IndexedEventEmitter} from 'squidlet-lib'
 import type {DriverIndex} from '../../types/types.js'
 import type {DriverContext} from '../../system/context/DriverContext.js'
 import DriverFactoryBase from '../../base/DriverFactoryBase.js'
-import {IO_NAMES} from '../../types/contstants.js'
+import {IO_NAMES} from '../../types/constants.js'
 import {WsServerEvent} from '../../types/io/WsServerIoType.js'
 import type {
   WsServerConnectionParams,
@@ -229,7 +229,7 @@ export class WsServerDriver extends DriverFactoryBase<WsServerInstance, WsServer
   protected SubDriverClass = WsServerInstance
 
   async init(cfg?: Record<string, any>) {
-    super.init(cfg)
+    await super.init(cfg)
 
     const wsServerIo = this.ctx.io
       .getIo<WsServerIoFullType>(IO_NAMES.WsServerIo)

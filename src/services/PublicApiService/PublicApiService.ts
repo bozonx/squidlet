@@ -2,7 +2,7 @@ import {deepGet, deepSet} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
-import {SYSTEM_SERVICE_NAMES} from '../../types/contstants.js'
+import {SYSTEM_SERVICE_NAMES} from '../../types/constants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
 import type {NetworkServiceApi} from '../Network/NetworkService.js'
 import type {NetworkIncomeRequest} from '../../types/Network.js'
@@ -51,7 +51,7 @@ export class PublicApiService extends ServiceBase {
   }
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: PublicApiServiceCfg) {
-    super.init(onFall)
+    await super.init(onFall)
 
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_PUBLIC_API_SERVICE_CFG
   }

@@ -1,6 +1,6 @@
 import {IndexedEventEmitter, pathJoin} from 'squidlet-lib'
 import type {Logger} from 'squidlet-lib'
-import {DRIVER_NAMES, EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/contstants.js'
+import {DRIVER_NAMES, EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/constants.js'
 import {FilesLog} from '../../helpers/wrappers/FilesLog.js'
 import {FilesWrapper} from '../../helpers/wrappers/FilesWrapper.js'
 import {FilesReadOnly} from '../../helpers/wrappers/FilesReadOnly.js'

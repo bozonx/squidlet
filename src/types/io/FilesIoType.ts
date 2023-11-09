@@ -1,4 +1,4 @@
-import {ROOT_DIRS} from '../contstants.js'
+import {ROOT_DIRS} from '../constants.js'
 
 export interface StatsSimplified {
   // in bytes

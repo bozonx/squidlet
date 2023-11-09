@@ -19,7 +19,7 @@ import type {
   HttpServerProps,
 } from '../../types/io/HttpServerIoType.js'
 import {IoBase} from '../../base/IoBase.js'
-import {SERVER_STARTING_TIMEOUT_SEC} from '../../types/contstants.js'
+import {SERVER_STARTING_TIMEOUT_SEC} from '../../types/constants.js'
 
 
 export interface HttpDriverRequest extends HttpRequestBase {
