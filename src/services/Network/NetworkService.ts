@@ -1,4 +1,3 @@
-import {IndexedEvents} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
@@ -8,13 +7,14 @@ import type {
   NetworkResponseStatus,
   NetworkSendRequest, NetworkSendResponse,
 } from '../../types/Network.js'
+import {Connections} from './Connections.js'
 
 
 export interface NetworkServiceApi {
   sendRequest<T = any>(request: NetworkSendRequest): Promise<NetworkIncomeResponse<T>>
   sendResponse(response: NetworkSendResponse): Promise<NetworkResponseStatus>
   listenRequests(category: string, handler: CategoryHandler, token?: string): void
-  removeRequestListener(category: number, token?: string): void
+  removeRequestListener(category: string, token?: string): void
 }
 
 export type CategoryHandler = (request: NetworkIncomeRequest) => void
@@ -32,6 +32,7 @@ export const DEFAULT_NETWORK_SERVICE_CFG = {
 export class NetworkService extends ServiceBase {
   private cfg!: NetworkServiceCfg
   private categoriesHandlers: Record<string, CategoryHandler> = {}
+  private readonly connections = new Connections(this)
 
 
   props: ServiceProps = {
@@ -56,12 +57,17 @@ export class NetworkService extends ServiceBase {
   }
 
   async destroy() {
+    this.categoriesHandlers = {}
+
+    await this.connections.destroy()
   }
 
   async start() {
+    await this.connections.start()
   }
 
   async stop(force?: boolean) {
+    await this.connections.stop()
   }
 
 
@@ -97,6 +103,9 @@ export class NetworkService extends ServiceBase {
 
   async sendResponse(response: NetworkSendResponse): Promise<NetworkResponseStatus> {
     // TODO: проверить что указан requestId
+    // TODO: сделать ещё один requetId или responseId
+    // TODO: отправить в connections
+    // TODO: ожидать с таймаутом response
 
     return {
       code: 0,
@@ -120,7 +129,7 @@ export class NetworkService extends ServiceBase {
     this.categoriesHandlers[category] = handler
   }
 
-  removeRequestListener(category: number, token?: string) {
+  removeRequestListener(category: string, token?: string) {
 
     // TODO: check token
 

@@ -7,12 +7,8 @@ export interface NetworkMessageBase {
   requestId: string
 }
 
-// export interface NetworkSerializedMessage extends NetworkMessageBase {
-//   payload: Uint8Array
-// }
-
-export interface NetworkIncomeRequest extends NetworkMessageBase {
-  payload: Record<string, any>
+export interface NetworkIncomeRequest<T = any> extends NetworkMessageBase {
+  payload: T
 }
 
 export interface NetworkIncomeResponse<T> extends NetworkMessageBase, NetworkResponseStatus {
@@ -26,7 +22,7 @@ export interface NetworkSendRequest
 }
 
 export interface NetworkSendResponse
-  extends Pick<NetworkMessageBase, 'toHostId' | 'category' | 'requestId'>
+  extends Pick<NetworkMessageBase, 'toHostId' | 'category' | 'requestId'>, NetworkResponseStatus
 {
   payload: Record<string, any>
 }

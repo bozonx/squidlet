@@ -76,7 +76,7 @@ export class AppManager {
   }
 
   getAppApi<T = Record<string, any>>(appName: string): T | undefined {
-    return this.apps[appName]?.getApi<T>?.()
+    return this.apps[appName]?.getApi?.()
   }
 
   getAppNames(): string[] {
