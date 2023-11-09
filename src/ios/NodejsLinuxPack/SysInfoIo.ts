@@ -4,7 +4,7 @@ import type SysInfoIoType from '../../types/io/SysInfoIoType.js'
 import {OS_ARCH, OS_TYPE, RUNTIME_ENV} from '../../types/SysInfo.js'
 import type {OsArch, OsType, RuntimeEnv, SysPermanentInfo} from '../../types/SysInfo.js'
 import type {IoIndex} from '../../types/types.js'
-import type {IoContext} from '../../system/Io/IoContext.js'
+import type {IoContext} from '../../system/context/IoContext.js'
 import {IoBase} from '../../base/IoBase.js'
 
 

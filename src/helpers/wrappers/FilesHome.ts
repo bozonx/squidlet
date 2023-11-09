@@ -5,7 +5,7 @@
 // TODO: ходить по симлинкам как по маунту в _Mnt
 
 
-import {DriversManager} from '../../system/driver/DriversManager.js'
+import {DriversManager} from '../../system/managers/DriversManager.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 export class FilesHome {

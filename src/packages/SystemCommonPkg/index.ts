@@ -1,4 +1,4 @@
-import type {PackageContext} from '../../system/package/PackageContext.js'
+import type {PackageContext} from '../../system/context/PackageContext.js'
 import type {PackageIndex} from '../../types/types.js'
 import {FilesDriverIndex} from '../../drivers/FilesDriver/FilesDriver.js'
 import {HttpServerDriverIndex} from '../../drivers/HttpServerDriver/HttpServerDriver.js'

@@ -1,6 +1,6 @@
 import {handleLogEvent, ConsoleLogger} from 'squidlet-lib'
 import type {LogLevel} from 'squidlet-lib'
-import type {PackageContext} from '../../system/package/PackageContext.js'
+import type {PackageContext} from '../../system/context/PackageContext.js'
 import type {PackageIndex} from '../../types/types.js'
 import {SystemEvents} from '../../types/contstants.js'
 

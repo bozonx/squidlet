@@ -3,7 +3,7 @@
 // TODO: как зарегать приложение??? какой-то install script???
 // TODO: можно навешаться на событие init, destroy
 
-import type {AppContext} from '../system/application/AppContext.js'
+import type {AppContext} from '../system/context/AppContext.js'
 
 export abstract class AppBase {
   abstract myName: string

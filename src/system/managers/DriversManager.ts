@@ -1,7 +1,7 @@
 import type {System} from '../System.js'
 import type {DriverIndex} from '../../types/types.js'
 import type {DriverBase} from '../../base/DriverBase.js'
-import {DriverContext} from './DriverContext.js'
+import {DriverContext} from '../context/DriverContext.js'
 
 
 export class DriversManager {

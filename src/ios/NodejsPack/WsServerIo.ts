@@ -6,7 +6,7 @@ import type {WsServerConnectionParams, WsServerIoType, WsServerProps} from '../.
 import type {WsCloseStatus} from '../../types/io/WsClientIoType.js'
 import {ServerIoBase} from '../../base/ServerIoBase.js'
 import type {IoIndex} from '../../types/types.js'
-import type {IoContext} from '../../system/Io/IoContext.js'
+import type {IoContext} from '../../system/context/IoContext.js'
 
 
 type ServerItem = [

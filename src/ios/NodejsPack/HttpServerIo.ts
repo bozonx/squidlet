@@ -5,7 +5,7 @@ import {HttpServerEvent} from '../../types/io/HttpServerIoType.js'
 import type {HttpServerIoType, HttpServerProps} from '../../types/io/HttpServerIoType.js'
 import {ServerIoBase} from '../../base/ServerIoBase.js'
 import type {IoIndex} from '../../types/types.js'
-import type {IoContext} from '../../system/Io/IoContext.js'
+import type {IoContext} from '../../system/context/IoContext.js'
 
 
 type ServerItem = [

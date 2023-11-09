@@ -1,5 +1,5 @@
 import yaml from 'yaml'
-import {pathJoin, mergeDeepObjects} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
+import {pathJoin, mergeDeepObjects} from 'squidlet-lib'
 import type {System} from '../System.js'
 import {systemCfgDefaults} from '../../types/SystemCfg.js'
 import type {SystemCfg} from '../../types/SystemCfg.js'

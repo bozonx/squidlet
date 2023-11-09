@@ -1,6 +1,6 @@
 import {pathJoin} from 'squidlet-lib'
 import type {System} from '../System.js'
-import {PackageContext} from './PackageContext.js'
+import {PackageContext} from '../context/PackageContext.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
 
 

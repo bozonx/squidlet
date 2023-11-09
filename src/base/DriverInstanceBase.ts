@@ -1,4 +1,4 @@
-import type {DriverContext} from '../system/driver/DriverContext.js'
+import type {DriverContext} from '../system/context/DriverContext.js'
 import type DriverFactoryBase from './DriverFactoryBase.js'
 
 

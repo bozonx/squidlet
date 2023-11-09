@@ -1,4 +1,4 @@
-import {IndexedEvents} from '../../../../../mnt/disk2/workspace/squidlet-lib/lib/index.js'
+import {IndexedEvents} from 'squidlet-lib'
 import {IoBase} from './IoBase.js'
 
 

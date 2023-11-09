@@ -1,5 +1,5 @@
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
-import type {DriversManager} from '../../system/driver/DriversManager.js'
+import type {DriversManager} from '../../system/managers/DriversManager.js'
 
 
 // TODO: файлы сразу сохранять и одновременно держать в памяти несколько секунд

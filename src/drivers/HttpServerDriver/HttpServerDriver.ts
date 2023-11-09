@@ -1,7 +1,7 @@
 import type {
   HttpRequest,
 } from 'squidlet-lib'
-import type {DriverContext} from '../../system/driver/DriverContext.js'
+import type {DriverContext} from '../../system/context/DriverContext.js'
 import type {DriverIndex} from '../../types/types.js'
 import DriverFactoryBase from '../../base/DriverFactoryBase.js'
 import DriverInstanceBase from '../../base/DriverInstanceBase.js'

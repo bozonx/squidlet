@@ -5,7 +5,7 @@
 
 export {startSystem} from './starters/devLocal/startSystem.js'
 export {System} from './system/System.js'
-export * from './system/package/PackageContext.js'
+export * from './system/context/PackageContext.js'
 export * from './base/AppBase.js'
 export * from './helpers/helpers.js'
 export * from './types/contstants.js'

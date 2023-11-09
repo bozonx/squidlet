@@ -6,7 +6,7 @@ import type {WsClientIoType, WebSocketClientProps} from '../../types/io/WsClient
 import {IoBase} from '../../base/IoBase.js'
 import {makeConnectionParams} from './WsServerIo.js'
 import type {IoIndex} from '../../types/types.js'
-import type {IoContext} from '../../system/Io/IoContext.js'
+import type {IoContext} from '../../system/context/IoContext.js'
 
 
 

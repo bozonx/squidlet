@@ -1,6 +1,6 @@
-import type {System} from '../System.js'
 import type {Logger} from 'squidlet-lib'
-import type {IoManager} from '../Io/IoManager.js'
+import type {System} from '../System.js'
+import type {IoManager} from '../managers/IoManager.js'
 
 
 export class DriverContext {

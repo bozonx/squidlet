@@ -4,7 +4,7 @@ import type {HttpClientIoType} from '../../types/io/HttpClientIoType.js'
 import type {HttpRequest, HttpResponse} from 'squidlet-lib'
 import {IoBase} from '../../base/IoBase.js'
 import type {IoIndex} from '../../types/types.js'
-import type {IoContext} from '../../system/Io/IoContext.js'
+import type {IoContext} from '../../system/context/IoContext.js'
 
 
 export const HttpClientIoIndex: IoIndex = (ctx: IoContext) => {

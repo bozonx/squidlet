@@ -1,4 +1,4 @@
-import type {IoContext} from '../system/Io/IoContext.js'
+import type {IoContext} from '../system/context/IoContext.js'
 
 
 export class IoBase {

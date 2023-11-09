@@ -1,7 +1,7 @@
 import {isUtf8} from 'buffer'
 import {pathBasename, pathDirname, pathJoin} from 'squidlet-lib'
 import {DriverBase} from '../../base/DriverBase.js'
-import type {DriverContext} from '../../system/driver/DriverContext.js'
+import type {DriverContext} from '../../system/context/DriverContext.js'
 import type {DriverIndex, PermissionFileType} from '../../types/types.js'
 import type FilesIoType from '../../types/io/FilesIoType.js'
 import type {StatsSimplified} from '../../types/io/FilesIoType.js'

@@ -4,7 +4,7 @@ import {DRIVER_NAMES, EXTERNAL_ROOT_DIR, ROOT_DIRS} from '../../types/contstants
 import {FilesLog} from '../../helpers/wrappers/FilesLog.js'
 import {FilesWrapper} from '../../helpers/wrappers/FilesWrapper.js'
 import {FilesReadOnly} from '../../helpers/wrappers/FilesReadOnly.js'
-import type {DriversManager} from '../driver/DriversManager.js'
+import type {DriversManager} from '../managers/DriversManager.js'
 import type {System} from '../System.js'
 import {FilesHome} from '../../helpers/wrappers/FilesHome.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'

@@ -1,6 +1,6 @@
 import {Promised, IndexedEventEmitter} from 'squidlet-lib'
 import type {DriverIndex} from '../../types/types.js'
-import type {DriverContext} from '../../system/driver/DriverContext.js'
+import type {DriverContext} from '../../system/context/DriverContext.js'
 import DriverFactoryBase from '../../base/DriverFactoryBase.js'
 import {IO_NAMES} from '../../types/contstants.js'
 import {WsServerEvent} from '../../types/io/WsServerIoType.js'

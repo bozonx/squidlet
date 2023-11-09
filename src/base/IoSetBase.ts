@@ -1,7 +1,7 @@
 import type {IoBase} from './IoBase.js'
-import type {PackageContext} from '../system/package/PackageContext.js'
+import type {PackageContext} from '../system/context/PackageContext.js'
 import type {IoIndex} from '../types/types.js'
-import type {IoContext} from '../system/Io/IoContext.js'
+import type {IoContext} from '../system/context/IoContext.js'
 
 
 export class IoSetBase {

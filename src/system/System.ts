@@ -1,16 +1,16 @@
 import {callSafely, IndexedEventEmitter, LogPublisher} from 'squidlet-lib'
 import {SystemEvents} from '../types/contstants.js'
-import {IoManager} from './Io/IoManager.js'
-import {ServicesManager} from './service/ServicesManager.js'
+import {IoManager} from './managers/IoManager.js'
+import {ServicesManager} from './managers/ServicesManager.js'
 import {ApiManager} from './managers/ApiManager.js'
 import {FilesManager} from './managers/FilesManager.js'
 import {ConfigsManager} from './managers/ConfigsManager.js'
 import {PermissionsManager} from './managers/PermissionsManager.js'
 import type {PackageIndex} from '../types/types.js'
-import {PackageManager} from './package/PackageManager.js'
-import {DriversManager} from './driver/DriversManager.js'
-import {AppManager} from './application/AppManager.js'
-import {AppUiManager} from './application/AppUiManager.js'
+import {PackageManager} from './managers/PackageManager.js'
+import {DriversManager} from './managers/DriversManager.js'
+import {AppManager} from './managers/AppManager.js'
+import {AppUiManager} from './managers/AppUiManager.js'
 
 
 export class System {
