@@ -31,5 +31,5 @@ export abstract class AppBase {
    * Put here only api which is accessible on local machine.
    * For api which is accessible on network use PublicApiService
    */
-  getApi?(): Record<string, any>
+  getApi?(): any
 }

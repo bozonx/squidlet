@@ -2,12 +2,13 @@ import {deepGet, deepSet} from 'squidlet-lib'
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
 import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
-import {DRIVER_NAMES, LOCAL_HOST, SYSTEM_SERVICE_NAMES} from '../../types/contstants.js'
+import {SYSTEM_SERVICE_NAMES} from '../../types/contstants.js'
 import type {ServiceProps} from '../../types/ServiceProps.js'
+import type {NetworkServiceApi} from '../Network/NetworkService.js'
 
 
 export interface PublicApiServiceApi {
-  callMethod(host: string | undefined, pathToMethod: string, ...args: any[]): Promise<any>
+  callMethod(toHostId: string | undefined, pathToMethod: string, ...args: any[]): Promise<any>
   registerNode(nodePath: string, item: Record<string, any> | Function, accessToken?: string): void
 }
 
@@ -21,6 +22,7 @@ export interface PublicApiServiceCfg {
 
 export const DEFAULT_PUBLIC_API_SERVICE_CFG = {
 }
+export const PUBLIC_API_CATEGORY = 'PUBLIC_API'
 
 export class PublicApiService extends ServiceBase {
   private cfg!: PublicApiServiceCfg
@@ -38,7 +40,7 @@ export class PublicApiService extends ServiceBase {
     return {
       callMethod: this.callMethod.bind(this),
       registerNode: this.registerNode.bind(this),
-    }
+    } as PublicApiServiceApi
   }
 
   async init(onFall: (err: SubprogramError) => void, loadedCfg?: PublicApiServiceCfg) {
@@ -57,10 +59,14 @@ export class PublicApiService extends ServiceBase {
   }
 
 
-  async callMethod(hostId: string | undefined, pathToMethod: string, ...args: any[]): Promise<any> {
+  async callMethod(
+    toHostId: string | undefined,
+    pathToMethod: string,
+    ...args: any[]
+  ): Promise<any> {
     // TODO: валидировать - не должно быть ф-и, классов, символов в аргументах в глубине
 
-    if (!hostId) {
+    if (!toHostId) {
       // TODO: либо хост тот же что и мой
       //  - спросить systemInfoService через контекст
 
@@ -73,14 +79,26 @@ export class PublicApiService extends ServiceBase {
 
       // TODO: валидировать что в результате не должно быть не нужных типов в глубине
 
-      return result
+      return result as any
     }
     else {
       // remote call
-      const network = this.ctx.getServiceApi(SYSTEM_SERVICE_NAMES.Network)
+      const network = this.ctx.getServiceApi<NetworkServiceApi>(SYSTEM_SERVICE_NAMES.Network)
 
+      if (!network) throw new Error(`Can't find NetworkService`)
 
-      // TODO: call network
+      const resp = await network.sendRequest({
+        toHostId,
+        category: PUBLIC_API_CATEGORY,
+        payload: {
+          method: pathToMethod,
+          args,
+        },
+      })
+
+      if (resp.error) throw resp.error
+
+      return resp.payload as any
     }
   }
 

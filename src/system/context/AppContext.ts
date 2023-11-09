@@ -56,12 +56,12 @@ export class AppContext {
     return this.system.events
   }
 
-  getServiceApi(serviceName: string): Record<string, any> | undefined {
-    return this.system.services.getServiceApi(serviceName)
+  getServiceApi<T = Record<string, any>>(serviceName: string): T | undefined {
+    return this.system.services.getServiceApi<T>(serviceName)
   }
 
-  getAppApi(appName: string): Record<string, any> | undefined {
-    return this.system.apps.getAppApi(appName)
+  getAppApi<T = Record<string, any>>(appName: string): T | undefined {
+    return this.system.apps.getAppApi<T>(appName)
   }
 
 

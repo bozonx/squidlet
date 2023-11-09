@@ -131,8 +131,8 @@ export class ServicesManager {
     return this.services[serviceName] as T
   }
 
-  getServiceApi(serviceName: string): Record<string, any> | undefined {
-    return this.services[serviceName]?.getApi?.()
+  getServiceApi<T = Record<string, any>>(serviceName: string): T | undefined {
+    return this.services[serviceName]?.getApi<T>?.()
   }
 
   getNames(): string[] {

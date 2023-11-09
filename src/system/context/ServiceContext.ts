@@ -23,8 +23,8 @@ export class ServiceContext {
     return this.system.events
   }
 
-  getServiceApi(serviceName: string): Record<string, any> | undefined {
-    return this.system.services.getServiceApi(serviceName)
+  getServiceApi<T = Record<string, any>>(serviceName: string): T | undefined {
+    return this.system.services.getServiceApi<T>(serviceName)
   }
 
 

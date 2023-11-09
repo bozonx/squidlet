@@ -34,7 +34,7 @@ export abstract class ServiceBase {
    * Put here only api which is accessible on local machine.
    * For api which is accessible on network use PublicApiService
    */
-  getApi?(): Record<string, any>
+  getApi?(): any
 
   abstract start(): Promise<void>
   abstract stop(force?: boolean): Promise<void>

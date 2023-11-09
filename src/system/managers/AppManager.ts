@@ -75,8 +75,8 @@ export class AppManager {
     return this.apps[appName] as T
   }
 
-  getAppApi(appName: string): Record<string, any> | undefined {
-    return this.apps[appName]?.getApi?.()
+  getAppApi<T = Record<string, any>>(appName: string): T | undefined {
+    return this.apps[appName]?.getApi<T>?.()
   }
 
   getAppNames(): string[] {
