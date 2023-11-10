@@ -7,18 +7,18 @@
 
 import {DriversManager} from '../../system/managers/DriversManager.js'
 import type {FilesDriver} from '../../drivers/FilesDriver/FilesDriver.js'
+import {FilesWrapper} from './FilesWrapper.js'
 
-export class FilesHome {
-  // it is relative path of system root dir
-  readonly rootDir: string
-  private readonly filesDriver: FilesDriver
-
-  constructor(filesDriver: FilesDriver, rootDir: string) {
-    this.filesDriver = filesDriver
-    // TODO: а зачем оно убиралось???
-    //this.rootDir = clearRelPathLeft(rootDir)
-    this.rootDir = rootDir
-  }
-
+export class FilesHome extends FilesWrapper {
+  // // it is relative path of system root dir
+  // readonly rootDir: string
+  // private readonly filesDriver: FilesDriver
+  //
+  // constructor(filesDriver: FilesDriver, rootDir: string) {
+  //   this.filesDriver = filesDriver
+  //   // TODO: а зачем оно убиралось???
+  //   //this.rootDir = clearRelPathLeft(rootDir)
+  //   this.rootDir = rootDir
+  // }
 
 }

@@ -6,7 +6,7 @@
 //       это конечный пункт то в network
 
 import {serializeJson} from 'squidlet-lib'
-import {NetworkService} from './NetworkService.js'
+import type {NetworkService} from './NetworkService.js'
 import type {
   NetworkIncomeRequest,
   NetworkMessageBase,

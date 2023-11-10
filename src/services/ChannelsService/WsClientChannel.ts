@@ -22,7 +22,7 @@ export class WsClientChannel implements ChannelType {
   }
 
   registerChannel(connectionId: string, channel: number): ChannelInstanceType {
-
+    return {} as any
   }
 
 }

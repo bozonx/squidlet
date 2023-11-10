@@ -1,5 +1,5 @@
 import type {ServiceIndex, SubprogramError} from '../../types/types.js'
-import {ServiceContext} from '../../system/context/ServiceContext.js'
+import type {ServiceContext} from '../../system/context/ServiceContext.js'
 import {ServiceBase} from '../../base/ServiceBase.js'
 import type {WsServerProps} from '../../types/io/WsServerIoType.js'
 import {DEFAULT_WS_CTRL_PORT, LOCAL_HOST} from '../../types/constants.js'
