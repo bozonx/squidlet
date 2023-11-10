@@ -26,7 +26,7 @@ export class SessionsService extends ServiceBase {
 
 
   props: ServiceProps = {
-    requireDriver: [DRIVER_NAMES.WsServerDriver],
+    //requireDriver: [DRIVER_NAMES.WsServerDriver],
     ...super.props,
   }
 
