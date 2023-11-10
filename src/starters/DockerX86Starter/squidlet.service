@@ -1,0 +1,15 @@
+[Unit]
+Description=Squidlet IoT control system
+After=networking.service
+After=pigpiod.service
+Requires=pigpiod.service
+
+[Service]
+User=pi
+Restart=always
+RestartSec=10
+#ExecStart=/home/pi/squidlet/squidletctl start /home/pi/home/hostConfig.yaml
+ExecStart=/bin/bash -c "cd /home/pi/squidlet; ./squidletctl start /home/pi/home/hostConfig.yaml"
+
+[Install]
+WantedBy=multi-user.target

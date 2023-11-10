@@ -1,5 +1,6 @@
 import type {ChannelType} from './ChannelType.js'
 import type {WsServerProps} from '../../types/io/WsServerIoType.js'
+import {ChannelInstanceType} from './ChannelType.js'
 
 
 export class WsServerChannel implements ChannelType {
@@ -34,6 +35,10 @@ export class WsServerChannel implements ChannelType {
 
 
   async send(channel: number) {
+
+  }
+
+  registerChannel(connectionId: string, channel: number): ChannelInstanceType {
 
   }
 

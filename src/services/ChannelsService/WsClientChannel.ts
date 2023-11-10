@@ -1,4 +1,4 @@
-import type {ChannelType} from './ChannelType.js'
+import type {ChannelInstanceType, ChannelType} from './ChannelType.js'
 import type {WebSocketClientProps} from '../../types/io/WsClientIoType.js'
 
 
@@ -19,6 +19,10 @@ export class WsClientChannel implements ChannelType {
 
   makeConnectionId(): string {
     return this.props.url
+  }
+
+  registerChannel(connectionId: string, channel: number): ChannelInstanceType {
+
   }
 
 }

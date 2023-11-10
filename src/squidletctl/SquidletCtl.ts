@@ -5,6 +5,11 @@ import {promisify} from 'node:util'
 import {DEFAULT_WS_CTRL_PORT, LOCAL_HOST} from '../types/constants.js'
 
 
+// TODO: add start of io-server
+// TODO: add log - read logs from remote server
+// TODO: add call api
+// TODO: add restart/reboot/info of remote server - it is just sugar of api call
+
 export const execPromise = promisify(exec)
 
 

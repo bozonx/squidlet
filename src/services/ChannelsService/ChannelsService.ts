@@ -7,7 +7,7 @@ import {WsServerChannel} from './WsServerChannel.js'
 import type {ChannelInstanceType, ChannelType} from './ChannelType.js'
 
 
-export const CtrlServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
+export const ChannelServiceIndex: ServiceIndex = (ctx: ServiceContext): ServiceBase => {
   return new ChannelsService(ctx)
 }
 export const CHANNEL_ID_DELIMITER = '|'
@@ -25,8 +25,8 @@ export interface ChannelsServiceCfg {
 }
 
 export const CHANNELS_WRAPPERS = {
-  WsClientChannel: typeof WsClientChannel,
-  WsServerChannel: typeof WsServerChannel,
+  WsClientChannel: typeof WsClientChannel.constructor,
+  WsServerChannel: typeof WsServerChannel.constructor,
 }
 
 export const DEFAULT_CHANNELS_SERVICE_CFG = {
@@ -57,16 +57,7 @@ export class ChannelsService extends ServiceBase {
     this.cfg = (loadedCfg) ? loadedCfg : DEFAULT_CHANNELS_SERVICE_CFG
 
     for (const item of this.cfg.connections) {
-      const instance: ChannelType = new (item.type as any)(item.props)
-      const id = item.type + CHANNEL_ID_DELIMITER + instance.makeConnectionId()
-
-      if (this.connections[id]) {
-        throw new Error(`ChannelsService: Can't register the same connection as exists. ${JSON.stringify(item)}`)
-      }
-
-      // TODO: надо проверить зависимый драйвер
-
-      this.connections[id] = instance
+      this.makeConnection(item.type, item.props)
     }
 
   }
@@ -88,6 +79,12 @@ export class ChannelsService extends ServiceBase {
   }
 
 
+  async newConnection(type: keyof typeof CHANNELS_WRAPPERS, props: Record<string, any>) {
+    const id = this.makeConnection(type, props)
+
+    await this.connections[id].init()
+  }
+
   registerChannel(id: string, channel: number, token?: string): ChannelInstanceType {
     const [type, connectionId] = id.split(CHANNEL_ID_DELIMITER)
 
@@ -96,4 +93,19 @@ export class ChannelsService extends ServiceBase {
     return this.connections[id].registerChannel(connectionId, channel)
   }
 
+
+  private makeConnection(type: keyof typeof CHANNELS_WRAPPERS, props: Record<string, any>): string {
+    const instance: ChannelType = new (CHANNELS_WRAPPERS[type] as any)(props)
+    const id = type + CHANNEL_ID_DELIMITER + instance.makeConnectionId()
+
+    if (this.connections[id]) {
+      throw new Error(`ChannelsService: Can't register the same connection as exists. "${type}": ${JSON.stringify(props)}`)
+    }
+
+    // TODO: надо проверить зависимый драйвер
+
+    this.connections[id] = instance
+
+    return id
+  }
 }
