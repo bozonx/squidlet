@@ -41,7 +41,7 @@ export default interface FilesIoType {
   rmdir(pathTo: string): Promise<void>
   unlink(pathTo: string): Promise<void>
   writeFile(pathTo: string, data: string | Uint8Array): Promise<void>
-  stat(pathTo: string): Promise<StatsSimplified>
+  stat(pathTo: string): Promise<StatsSimplified | undefined>
   // Copy specified files. Use full path
   // files is [SRC, DEST][]
   copyFiles(files: [string, string][]): Promise<void>

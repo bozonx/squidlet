@@ -84,7 +84,7 @@ export class FilesDriver extends DriverBase implements FilesDriverType {
     return this.io.writeFile(pathTo, data)
   }
 
-  async stat(pathTo: string): Promise<StatsSimplified> {
+  async stat(pathTo: string): Promise<StatsSimplified | undefined> {
     this.checkPermissions(pathTo, 'r')
 
     return this.io.stat(pathTo)
@@ -129,14 +129,16 @@ export class FilesDriver extends DriverBase implements FilesDriverType {
   ////////// ADDITIONAL
 
   /**
-   * Remove one file or an empty dir
+   * Remove one file or an empty dir.
+   * It doesn't rise an error if file doesn't exists
    */
   async rm(pathToFileOrDir: string) {
     this.checkPermissions(pathToFileOrDir, 'w')
 
-    const stats: StatsSimplified = await this.io.stat(pathToFileOrDir)
+    const stats: StatsSimplified | undefined = await this.io.stat(pathToFileOrDir)
 
-    if (stats.dir) {
+    if (!stats) return
+    else if (stats.dir) {
       return this.io.rmdir(pathToFileOrDir)
     }
     else {
@@ -179,20 +181,30 @@ export class FilesDriver extends DriverBase implements FilesDriverType {
     return this.io.renameFiles([[pathToFileOrDir, newPath]])
   }
 
+  /**
+   * Check if it is a dir.
+   * It will return false if dir doesn't exist
+   * @param pathToDir
+   */
   async isDir(pathToDir: string): Promise<boolean> {
     this.checkPermissions(pathToDir, 'r')
 
-    const stats: StatsSimplified = await this.io.stat(pathToDir)
+    const stats: StatsSimplified | undefined = await this.io.stat(pathToDir)
 
-    return stats.dir
+    return stats?.dir || false
   }
 
+  /**
+   * Check if it is a file and not symlink.
+   * It will return false if dir doesn't exist
+   * @param pathToFile
+   */
   async isFile(pathToFile: string): Promise<boolean> {
     this.checkPermissions(pathToFile, 'r')
 
-    const stats: StatsSimplified = await this.io.stat(pathToFile)
+    const stats: StatsSimplified | undefined = await this.io.stat(pathToFile)
 
-    return !stats.dir && !stats.symbolicLink
+    return (!stats?.dir && !stats?.symbolicLink) || false
   }
 
   /**
@@ -207,14 +219,7 @@ export class FilesDriver extends DriverBase implements FilesDriverType {
     // TODO: проверить что stat вернет ошибку если файла нет
     // TODO: и какую именно ошибку
 
-    try {
-      await this.io.stat(pathToFileOrDir)
-
-      return true
-    }
-    catch (e) {
-      return false
-    }
+    return Boolean(await this.io.stat(pathToFileOrDir))
   }
 
   async isFileUtf8(pathTo: string): Promise<boolean> {
@@ -250,9 +255,10 @@ export class FilesDriver extends DriverBase implements FilesDriverType {
     this.checkPermissions(destDir, 'w')
 
     for (const item of resolvedSrc) {
-      const fileStats: StatsSimplified = await this.io.stat(item)
+      const fileStats: StatsSimplified | undefined = await this.io.stat(item)
 
-      if (fileStats.dir) {
+      if (!fileStats) throw new Error(`File "${item}" doesn't exist`)
+      else if (fileStats.dir) {
         // TODO: !!!! support copying dir recursively
       }
       else {

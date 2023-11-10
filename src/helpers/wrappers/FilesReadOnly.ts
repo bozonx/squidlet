@@ -32,7 +32,7 @@ export class FilesReadOnly implements ReadOnlyFilesDriverType {
     return this.filesDriver.readlink(this.preparePath(pathTo))
   }
 
-  async stat(pathTo: string): Promise<StatsSimplified> {
+  async stat(pathTo: string): Promise<StatsSimplified | undefined> {
     return this.filesDriver.stat(this.preparePath(pathTo))
   }
 

@@ -6,7 +6,7 @@ export interface ReadOnlyFilesDriverType {
   readTextFile(pathTo: string): Promise<string>
   readBinFile(pathTo: string): Promise<Uint8Array>
   readlink(pathTo: string): Promise<string>
-  stat(pathTo: string): Promise<StatsSimplified>
+  stat(pathTo: string): Promise<StatsSimplified | undefined>
   ////////// ADDITIONAL
   isDir(pathToDir: string): Promise<boolean>
   isFile(pathToFile: string): Promise<boolean>

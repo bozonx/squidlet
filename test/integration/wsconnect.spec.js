@@ -9,6 +9,10 @@ describe('integration/wsconnect', () => {
         if (prop === 'myName') return 'FilesIo'
 
         return function(...a) {
+          if (prop === 'stat' && a[0].indexOf('/cfgLocal/system/ios/FilesIo.yml') === 0) {
+            return
+          }
+
           console.log(222, prop, a)
         }
       })
