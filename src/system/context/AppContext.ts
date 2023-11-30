@@ -12,6 +12,33 @@ import {FilesCache} from '../../helpers/wrappers/FilesCache.js'
 import {FilesDb} from '../../helpers/wrappers/FilesDb.js'
 
 
+
+// export const NOT_ALLOWED_CTX_PROPS: string[] = [
+//   'appName',
+//   'drivers',
+//   'events',
+//   'getServiceApi',
+//   'getAppApi',
+//   'constructor',
+//   'init',
+//   'destroy',
+//   'registerAppUi',
+// ]
+export const CTX_SUB_ITEMS = [
+  'api',
+  'appFiles',
+  'appDataLocal',
+  'cacheLocal',
+  'cfgLocal',
+  'cfgSynced',
+  'db',
+  'filesLog',
+  'tmpLocal',
+  'home',
+  'external',
+  'log',
+]
+
 export class AppContext {
   appName: string
 

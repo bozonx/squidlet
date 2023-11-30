@@ -8,36 +8,48 @@ import type {UiApiRequestData} from '../services/UiWsApiService/UiWsApiService.j
 import {makeRequestId} from '../helpers/helpers.js'
 import {DEFAULT_UI_WS_PORT} from '../types/constants.js'
 import type {ResponseMessage, RequestMessage} from '../types/Message.js'
+import type {AppBase} from '../base/AppBase.js'
+import {CTX_SUB_ITEMS} from '../system/context/AppContext.js'
+import {NOT_ALLOWED_APP_PROPS} from '../base/AppBase.js'
 
 // it needs to export the port
 export const APP_API_WS_PORT = DEFAULT_UI_WS_PORT
 
 
-//const PROTOCOL = 'squidlet-app-api'
-//
-// /**
-//  * this is api which is used in frontend to connect to backend api
-//  */
-//
-// const WsClass: new (url: string, protocol: string) => WebSocket = WebSocket
-// // @ts-ignore
-// const wsHost = window.SQUIDLET_API_HOST || DEFAULT_UI_HTTP_PORT
-// // @ts-ignore
-// const wsPort = window.SQUIDLET_API_PORT || DEFAULT_UI_WS_PORT
-//
-// // @ts-ignore
-// window.squidletUiApi =
-//   new UiApiMain(wsHost, wsPort, WsClass)
-
-
-// TODO: перенести в squidlet
 // TODO: таймаут ожидания и реконнект
 
 
-export class SquidletAppApiConnection {
+export function squidletAppWrapper<YourApp = AppBase>(handleCall: (path: string, args: any[]) => any): YourApp {
+  const handler: ProxyHandler<AppBase> = {
+    get(target: any, prop: string) {
+      if (prop === 'ctx') {
+        return new Proxy({} as any, { get(target: any, ctxProp: string) {
+          //if (NOT_ALLOWED_CTX_PROPS.includes(prop)) return
+          if (CTX_SUB_ITEMS.includes(ctxProp)) {
+            return new Proxy({} as any, { get(target: any, ctxPropParam: string) {
+              return function (...a: any[]) {
+                return handleCall(`${prop}.${ctxProp}.${ctxPropParam}`, a)
+              }
+            }})
+          }
+        }})
+      }
+      else if (NOT_ALLOWED_APP_PROPS.includes(prop)) return
+      // user defined props
+      return (...a: any[]) => handleCall(prop, a)
+    },
+  }
+
+  return new Proxy({} as any, handler)
+}
+
+
+
+export class SquidletAppApiConnection<YourApp = AppBase> {
   incomeMessages = new IndexedEvents()
   socket: WebSocket
-
+  app: YourApp
+  errorHandler: (response: ResponseMessage) => void
   private _startedPromised = new Promised<void>()
 
   get startedPromise(): Promise<void> {
@@ -46,12 +58,16 @@ export class SquidletAppApiConnection {
 
 
   constructor(
+    appName: string,
     wsHost: string,
     wsPort: string,
     WsClass: new (url: string, protocol: string) => WebSocket,
-    isSecure: boolean = false
+    isSecure: boolean = false,
+    errorHandler: (response: ResponseMessage) => void
   ) {
-    const url = `${(isSecure) ? 'wss' : 'ws'}://${wsHost}:${wsPort}`
+    this.errorHandler = errorHandler
+    this.app = squidletAppWrapper<YourApp>(this.handleAppMethod)
+    const url = `${(isSecure) ? 'wss' : 'ws'}://${wsHost}:${wsPort}/${appName}`
     this.socket = new WsClass(url, '0')
 
     this.socket.onmessage = this.handleWebsocketMessage
@@ -77,10 +93,11 @@ export class SquidletAppApiConnection {
   //   })
   // }
 
-  async send(msgObj: Omit<RequestMessage<UiApiRequestData>, 'requestId'>): Promise<ResponseMessage> {
+  // TODO: review RequestMessage
+  async send(msgObj: Omit<RequestMessage<UiApiRequestData>, 'requestId' | 'url'>): Promise<ResponseMessage> {
     await this.startedPromise
 
-    const request: RequestMessage<UiApiRequestData> = {
+    const request: Omit<RequestMessage<UiApiRequestData>, 'url'> = {
       requestId: makeRequestId(),
       ...msgObj,
     }
@@ -114,6 +131,19 @@ export class SquidletAppApiConnection {
     console.warn(`WS connection closed`)
 
     // TODO: reconnect
+  }
+
+  private handleAppMethod = async (path: string, args: any[]) => {
+    const resp = await this.send({
+      data: {
+        method: path,
+        arguments: args,
+      },
+    })
+
+    this.errorHandler(resp)
+
+    return resp
   }
 
 }

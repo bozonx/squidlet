@@ -1,4 +1,14 @@
 
+export const NOT_ALLOWED_APP_PROPS = [
+  'myName',
+  'requireDriver',
+  'constructor',
+  '$setCtx',
+  'init',
+  'destroy',
+  'getApi',
+]
+
 
 // TODO: как зарегать приложение??? какой-то install script???
 // TODO: можно навешаться на событие init, destroy

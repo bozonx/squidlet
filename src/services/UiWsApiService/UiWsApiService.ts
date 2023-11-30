@@ -81,6 +81,8 @@ export class UiWsApiService extends ServiceBase {
   private handleConnection = (connectionId: string, request: WsServerConnectionParams) => {
 
     // TODO: подключиться к сессии вкладки и приложения
+    // TODO: в request передается имя приложения в url
+    // TODO: хотя наверное его проще резолвить из sessionId
 
     //console.log(222, connectionId, request)
   }

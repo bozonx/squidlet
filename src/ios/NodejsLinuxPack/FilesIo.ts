@@ -151,9 +151,16 @@ export class FilesIo extends IoBase implements FilesIoType {
     await this.chown(fullPath)
   }
 
-  async stat(pathTo: string): Promise<StatsSimplified> {
+  async stat(pathTo: string): Promise<StatsSimplified | undefined> {
     const fullPath = this.makePath(pathTo)
-    const stat: Stats = await fs.lstat(fullPath)
+    let stat: Stats
+
+    try {
+      stat = await fs.lstat(fullPath)
+    }
+    catch (e) {
+      return undefined
+    }
 
     return {
       size: stat.size,
